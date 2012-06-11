@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/pref_title_category_defaults" >
+        <ListPreference
+            android:defaultValue="0"
+            android:key="default_report"
+            android:title="@string/pref_title_default_report" />
+        <ListPreference
+            android:defaultValue="1"
+            android:key="default_car"
+            android:title="@string/pref_title_default_car" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_title_category_units" >
+        <EditTextPreference
+            android:defaultValue="EUR"
+            android:key="unit_currency"
+            android:title="@string/pref_title_unit_currency" />
+        <EditTextPreference
+            android:defaultValue="l"
+            android:key="unit_volume"
+            android:title="@string/pref_title_unit_volume" />
+        <EditTextPreference
+            android:defaultValue="km"
+            android:key="unit_distance"
+            android:title="@string/pref_title_unit_distance" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

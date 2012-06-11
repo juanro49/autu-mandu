@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="reports">
+        <item>Fuel consumption</item>
+        <item>Fuel price</item>
+        <item>Costs</item>
+        <!--
+        <item>Price per refueling</item>
+        <item>Volume per refueling</item>
+        <item>Trips</item>
+        <item>Total tachometer</item>
+        -->
+    </string-array>
+    <string-array name="color_names">
+        <item>Blue</item>
+        <item>Cyan</item>
+        <item>Green</item>
+        <item>Magenta</item>
+        <item>Red</item>
+        <item>Yellow</item>
+    </string-array>
+
+    <integer-array name="colors">
+        <item>0xff0000ff</item>
+        <item>0xff00ffff</item>
+        <item>0xff00ff00</item>
+        <item>0xffff00ff</item>
+        <item>0xffff0000</item>
+        <item>0xffffff00</item>
+    </integer-array>
+
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <header
+        android:fragment="me.kuehle.carreport.PreferencesActivity$GeneralFragment"
+        android:title="@string/pref_title_header_general" />
+    <header
+        android:fragment="me.kuehle.carreport.PreferencesActivity$CarsFragment"
+        android:title="@string/pref_title_header_cars" />
+    <header
+        android:fragment="me.kuehle.carreport.PreferencesActivity$AboutFragment"
+        android:title="@string/pref_title_header_about" />
+
+</preference-headers>

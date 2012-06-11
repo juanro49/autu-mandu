@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    <fragment
+        android:id="@+id/list"
+        android:name="me.kuehle.carreport.ViewDataListFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.4" />
+
+    <View
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_border_left" />
+
+    <FrameLayout
+        android:id="@+id/edit"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.6"
+        android:background="@android:color/background_dark" />
+
+    <View
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_border_right" />
+
+</LinearLayout>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_description">Tragen Sie die laufenden Kosten Ihres Autos ein und erhalten Sie schöne Reports.</string>
+    <string name="about_licenses">Lizenzen</string>
+    <string name="hint_tachometer">Kilometerstand</string>
+    <string name="hint_volume">Liter</string>
+    <string name="hint_price">Preis</string>
+    <string name="hint_note">Notiz</string>
+    <string name="hint_title">Titel</string>
+    <string name="label_partial">Teilfüllung</string>
+    <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
+    <string name="menu_add_other">Andere Kosten hinzufügen</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_save">Speichern</string>
+    <string name="menu_cancel">Abbrechen</string>
+    <string name="menu_delete">Löschen</string>
+    <string name="menu_view_data">Daten ansehen</string>
+    <string name="menu_add_car">Auto hinzufügen</string>
+    <string name="alert_delete_refueling_message">Diese Tankfüllung wird gelöscht.</string>
+    <string name="alert_delete_other_message">Diese anderen Kosten werden gelöscht.</string>
+    <string name="section_car">Auto</string>
+    <string name="section_note">Notiz</string>
+    <string name="section_data">Daten</string>
+    <string name="title_add_refueling">Tankfüllung hinzufügen</string>
+    <string name="title_settings">Einstellungen</string>
+    <string name="title_view_data">Daten</string>
+    <string name="title_add_other">Andere Kosten hinzufügen</string>
+    <string name="cab_title_selected">%d ausgewählt</string>
+    <string name="edit_title_refueling">Tankfüllung</string>
+    <string name="alert_add_car_title">Auto hinzufügen</string>
+    <string name="alert_edit_car_title">Auto bearbeiten</string>
+    <string name="alert_add_car_message">Name des Autos eingeben:</string>
+    <string name="alert_delete_cars_message">Die %d ausgewählten Autos werden gelöscht.</string>
+    <string name="alert_cannot_delete_last_car">Das letzte Auto kann nicht gelöscht werden.</string>
+    <string name="alert_delete_refuelings_message">Die %d ausgewählten Tankfüllungen werden gelöscht.</string>
+    <string name="alert_about_licenses_title">Lizenzen</string>
+    <string name="alert_delete_title">Löschen bestätigen</string>
+    <string name="alert_delete_others_message">Die %d ausgewählten anderen Kosten werden gelöscht.</string>
+    <string name="alert_change_color_title">Farbe auswählen</string>
+    <string name="tab_indicator_refuelings">Tankfüllungen</string>
+    <string name="tab_indicator_other">Andere Kosten</string>
+	<string name="report_not_enough_data">Zu wenige Daten</string>
+    <string name="report_day">Tag</string>
+    <string name="report_month">Monat</string>
+    <string name="report_year">Jahr</string>
+    <string name="report_since">seit %s</string>
+    <string name="report_overall">Gesamt</string>
+    <string name="report_lowest">Niedrigster</string>
+    <string name="report_highest">Höchster</string>
+    <string name="report_average">Durchschnitt</string>
+    <string name="report_title_fuel_consumption">Benzinverbrauch</string>
+    <string name="report_title_fuel_price">Benzinpreis</string>
+    <string name="pref_title_header_about">Über</string>
+    <string name="pref_title_header_general">Standards</string>
+    <string name="pref_title_header_cars">Autos</string>
+    <string name="pref_title_category_defaults">Standards</string>
+    <string name="pref_title_category_units">Einheiten</string>
+    <string name="pref_title_default_car">Auto</string>
+    <string name="pref_title_unit_currency">Währung</string>
+    <string name="pref_title_unit_volume">Volumen</string>
+    <string name="pref_title_unit_distance">Entfernung</string>
+
+</resources>

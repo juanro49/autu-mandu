@@ -1,0 +1,159 @@
+package me.kuehle.carreport;
+
+import java.util.Date;
+
+import me.kuehle.carreport.db.AbstractItem;
+import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.OtherCost;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+public class EditOtherCostFragment extends AbstractEditFragment {
+	private EditTextDateField edtDate;
+
+	private Car[] cars;
+
+	@Override
+	protected int getLayout() {
+		return R.layout.edit_other;
+	}
+
+	@Override
+	protected int getTitleForNew() {
+		return R.string.title_add_other;
+	}
+
+	@Override
+	protected int getAlertDeleteMessage() {
+		return R.string.alert_delete_other_message;
+	}
+
+	@Override
+	protected AbstractItem getEditObject(int id) {
+		return new OtherCost(id);
+	}
+
+	@Override
+	protected void initFields() {
+		Preferences prefs = new Preferences(getActivity());
+
+		ArrayAdapter<String> titleAdapter = new ArrayAdapter<String>(
+				getActivity(), android.R.layout.simple_dropdown_item_1line,
+				OtherCost.getAllTitles());
+		AutoCompleteTextView edtTitle = (AutoCompleteTextView) getView()
+				.findViewById(R.id.edtTitle);
+		edtTitle.setAdapter(titleAdapter);
+
+		edtDate = new EditTextDateField(R.id.edtDate);
+
+		((TextView) getView().findViewById(R.id.txtUnitCurrency)).setText(prefs
+				.getUnitCurrency());
+		((TextView) getView().findViewById(R.id.txtUnitDistance)).setText(prefs
+				.getUnitDistance());
+
+		ArrayAdapter<String> carAdapter = new ArrayAdapter<String>(
+				getActivity(), android.R.layout.simple_spinner_dropdown_item);
+		cars = Car.getAll();
+		for (Car car : cars) {
+			carAdapter.add(car.getName());
+		}
+		Spinner spnCar = (Spinner) getView().findViewById(R.id.spnCar);
+		spnCar.setAdapter(carAdapter);
+		int defaultCar = prefs.getDefaultCar();
+		for (int pos = 0; pos < cars.length; pos++) {
+			if (cars[pos].getId() == defaultCar) {
+				spnCar.setSelection(pos);
+			}
+		}
+	}
+
+	@Override
+	protected void fillFields() {
+		if (!isInEditMode()) {
+			edtDate.setDate(new Date());
+
+			SharedPreferences prefs = PreferenceManager
+					.getDefaultSharedPreferences(getActivity()
+							.getApplicationContext());
+			int defaultCar = Integer.parseInt(prefs.getString("default_car",
+					"1"));
+			Spinner spnCar = ((Spinner) getView().findViewById(R.id.spnCar));
+			for (int pos = 0; pos < cars.length; pos++) {
+				if (cars[pos].getId() == defaultCar) {
+					spnCar.setSelection(pos);
+				}
+			}
+		} else {
+			OtherCost other = (OtherCost) editItem;
+
+			edtDate.setDate(other.getDate());
+
+			EditText edtTitle = ((EditText) getView().findViewById(
+					R.id.edtTitle));
+			edtTitle.setText(String.valueOf(other.getTitle()));
+
+			EditText edtTachometer = ((EditText) getView().findViewById(
+					R.id.edtTachometer));
+			edtTachometer.setText(String.valueOf(other.getTachometer()));
+
+			EditText edtPrice = ((EditText) getView().findViewById(
+					R.id.edtPrice));
+			edtPrice.setText(String.valueOf(other.getPrice()));
+
+			EditText edtNote = ((EditText) getView().findViewById(R.id.edtNote));
+			edtNote.setText(other.getNote());
+
+			Spinner spnCar = ((Spinner) getView().findViewById(R.id.spnCar));
+			for (int pos = 0; pos < cars.length; pos++) {
+				if (cars[pos].getId() == other.getCar().getId()) {
+					spnCar.setSelection(pos);
+				}
+			}
+		}
+	}
+
+	@Override
+	protected boolean save() {
+		String title = ((EditText) getView().findViewById(R.id.edtTitle))
+				.getText().toString();
+		Date date = edtDate.getDate();
+		int tachometer = getIntFromEditText(R.id.edtTachometer, 0);
+		float price = (float) getDoubleFromEditText(R.id.edtPrice, 0);
+		String note = ((EditText) getView().findViewById(R.id.edtNote))
+				.getText().toString();
+		Car car = cars[(int) ((Spinner) getView().findViewById(R.id.spnCar))
+				.getSelectedItemId()];
+		if (tachometer > 0 && price > 0) {
+			if (!isInEditMode()) {
+				OtherCost.create(title, date, tachometer, price, note, car);
+			} else {
+				OtherCost other = (OtherCost) editItem;
+				other.setTitle(title);
+				other.setDate(date);
+				other.setTachometer(tachometer);
+				other.setPrice(price);
+				other.setNote(note);
+				other.setCar(car);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static EditOtherCostFragment newInstance(int id) {
+		EditOtherCostFragment f = new EditOtherCostFragment();
+
+		Bundle args = new Bundle();
+		args.putInt(AbstractEditFragment.EXTRA_ID, id);
+		f.setArguments(args);
+
+		return f;
+	}
+}
