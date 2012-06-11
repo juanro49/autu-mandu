@@ -149,12 +149,12 @@ public class ReportActivity extends Activity {
 			graph.setVisibility(View.VISIBLE);
 			graph.addView(report.getGraphView());
 		}
-		
+
 		View txtData = findViewById(R.id.txtData);
-		if(txtData != null) {
+		if (txtData != null) {
 			txtData.setVisibility(graph.getVisibility());
 		}
-		
+
 		ListView lstData = (ListView) findViewById(R.id.lstData);
 		SimpleAdapter adapter = new SimpleAdapter(ReportActivity.this,
 				report.getData(), android.R.layout.simple_list_item_2,
