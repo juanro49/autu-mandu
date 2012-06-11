@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012 Jan Kühle
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package me.kuehle.carreport;
 
 import java.text.DateFormat;
@@ -38,7 +54,7 @@ public abstract class AbstractEditFragment extends Fragment {
 			throw new ClassCastException(activity.toString()
 					+ " must implement OnItemActionListener");
 		}
-		
+
 		int id = getArguments().getInt(EXTRA_ID, EXTRA_ID_DEFAULT);
 		if (id != EXTRA_ID_DEFAULT) {
 			editItem = getEditObject(id);
@@ -149,7 +165,7 @@ public abstract class AbstractEditFragment extends Fragment {
 	protected abstract void fillFields();
 
 	protected abstract boolean save();
-	
+
 	public interface OnItemActionListener {
 		public void itemSaved();
 
