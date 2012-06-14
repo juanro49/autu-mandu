@@ -22,6 +22,7 @@ import java.util.Date;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 public class OtherCost extends AbstractItem {
 	private String title;
@@ -35,7 +36,7 @@ public class OtherCost extends AbstractItem {
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
 		Cursor cursor = db.query(OtherCostTable.NAME, null,
-				OtherCostTable.COL_ID + "=?",
+				BaseColumns._ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null);
 		if (cursor.getCount() != 1) {
 			cursor.close();
@@ -123,7 +124,7 @@ public class OtherCost extends AbstractItem {
 		if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
 			SQLiteDatabase db = helper.getWritableDatabase();
-			db.delete(OtherCostTable.NAME, OtherCostTable.COL_ID + "=?",
+			db.delete(OtherCostTable.NAME, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) });
 			deleted = true;
 		}
@@ -142,7 +143,7 @@ public class OtherCost extends AbstractItem {
 			values.put(OtherCostTable.COL_NOTE, note);
 			values.put(OtherCostTable.COL_CAR, car.getId());
 			db.update(OtherCostTable.NAME, values,
-					OtherCostTable.COL_ID + "=?",
+					BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) });
 		}
 	}

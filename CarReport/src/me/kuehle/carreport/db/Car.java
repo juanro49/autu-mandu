@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 public class Car extends AbstractItem {
 	private String name;
@@ -29,7 +30,7 @@ public class Car extends AbstractItem {
 	public Car(int id) {
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(CarTable.NAME, null, CarTable.COL_ID + "=?",
+		Cursor cursor = db.query(CarTable.NAME, null, BaseColumns._ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null);
 		if (cursor.getCount() != 1) {
 			cursor.close();
@@ -74,7 +75,7 @@ public class Car extends AbstractItem {
 		} else if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
 			SQLiteDatabase db = helper.getWritableDatabase();
-			db.delete(CarTable.NAME, CarTable.COL_ID + "=?",
+			db.delete(CarTable.NAME, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) });
 			deleted = true;
 		}
@@ -88,7 +89,7 @@ public class Car extends AbstractItem {
 			ContentValues values = new ContentValues();
 			values.put(CarTable.COL_NAME, name);
 			values.put(CarTable.COL_COLOR, color);
-			db.update(CarTable.NAME, values, CarTable.COL_ID + "=?",
+			db.update(CarTable.NAME, values, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) });
 		}
 	}

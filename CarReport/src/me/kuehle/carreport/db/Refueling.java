@@ -22,6 +22,7 @@ import java.util.Date;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 public class Refueling extends AbstractItem {
 	private Date date;
@@ -36,7 +37,7 @@ public class Refueling extends AbstractItem {
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
 		Cursor cursor = db.query(RefuelingTable.NAME, null,
-				RefuelingTable.COL_ID + "=?",
+				BaseColumns._ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null);
 		if (cursor.getCount() != 1) {
 			cursor.close();
@@ -135,7 +136,7 @@ public class Refueling extends AbstractItem {
 		if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
 			SQLiteDatabase db = helper.getWritableDatabase();
-			db.delete(RefuelingTable.NAME, RefuelingTable.COL_ID + "=?",
+			db.delete(RefuelingTable.NAME, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) });
 			deleted = true;
 		}
@@ -155,7 +156,7 @@ public class Refueling extends AbstractItem {
 			values.put(RefuelingTable.COL_NOTE, note);
 			values.put(RefuelingTable.COL_CAR, car.getId());
 			db.update(RefuelingTable.NAME, values,
-					RefuelingTable.COL_ID + "=?",
+					BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) });
 		}
 	}

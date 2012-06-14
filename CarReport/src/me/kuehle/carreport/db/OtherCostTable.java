@@ -17,11 +17,11 @@
 package me.kuehle.carreport.db;
 
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 public class OtherCostTable {
 	public static final String NAME = "othercosts";
 	
-	public static final String COL_ID = "_id";
 	public static final String COL_TITLE = "title";
 	public static final String COL_DATE = "date";
 	public static final String COL_TACHO = "tachometer";
@@ -31,14 +31,14 @@ public class OtherCostTable {
 	public static final String COL_CAR = "cars_id";
 	
 	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
-			+ COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COL_TITLE + " TEXT NOT NULL,"
 			+ COL_DATE + " INTEGER NOT NULL,"
 			+ COL_TACHO + " INTEGER NOT NULL,"
 			+ COL_PRICE + " REAL NOT NULL,"
 			+ COL_NOTE + " TEXT NOT NULL,"
 			+ COL_CAR + " INTEGER NOT NULL,"
-			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + CarTable.COL_ID + "));";
+			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + "));";
 	
 	public static void onCreate(SQLiteDatabase db) {
 		db.execSQL(STMT_CREATE);
