@@ -15,8 +15,12 @@
   limitations under the License.
 -->
 <resources>
-
+    
+	<string name="app_name">Car Report</string>
+    <string name="app_version">1.1</string>
     <string name="app_description">Tragen Sie die laufenden Kosten Ihres Autos ein und erhalten Sie schöne Reports.</string>
+    <string name="about_author">© Jan Kühle</string>
+    <string name="about_version">Version: %s</string>
     <string name="about_licenses">Lizenzen</string>
     <string name="hint_tachometer">Kilometerstand</string>
     <string name="hint_volume">Liter</string>
@@ -75,6 +79,7 @@
     <string name="pref_title_category_defaults">Standards</string>
     <string name="pref_title_category_units">Einheiten</string>
     <string name="pref_title_default_car">Auto</string>
+    <string name="pref_title_default_report">Report</string>
     <string name="pref_title_unit_currency">Währung</string>
     <string name="pref_title_unit_volume">Volumen</string>
     <string name="pref_title_unit_distance">Entfernung</string>
