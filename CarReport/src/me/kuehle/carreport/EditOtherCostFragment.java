@@ -41,6 +41,12 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 	}
 
 	@Override
+	protected int getTitleForEdit() {
+		return R.string.title_edit_other;
+	}
+
+	
+	@Override
 	protected int getTitleForNew() {
 		return R.string.title_add_other;
 	}
@@ -139,7 +145,7 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 		String title = ((EditText) getView().findViewById(R.id.edtTitle))
 				.getText().toString();
 		Date date = edtDate.getDate();
-		int tachometer = getIntFromEditText(R.id.edtTachometer, 0);
+		int tachometer = getIntegerFromEditText(R.id.edtTachometer, 0);
 		float price = (float) getDoubleFromEditText(R.id.edtPrice, 0);
 		String note = ((EditText) getView().findViewById(R.id.edtNote))
 				.getText().toString();

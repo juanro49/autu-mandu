@@ -42,9 +42,11 @@
     <string name="section_note">Note</string>
     <string name="section_data">Data</string>
     <string name="title_add_refueling">Add refueling</string>
+    <string name="title_edit_refueling">Edit refueling</string>
     <string name="title_settings">Settings</string>
     <string name="title_view_data">Data</string>
     <string name="title_add_other">Add other</string>
+    <string name="title_edit_other">Edit other</string>
     <string name="cab_title_selected">%d selected</string>
     <string name="edit_title_refueling">Refueling</string>
     <string name="alert_add_car_title">Add car</string>

@@ -27,13 +27,13 @@ public class EditFragmentActivity extends Activity implements
 	public static final int EXTRA_EDIT_REFUELING = 0;
 	public static final int EXTRA_EDIT_OTHER = 1;
 
-	public static final int MAX_SCREEN_WIDTH = 800;
+	public static final int MAX_SCREEN_WIDTH = 1023;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.edit_fragment_holder);
-
+		
 		boolean finishOnBigScreen = getIntent().getBooleanExtra(
 				EXTRA_FINISH_ON_BIG_SCREEN, false);
 		int edit = getIntent().getIntExtra(EXTRA_EDIT, EXTRA_EDIT_REFUELING);

@@ -45,6 +45,9 @@ public abstract class AbstractEditFragment extends Fragment {
 	protected OnItemActionListener onItemActionListener;
 	protected AbstractItem editItem = null;
 
+	private CharSequence savedABTitle;
+	private int savedABNavMode;
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -78,18 +81,34 @@ public abstract class AbstractEditFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 		ActionBar actionBar = getActivity().getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
-		if (editItem == null) {
+
+		savedABTitle = actionBar.getTitle();
+		savedABNavMode = actionBar.getNavigationMode();
+
+		if (isInEditMode()) {
+			actionBar.setTitle(getTitleForEdit());
+		} else {
 			actionBar.setTitle(getTitleForNew());
 		}
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
 		initFields();
 		fillFields();
 	}
 
 	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		ActionBar actionBar = getActivity().getActionBar();
+		actionBar.setTitle(savedABTitle);
+		actionBar.setNavigationMode(savedABNavMode);
+	}
+
+	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
 		inflater.inflate(R.menu.edit, menu);
-		if (editItem == null) {
+		if (!isInEditMode()) {
 			menu.removeItem(R.id.menu_delete);
 		}
 	}
@@ -128,7 +147,7 @@ public abstract class AbstractEditFragment extends Fragment {
 		}
 	}
 
-	protected int getIntFromEditText(int view, int defaultValue) {
+	protected int getIntegerFromEditText(int view, int defaultValue) {
 		EditText editText = (EditText) getView().findViewById(view);
 		String strInt = editText.getText().toString();
 		try {
@@ -153,6 +172,8 @@ public abstract class AbstractEditFragment extends Fragment {
 	}
 
 	protected abstract int getLayout();
+
+	protected abstract int getTitleForEdit();
 
 	protected abstract int getTitleForNew();
 

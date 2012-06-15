@@ -18,24 +18,14 @@
     android:layout_width="800dp"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
+    android:baselineAligned="false"
     android:orientation="horizontal" >
 
-    <View
-        android:layout_width="10dp"
-        android:layout_height="match_parent"
-        android:background="@drawable/gradient_border_left" />
-
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/fragment_holder"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="@android:color/background_dark" >
-    </LinearLayout>
-
-    <View
-        android:layout_width="10dp"
-        android:layout_height="match_parent"
-        android:background="@drawable/gradient_border_right" />
+        android:background="?android:attr/detailsElementBackground" />
 
 </LinearLayout>

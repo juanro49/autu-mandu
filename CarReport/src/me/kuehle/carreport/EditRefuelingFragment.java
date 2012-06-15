@@ -41,6 +41,11 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 	}
 
 	@Override
+	protected int getTitleForEdit() {
+		return R.string.title_edit_refueling;
+	}
+	
+	@Override
 	protected int getTitleForNew() {
 		return R.string.title_add_refueling;
 	}
@@ -136,7 +141,7 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 	@Override
 	protected boolean save() {
 		Date date = edtDate.getDate();
-		int tachometer = getIntFromEditText(R.id.edtTachometer, 0);
+		int tachometer = getIntegerFromEditText(R.id.edtTachometer, 0);
 		float volume = (float) getDoubleFromEditText(R.id.edtVolume, 0);
 		boolean partial = ((CheckBox) getView().findViewById(R.id.chkPartial))
 				.isChecked();

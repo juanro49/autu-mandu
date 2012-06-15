@@ -16,54 +16,54 @@
 
 package me.kuehle.carreport;
 
-import me.kuehle.carreport.db.Car;
 import android.app.ActionBar;
-import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.view.View;
 
 public class ViewDataActivity extends Activity implements
-		AbstractEditFragment.OnItemActionListener {
-	public static final int ADD_REFUELING_REQUEST_CODE = 0;
-	public static final int ADD_OTHER_REQUEST_CODE = 1;
-	public static final int EDIT_REQUEST_CODE = 2;
+		AbstractEditFragment.OnItemActionListener,
+		ViewDataListFragment.ViewDataListListener {
+	private static final int ADD_REFUELING_REQUEST_CODE = 0;
+	private static final int ADD_OTHER_REQUEST_CODE = 1;
+	private static final String TAG_LIST = "list";
+	private static final String TAG_EDIT = "edit";
 
-	private ViewDataListFragment list;
-
-	private Car[] cars;
+	private ViewDataListFragment mList;
+	private AbstractEditFragment mEdit;
+	private boolean mDualPane;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.view_data);
 
-		list = (ViewDataListFragment) getFragmentManager().findFragmentById(
-				R.id.list);
-
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_dropdown_item);
-		cars = Car.getAll();
-		for (Car car : cars) {
-			adapter.add(car.getName());
+		View editFrame = findViewById(R.id.edit);
+		mDualPane = !editFrame.getParent().equals(findViewById(R.id.list));
+
+		FragmentManager fm = getFragmentManager();
+		mList = (ViewDataListFragment) fm.findFragmentByTag(TAG_LIST);
+		mEdit = (AbstractEditFragment) fm.findFragmentByTag(TAG_EDIT);
+		if (mList == null) {
+			mList = new ViewDataListFragment();
+			fm.beginTransaction().add(R.id.list, mList, TAG_LIST).commit();
 		}
-
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		actionBar.setListNavigationCallbacks(adapter, listNavigationCallback);
-
-		Preferences prefs = new Preferences(this);
-		int defaultCar = prefs.getDefaultCar();
-		for (int pos = 0; pos < cars.length; pos++) {
-			if (cars[pos].getId() == defaultCar) {
-				actionBar.setSelectedNavigationItem(pos);
-			}
+		if (mEdit != null && !mDualPane) {
+			fm.popBackStackImmediate();
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+			ft.hide(mList);
+			ft.replace(R.id.edit, mEdit, TAG_EDIT);
+			ft.addToBackStack(null);
+			ft.commit();
 		}
 	}
 
@@ -96,7 +96,11 @@ public class ViewDataActivity extends Activity implements
 			startActivityForResult(intent1, ADD_OTHER_REQUEST_CODE);
 			return true;
 		case android.R.id.home:
-			finish();
+			if (mEdit != null) {
+				itemCanceled();
+			} else {
+				finish();
+			}
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -105,33 +109,53 @@ public class ViewDataActivity extends Activity implements
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if ((requestCode == ADD_REFUELING_REQUEST_CODE && resultCode == Activity.RESULT_OK)
-				|| (requestCode == ADD_OTHER_REQUEST_CODE && resultCode == Activity.RESULT_OK)
-				|| (requestCode == EDIT_REQUEST_CODE && resultCode == Activity.RESULT_OK)) {
-			list.updateLists();
+		if (resultCode == Activity.RESULT_OK) {
+			mList.updateLists();
 		}
 	}
 
 	@Override
-	public void itemSaved() {
-		list.updateLists();
+	public void closeCurrentItem() {
+		if (mEdit != null) {
+			getFragmentManager().popBackStack();
+			mEdit = null;
+		}
+	}
+
+	@Override
+	public boolean isDualPane() {
+		return mDualPane;
 	}
 
 	@Override
 	public void itemCanceled() {
-		list.updateLists();
+		closeCurrentItem();
+		mList.unselectAll();
 	}
 
 	@Override
 	public void itemDeleted() {
-		list.updateLists();
+		closeCurrentItem();
+		mList.updateLists();
 	}
 
-	private OnNavigationListener listNavigationCallback = new OnNavigationListener() {
-		@Override
-		public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-			list.setCar(cars[itemPosition]);
-			return true;
+	@Override
+	public void itemSaved() {
+		closeCurrentItem();
+		mList.updateLists();
+	}
+
+	@Override
+	public void openItem(ViewDataListFragment.AbstractEditHelper helper) {
+		mEdit = helper.createEditFragment();
+		getFragmentManager().popBackStackImmediate();
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		if (!mDualPane) {
+			ft.hide(mList);
 		}
-	};
+		ft.replace(R.id.edit, mEdit, TAG_EDIT);
+		ft.addToBackStack(null);
+		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		ft.commit();
+	}
 }
