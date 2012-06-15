@@ -32,8 +32,6 @@
     <string name="menu_delete">Löschen</string>
     <string name="menu_view_data">Daten ansehen</string>
     <string name="menu_add_car">Auto hinzufügen</string>
-    <string name="alert_delete_refueling_message">Diese Tankfüllung wird gelöscht.</string>
-    <string name="alert_delete_other_message">Diese anderen Kosten werden gelöscht.</string>
     <string name="section_car">Auto</string>
     <string name="section_note">Notiz</string>
     <string name="section_data">Daten</string>
@@ -45,9 +43,12 @@
     <string name="title_edit_other">Andere Kosten bearbeiten</string>
     <string name="cab_title_selected">%d ausgewählt</string>
     <string name="edit_title_refueling">Tankfüllung</string>
+    <string name="edit_message_no_entry_selected">Kein Eintrag ausgewählt</string>
     <string name="alert_add_car_title">Auto hinzufügen</string>
     <string name="alert_edit_car_title">Auto bearbeiten</string>
     <string name="alert_add_car_message">Name des Autos eingeben:</string>
+    <string name="alert_delete_refueling_message">Diese Tankfüllung wird gelöscht.</string>
+    <string name="alert_delete_other_message">Diese anderen Kosten werden gelöscht.</string>
     <string name="alert_delete_cars_message">Die %d ausgewählten Autos werden gelöscht.</string>
     <string name="alert_cannot_delete_last_car">Das letzte Auto kann nicht gelöscht werden.</string>
     <string name="alert_delete_refuelings_message">Die %d ausgewählten Tankfüllungen werden gelöscht.</string>

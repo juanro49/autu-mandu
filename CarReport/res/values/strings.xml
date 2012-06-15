@@ -36,8 +36,6 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_view_data">View data</string>
     <string name="menu_add_car">Add car</string>
-    <string name="alert_delete_refueling_message">This refueling will be deleted.</string>
-    <string name="alert_delete_other_message">This other cost will be deleted.</string>
     <string name="section_car">Car</string>
     <string name="section_note">Note</string>
     <string name="section_data">Data</string>
@@ -49,9 +47,12 @@
     <string name="title_edit_other">Edit other</string>
     <string name="cab_title_selected">%d selected</string>
     <string name="edit_title_refueling">Refueling</string>
+    <string name="edit_message_no_entry_selected">No entry selected</string>
     <string name="alert_add_car_title">Add car</string>
     <string name="alert_edit_car_title">Edit car</string>
     <string name="alert_add_car_message">Enter the name of the car:</string>
+    <string name="alert_delete_refueling_message">This refueling will be deleted.</string>
+    <string name="alert_delete_other_message">This other cost will be deleted.</string>
     <string name="alert_delete_cars_message">The %d selected cars will be deleted.</string>
     <string name="alert_cannot_delete_last_car">One car cannot be deleted.</string>
     <string name="alert_delete_refuelings_message">The %d selected refuelings will be deleted.</string>

@@ -34,10 +34,12 @@
         android:background="?android:attr/detailsElementBackground" >
 
         <TextView
+            android:id="@+id/txtNoEntrySelected"
+            style="@android:style/TextAppearance.DeviceDefault.Large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Hallo" />
+            android:text="@string/edit_message_no_entry_selected" />
     </FrameLayout>
 
 </LinearLayout>

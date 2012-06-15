@@ -118,6 +118,7 @@ public class ViewDataActivity extends Activity implements
 	public void closeCurrentItem() {
 		if (mEdit != null) {
 			getFragmentManager().popBackStack();
+			setNoEntryMessageVisible(true);
 			mEdit = null;
 		}
 	}
@@ -147,6 +148,8 @@ public class ViewDataActivity extends Activity implements
 
 	@Override
 	public void openItem(ViewDataListFragment.AbstractEditHelper helper) {
+		setNoEntryMessageVisible(false);
+		
 		mEdit = helper.createEditFragment();
 		getFragmentManager().popBackStackImmediate();
 		FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -157,5 +160,12 @@ public class ViewDataActivity extends Activity implements
 		ft.addToBackStack(null);
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		ft.commit();
+	}
+	
+	private void setNoEntryMessageVisible(boolean visible) {
+		View msg = findViewById(R.id.txtNoEntrySelected);
+		if(msg != null) {
+			msg.setVisibility(visible ? View.VISIBLE : View.GONE);
+		}
 	}
 }
