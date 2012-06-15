@@ -27,7 +27,7 @@
     <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
     <string name="menu_add_other">Andere Kosten hinzufügen</string>
     <string name="menu_settings">Einstellungen</string>
-    <string name="menu_save">Speichern</string>
+    <string name="menu_save">Fertig</string>
     <string name="menu_cancel">Abbrechen</string>
     <string name="menu_delete">Löschen</string>
     <string name="menu_view_data">Daten ansehen</string>
@@ -38,9 +38,11 @@
     <string name="section_note">Notiz</string>
     <string name="section_data">Daten</string>
     <string name="title_add_refueling">Tankfüllung hinzufügen</string>
+    <string name="title_edit_refueling">Tankfüllung bearbeiten</string>
     <string name="title_settings">Einstellungen</string>
     <string name="title_view_data">Daten</string>
     <string name="title_add_other">Andere Kosten hinzufügen</string>
+    <string name="title_edit_other">Andere Kosten bearbeiten</string>
     <string name="cab_title_selected">%d ausgewählt</string>
     <string name="edit_title_refueling">Tankfüllung</string>
     <string name="alert_add_car_title">Auto hinzufügen</string>
@@ -66,8 +68,8 @@
     <string name="report_average">Durchschnitt</string>
     <string name="report_title_fuel_consumption">Benzinverbrauch</string>
     <string name="report_title_fuel_price">Benzinpreis</string>
-    <string name="pref_title_header_about">Über</string>
-    <string name="pref_title_header_general">Standards</string>
+    <string name="pref_title_header_about">Über Car Report</string>
+    <string name="pref_title_header_general">Allgemeine Einstellungen</string>
     <string name="pref_title_header_cars">Autos</string>
     <string name="pref_title_category_defaults">Standards</string>
     <string name="pref_title_category_units">Einheiten</string>
