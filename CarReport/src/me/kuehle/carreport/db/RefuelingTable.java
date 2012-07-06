@@ -31,6 +31,11 @@ public class RefuelingTable {
 	
 	public static final String COL_CAR = "cars_id";
 	
+	public static final String[] ALL_COLUMNS = {
+		BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME,
+		COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR
+	};
+	
 	private static final String STMT_CREATE = "create table " + NAME + "( "
 			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COL_DATE + " INTEGER NOT NULL,"
@@ -48,7 +53,6 @@ public class RefuelingTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS " + NAME);
-		onCreate(db);
+		
 	}
 }

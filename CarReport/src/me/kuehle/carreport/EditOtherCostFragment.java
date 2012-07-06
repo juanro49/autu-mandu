@@ -21,6 +21,7 @@ import java.util.Date;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
+import me.kuehle.carreport.db.OtherCostTable.RepeatInterval;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -45,7 +46,6 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 		return R.string.title_edit_other;
 	}
 
-	
 	@Override
 	protected int getTitleForNew() {
 		return R.string.title_add_other;
@@ -54,6 +54,16 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 	@Override
 	protected int getAlertDeleteMessage() {
 		return R.string.alert_delete_other_message;
+	}
+
+	@Override
+	protected int getToastSavedMessage() {
+		return R.string.toast_other_saved;
+	}
+
+	@Override
+	protected int getToastDeletedMessage() {
+		return R.string.toast_other_deleted;
 	}
 
 	@Override
@@ -122,11 +132,17 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 
 			EditText edtTachometer = ((EditText) getView().findViewById(
 					R.id.edtTachometer));
-			edtTachometer.setText(String.valueOf(other.getTachometer()));
+			if (other.getTachometer() > -1) {
+				edtTachometer.setText(String.valueOf(other.getTachometer()));
+			}
 
 			EditText edtPrice = ((EditText) getView().findViewById(
 					R.id.edtPrice));
 			edtPrice.setText(String.valueOf(other.getPrice()));
+
+			Spinner spnRepeat = ((Spinner) getView().findViewById(
+					R.id.spnRepeat));
+			spnRepeat.setSelection(other.getRepInterval().getInterval());
 
 			EditText edtNote = ((EditText) getView().findViewById(R.id.edtNote));
 			edtNote.setText(other.getNote());
@@ -145,21 +161,26 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 		String title = ((EditText) getView().findViewById(R.id.edtTitle))
 				.getText().toString();
 		Date date = edtDate.getDate();
-		int tachometer = getIntegerFromEditText(R.id.edtTachometer, 0);
+		int tachometer = getIntegerFromEditText(R.id.edtTachometer, -1);
 		float price = (float) getDoubleFromEditText(R.id.edtPrice, 0);
+		RepeatInterval repInterval = RepeatInterval
+				.getByInterval((int) ((Spinner) getView().findViewById(
+						R.id.spnRepeat)).getSelectedItemId());
 		String note = ((EditText) getView().findViewById(R.id.edtNote))
 				.getText().toString();
 		Car car = cars[(int) ((Spinner) getView().findViewById(R.id.spnCar))
 				.getSelectedItemId()];
-		if (tachometer > 0 && price > 0) {
+		if (price > 0) {
 			if (!isInEditMode()) {
-				OtherCost.create(title, date, tachometer, price, note, car);
+				OtherCost.create(title, date, tachometer, price, repInterval,
+						1, note, car);
 			} else {
 				OtherCost other = (OtherCost) editItem;
 				other.setTitle(title);
 				other.setDate(date);
 				other.setTachometer(tachometer);
 				other.setPrice(price);
+				other.setRepInterval(repInterval);
 				other.setNote(note);
 				other.setCar(car);
 			}

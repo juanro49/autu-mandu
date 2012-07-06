@@ -26,6 +26,10 @@ public class CarTable {
 	public static final String COL_NAME = "name";
 	public static final String COL_COLOR = "color";
 	
+	public static final String[] ALL_COLUMNS = {
+		BaseColumns._ID, COL_NAME, COL_COLOR
+	};
+	
 	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
 			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COL_NAME + " TEXT NOT NULL, "
@@ -40,7 +44,6 @@ public class CarTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS " + NAME);
-		onCreate(db);
+		
 	}
 }

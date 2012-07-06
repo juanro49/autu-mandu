@@ -38,7 +38,7 @@
 
         <TextView
             android:id="@+id/text_tr"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:gravity="right"
@@ -54,14 +54,14 @@
 
         <TextView
             android:id="@+id/text_bl"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
             android:id="@+id/text_bm"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.4"
             android:gravity="center"
@@ -69,7 +69,7 @@
 
         <TextView
             android:id="@+id/text_br"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
             android:gravity="right"

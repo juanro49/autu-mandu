@@ -17,7 +17,7 @@
 <resources>
     
 	<string name="app_name">Car Report</string>
-    <string name="app_version">1.1</string>
+    <string name="app_version">1.2</string>
     <string name="app_description">Tragen Sie die laufenden Kosten Ihres Autos ein und erhalten Sie schöne Reports.</string>
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
@@ -60,6 +60,10 @@
     <string name="alert_delete_title">Löschen bestätigen</string>
     <string name="alert_delete_others_message">Die %d ausgewählten anderen Kosten werden gelöscht.</string>
     <string name="alert_change_color_title">Farbe auswählen</string>
+    <string name="toast_refueling_saved">Tankfüllung gespeichert.</string>
+    <string name="toast_refueling_deleted">Tankfüllung gelöscht.</string>
+    <string name="toast_other_saved">Andere Kosten gespeichert.</string>
+    <string name="toast_other_deleted">Andere Kosten gelöscht.</string>
     <string name="tab_indicator_refuelings">Tankfüllungen</string>
     <string name="tab_indicator_other">Andere Kosten</string>
 	<string name="report_not_enough_data">Zu wenige Daten</string>

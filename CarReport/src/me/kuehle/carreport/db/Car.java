@@ -30,8 +30,9 @@ public class Car extends AbstractItem {
 	public Car(int id) {
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(CarTable.NAME, null, BaseColumns._ID + "=?",
-				new String[] { String.valueOf(id) }, null, null, null);
+		Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS,
+				BaseColumns._ID + "=?", new String[] { String.valueOf(id) },
+				null, null, null);
 		if (cursor.getCount() != 1) {
 			cursor.close();
 			throw new IllegalArgumentException(
@@ -111,13 +112,13 @@ public class Car extends AbstractItem {
 
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(CarTable.NAME, null, null, null, null, null,
-				null);
+		Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS, null,
+				null, null, null, null);
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
-			cars.add(new Car(cursor.getInt(0), cursor.getString(1),
-					cursor.getInt(2)));
+			cars.add(new Car(cursor.getInt(0), cursor.getString(1), cursor
+					.getInt(2)));
 			cursor.moveToNext();
 		}
 		cursor.close();

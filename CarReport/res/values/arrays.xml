@@ -20,12 +20,13 @@
         <item>Fuel consumption</item>
         <item>Fuel price</item>
         <item>Costs</item>
-        <!--
-        <item>Price per refueling</item>
-        <item>Volume per refueling</item>
-        <item>Trips</item>
-        <item>Total tachometer</item>
-        -->
+    </string-array>
+    <string-array name="repeat_intervals">
+        <item>Once</item>
+        <item>Repeat every day</item>
+        <item>Repeat every month</item>
+        <item>Repeat every quarter</item>
+        <item>Repeat every year</item>
     </string-array>
     <string-array name="color_names">
         <item>Blue</item>

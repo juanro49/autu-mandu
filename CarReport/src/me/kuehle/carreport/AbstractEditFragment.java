@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public abstract class AbstractEditFragment extends Fragment {
 	public static final String EXTRA_ID = "id";
@@ -118,6 +119,8 @@ public abstract class AbstractEditFragment extends Fragment {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
 			if (save()) {
+				Toast.makeText(getActivity(), getToastSavedMessage(),
+						Toast.LENGTH_SHORT).show();
 				onItemActionListener.itemSaved();
 			}
 			return true;
@@ -134,6 +137,9 @@ public abstract class AbstractEditFragment extends Fragment {
 								public void onClick(DialogInterface dialog,
 										int which) {
 									editItem.delete();
+									Toast.makeText(getActivity(),
+											getToastDeletedMessage(),
+											Toast.LENGTH_SHORT).show();
 									onItemActionListener.itemDeleted();
 								}
 							}).setNegativeButton(android.R.string.no, null)
@@ -180,6 +186,10 @@ public abstract class AbstractEditFragment extends Fragment {
 	protected abstract int getAlertDeleteMessage();
 
 	protected abstract AbstractItem getEditObject(int id);
+
+	protected abstract int getToastSavedMessage();
+
+	protected abstract int getToastDeletedMessage();
 
 	protected abstract void initFields();
 

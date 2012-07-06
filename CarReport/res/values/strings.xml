@@ -17,7 +17,7 @@
 <resources>
 
     <string name="app_name">Car Report</string>
-    <string name="app_version">1.1</string>
+    <string name="app_version">1.2</string>
     <string name="app_description">Enter the costs of your car and recieve nice reports and statistics.</string>
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
@@ -60,6 +60,10 @@
     <string name="alert_delete_title">Confirm delete</string>
     <string name="alert_delete_others_message">The %d selected other costs will be deleted.</string>
     <string name="alert_change_color_title">Choose color</string>
+    <string name="toast_refueling_saved">Refueling saved.</string>
+    <string name="toast_refueling_deleted">Refueling deleted.</string>
+    <string name="toast_other_saved">Other cost saved.</string>
+    <string name="toast_other_deleted">Other cost deleted.</string>
     <string name="tab_indicator_refuelings">Refuelings</string>
     <string name="tab_indicator_other">Other costs</string>
     <string name="report_not_enough_data">Not enough data</string>

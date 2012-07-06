@@ -36,8 +36,8 @@ public class Refueling extends AbstractItem {
 	public Refueling(int id) {
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(RefuelingTable.NAME, null,
-				BaseColumns._ID + "=?",
+		Cursor cursor = db.query(RefuelingTable.NAME,
+				RefuelingTable.ALL_COLUMNS, BaseColumns._ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null);
 		if (cursor.getCount() != 1) {
 			cursor.close();
@@ -155,8 +155,7 @@ public class Refueling extends AbstractItem {
 			values.put(RefuelingTable.COL_PARTIAL, partial);
 			values.put(RefuelingTable.COL_NOTE, note);
 			values.put(RefuelingTable.COL_CAR, car.getId());
-			db.update(RefuelingTable.NAME, values,
-					BaseColumns._ID + "=?",
+			db.update(RefuelingTable.NAME, values, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) });
 		}
 	}
@@ -185,11 +184,11 @@ public class Refueling extends AbstractItem {
 
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(RefuelingTable.NAME, null,
-				RefuelingTable.COL_CAR + "=?", new String[] { String
-						.valueOf(car.getId()) }, null, null, String.format(
-						"%s %s", RefuelingTable.COL_DATE, orderDateAsc ? "ASC"
-								: "DESC"));
+		Cursor cursor = db.query(RefuelingTable.NAME,
+				RefuelingTable.ALL_COLUMNS, RefuelingTable.COL_CAR + "=?",
+				new String[] { String.valueOf(car.getId()) }, null, null,
+				String.format("%s %s", RefuelingTable.COL_DATE,
+						orderDateAsc ? "ASC" : "DESC"));
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {

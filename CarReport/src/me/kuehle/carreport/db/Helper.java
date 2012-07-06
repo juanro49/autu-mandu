@@ -22,7 +22,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class Helper extends SQLiteOpenHelper {
 	public static final String DB_NAME = "data.db";
-	public static final int DB_VERSION = 1;
+	public static final int DB_VERSION = 2;
 
 	private static Helper instance = null;
 

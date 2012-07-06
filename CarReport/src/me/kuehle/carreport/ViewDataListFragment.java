@@ -23,6 +23,7 @@ import java.util.HashMap;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
+import me.kuehle.carreport.db.OtherCostTable.RepeatInterval;
 import me.kuehle.carreport.db.Refueling;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -430,20 +431,32 @@ public class ViewDataListFragment extends Fragment {
 			ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
 			SimpleAdapter adapter = new SimpleAdapter(getActivity(), data,
 					R.layout.two_line_list_item_5, new String[] { "text_tl",
-							"text_tr", "text_bl", "text_br" }, new int[] {
-							R.id.text_tl, R.id.text_tr, R.id.text_bl,
-							R.id.text_br });
+							"text_tr", "text_bl", "text_bm", "text_br" },
+					new int[] { R.id.text_tl, R.id.text_tr, R.id.text_bl,
+							R.id.text_bm, R.id.text_br });
 
 			Preferences prefs = new Preferences(getActivity());
 			DateFormat dateFmt = DateFormat.getDateInstance();
+			String[] repIntervals = getResources().getStringArray(
+					R.array.repeat_intervals);
 			for (AbstractItem item : mItems) {
 				OtherCost other = (OtherCost) item;
 				HashMap<String, String> map = new HashMap<String, String>();
 				map.put("text_tl", dateFmt.format(other.getDate()));
 				map.put("text_tr", other.getTitle());
-				map.put("text_bl",
-						String.format("%d %s", other.getTachometer(),
-								prefs.getUnitDistance()));
+				if (other.getTachometer() > -1) {
+					map.put("text_bl",
+							String.format("%d %s", other.getTachometer(),
+									prefs.getUnitDistance()));
+				} else {
+					map.put("text_bl", "");
+				}
+				if (other.getRepInterval().equals(RepeatInterval.ONCE)) {
+					map.put("text_bm", "");
+				} else {
+					map.put("text_bm", repIntervals[other.getRepInterval()
+							.getInterval()]);
+				}
 				map.put("text_br",
 						String.format("%.2f %s", other.getPrice(),
 								prefs.getUnitCurrency()));

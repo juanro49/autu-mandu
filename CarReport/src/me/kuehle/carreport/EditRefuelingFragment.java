@@ -44,7 +44,7 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 	protected int getTitleForEdit() {
 		return R.string.title_edit_refueling;
 	}
-	
+
 	@Override
 	protected int getTitleForNew() {
 		return R.string.title_add_refueling;
@@ -58,6 +58,16 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 	@Override
 	protected AbstractItem getEditObject(int id) {
 		return new Refueling(id);
+	}
+
+	@Override
+	protected int getToastSavedMessage() {
+		return R.string.toast_refueling_saved;
+	}
+
+	@Override
+	protected int getToastDeletedMessage() {
+		return R.string.toast_refueling_deleted;
 	}
 
 	@Override

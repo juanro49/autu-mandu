@@ -19,6 +19,8 @@ package me.kuehle.carreport.db;
 import java.util.ArrayList;
 import java.util.Date;
 
+import me.kuehle.carreport.db.OtherCostTable.RepeatInterval;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -29,14 +31,16 @@ public class OtherCost extends AbstractItem {
 	private Date date;
 	private int tachometer;
 	private float price;
+	private OtherCostTable.RepeatInterval repInterval;
+	private int repMultiplier;
 	private String note;
 	private Car car;
 
 	public OtherCost(int id) {
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(OtherCostTable.NAME, null,
-				BaseColumns._ID + "=?",
+		Cursor cursor = db.query(OtherCostTable.NAME,
+				OtherCostTable.ALL_COLUMNS, BaseColumns._ID + "=?",
 				new String[] { String.valueOf(id) }, null, null, null);
 		if (cursor.getCount() != 1) {
 			cursor.close();
@@ -49,19 +53,24 @@ public class OtherCost extends AbstractItem {
 			this.date = new Date(cursor.getLong(2));
 			this.tachometer = cursor.getInt(3);
 			this.price = cursor.getFloat(4);
-			this.note = cursor.getString(5);
-			this.car = new Car(cursor.getInt(6));
+			this.repInterval = RepeatInterval.getByInterval(cursor.getInt(5));
+			this.repMultiplier = cursor.getInt(6);
+			this.note = cursor.getString(7);
+			this.car = new Car(cursor.getInt(8));
 			cursor.close();
 		}
 	}
 
 	private OtherCost(int id, String title, Date date, int tachometer,
-			float price, String note, Car car) {
+			float price, RepeatInterval repInterval, int repMultiplier,
+			String note, Car car) {
 		this.id = id;
 		this.title = title;
 		this.date = date;
 		this.tachometer = tachometer;
 		this.price = price;
+		this.repInterval = repInterval;
+		this.repMultiplier = repMultiplier;
 		this.note = note;
 		this.car = car;
 	}
@@ -102,6 +111,22 @@ public class OtherCost extends AbstractItem {
 		save();
 	}
 
+	public OtherCostTable.RepeatInterval getRepInterval() {
+		return repInterval;
+	}
+
+	public void setRepInterval(OtherCostTable.RepeatInterval repInterval) {
+		this.repInterval = repInterval;
+	}
+
+	public int getRepMultiplier() {
+		return repMultiplier;
+	}
+
+	public void setRepMultiplier(int repMultiplier) {
+		this.repMultiplier = repMultiplier;
+	}
+
 	public String getNote() {
 		return note;
 	}
@@ -140,16 +165,18 @@ public class OtherCost extends AbstractItem {
 			values.put(OtherCostTable.COL_DATE, date.getTime());
 			values.put(OtherCostTable.COL_TACHO, tachometer);
 			values.put(OtherCostTable.COL_PRICE, price);
+			values.put(OtherCostTable.COL_REP_INT, repInterval.getInterval());
+			values.put(OtherCostTable.COL_REP_MULTI, repMultiplier);
 			values.put(OtherCostTable.COL_NOTE, note);
 			values.put(OtherCostTable.COL_CAR, car.getId());
-			db.update(OtherCostTable.NAME, values,
-					BaseColumns._ID + "=?",
+			db.update(OtherCostTable.NAME, values, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) });
 		}
 	}
 
 	public static OtherCost create(String title, Date date, int tachometer,
-			float price, String note, Car car) {
+			float price, RepeatInterval repInterval, int repMultiplier,
+			String note, Car car) {
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getWritableDatabase();
 
@@ -158,11 +185,14 @@ public class OtherCost extends AbstractItem {
 		values.put(OtherCostTable.COL_DATE, date.getTime());
 		values.put(OtherCostTable.COL_TACHO, tachometer);
 		values.put(OtherCostTable.COL_PRICE, price);
+		values.put(OtherCostTable.COL_REP_INT, repInterval.getInterval());
+		values.put(OtherCostTable.COL_REP_MULTI, repMultiplier);
 		values.put(OtherCostTable.COL_NOTE, note);
 		values.put(OtherCostTable.COL_CAR, car.getId());
 		int id = (int) db.insert(OtherCostTable.NAME, null, values);
 
-		return new OtherCost(id, title, date, tachometer, price, note, car);
+		return new OtherCost(id, title, date, tachometer, price, repInterval,
+				repMultiplier, note, car);
 	}
 
 	public static OtherCost[] getAllForCar(Car car, boolean orderDateAsc) {
@@ -170,17 +200,19 @@ public class OtherCost extends AbstractItem {
 
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(OtherCostTable.NAME, null,
-				OtherCostTable.COL_CAR + "=?", new String[] { String
-						.valueOf(car.getId()) }, null, null, String.format(
-						"%s %s", OtherCostTable.COL_DATE, orderDateAsc ? "ASC"
-								: "DESC"));
+		Cursor cursor = db.query(OtherCostTable.NAME,
+				OtherCostTable.ALL_COLUMNS, OtherCostTable.COL_CAR + "=?",
+				new String[] { String.valueOf(car.getId()) }, null, null,
+				String.format("%s %s", OtherCostTable.COL_DATE,
+						orderDateAsc ? "ASC" : "DESC"));
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			others.add(new OtherCost(cursor.getInt(0), cursor.getString(1),
 					new Date(cursor.getLong(2)), cursor.getInt(3), cursor
-							.getFloat(4), cursor.getString(5), car));
+							.getFloat(4), RepeatInterval.getByInterval(cursor
+							.getInt(5)), cursor.getInt(6), cursor.getString(7),
+					car));
 			cursor.moveToNext();
 		}
 		cursor.close();

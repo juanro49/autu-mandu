@@ -21,6 +21,13 @@
         <item>Benzinpreis</item>
         <item>Kosten</item>
     </string-array>
+    <string-array name="repeat_intervals">
+        <item>Einmalig</item>
+        <item>Jeden Tag wiederholen</item>
+        <item>Jeden Monat wiederholen</item>
+        <item>Jedes Quartal wiederholen</item>
+        <item>Jedes Jahr wiederholen</item>
+    </string-array>
     <string-array name="color_names">
         <item>Blau</item>
         <item>Cyan</item>

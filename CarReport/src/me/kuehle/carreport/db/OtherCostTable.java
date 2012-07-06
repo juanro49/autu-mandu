@@ -26,19 +26,34 @@ public class OtherCostTable {
 	public static final String COL_DATE = "date";
 	public static final String COL_TACHO = "tachometer";
 	public static final String COL_PRICE = "price";
+	public static final String COL_REP_INT = "repeat_interval";
+	public static final String COL_REP_MULTI = "repeat_multiplier";
 	public static final String COL_NOTE = "note";
 	
 	public static final String COL_CAR = "cars_id";
+	
+	public static final String[] ALL_COLUMNS = {
+		BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO,
+		COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE,
+		COL_CAR
+	};
 	
 	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
 			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COL_TITLE + " TEXT NOT NULL,"
 			+ COL_DATE + " INTEGER NOT NULL,"
-			+ COL_TACHO + " INTEGER NOT NULL,"
+			+ COL_TACHO + " INTEGER NOT NULL DEFAULT -1,"
 			+ COL_PRICE + " REAL NOT NULL,"
+			+ COL_REP_INT + " INTEGER NOT NULL DEFAULT 0,"
+			+ COL_REP_MULTI + " INTEGER NOT NULL DEFAULT 1,"
 			+ COL_NOTE + " TEXT NOT NULL,"
 			+ COL_CAR + " INTEGER NOT NULL,"
 			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + "));";
+	
+	private static final String STMT_UPGRADE_1TO2_1 = "ALTER TABLE " + NAME
+			+ " ADD COLUMN " + COL_REP_INT + " INTEGER NOT NULL DEFAULT 0;";
+	private static final String STMT_UPGRADE_1TO2_2 = "ALTER TABLE " + NAME
+			+ " ADD COLUMN " + COL_REP_MULTI + " INTEGER NOT NULL DEFAULT 1;";
 	
 	public static void onCreate(SQLiteDatabase db) {
 		db.execSQL(STMT_CREATE);
@@ -46,7 +61,38 @@ public class OtherCostTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		db.execSQL("DROP TABLE IF EXISTS " + NAME);
-		onCreate(db);
+		if (oldVersion == 1 && newVersion == 2) {
+			db.execSQL(STMT_UPGRADE_1TO2_1);
+			db.execSQL(STMT_UPGRADE_1TO2_2);
+		}
+	}
+
+	public enum RepeatInterval {
+		ONCE(0), DAY(1), MONTH(2), QUARTER(3), YEAR(4);
+		
+		private int interval;
+		 
+		private RepeatInterval(int i) {
+			interval = i;
+		}
+		
+		public int getInterval() {
+			return interval;
+		}
+		
+		public static RepeatInterval getByInterval(int i) {
+			switch(i) {
+			case 1:
+				return DAY;
+			case 2:
+				return MONTH;
+			case 3:
+				return QUARTER;
+			case 4:
+				return YEAR;
+			default:
+				return ONCE;
+			}
+		}
 	}
 }
