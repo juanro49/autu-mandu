@@ -28,15 +28,21 @@
         android:name="Application"
         android:allowBackup="true"
         android:allowClearUserData="true"
+        android:backupAgent="me.kuehle.carreport.util.BackupAgent"
         android:description="@string/app_description"
         android:enabled="true"
         android:hasCode="true"
         android:icon="@drawable/ic_launcher"
         android:killAfterRestore="true"
         android:label="@string/app_name"
+        android:restoreAnyVersion="false"
         android:testOnly="false"
         android:theme="@android:style/Theme.Holo"
         android:uiOptions="none" >
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIaqoQZUr-vL7mhscbezacNBQa79yK0nA51S3CZw" />
+
         <activity
             android:name="ReportActivity"
             android:label="@string/app_name" >

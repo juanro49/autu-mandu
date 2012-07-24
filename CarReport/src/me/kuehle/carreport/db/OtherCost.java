@@ -37,27 +37,29 @@ public class OtherCost extends AbstractItem {
 
 	public OtherCost(int id) {
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(OtherCostTable.NAME,
-				OtherCostTable.ALL_COLUMNS, BaseColumns._ID + "=?",
-				new String[] { String.valueOf(id) }, null, null, null);
-		if (cursor.getCount() != 1) {
-			cursor.close();
-			throw new IllegalArgumentException(
-					"A fuel with this ID does not exist!");
-		} else {
-			cursor.moveToFirst();
-			this.id = id;
-			this.title = cursor.getString(1);
-			this.date = new Date(cursor.getLong(2));
-			this.tachometer = cursor.getInt(3);
-			this.price = cursor.getFloat(4);
-			this.recurrence = new Recurrence(
-					RecurrenceInterval.getByValue(cursor.getInt(5)),
-					cursor.getInt(6));
-			this.note = cursor.getString(7);
-			this.car = new Car(cursor.getInt(8));
-			cursor.close();
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.query(OtherCostTable.NAME,
+					OtherCostTable.ALL_COLUMNS, BaseColumns._ID + "=?",
+					new String[] { String.valueOf(id) }, null, null, null);
+			if (cursor.getCount() != 1) {
+				cursor.close();
+				throw new IllegalArgumentException(
+						"A fuel with this ID does not exist!");
+			} else {
+				cursor.moveToFirst();
+				this.id = id;
+				this.title = cursor.getString(1);
+				this.date = new Date(cursor.getLong(2));
+				this.tachometer = cursor.getInt(3);
+				this.price = cursor.getFloat(4);
+				this.recurrence = new Recurrence(
+						RecurrenceInterval.getByValue(cursor.getInt(5)),
+						cursor.getInt(6));
+				this.note = cursor.getString(7);
+				this.car = new Car(cursor.getInt(8));
+				cursor.close();
+			}
 		}
 	}
 
@@ -138,18 +140,18 @@ public class OtherCost extends AbstractItem {
 	public void delete() {
 		if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
-			SQLiteDatabase db = helper.getWritableDatabase();
-			db.delete(OtherCostTable.NAME, BaseColumns._ID + "=?",
-					new String[] { String.valueOf(id) });
+			synchronized (Helper.dbLock) {
+				SQLiteDatabase db = helper.getWritableDatabase();
+				db.delete(OtherCostTable.NAME, BaseColumns._ID + "=?",
+						new String[] { String.valueOf(id) });
+			}
+			helper.dataChanged();
 			deleted = true;
 		}
 	}
 
 	private void save() {
 		if (!isDeleted()) {
-			Helper helper = Helper.getInstance();
-			SQLiteDatabase db = helper.getWritableDatabase();
-
 			ContentValues values = new ContentValues();
 			values.put(OtherCostTable.COL_TITLE, title);
 			values.put(OtherCostTable.COL_DATE, date.getTime());
@@ -160,16 +162,19 @@ public class OtherCost extends AbstractItem {
 			values.put(OtherCostTable.COL_REP_MULTI, recurrence.getMultiplier());
 			values.put(OtherCostTable.COL_NOTE, note);
 			values.put(OtherCostTable.COL_CAR, car.getId());
-			db.update(OtherCostTable.NAME, values, BaseColumns._ID + "=?",
-					new String[] { String.valueOf(id) });
+
+			Helper helper = Helper.getInstance();
+			synchronized (Helper.dbLock) {
+				SQLiteDatabase db = helper.getWritableDatabase();
+				db.update(OtherCostTable.NAME, values, BaseColumns._ID + "=?",
+						new String[] { String.valueOf(id) });
+			}
+			helper.dataChanged();
 		}
 	}
 
 	public static OtherCost create(String title, Date date, int tachometer,
 			float price, Recurrence recurrence, String note, Car car) {
-		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getWritableDatabase();
-
 		ContentValues values = new ContentValues();
 		values.put(OtherCostTable.COL_TITLE, title);
 		values.put(OtherCostTable.COL_DATE, date.getTime());
@@ -180,7 +185,14 @@ public class OtherCost extends AbstractItem {
 		values.put(OtherCostTable.COL_REP_MULTI, recurrence.getMultiplier());
 		values.put(OtherCostTable.COL_NOTE, note);
 		values.put(OtherCostTable.COL_CAR, car.getId());
-		int id = (int) db.insert(OtherCostTable.NAME, null, values);
+
+		Helper helper = Helper.getInstance();
+		int id;
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getWritableDatabase();
+			id = (int) db.insert(OtherCostTable.NAME, null, values);
+		}
+		helper.dataChanged();
 
 		return new OtherCost(id, title, date, tachometer, price, recurrence,
 				note, car);
@@ -190,24 +202,26 @@ public class OtherCost extends AbstractItem {
 		ArrayList<OtherCost> others = new ArrayList<OtherCost>();
 
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(OtherCostTable.NAME,
-				OtherCostTable.ALL_COLUMNS, OtherCostTable.COL_CAR + "=?",
-				new String[] { String.valueOf(car.getId()) }, null, null,
-				String.format("%s %s", OtherCostTable.COL_DATE,
-						orderDateAsc ? "ASC" : "DESC"));
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.query(OtherCostTable.NAME,
+					OtherCostTable.ALL_COLUMNS, OtherCostTable.COL_CAR + "=?",
+					new String[] { String.valueOf(car.getId()) }, null, null,
+					String.format("%s %s", OtherCostTable.COL_DATE,
+							orderDateAsc ? "ASC" : "DESC"));
 
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			others.add(new OtherCost(cursor.getInt(0), cursor.getString(1),
-					new Date(cursor.getLong(2)), cursor.getInt(3), cursor
-							.getFloat(4),
-					new Recurrence(RecurrenceInterval.getByValue(cursor
-							.getInt(5)), cursor.getInt(6)),
-					cursor.getString(7), car));
-			cursor.moveToNext();
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				others.add(new OtherCost(cursor.getInt(0), cursor.getString(1),
+						new Date(cursor.getLong(2)), cursor.getInt(3), cursor
+								.getFloat(4),
+						new Recurrence(RecurrenceInterval.getByValue(cursor
+								.getInt(5)), cursor.getInt(6)), cursor
+								.getString(7), car));
+				cursor.moveToNext();
+			}
+			cursor.close();
 		}
-		cursor.close();
 
 		return others.toArray(new OtherCost[others.size()]);
 	}
@@ -216,18 +230,20 @@ public class OtherCost extends AbstractItem {
 		ArrayList<String> titles = new ArrayList<String>();
 
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery(String.format(
-				"SELECT DISTINCT %s FROM %s ORDER BY %s",
-				OtherCostTable.COL_TITLE, OtherCostTable.NAME,
-				OtherCostTable.COL_TITLE), null);
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.rawQuery(String.format(
+					"SELECT DISTINCT %s FROM %s ORDER BY %s",
+					OtherCostTable.COL_TITLE, OtherCostTable.NAME,
+					OtherCostTable.COL_TITLE), null);
 
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			titles.add(cursor.getString(0));
-			cursor.moveToNext();
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				titles.add(cursor.getString(0));
+				cursor.moveToNext();
+			}
+			cursor.close();
 		}
-		cursor.close();
 
 		return titles.toArray(new String[titles.size()]);
 	}

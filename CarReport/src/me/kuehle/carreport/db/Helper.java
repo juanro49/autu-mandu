@@ -16,6 +16,7 @@
 
 package me.kuehle.carreport.db;
 
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -23,17 +24,26 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class Helper extends SQLiteOpenHelper {
 	public static final String DB_NAME = "data.db";
 	public static final int DB_VERSION = 2;
+	public static final Object[] dbLock = new Object[0];
 
 	private static Helper instance = null;
 
+	private Context context;
+
 	private Helper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);
+		this.context = context;
 	}
 
 	@Override
 	public synchronized void close() {
 		super.close();
 		instance = null;
+	}
+
+	public void dataChanged() {
+		BackupManager backupManager = new BackupManager(context);
+		backupManager.dataChanged();
 	}
 
 	@Override

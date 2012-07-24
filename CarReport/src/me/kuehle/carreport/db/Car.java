@@ -29,20 +29,22 @@ public class Car extends AbstractItem {
 
 	public Car(int id) {
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS,
-				BaseColumns._ID + "=?", new String[] { String.valueOf(id) },
-				null, null, null);
-		if (cursor.getCount() != 1) {
-			cursor.close();
-			throw new IllegalArgumentException(
-					"A car with this ID does not exist!");
-		} else {
-			cursor.moveToFirst();
-			this.id = id;
-			this.name = cursor.getString(1);
-			this.color = cursor.getInt(2);
-			cursor.close();
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS,
+					BaseColumns._ID + "=?",
+					new String[] { String.valueOf(id) }, null, null, null);
+			if (cursor.getCount() != 1) {
+				cursor.close();
+				throw new IllegalArgumentException(
+						"A car with this ID does not exist!");
+			} else {
+				cursor.moveToFirst();
+				this.id = id;
+				this.name = cursor.getString(1);
+				this.color = cursor.getInt(2);
+				cursor.close();
+			}
 		}
 	}
 
@@ -75,9 +77,12 @@ public class Car extends AbstractItem {
 			throw new RuntimeException("The last car cannot be deleted!");
 		} else if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
-			SQLiteDatabase db = helper.getWritableDatabase();
-			db.delete(CarTable.NAME, BaseColumns._ID + "=?",
-					new String[] { String.valueOf(id) });
+			synchronized (Helper.dbLock) {
+				SQLiteDatabase db = helper.getWritableDatabase();
+				db.delete(CarTable.NAME, BaseColumns._ID + "=?",
+						new String[] { String.valueOf(id) });
+			}
+			helper.dataChanged();
 			deleted = true;
 		}
 	}
@@ -85,24 +90,31 @@ public class Car extends AbstractItem {
 	private void save() {
 		if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
-			SQLiteDatabase db = helper.getWritableDatabase();
-
 			ContentValues values = new ContentValues();
 			values.put(CarTable.COL_NAME, name);
 			values.put(CarTable.COL_COLOR, color);
-			db.update(CarTable.NAME, values, BaseColumns._ID + "=?",
-					new String[] { String.valueOf(id) });
+
+			synchronized (Helper.dbLock) {
+				SQLiteDatabase db = helper.getWritableDatabase();
+				db.update(CarTable.NAME, values, BaseColumns._ID + "=?",
+						new String[] { String.valueOf(id) });
+			}
+			helper.dataChanged();
 		}
 	}
 
 	public static Car create(String name, int color) {
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getWritableDatabase();
-
 		ContentValues values = new ContentValues();
 		values.put(CarTable.COL_NAME, name);
 		values.put(CarTable.COL_COLOR, color);
-		int id = (int) db.insert(CarTable.NAME, null, values);
+
+		int id;
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getWritableDatabase();
+			id = (int) db.insert(CarTable.NAME, null, values);
+		}
+		helper.dataChanged();
 
 		return new Car(id, name, color);
 	}
@@ -111,29 +123,34 @@ public class Car extends AbstractItem {
 		ArrayList<Car> cars = new ArrayList<Car>();
 
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS, null,
-				null, null, null, null);
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS, null,
+					null, null, null, null);
 
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			cars.add(new Car(cursor.getInt(0), cursor.getString(1), cursor
-					.getInt(2)));
-			cursor.moveToNext();
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				cars.add(new Car(cursor.getInt(0), cursor.getString(1), cursor
+						.getInt(2)));
+				cursor.moveToNext();
+			}
+			cursor.close();
 		}
-		cursor.close();
 
 		return cars.toArray(new Car[cars.size()]);
 	}
 
 	public static int getCount() {
+		int count;
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("SELECT count(*) FROM " + CarTable.NAME,
-				null);
-		cursor.moveToFirst();
-		int count = cursor.getInt(0);
-		cursor.close();
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.rawQuery(
+					"SELECT count(*) FROM " + CarTable.NAME, null);
+			cursor.moveToFirst();
+			count = cursor.getInt(0);
+			cursor.close();
+		}
 		return count;
 	}
 }

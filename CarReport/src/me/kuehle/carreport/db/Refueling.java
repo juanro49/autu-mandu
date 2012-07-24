@@ -35,25 +35,27 @@ public class Refueling extends AbstractItem {
 
 	public Refueling(int id) {
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(RefuelingTable.NAME,
-				RefuelingTable.ALL_COLUMNS, BaseColumns._ID + "=?",
-				new String[] { String.valueOf(id) }, null, null, null);
-		if (cursor.getCount() != 1) {
-			cursor.close();
-			throw new IllegalArgumentException(
-					"A fuel with this ID does not exist!");
-		} else {
-			cursor.moveToFirst();
-			this.id = id;
-			this.date = new Date(cursor.getLong(1));
-			this.tachometer = cursor.getInt(2);
-			this.volume = cursor.getFloat(3);
-			this.price = cursor.getFloat(4);
-			this.partial = cursor.getInt(5) > 0;
-			this.note = cursor.getString(6);
-			this.car = new Car(cursor.getInt(7));
-			cursor.close();
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.query(RefuelingTable.NAME,
+					RefuelingTable.ALL_COLUMNS, BaseColumns._ID + "=?",
+					new String[] { String.valueOf(id) }, null, null, null);
+			if (cursor.getCount() != 1) {
+				cursor.close();
+				throw new IllegalArgumentException(
+						"A fuel with this ID does not exist!");
+			} else {
+				cursor.moveToFirst();
+				this.id = id;
+				this.date = new Date(cursor.getLong(1));
+				this.tachometer = cursor.getInt(2);
+				this.volume = cursor.getFloat(3);
+				this.price = cursor.getFloat(4);
+				this.partial = cursor.getInt(5) > 0;
+				this.note = cursor.getString(6);
+				this.car = new Car(cursor.getInt(7));
+				cursor.close();
+			}
 		}
 	}
 
@@ -135,18 +137,18 @@ public class Refueling extends AbstractItem {
 	public void delete() {
 		if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
-			SQLiteDatabase db = helper.getWritableDatabase();
-			db.delete(RefuelingTable.NAME, BaseColumns._ID + "=?",
-					new String[] { String.valueOf(id) });
+			synchronized (Helper.dbLock) {
+				SQLiteDatabase db = helper.getWritableDatabase();
+				db.delete(RefuelingTable.NAME, BaseColumns._ID + "=?",
+						new String[] { String.valueOf(id) });
+			}
+			helper.dataChanged();
 			deleted = true;
 		}
 	}
 
 	private void save() {
 		if (!isDeleted()) {
-			Helper helper = Helper.getInstance();
-			SQLiteDatabase db = helper.getWritableDatabase();
-
 			ContentValues values = new ContentValues();
 			values.put(RefuelingTable.COL_DATE, date.getTime());
 			values.put(RefuelingTable.COL_TACHO, tachometer);
@@ -155,16 +157,19 @@ public class Refueling extends AbstractItem {
 			values.put(RefuelingTable.COL_PARTIAL, partial);
 			values.put(RefuelingTable.COL_NOTE, note);
 			values.put(RefuelingTable.COL_CAR, car.getId());
-			db.update(RefuelingTable.NAME, values, BaseColumns._ID + "=?",
-					new String[] { String.valueOf(id) });
+
+			Helper helper = Helper.getInstance();
+			synchronized (Helper.dbLock) {
+				SQLiteDatabase db = helper.getWritableDatabase();
+				db.update(RefuelingTable.NAME, values, BaseColumns._ID + "=?",
+						new String[] { String.valueOf(id) });
+			}
+			helper.dataChanged();
 		}
 	}
 
 	public static Refueling create(Date date, int tachometer, float volume,
 			float price, boolean partial, String note, Car car) {
-		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getWritableDatabase();
-
 		ContentValues values = new ContentValues();
 		values.put(RefuelingTable.COL_DATE, date.getTime());
 		values.put(RefuelingTable.COL_TACHO, tachometer);
@@ -173,7 +178,14 @@ public class Refueling extends AbstractItem {
 		values.put(RefuelingTable.COL_PARTIAL, partial);
 		values.put(RefuelingTable.COL_NOTE, note);
 		values.put(RefuelingTable.COL_CAR, car.getId());
-		int id = (int) db.insert(RefuelingTable.NAME, null, values);
+
+		Helper helper = Helper.getInstance();
+		int id;
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getWritableDatabase();
+			id = (int) db.insert(RefuelingTable.NAME, null, values);
+		}
+		helper.dataChanged();
 
 		return new Refueling(id, date, tachometer, volume, price, partial,
 				note, car);
@@ -183,72 +195,85 @@ public class Refueling extends AbstractItem {
 		ArrayList<Refueling> refuelings = new ArrayList<Refueling>();
 
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.query(RefuelingTable.NAME,
-				RefuelingTable.ALL_COLUMNS, RefuelingTable.COL_CAR + "=?",
-				new String[] { String.valueOf(car.getId()) }, null, null,
-				String.format("%s %s", RefuelingTable.COL_DATE,
-						orderDateAsc ? "ASC" : "DESC"));
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.query(RefuelingTable.NAME,
+					RefuelingTable.ALL_COLUMNS, RefuelingTable.COL_CAR + "=?",
+					new String[] { String.valueOf(car.getId()) }, null, null,
+					String.format("%s %s", RefuelingTable.COL_DATE,
+							orderDateAsc ? "ASC" : "DESC"));
 
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			refuelings.add(new Refueling(cursor.getInt(0), new Date(cursor
-					.getLong(1)), cursor.getInt(2), cursor.getFloat(3), cursor
-					.getFloat(4), cursor.getInt(5) > 0, cursor.getString(6),
-					car));
-			cursor.moveToNext();
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				refuelings.add(new Refueling(cursor.getInt(0), new Date(cursor
+						.getLong(1)), cursor.getInt(2), cursor.getFloat(3),
+						cursor.getFloat(4), cursor.getInt(5) > 0, cursor
+								.getString(6), car));
+				cursor.moveToNext();
+			}
+			cursor.close();
 		}
-		cursor.close();
 
 		return refuelings.toArray(new Refueling[refuelings.size()]);
 	}
 
 	public static int getCount() {
+		int count;
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("SELECT count(*) FROM "
-				+ RefuelingTable.NAME, null);
-		cursor.moveToFirst();
-		int count = cursor.getInt(0);
-		cursor.close();
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.rawQuery("SELECT count(*) FROM "
+					+ RefuelingTable.NAME, null);
+			cursor.moveToFirst();
+			count = cursor.getInt(0);
+			cursor.close();
+		}
 		return count;
 	}
 
 	public static Refueling getFirst() {
+		Refueling fuel;
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("SELECT * FROM " + RefuelingTable.NAME
-				+ " ORDER BY " + RefuelingTable.COL_DATE + " LIMIT 1", null);
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db
+					.rawQuery("SELECT * FROM " + RefuelingTable.NAME
+							+ " ORDER BY " + RefuelingTable.COL_DATE
+							+ " LIMIT 1", null);
 
-		if (cursor.getCount() != 1) {
-			return null;
+			if (cursor.getCount() != 1) {
+				return null;
+			}
+			cursor.moveToFirst();
+			fuel = new Refueling(cursor.getInt(0), new Date(cursor.getLong(1)),
+					cursor.getInt(2), cursor.getFloat(3), cursor.getFloat(4),
+					cursor.getInt(5) > 0, cursor.getString(6), new Car(
+							cursor.getInt(7)));
+			cursor.close();
 		}
-		cursor.moveToFirst();
-		Refueling fuel = new Refueling(cursor.getInt(0), new Date(
-				cursor.getLong(1)), cursor.getInt(2), cursor.getFloat(3),
-				cursor.getFloat(4), cursor.getInt(5) > 0, cursor.getString(6),
-				new Car(cursor.getInt(7)));
-		cursor.close();
 
 		return fuel;
 	}
 
 	public static Refueling getLast() {
+		Refueling fuel;
 		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery("SELECT * FROM " + RefuelingTable.NAME
-				+ " ORDER BY " + RefuelingTable.COL_DATE + " DESC LIMIT 1",
-				null);
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.rawQuery("SELECT * FROM " + RefuelingTable.NAME
+					+ " ORDER BY " + RefuelingTable.COL_DATE + " DESC LIMIT 1",
+					null);
 
-		if (cursor.getCount() != 1) {
-			return null;
+			if (cursor.getCount() != 1) {
+				return null;
+			}
+			cursor.moveToFirst();
+			fuel = new Refueling(cursor.getInt(0), new Date(cursor.getLong(1)),
+					cursor.getInt(2), cursor.getFloat(3), cursor.getFloat(4),
+					cursor.getInt(5) > 0, cursor.getString(6), new Car(
+							cursor.getInt(7)));
+			cursor.close();
 		}
-		cursor.moveToFirst();
-		Refueling fuel = new Refueling(cursor.getInt(0), new Date(
-				cursor.getLong(1)), cursor.getInt(2), cursor.getFloat(3),
-				cursor.getFloat(4), cursor.getInt(5) > 0, cursor.getString(6),
-				new Car(cursor.getInt(7)));
-		cursor.close();
 
 		return fuel;
 	}

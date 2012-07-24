@@ -25,6 +25,7 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ListFragment;
+import android.app.backup.BackupManager;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -165,6 +166,9 @@ public class PreferencesActivity extends PreferenceActivity {
 				} else if (preference instanceof EditTextPreference) {
 					preference.setSummary(newValue.toString());
 				}
+				BackupManager backupManager = new BackupManager(getActivity()
+						.getApplicationContext());
+				backupManager.dataChanged();
 				return true;
 			}
 		};
