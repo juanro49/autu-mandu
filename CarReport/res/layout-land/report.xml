@@ -17,7 +17,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
     android:baselineAligned="false"
     android:orientation="horizontal" >
 
@@ -25,6 +24,7 @@
         android:id="@+id/graph"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_margin="16dp"
         android:layout_weight="0.6" >
     </LinearLayout>
 
@@ -32,7 +32,6 @@
         android:id="@+id/lstData"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
         android:layout_weight="0.4" >
     </ListView>
 

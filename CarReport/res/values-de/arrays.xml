@@ -21,6 +21,10 @@
         <item>Benzinpreis</item>
         <item>Kosten</item>
     </string-array>
+    <string-array name="overall_section_positions">
+        <item>Oben</item>
+        <item>Unten</item>
+    </string-array>
     <string-array name="repeat_intervals">
         <item>Einmalig</item>
         <item>Jeden Tag wiederholen</item>

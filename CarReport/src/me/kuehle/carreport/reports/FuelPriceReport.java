@@ -34,11 +34,10 @@ import com.jjoe64.graphview.GraphView.GraphViewSeries;
 import com.jjoe64.graphview.LineGraphView;
 
 public class FuelPriceReport extends AbstractReport {
-	private Context context;
 	private String unit;
 
 	public FuelPriceReport(Context context) {
-		this.context = context;
+		super(context);
 
 		Preferences prefs = new Preferences(context);
 		unit = String.format("%s/%s", prefs.getUnitCurrency(),
@@ -111,5 +110,10 @@ public class FuelPriceReport extends AbstractReport {
 					dateFmt.format(lastFuel.getDate()) });
 		}
 		return graphView;
+	}
+
+	@Override
+	public Section getOverallSection() {
+		return null;
 	}
 }

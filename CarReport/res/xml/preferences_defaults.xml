@@ -12,7 +12,7 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
@@ -25,6 +25,13 @@
             android:defaultValue="1"
             android:key="default_car"
             android:title="@string/pref_title_default_car" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_title_category_appearance" >
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/overall_section_positions"
+            android:key="appearance_overall_section_pos"
+            android:title="@string/pref_title_appearance_overall_section_pos" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_units" >
         <EditTextPreference

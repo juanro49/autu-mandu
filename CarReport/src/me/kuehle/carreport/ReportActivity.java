@@ -16,6 +16,10 @@
 
 package me.kuehle.carreport;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
 import me.kuehle.carreport.reports.AbstractReport;
 import me.kuehle.carreport.reports.CostsReport;
 import me.kuehle.carreport.reports.FuelConsumptionReport;
@@ -24,15 +28,20 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 public class ReportActivity extends Activity {
 	private static final int ADD_REFUELING_REQUEST_CODE = 0;
@@ -150,17 +159,8 @@ public class ReportActivity extends Activity {
 			graph.addView(report.getGraphView());
 		}
 
-		View txtData = findViewById(R.id.txtData);
-		if (txtData != null) {
-			txtData.setVisibility(graph.getVisibility());
-		}
-
 		ListView lstData = (ListView) findViewById(R.id.lstData);
-		SimpleAdapter adapter = new SimpleAdapter(ReportActivity.this,
-				report.getData(), android.R.layout.simple_list_item_2,
-				report.getDataKeys(), new int[] { android.R.id.text1,
-						android.R.id.text2 });
-		lstData.setAdapter(adapter);
+		lstData.setAdapter(new ReportAdapter(report.getData()));
 	}
 
 	private OnNavigationListener navigationListener = new OnNavigationListener() {
@@ -170,4 +170,92 @@ public class ReportActivity extends Activity {
 			return true;
 		}
 	};
+
+	private class ReportAdapter extends BaseAdapter {
+		private static final int ITEM_VIEW_TYPE_NORMAL = 0;
+		private static final int ITEM_VIEW_TYPE_SEPARATOR = 1;
+		private static final int ITEM_VIEW_TYPE_COUNT = 2;
+
+		private Object[] items;
+
+		public ReportAdapter(
+				HashMap<AbstractReport.Section, ArrayList<AbstractReport.Item>> data) {
+			ArrayList<Object> items = new ArrayList<Object>();
+
+			ArrayList<AbstractReport.Section> keys = new ArrayList<AbstractReport.Section>(
+					data.keySet());
+			Collections.sort(keys);
+			for (AbstractReport.Section section : keys) {
+				if (section != null) {
+					items.add(section);
+				}
+				items.addAll(data.get(section));
+			}
+
+			this.items = items.toArray();
+		}
+
+		@Override
+		public int getCount() {
+			return items.length;
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return items[position];
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public int getViewTypeCount() {
+			return ITEM_VIEW_TYPE_COUNT;
+		}
+
+		@Override
+		public int getItemViewType(int position) {
+			return (items[position] instanceof AbstractReport.Section) ? ITEM_VIEW_TYPE_SEPARATOR
+					: ITEM_VIEW_TYPE_NORMAL;
+		}
+
+		@Override
+		public boolean isEnabled(int position) {
+			return getItemViewType(position) != ITEM_VIEW_TYPE_SEPARATOR;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			final int type = getItemViewType(position);
+
+			if (convertView == null) {
+				convertView = LayoutInflater
+						.from(ReportActivity.this)
+						.inflate(
+								type == ITEM_VIEW_TYPE_SEPARATOR ? R.layout.separator_list_item
+										: android.R.layout.simple_list_item_2,
+								parent, false);
+			}
+
+			if (type == ITEM_VIEW_TYPE_SEPARATOR) {
+				AbstractReport.Section section = (AbstractReport.Section) getItem(position);
+				TextView text = (TextView) convertView;
+				text.setText(section.getLabel());
+				text.setTextColor(section.getColor());
+				GradientDrawable drawableBottom = (GradientDrawable) text
+						.getCompoundDrawables()[3];
+				drawableBottom.setColorFilter(section.getColor(), Mode.SRC_ATOP);
+			} else {
+				AbstractReport.Item item = (AbstractReport.Item) getItem(position);
+				((TextView) convertView.findViewById(android.R.id.text1))
+						.setText(item.getLabel());
+				((TextView) convertView.findViewById(android.R.id.text2))
+						.setText(item.getValue());
+			}
+
+			return convertView;
+		}
+	}
 }

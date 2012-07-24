@@ -33,12 +33,11 @@ import com.jjoe64.graphview.GraphView.LegendAlign;
 import com.jjoe64.graphview.LineGraphView;
 
 public class FuelConsumptionReport extends AbstractReport {
-	private Context context;
 	private ArrayList<GraphViewSeries> graphSerieses = new ArrayList<GraphViewSeries>();
 	private String unit;
 
 	public FuelConsumptionReport(Context context) {
-		this.context = context;
+		super(context);
 
 		Preferences prefs = new Preferences(context);
 		unit = String.format("%s/100%s", prefs.getUnitVolume(),
@@ -70,8 +69,8 @@ public class FuelConsumptionReport extends AbstractReport {
 			}
 
 			if (graphData.size() == 0) {
-				addData(car.getName(),
-						context.getString(R.string.report_not_enough_data));
+				addData(context.getString(R.string.report_not_enough_data), "",
+						car);
 			} else {
 				GraphViewSeries series = new GraphViewSeries(car.getName(),
 						new GraphViewStyle(car.getColor(), 3),
@@ -79,17 +78,15 @@ public class FuelConsumptionReport extends AbstractReport {
 				graphSerieses.add(series);
 
 				consumptions.addAll(consumptionsCar);
-				addConsumptionData(car.getName(), consumptionsCar);
+				addConsumptionData(car, consumptionsCar);
 			}
 		}
 
 		if (cars.length > 1) {
 			if (consumptions.size() == 0) {
-				addData(context.getString(R.string.report_overall),
-						context.getString(R.string.report_not_enough_data));
+				addData(context.getString(R.string.report_not_enough_data), "");
 			} else {
-				addConsumptionData(context.getString(R.string.report_overall),
-						consumptions);
+				addConsumptionData(null, consumptions);
 			}
 		}
 	}
@@ -125,7 +122,7 @@ public class FuelConsumptionReport extends AbstractReport {
 		return graphView;
 	}
 
-	private void addConsumptionData(String label, ArrayList<Double> numbers) {
+	private void addConsumptionData(Car car, ArrayList<Double> numbers) {
 		double max = 0;
 		double min = Double.MAX_VALUE;
 		double sum = 0;
@@ -135,11 +132,11 @@ public class FuelConsumptionReport extends AbstractReport {
 			sum += num;
 		}
 
-		addData(label + ": " + context.getString(R.string.report_highest),
-				String.format("%.2f %s", max, unit));
-		addData(label + ": " + context.getString(R.string.report_lowest),
-				String.format("%.2f %s", min, unit));
-		addData(label + ": " + context.getString(R.string.report_average),
-				String.format("%.2f %s", sum / numbers.size(), unit));
+		addData(context.getString(R.string.report_highest),
+				String.format("%.2f %s", max, unit), car);
+		addData(context.getString(R.string.report_lowest),
+				String.format("%.2f %s", min, unit), car);
+		addData(context.getString(R.string.report_average),
+				String.format("%.2f %s", sum / numbers.size(), unit), car);
 	}
 }

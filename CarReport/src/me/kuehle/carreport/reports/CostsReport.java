@@ -43,6 +43,8 @@ public class CostsReport extends AbstractReport {
 	private String unit;
 
 	public CostsReport(Context context) {
+		super(context);
+		
 		Preferences prefs = new Preferences(context);
 		unit = prefs.getUnitCurrency();
 
@@ -58,8 +60,8 @@ public class CostsReport extends AbstractReport {
 			OtherCost[] otherCosts = OtherCost.getAllForCar(car, true);
 
 			if ((refuelings.length + otherCosts.length) < 2) {
-				addData(car.getName(),
-						context.getString(R.string.report_not_enough_data));
+				addData(context.getString(R.string.report_not_enough_data), "",
+						car);
 				continue;
 			}
 
@@ -108,28 +110,23 @@ public class CostsReport extends AbstractReport {
 
 			int elapsedDays = Math.max(1, Days.daysBetween(startDate, endDate)
 					.getDays());
-			addData(car.getName() + ": "
-					+ context.getString(R.string.report_day),
-					String.format("%.2f %s", costs / elapsedDays, unit));
+			addData(context.getString(R.string.report_day),
+					String.format("%.2f %s", costs / elapsedDays, unit), car);
 			int elapsedMonths = Math.max(1,
 					Months.monthsBetween(startDate, endDate).getMonths());
-			addData(car.getName() + ": "
-					+ context.getString(R.string.report_month),
-					String.format("%.2f %s", costs / elapsedMonths, unit));
+			addData(context.getString(R.string.report_month),
+					String.format("%.2f %s", costs / elapsedMonths, unit), car);
 			int elapsedYears = Math.max(1,
 					Years.yearsBetween(startDate, endDate).getYears());
-			addData(car.getName() + ": "
-					+ context.getString(R.string.report_year),
-					String.format("%.2f %s", costs / elapsedYears, unit));
+			addData(context.getString(R.string.report_year),
+					String.format("%.2f %s", costs / elapsedYears, unit), car);
 			int tachoDiff = Math.max(1, endTacho - startTacho);
-			addData(car.getName() + ": " + prefs.getUnitDistance(),
-					String.format("%.2f %s", costs / tachoDiff, unit));
+			addData(prefs.getUnitDistance(),
+					String.format("%.2f %s", costs / tachoDiff, unit), car);
 
-			addData(car.getName()
-					+ ": "
-					+ context.getString(R.string.report_since, DateFormat
-							.getDateInstance().format(startDate.toDate())),
-					String.format("%.2f %s", costs, unit));
+			addData(context.getString(R.string.report_since, DateFormat
+					.getDateInstance().format(startDate.toDate())),
+					String.format("%.2f %s", costs, unit), car);
 		}
 	}
 

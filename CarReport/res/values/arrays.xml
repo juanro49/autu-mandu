@@ -21,6 +21,10 @@
         <item>Fuel price</item>
         <item>Costs</item>
     </string-array>
+    <string-array name="overall_section_positions">
+        <item>Top</item>
+        <item>Bottom</item>
+    </string-array>
     <string-array name="repeat_intervals">
         <item>Once</item>
         <item>Repeat every day</item>

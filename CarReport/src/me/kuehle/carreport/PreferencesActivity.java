@@ -28,6 +28,7 @@ import android.app.ListFragment;
 import android.app.backup.BackupManager;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -126,6 +127,21 @@ public class PreferencesActivity extends PreferenceActivity {
 						.getDefaultReport()]);
 			}
 
+			// Appearance Overall section position
+			{
+				String[] entries = getResources().getStringArray(
+						R.array.overall_section_positions);
+				String[] entryValues = new String[entries.length];
+				for (int i = 0; i < entries.length; i++) {
+					entryValues[i] = String.valueOf(i);
+				}
+				ListPreference sectionPos = (ListPreference) findPreference("appearance_overall_section_pos");
+				sectionPos.setEntryValues(entryValues);
+				sectionPos
+						.setOnPreferenceChangeListener(onPreferenceChangeListener);
+				sectionPos.setSummary(entries[prefs.getOverallSectionPos()]);
+			}
+
 			// Unit Currency
 			{
 				EditTextPreference unitCurrency = (EditTextPreference) findPreference("unit_currency");
@@ -162,6 +178,12 @@ public class PreferencesActivity extends PreferenceActivity {
 					String[] reports = getResources().getStringArray(
 							R.array.reports);
 					preference.setSummary(reports[Integer.parseInt(newValue
+							.toString())]);
+				} else if (preference.getKey().equals(
+						"appearance_overall_section_pos")) {
+					String[] positions = getResources().getStringArray(
+							R.array.overall_section_positions);
+					preference.setSummary(positions[Integer.parseInt(newValue
 							.toString())]);
 				} else if (preference instanceof EditTextPreference) {
 					preference.setSummary(newValue.toString());
@@ -419,9 +441,9 @@ public class PreferencesActivity extends PreferenceActivity {
 				}
 
 				holder.name.setText(cars[position].getName());
-				holder.color.setBackgroundResource(R.drawable.color_button);
 				((GradientDrawable) holder.color.getBackground())
-						.setColor(cars[position].getColor());
+						.setColorFilter(cars[position].getColor(),
+								Mode.SRC_ATOP);
 
 				return convertView;
 			}

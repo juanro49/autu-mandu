@@ -35,6 +35,11 @@ public class Preferences {
 		return Integer.parseInt(prefs.getString("default_report", "0"));
 	}
 
+	public int getOverallSectionPos() {
+		return Integer.parseInt(prefs.getString(
+				"appearance_overall_section_pos", "0"));
+	}
+
 	public String getUnitCurrency() {
 		return prefs.getString("unit_currency", "EUR");
 	}
