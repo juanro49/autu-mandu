@@ -19,6 +19,7 @@ package me.kuehle.carreport;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,6 +39,8 @@ public class ViewDataActivity extends Activity implements
 	private ViewDataListFragment mList;
 	private AbstractEditFragment mEdit;
 	private boolean mDualPane;
+	private boolean mSkipNextBackStackEvent = false;
+	private int mLowestBackStackState = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,19 +54,15 @@ public class ViewDataActivity extends Activity implements
 		mDualPane = !editFrame.getParent().equals(findViewById(R.id.list));
 
 		FragmentManager fm = getFragmentManager();
+		fm.addOnBackStackChangedListener(mOnBackStackChangedListener);
 		mList = (ViewDataListFragment) fm.findFragmentByTag(TAG_LIST);
 		mEdit = (AbstractEditFragment) fm.findFragmentByTag(TAG_EDIT);
 		if (mList == null) {
 			mList = new ViewDataListFragment();
 			fm.beginTransaction().add(R.id.list, mList, TAG_LIST).commit();
 		}
-		if (mEdit != null && !mDualPane) {
-			fm.popBackStackImmediate();
-			FragmentTransaction ft = getFragmentManager().beginTransaction();
-			ft.hide(mList);
-			ft.replace(R.id.edit, mEdit, TAG_EDIT);
-			ft.addToBackStack(null);
-			ft.commit();
+		if (mEdit != null) {
+			openItemDoFragmentTransactions();
 		}
 	}
 
@@ -80,19 +79,19 @@ public class ViewDataActivity extends Activity implements
 		case R.id.menu_add_refueling:
 			Intent intent = new Intent(this, EditFragmentActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			intent.putExtra(EditFragmentActivity.EXTRA_FINISH_ON_BIG_SCREEN,
-					false);
 			intent.putExtra(EditFragmentActivity.EXTRA_EDIT,
 					EditFragmentActivity.EXTRA_EDIT_REFUELING);
+			intent.putExtra(EditRefuelingFragment.EXTRA_CAR_ID, mList
+					.getCurrentCar().getId());
 			startActivityForResult(intent, ADD_REFUELING_REQUEST_CODE);
 			return true;
 		case R.id.menu_add_other:
 			Intent intent1 = new Intent(this, EditFragmentActivity.class);
 			intent1.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			intent1.putExtra(EditFragmentActivity.EXTRA_FINISH_ON_BIG_SCREEN,
-					false);
 			intent1.putExtra(EditFragmentActivity.EXTRA_EDIT,
 					EditFragmentActivity.EXTRA_EDIT_OTHER);
+			intent1.putExtra(EditOtherCostFragment.EXTRA_CAR_ID, mList
+					.getCurrentCar().getId());
 			startActivityForResult(intent1, ADD_OTHER_REQUEST_CODE);
 			return true;
 		case android.R.id.home:
@@ -117,7 +116,8 @@ public class ViewDataActivity extends Activity implements
 	@Override
 	public void closeCurrentItem() {
 		if (mEdit != null) {
-			getFragmentManager().popBackStack();
+			getFragmentManager().popBackStack(mLowestBackStackState,
+					FragmentManager.POP_BACK_STACK_INCLUSIVE);
 			setNoEntryMessageVisible(true);
 			mEdit = null;
 		}
@@ -149,23 +149,46 @@ public class ViewDataActivity extends Activity implements
 	@Override
 	public void openItem(ViewDataListFragment.AbstractEditHelper helper) {
 		setNoEntryMessageVisible(false);
-		
+
 		mEdit = helper.createEditFragment();
-		getFragmentManager().popBackStackImmediate();
-		FragmentTransaction ft = getFragmentManager().beginTransaction();
+		openItemDoFragmentTransactions();
+	}
+
+	private void openItemDoFragmentTransactions() {
+		mSkipNextBackStackEvent = true;
+		getFragmentManager().popBackStackImmediate(mLowestBackStackState,
+				FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
 		if (!mDualPane) {
-			ft.hide(mList);
+			mSkipNextBackStackEvent = true;
+			mLowestBackStackState = getFragmentManager().beginTransaction()
+					.hide(mList).addToBackStack(null).commit();
+			getFragmentManager().executePendingTransactions();
 		}
+
+		mSkipNextBackStackEvent = true;
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
 		ft.replace(R.id.edit, mEdit, TAG_EDIT);
 		ft.addToBackStack(null);
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		ft.commit();
 	}
-	
+
 	private void setNoEntryMessageVisible(boolean visible) {
 		View msg = findViewById(R.id.txtNoEntrySelected);
-		if(msg != null) {
+		if (msg != null) {
 			msg.setVisibility(visible ? View.VISIBLE : View.GONE);
 		}
 	}
+
+	private OnBackStackChangedListener mOnBackStackChangedListener = new OnBackStackChangedListener() {
+		@Override
+		public void onBackStackChanged() {
+			if (mSkipNextBackStackEvent) {
+				mSkipNextBackStackEvent = false;
+			} else {
+				itemCanceled();
+			}
+		}
+	};
 }

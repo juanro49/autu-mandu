@@ -85,8 +85,6 @@ public class ReportActivity extends Activity {
 		case R.id.menu_add_refueling:
 			Intent intent = new Intent(this, EditFragmentActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			intent.putExtra(EditFragmentActivity.EXTRA_FINISH_ON_BIG_SCREEN,
-					false);
 			intent.putExtra(EditFragmentActivity.EXTRA_EDIT,
 					EditFragmentActivity.EXTRA_EDIT_REFUELING);
 			startActivityForResult(intent, ADD_REFUELING_REQUEST_CODE);
@@ -94,8 +92,6 @@ public class ReportActivity extends Activity {
 		case R.id.menu_add_other:
 			Intent intent3 = new Intent(this, EditFragmentActivity.class);
 			intent3.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			intent3.putExtra(EditFragmentActivity.EXTRA_FINISH_ON_BIG_SCREEN,
-					false);
 			intent3.putExtra(EditFragmentActivity.EXTRA_EDIT,
 					EditFragmentActivity.EXTRA_EDIT_OTHER);
 			startActivityForResult(intent3, ADD_OTHER_REQUEST_CODE);

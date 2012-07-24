@@ -130,6 +130,10 @@ public class ViewDataListFragment extends Fragment {
 		outState.putInt("curTab", mTabHost.getCurrentTab());
 		outState.putInt("curItem", mCurrentItem);
 	}
+	
+	public Car getCurrentCar() {
+		return mCurrentCar;
+	}
 
 	public void openItem(int position) {
 		mCurrentTab.setId(mCurrentTab.mItems[position].getId());

@@ -21,9 +21,7 @@ import java.util.Date;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -31,6 +29,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class EditRefuelingFragment extends AbstractEditFragment {
+	public static final String EXTRA_CAR_ID = "car_id";
+	
 	private EditTextDateField edtDate;
 
 	private Car[] cars;
@@ -91,27 +91,22 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 		}
 		Spinner spnCar = (Spinner) getView().findViewById(R.id.spnCar);
 		spnCar.setAdapter(carAdapter);
-		int defaultCar = prefs.getDefaultCar();
-		for (int pos = 0; pos < cars.length; pos++) {
-			if (cars[pos].getId() == defaultCar) {
-				spnCar.setSelection(pos);
-			}
-		}
 	}
 
 	@Override
 	protected void fillFields() {
 		if (!isInEditMode()) {
+			Preferences prefs = new Preferences(getActivity());
+			
 			edtDate.setDate(new Date());
 
-			SharedPreferences prefs = PreferenceManager
-					.getDefaultSharedPreferences(getActivity()
-							.getApplicationContext());
-			int defaultCar = Integer.parseInt(prefs.getString("default_car",
-					"1"));
 			Spinner spnCar = ((Spinner) getView().findViewById(R.id.spnCar));
+			int selectCar = getArguments().getInt(EXTRA_CAR_ID);
+			if (selectCar == 0) {
+				selectCar = prefs.getDefaultCar();
+			}
 			for (int pos = 0; pos < cars.length; pos++) {
-				if (cars[pos].getId() == defaultCar) {
+				if (cars[pos].getId() == selectCar) {
 					spnCar.setSelection(pos);
 				}
 			}
