@@ -17,6 +17,7 @@
 package me.kuehle.carreport.reports;
 
 import java.text.DateFormat;
+import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -24,7 +25,6 @@ import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Helper;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.OtherCostTable;
-import me.kuehle.carreport.db.OtherCostTable.RepeatInterval;
 import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.db.RefuelingTable;
 
@@ -50,7 +50,6 @@ public class CostsReport extends AbstractReport {
 		for (Car car : cars) {
 			int startTacho = Integer.MAX_VALUE;
 			int endTacho = Integer.MIN_VALUE;
-			DateTime now = new DateTime();
 			DateTime startDate = new DateTime();
 			DateTime endDate = new DateTime();
 			double costs = 0;
@@ -99,27 +98,11 @@ public class CostsReport extends AbstractReport {
 				}
 			}
 			for (OtherCost otherCost : otherCosts) {
-				DateTime date = new DateTime(otherCost.getDate());
-				if (startDate.isBefore(date.getMillis() + 1)) {
-					int count = 1;
-					if (otherCost.getRepInterval().equals(RepeatInterval.DAY)) {
-						count += Days.daysBetween(date, now).getDays()
-								/ otherCost.getRepMultiplier();
-					} else if (otherCost.getRepInterval().equals(
-							RepeatInterval.MONTH)) {
-						count += Months.monthsBetween(date, now).getMonths()
-								/ otherCost.getRepMultiplier();
-					} else if (otherCost.getRepInterval().equals(
-							RepeatInterval.QUARTER)) {
-						int quarters = Months.monthsBetween(date, now)
-								.getMonths() / 3;
-						count += quarters / otherCost.getRepMultiplier();
-					} else if (otherCost.getRepInterval().equals(
-							RepeatInterval.YEAR)) {
-						count += Years.yearsBetween(date, now).getYears()
-								/ otherCost.getRepMultiplier();
-					}
-					costs += otherCost.getPrice() * count;
+				Date date = otherCost.getDate();
+				if (startDate.isBefore(date.getTime() + 1)) {
+					costs += otherCost.getPrice()
+							* otherCost.getRecurrence().getRecurrencesSince(
+									date);
 				}
 			}
 

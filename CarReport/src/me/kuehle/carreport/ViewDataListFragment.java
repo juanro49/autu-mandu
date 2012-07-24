@@ -23,8 +23,8 @@ import java.util.HashMap;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
-import me.kuehle.carreport.db.OtherCostTable.RepeatInterval;
 import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.util.RecurrenceInterval;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -451,11 +451,12 @@ public class ViewDataListFragment extends Fragment {
 				} else {
 					map.put("text_bl", "");
 				}
-				if (other.getRepInterval().equals(RepeatInterval.ONCE)) {
+				if (other.getRecurrence().getInterval()
+						.equals(RecurrenceInterval.ONCE)) {
 					map.put("text_bm", "");
 				} else {
-					map.put("text_bm", repIntervals[other.getRepInterval()
-							.getInterval()]);
+					map.put("text_bm", repIntervals[other.getRecurrence()
+							.getInterval().getValue()]);
 				}
 				map.put("text_br",
 						String.format("%.2f %s", other.getPrice(),

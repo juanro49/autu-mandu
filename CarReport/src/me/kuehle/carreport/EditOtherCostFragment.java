@@ -21,7 +21,8 @@ import java.util.Date;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
-import me.kuehle.carreport.db.OtherCostTable.RepeatInterval;
+import me.kuehle.carreport.util.Recurrence;
+import me.kuehle.carreport.util.RecurrenceInterval;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -142,7 +143,8 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 
 			Spinner spnRepeat = ((Spinner) getView().findViewById(
 					R.id.spnRepeat));
-			spnRepeat.setSelection(other.getRepInterval().getInterval());
+			spnRepeat.setSelection(other.getRecurrence().getInterval()
+					.getValue());
 
 			EditText edtNote = ((EditText) getView().findViewById(R.id.edtNote));
 			edtNote.setText(other.getNote());
@@ -163,24 +165,25 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 		Date date = edtDate.getDate();
 		int tachometer = getIntegerFromEditText(R.id.edtTachometer, -1);
 		float price = (float) getDoubleFromEditText(R.id.edtPrice, 0);
-		RepeatInterval repInterval = RepeatInterval
-				.getByInterval((int) ((Spinner) getView().findViewById(
+		RecurrenceInterval repInterval = RecurrenceInterval
+				.getByValue((int) ((Spinner) getView().findViewById(
 						R.id.spnRepeat)).getSelectedItemId());
+		Recurrence recurrence = new Recurrence(repInterval);
 		String note = ((EditText) getView().findViewById(R.id.edtNote))
 				.getText().toString();
 		Car car = cars[(int) ((Spinner) getView().findViewById(R.id.spnCar))
 				.getSelectedItemId()];
 		if (price > 0) {
 			if (!isInEditMode()) {
-				OtherCost.create(title, date, tachometer, price, repInterval,
-						1, note, car);
+				OtherCost.create(title, date, tachometer, price, recurrence,
+						note, car);
 			} else {
 				OtherCost other = (OtherCost) editItem;
 				other.setTitle(title);
 				other.setDate(date);
 				other.setTachometer(tachometer);
 				other.setPrice(price);
-				other.setRepInterval(repInterval);
+				other.setRecurrence(recurrence);
 				other.setNote(note);
 				other.setCar(car);
 			}

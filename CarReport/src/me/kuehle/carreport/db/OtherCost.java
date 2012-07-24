@@ -19,8 +19,8 @@ package me.kuehle.carreport.db;
 import java.util.ArrayList;
 import java.util.Date;
 
-import me.kuehle.carreport.db.OtherCostTable.RepeatInterval;
-
+import me.kuehle.carreport.util.Recurrence;
+import me.kuehle.carreport.util.RecurrenceInterval;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,8 +31,7 @@ public class OtherCost extends AbstractItem {
 	private Date date;
 	private int tachometer;
 	private float price;
-	private OtherCostTable.RepeatInterval repInterval;
-	private int repMultiplier;
+	private Recurrence recurrence;
 	private String note;
 	private Car car;
 
@@ -53,8 +52,9 @@ public class OtherCost extends AbstractItem {
 			this.date = new Date(cursor.getLong(2));
 			this.tachometer = cursor.getInt(3);
 			this.price = cursor.getFloat(4);
-			this.repInterval = RepeatInterval.getByInterval(cursor.getInt(5));
-			this.repMultiplier = cursor.getInt(6);
+			this.recurrence = new Recurrence(
+					RecurrenceInterval.getByValue(cursor.getInt(5)),
+					cursor.getInt(6));
 			this.note = cursor.getString(7);
 			this.car = new Car(cursor.getInt(8));
 			cursor.close();
@@ -62,15 +62,13 @@ public class OtherCost extends AbstractItem {
 	}
 
 	private OtherCost(int id, String title, Date date, int tachometer,
-			float price, RepeatInterval repInterval, int repMultiplier,
-			String note, Car car) {
+			float price, Recurrence recurrence, String note, Car car) {
 		this.id = id;
 		this.title = title;
 		this.date = date;
 		this.tachometer = tachometer;
 		this.price = price;
-		this.repInterval = repInterval;
-		this.repMultiplier = repMultiplier;
+		this.recurrence = recurrence;
 		this.note = note;
 		this.car = car;
 	}
@@ -111,20 +109,12 @@ public class OtherCost extends AbstractItem {
 		save();
 	}
 
-	public OtherCostTable.RepeatInterval getRepInterval() {
-		return repInterval;
+	public Recurrence getRecurrence() {
+		return recurrence;
 	}
 
-	public void setRepInterval(OtherCostTable.RepeatInterval repInterval) {
-		this.repInterval = repInterval;
-	}
-
-	public int getRepMultiplier() {
-		return repMultiplier;
-	}
-
-	public void setRepMultiplier(int repMultiplier) {
-		this.repMultiplier = repMultiplier;
+	public void setRecurrence(Recurrence recurrence) {
+		this.recurrence = recurrence;
 	}
 
 	public String getNote() {
@@ -165,8 +155,9 @@ public class OtherCost extends AbstractItem {
 			values.put(OtherCostTable.COL_DATE, date.getTime());
 			values.put(OtherCostTable.COL_TACHO, tachometer);
 			values.put(OtherCostTable.COL_PRICE, price);
-			values.put(OtherCostTable.COL_REP_INT, repInterval.getInterval());
-			values.put(OtherCostTable.COL_REP_MULTI, repMultiplier);
+			values.put(OtherCostTable.COL_REP_INT, recurrence.getInterval()
+					.getValue());
+			values.put(OtherCostTable.COL_REP_MULTI, recurrence.getMultiplier());
 			values.put(OtherCostTable.COL_NOTE, note);
 			values.put(OtherCostTable.COL_CAR, car.getId());
 			db.update(OtherCostTable.NAME, values, BaseColumns._ID + "=?",
@@ -175,8 +166,7 @@ public class OtherCost extends AbstractItem {
 	}
 
 	public static OtherCost create(String title, Date date, int tachometer,
-			float price, RepeatInterval repInterval, int repMultiplier,
-			String note, Car car) {
+			float price, Recurrence recurrence, String note, Car car) {
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getWritableDatabase();
 
@@ -185,14 +175,15 @@ public class OtherCost extends AbstractItem {
 		values.put(OtherCostTable.COL_DATE, date.getTime());
 		values.put(OtherCostTable.COL_TACHO, tachometer);
 		values.put(OtherCostTable.COL_PRICE, price);
-		values.put(OtherCostTable.COL_REP_INT, repInterval.getInterval());
-		values.put(OtherCostTable.COL_REP_MULTI, repMultiplier);
+		values.put(OtherCostTable.COL_REP_INT, recurrence.getInterval()
+				.getValue());
+		values.put(OtherCostTable.COL_REP_MULTI, recurrence.getMultiplier());
 		values.put(OtherCostTable.COL_NOTE, note);
 		values.put(OtherCostTable.COL_CAR, car.getId());
 		int id = (int) db.insert(OtherCostTable.NAME, null, values);
 
-		return new OtherCost(id, title, date, tachometer, price, repInterval,
-				repMultiplier, note, car);
+		return new OtherCost(id, title, date, tachometer, price, recurrence,
+				note, car);
 	}
 
 	public static OtherCost[] getAllForCar(Car car, boolean orderDateAsc) {
@@ -210,9 +201,10 @@ public class OtherCost extends AbstractItem {
 		while (!cursor.isAfterLast()) {
 			others.add(new OtherCost(cursor.getInt(0), cursor.getString(1),
 					new Date(cursor.getLong(2)), cursor.getInt(3), cursor
-							.getFloat(4), RepeatInterval.getByInterval(cursor
-							.getInt(5)), cursor.getInt(6), cursor.getString(7),
-					car));
+							.getFloat(4),
+					new Recurrence(RecurrenceInterval.getByValue(cursor
+							.getInt(5)), cursor.getInt(6)),
+					cursor.getString(7), car));
 			cursor.moveToNext();
 		}
 		cursor.close();

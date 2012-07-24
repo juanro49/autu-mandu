@@ -66,33 +66,4 @@ public class OtherCostTable {
 			db.execSQL(STMT_UPGRADE_1TO2_2);
 		}
 	}
-
-	public enum RepeatInterval {
-		ONCE(0), DAY(1), MONTH(2), QUARTER(3), YEAR(4);
-		
-		private int interval;
-		 
-		private RepeatInterval(int i) {
-			interval = i;
-		}
-		
-		public int getInterval() {
-			return interval;
-		}
-		
-		public static RepeatInterval getByInterval(int i) {
-			switch(i) {
-			case 1:
-				return DAY;
-			case 2:
-				return MONTH;
-			case 3:
-				return QUARTER;
-			case 4:
-				return YEAR;
-			default:
-				return ONCE;
-			}
-		}
-	}
 }
