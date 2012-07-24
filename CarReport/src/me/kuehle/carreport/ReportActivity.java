@@ -177,6 +177,7 @@ public class ReportActivity extends Activity {
 		private static final int ITEM_VIEW_TYPE_COUNT = 2;
 
 		private Object[] items;
+		private boolean colorSections;
 
 		public ReportAdapter(
 				HashMap<AbstractReport.Section, ArrayList<AbstractReport.Item>> data) {
@@ -193,6 +194,9 @@ public class ReportActivity extends Activity {
 			}
 
 			this.items = items.toArray();
+
+			Preferences prefs = new Preferences(ReportActivity.this);
+			colorSections = prefs.getColorSections();
 		}
 
 		@Override
@@ -243,10 +247,13 @@ public class ReportActivity extends Activity {
 				AbstractReport.Section section = (AbstractReport.Section) getItem(position);
 				TextView text = (TextView) convertView;
 				text.setText(section.getLabel());
-				text.setTextColor(section.getColor());
-				GradientDrawable drawableBottom = (GradientDrawable) text
-						.getCompoundDrawables()[3];
-				drawableBottom.setColorFilter(section.getColor(), Mode.SRC_ATOP);
+				if (colorSections) {
+					text.setTextColor(section.getColor());
+					GradientDrawable drawableBottom = (GradientDrawable) text
+							.getCompoundDrawables()[3];
+					drawableBottom.setColorFilter(section.getColor(),
+							Mode.SRC_ATOP);
+				}
 			} else {
 				AbstractReport.Item item = (AbstractReport.Item) getItem(position);
 				((TextView) convertView.findViewById(android.R.id.text1))

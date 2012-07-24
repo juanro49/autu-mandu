@@ -85,8 +85,10 @@
     <string name="pref_title_default_car">Car</string>
     <string name="pref_title_default_report">Report</string>
     <string name="pref_title_appearance_overall_section_pos">Position of "Overall" section</string>
+    <string name="pref_title_appearance_color_sections">Color sections</string>
     <string name="pref_title_unit_currency">Currency</string>
     <string name="pref_title_unit_volume">Volume</string>
     <string name="pref_title_unit_distance">Distance</string>
+    <string name="pref_summary_appearance_color_sections">Set the section heading to car color.</string>
 
 </resources>

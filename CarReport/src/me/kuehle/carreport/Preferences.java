@@ -26,6 +26,10 @@ public class Preferences {
 	public Preferences(Context context) {
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
+	
+	public boolean getColorSections() {
+		return prefs.getBoolean("appearance_color_sections", true);
+	}
 
 	public int getDefaultCar() {
 		return Integer.parseInt(prefs.getString("default_car", "1"));

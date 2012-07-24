@@ -31,6 +31,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -140,6 +141,13 @@ public class PreferencesActivity extends PreferenceActivity {
 				sectionPos
 						.setOnPreferenceChangeListener(onPreferenceChangeListener);
 				sectionPos.setSummary(entries[prefs.getOverallSectionPos()]);
+			}
+
+			// Appearance color sections
+			{
+				CheckBoxPreference colorSections = (CheckBoxPreference) findPreference("appearance_color_sections");
+				colorSections
+						.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			}
 
 			// Unit Currency

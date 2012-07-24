@@ -85,8 +85,10 @@
     <string name="pref_title_default_car">Auto</string>
     <string name="pref_title_default_report">Report</string>
     <string name="pref_title_appearance_overall_section_pos">Position des "Gesamt"-Abschnitts</string>
+    <string name="pref_title_appearance_color_sections">Farbige Abschnitte</string>
     <string name="pref_title_unit_currency">Währung</string>
     <string name="pref_title_unit_volume">Volumen</string>
     <string name="pref_title_unit_distance">Entfernung</string>
+    <string name="pref_summary_appearance_color_sections">Setze die Überschriften der Abschnitte auf die Farbe der Autos.</string>
 
 </resources>
