@@ -30,8 +30,9 @@ import android.widget.TextView;
 
 public class EditRefuelingFragment extends AbstractEditFragment {
 	public static final String EXTRA_CAR_ID = "car_id";
-	
+
 	private EditTextDateField edtDate;
+	private EditTextTimeField edtTime;
 
 	private Car[] cars;
 
@@ -75,6 +76,7 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 		Preferences prefs = new Preferences(getActivity());
 
 		edtDate = new EditTextDateField(R.id.edtDate);
+		edtTime = new EditTextTimeField(R.id.edtTime);
 
 		((TextView) getView().findViewById(R.id.txtUnitCurrency)).setText(prefs
 				.getUnitCurrency());
@@ -97,8 +99,9 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 	protected void fillFields() {
 		if (!isInEditMode()) {
 			Preferences prefs = new Preferences(getActivity());
-			
+
 			edtDate.setDate(new Date());
+			edtTime.setTime(new Date());
 
 			Spinner spnCar = ((Spinner) getView().findViewById(R.id.spnCar));
 			int selectCar = getArguments().getInt(EXTRA_CAR_ID);
@@ -114,6 +117,7 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 			Refueling refueling = (Refueling) editItem;
 
 			edtDate.setDate(refueling.getDate());
+			edtTime.setTime(refueling.getDate());
 
 			EditText edtTachometer = ((EditText) getView().findViewById(
 					R.id.edtTachometer));
@@ -145,7 +149,7 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 
 	@Override
 	protected boolean save() {
-		Date date = edtDate.getDate();
+		Date date = getDateTime(edtDate.getDate(), edtTime.getTime());
 		int tachometer = getIntegerFromEditText(R.id.edtTachometer, 0);
 		float volume = (float) getDoubleFromEditText(R.id.edtVolume, 0);
 		boolean partial = ((CheckBox) getView().findViewById(R.id.chkPartial))

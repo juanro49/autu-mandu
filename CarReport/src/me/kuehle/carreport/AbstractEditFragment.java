@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,8 +26,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +38,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 public abstract class AbstractEditFragment extends Fragment {
@@ -173,6 +175,20 @@ public abstract class AbstractEditFragment extends Fragment {
 		}
 	}
 
+	protected Date getDateTime(Date date, Date time) {
+		Calendar calTime = Calendar.getInstance();
+		calTime.setTime(time);
+
+		Calendar calDateTime = Calendar.getInstance();
+		calDateTime.setTime(date);
+		calDateTime
+				.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY));
+		calDateTime.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE));
+		calDateTime.set(Calendar.SECOND, calTime.get(Calendar.SECOND));
+
+		return calDateTime.getTime();
+	}
+
 	protected boolean isInEditMode() {
 		return editItem != null;
 	}
@@ -217,7 +233,7 @@ public abstract class AbstractEditFragment extends Fragment {
 		public Date getDate() {
 			Date date = new Date();
 			try {
-				date = DateFormat.getDateInstance().parse(
+				date = DateFormat.getDateFormat(getActivity()).parse(
 						editText.getText().toString());
 			} catch (ParseException e) {
 			}
@@ -225,17 +241,14 @@ public abstract class AbstractEditFragment extends Fragment {
 		}
 
 		public void setDate(Date date) {
-			editText.setText(DateFormat.getDateInstance().format(date));
+			editText.setText(DateFormat.getDateFormat(getActivity()).format(
+					date));
 		}
 
 		@Override
 		public void onClick(View v) {
 			Calendar cal = Calendar.getInstance();
-			try {
-				cal.setTime(DateFormat.getDateInstance().parse(
-						editText.getText().toString()));
-			} catch (ParseException e) {
-			}
+			cal.setTime(getDate());
 			new DatePickerDialog(getActivity(), this, cal.get(Calendar.YEAR),
 					cal.get(Calendar.MONTH), cal.get(Calendar.DATE)).show();
 		}
@@ -248,7 +261,50 @@ public abstract class AbstractEditFragment extends Fragment {
 			cal.set(Calendar.MONTH, monthOfYear);
 			cal.set(Calendar.DATE, dayOfMonth);
 
-			editText.setText(DateFormat.getDateInstance().format(cal.getTime()));
+			setDate(cal.getTime());
+		}
+	}
+
+	public class EditTextTimeField implements View.OnClickListener,
+			TimePickerDialog.OnTimeSetListener {
+		private EditText editText;
+
+		public EditTextTimeField(int view) {
+			editText = (EditText) getView().findViewById(view);
+			editText.setOnClickListener(this);
+		}
+
+		public Date getTime() {
+			Date time = new Date();
+			try {
+				time = DateFormat.getTimeFormat(getActivity()).parse(
+						editText.getText().toString());
+			} catch (ParseException e) {
+			}
+			return time;
+		}
+
+		public void setTime(Date time) {
+			editText.setText(DateFormat.getTimeFormat(getActivity()).format(
+					time));
+		}
+
+		@Override
+		public void onClick(View v) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(getTime());
+			new TimePickerDialog(getActivity(), this,
+					cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
+					DateFormat.is24HourFormat(getActivity())).show();
+		}
+
+		@Override
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			Calendar cal = Calendar.getInstance();
+			cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+			cal.set(Calendar.MINUTE, minute);
+
+			setTime(cal.getTime());
 		}
 	}
 }

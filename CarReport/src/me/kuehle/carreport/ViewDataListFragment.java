@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -26,12 +25,13 @@ import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.util.RecurrenceInterval;
 import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.ActionBar.OnNavigationListener;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -130,7 +130,7 @@ public class ViewDataListFragment extends Fragment {
 		outState.putInt("curTab", mTabHost.getCurrentTab());
 		outState.putInt("curItem", mCurrentItem);
 	}
-	
+
 	public Car getCurrentCar() {
 		return mCurrentCar;
 	}
@@ -371,7 +371,8 @@ public class ViewDataListFragment extends Fragment {
 							R.id.text_bm, R.id.text_br });
 
 			Preferences prefs = new Preferences(getActivity());
-			DateFormat dateFmt = DateFormat.getDateInstance();
+			java.text.DateFormat dateFmt = DateFormat
+					.getDateFormat(getActivity());
 			for (AbstractItem item : mItems) {
 				Refueling refueling = (Refueling) item;
 				HashMap<String, String> map = new HashMap<String, String>();
@@ -440,7 +441,8 @@ public class ViewDataListFragment extends Fragment {
 							R.id.text_bm, R.id.text_br });
 
 			Preferences prefs = new Preferences(getActivity());
-			DateFormat dateFmt = DateFormat.getDateInstance();
+			java.text.DateFormat dateFmt = DateFormat
+					.getDateFormat(getActivity());
 			String[] repIntervals = getResources().getStringArray(
 					R.array.repeat_intervals);
 			for (AbstractItem item : mItems) {

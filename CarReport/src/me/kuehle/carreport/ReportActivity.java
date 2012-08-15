@@ -60,6 +60,7 @@ public class ReportActivity extends Activity {
 				android.R.layout.simple_spinner_dropdown_item);
 
 		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setListNavigationCallbacks(adapter, navigationListener);
 

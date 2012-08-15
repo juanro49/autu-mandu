@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.reports;
 
-import java.text.DateFormat;
 import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
@@ -29,13 +28,12 @@ import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.db.RefuelingTable;
 
 import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.Months;
-import org.joda.time.Years;
+import org.joda.time.Seconds;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.format.DateFormat;
 
 import com.jjoe64.graphview.GraphView;
 
@@ -44,7 +42,7 @@ public class CostsReport extends AbstractReport {
 
 	public CostsReport(Context context) {
 		super(context);
-		
+
 		Preferences prefs = new Preferences(context);
 		unit = prefs.getUnitCurrency();
 
@@ -94,6 +92,7 @@ public class CostsReport extends AbstractReport {
 						otherCosts[otherCosts.length - 1].getDate());
 			}
 
+			// Count overall costs
 			for (Refueling refueling : refuelings) {
 				if (startDate.isBefore(refueling.getDate().getTime() + 1)) {
 					costs += refueling.getPrice();
@@ -107,25 +106,26 @@ public class CostsReport extends AbstractReport {
 									date);
 				}
 			}
-
-			int elapsedDays = Math.max(1, Days.daysBetween(startDate, endDate)
-					.getDays());
+			
+			// Calculate averages
+			Seconds elapsedSeconds = Seconds.secondsBetween(startDate, endDate);
+			double costsPerSecond = costs / elapsedSeconds.getSeconds();
+			// 60 seconds per minute * 60 minutes per hour * 24 hours per day = 86400 seconds per day
 			addData(context.getString(R.string.report_day),
-					String.format("%.2f %s", costs / elapsedDays, unit), car);
-			int elapsedMonths = Math.max(1,
-					Months.monthsBetween(startDate, endDate).getMonths());
+					String.format("%.2f %s", costsPerSecond * 86400, unit), car);
+			// 86400 seconds per day * 30,4375 days per month = 2629800 seconds per month
+			// (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
 			addData(context.getString(R.string.report_month),
-					String.format("%.2f %s", costs / elapsedMonths, unit), car);
-			int elapsedYears = Math.max(1,
-					Years.yearsBetween(startDate, endDate).getYears());
+					String.format("%.2f %s", costsPerSecond * 2629800, unit), car);
+			// 86400 seconds per day * 365,25 days per year = 31557600 seconds per year
 			addData(context.getString(R.string.report_year),
-					String.format("%.2f %s", costs / elapsedYears, unit), car);
+					String.format("%.2f %s", costsPerSecond * 31557600, unit), car);
 			int tachoDiff = Math.max(1, endTacho - startTacho);
 			addData(prefs.getUnitDistance(),
 					String.format("%.2f %s", costs / tachoDiff, unit), car);
 
 			addData(context.getString(R.string.report_since, DateFormat
-					.getDateInstance().format(startDate.toDate())),
+					.getDateFormat(context).format(startDate.toDate())),
 					String.format("%.2f %s", costs, unit), car);
 		}
 	}

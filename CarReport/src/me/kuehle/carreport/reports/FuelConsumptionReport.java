@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.reports;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 
 import me.kuehle.carreport.Preferences;
@@ -24,6 +23,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;
 import android.content.Context;
+import android.text.format.DateFormat;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GraphView.GraphViewData;
@@ -114,7 +114,7 @@ public class FuelConsumptionReport extends AbstractReport {
 		Refueling firstFuel = Refueling.getFirst();
 		Refueling lastFuel = Refueling.getLast();
 		if (firstFuel != null && lastFuel != null) {
-			DateFormat dateFmt = DateFormat.getDateInstance();
+			java.text.DateFormat dateFmt = DateFormat.getDateFormat(context);
 			graphView.setHorizontalLabels(new String[] {
 					dateFmt.format(firstFuel.getDate()),
 					dateFmt.format(lastFuel.getDate()) });

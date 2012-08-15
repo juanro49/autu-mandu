@@ -34,6 +34,7 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 	public static final String EXTRA_CAR_ID = "car_id";
 
 	private EditTextDateField edtDate;
+	private EditTextTimeField edtTime;
 
 	private Car[] cars;
 
@@ -84,6 +85,7 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 		edtTitle.setAdapter(titleAdapter);
 
 		edtDate = new EditTextDateField(R.id.edtDate);
+		edtTime = new EditTextTimeField(R.id.edtTime);
 
 		((TextView) getView().findViewById(R.id.txtUnitCurrency)).setText(prefs
 				.getUnitCurrency());
@@ -104,8 +106,9 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 	protected void fillFields() {
 		if (!isInEditMode()) {
 			Preferences prefs = new Preferences(getActivity());
-			
+
 			edtDate.setDate(new Date());
+			edtTime.setTime(new Date());
 
 			Spinner spnCar = ((Spinner) getView().findViewById(R.id.spnCar));
 			int selectCar = getArguments().getInt(EXTRA_CAR_ID);
@@ -121,6 +124,7 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 			OtherCost other = (OtherCost) editItem;
 
 			edtDate.setDate(other.getDate());
+			edtTime.setTime(other.getDate());
 
 			EditText edtTitle = ((EditText) getView().findViewById(
 					R.id.edtTitle));
@@ -157,7 +161,7 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 	protected boolean save() {
 		String title = ((EditText) getView().findViewById(R.id.edtTitle))
 				.getText().toString();
-		Date date = edtDate.getDate();
+		Date date = getDateTime(edtDate.getDate(), edtTime.getTime());
 		int tachometer = getIntegerFromEditText(R.id.edtTachometer, -1);
 		float price = (float) getDoubleFromEditText(R.id.edtPrice, 0);
 		RecurrenceInterval repInterval = RecurrenceInterval
