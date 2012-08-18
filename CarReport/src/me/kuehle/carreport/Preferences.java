@@ -16,6 +16,7 @@
 
 package me.kuehle.carreport;
 
+import me.kuehle.carreport.db.Car;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -26,9 +27,16 @@ public class Preferences {
 	public Preferences(Context context) {
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
-	
+
 	public int getDefaultCar() {
-		return Integer.parseInt(prefs.getString("default_car", "1"));
+		int id = Integer.parseInt(prefs.getString("default_car", "1"));
+		Car[] cars = Car.getAll();
+		for (Car car : cars) {
+			if (car.getId() == id) {
+				return id;
+			}
+		}
+		return cars[0].getId();
 	}
 
 	public int getDefaultReport() {
@@ -55,7 +63,7 @@ public class Preferences {
 	public boolean isColorSections() {
 		return prefs.getBoolean("appearance_color_sections", true);
 	}
-	
+
 	public boolean isShowLegend() {
 		return prefs.getBoolean("appearance_show_legend", false);
 	}
