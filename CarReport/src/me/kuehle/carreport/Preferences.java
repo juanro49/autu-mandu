@@ -27,10 +27,6 @@ public class Preferences {
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 	
-	public boolean getColorSections() {
-		return prefs.getBoolean("appearance_color_sections", true);
-	}
-
 	public int getDefaultCar() {
 		return Integer.parseInt(prefs.getString("default_car", "1"));
 	}
@@ -54,5 +50,13 @@ public class Preferences {
 
 	public String getUnitVolume() {
 		return prefs.getString("unit_volume", "l");
+	}
+
+	public boolean isColorSections() {
+		return prefs.getBoolean("appearance_color_sections", true);
+	}
+	
+	public boolean isShowLegend() {
+		return prefs.getBoolean("appearance_show_legend", false);
 	}
 }

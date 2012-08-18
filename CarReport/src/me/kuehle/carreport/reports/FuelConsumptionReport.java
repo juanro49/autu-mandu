@@ -17,24 +17,36 @@
 package me.kuehle.carreport.reports;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.model.SeriesSelection;
+import org.achartengine.model.TimeSeries;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
+
 import android.content.Context;
 import android.text.format.DateFormat;
-
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.GraphView.GraphViewData;
-import com.jjoe64.graphview.GraphView.GraphViewSeries;
-import com.jjoe64.graphview.GraphView.GraphViewStyle;
-import com.jjoe64.graphview.GraphView.LegendAlign;
-import com.jjoe64.graphview.LineGraphView;
+import android.view.View;
+import android.widget.Toast;
 
 public class FuelConsumptionReport extends AbstractReport {
-	private ArrayList<GraphViewSeries> graphSerieses = new ArrayList<GraphViewSeries>();
+	private XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+	private XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
+	private double minX = Double.MAX_VALUE;
+	private double maxX = Double.MIN_VALUE;
+	private double minY = Double.MAX_VALUE;
+	private double maxY = Double.MIN_VALUE;
+
 	private String unit;
+	private boolean showLegend;
 
 	public FuelConsumptionReport(Context context) {
 		super(context);
@@ -42,12 +54,13 @@ public class FuelConsumptionReport extends AbstractReport {
 		Preferences prefs = new Preferences(context);
 		unit = String.format("%s/100%s", prefs.getUnitVolume(),
 				prefs.getUnitDistance());
+		showLegend = prefs.isShowLegend();
 
 		ArrayList<Double> consumptions = new ArrayList<Double>();
 
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
-			ArrayList<GraphViewData> graphData = new ArrayList<GraphView.GraphViewData>();
+			TimeSeries series = new TimeSeries(car.getName());
 			ArrayList<Double> consumptionsCar = new ArrayList<Double>();
 
 			Refueling[] refuelings = Refueling.getAllForCar(car, true);
@@ -59,8 +72,7 @@ public class FuelConsumptionReport extends AbstractReport {
 					if (lastTacho > -1) {
 						double consumption = volume
 								/ (refueling.getTachometer() - lastTacho) * 100;
-						graphData.add(new GraphViewData(refueling.getDate()
-								.getTime(), consumption));
+						series.add(refueling.getDate(), consumption);
 						consumptionsCar.add(consumption);
 					}
 					lastTacho = refueling.getTachometer();
@@ -68,14 +80,11 @@ public class FuelConsumptionReport extends AbstractReport {
 				}
 			}
 
-			if (graphData.size() == 0) {
+			if (series.getItemCount() == 0) {
 				addData(context.getString(R.string.report_not_enough_data), "",
 						car);
 			} else {
-				GraphViewSeries series = new GraphViewSeries(car.getName(),
-						new GraphViewStyle(car.getColor(), 3),
-						graphData.toArray(new GraphViewData[graphData.size()]));
-				graphSerieses.add(series);
+				addSeries(series, car.getColor());
 
 				consumptions.addAll(consumptionsCar);
 				addConsumptionData(car, consumptionsCar);
@@ -92,33 +101,35 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	@Override
-	public GraphView getGraphView() {
-		GraphView graphView = new LineGraphView(context,
-				context.getString(R.string.report_title_fuel_consumption)) {
+	public GraphicalView getGraphView() {
+		double[] axesMinMax = { minX, maxX, minY, maxY };
+		AbstractReport.applyDefaultStyle(renderer, axesMinMax, true, null,
+				"%.2f");
+		renderer.setShowLegend(showLegend);
+
+		final GraphicalView graphView = ChartFactory.getTimeChartView(context,
+				dataset, renderer, getDateFormatPattern());
+
+		graphView.setOnClickListener(new View.OnClickListener() {
 			@Override
-			protected String formatLabel(double value, boolean isValueX) {
-				if (isValueX) {
-					return super.formatLabel(value, isValueX);
-				} else {
-					return String.format("%.2f", value);
+			public void onClick(View v) {
+				SeriesSelection seriesSelection = graphView
+						.getCurrentSeriesAndPoint();
+				if (seriesSelection != null) {
+					String car = dataset.getSeriesAt(
+							seriesSelection.getSeriesIndex()).getTitle();
+					String date = DateFormat.getDateFormat(context).format(
+							new Date((long) seriesSelection.getXValue()));
+					Toast.makeText(
+							context,
+							String.format(
+									"Car: %s\nConsumption: %.2f\nDate: %s",
+									car, seriesSelection.getValue(), date),
+							Toast.LENGTH_LONG).show();
 				}
 			}
-		};
+		});
 
-		for (GraphViewSeries series : graphSerieses) {
-			graphView.addSeries(series);
-		}
-		graphView.setShowLegend(true);
-		graphView.setLegendAlign(LegendAlign.BOTTOM);
-
-		Refueling firstFuel = Refueling.getFirst();
-		Refueling lastFuel = Refueling.getLast();
-		if (firstFuel != null && lastFuel != null) {
-			java.text.DateFormat dateFmt = DateFormat.getDateFormat(context);
-			graphView.setHorizontalLabels(new String[] {
-					dateFmt.format(firstFuel.getDate()),
-					dateFmt.format(lastFuel.getDate()) });
-		}
 		return graphView;
 	}
 
@@ -138,5 +149,18 @@ public class FuelConsumptionReport extends AbstractReport {
 				String.format("%.2f %s", min, unit), car);
 		addData(context.getString(R.string.report_average),
 				String.format("%.2f %s", sum / numbers.size(), unit), car);
+	}
+
+	private void addSeries(TimeSeries series, int color) {
+		dataset.addSeries(series);
+
+		minX = Math.min(minX, series.getMinX());
+		maxX = Math.max(maxX, series.getMaxX());
+		minY = Math.min(minY, series.getMinY());
+		maxY = Math.max(maxY, series.getMaxY());
+
+		XYSeriesRenderer r = new XYSeriesRenderer();
+		AbstractReport.applyDefaultStyle(r, color, false);
+		renderer.addSeriesRenderer(r);
 	}
 }

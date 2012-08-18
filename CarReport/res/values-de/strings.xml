@@ -12,11 +12,11 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License.
 -->
 <resources>
-    
-	<string name="app_name">Car Report</string>
+
+    <string name="app_name">Car Report</string>
     <string name="app_version">1.4</string>
     <string name="app_description">Tragen Sie die laufenden Kosten Ihres Autos ein und erhalten Sie schöne Reports.</string>
     <string name="about_author">© Jan Kühle</string>
@@ -65,8 +65,8 @@
     <string name="toast_other_deleted">Andere Kosten gelöscht.</string>
     <string name="tab_indicator_refuelings">Tankfüllungen</string>
     <string name="tab_indicator_other">Andere Kosten</string>
-	<string name="report_not_enough_data">Zu wenige Daten</string>
-	<string name="report_overall">Gesamt</string>
+    <string name="report_not_enough_data">Zu wenige Daten</string>
+    <string name="report_overall">Gesamt</string>
     <string name="report_day">Tag</string>
     <string name="report_month">Monat</string>
     <string name="report_year">Jahr</string>
@@ -84,11 +84,14 @@
     <string name="pref_title_category_units">Einheiten</string>
     <string name="pref_title_default_car">Auto</string>
     <string name="pref_title_default_report">Report</string>
-    <string name="pref_title_appearance_overall_section_pos">Position des "Gesamt"-Abschnitts</string>
+    <string name="pref_title_appearance_overall_section_pos">Position des Abschnittes Gesamt</string>
     <string name="pref_title_appearance_color_sections">Farbige Abschnitte</string>
+    <string name="pref_title_appearance_show_legend">Legende in Graphen anzeigen</string>
     <string name="pref_title_unit_currency">Währung</string>
     <string name="pref_title_unit_volume">Volumen</string>
     <string name="pref_title_unit_distance">Entfernung</string>
-    <string name="pref_summary_appearance_color_sections">Setze die Überschriften der Abschnitte auf die Farbe der Autos.</string>
+    <string name="pref_summary_appearance_overall_section_pos">Der Abschnitt Gesamt zeigt Durchschnittswerte an, wenn Sie mehr als ein Auto haben. Eingestellte Position: %s</string>
+    <string name="pref_summary_appearance_color_sections">Zeige die Überschriften der Abschnitte in der Farbe des dazugehörigen Autos.</string>
+    <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
 
 </resources>

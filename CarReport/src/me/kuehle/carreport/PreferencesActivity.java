@@ -87,9 +87,9 @@ public class PreferencesActivity extends PreferenceActivity {
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 
-			addPreferencesFromResource(R.xml.preferences_defaults);
+			addPreferencesFromResource(R.xml.preferences_general);
 			PreferenceManager.setDefaultValues(getActivity(),
-					R.xml.preferences_defaults, false);
+					R.xml.preferences_general, false);
 
 			Preferences prefs = new Preferences(getActivity());
 
@@ -140,12 +140,21 @@ public class PreferencesActivity extends PreferenceActivity {
 				sectionPos.setEntryValues(entryValues);
 				sectionPos
 						.setOnPreferenceChangeListener(onPreferenceChangeListener);
-				sectionPos.setSummary(entries[prefs.getOverallSectionPos()]);
+				sectionPos.setSummary(getString(
+						R.string.pref_summary_appearance_overall_section_pos,
+						entries[prefs.getOverallSectionPos()]));
 			}
 
 			// Appearance color sections
 			{
 				CheckBoxPreference colorSections = (CheckBoxPreference) findPreference("appearance_color_sections");
+				colorSections
+						.setOnPreferenceChangeListener(onPreferenceChangeListener);
+			}
+
+			// Appearance show legend
+			{
+				CheckBoxPreference colorSections = (CheckBoxPreference) findPreference("appearance_show_legend");
 				colorSections
 						.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			}
@@ -191,8 +200,11 @@ public class PreferencesActivity extends PreferenceActivity {
 						"appearance_overall_section_pos")) {
 					String[] positions = getResources().getStringArray(
 							R.array.overall_section_positions);
-					preference.setSummary(positions[Integer.parseInt(newValue
-							.toString())]);
+					preference
+							.setSummary(getString(
+									R.string.pref_summary_appearance_overall_section_pos,
+									positions[Integer.parseInt(newValue
+											.toString())]));
 				} else if (preference instanceof EditTextPreference) {
 					preference.setSummary(newValue.toString());
 				}

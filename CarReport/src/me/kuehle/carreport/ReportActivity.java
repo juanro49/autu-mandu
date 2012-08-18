@@ -153,7 +153,7 @@ public class ReportActivity extends Activity {
 			graph.setVisibility(View.GONE);
 		} else {
 			graph.setVisibility(View.VISIBLE);
-			graph.addView(report.getGraphView());
+			graph.addView(graphView);
 		}
 
 		ListView lstData = (ListView) findViewById(R.id.lstData);
@@ -193,7 +193,7 @@ public class ReportActivity extends Activity {
 			this.items = items.toArray();
 
 			Preferences prefs = new Preferences(ReportActivity.this);
-			colorSections = prefs.getColorSections();
+			colorSections = prefs.isColorSections();
 		}
 
 		@Override

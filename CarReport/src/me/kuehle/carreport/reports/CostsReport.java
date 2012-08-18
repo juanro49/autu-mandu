@@ -27,6 +27,7 @@ import me.kuehle.carreport.db.OtherCostTable;
 import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.db.RefuelingTable;
 
+import org.achartengine.GraphicalView;
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
@@ -34,8 +35,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.format.DateFormat;
-
-import com.jjoe64.graphview.GraphView;
 
 public class CostsReport extends AbstractReport {
 	private String unit;
@@ -106,20 +105,25 @@ public class CostsReport extends AbstractReport {
 									date);
 				}
 			}
-			
+
 			// Calculate averages
 			Seconds elapsedSeconds = Seconds.secondsBetween(startDate, endDate);
 			double costsPerSecond = costs / elapsedSeconds.getSeconds();
-			// 60 seconds per minute * 60 minutes per hour * 24 hours per day = 86400 seconds per day
+			// 60 seconds per minute * 60 minutes per hour * 24 hours per day =
+			// 86400 seconds per day
 			addData(context.getString(R.string.report_day),
 					String.format("%.2f %s", costsPerSecond * 86400, unit), car);
-			// 86400 seconds per day * 30,4375 days per month = 2629800 seconds per month
+			// 86400 seconds per day * 30,4375 days per month = 2629800 seconds
+			// per month
 			// (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
 			addData(context.getString(R.string.report_month),
-					String.format("%.2f %s", costsPerSecond * 2629800, unit), car);
-			// 86400 seconds per day * 365,25 days per year = 31557600 seconds per year
+					String.format("%.2f %s", costsPerSecond * 2629800, unit),
+					car);
+			// 86400 seconds per day * 365,25 days per year = 31557600 seconds
+			// per year
 			addData(context.getString(R.string.report_year),
-					String.format("%.2f %s", costsPerSecond * 31557600, unit), car);
+					String.format("%.2f %s", costsPerSecond * 31557600, unit),
+					car);
 			int tachoDiff = Math.max(1, endTacho - startTacho);
 			addData(prefs.getUnitDistance(),
 					String.format("%.2f %s", costs / tachoDiff, unit), car);
@@ -131,7 +135,7 @@ public class CostsReport extends AbstractReport {
 	}
 
 	@Override
-	public GraphView getGraphView() {
+	public GraphicalView getGraphView() {
 		return null;
 	}
 }

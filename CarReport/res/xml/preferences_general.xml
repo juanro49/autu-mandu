@@ -31,6 +31,7 @@
             android:defaultValue="0"
             android:entries="@array/overall_section_positions"
             android:key="appearance_overall_section_pos"
+            android:summary="@string/pref_summary_appearance_overall_section_pos"
             android:title="@string/pref_title_appearance_overall_section_pos" />
 
         <CheckBoxPreference
@@ -38,6 +39,12 @@
             android:key="appearance_color_sections"
             android:summary="@string/pref_summary_appearance_color_sections"
             android:title="@string/pref_title_appearance_color_sections" />
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="appearance_show_legend"
+            android:summary="@string/pref_summary_appearance_show_legend"
+            android:title="@string/pref_title_appearance_show_legend" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_units" >
         <EditTextPreference

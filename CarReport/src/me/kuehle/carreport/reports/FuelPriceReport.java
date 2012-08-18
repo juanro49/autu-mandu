@@ -16,22 +16,28 @@
 
 package me.kuehle.carreport.reports;
 
-import java.util.ArrayList;
+import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Helper;
-import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.db.RefuelingTable;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.GraphicalView;
+import org.achartengine.model.SeriesSelection;
+import org.achartengine.model.TimeSeries;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.text.format.DateFormat;
-
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.GraphView.GraphViewData;
-import com.jjoe64.graphview.GraphView.GraphViewSeries;
-import com.jjoe64.graphview.LineGraphView;
+import android.view.View;
+import android.widget.Toast;
 
 public class FuelPriceReport extends AbstractReport {
 	private String unit;
@@ -66,20 +72,11 @@ public class FuelPriceReport extends AbstractReport {
 	}
 
 	@Override
-	public GraphView getGraphView() {
-		LineGraphView graphView = new LineGraphView(context,
-				context.getString(R.string.report_title_fuel_price)) {
-			@Override
-			protected String formatLabel(double value, boolean isValueX) {
-				if (isValueX) {
-					return super.formatLabel(value, isValueX);
-				} else {
-					return String.format("%.3f", value);
-				}
-			}
-		};
+	public GraphicalView getGraphView() {
+		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
+		double[] axesMinMax = new double[4];
 
-		ArrayList<GraphViewData> graphData = new ArrayList<GraphView.GraphViewData>();
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
 		Cursor cursor = db.rawQuery(String.format(
@@ -88,27 +85,51 @@ public class FuelPriceReport extends AbstractReport {
 				RefuelingTable.COL_VOLUME, RefuelingTable.NAME,
 				RefuelingTable.COL_DATE), null);
 		if (cursor.getCount() >= 2) {
+			TimeSeries series = new TimeSeries("");
+
 			cursor.moveToFirst();
 			while (!cursor.isAfterLast()) {
-				graphData.add(new GraphViewData(cursor.getLong(0), cursor
-						.getFloat(1)));
+				series.add(new Date(cursor.getLong(0)), cursor.getFloat(1));
 				cursor.moveToNext();
 			}
 
-			graphView.addSeries(new GraphViewSeries(graphData
-					.toArray(new GraphViewData[graphData.size()])));
+			dataset.addSeries(series);
+
+			axesMinMax[0] = series.getMinX();
+			axesMinMax[1] = series.getMaxX();
+			axesMinMax[2] = series.getMinY();
+			axesMinMax[3] = series.getMaxY();
+
+			XYSeriesRenderer r = new XYSeriesRenderer();
+			AbstractReport.applyDefaultStyle(r, Color.BLUE, true);
+			renderer.addSeriesRenderer(r);
 		}
 		cursor.close();
-		graphView.setDrawBackground(true);
 
-		Refueling firstFuel = Refueling.getFirst();
-		Refueling lastFuel = Refueling.getLast();
-		if (firstFuel != null && lastFuel != null) {
-			java.text.DateFormat dateFmt = DateFormat.getDateFormat(context);
-			graphView.setHorizontalLabels(new String[] {
-					dateFmt.format(firstFuel.getDate()),
-					dateFmt.format(lastFuel.getDate()) });
-		}
+		AbstractReport.applyDefaultStyle(renderer, axesMinMax, true, null,
+				"%.3f");
+		renderer.setShowLegend(false);
+
+		final GraphicalView graphView = ChartFactory.getTimeChartView(context,
+				dataset, renderer, getDateFormatPattern());
+
+		graphView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				SeriesSelection seriesSelection = graphView
+						.getCurrentSeriesAndPoint();
+				if (seriesSelection != null) {
+					String date = DateFormat.getDateFormat(context).format(
+							new Date((long) seriesSelection.getXValue()));
+					Toast.makeText(
+							context,
+							String.format("Price: %.3f %s\nDate: %s",
+									seriesSelection.getValue(), unit, date),
+							Toast.LENGTH_LONG).show();
+				}
+			}
+		});
+
 		return graphView;
 	}
 
