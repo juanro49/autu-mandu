@@ -103,9 +103,15 @@ public class FuelConsumptionReport extends AbstractReport {
 	@Override
 	public GraphicalView getGraphView() {
 		double[] axesMinMax = { minX, maxX, minY, maxY };
-		AbstractReport.applyDefaultStyle(renderer, axesMinMax, true, null,
-				"%.2f");
+		applyDefaultStyle(renderer, axesMinMax, true, null, "%.2f");
 		renderer.setShowLegend(showLegend);
+		// Legend height is not proportional to its text size. So this is a
+		// quick fix.
+		if (showLegend) {
+			int[] margins = renderer.getMargins();
+			margins[2] = (int) renderer.getLegendTextSize();
+			renderer.setMargins(margins);
+		}
 
 		final GraphicalView graphView = ChartFactory.getTimeChartView(context,
 				dataset, renderer, getDateFormatPattern());
@@ -123,9 +129,14 @@ public class FuelConsumptionReport extends AbstractReport {
 					Toast.makeText(
 							context,
 							String.format(
-									"Car: %s\nConsumption: %.2f\nDate: %s",
-									car, seriesSelection.getValue(), date),
-							Toast.LENGTH_LONG).show();
+									"%s: %s\n%s: %.2f %s\n%s: %s",
+									context.getString(R.string.report_toast_car),
+									car,
+									context.getString(R.string.report_toast_consumption),
+									seriesSelection.getValue(),
+									unit,
+									context.getString(R.string.report_toast_date),
+									date), Toast.LENGTH_LONG).show();
 				}
 			}
 		});
@@ -160,7 +171,7 @@ public class FuelConsumptionReport extends AbstractReport {
 		maxY = Math.max(maxY, series.getMaxY());
 
 		XYSeriesRenderer r = new XYSeriesRenderer();
-		AbstractReport.applyDefaultStyle(r, color, false);
+		applyDefaultStyle(r, color, false);
 		renderer.addSeriesRenderer(r);
 	}
 }

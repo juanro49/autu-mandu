@@ -74,8 +74,10 @@
     <string name="report_lowest">Niedrigster</string>
     <string name="report_highest">Höchster</string>
     <string name="report_average">Durchschnitt</string>
-    <string name="report_title_fuel_consumption">Benzinverbrauch</string>
-    <string name="report_title_fuel_price">Benzinpreis</string>
+    <string name="report_toast_car">Auto</string>
+    <string name="report_toast_consumption">Verbrauch</string>
+    <string name="report_toast_price">Preis</string>
+    <string name="report_toast_date">Datum</string>
     <string name="pref_title_header_about">Über Car Report</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>
     <string name="pref_title_header_cars">Autos</string>

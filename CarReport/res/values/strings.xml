@@ -74,8 +74,10 @@
     <string name="report_lowest">Lowest</string>
     <string name="report_highest">Highest</string>
     <string name="report_average">Average</string>
-    <string name="report_title_fuel_consumption">Fuel consumption</string>
-    <string name="report_title_fuel_price">Fuel price</string>
+    <string name="report_toast_car">Car</string>
+    <string name="report_toast_consumption">Consumption</string>
+    <string name="report_toast_price">Price</string>
+    <string name="report_toast_date">Date</string>
     <string name="pref_title_header_about">About Car Report</string>
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>

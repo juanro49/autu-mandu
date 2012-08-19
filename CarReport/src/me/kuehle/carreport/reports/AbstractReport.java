@@ -23,10 +23,10 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.util.Calculator;
 
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
-import org.achartengine.chart.TimeChart;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 import org.achartengine.util.MathHelper;
@@ -84,30 +84,51 @@ public abstract class AbstractReport {
 		return new Section(label, Color.GRAY, position);
 	}
 
-	protected static void applyDefaultStyle(XYMultipleSeriesRenderer renderer,
+	protected void applyDefaultStyle(XYMultipleSeriesRenderer renderer,
 			double[] axesMinMax, boolean clickable, String xLabelFormat,
 			String yLabelFormat) {
-		renderer.setLabelsTextSize(12);
+		Calculator calc = new Calculator(context);
+
+		renderer.setLabelsTextSize(calc.spToPx(14));
+		renderer.setLegendTextSize(calc.spToPx(14));
 		renderer.setFitLegend(true);
-		renderer.setPointSize(4f);
-		renderer.setMargins(new int[] { 0, 30, 0, 0 });
+		renderer.setPointSize(calc.dpToPx(4));
+		renderer.setMargins(new int[] { 0, calc.spToPx(35), 0, 0 });
 		renderer.setAxesColor(Color.DKGRAY);
 		renderer.setLabelsColor(Color.LTGRAY);
 		renderer.setShowGridX(true);
 		renderer.setYLabelsAlign(Align.RIGHT);
 
-		renderer.setYAxisMin(axesMinMax[2]);
-		renderer.setYAxisMax(axesMinMax[3] * 1.001);
+		// When the background on the device is not completely black,
+		// the margin background bad, because it is black. Setting it
+		// to Color.TRANSPARENT does not work, but the below does.
+		renderer.setApplyBackgroundColor(true);
+		renderer.setBackgroundColor(Color.TRANSPARENT);
+		renderer.setMarginsColor(Color.argb(0, 255, 0, 0));
+
+		// When scaling the font, the amount of x labels is not being
+		// adjusted. This results in labels, which lay one above the other. So
+		// we need to adjust the amount manually.
+		int xLabelCount = renderer.getXLabels();
+		renderer.setXLabels((int) calc.pxToSp(xLabelCount) + 1);
+
+		// Add 5% padding to top, left and right. Points at the edges should be
+		// reachable simply.
+		double padX = (axesMinMax[1] - axesMinMax[0]) * 0.05;
+		double padY = (axesMinMax[3] - axesMinMax[2]) * 0.05;
+		double[] limits = { axesMinMax[0] - padX, axesMinMax[1] + padX,
+				axesMinMax[2], axesMinMax[3] + padY };
+
+		renderer.setYAxisMin(limits[2]);
+		renderer.setYAxisMax(limits[3]);
 		renderer.setInitialRange(axesMinMax);
-		axesMinMax[0] -= TimeChart.DAY / 2;
-		axesMinMax[1] += TimeChart.DAY / 2;
 		renderer.setZoomEnabled(true, false);
 		renderer.setPanEnabled(true, false);
-		renderer.setPanLimits(axesMinMax);
-		renderer.setZoomLimits(axesMinMax);
+		renderer.setPanLimits(limits);
+		renderer.setZoomLimits(limits);
 
 		renderer.setClickEnabled(clickable);
-		renderer.setSelectableBuffer(20);
+		renderer.setSelectableBuffer(calc.dpToPx(20));
 
 		if (xLabelFormat != null) {
 			List<Double> xLabels = MathHelper.getLabels(axesMinMax[0],
@@ -127,12 +148,14 @@ public abstract class AbstractReport {
 		}
 	}
 
-	protected static void applyDefaultStyle(XYSeriesRenderer renderer,
-			int color, boolean fill) {
+	protected void applyDefaultStyle(XYSeriesRenderer renderer, int color,
+			boolean fill) {
+		Calculator calc = new Calculator(context);
+
 		renderer.setColor(color);
 		renderer.setPointStyle(PointStyle.CIRCLE);
 		renderer.setFillPoints(true);
-		renderer.setLineWidth(3);
+		renderer.setLineWidth(calc.dpToPx(3));
 
 		renderer.setFillBelowLine(fill);
 		renderer.setFillBelowLineColor(Color.rgb(20, 40, 60));

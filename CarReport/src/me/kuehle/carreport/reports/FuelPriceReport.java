@@ -101,12 +101,12 @@ public class FuelPriceReport extends AbstractReport {
 			axesMinMax[3] = series.getMaxY();
 
 			XYSeriesRenderer r = new XYSeriesRenderer();
-			AbstractReport.applyDefaultStyle(r, Color.BLUE, true);
+			applyDefaultStyle(r, Color.BLUE, true);
 			renderer.addSeriesRenderer(r);
 		}
 		cursor.close();
 
-		AbstractReport.applyDefaultStyle(renderer, axesMinMax, true, null,
+		applyDefaultStyle(renderer, axesMinMax, true, null,
 				"%.3f");
 		renderer.setShowLegend(false);
 
@@ -123,9 +123,13 @@ public class FuelPriceReport extends AbstractReport {
 							new Date((long) seriesSelection.getXValue()));
 					Toast.makeText(
 							context,
-							String.format("Price: %.3f %s\nDate: %s",
-									seriesSelection.getValue(), unit, date),
-							Toast.LENGTH_LONG).show();
+							String.format(
+									"%s: %.3f %s\n%s: %s",
+									context.getString(R.string.report_toast_price),
+									seriesSelection.getValue(),
+									unit,
+									context.getString(R.string.report_toast_date),
+									date), Toast.LENGTH_LONG).show();
 				}
 			}
 		});
