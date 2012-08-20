@@ -22,10 +22,11 @@
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Licenses</string>
-    <string name="hint_tachometer">Tachometer</string>
+    <string name="hint_mileage">Mileage</string>
+    <string name="hint_mileage_optional">Mileage (optional)</string>
     <string name="hint_volume">Volume</string>
     <string name="hint_price">Price</string>
-    <string name="hint_note">Note</string>
+    <string name="hint_note_optional">Note (optional)</string>
     <string name="hint_title">Title</string>
     <string name="label_partial">Partial</string>
     <string name="menu_add_refueling">Add refueling</string>
@@ -59,6 +60,21 @@
     <string name="alert_delete_title">Confirm delete</string>
     <string name="alert_delete_others_message">The %d selected other costs will be deleted.</string>
     <string name="alert_change_color_title">Choose color</string>
+    <plurals name="alert_validate_msg_recommended">
+        <item quantity="one">You should enter a value for %s.</item>
+        <item quantity="other">You should enter values for %s.</item>
+    </plurals>
+    <plurals name="alert_validate_msg_required">
+        <item quantity="one">The app needs a value for %s.</item>
+        <item quantity="other">The app needs values for %s.</item>
+    </plurals>
+    <string name="alert_validate_title">the title</string>
+    <string name="alert_validate_mileage">the mileage</string>
+    <string name="alert_validate_volume">the volume</string>
+    <string name="alert_validate_price">the price</string>
+    <string name="alert_validate_last_separator">and</string>
+    <string name="alert_validate_save_anyway">Save anyway</string>
+    <string name="alert_validate_continue_edit">Continue edit</string>
     <string name="toast_refueling_saved">Refueling saved.</string>
     <string name="toast_refueling_deleted">Refueling deleted.</string>
     <string name="toast_other_saved">Other cost saved.</string>

@@ -23,7 +23,7 @@ public class RefuelingTable {
 	public static final String NAME = "refuelings";
 	
 	public static final String COL_DATE = "date";
-	public static final String COL_TACHO = "tachometer";
+	public static final String COL_TACHO = "tachometer"; // should be 'mileage'
 	public static final String COL_VOLUME = "volume";
 	public static final String COL_PRICE = "price";
 	public static final String COL_PARTIAL = "partial";

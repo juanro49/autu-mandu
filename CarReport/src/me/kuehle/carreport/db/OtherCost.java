@@ -29,7 +29,7 @@ import android.provider.BaseColumns;
 public class OtherCost extends AbstractItem {
 	private String title;
 	private Date date;
-	private int tachometer;
+	private int mileage;
 	private float price;
 	private Recurrence recurrence;
 	private String note;
@@ -51,7 +51,7 @@ public class OtherCost extends AbstractItem {
 				this.id = id;
 				this.title = cursor.getString(1);
 				this.date = new Date(cursor.getLong(2));
-				this.tachometer = cursor.getInt(3);
+				this.mileage = cursor.getInt(3);
 				this.price = cursor.getFloat(4);
 				this.recurrence = new Recurrence(
 						RecurrenceInterval.getByValue(cursor.getInt(5)),
@@ -63,12 +63,12 @@ public class OtherCost extends AbstractItem {
 		}
 	}
 
-	private OtherCost(int id, String title, Date date, int tachometer,
+	private OtherCost(int id, String title, Date date, int mileage,
 			float price, Recurrence recurrence, String note, Car car) {
 		this.id = id;
 		this.title = title;
 		this.date = date;
-		this.tachometer = tachometer;
+		this.mileage = mileage;
 		this.price = price;
 		this.recurrence = recurrence;
 		this.note = note;
@@ -93,12 +93,12 @@ public class OtherCost extends AbstractItem {
 		save();
 	}
 
-	public int getTachometer() {
-		return tachometer;
+	public int getMileage() {
+		return mileage;
 	}
 
-	public void setTachometer(int tachometer) {
-		this.tachometer = tachometer;
+	public void setMileage(int mileage) {
+		this.mileage = mileage;
 		save();
 	}
 
@@ -155,7 +155,7 @@ public class OtherCost extends AbstractItem {
 			ContentValues values = new ContentValues();
 			values.put(OtherCostTable.COL_TITLE, title);
 			values.put(OtherCostTable.COL_DATE, date.getTime());
-			values.put(OtherCostTable.COL_TACHO, tachometer);
+			values.put(OtherCostTable.COL_TACHO, mileage);
 			values.put(OtherCostTable.COL_PRICE, price);
 			values.put(OtherCostTable.COL_REP_INT, recurrence.getInterval()
 					.getValue());
@@ -173,12 +173,12 @@ public class OtherCost extends AbstractItem {
 		}
 	}
 
-	public static OtherCost create(String title, Date date, int tachometer,
+	public static OtherCost create(String title, Date date, int mileage,
 			float price, Recurrence recurrence, String note, Car car) {
 		ContentValues values = new ContentValues();
 		values.put(OtherCostTable.COL_TITLE, title);
 		values.put(OtherCostTable.COL_DATE, date.getTime());
-		values.put(OtherCostTable.COL_TACHO, tachometer);
+		values.put(OtherCostTable.COL_TACHO, mileage);
 		values.put(OtherCostTable.COL_PRICE, price);
 		values.put(OtherCostTable.COL_REP_INT, recurrence.getInterval()
 				.getValue());
@@ -194,7 +194,7 @@ public class OtherCost extends AbstractItem {
 		}
 		helper.dataChanged();
 
-		return new OtherCost(id, title, date, tachometer, price, recurrence,
+		return new OtherCost(id, title, date, mileage, price, recurrence,
 				note, car);
 	}
 

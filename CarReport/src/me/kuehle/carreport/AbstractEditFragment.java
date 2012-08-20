@@ -120,11 +120,7 @@ public abstract class AbstractEditFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
-			if (save()) {
-				Toast.makeText(getActivity(), getToastSavedMessage(),
-						Toast.LENGTH_SHORT).show();
-				onItemActionListener.itemSaved();
-			}
+			save();
 			return true;
 		case R.id.menu_cancel:
 			onItemActionListener.itemCanceled();
@@ -193,6 +189,12 @@ public abstract class AbstractEditFragment extends Fragment {
 		return editItem != null;
 	}
 
+	protected void saveSuccess() {
+		Toast.makeText(getActivity(), getToastSavedMessage(),
+				Toast.LENGTH_SHORT).show();
+		onItemActionListener.itemSaved();
+	}
+
 	protected abstract int getLayout();
 
 	protected abstract int getTitleForEdit();
@@ -211,7 +213,7 @@ public abstract class AbstractEditFragment extends Fragment {
 
 	protected abstract void fillFields();
 
-	protected abstract boolean save();
+	protected abstract void save();
 
 	public interface OnItemActionListener {
 		public void itemSaved();

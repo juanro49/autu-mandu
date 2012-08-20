@@ -71,11 +71,11 @@ public class FuelConsumptionReport extends AbstractReport {
 				if (!refueling.isPartial()) {
 					if (lastTacho > -1) {
 						double consumption = volume
-								/ (refueling.getTachometer() - lastTacho) * 100;
+								/ (refueling.getMileage() - lastTacho) * 100;
 						series.add(refueling.getDate(), consumption);
 						consumptionsCar.add(consumption);
 					}
-					lastTacho = refueling.getTachometer();
+					lastTacho = refueling.getMileage();
 					volume = 0;
 				}
 			}

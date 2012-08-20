@@ -381,7 +381,7 @@ public class ViewDataListFragment extends Fragment {
 						refueling.isPartial() ? getString(R.string.label_partial)
 								: "");
 				map.put("text_bl",
-						String.format("%d %s", refueling.getTachometer(),
+						String.format("%d %s", refueling.getMileage(),
 								prefs.getUnitDistance()));
 				map.put("text_bm",
 						String.format("%.2f %s", refueling.getVolume(),
@@ -450,9 +450,9 @@ public class ViewDataListFragment extends Fragment {
 				HashMap<String, String> map = new HashMap<String, String>();
 				map.put("text_tl", dateFmt.format(other.getDate()));
 				map.put("text_tr", other.getTitle());
-				if (other.getTachometer() > -1) {
+				if (other.getMileage() > -1) {
 					map.put("text_bl",
-							String.format("%d %s", other.getTachometer(),
+							String.format("%d %s", other.getMileage(),
 									prefs.getUnitDistance()));
 				} else {
 					map.put("text_bl", "");

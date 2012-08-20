@@ -24,7 +24,7 @@ public class OtherCostTable {
 	
 	public static final String COL_TITLE = "title";
 	public static final String COL_DATE = "date";
-	public static final String COL_TACHO = "tachometer";
+	public static final String COL_TACHO = "tachometer"; // should be 'mileage'
 	public static final String COL_PRICE = "price";
 	public static final String COL_REP_INT = "repeat_interval";
 	public static final String COL_REP_MULTI = "repeat_multiplier";

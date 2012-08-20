@@ -22,10 +22,11 @@
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Lizenzen</string>
-    <string name="hint_tachometer">Kilometerstand</string>
+    <string name="hint_mileage">Kilometerstand</string>
+    <string name="hint_mileage_optional">Kilometerstand (optional)</string>
     <string name="hint_volume">Liter</string>
     <string name="hint_price">Preis</string>
-    <string name="hint_note">Notiz</string>
+    <string name="hint_note_optional">Notiz (optional)</string>
     <string name="hint_title">Titel</string>
     <string name="label_partial">Teilfüllung</string>
     <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
@@ -59,6 +60,21 @@
     <string name="alert_delete_title">Löschen bestätigen</string>
     <string name="alert_delete_others_message">Die %d ausgewählten anderen Kosten werden gelöscht.</string>
     <string name="alert_change_color_title">Farbe auswählen</string>
+    <plurals name="alert_validate_msg_recommended">
+        <item quantity="one">Sie sollten einen Wert für %s eingeben.</item>
+        <item quantity="other">Sie sollten Werte für %s eingeben.</item>
+    </plurals>
+    <plurals name="alert_validate_msg_required">
+        <item quantity="one">Die App benötigt noch einen Wert für %s.</item>
+        <item quantity="other">Die App benötigt noch Werte für %s.</item>
+    </plurals>
+    <string name="alert_validate_title">den Titel</string>
+    <string name="alert_validate_mileage">den Kilometerstand</string>
+    <string name="alert_validate_volume">die getankten Liter</string>
+    <string name="alert_validate_price">den Preis</string>
+    <string name="alert_validate_last_separator">und</string>
+    <string name="alert_validate_save_anyway">Trotzdem speichern</string>
+    <string name="alert_validate_continue_edit">Weiter bearbeiten</string>
     <string name="toast_refueling_saved">Tankfüllung gespeichert.</string>
     <string name="toast_refueling_deleted">Tankfüllung gelöscht.</string>
     <string name="toast_other_saved">Andere Kosten gespeichert.</string>

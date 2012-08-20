@@ -65,14 +65,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
-
+
                 <EditText
-                    android:id="@+id/edtTachometer"
+                    android:id="@+id/edtMileage"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="@string/hint_tachometer"
+                    android:hint="@string/hint_mileage_optional"
                     android:inputType="number" />
 
                 <TextView
@@ -112,13 +112,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/section_note" />
-
+
             <EditText
                 android:id="@+id/edtNote"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:ems="10"
-                android:hint="@string/hint_note"
+                android:hint="@string/hint_note_optional"
                 android:inputType="text|textMultiLine" />
 
             <TextView

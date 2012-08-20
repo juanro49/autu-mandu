@@ -30,7 +30,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class EditOtherCostFragment extends AbstractEditFragment {
+public class EditOtherCostFragment extends AbstractEditFragment implements
+		InputFieldValidator.ValidationCallback {
 	public static final String EXTRA_CAR_ID = "car_id";
 
 	private EditTextDateField edtDate;
@@ -130,10 +131,10 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 					R.id.edtTitle));
 			edtTitle.setText(String.valueOf(other.getTitle()));
 
-			EditText edtTachometer = ((EditText) getView().findViewById(
-					R.id.edtTachometer));
-			if (other.getTachometer() > -1) {
-				edtTachometer.setText(String.valueOf(other.getTachometer()));
+			EditText edtMileage = ((EditText) getView().findViewById(
+					R.id.edtMileage));
+			if (other.getMileage() > -1) {
+				edtMileage.setText(String.valueOf(other.getMileage()));
 			}
 
 			EditText edtPrice = ((EditText) getView().findViewById(
@@ -158,38 +159,55 @@ public class EditOtherCostFragment extends AbstractEditFragment {
 	}
 
 	@Override
-	protected boolean save() {
+	protected void save() {
+		InputFieldValidator validator = new InputFieldValidator(getActivity(),
+				this);
+
+		validator.add(getView().findViewById(R.id.edtTitle),
+				InputFieldValidator.ValidationType.NotEmpty, false,
+				R.string.alert_validate_title);
+		validator.add(getView().findViewById(R.id.edtPrice),
+				InputFieldValidator.ValidationType.GreaterZero, true,
+				R.string.alert_validate_price);
+
+		validator.validate();
+	}
+
+	@Override
+	public void validationFinished(boolean success) {
+		if (!success) {
+			return;
+		}
+
 		String title = ((EditText) getView().findViewById(R.id.edtTitle))
-				.getText().toString();
+				.getText().toString().trim();
 		Date date = getDateTime(edtDate.getDate(), edtTime.getTime());
-		int tachometer = getIntegerFromEditText(R.id.edtTachometer, -1);
+		int mileage = getIntegerFromEditText(R.id.edtMileage, -1);
 		float price = (float) getDoubleFromEditText(R.id.edtPrice, 0);
 		RecurrenceInterval repInterval = RecurrenceInterval
 				.getByValue((int) ((Spinner) getView().findViewById(
 						R.id.spnRepeat)).getSelectedItemId());
 		Recurrence recurrence = new Recurrence(repInterval);
 		String note = ((EditText) getView().findViewById(R.id.edtNote))
-				.getText().toString();
+				.getText().toString().trim();
 		Car car = cars[(int) ((Spinner) getView().findViewById(R.id.spnCar))
 				.getSelectedItemId()];
-		if (price > 0) {
-			if (!isInEditMode()) {
-				OtherCost.create(title, date, tachometer, price, recurrence,
-						note, car);
-			} else {
-				OtherCost other = (OtherCost) editItem;
-				other.setTitle(title);
-				other.setDate(date);
-				other.setTachometer(tachometer);
-				other.setPrice(price);
-				other.setRecurrence(recurrence);
-				other.setNote(note);
-				other.setCar(car);
-			}
-			return true;
+
+		if (!isInEditMode()) {
+			OtherCost.create(title, date, mileage, price, recurrence, note,
+					car);
 		} else {
-			return false;
+			OtherCost other = (OtherCost) editItem;
+			other.setTitle(title);
+			other.setDate(date);
+			other.setMileage(mileage);
+			other.setPrice(price);
+			other.setRecurrence(recurrence);
+			other.setNote(note);
+			other.setCar(car);
 		}
+
+		saveSuccess();
 	}
 
 	public static EditOtherCostFragment newInstance(int id) {

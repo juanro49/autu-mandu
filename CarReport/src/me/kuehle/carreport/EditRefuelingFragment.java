@@ -28,7 +28,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class EditRefuelingFragment extends AbstractEditFragment {
+public class EditRefuelingFragment extends AbstractEditFragment implements
+		InputFieldValidator.ValidationCallback {
 	public static final String EXTRA_CAR_ID = "car_id";
 
 	private EditTextDateField edtDate;
@@ -119,9 +120,9 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 			edtDate.setDate(refueling.getDate());
 			edtTime.setTime(refueling.getDate());
 
-			EditText edtTachometer = ((EditText) getView().findViewById(
-					R.id.edtTachometer));
-			edtTachometer.setText(String.valueOf(refueling.getTachometer()));
+			EditText edtMileage = ((EditText) getView().findViewById(
+					R.id.edtMileage));
+			edtMileage.setText(String.valueOf(refueling.getMileage()));
 
 			EditText edtVolume = ((EditText) getView().findViewById(
 					R.id.edtVolume));
@@ -148,35 +149,55 @@ public class EditRefuelingFragment extends AbstractEditFragment {
 	}
 
 	@Override
-	protected boolean save() {
+	protected void save() {
+		InputFieldValidator validator = new InputFieldValidator(getActivity(),
+				this);
+
+		validator.add(getView().findViewById(R.id.edtMileage),
+				InputFieldValidator.ValidationType.GreaterZero, true,
+				R.string.alert_validate_mileage);
+		validator.add(getView().findViewById(R.id.edtVolume),
+				InputFieldValidator.ValidationType.GreaterZero, true,
+				R.string.alert_validate_volume);
+		validator.add(getView().findViewById(R.id.edtPrice),
+				InputFieldValidator.ValidationType.GreaterZero, true,
+				R.string.alert_validate_price);
+
+		validator.validate();
+	}
+
+	@Override
+	public void validationFinished(boolean success) {
+		if (!success) {
+			return;
+		}
+
 		Date date = getDateTime(edtDate.getDate(), edtTime.getTime());
-		int tachometer = getIntegerFromEditText(R.id.edtTachometer, 0);
+		int mileage = getIntegerFromEditText(R.id.edtMileage, 0);
 		float volume = (float) getDoubleFromEditText(R.id.edtVolume, 0);
 		boolean partial = ((CheckBox) getView().findViewById(R.id.chkPartial))
 				.isChecked();
 		float price = (float) getDoubleFromEditText(R.id.edtPrice, 0);
 		String note = ((EditText) getView().findViewById(R.id.edtNote))
-				.getText().toString();
+				.getText().toString().trim();
 		Car car = cars[(int) ((Spinner) getView().findViewById(R.id.spnCar))
 				.getSelectedItemId()];
-		if (tachometer > 0 && volume > 0 && price > 0) {
-			if (!isInEditMode()) {
-				Refueling.create(date, tachometer, volume, price, partial,
-						note, car);
-			} else {
-				Refueling refueling = (Refueling) editItem;
-				refueling.setDate(date);
-				refueling.setTachometer(tachometer);
-				refueling.setVolume(volume);
-				refueling.setPrice(price);
-				refueling.setPartial(partial);
-				refueling.setNote(note);
-				refueling.setCar(car);
-			}
-			return true;
+
+		if (!isInEditMode()) {
+			Refueling.create(date, mileage, volume, price, partial, note,
+					car);
 		} else {
-			return false;
+			Refueling refueling = (Refueling) editItem;
+			refueling.setDate(date);
+			refueling.setMileage(mileage);
+			refueling.setVolume(volume);
+			refueling.setPrice(price);
+			refueling.setPartial(partial);
+			refueling.setNote(note);
+			refueling.setCar(car);
 		}
+
+		saveSuccess();
 	}
 
 	public static EditRefuelingFragment newInstance(int id) {

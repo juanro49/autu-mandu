@@ -26,7 +26,7 @@ import android.provider.BaseColumns;
 
 public class Refueling extends AbstractItem {
 	private Date date;
-	private int tachometer;
+	private int mileage;
 	private float volume;
 	private float price;
 	private boolean partial;
@@ -48,7 +48,7 @@ public class Refueling extends AbstractItem {
 				cursor.moveToFirst();
 				this.id = id;
 				this.date = new Date(cursor.getLong(1));
-				this.tachometer = cursor.getInt(2);
+				this.mileage = cursor.getInt(2);
 				this.volume = cursor.getFloat(3);
 				this.price = cursor.getFloat(4);
 				this.partial = cursor.getInt(5) > 0;
@@ -59,11 +59,11 @@ public class Refueling extends AbstractItem {
 		}
 	}
 
-	private Refueling(int id, Date date, int tachometer, float volume,
+	private Refueling(int id, Date date, int mileage, float volume,
 			float price, boolean partial, String note, Car car) {
 		this.id = id;
 		this.date = date;
-		this.tachometer = tachometer;
+		this.mileage = mileage;
 		this.volume = volume;
 		this.price = price;
 		this.partial = partial;
@@ -80,12 +80,12 @@ public class Refueling extends AbstractItem {
 		save();
 	}
 
-	public int getTachometer() {
-		return tachometer;
+	public int getMileage() {
+		return mileage;
 	}
 
-	public void setTachometer(int tachometer) {
-		this.tachometer = tachometer;
+	public void setMileage(int mileage) {
+		this.mileage = mileage;
 		save();
 	}
 
@@ -151,7 +151,7 @@ public class Refueling extends AbstractItem {
 		if (!isDeleted()) {
 			ContentValues values = new ContentValues();
 			values.put(RefuelingTable.COL_DATE, date.getTime());
-			values.put(RefuelingTable.COL_TACHO, tachometer);
+			values.put(RefuelingTable.COL_TACHO, mileage);
 			values.put(RefuelingTable.COL_VOLUME, volume);
 			values.put(RefuelingTable.COL_PRICE, price);
 			values.put(RefuelingTable.COL_PARTIAL, partial);
@@ -168,11 +168,11 @@ public class Refueling extends AbstractItem {
 		}
 	}
 
-	public static Refueling create(Date date, int tachometer, float volume,
+	public static Refueling create(Date date, int mileage, float volume,
 			float price, boolean partial, String note, Car car) {
 		ContentValues values = new ContentValues();
 		values.put(RefuelingTable.COL_DATE, date.getTime());
-		values.put(RefuelingTable.COL_TACHO, tachometer);
+		values.put(RefuelingTable.COL_TACHO, mileage);
 		values.put(RefuelingTable.COL_VOLUME, volume);
 		values.put(RefuelingTable.COL_PRICE, price);
 		values.put(RefuelingTable.COL_PARTIAL, partial);
@@ -187,7 +187,7 @@ public class Refueling extends AbstractItem {
 		}
 		helper.dataChanged();
 
-		return new Refueling(id, date, tachometer, volume, price, partial,
+		return new Refueling(id, date, mileage, volume, price, partial,
 				note, car);
 	}
 
