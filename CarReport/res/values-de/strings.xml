@@ -60,21 +60,18 @@
     <string name="alert_delete_title">Löschen bestätigen</string>
     <string name="alert_delete_others_message">Die %d ausgewählten anderen Kosten werden gelöscht.</string>
     <string name="alert_change_color_title">Farbe auswählen</string>
-    <plurals name="alert_validate_msg_recommended">
-        <item quantity="one">Sie sollten einen Wert für %s eingeben.</item>
-        <item quantity="other">Sie sollten Werte für %s eingeben.</item>
-    </plurals>
-    <plurals name="alert_validate_msg_required">
-        <item quantity="one">Die App benötigt noch einen Wert für %s.</item>
-        <item quantity="other">Die App benötigt noch Werte für %s.</item>
-    </plurals>
-    <string name="alert_validate_title">den Titel</string>
-    <string name="alert_validate_mileage">den Kilometerstand</string>
-    <string name="alert_validate_volume">die getankten Liter</string>
-    <string name="alert_validate_price">den Preis</string>
-    <string name="alert_validate_last_separator">und</string>
-    <string name="alert_validate_save_anyway">Trotzdem speichern</string>
-    <string name="alert_validate_continue_edit">Weiter bearbeiten</string>
+    <string name="alert_validate_recommend_title">%s empfohlen</string>
+    <string name="alert_validate_recommend_dont_ask_again">Nicht wieder nachfragen.</string>
+    <string name="alert_validate_recommend_save">Ohne %s speichern</string>
+    <string name="alert_validate_recommend_edit">%s eingeben</string>
+    <string name="alert_validate_recommend_f_title">Titel</string>
+    <string name="alert_validate_recommend_f_title_msg">Ein Titel hilft, den Überblick über die Daten zu behalten.</string>
+    <string name="alert_validate_required_title">Weitere Werte benötigt</string>
+    <string name="alert_validate_required_message">Die App benötigt noch folgende Werte um richtig rechnen zu können:%s.</string>
+    <string name="alert_validate_required_f_mileage">einen Kilometerstand (> 0)</string>
+    <string name="alert_validate_required_f_volume">eine Angabe für getankte Liter (> 0)</string>
+    <string name="alert_validate_required_f_price">einen Preis (> 0)</string>
+    <string name="alert_validate_last_separator">" und "</string>
     <string name="toast_refueling_saved">Tankfüllung gespeichert.</string>
     <string name="toast_refueling_deleted">Tankfüllung gelöscht.</string>
     <string name="toast_other_saved">Andere Kosten gespeichert.</string>

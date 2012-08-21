@@ -17,14 +17,17 @@
 package me.kuehle.carreport;
 
 import me.kuehle.carreport.db.Car;
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class Preferences {
+	private Context context;
 	private SharedPreferences prefs;
 
 	public Preferences(Context context) {
+		this.context = context;
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
@@ -66,5 +69,18 @@ public class Preferences {
 
 	public boolean isShowLegend() {
 		return prefs.getBoolean("appearance_show_legend", false);
+	}
+	
+	public boolean isValidateDontAskAgain(int field) {
+		return prefs.getBoolean(String.format("validate_dont_ask_again_f_%d", field), false);
+	}
+	
+	public void setValidateDontAskAgain(int field, boolean value) {
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(String.format("validate_dont_ask_again_f_%d", field), value);
+		if(editor.commit()) {
+			BackupManager backupManager = new BackupManager(context);
+			backupManager.dataChanged();
+		}
 	}
 }

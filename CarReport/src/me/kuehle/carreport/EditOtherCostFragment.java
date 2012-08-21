@@ -163,22 +163,19 @@ public class EditOtherCostFragment extends AbstractEditFragment implements
 		InputFieldValidator validator = new InputFieldValidator(getActivity(),
 				this);
 
-		validator.add(getView().findViewById(R.id.edtTitle),
-				InputFieldValidator.ValidationType.NotEmpty, false,
-				R.string.alert_validate_title);
-		validator.add(getView().findViewById(R.id.edtPrice),
-				InputFieldValidator.ValidationType.GreaterZero, true,
-				R.string.alert_validate_price);
+		validator.setRecommended(getView().findViewById(R.id.edtTitle),
+				InputFieldValidator.ValidationType.NotEmpty,
+				R.string.alert_validate_recommend_f_title,
+				R.string.alert_validate_recommend_f_title_msg);
+		validator.addRequired(getView().findViewById(R.id.edtPrice),
+				InputFieldValidator.ValidationType.GreaterZero,
+				R.string.alert_validate_required_f_price);
 
 		validator.validate();
 	}
 
 	@Override
-	public void validationFinished(boolean success) {
-		if (!success) {
-			return;
-		}
-
+	public void validationSuccessfull() {
 		String title = ((EditText) getView().findViewById(R.id.edtTitle))
 				.getText().toString().trim();
 		Date date = getDateTime(edtDate.getDate(), edtTime.getTime());
@@ -194,8 +191,8 @@ public class EditOtherCostFragment extends AbstractEditFragment implements
 				.getSelectedItemId()];
 
 		if (!isInEditMode()) {
-			OtherCost.create(title, date, mileage, price, recurrence, note,
-					car);
+			OtherCost
+					.create(title, date, mileage, price, recurrence, note, car);
 		} else {
 			OtherCost other = (OtherCost) editItem;
 			other.setTitle(title);

@@ -153,25 +153,21 @@ public class EditRefuelingFragment extends AbstractEditFragment implements
 		InputFieldValidator validator = new InputFieldValidator(getActivity(),
 				this);
 
-		validator.add(getView().findViewById(R.id.edtMileage),
-				InputFieldValidator.ValidationType.GreaterZero, true,
-				R.string.alert_validate_mileage);
-		validator.add(getView().findViewById(R.id.edtVolume),
-				InputFieldValidator.ValidationType.GreaterZero, true,
-				R.string.alert_validate_volume);
-		validator.add(getView().findViewById(R.id.edtPrice),
-				InputFieldValidator.ValidationType.GreaterZero, true,
-				R.string.alert_validate_price);
+		validator.addRequired(getView().findViewById(R.id.edtMileage),
+				InputFieldValidator.ValidationType.GreaterZero,
+				R.string.alert_validate_required_f_mileage);
+		validator.addRequired(getView().findViewById(R.id.edtVolume),
+				InputFieldValidator.ValidationType.GreaterZero,
+				R.string.alert_validate_required_f_volume);
+		validator.addRequired(getView().findViewById(R.id.edtPrice),
+				InputFieldValidator.ValidationType.GreaterZero,
+				R.string.alert_validate_required_f_price);
 
 		validator.validate();
 	}
 
 	@Override
-	public void validationFinished(boolean success) {
-		if (!success) {
-			return;
-		}
-
+	public void validationSuccessfull() {
 		Date date = getDateTime(edtDate.getDate(), edtTime.getTime());
 		int mileage = getIntegerFromEditText(R.id.edtMileage, 0);
 		float volume = (float) getDoubleFromEditText(R.id.edtVolume, 0);
@@ -184,8 +180,7 @@ public class EditRefuelingFragment extends AbstractEditFragment implements
 				.getSelectedItemId()];
 
 		if (!isInEditMode()) {
-			Refueling.create(date, mileage, volume, price, partial, note,
-					car);
+			Refueling.create(date, mileage, volume, price, partial, note, car);
 		} else {
 			Refueling refueling = (Refueling) editItem;
 			refueling.setDate(date);
