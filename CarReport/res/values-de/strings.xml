@@ -79,6 +79,7 @@
     <string name="tab_indicator_refuelings">Tankfüllungen</string>
     <string name="tab_indicator_other">Andere Kosten</string>
     <string name="report_not_enough_data">Zu wenige Daten</string>
+    <string name="report_trend_label">%s (Trend)</string>
     <string name="report_overall">Gesamt</string>
     <string name="report_day">Tag</string>
     <string name="report_month">Monat</string>

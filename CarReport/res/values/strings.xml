@@ -78,6 +78,7 @@
     <string name="toast_other_deleted">Other cost deleted.</string>
     <string name="tab_indicator_refuelings">Refuelings</string>
     <string name="tab_indicator_other">Other costs</string>
+    <string name="report_trend_label">%s (Trend)</string>
     <string name="report_not_enough_data">Not enough data</string>
     <string name="report_overall">Overall</string>
     <string name="report_day">Day</string>

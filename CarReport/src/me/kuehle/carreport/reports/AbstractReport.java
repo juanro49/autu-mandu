@@ -27,6 +27,7 @@ import me.kuehle.carreport.util.Calculator;
 
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
+import org.achartengine.renderer.BasicStroke;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 import org.achartengine.util.MathHelper;
@@ -159,6 +160,14 @@ public abstract class AbstractReport {
 
 		renderer.setFillBelowLine(fill);
 		renderer.setFillBelowLineColor(Color.rgb(20, 40, 60));
+	}
+	
+	protected void applyTrendStyle(XYSeriesRenderer renderer, int color) {
+		Calculator calc = new Calculator(context);
+
+		renderer.setColor(color);
+		renderer.setLineWidth(calc.dpToPx(2));
+		renderer.setStroke(BasicStroke.DASHED);
 	}
 
 	public static class Section implements Comparable<Section> {
