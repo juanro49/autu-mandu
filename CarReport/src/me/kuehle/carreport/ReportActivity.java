@@ -39,16 +39,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
+import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 
-public class ReportActivity extends Activity {
+public class ReportActivity extends Activity implements OnMenuItemClickListener {
 	private static final int ADD_REFUELING_REQUEST_CODE = 0;
 	private static final int ADD_OTHER_REQUEST_CODE = 1;
 	private static final int EDIT_REFUELING_REQUEST_CODE = 2;
 	private static final int EDIT_OTHER_REQUEST_CODE = 3;
 	private static final int PREFERENCES_REQUEST_CODE = 4;
+
+	private AbstractReport mCurrentReport;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -127,37 +131,67 @@ public class ReportActivity extends Activity {
 		return actionBar.getSelectedNavigationIndex();
 	}
 
+	@Override
+	public boolean onMenuItemClick(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_show_trend:
+			mCurrentReport.setShowTrend(!item.isChecked());
+			updateReportGraph();
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	public void showReportOptions(View v) {
+		PopupMenu popup = new PopupMenu(this, v);
+		popup.inflate(R.menu.report_options);
+		popup.setOnMenuItemClickListener(this);
+
+		Menu menu = popup.getMenu();
+		MenuItem item = menu.findItem(R.id.menu_show_trend);
+		item.setChecked(mCurrentReport.isShowTrend());
+
+		popup.show();
+	}
+
 	private void updateReport() {
 		ActionBar actionBar = getActionBar();
 		int reportIndex = actionBar.getSelectedNavigationIndex();
 
-		AbstractReport report;
 		switch (reportIndex) {
 		case 0:
-			report = new FuelConsumptionReport(getApplicationContext());
+			mCurrentReport = new FuelConsumptionReport(getApplicationContext());
 			break;
 		case 1:
-			report = new FuelPriceReport(getApplicationContext());
+			mCurrentReport = new FuelPriceReport(getApplicationContext());
 			break;
 		case 2:
-			report = new CostsReport(getApplicationContext());
+			mCurrentReport = new CostsReport(getApplicationContext());
 			break;
 		default:
 			return;
 		}
 
-		LinearLayout graph = (LinearLayout) findViewById(R.id.graph);
-		graph.removeAllViews();
-		View graphView = report.getGraphView();
+		updateReportGraph();
+
+		ListView lstData = (ListView) findViewById(R.id.lstData);
+		lstData.setAdapter(new ReportAdapter(mCurrentReport.getData()));
+	}
+	
+	private void updateReportGraph() {
+		FrameLayout graph = (FrameLayout) findViewById(R.id.graph);
+		if(graph.getChildCount() == 2) {
+			graph.removeViewAt(0);
+		}
+		
+		View graphView = mCurrentReport.getGraphView();
 		if (graphView == null) {
 			graph.setVisibility(View.GONE);
 		} else {
 			graph.setVisibility(View.VISIBLE);
-			graph.addView(graphView);
+			graph.addView(graphView, 0);
 		}
-
-		ListView lstData = (ListView) findViewById(R.id.lstData);
-		lstData.setAdapter(new ReportAdapter(report.getData()));
 	}
 
 	private OnNavigationListener navigationListener = new OnNavigationListener() {

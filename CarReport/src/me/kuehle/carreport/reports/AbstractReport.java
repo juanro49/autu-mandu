@@ -36,6 +36,7 @@ import android.text.format.DateFormat;
 
 public abstract class AbstractReport {
 	private HashMap<Section, ArrayList<AbstractReport.Item>> data = new HashMap<Section, ArrayList<AbstractReport.Item>>();
+	private boolean showTrend = false;
 	protected Context context;
 
 	public AbstractReport(Context context) {
@@ -80,6 +81,14 @@ public abstract class AbstractReport {
 		Preferences prefs = new Preferences(context);
 		int position = prefs.getOverallSectionPos();
 		return new Section(label, Color.GRAY, position);
+	}
+	
+	public boolean isShowTrend() {
+		return showTrend;
+	}
+
+	public void setShowTrend(boolean showTrend) {
+		this.showTrend = showTrend;
 	}
 
 	protected void applyDefaultStyle(XYMultipleSeriesRenderer renderer,

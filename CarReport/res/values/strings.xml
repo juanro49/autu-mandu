@@ -37,6 +37,7 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_view_data">View data</string>
     <string name="menu_add_car">Add car</string>
+    <string name="menu_show_trend">Show trend</string>
     <string name="section_car">Car</string>
     <string name="section_note">Note</string>
     <string name="title_add_refueling">Add refueling</string>

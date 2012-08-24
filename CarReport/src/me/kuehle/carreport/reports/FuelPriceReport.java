@@ -41,8 +41,7 @@ import android.view.View;
 import android.widget.Toast;
 
 public class FuelPriceReport extends AbstractReport {
-	private Vector<AbstractReportData> reportData = new Vector<AbstractReportData>();
-
+	private ReportData reportData;
 	private String unit;
 
 	public FuelPriceReport(Context context) {
@@ -51,6 +50,8 @@ public class FuelPriceReport extends AbstractReport {
 		Preferences prefs = new Preferences(context);
 		unit = String.format("%s/%s", prefs.getUnitCurrency(),
 				prefs.getUnitVolume());
+		
+		reportData = new ReportData(context, "", Color.BLUE);
 
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
@@ -72,10 +73,6 @@ public class FuelPriceReport extends AbstractReport {
 				String.format("%.3f %s", cursor.getFloat(2), unit));
 
 		cursor.close();
-
-		ReportData data = new ReportData(context, "", Color.BLUE);
-		reportData.add(data);
-		reportData.add(data.createRegressionData());
 	}
 
 	@Override
@@ -85,6 +82,11 @@ public class FuelPriceReport extends AbstractReport {
 		double[] axesMinMax = { Double.MAX_VALUE, Double.MIN_VALUE,
 				Double.MAX_VALUE, Double.MIN_VALUE };
 
+		Vector<AbstractReportData> reportData = new Vector<AbstractReportData>();
+		reportData.add(this.reportData);
+		if(isShowTrend()) {
+			reportData.add(this.reportData.createRegressionData());
+		}
 		for (AbstractReportData data : reportData) {
 			TimeSeries series = data.getSeries();
 			dataset.addSeries(series);

@@ -65,7 +65,6 @@ public class FuelConsumptionReport extends AbstractReport {
 						car);
 			} else {
 				reportData.add(carData);
-				reportData.add(carData.createRegressionData());
 
 				consumptions.addAll(carData.yValues);
 				addConsumptionData(car, carData.yValues);
@@ -81,10 +80,19 @@ public class FuelConsumptionReport extends AbstractReport {
 
 	@Override
 	public GraphicalView getGraphView() {
-		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+		final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 		double[] axesMinMax = { Double.MAX_VALUE, Double.MIN_VALUE,
 				Double.MAX_VALUE, Double.MIN_VALUE };
+
+		// Collect data
+		Vector<AbstractReportData> reportData = new Vector<AbstractReportData>();
+		if (isShowTrend()) {
+			for (AbstractReportData data : this.reportData) {
+				reportData.add(data.createRegressionData());
+			}
+		}
+		reportData.addAll(this.reportData);
 
 		// Add series
 		for (AbstractReportData data : reportData) {
@@ -120,8 +128,8 @@ public class FuelConsumptionReport extends AbstractReport {
 				SeriesSelection seriesSelection = graphView
 						.getCurrentSeriesAndPoint();
 				if (seriesSelection != null) {
-					String car = reportData.get(seriesSelection
-							.getSeriesIndex()).name;
+					String car = dataset.getSeriesAt(
+							seriesSelection.getSeriesIndex()).getTitle();
 					String date = DateFormat.getDateFormat(context).format(
 							new Date((long) seriesSelection.getXValue()));
 					Toast.makeText(
