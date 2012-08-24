@@ -17,6 +17,7 @@
 package me.kuehle.carreport.reports;
 
 import java.util.Date;
+import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -40,6 +41,8 @@ import android.view.View;
 import android.widget.Toast;
 
 public class FuelPriceReport extends AbstractReport {
+	private Vector<AbstractReportData> reportData = new Vector<AbstractReportData>();
+
 	private String unit;
 
 	public FuelPriceReport(Context context) {
@@ -69,45 +72,31 @@ public class FuelPriceReport extends AbstractReport {
 				String.format("%.3f %s", cursor.getFloat(2), unit));
 
 		cursor.close();
+
+		ReportData data = new ReportData(context, "", Color.BLUE);
+		reportData.add(data);
+		reportData.add(data.createRegressionData());
 	}
 
 	@Override
 	public GraphicalView getGraphView() {
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
-		double[] axesMinMax = new double[4];
+		double[] axesMinMax = { Double.MAX_VALUE, Double.MIN_VALUE,
+				Double.MAX_VALUE, Double.MIN_VALUE };
 
-		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db.rawQuery(String.format(
-				"SELECT %s, (%s / %s) AS fuelprice FROM %s ORDER BY %s ASC",
-				RefuelingTable.COL_DATE, RefuelingTable.COL_PRICE,
-				RefuelingTable.COL_VOLUME, RefuelingTable.NAME,
-				RefuelingTable.COL_DATE), null);
-		if (cursor.getCount() >= 2) {
-			TimeSeries series = new TimeSeries("");
-
-			cursor.moveToFirst();
-			while (!cursor.isAfterLast()) {
-				series.add(new Date(cursor.getLong(0)), cursor.getFloat(1));
-				cursor.moveToNext();
-			}
-
+		for (AbstractReportData data : reportData) {
+			TimeSeries series = data.getSeries();
 			dataset.addSeries(series);
+			renderer.addSeriesRenderer(data.getRenderer());
 
-			axesMinMax[0] = series.getMinX();
-			axesMinMax[1] = series.getMaxX();
-			axesMinMax[2] = series.getMinY();
-			axesMinMax[3] = series.getMaxY();
-
-			XYSeriesRenderer r = new XYSeriesRenderer();
-			applyDefaultStyle(r, Color.BLUE, true);
-			renderer.addSeriesRenderer(r);
+			axesMinMax[0] = Math.min(axesMinMax[0], series.getMinX());
+			axesMinMax[1] = Math.max(axesMinMax[1], series.getMaxX());
+			axesMinMax[2] = Math.min(axesMinMax[2], series.getMinY());
+			axesMinMax[3] = Math.max(axesMinMax[3], series.getMaxY());
 		}
-		cursor.close();
 
-		applyDefaultStyle(renderer, axesMinMax, true, null,
-				"%.3f");
+		applyDefaultStyle(renderer, axesMinMax, true, null, "%.3f");
 		renderer.setShowLegend(false);
 
 		final GraphicalView graphView = ChartFactory.getTimeChartView(context,
@@ -140,5 +129,39 @@ public class FuelPriceReport extends AbstractReport {
 	@Override
 	public Section getOverallSection() {
 		return null;
+	}
+
+	private class ReportData extends AbstractReportData {
+		public ReportData(Context context, String name, int color) {
+			super(context, name, color);
+
+			Helper helper = Helper.getInstance();
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db
+					.rawQuery(
+							String.format(
+									"SELECT %s, (%s / %s) AS fuelprice FROM %s ORDER BY %s ASC",
+									RefuelingTable.COL_DATE,
+									RefuelingTable.COL_PRICE,
+									RefuelingTable.COL_VOLUME,
+									RefuelingTable.NAME,
+									RefuelingTable.COL_DATE), null);
+			if (cursor.getCount() >= 2) {
+				cursor.moveToFirst();
+				while (!cursor.isAfterLast()) {
+					xValues.add(cursor.getLong(0));
+					yValues.add(cursor.getDouble(1));
+					cursor.moveToNext();
+				}
+			}
+			cursor.close();
+		}
+
+		@Override
+		public XYSeriesRenderer getRenderer() {
+			XYSeriesRenderer renderer = new XYSeriesRenderer();
+			applyDefaultStyle(renderer, color, true);
+			return renderer;
+		}
 	}
 }

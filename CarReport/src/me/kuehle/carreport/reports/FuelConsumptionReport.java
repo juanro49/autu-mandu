@@ -39,7 +39,7 @@ import android.view.View;
 import android.widget.Toast;
 
 public class FuelConsumptionReport extends AbstractReport {
-	private Vector<CarData> reportData = new Vector<CarData>();
+	private Vector<AbstractReportData> reportData = new Vector<AbstractReportData>();
 
 	private String unit;
 	private boolean showLegend;
@@ -58,22 +58,23 @@ public class FuelConsumptionReport extends AbstractReport {
 		Vector<Double> consumptions = new Vector<Double>();
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
-			CarData carData = new CarData(car);
+			ReportData carData = new ReportData(context, car);
 
 			if (carData.size() == 0) {
 				addData(context.getString(R.string.report_not_enough_data), "",
 						car);
 			} else {
 				reportData.add(carData);
+				reportData.add(carData.createRegressionData());
 
-				consumptions.addAll(carData.consumptions);
-				addConsumptionData(car, carData.consumptions);
+				consumptions.addAll(carData.yValues);
+				addConsumptionData(car, carData.yValues);
 			}
 		}
 
 		// Only display overall section, when at least report data for 2
-		// cars is present.
-		if (reportData.size() >= 2) {
+		// cars is present (2 graphs per car).
+		if (reportData.size() >= 4) {
 			addConsumptionData(null, consumptions);
 		}
 	}
@@ -82,46 +83,22 @@ public class FuelConsumptionReport extends AbstractReport {
 	public GraphicalView getGraphView() {
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
-		double minX = Double.MAX_VALUE;
-		double maxX = Double.MIN_VALUE;
-		double minY = Double.MAX_VALUE;
-		double maxY = Double.MIN_VALUE;
+		double[] axesMinMax = { Double.MAX_VALUE, Double.MIN_VALUE,
+				Double.MAX_VALUE, Double.MIN_VALUE };
 
 		// Add series
-		for (CarData carData : reportData) {
-			// Trend
-			TimeSeries trendSeries = new TimeSeries(context.getString(
-					R.string.report_trend_label, carData.car.getName()));
-			for (int i = 0; i < carData.regressionSize(); i++) {
-				trendSeries.add(new Date(carData.regressionDates.get(i)),
-						carData.regressionValues.get(i));
-			}
-			dataset.addSeries(trendSeries);
-
-			XYSeriesRenderer tr = new XYSeriesRenderer();
-			applyTrendStyle(tr, carData.car.getColor());
-			renderer.addSeriesRenderer(tr);
-
-			// Original data
-			TimeSeries series = new TimeSeries(carData.car.getName());
-			for (int i = 0; i < carData.size(); i++) {
-				series.add(new Date(carData.dates.get(i)),
-						carData.consumptions.get(i));
-			}
+		for (AbstractReportData data : reportData) {
+			TimeSeries series = data.getSeries();
 			dataset.addSeries(series);
+			renderer.addSeriesRenderer(data.getRenderer());
 
-			minX = Math.min(minX, series.getMinX());
-			maxX = Math.max(maxX, series.getMaxX());
-			minY = Math.min(minY, series.getMinY());
-			maxY = Math.max(maxY, series.getMaxY());
-
-			XYSeriesRenderer r = new XYSeriesRenderer();
-			applyDefaultStyle(r, carData.car.getColor(), false);
-			renderer.addSeriesRenderer(r);
+			axesMinMax[0] = Math.min(axesMinMax[0], series.getMinX());
+			axesMinMax[1] = Math.max(axesMinMax[1], series.getMaxX());
+			axesMinMax[2] = Math.min(axesMinMax[2], series.getMinY());
+			axesMinMax[3] = Math.max(axesMinMax[3], series.getMaxY());
 		}
 
 		// Style report
-		double[] axesMinMax = { minX, maxX, minY, maxY };
 		applyDefaultStyle(renderer, axesMinMax, true, null, "%.2f");
 		renderer.setShowLegend(showLegend);
 		// Legend height is not proportional to its text size. So this is a
@@ -142,10 +119,9 @@ public class FuelConsumptionReport extends AbstractReport {
 			public void onClick(View v) {
 				SeriesSelection seriesSelection = graphView
 						.getCurrentSeriesAndPoint();
-				if (seriesSelection != null
-						&& seriesSelection.getSeriesIndex() % 2 != 0) {
+				if (seriesSelection != null) {
 					String car = reportData.get(seriesSelection
-							.getSeriesIndex() / 2).car.getName();
+							.getSeriesIndex()).name;
 					String date = DateFormat.getDateFormat(context).format(
 							new Date((long) seriesSelection.getXValue()));
 					Toast.makeText(
@@ -175,17 +151,9 @@ public class FuelConsumptionReport extends AbstractReport {
 				String.format("%.2f %s", Calculator.avg(numbers), unit), car);
 	}
 
-	private class CarData {
-		private Car car;
-
-		private Vector<Long> dates = new Vector<Long>();
-		private Vector<Double> consumptions = new Vector<Double>();
-
-		private Vector<Long> regressionDates = new Vector<Long>();
-		private Vector<Double> regressionValues = new Vector<Double>();
-
-		public CarData(Car car) {
-			this.car = car;
+	private class ReportData extends AbstractReportData {
+		public ReportData(Context context, Car car) {
+			super(context, car.getName(), car.getColor());
 
 			Refueling[] refuelings = Refueling.getAllForCar(car, true);
 			int lastTacho = -1;
@@ -196,48 +164,20 @@ public class FuelConsumptionReport extends AbstractReport {
 					if (lastTacho > -1) {
 						double consumption = volume
 								/ (refueling.getMileage() - lastTacho) * 100;
-						dates.add(refueling.getDate().getTime());
-						consumptions.add(consumption);
+						xValues.add(refueling.getDate().getTime());
+						yValues.add(consumption);
 					}
 					lastTacho = refueling.getMileage();
 					volume = 0;
 				}
 			}
-
-			calcRegressionValues();
 		}
 
-		public int size() {
-			return dates.size();
-		}
-
-		public int regressionSize() {
-			return regressionDates.size();
-		}
-
-		private void calcRegressionValues() {
-			long avgX = Calculator.avg(dates);
-			double avgY = Calculator.avg(consumptions);
-
-			long sum1 = 0; // (x_i - avg(X)) ^ 2
-			double sum2 = 0; // (x_i - avg(X)) * (y_i - avg(Y))
-			for (int i = 0; i < size(); i++) {
-				long xMinusAvgX = dates.get(i) - avgX;
-				double yMinusAvgY = consumptions.get(i) - avgY;
-				sum1 += xMinusAvgX * xMinusAvgX;
-				sum2 += xMinusAvgX * yMinusAvgY;
-			}
-
-			double beta1 = sum2 / sum1;
-			double beta0 = avgY - (beta1 * avgX);
-
-			regressionValues.clear();
-			regressionDates.clear();
-			regressionDates.add(dates.firstElement());
-			regressionValues.add(beta0 + (beta1 * dates.firstElement()));
-			regressionDates.add(dates.lastElement());
-			regressionValues.add(beta0 + (beta1 * dates.lastElement()));
+		@Override
+		public XYSeriesRenderer getRenderer() {
+			XYSeriesRenderer renderer = new XYSeriesRenderer();
+			applyDefaultStyle(renderer, color, false);
+			return renderer;
 		}
 	}
-
 }
