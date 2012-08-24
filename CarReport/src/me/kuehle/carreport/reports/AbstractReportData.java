@@ -1,5 +1,8 @@
 package me.kuehle.carreport.reports;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.Date;
 import java.util.Vector;
 
@@ -35,16 +38,16 @@ public abstract class AbstractReportData {
 				long avgX = Calculator.avg(data.xValues);
 				double avgY = Calculator.avg(data.yValues);
 
-				long sum1 = 0; // (x_i - avg(X)) ^ 2
-				double sum2 = 0; // (x_i - avg(X)) * (y_i - avg(Y))
+				BigInteger sum1 = BigInteger.ZERO; // (x_i - avg(X)) ^ 2
+				BigDecimal sum2 = BigDecimal.ZERO; // (x_i - avg(X)) * (y_i - avg(Y))
 				for (int i = 0; i < data.size(); i++) {
-					long xMinusAvgX = data.xValues.get(i) - avgX;
-					double yMinusAvgY = data.yValues.get(i) - avgY;
-					sum1 += xMinusAvgX * xMinusAvgX;
-					sum2 += xMinusAvgX * yMinusAvgY;
+					BigInteger xMinusAvgX = BigInteger.valueOf(data.xValues.get(i) - avgX);
+					BigDecimal yMinusAvgY = BigDecimal.valueOf(data.yValues.get(i) - avgY);
+					sum1 = sum1.add(xMinusAvgX.multiply(xMinusAvgX));
+					sum2 = sum2.add(yMinusAvgY.multiply(new BigDecimal(xMinusAvgX)));
 				}
 
-				double beta1 = sum2 / sum1;
+				double beta1 = sum2.divide(new BigDecimal(sum1), MathContext.DECIMAL128).doubleValue();
 				double beta0 = avgY - (beta1 * avgX);
 
 				xValues.add(data.xValues.firstElement());
