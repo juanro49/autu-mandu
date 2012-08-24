@@ -37,7 +37,7 @@
     <string name="menu_delete">Löschen</string>
     <string name="menu_view_data">Daten ansehen</string>
     <string name="menu_add_car">Auto hinzufügen</string>
-    <string name="menu_show_trend">Show trend</string>
+    <string name="menu_show_trend">Trend anzeigen</string>
     <string name="section_car">Auto</string>
     <string name="section_note">Notiz</string>
     <string name="title_add_refueling">Tankfüllung hinzufügen</string>
