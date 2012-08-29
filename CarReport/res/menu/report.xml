@@ -12,10 +12,9 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
     <item
         android:id="@+id/menu_add_refueling"
         android:icon="@drawable/ic_new"
@@ -35,10 +34,15 @@
         android:title="@string/menu_view_data">
     </item>
     <item
+        android:id="@+id/menu_calculate"
+        android:icon="@drawable/ic_calculate"
+        android:showAsAction="never"
+        android:title="@string/menu_calculate">
+    </item>
+    <item
         android:id="@+id/menu_settings"
         android:icon="@drawable/ic_settings"
         android:showAsAction="never"
         android:title="@string/menu_settings">
     </item>
-
 </menu>

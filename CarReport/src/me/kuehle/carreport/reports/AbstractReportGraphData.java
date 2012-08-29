@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012 Jan Kühle
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package me.kuehle.carreport.reports;
 
 import java.math.BigDecimal;
@@ -16,7 +32,7 @@ import me.kuehle.carreport.util.Calculator;
 import android.content.Context;
 import android.graphics.Color;
 
-public abstract class AbstractReportData {
+public abstract class AbstractReportGraphData {
 	protected Context context;
 	protected String name;
 	protected int color;
@@ -24,30 +40,35 @@ public abstract class AbstractReportData {
 	protected Vector<Long> xValues = new Vector<Long>();
 	protected Vector<Double> yValues = new Vector<Double>();
 
-	public AbstractReportData(Context context, String name, int color) {
+	public AbstractReportGraphData(Context context, String name, int color) {
 		this.context = context;
 		this.name = name;
 		this.color = color;
 	}
 
-	public AbstractReportData createRegressionData() {
-		final AbstractReportData data = this;
-		return new AbstractReportData(context, context.getString(
+	public AbstractReportGraphData createRegressionData() {
+		final AbstractReportGraphData data = this;
+		return new AbstractReportGraphData(context, context.getString(
 				R.string.report_trend_label, data.name), data.color) {
 			{
 				long avgX = Calculator.avg(data.xValues);
 				double avgY = Calculator.avg(data.yValues);
 
 				BigInteger sum1 = BigInteger.ZERO; // (x_i - avg(X)) ^ 2
-				BigDecimal sum2 = BigDecimal.ZERO; // (x_i - avg(X)) * (y_i - avg(Y))
+				BigDecimal sum2 = BigDecimal.ZERO; // (x_i - avg(X)) * (y_i -
+													// avg(Y))
 				for (int i = 0; i < data.size(); i++) {
-					BigInteger xMinusAvgX = BigInteger.valueOf(data.xValues.get(i) - avgX);
-					BigDecimal yMinusAvgY = BigDecimal.valueOf(data.yValues.get(i) - avgY);
+					BigInteger xMinusAvgX = BigInteger.valueOf(data.xValues
+							.get(i) - avgX);
+					BigDecimal yMinusAvgY = BigDecimal.valueOf(data.yValues
+							.get(i) - avgY);
 					sum1 = sum1.add(xMinusAvgX.multiply(xMinusAvgX));
-					sum2 = sum2.add(yMinusAvgY.multiply(new BigDecimal(xMinusAvgX)));
+					sum2 = sum2.add(yMinusAvgY.multiply(new BigDecimal(
+							xMinusAvgX)));
 				}
 
-				double beta1 = sum2.divide(new BigDecimal(sum1), MathContext.DECIMAL128).doubleValue();
+				double beta1 = sum2.divide(new BigDecimal(sum1),
+						MathContext.DECIMAL128).doubleValue();
 				double beta0 = avgY - (beta1 * avgX);
 
 				xValues.add(data.xValues.firstElement());

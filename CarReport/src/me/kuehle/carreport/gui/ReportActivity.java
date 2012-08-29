@@ -16,10 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.reports.AbstractReport;
@@ -29,23 +25,24 @@ import me.kuehle.carreport.reports.FuelPriceReport;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
-import android.widget.TextView;
 
 public class ReportActivity extends Activity implements OnMenuItemClickListener {
 	private static final int ADD_REFUELING_REQUEST_CODE = 0;
@@ -102,6 +99,9 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			intent3.putExtra(EditFragmentActivity.EXTRA_EDIT,
 					EditFragmentActivity.EXTRA_EDIT_OTHER);
 			startActivityForResult(intent3, ADD_OTHER_REQUEST_CODE);
+			return true;
+		case R.id.menu_calculate:
+			startActionMode(mCalculationActionMode);
 			return true;
 		case R.id.menu_view_data:
 			Intent intent1 = new Intent(this, ViewDataActivity.class);
@@ -178,15 +178,17 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		updateReportGraph();
 
 		ListView lstData = (ListView) findViewById(R.id.lstData);
-		lstData.setAdapter(new ReportAdapter(mCurrentReport.getData()));
+		Preferences prefs = new Preferences(ReportActivity.this);
+		lstData.setAdapter(new SectionListAdapter(this, mCurrentReport
+				.getData().getData(), prefs.isColorSections()));
 	}
-	
+
 	private void updateReportGraph() {
 		FrameLayout graph = (FrameLayout) findViewById(R.id.graph);
-		if(graph.getChildCount() == 2) {
+		if (graph.getChildCount() == 2) {
 			graph.removeViewAt(0);
 		}
-		
+
 		View graphView = mCurrentReport.getGraphView();
 		if (graphView == null) {
 			graph.setVisibility(View.GONE);
@@ -204,98 +206,90 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		}
 	};
 
-	private class ReportAdapter extends BaseAdapter {
-		private static final int ITEM_VIEW_TYPE_NORMAL = 0;
-		private static final int ITEM_VIEW_TYPE_SEPARATOR = 1;
-		private static final int ITEM_VIEW_TYPE_COUNT = 2;
+	private ActionMode.Callback mCalculationActionMode = new ActionMode.Callback() {
+		private int graphVisibility;
+		private EditText input;
+		private int option = 0;
 
-		private Object[] items;
-		private boolean colorSections;
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			return false;
+		}
 
-		public ReportAdapter(
-				HashMap<AbstractReport.Section, ArrayList<AbstractReport.Item>> data) {
-			ArrayList<Object> items = new ArrayList<Object>();
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			mCurrentReport.getData().resetCalculation();
 
-			ArrayList<AbstractReport.Section> keys = new ArrayList<AbstractReport.Section>(
-					data.keySet());
-			Collections.sort(keys);
-			for (AbstractReport.Section section : keys) {
-				if (section != null) {
-					items.add(section);
+			InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			keyboard.hideSoftInputFromWindow(input.getWindowToken(), 0);
+
+			ReportActivity.this.findViewById(R.id.graph).setVisibility(
+					graphVisibility);
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			int[] options = mCurrentReport.getCalculationOptions();
+			if (options.length == 0) {
+				return false;
+			} else if (options.length > 1) {
+				for (int i = 0; i < options.length; i++) {
+					MenuItem item = menu.add(Menu.NONE, i, Menu.NONE,
+							options[i]);
+					item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
-				items.addAll(data.get(section));
 			}
 
-			this.items = items.toArray();
-
-			Preferences prefs = new Preferences(ReportActivity.this);
-			colorSections = prefs.isColorSections();
-		}
-
-		@Override
-		public int getCount() {
-			return items.length;
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return items[position];
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public int getViewTypeCount() {
-			return ITEM_VIEW_TYPE_COUNT;
-		}
-
-		@Override
-		public int getItemViewType(int position) {
-			return (items[position] instanceof AbstractReport.Section) ? ITEM_VIEW_TYPE_SEPARATOR
-					: ITEM_VIEW_TYPE_NORMAL;
-		}
-
-		@Override
-		public boolean isEnabled(int position) {
-			return getItemViewType(position) != ITEM_VIEW_TYPE_SEPARATOR;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			final int type = getItemViewType(position);
-
-			if (convertView == null) {
-				convertView = LayoutInflater
-						.from(ReportActivity.this)
-						.inflate(
-								type == ITEM_VIEW_TYPE_SEPARATOR ? R.layout.separator_list_item
-										: android.R.layout.simple_list_item_2,
-								parent, false);
-			}
-
-			if (type == ITEM_VIEW_TYPE_SEPARATOR) {
-				AbstractReport.Section section = (AbstractReport.Section) getItem(position);
-				TextView text = (TextView) convertView;
-				text.setText(section.getLabel());
-				if (colorSections) {
-					text.setTextColor(section.getColor());
-					GradientDrawable drawableBottom = (GradientDrawable) text
-							.getCompoundDrawables()[3];
-					drawableBottom.setColorFilter(section.getColor(),
-							Mode.SRC_ATOP);
+			View graph = ReportActivity.this.findViewById(R.id.graph);
+			graphVisibility = graph.getVisibility();
+			graph.setVisibility(View.GONE);
+			
+			input = new EditText(ReportActivity.this);
+			input.setInputType(InputType.TYPE_CLASS_NUMBER
+					| InputType.TYPE_NUMBER_FLAG_DECIMAL);
+			input.setLines(1);
+			input.setHint(options[option]);
+			input.addTextChangedListener(new TextWatcher() {
+				@Override
+				public void onTextChanged(CharSequence s, int start,
+						int before, int count) {
 				}
-			} else {
-				AbstractReport.Item item = (AbstractReport.Item) getItem(position);
-				((TextView) convertView.findViewById(android.R.id.text1))
-						.setText(item.getLabel());
-				((TextView) convertView.findViewById(android.R.id.text2))
-						.setText(item.getValue());
-			}
 
-			return convertView;
+				@Override
+				public void beforeTextChanged(CharSequence s, int start,
+						int count, int after) {
+				}
+
+				@Override
+				public void afterTextChanged(Editable s) {
+					double input = 1;
+					try {
+						input = Double.parseDouble(s.toString());
+					} catch (NumberFormatException e) {
+					}
+					mCurrentReport.getData().applyCalculation(input, option);
+					((ListView) ReportActivity.this.findViewById(R.id.lstData))
+							.invalidateViews();
+				}
+			});
+			mode.setCustomView(input);
+			input.requestFocus();
+			input.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					keyboard.showSoftInput(input, 0);
+				}
+			}, 100);
+			return true;
 		}
-	}
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			option = item.getItemId();
+			input.setHint(mCurrentReport.getCalculationOptions()[option]);
+			return true;
+		}
+
+	};
 }

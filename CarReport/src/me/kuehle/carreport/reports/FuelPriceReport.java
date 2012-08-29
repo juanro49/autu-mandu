@@ -76,18 +76,23 @@ public class FuelPriceReport extends AbstractReport {
 	}
 
 	@Override
+	public int[] getCalculationOptions() {
+		return new int[0];
+	}
+	
+	@Override
 	public GraphicalView getGraphView() {
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 		double[] axesMinMax = { Double.MAX_VALUE, Double.MIN_VALUE,
 				Double.MAX_VALUE, Double.MIN_VALUE };
 
-		Vector<AbstractReportData> reportData = new Vector<AbstractReportData>();
+		Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
 		reportData.add(this.reportData);
 		if(isShowTrend()) {
 			reportData.add(this.reportData.createRegressionData());
 		}
-		for (AbstractReportData data : reportData) {
+		for (AbstractReportGraphData data : reportData) {
 			TimeSeries series = data.getSeries();
 			dataset.addSeries(series);
 			renderer.addSeriesRenderer(data.getRenderer());
@@ -128,12 +133,7 @@ public class FuelPriceReport extends AbstractReport {
 		return graphView;
 	}
 
-	@Override
-	public Section getOverallSection() {
-		return null;
-	}
-
-	private class ReportData extends AbstractReportData {
+	private class ReportData extends AbstractReportGraphData {
 		public ReportData(Context context, String name, int color) {
 			super(context, name, color);
 

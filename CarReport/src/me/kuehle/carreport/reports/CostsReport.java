@@ -26,6 +26,8 @@ import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.OtherCostTable;
 import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.db.RefuelingTable;
+import me.kuehle.carreport.gui.SectionListAdapter.Item;
+import me.kuehle.carreport.gui.SectionListAdapter.Section;
 
 import org.achartengine.GraphicalView;
 import org.joda.time.DateTime;
@@ -47,6 +49,8 @@ public class CostsReport extends AbstractReport {
 
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
+			Section section = addDataSection(car.getName(), car.getColor());
+
 			int startTacho = Integer.MAX_VALUE;
 			int endTacho = Integer.MIN_VALUE;
 			DateTime startDate = new DateTime();
@@ -57,8 +61,8 @@ public class CostsReport extends AbstractReport {
 			OtherCost[] otherCosts = OtherCost.getAllForCar(car, true);
 
 			if ((refuelings.length + otherCosts.length) < 2) {
-				addData(context.getString(R.string.report_not_enough_data), "",
-						car);
+				section.addItem(new Item(context
+						.getString(R.string.report_not_enough_data), ""));
 				continue;
 			}
 
@@ -111,31 +115,68 @@ public class CostsReport extends AbstractReport {
 			double costsPerSecond = costs / elapsedSeconds.getSeconds();
 			// 60 seconds per minute * 60 minutes per hour * 24 hours per day =
 			// 86400 seconds per day
-			addData(context.getString(R.string.report_day),
-					String.format("%.2f %s", costsPerSecond * 86400, unit), car);
+			section.addItem(new CalculatableItem(R.plurals.report_day,
+					costsPerSecond * 86400));
 			// 86400 seconds per day * 30,4375 days per month = 2629800 seconds
 			// per month
 			// (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
-			addData(context.getString(R.string.report_month),
-					String.format("%.2f %s", costsPerSecond * 2629800, unit),
-					car);
+			section.addItem(new CalculatableItem(R.plurals.report_month,
+					costsPerSecond * 2629800));
 			// 86400 seconds per day * 365,25 days per year = 31557600 seconds
 			// per year
-			addData(context.getString(R.string.report_year),
-					String.format("%.2f %s", costsPerSecond * 31557600, unit),
-					car);
+			section.addItem(new CalculatableItem(R.plurals.report_year,
+					costsPerSecond * 31557600));
 			int tachoDiff = Math.max(1, endTacho - startTacho);
-			addData(prefs.getUnitDistance(),
-					String.format("%.2f %s", costs / tachoDiff, unit), car);
+			section.addItem(new CalculatableItem(prefs.getUnitDistance(), costs
+					/ tachoDiff));
 
-			addData(context.getString(R.string.report_since, DateFormat
-					.getDateFormat(context).format(startDate.toDate())),
-					String.format("%.2f %s", costs, unit), car);
+			section.addItem(new Item(context.getString(R.string.report_since,
+					DateFormat.getDateFormat(context)
+							.format(startDate.toDate())), String.format(
+					"%.2f %s", costs, unit)));
 		}
+	}
+
+	@Override
+	public int[] getCalculationOptions() {
+		return new int[] { R.string.report_calc_multiply };
 	}
 
 	@Override
 	public GraphicalView getGraphView() {
 		return null;
+	}
+
+	private class CalculatableItem extends ReportData.CalculatableItem {
+		private static final String FORMAT = "%.2f %s";
+		private double value;
+		private int pluralId;
+
+		public CalculatableItem(int labelId, double value) {
+			super(context.getResources().getQuantityString(labelId, 1), String
+					.format(FORMAT, value, unit));
+			this.pluralId = labelId;
+			this.value = value;
+		}
+
+		public CalculatableItem(String label, double value) {
+			super(label, String.format(FORMAT, value, unit));
+			this.pluralId = -1;
+			this.value = value;
+		}
+
+		@Override
+		public void applyCalculation(double value1, int option) {
+			double result = value * value1;
+			setValue(String.format(FORMAT, result, unit));
+
+			String newLabel = origLabel;
+			if (pluralId != -1) {
+				newLabel = context.getResources().getQuantityString(pluralId,
+						value1 == 1 ? 1 : 2);
+			}
+			setLabel((value1 == (int) value1 ? String.valueOf((int) value1)
+					: String.valueOf(value1)) + " " + newLabel);
+		}
 	}
 }

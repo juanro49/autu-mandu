@@ -16,13 +16,13 @@
 
 package me.kuehle.carreport.reports;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.gui.SectionListAdapter.Item;
+import me.kuehle.carreport.gui.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Calculator;
 
 import org.achartengine.GraphicalView;
@@ -35,7 +35,7 @@ import android.graphics.Paint.Align;
 import android.text.format.DateFormat;
 
 public abstract class AbstractReport {
-	private HashMap<Section, ArrayList<AbstractReport.Item>> data = new HashMap<Section, ArrayList<AbstractReport.Item>>();
+	private ReportData data = new ReportData();
 	private boolean showTrend = false;
 	protected Context context;
 
@@ -44,51 +44,22 @@ public abstract class AbstractReport {
 	}
 
 	protected void addData(String label, String value) {
-		addData(label, value, getOverallSection());
+		data.getData().add(new Item(label, value));
 	}
 
-	protected void addData(String label, String value, Car car) {
-		addData(label, value, car == null ? getOverallSection() : new Section(
-				car.getName(), car.getColor()));
+	protected Section addDataSection(String label, int color) {
+		Section section = new Section(label, color);
+		data.getData().add(section);
+		return section;
 	}
 
-	protected void addData(String label, String value, Section section) {
-		if (!data.containsKey(section)) {
-			data.put(section, new ArrayList<AbstractReport.Item>());
-		}
-		ArrayList<AbstractReport.Item> items = data.get(section);
-		items.add(new Item(label, value));
-	}
-
-	protected String getDateFormatPattern() {
-		java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
-		if (dateFormat instanceof java.text.SimpleDateFormat) {
-			return ((java.text.SimpleDateFormat) dateFormat)
-					.toLocalizedPattern();
-		} else {
-			return null;
-		}
-	}
-
-	public abstract GraphicalView getGraphView();
-
-	public HashMap<Section, ArrayList<AbstractReport.Item>> getData() {
-		return data;
-	}
-
-	public Section getOverallSection() {
+	protected Section addDataOverallSection() {
 		String label = context.getString(R.string.report_overall);
 		Preferences prefs = new Preferences(context);
 		int position = prefs.getOverallSectionPos();
-		return new Section(label, Color.GRAY, position);
-	}
-	
-	public boolean isShowTrend() {
-		return showTrend;
-	}
-
-	public void setShowTrend(boolean showTrend) {
-		this.showTrend = showTrend;
+		Section section = new Section(label, Color.GRAY, position);
+		data.getData().add(section);
+		return section;
 	}
 
 	protected void applyDefaultStyle(XYMultipleSeriesRenderer renderer,
@@ -154,114 +125,31 @@ public abstract class AbstractReport {
 			}
 		}
 	}
+	
+	public abstract int[] getCalculationOptions();
 
-	public static class Section implements Comparable<Section> {
-		public static final int DONT_STICK = -1;
-		public static final int STICK_TOP = 0;
-		public static final int STICK_BOTTOM = 1;
+	public ReportData getData() {
+		Collections.sort(data.getData());
+		return data;
+	}
 
-		private String label;
-		private int color;
-		private int stickToPos;
-
-		public Section(String label, int color) {
-			this(label, color, DONT_STICK);
-		}
-
-		public Section(String label, int color, int stickToBottom) {
-			this.label = label;
-			this.color = color;
-			this.stickToPos = stickToBottom;
-		}
-
-		public String getLabel() {
-			return label;
-		}
-
-		public void setLabel(String label) {
-			this.label = label;
-		}
-
-		public int getColor() {
-			return color;
-		}
-
-		public void setColor(int color) {
-			this.color = color;
-		}
-
-		public int getStickToPos() {
-			return stickToPos;
-		}
-
-		public void setStickToPos(int stickToPos) {
-			this.stickToPos = stickToPos;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + color;
-			result = prime * result + ((label == null) ? 0 : label.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Section other = (Section) obj;
-			if (color != other.color)
-				return false;
-			if (label == null) {
-				if (other.label != null)
-					return false;
-			} else if (!label.equals(other.label))
-				return false;
-			return true;
-		}
-
-		@Override
-		public int compareTo(Section another) {
-			if (stickToPos == STICK_TOP && another.getStickToPos() != STICK_TOP) {
-				return -1;
-			} else if (stickToPos == STICK_BOTTOM
-					&& another.getStickToPos() != STICK_BOTTOM) {
-				return 1;
-			} else {
-				return label.compareTo(another.getLabel());
-			}
+	protected String getDateFormatPattern() {
+		java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
+		if (dateFormat instanceof java.text.SimpleDateFormat) {
+			return ((java.text.SimpleDateFormat) dateFormat)
+					.toLocalizedPattern();
+		} else {
+			return null;
 		}
 	}
 
-	public static class Item {
-		private String label;
-		private String value;
+	public abstract GraphicalView getGraphView();
 
-		public Item(String label, String value) {
-			this.label = label;
-			this.value = value;
-		}
+	public boolean isShowTrend() {
+		return showTrend;
+	}
 
-		public String getLabel() {
-			return label;
-		}
-
-		public void setLabel(String label) {
-			this.label = label;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
+	public void setShowTrend(boolean showTrend) {
+		this.showTrend = showTrend;
 	}
 }

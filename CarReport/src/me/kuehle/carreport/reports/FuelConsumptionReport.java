@@ -23,6 +23,8 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.gui.SectionListAdapter.Section;
+import me.kuehle.carreport.gui.SectionListAdapter.Item;
 import me.kuehle.carreport.util.Calculator;
 
 import org.achartengine.ChartFactory;
@@ -39,7 +41,7 @@ import android.view.View;
 import android.widget.Toast;
 
 public class FuelConsumptionReport extends AbstractReport {
-	private Vector<AbstractReportData> reportData = new Vector<AbstractReportData>();
+	private Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
 
 	private String unit;
 	private boolean showLegend;
@@ -59,23 +61,29 @@ public class FuelConsumptionReport extends AbstractReport {
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
 			ReportData carData = new ReportData(context, car);
+			Section section = addDataSection(car.getName(), car.getColor());
 
 			if (carData.size() == 0) {
-				addData(context.getString(R.string.report_not_enough_data), "",
-						car);
+				section.addItem(new Item(context
+						.getString(R.string.report_not_enough_data), ""));
 			} else {
 				reportData.add(carData);
 
 				consumptions.addAll(carData.yValues);
-				addConsumptionData(car, carData.yValues);
+				addConsumptionData(section, carData.yValues);
 			}
 		}
 
 		// Only display overall section, when at least report data for 2
-		// cars is present (2 graphs per car).
-		if (reportData.size() >= 4) {
-			addConsumptionData(null, consumptions);
+		// cars is present.
+		if (reportData.size() >= 2) {
+			addConsumptionData(addDataOverallSection(), consumptions);
 		}
+	}
+
+	@Override
+	public int[] getCalculationOptions() {
+		return new int[0];
 	}
 
 	@Override
@@ -86,16 +94,16 @@ public class FuelConsumptionReport extends AbstractReport {
 				Double.MAX_VALUE, Double.MIN_VALUE };
 
 		// Collect data
-		Vector<AbstractReportData> reportData = new Vector<AbstractReportData>();
+		Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
 		if (isShowTrend()) {
-			for (AbstractReportData data : this.reportData) {
+			for (AbstractReportGraphData data : this.reportData) {
 				reportData.add(data.createRegressionData());
 			}
 		}
 		reportData.addAll(this.reportData);
 
 		// Add series
-		for (AbstractReportData data : reportData) {
+		for (AbstractReportGraphData data : reportData) {
 			TimeSeries series = data.getSeries();
 			dataset.addSeries(series);
 			renderer.addSeriesRenderer(data.getRenderer());
@@ -150,16 +158,16 @@ public class FuelConsumptionReport extends AbstractReport {
 		return graphView;
 	}
 
-	private void addConsumptionData(Car car, Vector<Double> numbers) {
-		addData(context.getString(R.string.report_highest),
-				String.format("%.2f %s", Calculator.max(numbers), unit), car);
-		addData(context.getString(R.string.report_lowest),
-				String.format("%.2f %s", Calculator.min(numbers), unit), car);
-		addData(context.getString(R.string.report_average),
-				String.format("%.2f %s", Calculator.avg(numbers), unit), car);
+	private void addConsumptionData(Section section, Vector<Double> numbers) {
+		section.addItem(new Item(context.getString(R.string.report_highest),
+				String.format("%.2f %s", Calculator.max(numbers), unit)));
+		section.addItem(new Item(context.getString(R.string.report_lowest),
+				String.format("%.2f %s", Calculator.min(numbers), unit)));
+		section.addItem(new Item(context.getString(R.string.report_average),
+				String.format("%.2f %s", Calculator.avg(numbers), unit)));
 	}
 
-	private class ReportData extends AbstractReportData {
+	private class ReportData extends AbstractReportGraphData {
 		public ReportData(Context context, Car car) {
 			super(context, car.getName(), car.getColor());
 
