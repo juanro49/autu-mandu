@@ -21,11 +21,6 @@ import java.util.HashMap;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.R.array;
-import me.kuehle.carreport.R.id;
-import me.kuehle.carreport.R.layout;
-import me.kuehle.carreport.R.menu;
-import me.kuehle.carreport.R.string;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;

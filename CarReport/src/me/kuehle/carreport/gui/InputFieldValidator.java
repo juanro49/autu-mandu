@@ -20,8 +20,6 @@ import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.R.string;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;

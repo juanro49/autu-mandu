@@ -20,9 +20,6 @@ import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.R.id;
-import me.kuehle.carreport.R.layout;
-import me.kuehle.carreport.R.string;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;

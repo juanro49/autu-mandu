@@ -21,9 +21,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.R.id;
-import me.kuehle.carreport.R.menu;
-import me.kuehle.carreport.R.string;
 import me.kuehle.carreport.db.AbstractItem;
 import android.app.ActionBar;
 import android.app.Activity;

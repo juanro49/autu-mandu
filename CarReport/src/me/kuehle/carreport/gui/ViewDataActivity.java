@@ -17,9 +17,6 @@
 package me.kuehle.carreport.gui;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.R.id;
-import me.kuehle.carreport.R.layout;
-import me.kuehle.carreport.R.menu;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
