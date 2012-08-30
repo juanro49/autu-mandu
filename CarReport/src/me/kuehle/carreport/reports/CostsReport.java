@@ -115,19 +115,19 @@ public class CostsReport extends AbstractReport {
 			double costsPerSecond = costs / elapsedSeconds.getSeconds();
 			// 60 seconds per minute * 60 minutes per hour * 24 hours per day =
 			// 86400 seconds per day
-			section.addItem(new CalculatableItem(R.plurals.report_day,
+			section.addItem(new CalculableItem(R.plurals.report_day,
 					costsPerSecond * 86400));
 			// 86400 seconds per day * 30,4375 days per month = 2629800 seconds
 			// per month
 			// (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
-			section.addItem(new CalculatableItem(R.plurals.report_month,
+			section.addItem(new CalculableItem(R.plurals.report_month,
 					costsPerSecond * 2629800));
 			// 86400 seconds per day * 365,25 days per year = 31557600 seconds
 			// per year
-			section.addItem(new CalculatableItem(R.plurals.report_year,
+			section.addItem(new CalculableItem(R.plurals.report_year,
 					costsPerSecond * 31557600));
 			int tachoDiff = Math.max(1, endTacho - startTacho);
-			section.addItem(new CalculatableItem(prefs.getUnitDistance(), costs
+			section.addItem(new CalculableItem(prefs.getUnitDistance(), costs
 					/ tachoDiff));
 
 			section.addItem(new Item(context.getString(R.string.report_since,
@@ -138,8 +138,10 @@ public class CostsReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getCalculationOptions() {
-		return new int[] { R.string.report_calc_multiply };
+	public CalculationOption[] getCalculationOptions() {
+		return new CalculationOption[] { new CalculationOption(
+				R.string.report_calc_multiply_name,
+				R.string.report_calc_multiply_hint1) };
 	}
 
 	@Override
@@ -147,19 +149,19 @@ public class CostsReport extends AbstractReport {
 		return null;
 	}
 
-	private class CalculatableItem extends ReportData.CalculatableItem {
+	private class CalculableItem extends ReportData.AbstractCalculableItem {
 		private static final String FORMAT = "%.2f %s";
 		private double value;
 		private int pluralId;
 
-		public CalculatableItem(int labelId, double value) {
+		public CalculableItem(int labelId, double value) {
 			super(context.getResources().getQuantityString(labelId, 1), String
 					.format(FORMAT, value, unit));
 			this.pluralId = labelId;
 			this.value = value;
 		}
 
-		public CalculatableItem(String label, double value) {
+		public CalculableItem(String label, double value) {
 			super(label, String.format(FORMAT, value, unit));
 			this.pluralId = -1;
 			this.value = value;

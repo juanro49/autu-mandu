@@ -29,13 +29,14 @@ public class ReportData {
 		for (AbstractListItem item : data) {
 			if (item instanceof Section) {
 				for (Item childItem : ((Section) item).getItems()) {
-					if (childItem instanceof CalculatableItem) {
-						((CalculatableItem) childItem).applyCalculation(value1,
-								option);
+					if (childItem instanceof AbstractCalculableItem) {
+						((AbstractCalculableItem) childItem).applyCalculation(
+								value1, option);
 					}
 				}
-			} else if (item instanceof CalculatableItem) {
-				((CalculatableItem) item).applyCalculation(value1, option);
+			} else if (item instanceof AbstractCalculableItem) {
+				((AbstractCalculableItem) item)
+						.applyCalculation(value1, option);
 			}
 		}
 	}
@@ -48,21 +49,21 @@ public class ReportData {
 		for (AbstractListItem item : data) {
 			if (item instanceof Section) {
 				for (Item childItem : ((Section) item).getItems()) {
-					if (childItem instanceof CalculatableItem) {
-						((CalculatableItem) childItem).resetCalculation();
+					if (childItem instanceof AbstractCalculableItem) {
+						((AbstractCalculableItem) childItem).resetCalculation();
 					}
 				}
-			} else if (item instanceof CalculatableItem) {
-				((CalculatableItem) item).resetCalculation();
+			} else if (item instanceof AbstractCalculableItem) {
+				((AbstractCalculableItem) item).resetCalculation();
 			}
 		}
 	}
 
-	public abstract static class CalculatableItem extends Item {
+	public abstract static class AbstractCalculableItem extends Item {
 		protected String origLabel;
 		protected String origValue;
 
-		public CalculatableItem(String label, String value) {
+		public AbstractCalculableItem(String label, String value) {
 			super(label, value);
 			origLabel = label;
 			origValue = value;

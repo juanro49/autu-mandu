@@ -43,8 +43,8 @@ public abstract class AbstractReport {
 		this.context = context;
 	}
 
-	protected void addData(String label, String value) {
-		data.getData().add(new Item(label, value));
+	protected void addData(Item item) {
+		data.getData().add(item);
 	}
 
 	protected Section addDataSection(String label, int color) {
@@ -125,8 +125,8 @@ public abstract class AbstractReport {
 			}
 		}
 	}
-	
-	public abstract int[] getCalculationOptions();
+
+	public abstract CalculationOption[] getCalculationOptions();
 
 	public ReportData getData() {
 		Collections.sort(data.getData());
@@ -151,5 +151,36 @@ public abstract class AbstractReport {
 
 	public void setShowTrend(boolean showTrend) {
 		this.showTrend = showTrend;
+	}
+
+	public class CalculationOption {
+		private String name;
+		private String hint1;
+
+		public CalculationOption(int name, int hint1) {
+			this.name = context.getString(name);
+			this.hint1 = context.getString(hint1);
+		}
+
+		public CalculationOption(String name, String hint1) {
+			this.name = name;
+			this.hint1 = hint1;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getHint1() {
+			return hint1;
+		}
+
+		public void setHint1(String hint1) {
+			this.hint1 = hint1;
+		}
 	}
 }

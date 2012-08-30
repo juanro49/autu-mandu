@@ -41,7 +41,7 @@ import android.view.View;
 import android.widget.Toast;
 
 public class FuelPriceReport extends AbstractReport {
-	private ReportData reportData;
+	private ReportGraphData reportData;
 	private String unit;
 
 	public FuelPriceReport(Context context) {
@@ -50,8 +50,8 @@ public class FuelPriceReport extends AbstractReport {
 		Preferences prefs = new Preferences(context);
 		unit = String.format("%s/%s", prefs.getUnitCurrency(),
 				prefs.getUnitVolume());
-		
-		reportData = new ReportData(context, "", Color.BLUE);
+
+		reportData = new ReportGraphData(context, "", Color.BLUE);
 
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
@@ -65,21 +65,29 @@ public class FuelPriceReport extends AbstractReport {
 						null);
 		cursor.moveToFirst();
 
-		addData(context.getString(R.string.report_highest),
-				String.format("%.3f %s", cursor.getFloat(0), unit));
-		addData(context.getString(R.string.report_lowest),
-				String.format("%.3f %s", cursor.getFloat(1), unit));
-		addData(context.getString(R.string.report_average),
-				String.format("%.3f %s", cursor.getFloat(2), unit));
+		addData(new CalculableItem(context.getString(R.string.report_highest),
+				cursor.getFloat(0)));
+		addData(new CalculableItem(context.getString(R.string.report_lowest),
+				cursor.getFloat(1)));
+		addData(new CalculableItem(context.getString(R.string.report_average),
+				cursor.getFloat(2)));
 
 		cursor.close();
 	}
 
 	@Override
-	public int[] getCalculationOptions() {
-		return new int[0];
+	public CalculationOption[] getCalculationOptions() {
+		Preferences prefs = new Preferences(context);
+		return new CalculationOption[] {
+				new CalculationOption(context.getString(
+						R.string.report_calc_vol2price_name,
+						prefs.getUnitVolume()), prefs.getUnitVolume()),
+				new CalculationOption(context.getString(
+						R.string.report_calc_price2vol_name,
+						prefs.getUnitVolume(), prefs.getUnitCurrency()),
+						prefs.getUnitCurrency()) };
 	}
-	
+
 	@Override
 	public GraphicalView getGraphView() {
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
@@ -89,7 +97,7 @@ public class FuelPriceReport extends AbstractReport {
 
 		Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
 		reportData.add(this.reportData);
-		if(isShowTrend()) {
+		if (isShowTrend()) {
 			reportData.add(this.reportData.createRegressionData());
 		}
 		for (AbstractReportGraphData data : reportData) {
@@ -133,8 +141,8 @@ public class FuelPriceReport extends AbstractReport {
 		return graphView;
 	}
 
-	private class ReportData extends AbstractReportGraphData {
-		public ReportData(Context context, String name, int color) {
+	private class ReportGraphData extends AbstractReportGraphData {
+		public ReportGraphData(Context context, String name, int color) {
 			super(context, name, color);
 
 			Helper helper = Helper.getInstance();
@@ -164,6 +172,31 @@ public class FuelPriceReport extends AbstractReport {
 			XYSeriesRenderer renderer = new XYSeriesRenderer();
 			applyDefaultStyle(renderer, color, true);
 			return renderer;
+		}
+	}
+
+	private class CalculableItem extends ReportData.AbstractCalculableItem {
+		private static final String FORMAT_NORMAL = "%.3f %s";
+		private static final String FORMAT_CALCULATION = "%.2f %s";
+		private double value;
+
+		public CalculableItem(String label, double value) {
+			super(label, String.format(FORMAT_NORMAL, value, unit));
+			this.value = value;
+		}
+
+		@Override
+		public void applyCalculation(double value1, int option) {
+			Preferences prefs = new Preferences(context);
+			if (option == 0) {
+				double result = value * value1;
+				setValue(String.format(FORMAT_CALCULATION, result,
+						prefs.getUnitCurrency()));
+			} else if (option == 1) {
+				double result = value1 / value;
+				setValue(String.format(FORMAT_CALCULATION, result,
+						prefs.getUnitVolume()));
+			}
 		}
 	}
 }

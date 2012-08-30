@@ -91,7 +91,12 @@
     <string name="report_toast_consumption">Verbrauch</string>
     <string name="report_toast_price">Preis</string>
     <string name="report_toast_date">Datum</string>
-    <string name="report_calc_multiply">Multiplizieren</string>
+    <string name="report_calc_multiply_name">Multiplizieren</string>
+    <string name="report_calc_multiply_hint1">Faktor</string>
+    <string name="report_calc_vol2mileage_name">Wie weit komme ich mit X %s?</string>
+    <string name="report_calc_mileage2vol_name">Wie viele %1$s brauche ich für X %2$s?</string>
+    <string name="report_calc_vol2price_name">Wie viel kosten X %s?</string>
+    <string name="report_calc_price2vol_name">Wie viele %1$s bekomme ich für X %2$s?</string>
     <string name="pref_title_header_about">Über Car Report</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>
     <string name="pref_title_header_cars">Autos</string>

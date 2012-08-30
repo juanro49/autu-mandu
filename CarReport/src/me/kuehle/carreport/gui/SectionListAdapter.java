@@ -63,7 +63,8 @@ public class SectionListAdapter extends BaseAdapter {
 			if (another instanceof Section) {
 				return -1;
 			} else {
-				return label.compareTo(another.getLabel());
+				//return label.compareTo(another.getLabel());
+				return 0;
 			}
 		}
 	}

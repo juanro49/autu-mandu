@@ -19,6 +19,7 @@ package me.kuehle.carreport.gui;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.reports.AbstractReport;
+import me.kuehle.carreport.reports.AbstractReport.CalculationOption;
 import me.kuehle.carreport.reports.CostsReport;
 import me.kuehle.carreport.reports.FuelConsumptionReport;
 import me.kuehle.carreport.reports.FuelPriceReport;
@@ -209,7 +210,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	private ActionMode.Callback mCalculationActionMode = new ActionMode.Callback() {
 		private int graphVisibility;
 		private EditText input;
-		private int option = 0;
+		private int option;
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -229,26 +230,28 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			int[] options = mCurrentReport.getCalculationOptions();
+			CalculationOption[] options = mCurrentReport
+					.getCalculationOptions();
 			if (options.length == 0) {
 				return false;
 			} else if (options.length > 1) {
 				for (int i = 0; i < options.length; i++) {
 					MenuItem item = menu.add(Menu.NONE, i, Menu.NONE,
-							options[i]);
+							options[i].getName());
 					item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
 			}
+			option = 0;
 
 			View graph = ReportActivity.this.findViewById(R.id.graph);
 			graphVisibility = graph.getVisibility();
 			graph.setVisibility(View.GONE);
-			
+
 			input = new EditText(ReportActivity.this);
 			input.setInputType(InputType.TYPE_CLASS_NUMBER
 					| InputType.TYPE_NUMBER_FLAG_DECIMAL);
 			input.setLines(1);
-			input.setHint(options[option]);
+			input.setHint(options[option].getHint1());
 			input.addTextChangedListener(new TextWatcher() {
 				@Override
 				public void onTextChanged(CharSequence s, int start,
@@ -262,14 +265,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 
 				@Override
 				public void afterTextChanged(Editable s) {
-					double input = 1;
-					try {
-						input = Double.parseDouble(s.toString());
-					} catch (NumberFormatException e) {
-					}
-					mCurrentReport.getData().applyCalculation(input, option);
-					((ListView) ReportActivity.this.findViewById(R.id.lstData))
-							.invalidateViews();
+					applyCalculation(s.toString());
 				}
 			});
 			mode.setCustomView(input);
@@ -281,15 +277,29 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 					keyboard.showSoftInput(input, 0);
 				}
 			}, 100);
+			
+			applyCalculation(input.getText().toString());
 			return true;
 		}
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			option = item.getItemId();
-			input.setHint(mCurrentReport.getCalculationOptions()[option]);
+			input.setHint(mCurrentReport.getCalculationOptions()[option]
+					.getHint1());
+			applyCalculation(input.getText().toString());
 			return true;
 		}
 
+		private void applyCalculation(String input) {
+			double value1 = 1;
+			try {
+				value1 = Double.parseDouble(input);
+			} catch (NumberFormatException e) {
+			}
+			mCurrentReport.getData().applyCalculation(value1, option);
+			((ListView) ReportActivity.this.findViewById(R.id.lstData))
+					.invalidateViews();
+		}
 	};
 }

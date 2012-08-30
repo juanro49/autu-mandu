@@ -23,8 +23,8 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.gui.SectionListAdapter.Section;
 import me.kuehle.carreport.gui.SectionListAdapter.Item;
+import me.kuehle.carreport.gui.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Calculator;
 
 import org.achartengine.ChartFactory;
@@ -60,7 +60,7 @@ public class FuelConsumptionReport extends AbstractReport {
 		Vector<Double> consumptions = new Vector<Double>();
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
-			ReportData carData = new ReportData(context, car);
+			ReportGraphData carData = new ReportGraphData(context, car);
 			Section section = addDataSection(car.getName(), car.getColor());
 
 			if (carData.size() == 0) {
@@ -82,8 +82,16 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getCalculationOptions() {
-		return new int[0];
+	public CalculationOption[] getCalculationOptions() {
+		Preferences prefs = new Preferences(context);
+		return new CalculationOption[] {
+				new CalculationOption(context.getString(
+						R.string.report_calc_vol2mileage_name,
+						prefs.getUnitVolume()), prefs.getUnitVolume()),
+				new CalculationOption(context.getString(
+						R.string.report_calc_mileage2vol_name,
+						prefs.getUnitVolume(), prefs.getUnitDistance()),
+						prefs.getUnitDistance()) };
 	}
 
 	@Override
@@ -159,16 +167,16 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	private void addConsumptionData(Section section, Vector<Double> numbers) {
-		section.addItem(new Item(context.getString(R.string.report_highest),
-				String.format("%.2f %s", Calculator.max(numbers), unit)));
-		section.addItem(new Item(context.getString(R.string.report_lowest),
-				String.format("%.2f %s", Calculator.min(numbers), unit)));
-		section.addItem(new Item(context.getString(R.string.report_average),
-				String.format("%.2f %s", Calculator.avg(numbers), unit)));
+		section.addItem(new CalculableItem(context
+				.getString(R.string.report_highest), Calculator.max(numbers)));
+		section.addItem(new CalculableItem(context
+				.getString(R.string.report_lowest), Calculator.min(numbers)));
+		section.addItem(new CalculableItem(context
+				.getString(R.string.report_average), Calculator.avg(numbers)));
 	}
 
-	private class ReportData extends AbstractReportGraphData {
-		public ReportData(Context context, Car car) {
+	private class ReportGraphData extends AbstractReportGraphData {
+		public ReportGraphData(Context context, Car car) {
 			super(context, car.getName(), car.getColor());
 
 			Refueling[] refuelings = Refueling.getAllForCar(car, true);
@@ -194,6 +202,28 @@ public class FuelConsumptionReport extends AbstractReport {
 			XYSeriesRenderer renderer = new XYSeriesRenderer();
 			applyDefaultStyle(renderer, color, false);
 			return renderer;
+		}
+	}
+
+	private class CalculableItem extends ReportData.AbstractCalculableItem {
+		private static final String FORMAT = "%.2f %s";
+		private double value;
+
+		public CalculableItem(String label, double value) {
+			super(label, String.format(FORMAT, value, unit));
+			this.value = value;
+		}
+
+		@Override
+		public void applyCalculation(double value1, int option) {
+			Preferences prefs = new Preferences(context);
+			if (option == 0) {
+				double result = value1 / (value / 100);
+				setValue(String.format(FORMAT, result, prefs.getUnitDistance()));
+			} else if (option == 1) {
+				double result = (value / 100) * value1;
+				setValue(String.format(FORMAT, result, prefs.getUnitVolume()));
+			}
 		}
 	}
 }
