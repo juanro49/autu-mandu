@@ -17,27 +17,61 @@
 package me.kuehle.carreport.reports;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.SectionListAdapter.Item;
 import me.kuehle.carreport.gui.SectionListAdapter.Section;
-import me.kuehle.carreport.util.Calculator;
-
-import org.achartengine.GraphicalView;
-import org.achartengine.renderer.XYMultipleSeriesRenderer;
-import org.achartengine.util.MathHelper;
-
+import me.kuehle.chartlib.axis.AxisLabelFormatter;
+import me.kuehle.chartlib.chart.Chart;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Paint.Align;
 import android.text.format.DateFormat;
+import android.util.TypedValue;
 
 public abstract class AbstractReport {
+	public class CalculationOption {
+		private String name;
+		private String hint1;
+
+		public CalculationOption(int name, int hint1) {
+			this.name = context.getString(name);
+			this.hint1 = context.getString(hint1);
+		}
+
+		public CalculationOption(String name, String hint1) {
+			this.name = name;
+			this.hint1 = hint1;
+		}
+
+		public String getHint1() {
+			return hint1;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setHint1(String hint1) {
+			this.hint1 = hint1;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+	}
 	private ReportData data = new ReportData();
 	private boolean showTrend = false;
 	protected Context context;
+
+	protected AxisLabelFormatter dateLabelFormatter = new AxisLabelFormatter() {
+		@Override
+		public String formatLabel(double value) {
+			return DateFormat.getDateFormat(context).format(
+					new Date((long) value));
+		}
+	};
 
 	public AbstractReport(Context context) {
 		this.context = context;
@@ -45,12 +79,6 @@ public abstract class AbstractReport {
 
 	protected void addData(Item item) {
 		data.getData().add(item);
-	}
-
-	protected Section addDataSection(String label, int color) {
-		Section section = new Section(label, color);
-		data.getData().add(section);
-		return section;
 	}
 
 	protected Section addDataOverallSection() {
@@ -62,72 +90,25 @@ public abstract class AbstractReport {
 		return section;
 	}
 
-	protected void applyDefaultStyle(XYMultipleSeriesRenderer renderer,
-			double[] axesMinMax, boolean clickable, String xLabelFormat,
-			String yLabelFormat) {
-		Calculator calc = new Calculator(context);
+	protected Section addDataSection(String label, int color) {
+		Section section = new Section(label, color);
+		data.getData().add(section);
+		return section;
+	}
 
-		renderer.setLabelsTextSize(calc.spToPx(14));
-		renderer.setLegendTextSize(calc.spToPx(14));
-		renderer.setFitLegend(true);
-		renderer.setPointSize(calc.dpToPx(4));
-		renderer.setMargins(new int[] { 0, calc.spToPx(35), 0, 0 });
-		renderer.setAxesColor(Color.DKGRAY);
-		renderer.setLabelsColor(Color.LTGRAY);
-		renderer.setShowGridX(true);
-		renderer.setYLabelsAlign(Align.RIGHT);
-
-		// When the background on the device is not completely black,
-		// the margin background bad, because it is black. Setting it
-		// to Color.TRANSPARENT does not work, but the below does.
-		renderer.setApplyBackgroundColor(true);
-		renderer.setBackgroundColor(Color.TRANSPARENT);
-		renderer.setMarginsColor(Color.argb(0, 255, 0, 0));
-
-		// When scaling the font, the amount of x labels is not being
-		// adjusted. This results in labels, which lay one above the other. So
-		// we need to adjust the amount manually.
-		int xLabelCount = renderer.getXLabels();
-		renderer.setXLabels((int) calc.pxToSp(xLabelCount) + 1);
-
-		// Add 5% padding to top, left and right. Points at the edges should be
-		// reachable simply.
-		double padX = (axesMinMax[1] - axesMinMax[0]) * 0.05;
-		double padY = (axesMinMax[3] - axesMinMax[2]) * 0.05;
-		double[] limits = { axesMinMax[0] - padX, axesMinMax[1] + padX,
-				axesMinMax[2], axesMinMax[3] + padY };
-
-		renderer.setYAxisMin(limits[2]);
-		renderer.setYAxisMax(limits[3]);
-		renderer.setInitialRange(axesMinMax);
-		renderer.setZoomEnabled(true, false);
-		renderer.setPanEnabled(true, false);
-		renderer.setPanLimits(limits);
-		renderer.setZoomLimits(limits);
-
-		renderer.setClickEnabled(clickable);
-		renderer.setSelectableBuffer(calc.dpToPx(20));
-
-		if (xLabelFormat != null) {
-			List<Double> xLabels = MathHelper.getLabels(axesMinMax[0],
-					axesMinMax[1], renderer.getXLabels());
-			for (double label : xLabels) {
-				renderer.addXTextLabel(label,
-						String.format(xLabelFormat, label));
-			}
-		}
-		if (yLabelFormat != null) {
-			List<Double> yLabels = MathHelper.getLabels(axesMinMax[2],
-					axesMinMax[3], renderer.getYLabels());
-			for (double label : yLabels) {
-				renderer.addYTextLabel(label,
-						String.format(yLabelFormat, label));
-			}
-		}
+	protected void applyDefaultChartStyles(Chart chart) {
+		chart.getDomainAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
+		chart.getDomainAxis().setShowGrid(false);
+		chart.getRangeAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
+		chart.getRangeAxis().setZoomable(false);
+		chart.getRangeAxis().setMovable(false);
+		chart.getLegend().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
 	}
 
 	public abstract CalculationOption[] getCalculationOptions();
-	
+
+	public abstract Chart getChart(int option);
+
 	public ReportData getData() {
 		Collections.sort(data.getData());
 		return data;
@@ -145,44 +126,11 @@ public abstract class AbstractReport {
 
 	public abstract int[] getGraphOptions();
 
-	public abstract GraphicalView getGraphView(int option);
-
 	public boolean isShowTrend() {
 		return showTrend;
 	}
 
 	public void setShowTrend(boolean showTrend) {
 		this.showTrend = showTrend;
-	}
-
-	public class CalculationOption {
-		private String name;
-		private String hint1;
-
-		public CalculationOption(int name, int hint1) {
-			this.name = context.getString(name);
-			this.hint1 = context.getString(hint1);
-		}
-
-		public CalculationOption(String name, String hint1) {
-			this.name = name;
-			this.hint1 = hint1;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getHint1() {
-			return hint1;
-		}
-
-		public void setHint1(String hint1) {
-			this.hint1 = hint1;
-		}
 	}
 }

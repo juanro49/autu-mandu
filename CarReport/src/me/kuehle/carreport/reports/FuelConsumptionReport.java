@@ -26,24 +26,67 @@ import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.gui.SectionListAdapter.Item;
 import me.kuehle.carreport.gui.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Calculator;
-
-import org.achartengine.ChartFactory;
-import org.achartengine.GraphicalView;
-import org.achartengine.model.SeriesSelection;
-import org.achartengine.model.TimeSeries;
-import org.achartengine.model.XYMultipleSeriesDataset;
-import org.achartengine.renderer.XYMultipleSeriesRenderer;
-import org.achartengine.renderer.XYSeriesRenderer;
-
+import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
+import me.kuehle.chartlib.chart.Chart;
+import me.kuehle.chartlib.data.Dataset;
+import me.kuehle.chartlib.data.Series;
+import me.kuehle.chartlib.renderer.LineRenderer;
+import me.kuehle.chartlib.renderer.OnClickListener;
+import me.kuehle.chartlib.renderer.RendererList;
 import android.content.Context;
 import android.text.format.DateFormat;
-import android.view.View;
 import android.widget.Toast;
 
 public class FuelConsumptionReport extends AbstractReport {
+	private class CalculableItem extends ReportData.AbstractCalculableItem {
+		private static final String FORMAT = "%.2f %s";
+		private double value;
+
+		public CalculableItem(String label, double value) {
+			super(label, String.format(FORMAT, value, unit));
+			this.value = value;
+		}
+
+		@Override
+		public void applyCalculation(double value1, int option) {
+			Preferences prefs = new Preferences(context);
+			if (option == 0) {
+				double result = value1 / (value / 100);
+				setValue(String.format(FORMAT, result, prefs.getUnitDistance()));
+			} else if (option == 1) {
+				double result = (value / 100) * value1;
+				setValue(String.format(FORMAT, result, prefs.getUnitVolume()));
+			}
+		}
+	}
+
+	private class ReportGraphData extends AbstractReportGraphData {
+		public ReportGraphData(Context context, Car car) {
+			super(context, car.getName(), car.getColor());
+
+			Refueling[] refuelings = Refueling.getAllForCar(car, true);
+			int lastTacho = -1;
+			float volume = 0;
+			for (Refueling refueling : refuelings) {
+				volume += refueling.getVolume();
+				if (!refueling.isPartial()) {
+					if (lastTacho > -1) {
+						double consumption = volume
+								/ (refueling.getMileage() - lastTacho) * 100;
+						xValues.add(refueling.getDate().getTime());
+						yValues.add(consumption);
+					}
+					lastTacho = refueling.getMileage();
+					volume = 0;
+				}
+			}
+		}
+	}
+
 	private Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
 
 	private String unit;
+
 	private boolean showLegend;
 
 	public FuelConsumptionReport(Context context) {
@@ -81,6 +124,15 @@ public class FuelConsumptionReport extends AbstractReport {
 		}
 	}
 
+	private void addConsumptionData(Section section, Vector<Double> numbers) {
+		section.addItem(new CalculableItem(context
+				.getString(R.string.report_highest), Calculator.max(numbers)));
+		section.addItem(new CalculableItem(context
+				.getString(R.string.report_lowest), Calculator.min(numbers)));
+		section.addItem(new CalculableItem(context
+				.getString(R.string.report_average), Calculator.avg(numbers)));
+	}
+
 	@Override
 	public CalculationOption[] getCalculationOptions() {
 		Preferences prefs = new Preferences(context);
@@ -95,18 +147,12 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getGraphOptions() {
-		return new int[1];
-	}
+	public Chart getChart(int option) {
+		final Dataset dataset = new Dataset();
+		RendererList renderers = new RendererList();
+		LineRenderer renderer = new LineRenderer(context);
+		renderers.addRenderer(renderer);
 
-	@Override
-	public GraphicalView getGraphView(int option) {
-		final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
-		double[] axesMinMax = { Double.MAX_VALUE, Double.MIN_VALUE,
-				Double.MAX_VALUE, Double.MIN_VALUE };
-
-		// Collect data
 		Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
 		if (isShowTrend()) {
 			for (AbstractReportGraphData data : this.reportData) {
@@ -114,121 +160,48 @@ public class FuelConsumptionReport extends AbstractReport {
 			}
 		}
 		reportData.addAll(this.reportData);
-
-		// Add series
-		for (AbstractReportGraphData data : reportData) {
-			TimeSeries series = data.getSeries();
-			dataset.addSeries(series);
-			renderer.addSeriesRenderer(data.getRenderer());
-
-			axesMinMax[0] = Math.min(axesMinMax[0], series.getMinX());
-			axesMinMax[1] = Math.max(axesMinMax[1], series.getMaxX());
-			axesMinMax[2] = Math.min(axesMinMax[2], series.getMinY());
-			axesMinMax[3] = Math.max(axesMinMax[3], series.getMaxY());
+		for (int i = 0; i < reportData.size(); i++) {
+			dataset.add(reportData.get(i).getSeries());
+			reportData.get(i).applySeriesStyle(i, renderer);
 		}
 
-		// Style report
-		applyDefaultStyle(renderer, axesMinMax, true, null, "%.2f");
-		renderer.setShowLegend(showLegend);
-		// Legend height is not proportional to its text size. So this is a
-		// quick fix.
-		if (showLegend) {
-			int[] margins = renderer.getMargins();
-			margins[2] = (int) renderer.getLegendTextSize();
-			renderer.setMargins(margins);
-		}
-
-		// Draw report
-		final GraphicalView graphView = ChartFactory.getTimeChartView(context,
-				dataset, renderer, getDateFormatPattern());
-
-		// Add click listener
-		graphView.setOnClickListener(new View.OnClickListener() {
+		renderer.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View v) {
-				SeriesSelection seriesSelection = graphView
-						.getCurrentSeriesAndPoint();
-				if (seriesSelection != null) {
-					String car = dataset.getSeriesAt(
-							seriesSelection.getSeriesIndex()).getTitle();
-					String date = DateFormat.getDateFormat(context).format(
-							new Date((long) seriesSelection.getXValue()));
-					Toast.makeText(
-							context,
-							String.format(
-									"%s: %s\n%s: %.2f %s\n%s: %s",
-									context.getString(R.string.report_toast_car),
-									car,
-									context.getString(R.string.report_toast_consumption),
-									seriesSelection.getValue(),
-									unit,
-									context.getString(R.string.report_toast_date),
-									date), Toast.LENGTH_LONG).show();
-				}
+			public void onSeriesClick(int series, int point) {
+				Series s = dataset.get(series);
+				String car = s.getTitle();
+				String date = DateFormat.getDateFormat(context).format(
+						new Date((long) s.get(point).x));
+				Toast.makeText(
+						context,
+						String.format(
+								"%s: %s\n%s: %.2f %s\n%s: %s",
+								context.getString(R.string.report_toast_car),
+								car,
+								context.getString(R.string.report_toast_consumption),
+								s.get(point).y, unit, context
+										.getString(R.string.report_toast_date),
+								date), Toast.LENGTH_LONG).show();
 			}
 		});
 
-		return graphView;
-	}
-
-	private void addConsumptionData(Section section, Vector<Double> numbers) {
-		section.addItem(new CalculableItem(context
-				.getString(R.string.report_highest), Calculator.max(numbers)));
-		section.addItem(new CalculableItem(context
-				.getString(R.string.report_lowest), Calculator.min(numbers)));
-		section.addItem(new CalculableItem(context
-				.getString(R.string.report_average), Calculator.avg(numbers)));
-	}
-
-	private class ReportGraphData extends AbstractReportGraphData {
-		public ReportGraphData(Context context, Car car) {
-			super(context, car.getName(), car.getColor());
-
-			Refueling[] refuelings = Refueling.getAllForCar(car, true);
-			int lastTacho = -1;
-			float volume = 0;
-			for (Refueling refueling : refuelings) {
-				volume += refueling.getVolume();
-				if (!refueling.isPartial()) {
-					if (lastTacho > -1) {
-						double consumption = volume
-								/ (refueling.getMileage() - lastTacho) * 100;
-						xValues.add(refueling.getDate().getTime());
-						yValues.add(consumption);
-					}
-					lastTacho = refueling.getMileage();
-					volume = 0;
-				}
+		final Chart chart = new Chart(context, dataset, renderers);
+		applyDefaultChartStyles(chart);
+		chart.setShowLegend(showLegend);
+		if (isShowTrend()) {
+			for (int i = 0; i < reportData.size() / 2; i++) {
+				chart.getLegend().setSeriesVisible(i, false);
 			}
 		}
+		chart.getDomainAxis().setLabelFormatter(dateLabelFormatter);
+		chart.getRangeAxis()
+				.setLabelFormatter(new DecimalAxisLabelFormatter(2));
 
-		@Override
-		public XYSeriesRenderer getRenderer() {
-			XYSeriesRenderer renderer = new XYSeriesRenderer();
-			applyDefaultStyle(renderer, color, false);
-			return renderer;
-		}
+		return chart;
 	}
 
-	private class CalculableItem extends ReportData.AbstractCalculableItem {
-		private static final String FORMAT = "%.2f %s";
-		private double value;
-
-		public CalculableItem(String label, double value) {
-			super(label, String.format(FORMAT, value, unit));
-			this.value = value;
-		}
-
-		@Override
-		public void applyCalculation(double value1, int option) {
-			Preferences prefs = new Preferences(context);
-			if (option == 0) {
-				double result = value1 / (value / 100);
-				setValue(String.format(FORMAT, result, prefs.getUnitDistance()));
-			} else if (option == 1) {
-				double result = (value / 100) * value1;
-				setValue(String.format(FORMAT, result, prefs.getUnitVolume()));
-			}
-		}
+	@Override
+	public int[] getGraphOptions() {
+		return new int[1];
 	}
 }

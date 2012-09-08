@@ -23,6 +23,7 @@ import me.kuehle.carreport.reports.AbstractReport.CalculationOption;
 import me.kuehle.carreport.reports.CostsReport;
 import me.kuehle.carreport.reports.FuelConsumptionReport;
 import me.kuehle.carreport.reports.FuelPriceReport;
+import me.kuehle.chartlib.ChartView;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
@@ -200,17 +201,13 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	}
 
 	private void updateReportGraph() {
-		FrameLayout graph = (FrameLayout) findViewById(R.id.graph);
-		if (graph.getChildCount() == 2) {
-			graph.removeViewAt(0);
-		}
-
-		View graphView = mCurrentReport.getGraphView(mCurrentGraphOption);
-		if (graphView == null) {
-			graph.setVisibility(View.GONE);
+		FrameLayout graphHolder = (FrameLayout) findViewById(R.id.graph_holder);
+		ChartView graph = (ChartView) findViewById(R.id.graph);
+		graph.setChart(mCurrentReport.getChart(mCurrentGraphOption));
+		if (graph.getChart() == null) {
+			graphHolder.setVisibility(View.GONE);
 		} else {
-			graph.setVisibility(View.VISIBLE);
-			graph.addView(graphView, 0);
+			graphHolder.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -239,7 +236,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			keyboard.hideSoftInputFromWindow(input.getWindowToken(), 0);
 
-			ReportActivity.this.findViewById(R.id.graph).setVisibility(
+			ReportActivity.this.findViewById(R.id.graph_holder).setVisibility(
 					graphVisibility);
 		}
 
@@ -258,7 +255,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			}
 			option = 0;
 
-			View graph = ReportActivity.this.findViewById(R.id.graph);
+			View graph = ReportActivity.this.findViewById(R.id.graph_holder);
 			graphVisibility = graph.getVisibility();
 			graph.setVisibility(View.GONE);
 
