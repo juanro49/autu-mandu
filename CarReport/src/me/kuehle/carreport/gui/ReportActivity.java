@@ -23,6 +23,7 @@ import me.kuehle.carreport.reports.AbstractReport.CalculationOption;
 import me.kuehle.carreport.reports.CostsReport;
 import me.kuehle.carreport.reports.FuelConsumptionReport;
 import me.kuehle.carreport.reports.FuelPriceReport;
+import me.kuehle.carreport.util.WeightAnimator;
 import me.kuehle.chartlib.ChartView;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
@@ -220,7 +221,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	};
 
 	private ActionMode.Callback mCalculationActionMode = new ActionMode.Callback() {
-		private int graphVisibility;
+		private WeightAnimator graphAnim;
 		private EditText input;
 		private int option;
 
@@ -236,8 +237,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			keyboard.hideSoftInputFromWindow(input.getWindowToken(), 0);
 
-			ReportActivity.this.findViewById(R.id.graph_holder).setVisibility(
-					graphVisibility);
+			graphAnim.expand(null, null);
 		}
 
 		@Override
@@ -256,8 +256,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			option = 0;
 
 			View graph = ReportActivity.this.findViewById(R.id.graph_holder);
-			graphVisibility = graph.getVisibility();
-			graph.setVisibility(View.GONE);
+			graphAnim = new WeightAnimator(graph, 500);
 
 			input = new EditText(ReportActivity.this);
 			input.setInputType(InputType.TYPE_CLASS_NUMBER
@@ -282,13 +281,14 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			});
 			mode.setCustomView(input);
 			input.requestFocus();
-			input.postDelayed(new Runnable() {
+
+			graphAnim.collapse(null, new Runnable() {
 				@Override
 				public void run() {
 					InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 					keyboard.showSoftInput(input, 0);
 				}
-			}, 100);
+			});
 
 			applyCalculation(input.getText().toString());
 			return true;
