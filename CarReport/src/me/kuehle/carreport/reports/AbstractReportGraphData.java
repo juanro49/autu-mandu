@@ -67,14 +67,16 @@ public abstract class AbstractReportGraphData {
 							xMinusAvgX)));
 				}
 
-				double beta1 = sum2.divide(new BigDecimal(sum1),
-						MathContext.DECIMAL128).doubleValue();
-				double beta0 = avgY - (beta1 * avgX);
+				if (!sum1.equals(BigInteger.ZERO)) {
+					double beta1 = sum2.divide(new BigDecimal(sum1),
+							MathContext.DECIMAL128).doubleValue();
+					double beta0 = avgY - (beta1 * avgX);
 
-				xValues.add(data.xValues.firstElement());
-				yValues.add(beta0 + (beta1 * data.xValues.firstElement()));
-				xValues.add(data.xValues.lastElement());
-				yValues.add(beta0 + (beta1 * data.xValues.lastElement()));
+					xValues.add(data.xValues.firstElement());
+					yValues.add(beta0 + (beta1 * data.xValues.firstElement()));
+					xValues.add(data.xValues.lastElement());
+					yValues.add(beta0 + (beta1 * data.xValues.lastElement()));
+				}
 			}
 
 			@Override

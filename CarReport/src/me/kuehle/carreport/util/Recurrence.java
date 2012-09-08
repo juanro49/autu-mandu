@@ -49,15 +49,20 @@ public class Recurrence {
 		DateTime now = new DateTime();
 
 		int count = 1;
-		if (this.equals(RecurrenceInterval.DAY)) {
+		switch (interval) {
+		case DAY:
 			count += Days.daysBetween(then, now).getDays() / multiplier;
-		} else if (this.equals(RecurrenceInterval.MONTH)) {
+			break;
+		case MONTH:
 			count += Months.monthsBetween(then, now).getMonths() / multiplier;
-		} else if (this.equals(RecurrenceInterval.QUARTER)) {
+			break;
+		case QUARTER:
 			int quarters = Months.monthsBetween(then, now).getMonths() / 3;
 			count += quarters / multiplier;
-		} else if (this.equals(RecurrenceInterval.YEAR)) {
+			break;
+		case YEAR:
 			count += Years.yearsBetween(then, now).getYears() / multiplier;
+			break;
 		}
 		return count;
 	}

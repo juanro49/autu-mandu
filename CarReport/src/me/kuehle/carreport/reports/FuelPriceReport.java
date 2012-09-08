@@ -87,9 +87,14 @@ public class FuelPriceReport extends AbstractReport {
 						prefs.getUnitVolume(), prefs.getUnitCurrency()),
 						prefs.getUnitCurrency()) };
 	}
+	
+	@Override
+	public int[] getGraphOptions() {
+		return new int[1];
+	}
 
 	@Override
-	public GraphicalView getGraphView() {
+	public GraphicalView getGraphView(int option) {
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 		XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
 		double[] axesMinMax = { Double.MAX_VALUE, Double.MIN_VALUE,

@@ -127,7 +127,7 @@ public abstract class AbstractReport {
 	}
 
 	public abstract CalculationOption[] getCalculationOptions();
-
+	
 	public ReportData getData() {
 		Collections.sort(data.getData());
 		return data;
@@ -143,7 +143,9 @@ public abstract class AbstractReport {
 		}
 	}
 
-	public abstract GraphicalView getGraphView();
+	public abstract int[] getGraphOptions();
+
+	public abstract GraphicalView getGraphView(int option);
 
 	public boolean isShowTrend() {
 		return showTrend;

@@ -53,6 +53,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	private static final int PREFERENCES_REQUEST_CODE = 4;
 
 	private AbstractReport mCurrentReport;
+	private int mCurrentGraphOption;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -136,12 +137,15 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 
 	@Override
 	public boolean onMenuItemClick(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_show_trend:
+		if (item.getItemId() == R.id.menu_show_trend) {
 			mCurrentReport.setShowTrend(!item.isChecked());
 			updateReportGraph();
 			return true;
-		default:
+		} else if (item.getGroupId() == R.id.group_graph) {
+			mCurrentGraphOption = item.getOrder();
+			updateReportGraph();
+			return true;
+		} else {
 			return false;
 		}
 	}
@@ -154,6 +158,16 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		Menu menu = popup.getMenu();
 		MenuItem item = menu.findItem(R.id.menu_show_trend);
 		item.setChecked(mCurrentReport.isShowTrend());
+
+		int[] graphOptions = mCurrentReport.getGraphOptions();
+		if (graphOptions.length >= 2) {
+			for (int i = 0; i < graphOptions.length; i++) {
+				item = menu
+						.add(R.id.group_graph, Menu.NONE, i, graphOptions[i]);
+				item.setChecked(i == mCurrentGraphOption);
+			}
+			menu.setGroupCheckable(R.id.group_graph, true, true);
+		}
 
 		popup.show();
 	}
@@ -175,6 +189,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		default:
 			return;
 		}
+		mCurrentGraphOption = 0;
 
 		updateReportGraph();
 
@@ -190,7 +205,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			graph.removeViewAt(0);
 		}
 
-		View graphView = mCurrentReport.getGraphView();
+		View graphView = mCurrentReport.getGraphView(mCurrentGraphOption);
 		if (graphView == null) {
 			graph.setVisibility(View.GONE);
 		} else {
@@ -236,7 +251,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 				return false;
 			} else if (options.length > 1) {
 				for (int i = 0; i < options.length; i++) {
-					MenuItem item = menu.add(Menu.NONE, i, Menu.NONE,
+					MenuItem item = menu.add(Menu.NONE, Menu.NONE, i,
 							options[i].getName());
 					item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				}
@@ -277,14 +292,14 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 					keyboard.showSoftInput(input, 0);
 				}
 			}, 100);
-			
+
 			applyCalculation(input.getText().toString());
 			return true;
 		}
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			option = item.getItemId();
+			option = item.getOrder();
 			input.setHint(mCurrentReport.getCalculationOptions()[option]
 					.getHint1());
 			applyCalculation(input.getText().toString());
