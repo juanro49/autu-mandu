@@ -34,11 +34,10 @@
     </string-array>
     <string-array name="color_names">
         <item>Blau</item>
-        <item>Cyan</item>
+        <item>Lila</item>
         <item>Grün</item>
-        <item>Magenta</item>
-        <item>Rot</item>
         <item>Gelb</item>
+        <item>Rot</item>
     </string-array>
 
 </resources>

@@ -116,7 +116,7 @@ public class FuelPriceReport extends AbstractReport {
 		unit = String.format("%s/%s", prefs.getUnitCurrency(),
 				prefs.getUnitVolume());
 
-		reportData = new ReportGraphData(context, "", Color.BLUE);
+		reportData = new ReportGraphData(context, "", Color.rgb(51, 181, 229));
 
 		Helper helper = Helper.getInstance();
 		SQLiteDatabase db = helper.getReadableDatabase();
