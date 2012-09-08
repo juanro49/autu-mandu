@@ -41,10 +41,16 @@ public class FuelConsumptionReport extends AbstractReport {
 	private class CalculableItem extends ReportData.AbstractCalculableItem {
 		private static final String FORMAT = "%.2f %s";
 		private double value;
+		private String[] calcLabels;
 
 		public CalculableItem(String label, double value) {
+			this(label, value, new String[] { label, label });
+		}
+
+		public CalculableItem(String label, double value, String[] calcLabels) {
 			super(label, String.format(FORMAT, value, unit));
 			this.value = value;
+			this.calcLabels = calcLabels;
 		}
 
 		@Override
@@ -57,6 +63,7 @@ public class FuelConsumptionReport extends AbstractReport {
 				double result = (value / 100) * value1;
 				setValue(String.format(FORMAT, result, prefs.getUnitVolume()));
 			}
+			setLabel(calcLabels[option]);
 		}
 	}
 
@@ -126,9 +133,13 @@ public class FuelConsumptionReport extends AbstractReport {
 
 	private void addConsumptionData(Section section, Vector<Double> numbers) {
 		section.addItem(new CalculableItem(context
-				.getString(R.string.report_highest), Calculator.max(numbers)));
+				.getString(R.string.report_highest), Calculator.max(numbers),
+				new String[] { context.getString(R.string.report_at_least),
+						context.getString(R.string.report_at_most) }));
 		section.addItem(new CalculableItem(context
-				.getString(R.string.report_lowest), Calculator.min(numbers)));
+				.getString(R.string.report_lowest), Calculator.min(numbers),
+				new String[] { context.getString(R.string.report_at_most),
+						context.getString(R.string.report_at_least) }));
 		section.addItem(new CalculableItem(context
 				.getString(R.string.report_average), Calculator.avg(numbers)));
 	}

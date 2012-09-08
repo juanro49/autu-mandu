@@ -42,10 +42,16 @@ public class FuelPriceReport extends AbstractReport {
 		private static final String FORMAT_NORMAL = "%.3f %s";
 		private static final String FORMAT_CALCULATION = "%.2f %s";
 		private double value;
+		private String[] calcLabels;
 
 		public CalculableItem(String label, double value) {
+			this(label, value, new String[] { label, label });
+		}
+
+		public CalculableItem(String label, double value, String[] calcLabels) {
 			super(label, String.format(FORMAT_NORMAL, value, unit));
 			this.value = value;
+			this.calcLabels = calcLabels;
 		}
 
 		@Override
@@ -60,6 +66,7 @@ public class FuelPriceReport extends AbstractReport {
 				setValue(String.format(FORMAT_CALCULATION, result,
 						prefs.getUnitVolume()));
 			}
+			setLabel(calcLabels[option]);
 		}
 	}
 
@@ -124,9 +131,13 @@ public class FuelPriceReport extends AbstractReport {
 		cursor.moveToFirst();
 
 		addData(new CalculableItem(context.getString(R.string.report_highest),
-				cursor.getFloat(0)));
+				cursor.getFloat(0), new String[] {
+						context.getString(R.string.report_at_most),
+						context.getString(R.string.report_at_least) }));
 		addData(new CalculableItem(context.getString(R.string.report_lowest),
-				cursor.getFloat(1)));
+				cursor.getFloat(1), new String[] {
+						context.getString(R.string.report_at_least),
+						context.getString(R.string.report_at_most) }));
 		addData(new CalculableItem(context.getString(R.string.report_average),
 				cursor.getFloat(2)));
 
@@ -156,7 +167,8 @@ public class FuelPriceReport extends AbstractReport {
 		dataset.add(reportData.getSeries());
 		reportData.applySeriesStyle(0, renderer);
 		if (isShowTrend()) {
-			AbstractReportGraphData trendReportData =reportData.createRegressionData();
+			AbstractReportGraphData trendReportData = reportData
+					.createRegressionData();
 			dataset.add(trendReportData.getSeries());
 			trendReportData.applySeriesStyle(1, renderer);
 		}

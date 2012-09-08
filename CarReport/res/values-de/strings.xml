@@ -88,6 +88,8 @@
     <string name="report_since">seit %s</string>
     <string name="report_lowest">Niedrigster</string>
     <string name="report_highest">Höchster</string>
+    <string name="report_at_least">Mindestens</string>
+    <string name="report_at_most">Höchstens</string>
     <string name="report_average">Durchschnitt</string>
     <string name="report_toast_car">Auto</string>
     <string name="report_toast_consumption">Verbrauch</string>
