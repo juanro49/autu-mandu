@@ -22,6 +22,8 @@ public class Application extends android.app.Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		System.setProperty("org.joda.time.DateTimeZone.Provider",
+				"org.joda.time.tz.UTCProvider");
 		Helper.init(this);
 	}
 }
