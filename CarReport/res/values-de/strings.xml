@@ -12,7 +12,7 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License.
 -->
 <resources>
 
@@ -80,6 +80,7 @@
     <string name="toast_other_deleted">Andere Kosten gelöscht.</string>
     <string name="tab_indicator_refuelings">Tankfüllungen</string>
     <string name="tab_indicator_other">Andere Kosten</string>
+    <string name="graph_options_desc">Graph-Optionen</string>
     <string name="report_trend_label">%s (Trend)</string>
     <string name="report_graph_month_history">Monat Historie</string>
     <string name="report_graph_year_history">Jahr Historie</string>

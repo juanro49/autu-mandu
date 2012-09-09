@@ -80,6 +80,7 @@
     <string name="toast_other_deleted">Other cost deleted.</string>
     <string name="tab_indicator_refuelings">Refuelings</string>
     <string name="tab_indicator_other">Other costs</string>
+    <string name="graph_options_desc">Graph options</string>
     <string name="report_trend_label">%s (Trend)</string>
     <string name="report_graph_month_history">Month History</string>
     <string name="report_graph_year_history">Year History</string>

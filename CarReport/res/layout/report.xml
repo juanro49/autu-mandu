@@ -28,13 +28,15 @@
             android:id="@+id/graph"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-        <Button
+        <ImageButton
             android:id="@+id/btnMenu"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="right"
-            android:background="@drawable/ic_menu_overflow"
-            android:onClick="showReportOptions" />
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/graph_options_desc"
+            android:onClick="showReportOptions"
+            android:src="@drawable/ic_menu_overflow" />
     </FrameLayout>
     <ListView
         android:id="@+id/lstData"
