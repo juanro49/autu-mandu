@@ -12,34 +12,35 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:baselineAligned="false"
-    android:orientation="horizontal" >
-
-    <FrameLayout
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:divider="?android:attr/dividerHorizontal"
+    android:orientation="horizontal"
+    android:showDividers="middle" >
+    <fragment
         android:id="@+id/list"
+        android:name="me.kuehle.carreport.gui.DataListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.4" />
-
+        android:layout_weight="2" />
     <FrameLayout
-        android:id="@+id/edit"
+        android:id="@+id/detail"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.6"
+        android:layout_weight="3"
         android:background="?android:attr/detailsElementBackground" >
-
         <TextView
             android:id="@+id/txtNoEntrySelected"
             style="@android:style/TextAppearance.DeviceDefault.Large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:drawableTop="@drawable/ic_data_detail_refueling"
             android:text="@string/edit_message_no_entry_selected" />
     </FrameLayout>
-
 </LinearLayout>

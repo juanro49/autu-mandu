@@ -42,9 +42,10 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-public abstract class AbstractEditFragment extends Fragment {
+public abstract class AbstractDataDetailFragment extends Fragment {
 	public static final String EXTRA_ID = "id";
 	public static final int EXTRA_ID_DEFAULT = -1;
+	public static final String EXTRA_CAR_ID = "car_id";
 
 	protected OnItemActionListener onItemActionListener;
 	protected AbstractItem editItem = null;
@@ -61,7 +62,12 @@ public abstract class AbstractEditFragment extends Fragment {
 			throw new ClassCastException(activity.toString()
 					+ " must implement OnItemActionListener");
 		}
+	}
 
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
 		int id = getArguments().getInt(EXTRA_ID, EXTRA_ID_DEFAULT);
 		if (id != EXTRA_ID_DEFAULT) {
 			editItem = getEditObject(id);
@@ -69,15 +75,12 @@ public abstract class AbstractEditFragment extends Fragment {
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(getLayout(), container, false);
+		View v = inflater.inflate(getLayout(), container, false);
+		initFields(v);
+		fillFields(v);
+		return v;
 	}
 
 	@Override
@@ -95,9 +98,6 @@ public abstract class AbstractEditFragment extends Fragment {
 			actionBar.setTitle(getTitleForNew());
 		}
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-
-		initFields();
-		fillFields();
 	}
 
 	@Override
@@ -210,9 +210,9 @@ public abstract class AbstractEditFragment extends Fragment {
 
 	protected abstract int getToastDeletedMessage();
 
-	protected abstract void initFields();
+	protected abstract void initFields(View v);
 
-	protected abstract void fillFields();
+	protected abstract void fillFields(View v);
 
 	protected abstract void save();
 
@@ -228,8 +228,8 @@ public abstract class AbstractEditFragment extends Fragment {
 			DatePickerDialog.OnDateSetListener {
 		private EditText editText;
 
-		public EditTextDateField(int view) {
-			editText = (EditText) getView().findViewById(view);
+		public EditTextDateField(EditText view) {
+			editText = view;
 			editText.setOnClickListener(this);
 		}
 
@@ -272,8 +272,8 @@ public abstract class AbstractEditFragment extends Fragment {
 			TimePickerDialog.OnTimeSetListener {
 		private EditText editText;
 
-		public EditTextTimeField(int view) {
-			editText = (EditText) getView().findViewById(view);
+		public EditTextTimeField(EditText view) {
+			editText = view;
 			editText.setOnClickListener(this);
 		}
 

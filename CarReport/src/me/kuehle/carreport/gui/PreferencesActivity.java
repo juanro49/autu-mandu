@@ -476,7 +476,8 @@ public class PreferencesActivity extends PreferenceActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View root = inflater.inflate(R.layout.about, container, false);
+			View root = inflater.inflate(R.layout.fragment_prefs_about,
+					container, false);
 
 			String strVersion = String.format(
 					getString(R.string.about_version),

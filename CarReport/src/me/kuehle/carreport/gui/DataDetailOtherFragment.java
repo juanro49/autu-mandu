@@ -23,19 +23,19 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
+import me.kuehle.carreport.util.InputFieldValidator;
 import me.kuehle.carreport.util.Recurrence;
 import me.kuehle.carreport.util.RecurrenceInterval;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class EditOtherCostFragment extends AbstractEditFragment implements
-		InputFieldValidator.ValidationCallback {
-	public static final String EXTRA_CAR_ID = "car_id";
-
+public class DataDetailOtherFragment extends AbstractDataDetailFragment
+		implements InputFieldValidator.ValidationCallback {
 	private EditTextDateField edtDate;
 	private EditTextTimeField edtTime;
 
@@ -43,7 +43,7 @@ public class EditOtherCostFragment extends AbstractEditFragment implements
 
 	@Override
 	protected int getLayout() {
-		return R.layout.edit_other;
+		return R.layout.fragment_data_detail_other;
 	}
 
 	@Override
@@ -77,22 +77,22 @@ public class EditOtherCostFragment extends AbstractEditFragment implements
 	}
 
 	@Override
-	protected void initFields() {
+	protected void initFields(View v) {
 		Preferences prefs = new Preferences(getActivity());
 
 		ArrayAdapter<String> titleAdapter = new ArrayAdapter<String>(
 				getActivity(), android.R.layout.simple_dropdown_item_1line,
 				OtherCost.getAllTitles());
-		AutoCompleteTextView edtTitle = (AutoCompleteTextView) getView()
+		AutoCompleteTextView edtTitle = (AutoCompleteTextView) v
 				.findViewById(R.id.edtTitle);
 		edtTitle.setAdapter(titleAdapter);
 
-		edtDate = new EditTextDateField(R.id.edtDate);
-		edtTime = new EditTextTimeField(R.id.edtTime);
+		edtDate = new EditTextDateField((EditText) v.findViewById(R.id.edtDate));
+		edtTime = new EditTextTimeField((EditText) v.findViewById(R.id.edtTime));
 
-		((TextView) getView().findViewById(R.id.txtUnitCurrency)).setText(prefs
+		((TextView) v.findViewById(R.id.txtUnitCurrency)).setText(prefs
 				.getUnitCurrency());
-		((TextView) getView().findViewById(R.id.txtUnitDistance)).setText(prefs
+		((TextView) v.findViewById(R.id.txtUnitDistance)).setText(prefs
 				.getUnitDistance());
 
 		ArrayAdapter<String> carAdapter = new ArrayAdapter<String>(
@@ -101,19 +101,19 @@ public class EditOtherCostFragment extends AbstractEditFragment implements
 		for (Car car : cars) {
 			carAdapter.add(car.getName());
 		}
-		Spinner spnCar = (Spinner) getView().findViewById(R.id.spnCar);
+		Spinner spnCar = (Spinner) v.findViewById(R.id.spnCar);
 		spnCar.setAdapter(carAdapter);
 	}
 
 	@Override
-	protected void fillFields() {
+	protected void fillFields(View v) {
 		if (!isInEditMode()) {
 			Preferences prefs = new Preferences(getActivity());
 
 			edtDate.setDate(new Date());
 			edtTime.setTime(new Date());
 
-			Spinner spnCar = ((Spinner) getView().findViewById(R.id.spnCar));
+			Spinner spnCar = ((Spinner) v.findViewById(R.id.spnCar));
 			int selectCar = getArguments().getInt(EXTRA_CAR_ID);
 			if (selectCar == 0) {
 				selectCar = prefs.getDefaultCar();
@@ -129,29 +129,25 @@ public class EditOtherCostFragment extends AbstractEditFragment implements
 			edtDate.setDate(other.getDate());
 			edtTime.setTime(other.getDate());
 
-			EditText edtTitle = ((EditText) getView().findViewById(
-					R.id.edtTitle));
+			EditText edtTitle = (EditText) v.findViewById(R.id.edtTitle);
 			edtTitle.setText(String.valueOf(other.getTitle()));
 
-			EditText edtMileage = ((EditText) getView().findViewById(
-					R.id.edtMileage));
+			EditText edtMileage = (EditText) v.findViewById(R.id.edtMileage);
 			if (other.getMileage() > -1) {
 				edtMileage.setText(String.valueOf(other.getMileage()));
 			}
 
-			EditText edtPrice = ((EditText) getView().findViewById(
-					R.id.edtPrice));
+			EditText edtPrice = (EditText) v.findViewById(R.id.edtPrice);
 			edtPrice.setText(String.valueOf(other.getPrice()));
 
-			Spinner spnRepeat = ((Spinner) getView().findViewById(
-					R.id.spnRepeat));
+			Spinner spnRepeat = (Spinner) v.findViewById(R.id.spnRepeat);
 			spnRepeat.setSelection(other.getRecurrence().getInterval()
 					.getValue());
 
-			EditText edtNote = ((EditText) getView().findViewById(R.id.edtNote));
+			EditText edtNote = (EditText) v.findViewById(R.id.edtNote);
 			edtNote.setText(other.getNote());
 
-			Spinner spnCar = ((Spinner) getView().findViewById(R.id.spnCar));
+			Spinner spnCar = (Spinner) v.findViewById(R.id.spnCar);
 			for (int pos = 0; pos < cars.length; pos++) {
 				if (cars[pos].getId() == other.getCar().getId()) {
 					spnCar.setSelection(pos);
@@ -209,11 +205,11 @@ public class EditOtherCostFragment extends AbstractEditFragment implements
 		saveSuccess();
 	}
 
-	public static EditOtherCostFragment newInstance(int id) {
-		EditOtherCostFragment f = new EditOtherCostFragment();
+	public static DataDetailOtherFragment newInstance(int id) {
+		DataDetailOtherFragment f = new DataDetailOtherFragment();
 
 		Bundle args = new Bundle();
-		args.putInt(AbstractEditFragment.EXTRA_ID, id);
+		args.putInt(AbstractDataDetailFragment.EXTRA_ID, id);
 		f.setArguments(args);
 
 		return f;

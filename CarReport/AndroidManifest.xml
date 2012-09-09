@@ -48,10 +48,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".gui.EditFragmentActivity" >
+        <activity android:name=".gui.DataDetailActivity" >
         </activity>
         <activity
-            android:name=".gui.ViewDataActivity"
+            android:name=".gui.DataListActivity"
             android:label="@string/title_view_data" >
         </activity>
         <activity

@@ -20,8 +20,8 @@ import me.kuehle.carreport.R;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class EditFragmentActivity extends Activity implements
-		AbstractEditFragment.OnItemActionListener {
+public class DataDetailActivity extends Activity implements
+		AbstractDataDetailFragment.OnItemActionListener {
 	public static final String EXTRA_EDIT = "edit";
 
 	public static final int EXTRA_EDIT_REFUELING = 0;
@@ -30,22 +30,22 @@ public class EditFragmentActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.edit_fragment_holder);
-		
-		int edit = getIntent().getIntExtra(EXTRA_EDIT, EXTRA_EDIT_REFUELING);
+		setContentView(R.layout.activity_data_detail);
 
 		if (savedInstanceState == null) {
 			// During initial setup, plug in the details fragment.
-			AbstractEditFragment fragment;
+			int edit = getIntent()
+					.getIntExtra(EXTRA_EDIT, EXTRA_EDIT_REFUELING);
+			AbstractDataDetailFragment fragment;
 			if (edit == EXTRA_EDIT_REFUELING) {
-				fragment = new EditRefuelingFragment();
+				fragment = new DataDetailRefuelingFragment();
 			} else {
-				fragment = new EditOtherCostFragment();
+				fragment = new DataDetailOtherFragment();
 			}
 			fragment.setArguments(getIntent().getExtras());
 
-			getFragmentManager().beginTransaction()
-					.add(R.id.fragment_holder, fragment).commit();
+			getFragmentManager().beginTransaction().add(R.id.detail, fragment)
+					.commit();
 		}
 	}
 

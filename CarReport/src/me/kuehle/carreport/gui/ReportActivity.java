@@ -23,6 +23,7 @@ import me.kuehle.carreport.reports.AbstractReport.CalculationOption;
 import me.kuehle.carreport.reports.CostsReport;
 import me.kuehle.carreport.reports.FuelConsumptionReport;
 import me.kuehle.carreport.reports.FuelPriceReport;
+import me.kuehle.carreport.util.SectionListAdapter;
 import me.kuehle.carreport.util.WeightAnimator;
 import me.kuehle.chartlib.ChartView;
 import android.app.ActionBar;
@@ -60,7 +61,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.report);
+		setContentView(R.layout.activity_report);
 
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
 				this, R.array.reports,
@@ -91,24 +92,24 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_add_refueling:
-			Intent intent = new Intent(this, EditFragmentActivity.class);
+			Intent intent = new Intent(this, DataDetailActivity.class);
 			intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			intent.putExtra(EditFragmentActivity.EXTRA_EDIT,
-					EditFragmentActivity.EXTRA_EDIT_REFUELING);
+			intent.putExtra(DataDetailActivity.EXTRA_EDIT,
+					DataDetailActivity.EXTRA_EDIT_REFUELING);
 			startActivityForResult(intent, ADD_REFUELING_REQUEST_CODE);
 			return true;
 		case R.id.menu_add_other:
-			Intent intent3 = new Intent(this, EditFragmentActivity.class);
+			Intent intent3 = new Intent(this, DataDetailActivity.class);
 			intent3.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			intent3.putExtra(EditFragmentActivity.EXTRA_EDIT,
-					EditFragmentActivity.EXTRA_EDIT_OTHER);
+			intent3.putExtra(DataDetailActivity.EXTRA_EDIT,
+					DataDetailActivity.EXTRA_EDIT_OTHER);
 			startActivityForResult(intent3, ADD_OTHER_REQUEST_CODE);
 			return true;
 		case R.id.menu_calculate:
 			startActionMode(mCalculationActionMode);
 			return true;
 		case R.id.menu_view_data:
-			Intent intent1 = new Intent(this, ViewDataActivity.class);
+			Intent intent1 = new Intent(this, DataListActivity.class);
 			startActivityForResult(intent1, EDIT_REFUELING_REQUEST_CODE);
 			return true;
 		case R.id.menu_settings:
