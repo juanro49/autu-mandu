@@ -51,9 +51,8 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 public class ReportActivity extends Activity implements OnMenuItemClickListener {
 	private static final int ADD_REFUELING_REQUEST_CODE = 0;
 	private static final int ADD_OTHER_REQUEST_CODE = 1;
-	private static final int EDIT_REFUELING_REQUEST_CODE = 2;
-	private static final int EDIT_OTHER_REQUEST_CODE = 3;
-	private static final int PREFERENCES_REQUEST_CODE = 4;
+	private static final int VIEW_DATA_REQUEST_CODE = 2;
+	private static final int PREFERENCES_REQUEST_CODE = 3;
 
 	private AbstractReport mCurrentReport;
 	private int mCurrentGraphOption;
@@ -110,7 +109,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			return true;
 		case R.id.menu_view_data:
 			Intent intent1 = new Intent(this, DataListActivity.class);
-			startActivityForResult(intent1, EDIT_REFUELING_REQUEST_CODE);
+			startActivityForResult(intent1, VIEW_DATA_REQUEST_CODE);
 			return true;
 		case R.id.menu_settings:
 			Intent intent2 = new Intent(this, PreferencesActivity.class);
@@ -125,8 +124,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if ((requestCode == ADD_REFUELING_REQUEST_CODE && resultCode == RESULT_OK)
 				|| (requestCode == ADD_OTHER_REQUEST_CODE && resultCode == RESULT_OK)
-				|| requestCode == EDIT_REFUELING_REQUEST_CODE
-				|| requestCode == EDIT_OTHER_REQUEST_CODE
+				|| requestCode == VIEW_DATA_REQUEST_CODE
 				|| requestCode == PREFERENCES_REQUEST_CODE) {
 			updateReport();
 		}

@@ -21,6 +21,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentManager.OnBackStackChangedListener;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,6 +37,29 @@ public class DataListActivity extends Activity implements
 		DataListFragment.Callback {
 	private DataListFragment mList;
 	private boolean mTwoPane;
+
+	private OnBackStackChangedListener mOnBackStackChangeListener = new OnBackStackChangedListener() {
+		private int count = getFragmentManager().getBackStackEntryCount();
+
+		@Override
+		public void onBackStackChanged() {
+			FragmentManager fm = getFragmentManager();
+			if (fm.getBackStackEntryCount() < count) {
+				Fragment fragment = fm.findFragmentById(R.id.detail);
+				if (fragment != null) {
+					fm.beginTransaction()
+							.remove(fragment)
+							.setTransition(
+									FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+							.commit();
+				}
+
+				setNoEntryMessageVisible(true);
+				mList.setCurrentPosition(ListView.INVALID_POSITION);
+			}
+			count = fm.getBackStackEntryCount();
+		}
+	};
 
 	@Override
 	public void itemCanceled() {
@@ -76,6 +100,9 @@ public class DataListActivity extends Activity implements
 			mTwoPane = true;
 			mList.setActivateOnItemClick(true);
 		}
+
+		getFragmentManager().addOnBackStackChangedListener(
+				mOnBackStackChangeListener);
 	}
 
 	@Override
@@ -87,14 +114,7 @@ public class DataListActivity extends Activity implements
 
 	@Override
 	public void onItemClosed() {
-		FragmentManager fm = getFragmentManager();
-		Fragment fragment = fm.findFragmentById(R.id.detail);
-		if (fragment != null) {
-			fm.beginTransaction()
-					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-					.remove(fragment).commit();
-		}
-		setNoEntryMessageVisible(true);
+		getFragmentManager().popBackStack();
 	}
 
 	@Override
@@ -114,6 +134,7 @@ public class DataListActivity extends Activity implements
 					.replace(R.id.detail, fragment);
 			if (fm.findFragmentById(R.id.detail) == null) {
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+				ft.addToBackStack(null);
 			}
 			ft.commit();
 		} else {

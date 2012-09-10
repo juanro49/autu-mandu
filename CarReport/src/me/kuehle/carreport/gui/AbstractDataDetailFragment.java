@@ -43,44 +43,165 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 public abstract class AbstractDataDetailFragment extends Fragment {
+	public class EditTextDateField implements View.OnClickListener,
+			DatePickerDialog.OnDateSetListener {
+		private EditText editText;
+
+		public EditTextDateField(EditText view) {
+			editText = view;
+			editText.setOnClickListener(this);
+		}
+
+		public Date getDate() {
+			Date date = new Date();
+			try {
+				date = DateFormat.getDateFormat(getActivity()).parse(
+						editText.getText().toString());
+			} catch (ParseException e) {
+			}
+			return date;
+		}
+
+		@Override
+		public void onClick(View v) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(getDate());
+			new DatePickerDialog(getActivity(), this, cal.get(Calendar.YEAR),
+					cal.get(Calendar.MONTH), cal.get(Calendar.DATE)).show();
+		}
+
+		@Override
+		public void onDateSet(DatePicker view, int year, int monthOfYear,
+				int dayOfMonth) {
+			Calendar cal = Calendar.getInstance();
+			cal.set(Calendar.YEAR, year);
+			cal.set(Calendar.MONTH, monthOfYear);
+			cal.set(Calendar.DATE, dayOfMonth);
+
+			setDate(cal.getTime());
+		}
+
+		public void setDate(Date date) {
+			editText.setText(DateFormat.getDateFormat(getActivity()).format(
+					date));
+		}
+	}
+	public class EditTextTimeField implements View.OnClickListener,
+			TimePickerDialog.OnTimeSetListener {
+		private EditText editText;
+
+		public EditTextTimeField(EditText view) {
+			editText = view;
+			editText.setOnClickListener(this);
+		}
+
+		public Date getTime() {
+			Date time = new Date();
+			try {
+				time = DateFormat.getTimeFormat(getActivity()).parse(
+						editText.getText().toString());
+			} catch (ParseException e) {
+			}
+			return time;
+		}
+
+		@Override
+		public void onClick(View v) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(getTime());
+			new TimePickerDialog(getActivity(), this,
+					cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
+					DateFormat.is24HourFormat(getActivity())).show();
+		}
+
+		@Override
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			Calendar cal = Calendar.getInstance();
+			cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+			cal.set(Calendar.MINUTE, minute);
+
+			setTime(cal.getTime());
+		}
+
+		public void setTime(Date time) {
+			editText.setText(DateFormat.getTimeFormat(getActivity()).format(
+					time));
+		}
+	}
+	public interface OnItemActionListener {
+		public void itemCanceled();
+
+		public void itemDeleted();
+
+		public void itemSaved();
+	}
+
 	public static final String EXTRA_ID = "id";
 	public static final int EXTRA_ID_DEFAULT = -1;
-	public static final String EXTRA_CAR_ID = "car_id";
 
+	public static final String EXTRA_CAR_ID = "car_id";
 	protected OnItemActionListener onItemActionListener;
+
 	protected AbstractItem editItem = null;
 
 	private CharSequence savedABTitle;
+
 	private int savedABNavMode;
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
+	protected abstract void fillFields(View v);
+
+	protected abstract int getAlertDeleteMessage();
+
+	protected Date getDateTime(Date date, Date time) {
+		Calendar calTime = Calendar.getInstance();
+		calTime.setTime(time);
+
+		Calendar calDateTime = Calendar.getInstance();
+		calDateTime.setTime(date);
+		calDateTime
+				.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY));
+		calDateTime.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE));
+		calDateTime.set(Calendar.SECOND, calTime.get(Calendar.SECOND));
+
+		return calDateTime.getTime();
+	}
+
+	protected double getDoubleFromEditText(int view, double defaultValue) {
+		EditText editText = (EditText) getView().findViewById(view);
+		String strDouble = editText.getText().toString();
 		try {
-			onItemActionListener = (OnItemActionListener) activity;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement OnItemActionListener");
+			return Double.parseDouble(strDouble);
+		} catch (NumberFormatException e) {
+			return defaultValue;
 		}
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-		int id = getArguments().getInt(EXTRA_ID, EXTRA_ID_DEFAULT);
-		if (id != EXTRA_ID_DEFAULT) {
-			editItem = getEditObject(id);
+	protected abstract AbstractItem getEditObject(int id);
+
+	protected int getIntegerFromEditText(int view, int defaultValue) {
+		EditText editText = (EditText) getView().findViewById(view);
+		String strInt = editText.getText().toString();
+		try {
+			return Integer.parseInt(strInt);
+		} catch (NumberFormatException e) {
+			return defaultValue;
 		}
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View v = inflater.inflate(getLayout(), container, false);
-		initFields(v);
-		fillFields(v);
-		return v;
+	protected abstract int getLayout();
+
+	protected abstract int getTitleForEdit();
+
+	protected abstract int getTitleForNew();
+
+	protected abstract int getToastDeletedMessage();
+
+	protected abstract int getToastSavedMessage();
+
+	protected abstract void initFields(View v);
+
+	protected boolean isInEditMode() {
+		return editItem != null;
 	}
 
 	@Override
@@ -101,11 +222,24 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 	}
 
 	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setTitle(savedABTitle);
-		actionBar.setNavigationMode(savedABNavMode);
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			onItemActionListener = (OnItemActionListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement OnItemActionListener");
+		}
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		int id = getArguments().getInt(EXTRA_ID, EXTRA_ID_DEFAULT);
+		if (id != EXTRA_ID_DEFAULT) {
+			editItem = getEditObject(id);
+		}
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -115,6 +249,23 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 		if (!isInEditMode()) {
 			menu.removeItem(R.id.menu_delete);
 		}
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View v = inflater.inflate(getLayout(), container, false);
+		initFields(v);
+		fillFields(v);
+		return v;
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		ActionBar actionBar = getActivity().getActionBar();
+		actionBar.setTitle(savedABTitle);
+		actionBar.setNavigationMode(savedABNavMode);
 	}
 
 	@Override
@@ -152,162 +303,11 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 		}
 	}
 
-	protected int getIntegerFromEditText(int view, int defaultValue) {
-		EditText editText = (EditText) getView().findViewById(view);
-		String strInt = editText.getText().toString();
-		try {
-			return Integer.parseInt(strInt);
-		} catch (NumberFormatException e) {
-			return defaultValue;
-		}
-	}
-
-	protected double getDoubleFromEditText(int view, double defaultValue) {
-		EditText editText = (EditText) getView().findViewById(view);
-		String strDouble = editText.getText().toString();
-		try {
-			return Double.parseDouble(strDouble);
-		} catch (NumberFormatException e) {
-			return defaultValue;
-		}
-	}
-
-	protected Date getDateTime(Date date, Date time) {
-		Calendar calTime = Calendar.getInstance();
-		calTime.setTime(time);
-
-		Calendar calDateTime = Calendar.getInstance();
-		calDateTime.setTime(date);
-		calDateTime
-				.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY));
-		calDateTime.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE));
-		calDateTime.set(Calendar.SECOND, calTime.get(Calendar.SECOND));
-
-		return calDateTime.getTime();
-	}
-
-	protected boolean isInEditMode() {
-		return editItem != null;
-	}
+	protected abstract void save();
 
 	protected void saveSuccess() {
 		Toast.makeText(getActivity(), getToastSavedMessage(),
 				Toast.LENGTH_SHORT).show();
 		onItemActionListener.itemSaved();
-	}
-
-	protected abstract int getLayout();
-
-	protected abstract int getTitleForEdit();
-
-	protected abstract int getTitleForNew();
-
-	protected abstract int getAlertDeleteMessage();
-
-	protected abstract AbstractItem getEditObject(int id);
-
-	protected abstract int getToastSavedMessage();
-
-	protected abstract int getToastDeletedMessage();
-
-	protected abstract void initFields(View v);
-
-	protected abstract void fillFields(View v);
-
-	protected abstract void save();
-
-	public interface OnItemActionListener {
-		public void itemSaved();
-
-		public void itemCanceled();
-
-		public void itemDeleted();
-	}
-
-	public class EditTextDateField implements View.OnClickListener,
-			DatePickerDialog.OnDateSetListener {
-		private EditText editText;
-
-		public EditTextDateField(EditText view) {
-			editText = view;
-			editText.setOnClickListener(this);
-		}
-
-		public Date getDate() {
-			Date date = new Date();
-			try {
-				date = DateFormat.getDateFormat(getActivity()).parse(
-						editText.getText().toString());
-			} catch (ParseException e) {
-			}
-			return date;
-		}
-
-		public void setDate(Date date) {
-			editText.setText(DateFormat.getDateFormat(getActivity()).format(
-					date));
-		}
-
-		@Override
-		public void onClick(View v) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(getDate());
-			new DatePickerDialog(getActivity(), this, cal.get(Calendar.YEAR),
-					cal.get(Calendar.MONTH), cal.get(Calendar.DATE)).show();
-		}
-
-		@Override
-		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {
-			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.YEAR, year);
-			cal.set(Calendar.MONTH, monthOfYear);
-			cal.set(Calendar.DATE, dayOfMonth);
-
-			setDate(cal.getTime());
-		}
-	}
-
-	public class EditTextTimeField implements View.OnClickListener,
-			TimePickerDialog.OnTimeSetListener {
-		private EditText editText;
-
-		public EditTextTimeField(EditText view) {
-			editText = view;
-			editText.setOnClickListener(this);
-		}
-
-		public Date getTime() {
-			Date time = new Date();
-			try {
-				time = DateFormat.getTimeFormat(getActivity()).parse(
-						editText.getText().toString());
-			} catch (ParseException e) {
-			}
-			return time;
-		}
-
-		public void setTime(Date time) {
-			editText.setText(DateFormat.getTimeFormat(getActivity()).format(
-					time));
-		}
-
-		@Override
-		public void onClick(View v) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(getTime());
-			new TimePickerDialog(getActivity(), this,
-					cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
-					DateFormat.is24HourFormat(getActivity())).show();
-		}
-
-		@Override
-		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-			cal.set(Calendar.MINUTE, minute);
-
-			setTime(cal.getTime());
-		}
 	}
 }
