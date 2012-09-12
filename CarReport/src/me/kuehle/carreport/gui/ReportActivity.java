@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Jan Kühle
+ * Copyright 2012 Jan Kï¿½hle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,10 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		case R.id.menu_settings:
 			Intent intent2 = new Intent(this, PreferencesActivity.class);
 			startActivityForResult(intent2, PREFERENCES_REQUEST_CODE);
+			return true;
+		case R.id.menu_help:
+			Intent intent4 = new Intent(this, HelpActivity.class);
+			startActivity(intent4);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

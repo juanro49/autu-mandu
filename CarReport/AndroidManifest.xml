@@ -58,5 +58,9 @@
             android:name=".gui.PreferencesActivity"
             android:label="@string/title_settings" >
         </activity>
+        <activity
+            android:name=".gui.HelpActivity"
+            android:label="@string/title_help" >
+        </activity>
     </application>
 </manifest>

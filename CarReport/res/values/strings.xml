@@ -32,6 +32,7 @@
     <string name="menu_add_refueling">Add refueling</string>
     <string name="menu_add_other">Add other</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_help">Help</string>
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
     <string name="menu_delete">Delete</string>
@@ -44,6 +45,7 @@
     <string name="title_add_refueling">Add refueling</string>
     <string name="title_edit_refueling">Edit refueling</string>
     <string name="title_settings">Settings</string>
+    <string name="title_help">Help</string>
     <string name="title_view_data">Data</string>
     <string name="title_add_other">Add other</string>
     <string name="title_edit_other">Edit other</string>
@@ -119,5 +121,8 @@
     <string name="pref_summary_appearance_overall_section_pos">The section Overall displays average values, when you use the app for more than one car. Set position: %s</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
+    <string name="help_section_getting_started">Getting started</string>
+    <string name="help_section_tips">Tips</string>
+    <string name="help_section_calculations">Calculations</string>
 
 </resources>

@@ -32,6 +32,7 @@
     <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
     <string name="menu_add_other">Andere Kosten hinzufügen</string>
     <string name="menu_settings">Einstellungen</string>
+    <string name="menu_help">Hilfe</string>
     <string name="menu_save">Fertig</string>
     <string name="menu_cancel">Abbrechen</string>
     <string name="menu_delete">Löschen</string>
@@ -44,6 +45,7 @@
     <string name="title_add_refueling">Tankfüllung hinzufügen</string>
     <string name="title_edit_refueling">Tankfüllung bearbeiten</string>
     <string name="title_settings">Einstellungen</string>
+    <string name="title_help">Hilfe</string>
     <string name="title_view_data">Daten</string>
     <string name="title_add_other">Andere Kosten hinzufügen</string>
     <string name="title_edit_other">Andere Kosten bearbeiten</string>
@@ -119,5 +121,8 @@
     <string name="pref_summary_appearance_overall_section_pos">Der Abschnitt Gesamt zeigt Durchschnittswerte an, wenn Sie mehr als ein Auto haben. Eingestellte Position: %s</string>
     <string name="pref_summary_appearance_color_sections">Zeige die Überschriften der Abschnitte in der Farbe des dazugehörigen Autos.</string>
     <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
+    <string name="help_section_getting_started">Einstieg</string>
+    <string name="help_section_tips">Tipps</string>
+    <string name="help_section_calculations">Berechnungen</string>
 
 </resources>
