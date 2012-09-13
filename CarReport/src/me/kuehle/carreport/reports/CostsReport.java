@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Jan Kühle
+ * Copyright 2012 Jan Kï¿½hle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,7 +178,7 @@ public class CostsReport extends AbstractReport {
 	private SparseArray<ReportGraphData> costsPerYear = new SparseArray<ReportGraphData>();
 	private String unit;
 	private boolean showLegend;
-	private String[] xLabelFormat = { "MMMM, yyyy", "yyyy" };
+	private String[] xLabelFormat = { "MMM, yyyy", "yyyy" };
 
 	public CostsReport(Context context) {
 		super(context);
@@ -186,6 +186,9 @@ public class CostsReport extends AbstractReport {
 		Preferences prefs = new Preferences(context);
 		unit = prefs.getUnitCurrency();
 		showLegend = prefs.isShowLegend();
+		if (context.getResources().getConfiguration().smallestScreenWidthDp > 480) {
+			xLabelFormat[0] = "MMMM, yyyy";
+		}
 
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
