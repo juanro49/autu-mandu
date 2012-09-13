@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Jan Kühle
+ * Copyright 2012 Jan KÃ¼hle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,15 +151,15 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		InputFieldValidator validator = new InputFieldValidator(getActivity(),
 				this);
 
-		validator.addRequired(getView().findViewById(R.id.edtMileage),
+		validator.add(getView().findViewById(R.id.edtMileage),
 				InputFieldValidator.ValidationType.GreaterZero,
-				R.string.alert_validate_required_f_mileage);
-		validator.addRequired(getView().findViewById(R.id.edtVolume),
+				R.string.hint_mileage);
+		validator.add(getView().findViewById(R.id.edtVolume),
 				InputFieldValidator.ValidationType.GreaterZero,
-				R.string.alert_validate_required_f_volume);
-		validator.addRequired(getView().findViewById(R.id.edtPrice),
+				R.string.hint_volume);
+		validator.add(getView().findViewById(R.id.edtPrice),
 				InputFieldValidator.ValidationType.GreaterZero,
-				R.string.alert_validate_required_f_price);
+				R.string.hint_price);
 
 		validator.validate();
 	}

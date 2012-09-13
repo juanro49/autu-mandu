@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Jan Kühle
+ * Copyright 2012 Jan KÃ¼hle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,13 +161,9 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 		InputFieldValidator validator = new InputFieldValidator(getActivity(),
 				this);
 
-		validator.setRecommended(getView().findViewById(R.id.edtTitle),
-				InputFieldValidator.ValidationType.NotEmpty,
-				R.string.alert_validate_recommend_f_title,
-				R.string.alert_validate_recommend_f_title_msg);
-		validator.addRequired(getView().findViewById(R.id.edtPrice),
+		validator.add(getView().findViewById(R.id.edtPrice),
 				InputFieldValidator.ValidationType.GreaterZero,
-				R.string.alert_validate_required_f_price);
+				R.string.hint_price);
 
 		validator.validate();
 	}
