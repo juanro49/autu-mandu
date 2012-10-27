@@ -23,6 +23,9 @@
         android:fragment="me.kuehle.carreport.gui.PreferencesActivity$CarsFragment"
         android:title="@string/pref_title_header_cars" />
     <header
+        android:fragment="me.kuehle.carreport.gui.PreferencesActivity$BackupFragment"
+        android:title="@string/pref_title_header_backup" />
+    <header
         android:fragment="me.kuehle.carreport.gui.PreferencesActivity$AboutFragment"
         android:title="@string/pref_title_header_about" />
 

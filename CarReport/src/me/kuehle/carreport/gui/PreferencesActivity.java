@@ -16,28 +16,36 @@
 
 package me.kuehle.carreport.gui;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.Helper;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.app.backup.BackupManager;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -59,6 +67,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PreferencesActivity extends PreferenceActivity {
 	@Override
@@ -470,6 +479,138 @@ public class PreferencesActivity extends PreferenceActivity {
 				return convertView;
 			}
 		}
+	}
+
+	public static class BackupFragment extends PreferenceFragment {
+		private static final String FILE_NAME = "carreport.backup";
+		private File dbFile;
+		private File backupFile;
+
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+
+			addPreferencesFromResource(R.xml.preferences_backup);
+
+			dbFile = new File(Helper.getInstance().getReadableDatabase()
+					.getPath());
+			File dir = Environment.getExternalStorageDirectory();
+			backupFile = new File(dir, FILE_NAME);
+
+			// Backup
+			{
+				Preference backup = findPreference("backup");
+				backup.setEnabled(dir.canWrite());
+				backup.setOnPreferenceClickListener(mBackup);
+			}
+
+			// Restore
+			{
+				setupRestorePreference();
+			}
+		}
+
+		private boolean copyFile(File from, File to) {
+			try {
+				FileChannel src = new FileInputStream(from).getChannel();
+				FileChannel dst = new FileOutputStream(to).getChannel();
+				dst.transferFrom(src, 0, src.size());
+				src.close();
+				dst.close();
+				return true;
+			} catch (Exception e) {
+				return false;
+			}
+		}
+
+		private void setupRestorePreference() {
+			Preference restore = findPreference("restore");
+			if (backupFile.exists()) {
+				restore.setSummary(getString(R.string.pref_summary_restore,
+						FILE_NAME));
+				restore.setEnabled(true);
+			} else {
+				restore.setSummary(getString(
+						R.string.pref_summary_restore_no_data, FILE_NAME));
+				restore.setEnabled(false);
+			}
+			restore.setOnPreferenceClickListener(mRestore);
+		}
+		
+		private OnPreferenceClickListener mBackup = new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				if (backupFile.exists()) {
+					new AlertDialog.Builder(getActivity())
+							.setTitle(R.string.alert_backup_overwrite_title)
+							.setMessage(R.string.alert_backup_overwrite_message)
+							.setPositiveButton(R.string.overwrite,
+									new OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											doBackup();
+										}
+									})
+							.setNegativeButton(android.R.string.cancel, null)
+							.show();
+				} else {
+					doBackup();
+				}
+				return true;
+			}
+
+			private void doBackup() {
+				synchronized (Helper.dbLock) {
+					if (copyFile(dbFile, backupFile)) {
+						Toast.makeText(
+								getActivity(),
+								getString(R.string.toast_backup_success,
+										FILE_NAME), Toast.LENGTH_SHORT).show();
+						setupRestorePreference();
+					} else {
+						Toast.makeText(getActivity(),
+								R.string.toast_backup_failed,
+								Toast.LENGTH_SHORT).show();
+					}
+				}
+			}
+		};
+
+		private OnPreferenceClickListener mRestore = new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				new AlertDialog.Builder(getActivity())
+						.setTitle(R.string.alert_restore_title)
+						.setMessage(R.string.alert_restore_message)
+						.setPositiveButton(R.string.restore,
+								new OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										doRestore();
+									}
+								})
+						.setNegativeButton(android.R.string.cancel, null)
+						.show();
+				return true;
+			}
+
+			private void doRestore() {
+				synchronized (Helper.dbLock) {
+					if (copyFile(backupFile, dbFile)) {
+						Toast.makeText(getActivity(),
+								R.string.toast_restore_success,
+								Toast.LENGTH_SHORT).show();
+					} else {
+						Toast.makeText(getActivity(),
+								R.string.toast_restore_failed,
+								Toast.LENGTH_SHORT).show();
+					}
+				}
+			}
+		};
 	}
 
 	public static class AboutFragment extends Fragment {
