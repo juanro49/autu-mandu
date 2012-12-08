@@ -39,6 +39,11 @@
         <item>Yellow</item>
         <item>Red</item>
     </string-array>
+    <string-array name="exportcsv_singlemultiplefile">
+        <item>Single file</item>
+        <item>Two files (refuelings, other costs)</item>
+        <item>Three files (cars, refuelings, other costs)</item>
+    </string-array>
 
     <integer-array name="colors">
         <item>0xff33b5e5</item>

@@ -18,7 +18,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
     <AutoCompleteTextView
         android:id="@+id/edtTitle"
         style="@style/edit_title"
@@ -26,22 +25,18 @@
         android:layout_height="48dp"
         android:ems="10"
         android:hint="@string/hint_title" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="16dp" >
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
-
                 <EditText
                     android:id="@+id/edtDate"
                     android:layout_width="0dp"
@@ -50,7 +45,6 @@
                     android:ems="10"
                     android:focusable="false"
                     android:inputType="date" />
-
                 <EditText
                     android:id="@+id/edtTime"
                     android:layout_width="0dp"
@@ -60,12 +54,10 @@
                     android:focusable="false"
                     android:inputType="time" />
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
-
                 <EditText
                     android:id="@+id/edtMileage"
                     android:layout_width="0dp"
@@ -74,18 +66,15 @@
                     android:ems="10"
                     android:hint="@string/hint_mileage_optional"
                     android:inputType="number" />
-
                 <TextView
                     android:id="@+id/txtUnitDistance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
-
                 <EditText
                     android:id="@+id/edtPrice"
                     android:layout_width="0dp"
@@ -94,25 +83,21 @@
                     android:ems="10"
                     android:hint="@string/hint_price"
                     android:inputType="number|numberDecimal" />
-
                 <TextView
                     android:id="@+id/txtUnitCurrency"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
-
             <Spinner
                 android:id="@+id/spnRepeat"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:entries="@array/repeat_intervals" />
-
             <TextView
                 style="@style/section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/section_note" />
-
             <EditText
                 android:id="@+id/edtNote"
                 android:layout_width="match_parent"
@@ -120,18 +105,15 @@
                 android:ems="10"
                 android:hint="@string/hint_note_optional"
                 android:inputType="text|textMultiLine" />
-
             <TextView
                 style="@style/section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/section_car" />
-
             <Spinner
                 android:id="@+id/spnCar"
                 android:layout_width="match_parent"
                 android:layout_height="48dp" />
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

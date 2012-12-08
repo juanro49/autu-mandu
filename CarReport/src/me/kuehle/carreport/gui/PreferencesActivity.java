@@ -22,12 +22,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.util.HashMap;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.CarTable;
 import me.kuehle.carreport.db.Helper;
+import me.kuehle.carreport.db.OtherCostTable;
+import me.kuehle.carreport.db.RefuelingTable;
+import me.kuehle.carreport.util.CSVWriter;
+import me.kuehle.carreport.util.Strings;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -35,6 +41,8 @@ import android.app.ListFragment;
 import android.app.backup.BackupManager;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.GradientDrawable;
@@ -49,6 +57,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.SparseBooleanArray;
@@ -64,8 +73,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -482,7 +493,8 @@ public class PreferencesActivity extends PreferenceActivity {
 	}
 
 	public static class BackupFragment extends PreferenceFragment {
-		private static final String FILE_NAME = "carreport.backup";
+		private static final String BACKUP_FILE_NAME = "carreport.backup";
+		private static final String EXPORT_FILE_PREFIX = "carreport_export";
 		private File dbFile;
 		private File backupFile;
 
@@ -495,7 +507,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			dbFile = new File(Helper.getInstance().getReadableDatabase()
 					.getPath());
 			File dir = Environment.getExternalStorageDirectory();
-			backupFile = new File(dir, FILE_NAME);
+			backupFile = new File(dir, BACKUP_FILE_NAME);
 
 			// Backup
 			{
@@ -507,6 +519,13 @@ public class PreferencesActivity extends PreferenceActivity {
 			// Restore
 			{
 				setupRestorePreference();
+			}
+
+			// Export CSV
+			{
+				Preference export = findPreference("exportcsv");
+				export.setEnabled(dir.canWrite());
+				export.setOnPreferenceClickListener(mExportCSV);
 			}
 		}
 
@@ -531,16 +550,16 @@ public class PreferencesActivity extends PreferenceActivity {
 			Preference restore = findPreference("restore");
 			if (backupFile.exists()) {
 				restore.setSummary(getString(R.string.pref_summary_restore,
-						FILE_NAME));
+						BACKUP_FILE_NAME));
 				restore.setEnabled(true);
 			} else {
 				restore.setSummary(getString(
-						R.string.pref_summary_restore_no_data, FILE_NAME));
+						R.string.pref_summary_restore_no_data, BACKUP_FILE_NAME));
 				restore.setEnabled(false);
 			}
 			restore.setOnPreferenceClickListener(mRestore);
 		}
-		
+
 		private OnPreferenceClickListener mBackup = new OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
@@ -571,7 +590,8 @@ public class PreferencesActivity extends PreferenceActivity {
 						Toast.makeText(
 								getActivity(),
 								getString(R.string.toast_backup_success,
-										FILE_NAME), Toast.LENGTH_SHORT).show();
+										BACKUP_FILE_NAME), Toast.LENGTH_SHORT)
+								.show();
 						setupRestorePreference();
 					} else {
 						Toast.makeText(getActivity(),
@@ -613,6 +633,236 @@ public class PreferencesActivity extends PreferenceActivity {
 								Toast.LENGTH_SHORT).show();
 					}
 				}
+			}
+		};
+
+		private OnPreferenceClickListener mExportCSV = new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				LayoutInflater inflater = getActivity().getLayoutInflater();
+				final View view = inflater.inflate(R.layout.dialog_exportcsv,
+						null);
+				new AlertDialog.Builder(getActivity())
+						.setTitle(R.string.pref_title_exportcsv)
+						.setView(view)
+						.setPositiveButton(R.string.export,
+								new OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										int option = ((Spinner) view
+												.findViewById(R.id.spnSingleMultipleFile))
+												.getSelectedItemPosition();
+										boolean overwrite = ((CheckBox) view
+												.findViewById(R.id.chkOverwrite))
+												.isChecked();
+										doExport(option, overwrite);
+									}
+								})
+						.setNegativeButton(android.R.string.cancel, null)
+						.show();
+				return true;
+			}
+
+			private void doExport(int option, boolean overwrite) {
+				Helper helper = Helper.getInstance();
+				File dir = Environment.getExternalStorageDirectory();
+				if (option == 0) { // Single file
+					File export = new File(dir, EXPORT_FILE_PREFIX + ".csv");
+					if (!overwrite && export.exists()) {
+						Toast.makeText(getActivity(),
+								R.string.toast_export_failed_overwrite,
+								Toast.LENGTH_SHORT).show();
+						return;
+					}
+
+					// Build SQL select statement
+					HashMap<String, String> replacements = new HashMap<String, String>();
+					replacements.put(
+							"%r_columns",
+							Strings.join(new String[] {
+									"'Refueling' AS title",
+									RefuelingTable.COL_DATE,
+									RefuelingTable.COL_TACHO,
+									RefuelingTable.COL_VOLUME,
+									RefuelingTable.COL_PRICE,
+									RefuelingTable.COL_PARTIAL,
+									"'0' AS repeat_interval",
+									"'1' AS repeat_multiplier",
+									RefuelingTable.COL_NOTE,
+									CarTable.NAME + "." + CarTable.COL_NAME
+											+ " AS carname",
+									CarTable.NAME + "." + CarTable.COL_COLOR
+											+ " AS carcolor" }, ", "));
+					replacements.put(
+							"%o_columns",
+							Strings.join(new String[] {
+									OtherCostTable.COL_TITLE,
+									OtherCostTable.COL_DATE,
+									OtherCostTable.COL_TACHO,
+									"'' AS volume",
+									OtherCostTable.COL_PRICE,
+									"'0' AS partial",
+									OtherCostTable.COL_REP_INT,
+									OtherCostTable.COL_REP_MULTI,
+									OtherCostTable.COL_NOTE,
+									CarTable.NAME + "." + CarTable.COL_NAME
+											+ " AS carname",
+									CarTable.NAME + "." + CarTable.COL_COLOR
+											+ " AS carcolor" }, ", "));
+					replacements.put("%refuelings", RefuelingTable.NAME);
+					replacements.put("%othercosts", OtherCostTable.NAME);
+					replacements.put("%cars", CarTable.NAME);
+					replacements.put("%r_car_id", RefuelingTable.COL_CAR);
+					replacements.put("%o_car_id", OtherCostTable.COL_CAR);
+					replacements.put("%id", BaseColumns._ID);
+					String sql = Strings
+							.replaceMap(
+									"SELECT %r_columns "
+											+ "FROM %refuelings "
+											+ "JOIN %cars ON %refuelings.%r_car_id = %cars.%id "
+											+ "UNION ALL SELECT %o_columns "
+											+ "FROM %othercosts "
+											+ "JOIN %cars ON %othercosts.%o_car_id = %cars.%id",
+									replacements);
+
+					CSVWriter writer = new CSVWriter();
+					synchronized (Helper.dbLock) {
+						SQLiteDatabase db = helper.getReadableDatabase();
+						Cursor cursor = db.rawQuery(sql, null);
+						writer.write(cursor, true);
+						cursor.close();
+					}
+
+					writer.toFile(export);
+				} else if (option == 1) { // Two files
+					File exportRefuelings = new File(dir, EXPORT_FILE_PREFIX
+							+ "_refuelings.csv");
+					File exportOtherCosts = new File(dir, EXPORT_FILE_PREFIX
+							+ "_othercosts.csv");
+					if (!overwrite
+							&& (exportRefuelings.exists() || exportOtherCosts
+									.exists())) {
+						Toast.makeText(getActivity(),
+								R.string.toast_export_failed_overwrite,
+								Toast.LENGTH_SHORT).show();
+						return;
+					}
+
+					// Build SQL select statement for refuelings
+					HashMap<String, String> replacementsRefuelings = new HashMap<String, String>();
+					replacementsRefuelings.put(
+							"%columns",
+							Strings.join(new String[] {
+									RefuelingTable.COL_DATE,
+									RefuelingTable.COL_TACHO,
+									RefuelingTable.COL_VOLUME,
+									RefuelingTable.COL_PRICE,
+									RefuelingTable.COL_PARTIAL,
+									RefuelingTable.COL_NOTE,
+									CarTable.NAME + "." + CarTable.COL_NAME
+											+ " AS carname",
+									CarTable.NAME + "." + CarTable.COL_COLOR
+											+ " AS carcolor" }, ", "));
+					replacementsRefuelings.put("%refuelings",
+							RefuelingTable.NAME);
+					replacementsRefuelings.put("%cars", CarTable.NAME);
+					replacementsRefuelings.put("%car_id",
+							RefuelingTable.COL_CAR);
+					replacementsRefuelings.put("%id", BaseColumns._ID);
+					String sqlRefuelings = Strings
+							.replaceMap(
+									"SELECT %columns "
+											+ "FROM %refuelings "
+											+ "JOIN %cars ON %refuelings.%car_id = %cars.%id ",
+									replacementsRefuelings);
+
+					// Build SQL select statement for other costs
+					HashMap<String, String> replacementsOtherCosts = new HashMap<String, String>();
+					replacementsOtherCosts.put(
+							"%columns",
+							Strings.join(new String[] {
+									OtherCostTable.COL_TITLE,
+									OtherCostTable.COL_DATE,
+									OtherCostTable.COL_TACHO,
+									OtherCostTable.COL_PRICE,
+									OtherCostTable.COL_REP_INT,
+									OtherCostTable.COL_REP_MULTI,
+									OtherCostTable.COL_NOTE,
+									CarTable.NAME + "." + CarTable.COL_NAME
+											+ " AS carname",
+									CarTable.NAME + "." + CarTable.COL_COLOR
+											+ " AS carcolor" }, ", "));
+					replacementsOtherCosts.put("%othercosts",
+							OtherCostTable.NAME);
+					replacementsOtherCosts.put("%cars", CarTable.NAME);
+					replacementsOtherCosts.put("%car_id",
+							OtherCostTable.COL_CAR);
+					replacementsOtherCosts.put("%id", BaseColumns._ID);
+					String sqlOtherCosts = Strings
+							.replaceMap(
+									"SELECT %columns "
+											+ "FROM %othercosts "
+											+ "JOIN %cars ON %othercosts.%car_id = %cars.%id",
+									replacementsOtherCosts);
+
+					CSVWriter writerRefuelings = new CSVWriter();
+					CSVWriter writerOtherCosts = new CSVWriter();
+					synchronized (Helper.dbLock) {
+						SQLiteDatabase db = helper.getReadableDatabase();
+						Cursor cursor = db.rawQuery(sqlRefuelings, null);
+						writerRefuelings.write(cursor, true);
+						cursor.close();
+						cursor = db.rawQuery(sqlOtherCosts, null);
+						writerOtherCosts.write(cursor, true);
+						cursor.close();
+					}
+
+					writerRefuelings.toFile(exportRefuelings);
+					writerOtherCosts.toFile(exportOtherCosts);
+				} else if (option == 2) { // Three files
+					File exportCars = new File(dir, EXPORT_FILE_PREFIX
+							+ "_cars.csv");
+					File exportRefuelings = new File(dir, EXPORT_FILE_PREFIX
+							+ "_refuelings.csv");
+					File exportOtherCosts = new File(dir, EXPORT_FILE_PREFIX
+							+ "_othercosts.csv");
+					if (!overwrite
+							&& (exportCars.exists()
+									|| exportRefuelings.exists() || exportOtherCosts
+										.exists())) {
+						Toast.makeText(getActivity(),
+								R.string.toast_export_failed_overwrite,
+								Toast.LENGTH_SHORT).show();
+						return;
+					}
+
+					CSVWriter writerCars = new CSVWriter();
+					CSVWriter writerRefuelings = new CSVWriter();
+					CSVWriter writerOtherCosts = new CSVWriter();
+					synchronized (Helper.dbLock) {
+						SQLiteDatabase db = helper.getReadableDatabase();
+						Cursor cursor = db.query(CarTable.NAME, null, null,
+								null, null, null, null);
+						writerCars.write(cursor, true);
+						cursor.close();
+						cursor = db.query(RefuelingTable.NAME, null, null,
+								null, null, null, null);
+						writerRefuelings.write(cursor, true);
+						cursor.close();
+						cursor = db.query(OtherCostTable.NAME, null, null,
+								null, null, null, null);
+						writerOtherCosts.write(cursor, true);
+						cursor.close();
+					}
+
+					writerCars.toFile(exportCars);
+					writerRefuelings.toFile(exportRefuelings);
+					writerOtherCosts.toFile(exportOtherCosts);
+				}
+
+				Toast.makeText(getActivity(), R.string.toast_export_success,
+						Toast.LENGTH_SHORT).show();
 			}
 		};
 	}

@@ -23,8 +23,10 @@ import java.text.SimpleDateFormat;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 
+@SuppressLint("SimpleDateFormat")
 public class DemoData {
 	public static void  addDemoData() {
 		DateFormat date = new SimpleDateFormat("dd.MM.yyyy kk:mm");

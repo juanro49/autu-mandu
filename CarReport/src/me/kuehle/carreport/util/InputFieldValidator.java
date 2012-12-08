@@ -71,17 +71,6 @@ public class InputFieldValidator {
 		NotEmpty, GreaterZero
 	}
 
-	private static String joinList(Vector<String> list) {
-		StringBuilder sb = new StringBuilder();
-		for (String line : list) {
-			if (sb.length() > 0) {
-				sb.append("\n");
-			}
-			sb.append(line);
-		}
-		return sb.toString();
-	}
-
 	private Context context;
 
 	private Vector<Field> requiredFields = new Vector<Field>();
@@ -108,7 +97,7 @@ public class InputFieldValidator {
 		if (messages.size() > 0) {
 			new AlertDialog.Builder(context)
 					.setTitle(R.string.alert_validate_title)
-					.setMessage(joinList(messages))
+					.setMessage(Strings.join(messages, "\n"))
 					.setPositiveButton(android.R.string.ok, null).show();
 		} else {
 			callback.validationSuccessfull();

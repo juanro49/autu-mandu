@@ -86,7 +86,7 @@ public class HelpActivity extends PreferenceActivity {
 		private String getLocale() {
 			String[] availableLocales = { "de", "en" };
 			String locale = Locale.getDefault().getLanguage().substring(0, 2)
-					.toLowerCase();
+					.toLowerCase(Locale.US);
 			if (Arrays.binarySearch(availableLocales, locale) < 0) {
 				return availableLocales[0];
 			} else {

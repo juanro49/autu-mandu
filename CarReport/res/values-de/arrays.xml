@@ -39,5 +39,10 @@
         <item>Gelb</item>
         <item>Rot</item>
     </string-array>
+    <string-array name="exportcsv_singlemultiplefile">
+        <item>Eine Datei</item>
+        <item>Zwei Dateien (Tankfüllungen, Andere Kosten)</item>
+        <item>Drei Dateien (Autos, Tankfüllungen, Andere Kosten)</item>
+    </string-array>
 
 </resources>
