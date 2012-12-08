@@ -512,11 +512,15 @@ public class PreferencesActivity extends PreferenceActivity {
 
 		private boolean copyFile(File from, File to) {
 			try {
-				FileChannel src = new FileInputStream(from).getChannel();
-				FileChannel dst = new FileOutputStream(to).getChannel();
+				FileInputStream inStream = new FileInputStream(from);
+				FileOutputStream outStream = new FileOutputStream(from);
+				FileChannel src = inStream.getChannel();
+				FileChannel dst = outStream.getChannel();
 				dst.transferFrom(src, 0, src.size());
 				src.close();
 				dst.close();
+				inStream.close();
+				outStream.close();
 				return true;
 			} catch (Exception e) {
 				return false;

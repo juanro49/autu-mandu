@@ -50,6 +50,8 @@ public class Recurrence {
 
 		int count = 1;
 		switch (interval) {
+		case ONCE:
+			break;
 		case DAY:
 			count += Days.daysBetween(then, now).getDays() / multiplier;
 			break;
