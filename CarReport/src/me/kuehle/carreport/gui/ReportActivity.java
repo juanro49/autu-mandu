@@ -78,6 +78,10 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			Preferences prefs = new Preferences(this);
 			actionBar.setSelectedNavigationItem(prefs.getDefaultReport());
 		}
+
+		ChartView graph = (ChartView) findViewById(R.id.graph);
+		graph.setNotEnoughDataView(View.inflate(this,
+				R.layout.chart_not_enough_data, null));
 	}
 
 	@Override
