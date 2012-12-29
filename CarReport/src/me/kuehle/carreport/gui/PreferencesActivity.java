@@ -532,7 +532,7 @@ public class PreferencesActivity extends PreferenceActivity {
 		private boolean copyFile(File from, File to) {
 			try {
 				FileInputStream inStream = new FileInputStream(from);
-				FileOutputStream outStream = new FileOutputStream(from);
+				FileOutputStream outStream = new FileOutputStream(to);
 				FileChannel src = inStream.getChannel();
 				FileChannel dst = outStream.getChannel();
 				dst.transferFrom(src, 0, src.size());
