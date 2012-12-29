@@ -17,7 +17,7 @@
 <resources>
 
     <string name="app_name">Car Report</string>
-    <string name="app_version">2.2</string>
+    <string name="app_version">2.3</string>
     <string name="app_description">Enter the costs of your car and receive nice reports and statistics.</string>
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
