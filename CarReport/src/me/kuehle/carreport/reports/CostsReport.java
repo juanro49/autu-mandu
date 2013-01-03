@@ -241,7 +241,7 @@ public class CostsReport extends AbstractReport {
 							otherCost.getPrice());
 					switch (recurrence.getInterval()) {
 					case ONCE:
-						date = date.plusYears(100);
+						date = DateTime.now().plusYears(1); // Set date after now, so the loop ends.
 						break;
 					case DAY:
 						date = date.plusDays(recurrence.getMultiplier());
@@ -319,6 +319,10 @@ public class CostsReport extends AbstractReport {
 		for (Car car : Car.getAll()) {
 			ReportGraphData data = option == 0 ? costsPerMonth.get(car.getId())
 					: costsPerYear.get(car.getId());
+			if(data.isEmpty()) {
+				continue;
+			}
+			
 			dataset.add(data.getSeries());
 			data.applySeriesStyle(series, renderer);
 			series++;

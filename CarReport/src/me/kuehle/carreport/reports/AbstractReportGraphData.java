@@ -114,6 +114,10 @@ public abstract class AbstractReportGraphData {
 		}
 		return series;
 	}
+	
+	public boolean isEmpty() {
+		return xValues.size() == 0 || yValues.size() == 0;
+	}
 
 	public int size() {
 		return xValues.size();
