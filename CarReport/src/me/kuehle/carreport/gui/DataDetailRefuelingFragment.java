@@ -23,7 +23,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.util.InputFieldValidator;
+import me.kuehle.carreport.util.gui.InputFieldValidator;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;

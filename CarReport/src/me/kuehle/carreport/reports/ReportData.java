@@ -18,9 +18,9 @@ package me.kuehle.carreport.reports;
 
 import java.util.ArrayList;
 
-import me.kuehle.carreport.util.SectionListAdapter.AbstractListItem;
-import me.kuehle.carreport.util.SectionListAdapter.Item;
-import me.kuehle.carreport.util.SectionListAdapter.Section;
+import me.kuehle.carreport.util.gui.SectionListAdapter.AbstractListItem;
+import me.kuehle.carreport.util.gui.SectionListAdapter.Item;
+import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
 
 public class ReportData {
 	private ArrayList<AbstractListItem> data = new ArrayList<AbstractListItem>();

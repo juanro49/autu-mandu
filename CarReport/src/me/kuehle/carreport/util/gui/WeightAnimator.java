@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.kuehle.carreport.util;
+package me.kuehle.carreport.util.gui;
 
 import android.view.View;
 import android.view.animation.Animation;

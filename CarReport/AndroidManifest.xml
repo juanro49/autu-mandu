@@ -26,7 +26,7 @@
         android:name="Application"
         android:allowBackup="true"
         android:allowClearUserData="true"
-        android:backupAgent="me.kuehle.carreport.util.BackupAgent"
+        android:backupAgent="me.kuehle.carreport.util.backup.BackupAgent"
         android:description="@string/app_description"
         android:enabled="true"
         android:hasCode="true"

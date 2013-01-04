@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package me.kuehle.carreport.util;
+package me.kuehle.carreport.util.gui;
 
 import java.util.Vector;
 
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.util.Strings;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.View;
