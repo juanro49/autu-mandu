@@ -218,7 +218,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			}
 
 			private void doExport(int option, boolean overwrite) {
-				if (!overwrite && csvExportImport.exportFilesExist(option)) {
+				if (!overwrite && csvExportImport.anyExportFileExist(option)) {
 					Toast.makeText(getActivity(),
 							R.string.toast_export_failed_overwrite,
 							Toast.LENGTH_SHORT).show();
@@ -227,6 +227,47 @@ public class PreferencesActivity extends PreferenceActivity {
 					Toast.makeText(getActivity(),
 							R.string.toast_export_success, Toast.LENGTH_SHORT)
 							.show();
+				}
+			}
+		};
+
+		private OnPreferenceClickListener mImportCSV = new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				LayoutInflater inflater = getActivity().getLayoutInflater();
+				final View view = inflater.inflate(R.layout.dialog_importcsv,
+						null);
+				new AlertDialog.Builder(getActivity())
+						.setTitle(R.string.pref_title_importcsv)
+						.setView(view)
+						.setPositiveButton(R.string.import_,
+								new OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										int option = ((Spinner) view
+												.findViewById(R.id.spnSingleMultipleFile))
+												.getSelectedItemPosition();
+										doImport(option);
+									}
+								})
+						.setNegativeButton(android.R.string.cancel, null)
+						.show();
+				return true;
+			}
+
+			private void doImport(int option) {
+				if (!csvExportImport.allExportFilesExist(option)) {
+					Toast.makeText(getActivity(),
+							R.string.toast_import_files_dont_exist,
+							Toast.LENGTH_SHORT).show();
+				} else if (csvExportImport.import_(option)) {
+					Toast.makeText(getActivity(),
+							R.string.toast_import_success, Toast.LENGTH_SHORT)
+							.show();
+				} else {
+					Toast.makeText(getActivity(), R.string.toast_import_failed,
+							Toast.LENGTH_SHORT).show();
 				}
 			}
 		};
@@ -256,6 +297,12 @@ public class PreferencesActivity extends PreferenceActivity {
 				Preference export = findPreference("exportcsv");
 				export.setEnabled(csvExportImport.canExport());
 				export.setOnPreferenceClickListener(mExportCSV);
+			}
+
+			// Import CSV
+			{
+				Preference import_ = findPreference("importcsv");
+				import_.setOnPreferenceClickListener(mImportCSV);
 			}
 		}
 
@@ -321,6 +368,7 @@ public class PreferencesActivity extends PreferenceActivity {
 				return convertView;
 			}
 		}
+
 		private static class CarViewHolder {
 			public TextView name;
 			public Button color;
@@ -339,6 +387,7 @@ public class PreferencesActivity extends PreferenceActivity {
 					String name = editInput.getText().toString();
 					if (name.length() > 0) {
 						editCar.setName(name);
+						editCar.save();
 						fillList();
 					}
 				}
@@ -369,6 +418,7 @@ public class PreferencesActivity extends PreferenceActivity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					editCar.setColor(getResources().getIntArray(R.array.colors)[which]);
+					editCar.save();
 					fillList();
 					dialog.dismiss();
 				}

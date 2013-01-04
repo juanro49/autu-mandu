@@ -17,13 +17,20 @@
 package me.kuehle.carreport.util.backup;
 
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
 
+import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.CarTable;
 import me.kuehle.carreport.db.Helper;
+import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.OtherCostTable;
+import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.db.RefuelingTable;
+import me.kuehle.carreport.util.CSVReader;
 import me.kuehle.carreport.util.CSVWriter;
+import me.kuehle.carreport.util.Recurrence;
+import me.kuehle.carreport.util.RecurrenceInterval;
 import me.kuehle.carreport.util.Strings;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -32,9 +39,11 @@ import android.provider.BaseColumns;
 
 public class CSVExportImport {
 	public static final String FILE_PREFIX = "carreport_export";
-	public static final int EXPORT_SINGLE_FILE = 0;
-	public static final int EXPORT_TWO_FILES = 1;
-	public static final int EXPORT_THREE_FILES = 2;
+	public static final int SINGLE_FILE = 0;
+	public static final int TWO_FILES = 1;
+	public static final int THREE_FILES = 2;
+
+	private static final String REFUELING_TITLE = "Refueling";
 
 	private File dir;
 
@@ -44,44 +53,47 @@ public class CSVExportImport {
 
 	public boolean export(int option) {
 		Helper helper = Helper.getInstance();
-		File dir = Environment.getExternalStorageDirectory();
-		if (option == EXPORT_SINGLE_FILE) {
+		if (option == SINGLE_FILE) {
 			File export = new File(dir, FILE_PREFIX + ".csv");
 
 			// Build SQL select statement
 			HashMap<String, String> replacements = new HashMap<String, String>();
-			replacements.put(
-					"%r_columns",
-					Strings.join(new String[] {
-							"'Refueling' AS title",
-							RefuelingTable.COL_DATE,
-							RefuelingTable.COL_TACHO,
-							RefuelingTable.COL_VOLUME,
-							RefuelingTable.COL_PRICE,
-							RefuelingTable.COL_PARTIAL,
-							"'0' AS repeat_interval",
-							"'1' AS repeat_multiplier",
-							RefuelingTable.COL_NOTE,
-							CarTable.NAME + "." + CarTable.COL_NAME
-									+ " AS carname",
-							CarTable.NAME + "." + CarTable.COL_COLOR
-									+ " AS carcolor" }, ", "));
-			replacements.put(
-					"%o_columns",
-					Strings.join(new String[] {
-							OtherCostTable.COL_TITLE,
-							OtherCostTable.COL_DATE,
-							OtherCostTable.COL_TACHO,
-							"'' AS volume",
-							OtherCostTable.COL_PRICE,
-							"'0' AS partial",
-							OtherCostTable.COL_REP_INT,
-							OtherCostTable.COL_REP_MULTI,
-							OtherCostTable.COL_NOTE,
-							CarTable.NAME + "." + CarTable.COL_NAME
-									+ " AS carname",
-							CarTable.NAME + "." + CarTable.COL_COLOR
-									+ " AS carcolor" }, ", "));
+			replacements.put("%r_columns", Strings.join(new String[] {
+					RefuelingTable.NAME + "." + BaseColumns._ID + " AS "
+							+ BaseColumns._ID,
+					"'" + REFUELING_TITLE + "' AS " + OtherCostTable.COL_TITLE,
+					RefuelingTable.COL_DATE,
+					RefuelingTable.COL_TACHO,
+					RefuelingTable.COL_VOLUME,
+					RefuelingTable.COL_PRICE,
+					RefuelingTable.COL_PARTIAL,
+					"'0' AS " + OtherCostTable.COL_REP_INT,
+					"'1' AS " + OtherCostTable.COL_REP_MULTI,
+					RefuelingTable.COL_NOTE,
+					CarTable.NAME + "." + BaseColumns._ID + " AS "
+							+ CarTable.NAME + BaseColumns._ID,
+					CarTable.NAME + "." + CarTable.COL_NAME + " AS "
+							+ CarTable.NAME + CarTable.COL_NAME,
+					CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
+							+ CarTable.NAME + CarTable.COL_COLOR }, ", "));
+			replacements.put("%o_columns", Strings.join(new String[] {
+					OtherCostTable.NAME + "." + BaseColumns._ID + " AS "
+							+ BaseColumns._ID,
+					OtherCostTable.COL_TITLE,
+					OtherCostTable.COL_DATE,
+					OtherCostTable.COL_TACHO,
+					"'' AS " + RefuelingTable.COL_VOLUME,
+					OtherCostTable.COL_PRICE,
+					"'0' AS " + RefuelingTable.COL_PARTIAL,
+					OtherCostTable.COL_REP_INT,
+					OtherCostTable.COL_REP_MULTI,
+					OtherCostTable.COL_NOTE,
+					CarTable.NAME + "." + BaseColumns._ID + " AS "
+							+ CarTable.NAME + BaseColumns._ID,
+					CarTable.NAME + "." + CarTable.COL_NAME + " AS "
+							+ CarTable.NAME + CarTable.COL_NAME,
+					CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
+							+ CarTable.NAME + CarTable.COL_COLOR }, ", "));
 			replacements.put("%refuelings", RefuelingTable.NAME);
 			replacements.put("%othercosts", OtherCostTable.NAME);
 			replacements.put("%cars", CarTable.NAME);
@@ -105,7 +117,7 @@ public class CSVExportImport {
 
 			writer.toFile(export);
 			return true;
-		} else if (option == EXPORT_TWO_FILES) {
+		} else if (option == TWO_FILES) {
 			File exportRefuelings = new File(dir, FILE_PREFIX
 					+ "_refuelings.csv");
 			File exportOtherCosts = new File(dir, FILE_PREFIX
@@ -113,19 +125,21 @@ public class CSVExportImport {
 
 			// Build SQL select statement for refuelings
 			HashMap<String, String> replacementsRefuelings = new HashMap<String, String>();
-			replacementsRefuelings.put(
-					"%columns",
-					Strings.join(new String[] {
-							RefuelingTable.COL_DATE,
-							RefuelingTable.COL_TACHO,
-							RefuelingTable.COL_VOLUME,
-							RefuelingTable.COL_PRICE,
-							RefuelingTable.COL_PARTIAL,
-							RefuelingTable.COL_NOTE,
-							CarTable.NAME + "." + CarTable.COL_NAME
-									+ " AS carname",
-							CarTable.NAME + "." + CarTable.COL_COLOR
-									+ " AS carcolor" }, ", "));
+			replacementsRefuelings.put("%columns", Strings.join(new String[] {
+					RefuelingTable.NAME + "." + BaseColumns._ID + " AS "
+							+ BaseColumns._ID,
+					RefuelingTable.COL_DATE,
+					RefuelingTable.COL_TACHO,
+					RefuelingTable.COL_VOLUME,
+					RefuelingTable.COL_PRICE,
+					RefuelingTable.COL_PARTIAL,
+					RefuelingTable.COL_NOTE,
+					CarTable.NAME + "." + BaseColumns._ID + " AS "
+							+ CarTable.NAME + BaseColumns._ID,
+					CarTable.NAME + "." + CarTable.COL_NAME + " AS "
+							+ CarTable.NAME + CarTable.COL_NAME,
+					CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
+							+ CarTable.NAME + CarTable.COL_COLOR }, ", "));
 			replacementsRefuelings.put("%refuelings", RefuelingTable.NAME);
 			replacementsRefuelings.put("%cars", CarTable.NAME);
 			replacementsRefuelings.put("%car_id", RefuelingTable.COL_CAR);
@@ -137,20 +151,22 @@ public class CSVExportImport {
 
 			// Build SQL select statement for other costs
 			HashMap<String, String> replacementsOtherCosts = new HashMap<String, String>();
-			replacementsOtherCosts.put(
-					"%columns",
-					Strings.join(new String[] {
-							OtherCostTable.COL_TITLE,
-							OtherCostTable.COL_DATE,
-							OtherCostTable.COL_TACHO,
-							OtherCostTable.COL_PRICE,
-							OtherCostTable.COL_REP_INT,
-							OtherCostTable.COL_REP_MULTI,
-							OtherCostTable.COL_NOTE,
-							CarTable.NAME + "." + CarTable.COL_NAME
-									+ " AS carname",
-							CarTable.NAME + "." + CarTable.COL_COLOR
-									+ " AS carcolor" }, ", "));
+			replacementsOtherCosts.put("%columns", Strings.join(new String[] {
+					OtherCostTable.NAME + "." + BaseColumns._ID + " AS "
+							+ BaseColumns._ID,
+					OtherCostTable.COL_TITLE,
+					OtherCostTable.COL_DATE,
+					OtherCostTable.COL_TACHO,
+					OtherCostTable.COL_PRICE,
+					OtherCostTable.COL_REP_INT,
+					OtherCostTable.COL_REP_MULTI,
+					OtherCostTable.COL_NOTE,
+					CarTable.NAME + "." + BaseColumns._ID + " AS "
+							+ CarTable.NAME + BaseColumns._ID,
+					CarTable.NAME + "." + CarTable.COL_NAME + " AS "
+							+ CarTable.NAME + CarTable.COL_NAME,
+					CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
+							+ CarTable.NAME + CarTable.COL_COLOR }, ", "));
 			replacementsOtherCosts.put("%othercosts", OtherCostTable.NAME);
 			replacementsOtherCosts.put("%cars", CarTable.NAME);
 			replacementsOtherCosts.put("%car_id", OtherCostTable.COL_CAR);
@@ -175,7 +191,7 @@ public class CSVExportImport {
 			writerRefuelings.toFile(exportRefuelings);
 			writerOtherCosts.toFile(exportOtherCosts);
 			return true;
-		} else if (option == EXPORT_THREE_FILES) {
+		} else if (option == THREE_FILES) {
 			File exportCars = new File(dir, FILE_PREFIX + "_cars.csv");
 			File exportRefuelings = new File(dir, FILE_PREFIX
 					+ "_refuelings.csv");
@@ -218,17 +234,40 @@ public class CSVExportImport {
 		return false;
 	}
 
-	public boolean exportFilesExist(int option) {
-		if (option == EXPORT_SINGLE_FILE) {
+	public boolean allExportFilesExist(int option) {
+		if (option == SINGLE_FILE) {
 			File export = new File(dir, FILE_PREFIX + ".csv");
 			return export.isFile();
-		} else if (option == EXPORT_TWO_FILES) {
+		} else if (option == TWO_FILES) {
+			File exportRefuelings = new File(dir, FILE_PREFIX
+					+ "_refuelings.csv");
+			File exportOtherCosts = new File(dir, FILE_PREFIX
+					+ "_othercosts.csv");
+			return exportRefuelings.isFile() && exportOtherCosts.isFile();
+		} else if (option == THREE_FILES) {
+			File exportCars = new File(dir, FILE_PREFIX + "_cars.csv");
+			File exportRefuelings = new File(dir, FILE_PREFIX
+					+ "_refuelings.csv");
+			File exportOtherCosts = new File(dir, FILE_PREFIX
+					+ "_othercosts.csv");
+			return exportCars.isFile() && exportRefuelings.isFile()
+					&& exportOtherCosts.isFile();
+		} else {
+			return false;
+		}
+	}
+
+	public boolean anyExportFileExist(int option) {
+		if (option == SINGLE_FILE) {
+			File export = new File(dir, FILE_PREFIX + ".csv");
+			return export.isFile();
+		} else if (option == TWO_FILES) {
 			File exportRefuelings = new File(dir, FILE_PREFIX
 					+ "_refuelings.csv");
 			File exportOtherCosts = new File(dir, FILE_PREFIX
 					+ "_othercosts.csv");
 			return exportRefuelings.isFile() || exportOtherCosts.isFile();
-		} else if (option == EXPORT_THREE_FILES) {
+		} else if (option == THREE_FILES) {
 			File exportCars = new File(dir, FILE_PREFIX + "_cars.csv");
 			File exportRefuelings = new File(dir, FILE_PREFIX
 					+ "_refuelings.csv");
@@ -241,7 +280,164 @@ public class CSVExportImport {
 		}
 	}
 
-	public boolean import_() {
-		return false;
+	public boolean import_(int option) {
+		if (!allExportFilesExist(option)) {
+			return false;
+		}
+
+		boolean errors = false;
+		if (option == SINGLE_FILE) {
+			File export = new File(dir, FILE_PREFIX + ".csv");
+			CSVReader reader = CSVReader.fromFile(export, true);
+
+			for (int i = 0; i < reader.getRowCount(); i++) {
+				try {
+					importCar(reader, i, CarTable.NAME);
+					if (reader.getString(i, OtherCostTable.COL_TITLE).equals(
+							REFUELING_TITLE)) {
+						importRefueling(reader, i);
+					} else {
+						importOtherCost(reader, i);
+					}
+				} catch (Exception e) {
+					errors = true;
+				}
+			}
+		} else if (option == TWO_FILES) {
+			File exportRefuelings = new File(dir, FILE_PREFIX
+					+ "_refuelings.csv");
+			File exportOtherCosts = new File(dir, FILE_PREFIX
+					+ "_othercosts.csv");
+			CSVReader readerRefuelings = CSVReader.fromFile(exportRefuelings,
+					true);
+			CSVReader readerOtherCosts = CSVReader.fromFile(exportOtherCosts,
+					true);
+
+			for (int i = 0; i < readerRefuelings.getRowCount(); i++) {
+				try {
+					importCar(readerRefuelings, i, CarTable.NAME);
+					importRefueling(readerRefuelings, i);
+				} catch (Exception e) {
+					errors = true;
+				}
+			}
+			for (int i = 0; i < readerOtherCosts.getRowCount(); i++) {
+				try {
+					importCar(readerOtherCosts, i, CarTable.NAME);
+					importOtherCost(readerOtherCosts, i);
+				} catch (Exception e) {
+					errors = true;
+				}
+			}
+		} else if (option == THREE_FILES) {
+			File exportCars = new File(dir, FILE_PREFIX + "_cars.csv");
+			File exportRefuelings = new File(dir, FILE_PREFIX
+					+ "_refuelings.csv");
+			File exportOtherCosts = new File(dir, FILE_PREFIX
+					+ "_othercosts.csv");
+			CSVReader readerCars = CSVReader.fromFile(exportCars, true);
+			CSVReader readerRefuelings = CSVReader.fromFile(exportRefuelings,
+					true);
+			CSVReader readerOtherCosts = CSVReader.fromFile(exportOtherCosts,
+					true);
+
+			for (int i = 0; i < readerCars.getRowCount(); i++) {
+				try {
+					importCar(readerCars, i, "");
+				} catch (Exception e) {
+					errors = true;
+				}
+			}
+			for (int i = 0; i < readerRefuelings.getRowCount(); i++) {
+				try {
+					importRefueling(readerRefuelings, i);
+				} catch (Exception e) {
+					errors = true;
+				}
+			}
+			for (int i = 0; i < readerOtherCosts.getRowCount(); i++) {
+				try {
+					importOtherCost(readerOtherCosts, i);
+				} catch (Exception e) {
+					errors = true;
+				}
+			}
+		} else {
+			errors = true;
+		}
+
+		return !errors;
+	}
+
+	private void importCar(CSVReader reader, int row, String titlePrefix) {
+		int id = reader.getInt(row, titlePrefix + BaseColumns._ID);
+		String name = reader.getString(row, titlePrefix + CarTable.COL_NAME);
+		int color = reader.getInt(row, titlePrefix + CarTable.COL_COLOR);
+
+		try {
+			Car car = new Car(id);
+			car.setName(name);
+			car.setColor(color);
+			car.save();
+		} catch (IllegalArgumentException e) {
+			Car.create(id, name, color);
+		}
+	}
+
+	private void importRefueling(CSVReader reader, int row) {
+		int id = reader.getInt(row, BaseColumns._ID);
+		Date date = new Date(reader.getLong(row, RefuelingTable.COL_DATE));
+		int mileage = reader.getInt(row, RefuelingTable.COL_TACHO);
+		float volume = reader.getFloat(row, RefuelingTable.COL_VOLUME);
+		float price = reader.getFloat(row, RefuelingTable.COL_PRICE);
+		boolean partial = reader.getInt(row, RefuelingTable.COL_PARTIAL) > 0;
+		String note = reader.getString(row, RefuelingTable.COL_NOTE);
+		int carID = reader.getInt(row, CarTable.NAME + BaseColumns._ID);
+
+		Car car = new Car(carID);
+		try {
+			Refueling refueling = new Refueling(id);
+			refueling.setDate(date);
+			refueling.setMileage(mileage);
+			refueling.setVolume(volume);
+			refueling.setPrice(price);
+			refueling.setPartial(partial);
+			refueling.setNote(note);
+			refueling.setCar(car);
+			refueling.save();
+		} catch (IllegalArgumentException e) {
+			Refueling.create(id, date, mileage, volume, price, partial, note,
+					car);
+		}
+	}
+
+	private void importOtherCost(CSVReader reader, int row) {
+		int id = reader.getInt(row, BaseColumns._ID);
+		String title = reader.getString(row, OtherCostTable.COL_TITLE);
+		Date date = new Date(reader.getLong(row, OtherCostTable.COL_DATE));
+		int mileage = reader.getInt(row, OtherCostTable.COL_TACHO);
+		float price = reader.getFloat(row, OtherCostTable.COL_PRICE);
+		int repeatInterval = reader.getInt(row, OtherCostTable.COL_REP_INT);
+		int repeatMultiplier = reader.getInt(row, OtherCostTable.COL_REP_MULTI);
+		String note = reader.getString(row, OtherCostTable.COL_NOTE);
+		int carID = reader.getInt(row, CarTable.NAME + BaseColumns._ID);
+
+		Recurrence recurrence = new Recurrence(
+				RecurrenceInterval.getByValue(repeatInterval), repeatMultiplier);
+		Car car = new Car(carID);
+		try {
+			OtherCost otherCost = new OtherCost(id);
+			otherCost.setTitle(title);
+			otherCost.setDate(date);
+			otherCost.setMileage(mileage);
+			otherCost.setPrice(price);
+			otherCost.setRecurrence(recurrence);
+			otherCost.setNote(note);
+			otherCost.setCar(car);
+			otherCost.save();
+		} catch (IllegalArgumentException e) {
+			OtherCost.create(id, title, date, mileage, price, recurrence, note,
+					car);
+		}
 	}
 }

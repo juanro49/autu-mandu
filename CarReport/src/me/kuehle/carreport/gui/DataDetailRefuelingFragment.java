@@ -188,6 +188,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			refueling.setPartial(partial);
 			refueling.setNote(note);
 			refueling.setCar(car);
+			refueling.save();
 		}
 
 		saveSuccess();

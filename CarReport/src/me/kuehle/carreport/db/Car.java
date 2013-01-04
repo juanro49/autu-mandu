@@ -60,7 +60,6 @@ public class Car extends AbstractItem {
 
 	public void setName(String name) {
 		this.name = name;
-		save();
 	}
 
 	public int getColor() {
@@ -69,7 +68,6 @@ public class Car extends AbstractItem {
 
 	public void setColor(int color) {
 		this.color = color;
-		save();
 	}
 
 	public void delete() {
@@ -87,7 +85,7 @@ public class Car extends AbstractItem {
 		}
 	}
 
-	private void save() {
+	public void save() {
 		if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
 			ContentValues values = new ContentValues();
@@ -104,18 +102,29 @@ public class Car extends AbstractItem {
 	}
 
 	public static Car create(String name, int color) {
-		Helper helper = Helper.getInstance();
+		return create(-1, name, color);
+	}
+
+	public static Car create(int id, String name, int color) {
 		ContentValues values = new ContentValues();
+		if (id != -1) {
+			values.put(BaseColumns._ID, id);
+		}
 		values.put(CarTable.COL_NAME, name);
 		values.put(CarTable.COL_COLOR, color);
 
-		int id;
+		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
 			SQLiteDatabase db = helper.getWritableDatabase();
 			id = (int) db.insert(CarTable.NAME, null, values);
 		}
-		helper.dataChanged();
 
+		if (id == -1) {
+			throw new IllegalArgumentException(
+					"A car with this ID does already exist!");
+		}
+
+		helper.dataChanged();
 		return new Car(id, name, color);
 	}
 

@@ -45,7 +45,7 @@ public class OtherCost extends AbstractItem {
 			if (cursor.getCount() != 1) {
 				cursor.close();
 				throw new IllegalArgumentException(
-						"A fuel with this ID does not exist!");
+						"An other cost with this ID does not exist!");
 			} else {
 				cursor.moveToFirst();
 				this.id = id;
@@ -81,7 +81,6 @@ public class OtherCost extends AbstractItem {
 
 	public void setTitle(String title) {
 		this.title = title;
-		save();
 	}
 
 	public Date getDate() {
@@ -90,7 +89,6 @@ public class OtherCost extends AbstractItem {
 
 	public void setDate(Date date) {
 		this.date = date;
-		save();
 	}
 
 	public int getMileage() {
@@ -99,7 +97,6 @@ public class OtherCost extends AbstractItem {
 
 	public void setMileage(int mileage) {
 		this.mileage = mileage;
-		save();
 	}
 
 	public float getPrice() {
@@ -108,7 +105,6 @@ public class OtherCost extends AbstractItem {
 
 	public void setPrice(float price) {
 		this.price = price;
-		save();
 	}
 
 	public Recurrence getRecurrence() {
@@ -125,7 +121,6 @@ public class OtherCost extends AbstractItem {
 
 	public void setNote(String note) {
 		this.note = note;
-		save();
 	}
 
 	public Car getCar() {
@@ -134,7 +129,6 @@ public class OtherCost extends AbstractItem {
 
 	public void setCar(Car car) {
 		this.car = car;
-		save();
 	}
 
 	public void delete() {
@@ -150,7 +144,7 @@ public class OtherCost extends AbstractItem {
 		}
 	}
 
-	private void save() {
+	public void save() {
 		if (!isDeleted()) {
 			ContentValues values = new ContentValues();
 			values.put(OtherCostTable.COL_TITLE, title);
@@ -175,7 +169,15 @@ public class OtherCost extends AbstractItem {
 
 	public static OtherCost create(String title, Date date, int mileage,
 			float price, Recurrence recurrence, String note, Car car) {
+		return create(-1, title, date, mileage, price, recurrence, note, car);
+	}
+	
+	public static OtherCost create(int id, String title, Date date, int mileage,
+			float price, Recurrence recurrence, String note, Car car) {
 		ContentValues values = new ContentValues();
+		if (id != -1) {
+			values.put(BaseColumns._ID, id);
+		}
 		values.put(OtherCostTable.COL_TITLE, title);
 		values.put(OtherCostTable.COL_DATE, date.getTime());
 		values.put(OtherCostTable.COL_TACHO, mileage);
@@ -187,11 +189,16 @@ public class OtherCost extends AbstractItem {
 		values.put(OtherCostTable.COL_CAR, car.getId());
 
 		Helper helper = Helper.getInstance();
-		int id;
 		synchronized (Helper.dbLock) {
 			SQLiteDatabase db = helper.getWritableDatabase();
 			id = (int) db.insert(OtherCostTable.NAME, null, values);
 		}
+		
+		if (id == -1) {
+			throw new IllegalArgumentException(
+					"An other cost with this ID does already exist!");
+		}
+		
 		helper.dataChanged();
 
 		return new OtherCost(id, title, date, mileage, price, recurrence,

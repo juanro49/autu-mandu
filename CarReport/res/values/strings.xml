@@ -75,6 +75,7 @@
     <string name="overwrite">Overwrite</string>
     <string name="restore">Restore</string>
     <string name="export">Export</string>
+    <string name="import_">Import</string>
     <string name="toast_refueling_saved">Refueling saved.</string>
     <string name="toast_refueling_deleted">Refueling deleted.</string>
     <string name="toast_other_saved">Other cost saved.</string>
@@ -85,6 +86,9 @@
     <string name="toast_restore_failed">Restore failed.</string>
     <string name="toast_export_success">Export to SD card completed successfully.</string>
     <string name="toast_export_failed_overwrite">Export failed because a file does already exist on SD card.</string>
+    <string name="toast_import_success">Import completed successfully.</string>
+    <string name="toast_import_failed">Errors occurred during import. Please cofirm, that your data is still valid.</string>
+    <string name="toast_import_files_dont_exist">The files, that are needed for the import, do not exist on the SD card.</string>
     <string name="tab_indicator_refuelings">Refuelings</string>
     <string name="tab_indicator_other">Other costs</string>
     <string name="graph_options_desc">Graph options</string>
@@ -118,6 +122,7 @@
     <string name="pref_title_category_units">Units</string>
     <string name="pref_title_category_backup">Backup &amp; Restore</string>
     <string name="pref_title_category_export">Export</string>
+    <string name="pref_title_category_import">Import</string>
     <string name="pref_title_default_car">Car</string>
     <string name="pref_title_default_report">Report</string>
     <string name="pref_title_appearance_overall_section_pos">Position of section Overall</string>
@@ -129,6 +134,7 @@
     <string name="pref_title_backup">Backup</string>
     <string name="pref_title_restore">Restore</string>
     <string name="pref_title_exportcsv">Export CSV</string>
+    <string name="pref_title_importcsv">Import CSV</string>
     <string name="pref_summary_appearance_overall_section_pos">The section Overall displays average values, when you use the app for more than one car. Set position: %s</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
@@ -136,6 +142,7 @@
     <string name="pref_summary_restore">Restore data from file %s on SD card.</string>
     <string name="pref_summary_restore_no_data">File %s does not exist on SD card.</string>
     <string name="pref_summary_exportcsv">Export data as CSV so you can use it in other programs like Microsoft Excel or LibreOffice Calc.</string>
+    <string name="pref_summary_importcsv">Import data from CSV files. The files must look like the ones, that are generated during CSV export. Import will update existing entries and add new ones, but it will not delete entries.</string>
     <string name="help_section_getting_started">Getting started</string>
     <string name="help_section_tips">Tips</string>
     <string name="help_section_calculations">Calculations</string>

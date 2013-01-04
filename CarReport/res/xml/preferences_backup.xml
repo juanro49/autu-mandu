@@ -16,4 +16,10 @@
             android:summary="@string/pref_summary_exportcsv"
             android:title="@string/pref_title_exportcsv" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_title_category_import" >
+        <Preference
+            android:key="importcsv"
+            android:summary="@string/pref_summary_importcsv"
+            android:title="@string/pref_title_importcsv" />
+    </PreferenceCategory>
 </PreferenceScreen>

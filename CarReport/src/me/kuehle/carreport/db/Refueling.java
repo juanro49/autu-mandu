@@ -43,7 +43,7 @@ public class Refueling extends AbstractItem {
 			if (cursor.getCount() != 1) {
 				cursor.close();
 				throw new IllegalArgumentException(
-						"A fuel with this ID does not exist!");
+						"A refueling with this ID does not exist!");
 			} else {
 				cursor.moveToFirst();
 				this.id = id;
@@ -77,7 +77,6 @@ public class Refueling extends AbstractItem {
 
 	public void setDate(Date date) {
 		this.date = date;
-		save();
 	}
 
 	public int getMileage() {
@@ -86,7 +85,6 @@ public class Refueling extends AbstractItem {
 
 	public void setMileage(int mileage) {
 		this.mileage = mileage;
-		save();
 	}
 
 	public float getVolume() {
@@ -95,7 +93,6 @@ public class Refueling extends AbstractItem {
 
 	public void setVolume(float volume) {
 		this.volume = volume;
-		save();
 	}
 
 	public float getPrice() {
@@ -104,7 +101,6 @@ public class Refueling extends AbstractItem {
 
 	public void setPrice(float price) {
 		this.price = price;
-		save();
 	}
 
 	public boolean isPartial() {
@@ -113,7 +109,6 @@ public class Refueling extends AbstractItem {
 
 	public void setPartial(boolean partial) {
 		this.partial = partial;
-		save();
 	}
 
 	public String getNote() {
@@ -122,7 +117,6 @@ public class Refueling extends AbstractItem {
 
 	public void setNote(String note) {
 		this.note = note;
-		save();
 	}
 
 	public Car getCar() {
@@ -131,7 +125,6 @@ public class Refueling extends AbstractItem {
 
 	public void setCar(Car car) {
 		this.car = car;
-		save();
 	}
 
 	public void delete() {
@@ -147,7 +140,7 @@ public class Refueling extends AbstractItem {
 		}
 	}
 
-	private void save() {
+	public void save() {
 		if (!isDeleted()) {
 			ContentValues values = new ContentValues();
 			values.put(RefuelingTable.COL_DATE, date.getTime());
@@ -170,7 +163,15 @@ public class Refueling extends AbstractItem {
 
 	public static Refueling create(Date date, int mileage, float volume,
 			float price, boolean partial, String note, Car car) {
+		return create(-1, date, mileage, volume, price, partial, note, car);
+	}
+	
+	public static Refueling create(int id, Date date, int mileage, float volume,
+			float price, boolean partial, String note, Car car) {
 		ContentValues values = new ContentValues();
+		if (id != -1) {
+			values.put(BaseColumns._ID, id);
+		}
 		values.put(RefuelingTable.COL_DATE, date.getTime());
 		values.put(RefuelingTable.COL_TACHO, mileage);
 		values.put(RefuelingTable.COL_VOLUME, volume);
@@ -180,11 +181,16 @@ public class Refueling extends AbstractItem {
 		values.put(RefuelingTable.COL_CAR, car.getId());
 
 		Helper helper = Helper.getInstance();
-		int id;
 		synchronized (Helper.dbLock) {
 			SQLiteDatabase db = helper.getWritableDatabase();
 			id = (int) db.insert(RefuelingTable.NAME, null, values);
 		}
+		
+		if (id == -1) {
+			throw new IllegalArgumentException(
+					"A refueling with this ID does already exist!");
+		}
+		
 		helper.dataChanged();
 
 		return new Refueling(id, date, mileage, volume, price, partial,

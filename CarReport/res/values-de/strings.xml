@@ -75,6 +75,7 @@
     <string name="overwrite">Überschreiben</string>
     <string name="restore">Wiederherstellen</string>
     <string name="export">Exportieren</string>
+    <string name="import_">Importieren</string>
     <string name="toast_refueling_saved">Tankfüllung gespeichert.</string>
     <string name="toast_refueling_deleted">Tankfüllung gelöscht.</string>
     <string name="toast_other_saved">Andere Kosten gespeichert.</string>
@@ -85,6 +86,9 @@
     <string name="toast_restore_failed">Wiederherstellen fehlgeschlagen.</string>
     <string name="toast_export_success">Exportieren der Daten auf die SD-Karte war erfolgreich.</string>
     <string name="toast_export_failed_overwrite">Exportieren fehlgeschlagen, weil schon eine Datei mit dem Namen auf der SD-Karte existiert.</string>
+    <string name="toast_import_success">Importieren der Daten war erfolgreich.</string>
+    <string name="toast_import_failed">Beim Import sind Fehler aufgetreten. Bitte stellen Sie sicher, dass Ihre Daten noch in Ordnung sind.</string>
+    <string name="toast_import_files_dont_exist">Die Dateien, die zum Import nötig sind, sind nicht auf der SD-Karte vorhanden.</string>
     <string name="tab_indicator_refuelings">Tankfüllungen</string>
     <string name="tab_indicator_other">Andere Kosten</string>
     <string name="graph_options_desc">Graph-Optionen</string>
@@ -118,6 +122,7 @@
     <string name="pref_title_category_units">Einheiten</string>
     <string name="pref_title_category_backup">Sichern &amp; Wiederherstellen</string>
     <string name="pref_title_category_export">Exportieren</string>
+    <string name="pref_title_category_import">Importieren</string>
     <string name="pref_title_default_car">Auto</string>
     <string name="pref_title_default_report">Report</string>
     <string name="pref_title_appearance_overall_section_pos">Position des Abschnittes Gesamt</string>
@@ -129,6 +134,7 @@
     <string name="pref_title_backup">Sichern</string>
     <string name="pref_title_restore">Wiederherstellen</string>
     <string name="pref_title_exportcsv">CSV exportieren</string>
+    <string name="pref_title_importcsv">CSV importieren</string>
     <string name="pref_summary_appearance_overall_section_pos">Der Abschnitt Gesamt zeigt Durchschnittswerte an, wenn Sie mehr als ein Auto haben. Eingestellte Position: %s</string>
     <string name="pref_summary_appearance_color_sections">Zeige die Überschriften der Abschnitte in der Farbe des dazugehörigen Autos.</string>
     <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
@@ -136,6 +142,7 @@
     <string name="pref_summary_restore">Stelle Daten aus der Datei %s von der SD-Karte wieder her.</string>
     <string name="pref_summary_restore_no_data">Datei %s wurde auf der SD-Karte nicht gefunden.</string>
     <string name="pref_summary_exportcsv">Exportieren Sie die Daten als CSV, um sie in anderen Programmen wie Microsoft Excel oder LibreOffice Calc verwenden zu können.</string>
+    <string name="pref_summary_importcsv">Importieren Sie Daten aus CSV-Dateien. Die Dateien müssen so aussehen, wie die, die beim Export generiert werden. Beim Import werden bestehende Einträge aktualisiert und neue hinzugefügt, aber es werden keine Einträge gelöscht.</string>
     <string name="help_section_getting_started">Einstieg</string>
     <string name="help_section_tips">Tipps</string>
     <string name="help_section_calculations">Berechnungen</string>

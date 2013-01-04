@@ -196,6 +196,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			other.setRecurrence(recurrence);
 			other.setNote(note);
 			other.setCar(car);
+			other.save();
 		}
 
 		saveSuccess();
