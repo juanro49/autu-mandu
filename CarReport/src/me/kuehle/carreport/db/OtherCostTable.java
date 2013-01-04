@@ -16,6 +16,7 @@
 
 package me.kuehle.carreport.db;
 
+import me.kuehle.carreport.util.Strings;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
@@ -48,12 +49,24 @@ public class OtherCostTable {
 			+ COL_REP_MULTI + " INTEGER NOT NULL DEFAULT 1,"
 			+ COL_NOTE + " TEXT NOT NULL,"
 			+ COL_CAR + " INTEGER NOT NULL,"
-			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + "));";
+			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE CASCADE);";
 	
-	private static final String STMT_UPGRADE_1TO2_1 = "ALTER TABLE " + NAME
-			+ " ADD COLUMN " + COL_REP_INT + " INTEGER NOT NULL DEFAULT 0;";
-	private static final String STMT_UPGRADE_1TO2_2 = "ALTER TABLE " + NAME
-			+ " ADD COLUMN " + COL_REP_MULTI + " INTEGER NOT NULL DEFAULT 1;";
+	// Add recurrence columns.
+	private static final String[] STMT_UPGRADE_1TO2 = {
+		"ALTER TABLE " + NAME + " ADD COLUMN " + COL_REP_INT + " INTEGER NOT NULL DEFAULT 0;",
+		"ALTER TABLE " + NAME + " ADD COLUMN " + COL_REP_MULTI + " INTEGER NOT NULL DEFAULT 1;"
+	};
+	
+	// Add ON DELETE and ON UPDATE actions to cars_id column.
+	private static final String[] STMT_UPGRADE_1TO3 = {
+		STMT_CREATE.replaceFirst(NAME, NAME + "2"),
+		"INSERT INTO " + NAME + "2 (" + Strings.join(new String[] { BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO, COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE, COL_CAR }, ", ") + ") "
+			+ "SELECT " + Strings.join(new String[] { NAME + "." + BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO, COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE, COL_CAR }, ", ") + " "
+			+ "FROM " + NAME + " "
+			+ "JOIN " + CarTable.NAME + " ON " + CarTable.NAME + "." + BaseColumns._ID + " = " + NAME + "." + COL_CAR + ";",
+		"DROP TABLE " + NAME + ";",
+		"ALTER TABLE " + NAME + "2 RENAME TO " + NAME + ";"
+	};
 	
 	public static void onCreate(SQLiteDatabase db) {
 		db.execSQL(STMT_CREATE);
@@ -62,8 +75,14 @@ public class OtherCostTable {
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
 		if (oldVersion == 1 && newVersion == 2) {
-			db.execSQL(STMT_UPGRADE_1TO2_1);
-			db.execSQL(STMT_UPGRADE_1TO2_2);
+			for(String stmt : STMT_UPGRADE_1TO2) {
+				db.execSQL(stmt);
+			}
+		}
+		if((oldVersion == 1 || oldVersion == 2) && newVersion == 3) {
+			for(String stmt : STMT_UPGRADE_1TO3) {
+				db.execSQL(stmt);
+			}
 		}
 	}
 }

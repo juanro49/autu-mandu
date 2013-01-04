@@ -16,6 +16,7 @@
 
 package me.kuehle.carreport.db;
 
+import me.kuehle.carreport.util.Strings;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
@@ -36,7 +37,7 @@ public class RefuelingTable {
 		COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR
 	};
 	
-	private static final String STMT_CREATE = "create table " + NAME + "( "
+	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
 			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COL_DATE + " INTEGER NOT NULL,"
 			+ COL_TACHO + " INTEGER NOT NULL,"
@@ -45,7 +46,18 @@ public class RefuelingTable {
 			+ COL_PARTIAL + " INTEGER NOT NULL,"
 			+ COL_NOTE + " TEXT NOT NULL,"
 			+ COL_CAR + " INTEGER NOT NULL,"
-			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + "));";
+			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE CASCADE);";
+	
+	// Add ON DELETE and ON UPDATE actions to cars_id column.
+	private static final String[] STMT_UPGRADE_1TO3 = {
+		STMT_CREATE.replaceFirst(NAME, NAME + "2"),
+		"INSERT INTO " + NAME + "2 (" + Strings.join(new String[] { BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME, COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR }, ", ") + ") "
+			+ "SELECT " + Strings.join(new String[] { NAME + "." + BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME, COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR }, ", ") + " "
+			+ "FROM " + NAME + " "
+			+ "JOIN " + CarTable.NAME + " ON " + CarTable.NAME + "." + BaseColumns._ID + " = " + NAME + "." + COL_CAR + ";",
+		"DROP TABLE " + NAME + ";",
+		"ALTER TABLE " + NAME + "2 RENAME TO " + NAME + ";"
+	};
 	
 	public static void onCreate(SQLiteDatabase db) {
 		db.execSQL(STMT_CREATE);
@@ -53,6 +65,10 @@ public class RefuelingTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		
+		if((oldVersion == 1 || oldVersion == 2) && newVersion == 3) {
+			for(String stmt : STMT_UPGRADE_1TO3) {
+				db.execSQL(stmt);
+			}
+		}
 	}
 }
