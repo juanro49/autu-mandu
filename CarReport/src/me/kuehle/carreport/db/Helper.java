@@ -60,6 +60,14 @@ public class Helper extends SQLiteOpenHelper {
 	}
 
 	@Override
+	public void onOpen(SQLiteDatabase db) {
+		super.onOpen(db);
+		if (!db.isReadOnly()) {
+			db.execSQL("PRAGMA foreign_keys=ON;");
+		}
+	}
+
+	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		CarTable.onUpgrade(db, oldVersion, newVersion);
 		RefuelingTable.onUpgrade(db, oldVersion, newVersion);
