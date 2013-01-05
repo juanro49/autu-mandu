@@ -41,14 +41,14 @@ public class OtherCostTable {
 	
 	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
 			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-			+ COL_TITLE + " TEXT NOT NULL,"
-			+ COL_DATE + " INTEGER NOT NULL,"
-			+ COL_TACHO + " INTEGER NOT NULL DEFAULT -1,"
-			+ COL_PRICE + " REAL NOT NULL,"
-			+ COL_REP_INT + " INTEGER NOT NULL DEFAULT 0,"
-			+ COL_REP_MULTI + " INTEGER NOT NULL DEFAULT 1,"
-			+ COL_NOTE + " TEXT NOT NULL,"
-			+ COL_CAR + " INTEGER NOT NULL,"
+			+ COL_TITLE + " TEXT NOT NULL, "
+			+ COL_DATE + " INTEGER NOT NULL, "
+			+ COL_TACHO + " INTEGER NOT NULL DEFAULT -1, "
+			+ COL_PRICE + " REAL NOT NULL, "
+			+ COL_REP_INT + " INTEGER NOT NULL DEFAULT 0, "
+			+ COL_REP_MULTI + " INTEGER NOT NULL DEFAULT 1, "
+			+ COL_NOTE + " TEXT NOT NULL, "
+			+ COL_CAR + " INTEGER NOT NULL, "
 			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE CASCADE);";
 	
 	// Add recurrence columns.
@@ -58,7 +58,7 @@ public class OtherCostTable {
 	};
 	
 	// Add ON DELETE and ON UPDATE actions to cars_id column.
-	private static final String[] STMT_UPGRADE_1TO3 = {
+	private static final String[] STMT_UPGRADE_2TO3 = {
 		STMT_CREATE.replaceFirst(NAME, NAME + "2"),
 		"INSERT INTO " + NAME + "2 (" + Strings.join(new String[] { BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO, COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE, COL_CAR }, ", ") + ") "
 			+ "SELECT " + Strings.join(new String[] { NAME + "." + BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO, COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE, COL_CAR }, ", ") + " "
@@ -74,13 +74,13 @@ public class OtherCostTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		if (oldVersion == 1 && newVersion == 2) {
+		if (oldVersion == 1 && newVersion >= 2) {
 			for(String stmt : STMT_UPGRADE_1TO2) {
 				db.execSQL(stmt);
 			}
 		}
 		if((oldVersion == 1 || oldVersion == 2) && newVersion == 3) {
-			for(String stmt : STMT_UPGRADE_1TO3) {
+			for(String stmt : STMT_UPGRADE_2TO3) {
 				db.execSQL(stmt);
 			}
 		}

@@ -39,13 +39,13 @@ public class RefuelingTable {
 	
 	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
 			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-			+ COL_DATE + " INTEGER NOT NULL,"
-			+ COL_TACHO + " INTEGER NOT NULL,"
-			+ COL_VOLUME + " REAL NOT NULL,"
-			+ COL_PRICE + " REAL NOT NULL,"
-			+ COL_PARTIAL + " INTEGER NOT NULL,"
-			+ COL_NOTE + " TEXT NOT NULL,"
-			+ COL_CAR + " INTEGER NOT NULL,"
+			+ COL_DATE + " INTEGER NOT NULL, "
+			+ COL_TACHO + " INTEGER NOT NULL, "
+			+ COL_VOLUME + " REAL NOT NULL, "
+			+ COL_PRICE + " REAL NOT NULL, "
+			+ COL_PARTIAL + " INTEGER NOT NULL, "
+			+ COL_NOTE + " TEXT NOT NULL, "
+			+ COL_CAR + " INTEGER NOT NULL, "
 			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE CASCADE);";
 	
 	// Add ON DELETE and ON UPDATE actions to cars_id column.
