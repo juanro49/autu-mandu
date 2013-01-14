@@ -25,17 +25,24 @@ public class CarTable {
 	
 	public static final String COL_NAME = "name";
 	public static final String COL_COLOR = "color";
+	public static final String COL_SUSPENDED = "suspended_since";
 	
 	public static final String[] ALL_COLUMNS = {
-		BaseColumns._ID, COL_NAME, COL_COLOR
+		BaseColumns._ID, COL_NAME, COL_COLOR, COL_SUSPENDED
 	};
 	
 	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
 			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COL_NAME + " TEXT NOT NULL, "
-			+ COL_COLOR + " INTEGER NOT NULL);";
+			+ COL_COLOR + " INTEGER NOT NULL, "
+			+ COL_SUSPENDED + " INTEGER DEFAULT NULL);";
 	private static final String STMT_INSERT_DEFAULT = "INSERT INTO " + NAME
+			+ "(" + BaseColumns._ID + ", " + COL_NAME + ", " + COL_COLOR + ")"
 			+ " VALUES(1, 'Default Car', " + Color.BLUE + ");";
+	
+	// Add suspended column.
+	private static final String STMT_UPGRADE_3TO4 =
+			"ALTER TABLE " + NAME + " ADD COLUMN " + COL_SUSPENDED + " INTEGER DEFAULT NULL;";
 	
 	public static void onCreate(SQLiteDatabase db) {
 		db.execSQL(STMT_CREATE);
@@ -44,6 +51,8 @@ public class CarTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		
+		if(oldVersion <= 3) {
+			db.execSQL(STMT_UPGRADE_3TO4);
+		}
 	}
 }

@@ -30,6 +30,8 @@
     <string name="hint_title">Title</string>
     <string name="label_partial">Partial</string>
     <string name="label_overwrite">Overwrite existing files</string>
+    <string name="suspended">Suspended</string>
+    <string name="suspended_since">Suspended since %s</string>
     <string name="menu_add_refueling">Add refueling</string>
     <string name="menu_add_other">Add other</string>
     <string name="menu_settings">Settings</string>
@@ -41,6 +43,8 @@
     <string name="menu_calculate">Calculate</string>
     <string name="menu_add_car">Add car</string>
     <string name="menu_show_trend">Show trend</string>
+    <string name="menu_suspend">Suspend</string>
+    <string name="menu_unsuspend">Unsuspend</string>
     <string name="section_car">Car</string>
     <string name="section_note">Note</string>
     <string name="title_add_refueling">Add refueling</string>

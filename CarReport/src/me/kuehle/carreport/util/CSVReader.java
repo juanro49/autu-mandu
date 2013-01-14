@@ -180,7 +180,7 @@ public class CSVReader {
 		try {
 			return format.parse(value);
 		} catch (Exception e) {
-			return new Date(0);
+			return null;
 		}
 	}
 

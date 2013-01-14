@@ -17,6 +17,7 @@
 package me.kuehle.carreport.db;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -26,6 +27,7 @@ import android.provider.BaseColumns;
 public class Car extends AbstractItem {
 	private String name;
 	private int color;
+	private Date suspended;
 
 	public Car(int id) {
 		Helper helper = Helper.getInstance();
@@ -43,15 +45,21 @@ public class Car extends AbstractItem {
 				this.id = id;
 				this.name = cursor.getString(1);
 				this.color = cursor.getInt(2);
+				if (cursor.isNull(3)) {
+					this.suspended = null;
+				} else {
+					this.suspended = new Date(cursor.getLong(3));
+				}
 				cursor.close();
 			}
 		}
 	}
 
-	private Car(int id, String name, int color) {
+	private Car(int id, String name, int color, Date suspended) {
 		this.id = id;
 		this.name = name;
 		this.color = color;
+		this.suspended = suspended;
 	}
 
 	public String getName() {
@@ -68,6 +76,18 @@ public class Car extends AbstractItem {
 
 	public void setColor(int color) {
 		this.color = color;
+	}
+
+	public Date getSuspended() {
+		return this.suspended;
+	}
+
+	public boolean isSuspended() {
+		return this.suspended != null;
+	}
+
+	public void setSuspended(Date suspended) {
+		this.suspended = suspended;
 	}
 
 	public void delete() {
@@ -91,6 +111,8 @@ public class Car extends AbstractItem {
 			ContentValues values = new ContentValues();
 			values.put(CarTable.COL_NAME, name);
 			values.put(CarTable.COL_COLOR, color);
+			values.put(CarTable.COL_SUSPENDED, suspended == null ? null
+					: suspended.getTime());
 
 			synchronized (Helper.dbLock) {
 				SQLiteDatabase db = helper.getWritableDatabase();
@@ -101,17 +123,19 @@ public class Car extends AbstractItem {
 		}
 	}
 
-	public static Car create(String name, int color) {
-		return create(-1, name, color);
+	public static Car create(String name, int color, Date suspended) {
+		return create(-1, name, color, suspended);
 	}
 
-	public static Car create(int id, String name, int color) {
+	public static Car create(int id, String name, int color, Date suspended) {
 		ContentValues values = new ContentValues();
 		if (id != -1) {
 			values.put(BaseColumns._ID, id);
 		}
 		values.put(CarTable.COL_NAME, name);
 		values.put(CarTable.COL_COLOR, color);
+		values.put(CarTable.COL_SUSPENDED,
+				suspended == null ? null : suspended.getTime());
 
 		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
@@ -125,7 +149,7 @@ public class Car extends AbstractItem {
 		}
 
 		helper.dataChanged();
-		return new Car(id, name, color);
+		return new Car(id, name, color, suspended);
 	}
 
 	public static Car[] getAll() {
@@ -135,12 +159,16 @@ public class Car extends AbstractItem {
 		synchronized (Helper.dbLock) {
 			SQLiteDatabase db = helper.getReadableDatabase();
 			Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS, null,
-					null, null, null, null);
+					null, null, null, CarTable.COL_SUSPENDED + " ASC");
 
 			cursor.moveToFirst();
 			while (!cursor.isAfterLast()) {
+				Date suspended = null;
+				if (!cursor.isNull(3)) {
+					suspended = new Date(cursor.getLong(3));
+				}
 				cars.add(new Car(cursor.getInt(0), cursor.getString(1), cursor
-						.getInt(2)));
+						.getInt(2), suspended));
 				cursor.moveToNext();
 			}
 			cursor.close();

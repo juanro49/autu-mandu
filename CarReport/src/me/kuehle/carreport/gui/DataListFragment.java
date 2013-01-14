@@ -319,7 +319,7 @@ public class DataListFragment extends Fragment {
 			mCurrentTab.mListView.setOnItemClickListener(null);
 
 			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.cab_delete, menu);
+			inflater.inflate(R.menu.view_data_cab, menu);
 
 			mActionMode = mode;
 			return true;

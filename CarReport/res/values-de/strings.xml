@@ -30,6 +30,8 @@
     <string name="hint_title">Titel</string>
     <string name="label_partial">Teilfüllung</string>
     <string name="label_overwrite">Bereits vorhandene Dateien überschreiben</string>
+    <string name="suspended">Stillgelegt</string>
+    <string name="suspended_since">Stillgelegt seit %s</string>
     <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
     <string name="menu_add_other">Andere Kosten hinzufügen</string>
     <string name="menu_settings">Einstellungen</string>
@@ -41,6 +43,8 @@
     <string name="menu_calculate">Rechnen</string>
     <string name="menu_add_car">Auto hinzufügen</string>
     <string name="menu_show_trend">Trend anzeigen</string>
+    <string name="menu_suspend">Stilllegen</string>
+    <string name="menu_unsuspend">Wieder aufnehmen</string>
     <string name="section_car">Auto</string>
     <string name="section_note">Notiz</string>
     <string name="title_add_refueling">Tankfüllung hinzufügen</string>

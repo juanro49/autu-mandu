@@ -91,7 +91,11 @@ public abstract class AbstractReport {
 	}
 
 	protected Section addDataSection(String label, int color) {
-		Section section = new Section(label, color);
+		return addDataSection(label, color, Section.DONT_STICK);
+	}
+	
+	protected Section addDataSection(String label, int color, int stick) {
+		Section section = new Section(label, color, stick);
 		data.getData().add(section);
 		return section;
 	}

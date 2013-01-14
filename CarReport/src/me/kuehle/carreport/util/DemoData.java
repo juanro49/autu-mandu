@@ -32,7 +32,7 @@ public class DemoData {
 		DateFormat date = new SimpleDateFormat("dd.MM.yyyy kk:mm");
 		
 		try {
-			Car car1 = Car.create("Fiat Punto", Color.BLUE);
+			Car car1 = Car.create("Fiat Punto", Color.BLUE, null);
 			Refueling.create(date.parse("01.06.2012 08:04"), 120300, 41, 60.64f, false, "", car1);
 			Refueling.create(date.parse("13.06.2012 08:10"), 120930, 44, 65.97f, false, "", car1);
 			Refueling.create(date.parse("28.06.2012 07:43"), 121470, 37, 56.20f, true, "", car1);
@@ -44,7 +44,7 @@ public class DemoData {
 			OtherCost.create("Rechtes Abblendlicht", date.parse("15.06.2012 07:25"), 121009, 10, new Recurrence(RecurrenceInterval.ONCE), "", car1);
 			OtherCost.create("Steuern", date.parse("01.06.2012 00:00"), -1, 210, new Recurrence(RecurrenceInterval.YEAR), "", car1);
 			
-			Car car2 = Car.create("Opel Astra", Color.RED);
+			Car car2 = Car.create("Opel Astra", Color.RED, null);
 			Refueling.create(date.parse("03.07.2012 08:03"), 43000, 45, 67.01f, false, "", car2);
 			Refueling.create(date.parse("14.07.2012 18:15"), 43640, 51, 76.45f, false, "", car2);
 			Refueling.create(date.parse("24.07.2012 19:04"), 44300, 52, 79.51f, false, "", car2);

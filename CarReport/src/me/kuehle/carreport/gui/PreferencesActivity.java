@@ -19,12 +19,14 @@ package me.kuehle.carreport.gui;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Helper;
+import me.kuehle.carreport.util.ForEachInterface;
 import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.backup.CSVExportImport;
 import android.app.ActionBar;
@@ -325,7 +327,6 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	public static class CarsFragment extends ListFragment {
 		private class CarAdapter extends BaseAdapter {
-
 			@Override
 			public int getCount() {
 				return cars.length;
@@ -347,11 +348,13 @@ public class PreferencesActivity extends PreferenceActivity {
 
 				if (convertView == null) {
 					convertView = getActivity().getLayoutInflater().inflate(
-							R.layout.split_list_item_1, parent, false);
+							R.layout.split_list_item_2, parent, false);
 
 					holder = new CarViewHolder();
 					holder.name = (TextView) convertView
 							.findViewById(android.R.id.text1);
+					holder.suspended = (TextView) convertView
+							.findViewById(android.R.id.text2);
 					holder.color = ((Button) convertView
 							.findViewById(android.R.id.button1));
 					holder.color.setBackgroundResource(R.drawable.color_button);
@@ -363,6 +366,16 @@ public class PreferencesActivity extends PreferenceActivity {
 				}
 
 				holder.name.setText(cars[position].getName());
+				if (cars[position].isSuspended()) {
+					holder.suspended.setText(getString(
+							R.string.suspended_since,
+							android.text.format.DateFormat.getDateFormat(
+									getActivity()).format(
+									cars[position].getSuspended())));
+					holder.suspended.setVisibility(View.VISIBLE);
+				} else {
+					holder.suspended.setVisibility(View.GONE);
+				}
 				((GradientDrawable) holder.color.getBackground())
 						.setColorFilter(cars[position].getColor(),
 								Mode.SRC_ATOP);
@@ -373,15 +386,15 @@ public class PreferencesActivity extends PreferenceActivity {
 
 		private static class CarViewHolder {
 			public TextView name;
+			public TextView suspended;
 			public Button color;
 		}
 
 		private Car[] cars;
 
-		private EditText editInput;
-
 		private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 			private Car editCar;
+			private EditText editInput;
 
 			private DialogInterface.OnClickListener positiveOnClickListener = new DialogInterface.OnClickListener() {
 				@Override
@@ -455,24 +468,40 @@ public class PreferencesActivity extends PreferenceActivity {
 			private DialogInterface.OnClickListener deleteOnClickListener = new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					SparseBooleanArray selected = getListView()
-							.getCheckedItemPositions();
-					for (int i = 0; i < cars.length; i++) {
-						if (selected.get(i)) {
-							cars[i].delete();
+					execActionAndFinish(new ForEachInterface<Car>() {
+						public void action(Car car) {
+							car.delete();
 						}
-					}
-					mode.finish();
-					fillList();
+					});
 				}
 			};
 
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-				switch (item.getItemId()) {
-				case R.id.menu_delete:
-					this.mode = mode;
+				this.mode = mode;
 
+				switch (item.getItemId()) {
+				case R.id.menu_suspend:
+					execActionAndFinish(new ForEachInterface<Car>() {
+						Date now = new Date();
+
+						public void action(Car car) {
+							if (!car.isSuspended()) {
+								car.setSuspended(now);
+								car.save();
+							}
+						}
+					});
+					return true;
+				case R.id.menu_unsuspend:
+					execActionAndFinish(new ForEachInterface<Car>() {
+						public void action(Car car) {
+							car.setSuspended(null);
+							car.save();
+						}
+					});
+					return true;
+				case R.id.menu_delete:
 					if (getListView().getCheckedItemCount() == cars.length) {
 						new AlertDialog.Builder(getActivity())
 								.setTitle(R.string.alert_delete_title)
@@ -481,8 +510,8 @@ public class PreferencesActivity extends PreferenceActivity {
 								.setPositiveButton(android.R.string.ok, null)
 								.show();
 					} else {
-						String message = String.format(
-								getString(R.string.alert_delete_cars_message),
+						String message = getString(
+								R.string.alert_delete_cars_message,
 								getListView().getCheckedItemCount());
 						new AlertDialog.Builder(getActivity())
 								.setTitle(R.string.alert_delete_title)
@@ -501,7 +530,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			@Override
 			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 				MenuInflater inflater = mode.getMenuInflater();
-				inflater.inflate(R.menu.cab_delete, menu);
+				inflater.inflate(R.menu.edit_cars_cab, menu);
 				return true;
 			}
 
@@ -520,6 +549,19 @@ public class PreferencesActivity extends PreferenceActivity {
 			@Override
 			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 				return false;
+			}
+
+			private void execActionAndFinish(ForEachInterface<Car> forEach) {
+				SparseBooleanArray selected = getListView()
+						.getCheckedItemPositions();
+				for (int i = 0; i < cars.length; i++) {
+					if (selected.get(i)) {
+						forEach.action(cars[i]);
+					}
+				}
+
+				mode.finish();
+				fillList();
 			}
 		};
 
@@ -549,7 +591,7 @@ public class PreferencesActivity extends PreferenceActivity {
 		public boolean onOptionsItemSelected(MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.menu_add_car:
-				editInput = new EditText(getActivity());
+				final EditText editInput = new EditText(getActivity());
 				new AlertDialog.Builder(getActivity())
 						.setTitle(R.string.alert_add_car_title)
 						.setMessage(R.string.alert_add_car_message)
@@ -561,7 +603,7 @@ public class PreferencesActivity extends PreferenceActivity {
 										String name = editInput.getText()
 												.toString();
 										if (name.length() > 0) {
-											Car.create(name, Color.BLUE);
+											Car.create(name, Color.BLUE, null);
 											fillList();
 										}
 									}

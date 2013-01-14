@@ -134,6 +134,7 @@ public class CostsReport extends AbstractReport {
 		}
 
 		public void fillXGaps() {
+			// Add missing elements.
 			DateTime date = new DateTime(xValues.firstElement());
 			while (date.isBeforeNow()) {
 				if (!xValues.contains(date.getMillis())) {
@@ -148,6 +149,7 @@ public class CostsReport extends AbstractReport {
 				}
 			}
 
+			// Sort entries.
 			ArrayList<PointD> points = new ArrayList<PointD>();
 			for (int i = 0; i < xValues.size(); i++) {
 				points.add(new PointD(xValues.get(i), yValues.get(i)));
@@ -192,7 +194,15 @@ public class CostsReport extends AbstractReport {
 
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
-			Section section = addDataSection(car.getName(), car.getColor());
+			Section section;
+			if (car.isSuspended()) {
+				section = addDataSection(
+						String.format("%s (%s)", car.getName(),
+								context.getString(R.string.suspended)),
+						car.getColor(), Section.STICK_BOTTOM);
+			} else {
+				section = addDataSection(car.getName(), car.getColor());
+			}
 
 			costsPerMonth
 					.put(car.getId(), new ReportGraphData(context, car, 0));
@@ -201,6 +211,12 @@ public class CostsReport extends AbstractReport {
 			int startMileage = Integer.MAX_VALUE;
 			int endMileage = Integer.MIN_VALUE;
 			DateTime startDate = new DateTime();
+			DateTime endDate;
+			if (car.isSuspended()) {
+				endDate = new DateTime(car.getSuspended());
+			} else {
+				endDate = new DateTime();
+			}
 			double costs = 0;
 
 			Refueling[] refuelings = Refueling.getAllForCar(car, true);
@@ -234,14 +250,16 @@ public class CostsReport extends AbstractReport {
 
 				Recurrence recurrence = otherCost.getRecurrence();
 				DateTime date = new DateTime(otherCost.getDate());
-				while (date.isBeforeNow()) {
+				while (date.isBefore(endDate)) {
 					costsPerMonth.get(car.getId()).add(date,
 							otherCost.getPrice());
 					costsPerYear.get(car.getId()).add(date,
 							otherCost.getPrice());
 					switch (recurrence.getInterval()) {
 					case ONCE:
-						date = DateTime.now().plusYears(1); // Set date after now, so the loop ends.
+						date = DateTime.now().plusYears(1); // Set date after
+															// now, so the loop
+															// ends.
 						break;
 					case DAY:
 						date = date.plusDays(recurrence.getMultiplier());
@@ -272,8 +290,7 @@ public class CostsReport extends AbstractReport {
 			costsPerYear.get(car.getId()).fillXGaps();
 
 			// Calculate averages
-			Seconds elapsedSeconds = Seconds.secondsBetween(startDate,
-					new DateTime());
+			Seconds elapsedSeconds = Seconds.secondsBetween(startDate, endDate);
 			double costsPerSecond = costs / elapsedSeconds.getSeconds();
 			// 60 seconds per minute * 60 minutes per hour * 24 hours per day =
 			// 86400 seconds per day
@@ -319,10 +336,10 @@ public class CostsReport extends AbstractReport {
 		for (Car car : Car.getAll()) {
 			ReportGraphData data = option == 0 ? costsPerMonth.get(car.getId())
 					: costsPerYear.get(car.getId());
-			if(data.isEmpty()) {
+			if (data.isEmpty()) {
 				continue;
 			}
-			
+
 			dataset.add(data.getSeries());
 			data.applySeriesStyle(series, renderer);
 			series++;

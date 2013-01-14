@@ -63,42 +63,53 @@ public class CSVExportImport {
 
 			// Build SQL select statement
 			HashMap<String, String> replacements = new HashMap<String, String>();
-			replacements.put("%r_columns", Strings.join(new String[] {
-					RefuelingTable.NAME + "." + BaseColumns._ID + " AS "
-							+ BaseColumns._ID,
-					"'" + REFUELING_TITLE + "' AS " + OtherCostTable.COL_TITLE,
-					RefuelingTable.COL_DATE,
-					RefuelingTable.COL_TACHO,
-					RefuelingTable.COL_VOLUME,
-					RefuelingTable.COL_PRICE,
-					RefuelingTable.COL_PARTIAL,
-					"'0' AS " + OtherCostTable.COL_REP_INT,
-					"'1' AS " + OtherCostTable.COL_REP_MULTI,
-					RefuelingTable.COL_NOTE,
-					CarTable.NAME + "." + BaseColumns._ID + " AS "
-							+ CarTable.NAME + BaseColumns._ID,
-					CarTable.NAME + "." + CarTable.COL_NAME + " AS "
-							+ CarTable.NAME + CarTable.COL_NAME,
-					CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
-							+ CarTable.NAME + CarTable.COL_COLOR }, ", "));
-			replacements.put("%o_columns", Strings.join(new String[] {
-					OtherCostTable.NAME + "." + BaseColumns._ID + " AS "
-							+ BaseColumns._ID,
-					OtherCostTable.COL_TITLE,
-					OtherCostTable.COL_DATE,
-					OtherCostTable.COL_TACHO,
-					"'' AS " + RefuelingTable.COL_VOLUME,
-					OtherCostTable.COL_PRICE,
-					"'0' AS " + RefuelingTable.COL_PARTIAL,
-					OtherCostTable.COL_REP_INT,
-					OtherCostTable.COL_REP_MULTI,
-					OtherCostTable.COL_NOTE,
-					CarTable.NAME + "." + BaseColumns._ID + " AS "
-							+ CarTable.NAME + BaseColumns._ID,
-					CarTable.NAME + "." + CarTable.COL_NAME + " AS "
-							+ CarTable.NAME + CarTable.COL_NAME,
-					CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
-							+ CarTable.NAME + CarTable.COL_COLOR }, ", "));
+			replacements.put(
+					"%r_columns",
+					Strings.join(new String[] {
+							RefuelingTable.NAME + "." + BaseColumns._ID
+									+ " AS " + BaseColumns._ID,
+							"'" + REFUELING_TITLE + "' AS "
+									+ OtherCostTable.COL_TITLE,
+							RefuelingTable.COL_DATE,
+							RefuelingTable.COL_TACHO,
+							RefuelingTable.COL_VOLUME,
+							RefuelingTable.COL_PRICE,
+							RefuelingTable.COL_PARTIAL,
+							"'0' AS " + OtherCostTable.COL_REP_INT,
+							"'1' AS " + OtherCostTable.COL_REP_MULTI,
+							RefuelingTable.COL_NOTE,
+							CarTable.NAME + "." + BaseColumns._ID + " AS "
+									+ CarTable.NAME + BaseColumns._ID,
+							CarTable.NAME + "." + CarTable.COL_NAME + " AS "
+									+ CarTable.NAME + CarTable.COL_NAME,
+							CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
+									+ CarTable.NAME + CarTable.COL_COLOR,
+							CarTable.NAME + "." + CarTable.COL_SUSPENDED
+									+ " AS " + CarTable.NAME
+									+ CarTable.COL_SUSPENDED }, ", "));
+			replacements.put(
+					"%o_columns",
+					Strings.join(new String[] {
+							OtherCostTable.NAME + "." + BaseColumns._ID
+									+ " AS " + BaseColumns._ID,
+							OtherCostTable.COL_TITLE,
+							OtherCostTable.COL_DATE,
+							OtherCostTable.COL_TACHO,
+							"'' AS " + RefuelingTable.COL_VOLUME,
+							OtherCostTable.COL_PRICE,
+							"'0' AS " + RefuelingTable.COL_PARTIAL,
+							OtherCostTable.COL_REP_INT,
+							OtherCostTable.COL_REP_MULTI,
+							OtherCostTable.COL_NOTE,
+							CarTable.NAME + "." + BaseColumns._ID + " AS "
+									+ CarTable.NAME + BaseColumns._ID,
+							CarTable.NAME + "." + CarTable.COL_NAME + " AS "
+									+ CarTable.NAME + CarTable.COL_NAME,
+							CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
+									+ CarTable.NAME + CarTable.COL_COLOR,
+							CarTable.NAME + "." + CarTable.COL_SUSPENDED
+									+ " AS " + CarTable.NAME
+									+ CarTable.COL_SUSPENDED }, ", "));
 			replacements.put("%refuelings", RefuelingTable.NAME);
 			replacements.put("%othercosts", OtherCostTable.NAME);
 			replacements.put("%cars", CarTable.NAME);
@@ -114,6 +125,8 @@ public class CSVExportImport {
 
 			SparseArray<SpecialColumnType> columnTypes = new SparseArray<SpecialColumnType>();
 			columnTypes.put(2, new CSVWriter.SpecialColumnType(Date.class,
+					dateFormat));
+			columnTypes.put(13, new CSVWriter.SpecialColumnType(Date.class,
 					dateFormat));
 
 			CSVWriter writer = new CSVWriter();
@@ -134,21 +147,26 @@ public class CSVExportImport {
 
 			// Build SQL select statement for refuelings
 			HashMap<String, String> replacementsRefuelings = new HashMap<String, String>();
-			replacementsRefuelings.put("%columns", Strings.join(new String[] {
-					RefuelingTable.NAME + "." + BaseColumns._ID + " AS "
-							+ BaseColumns._ID,
-					RefuelingTable.COL_DATE,
-					RefuelingTable.COL_TACHO,
-					RefuelingTable.COL_VOLUME,
-					RefuelingTable.COL_PRICE,
-					RefuelingTable.COL_PARTIAL,
-					RefuelingTable.COL_NOTE,
-					CarTable.NAME + "." + BaseColumns._ID + " AS "
-							+ CarTable.NAME + BaseColumns._ID,
-					CarTable.NAME + "." + CarTable.COL_NAME + " AS "
-							+ CarTable.NAME + CarTable.COL_NAME,
-					CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
-							+ CarTable.NAME + CarTable.COL_COLOR }, ", "));
+			replacementsRefuelings.put(
+					"%columns",
+					Strings.join(new String[] {
+							RefuelingTable.NAME + "." + BaseColumns._ID
+									+ " AS " + BaseColumns._ID,
+							RefuelingTable.COL_DATE,
+							RefuelingTable.COL_TACHO,
+							RefuelingTable.COL_VOLUME,
+							RefuelingTable.COL_PRICE,
+							RefuelingTable.COL_PARTIAL,
+							RefuelingTable.COL_NOTE,
+							CarTable.NAME + "." + BaseColumns._ID + " AS "
+									+ CarTable.NAME + BaseColumns._ID,
+							CarTable.NAME + "." + CarTable.COL_NAME + " AS "
+									+ CarTable.NAME + CarTable.COL_NAME,
+							CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
+									+ CarTable.NAME + CarTable.COL_COLOR,
+							CarTable.NAME + "." + CarTable.COL_SUSPENDED
+									+ " AS " + CarTable.NAME
+									+ CarTable.COL_SUSPENDED }, ", "));
 			replacementsRefuelings.put("%refuelings", RefuelingTable.NAME);
 			replacementsRefuelings.put("%cars", CarTable.NAME);
 			replacementsRefuelings.put("%car_id", RefuelingTable.COL_CAR);
@@ -161,25 +179,32 @@ public class CSVExportImport {
 			SparseArray<SpecialColumnType> columnTypesRefuelings = new SparseArray<SpecialColumnType>();
 			columnTypesRefuelings.put(1, new CSVWriter.SpecialColumnType(
 					Date.class, dateFormat));
+			columnTypesRefuelings.put(10, new CSVWriter.SpecialColumnType(
+					Date.class, dateFormat));
 
 			// Build SQL select statement for other costs
 			HashMap<String, String> replacementsOtherCosts = new HashMap<String, String>();
-			replacementsOtherCosts.put("%columns", Strings.join(new String[] {
-					OtherCostTable.NAME + "." + BaseColumns._ID + " AS "
-							+ BaseColumns._ID,
-					OtherCostTable.COL_TITLE,
-					OtherCostTable.COL_DATE,
-					OtherCostTable.COL_TACHO,
-					OtherCostTable.COL_PRICE,
-					OtherCostTable.COL_REP_INT,
-					OtherCostTable.COL_REP_MULTI,
-					OtherCostTable.COL_NOTE,
-					CarTable.NAME + "." + BaseColumns._ID + " AS "
-							+ CarTable.NAME + BaseColumns._ID,
-					CarTable.NAME + "." + CarTable.COL_NAME + " AS "
-							+ CarTable.NAME + CarTable.COL_NAME,
-					CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
-							+ CarTable.NAME + CarTable.COL_COLOR }, ", "));
+			replacementsOtherCosts.put(
+					"%columns",
+					Strings.join(new String[] {
+							OtherCostTable.NAME + "." + BaseColumns._ID
+									+ " AS " + BaseColumns._ID,
+							OtherCostTable.COL_TITLE,
+							OtherCostTable.COL_DATE,
+							OtherCostTable.COL_TACHO,
+							OtherCostTable.COL_PRICE,
+							OtherCostTable.COL_REP_INT,
+							OtherCostTable.COL_REP_MULTI,
+							OtherCostTable.COL_NOTE,
+							CarTable.NAME + "." + BaseColumns._ID + " AS "
+									+ CarTable.NAME + BaseColumns._ID,
+							CarTable.NAME + "." + CarTable.COL_NAME + " AS "
+									+ CarTable.NAME + CarTable.COL_NAME,
+							CarTable.NAME + "." + CarTable.COL_COLOR + " AS "
+									+ CarTable.NAME + CarTable.COL_COLOR,
+							CarTable.NAME + "." + CarTable.COL_SUSPENDED
+									+ " AS " + CarTable.NAME
+									+ CarTable.COL_SUSPENDED }, ", "));
 			replacementsOtherCosts.put("%othercosts", OtherCostTable.NAME);
 			replacementsOtherCosts.put("%cars", CarTable.NAME);
 			replacementsOtherCosts.put("%car_id", OtherCostTable.COL_CAR);
@@ -191,6 +216,8 @@ public class CSVExportImport {
 
 			SparseArray<SpecialColumnType> columnTypesOtherCosts = new SparseArray<SpecialColumnType>();
 			columnTypesOtherCosts.put(2, new CSVWriter.SpecialColumnType(
+					Date.class, dateFormat));
+			columnTypesOtherCosts.put(11, new CSVWriter.SpecialColumnType(
 					Date.class, dateFormat));
 
 			CSVWriter writerRefuelings = new CSVWriter();
@@ -400,14 +427,17 @@ public class CSVExportImport {
 		int id = reader.getInt(row, titlePrefix + BaseColumns._ID);
 		String name = reader.getString(row, titlePrefix + CarTable.COL_NAME);
 		int color = reader.getInt(row, titlePrefix + CarTable.COL_COLOR);
+		Date suspended = reader.getDate(row, titlePrefix
+				+ CarTable.COL_SUSPENDED, dateFormat);
 
 		try {
 			Car car = new Car(id);
 			car.setName(name);
 			car.setColor(color);
+			car.setSuspended(suspended);
 			car.save();
 		} catch (IllegalArgumentException e) {
-			Car.create(id, name, color);
+			Car.create(id, name, color, suspended);
 		}
 	}
 

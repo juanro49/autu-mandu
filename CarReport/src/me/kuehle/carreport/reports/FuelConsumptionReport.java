@@ -91,6 +91,7 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	private Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
+	private double minXValue = Long.MAX_VALUE;
 
 	private String unit;
 
@@ -111,7 +112,17 @@ public class FuelConsumptionReport extends AbstractReport {
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
 			ReportGraphData carData = new ReportGraphData(context, car);
-			Section section = addDataSection(car.getName(), car.getColor());
+
+			Section section;
+			if (car.isSuspended()) {
+				section = addDataSection(
+						String.format("%s (%s)", car.getName(),
+								context.getString(R.string.suspended)),
+						car.getColor(), Section.STICK_BOTTOM);
+			} else {
+				section = addDataSection(car.getName(), car.getColor());
+				minXValue = Math.min(minXValue, carData.getSeries().minX());
+			}
 
 			if (carData.size() == 0) {
 				section.addItem(new Item(context
@@ -205,6 +216,7 @@ public class FuelConsumptionReport extends AbstractReport {
 			}
 		}
 		chart.getDomainAxis().setLabelFormatter(dateLabelFormatter);
+		chart.getDomainAxis().setDefaultBottomBound(minXValue);
 		chart.getRangeAxis()
 				.setLabelFormatter(new DecimalAxisLabelFormatter(2));
 

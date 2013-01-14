@@ -38,9 +38,13 @@ public class CSVWriter {
 		}
 
 		public String format(String value) {
-			if(type == Date.class) {
-				Date date = new Date(Long.parseLong(value));
-				return format.format(date);
+			if (type == Date.class) {
+				try {
+					Date date = new Date(Long.parseLong(value));
+					return format.format(date);
+				} catch (NumberFormatException e) {
+					return "";
+				}
 			} else {
 				return "";
 			}
