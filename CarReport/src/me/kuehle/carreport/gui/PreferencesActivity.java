@@ -26,7 +26,7 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Helper;
-import me.kuehle.carreport.util.ForEachInterface;
+import me.kuehle.carreport.util.IForEach;
 import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.backup.CSVExportImport;
 import android.app.ActionBar;
@@ -468,7 +468,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			private DialogInterface.OnClickListener deleteOnClickListener = new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					execActionAndFinish(new ForEachInterface<Car>() {
+					execActionAndFinish(new IForEach<Car>() {
 						public void action(Car car) {
 							car.delete();
 						}
@@ -482,7 +482,7 @@ public class PreferencesActivity extends PreferenceActivity {
 
 				switch (item.getItemId()) {
 				case R.id.menu_suspend:
-					execActionAndFinish(new ForEachInterface<Car>() {
+					execActionAndFinish(new IForEach<Car>() {
 						Date now = new Date();
 
 						public void action(Car car) {
@@ -494,7 +494,7 @@ public class PreferencesActivity extends PreferenceActivity {
 					});
 					return true;
 				case R.id.menu_unsuspend:
-					execActionAndFinish(new ForEachInterface<Car>() {
+					execActionAndFinish(new IForEach<Car>() {
 						public void action(Car car) {
 							car.setSuspended(null);
 							car.save();
@@ -551,7 +551,7 @@ public class PreferencesActivity extends PreferenceActivity {
 				return false;
 			}
 
-			private void execActionAndFinish(ForEachInterface<Car> forEach) {
+			private void execActionAndFinish(IForEach<Car> forEach) {
 				SparseBooleanArray selected = getListView()
 						.getCheckedItemPositions();
 				for (int i = 0; i < cars.length; i++) {

@@ -16,6 +16,6 @@
 
 package me.kuehle.carreport.util;
 
-public interface ForEachInterface<T> {
+public interface IForEach<T> {
 	public void action(T object);
 }
