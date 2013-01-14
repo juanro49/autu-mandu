@@ -18,6 +18,7 @@ package me.kuehle.carreport.gui;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
@@ -278,7 +279,8 @@ public class PreferencesActivity extends PreferenceActivity {
 
 			addPreferencesFromResource(R.xml.preferences_backup);
 			backup = new Backup();
-			csvExportImport = new CSVExportImport();
+			csvExportImport = new CSVExportImport(
+					DateFormat.getDateTimeInstance());
 
 			// Backup
 			{

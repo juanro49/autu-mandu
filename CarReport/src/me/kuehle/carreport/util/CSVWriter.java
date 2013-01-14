@@ -19,39 +19,61 @@ package me.kuehle.carreport.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.text.Format;
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import android.database.Cursor;
+import android.util.SparseArray;
 
 public class CSVWriter {
-	private char quote;
-	private char escape;
-	private char separator;
-	private char newLine;
+	public static class SpecialColumnType {
+		private Class<?> type;
+		private Format format;
+
+		public SpecialColumnType(Class<?> type, Format format) {
+			this.type = type;
+			this.format = format;
+		}
+
+		public String format(String value) {
+			if(type == Date.class) {
+				Date date = new Date(Long.parseLong(value));
+				return format.format(date);
+			} else {
+				return "";
+			}
+		}
+	}
+
+	private static final char QUOTE = '"';
+	private static final char ESCAPE = '\\';
+	private static final char SEPARATOR;
+	private static final char NEW_LINE = '\n';
+
+	static {
+		String locale = Locale.getDefault().getLanguage().substring(0, 2)
+				.toLowerCase(Locale.US);
+		if (locale.equals("de")) {
+			SEPARATOR = ';';
+		} else {
+			SEPARATOR = ',';
+		}
+	}
 
 	private StringBuilder data;
 
 	public CSVWriter() {
-		quote = '"';
-		escape = '\\';
-		newLine = '\n';
-		String locale = Locale.getDefault().getLanguage()
-				.substring(0, 2).toLowerCase(Locale.US);
-		if (locale.equals("de")) {
-			separator = ';';
-		} else {
-			separator = ',';
-		}
-		
 		data = new StringBuilder();
 	}
 
-	public void write(Cursor cursor) {
-		write(cursor, false);
+	public void write(Cursor cursor, SparseArray<SpecialColumnType> columnTypes) {
+		write(cursor, columnTypes, false);
 	}
 
-	public void write(Cursor cursor, boolean includeHeader) {
+	public void write(Cursor cursor,
+			SparseArray<SpecialColumnType> columnTypes, boolean includeHeader) {
 		if (includeHeader) {
 			writeLine(cursor.getColumnNames());
 		}
@@ -61,16 +83,18 @@ public class CSVWriter {
 		while (!cursor.isAfterLast()) {
 			for (int i = 0; i < cursor.getColumnCount(); i++) {
 				if (i != 0) {
-					data.append(separator);
+					data.append(SEPARATOR);
 				}
-				
-				if(cursor.getType(i) == Cursor.FIELD_TYPE_FLOAT) {
+
+				if (columnTypes.get(i) != null) {
+					writeColumn(columnTypes.get(i).format(cursor.getString(i)));
+				} else if (cursor.getType(i) == Cursor.FIELD_TYPE_FLOAT) {
 					writeColumn(floatFormat.format(cursor.getFloat(i)));
 				} else {
 					writeColumn(cursor.getString(i));
 				}
 			}
-			data.append(newLine);
+			data.append(NEW_LINE);
 			cursor.moveToNext();
 		}
 	}
@@ -78,24 +102,24 @@ public class CSVWriter {
 	public void writeLine(String[] line) {
 		for (int i = 0; i < line.length; i++) {
 			if (i != 0) {
-				data.append(separator);
+				data.append(SEPARATOR);
 			}
 			writeColumn(line[i]);
 		}
-		data.append(newLine);
+		data.append(NEW_LINE);
 	}
 
 	public void writeColumn(String column) {
-		data.append(quote);
+		data.append(QUOTE);
 		for (int j = 0; j < column.length(); j++) {
 			char nextChar = column.charAt(j);
-			if (nextChar == quote || nextChar == escape) {
-				data.append(escape).append(nextChar);
-			} else if (nextChar != newLine) {
+			if (nextChar == QUOTE || nextChar == ESCAPE) {
+				data.append(ESCAPE).append(nextChar);
+			} else if (nextChar != NEW_LINE) {
 				data.append(nextChar);
 			}
 		}
-		data.append(quote);
+		data.append(QUOTE);
 	}
 
 	public void toFile(File file) {

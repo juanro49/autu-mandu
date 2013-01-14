@@ -21,9 +21,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Locale;
 
 public class CSVReader {
@@ -142,6 +144,14 @@ public class CSVReader {
 		return null;
 	}
 
+	public Date getDate(int row, int col, DateFormat format) {
+		return parseDate(getString(row, col), format);
+	}
+
+	public Date getDate(int row, String title, DateFormat format) {
+		return parseDate(getString(row, title), format);
+	}
+
 	public float getFloat(int row, int col) {
 		return parseFloat(getString(row, col));
 	}
@@ -164,6 +174,14 @@ public class CSVReader {
 
 	public long getLong(int row, String title) {
 		return parseLong(getString(row, title));
+	}
+
+	private Date parseDate(String value, DateFormat format) {
+		try {
+			return format.parse(value);
+		} catch (Exception e) {
+			return new Date(0);
+		}
 	}
 
 	private float parseFloat(String value) {

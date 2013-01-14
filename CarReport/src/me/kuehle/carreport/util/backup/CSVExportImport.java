@@ -17,6 +17,7 @@
 package me.kuehle.carreport.util.backup;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -29,6 +30,7 @@ import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.db.RefuelingTable;
 import me.kuehle.carreport.util.CSVReader;
 import me.kuehle.carreport.util.CSVWriter;
+import me.kuehle.carreport.util.CSVWriter.SpecialColumnType;
 import me.kuehle.carreport.util.Recurrence;
 import me.kuehle.carreport.util.RecurrenceInterval;
 import me.kuehle.carreport.util.Strings;
@@ -36,6 +38,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.provider.BaseColumns;
+import android.util.SparseArray;
 
 public class CSVExportImport {
 	public static final String FILE_PREFIX = "carreport_export";
@@ -46,9 +49,11 @@ public class CSVExportImport {
 	private static final String REFUELING_TITLE = "Refueling";
 
 	private File dir;
+	private DateFormat dateFormat;
 
-	public CSVExportImport() {
-		dir = Environment.getExternalStorageDirectory();
+	public CSVExportImport(DateFormat dateFormat) {
+		this.dir = Environment.getExternalStorageDirectory();
+		this.dateFormat = dateFormat;
 	}
 
 	public boolean export(int option) {
@@ -107,11 +112,15 @@ public class CSVExportImport {
 					+ "JOIN %cars ON %othercosts.%o_car_id = %cars.%id",
 					replacements);
 
+			SparseArray<SpecialColumnType> columnTypes = new SparseArray<SpecialColumnType>();
+			columnTypes.put(2, new CSVWriter.SpecialColumnType(Date.class,
+					dateFormat));
+
 			CSVWriter writer = new CSVWriter();
 			synchronized (Helper.dbLock) {
 				SQLiteDatabase db = helper.getReadableDatabase();
 				Cursor cursor = db.rawQuery(sql, null);
-				writer.write(cursor, true);
+				writer.write(cursor, columnTypes, true);
 				cursor.close();
 			}
 
@@ -149,6 +158,10 @@ public class CSVExportImport {
 					+ "JOIN %cars ON %refuelings.%car_id = %cars.%id ",
 					replacementsRefuelings);
 
+			SparseArray<SpecialColumnType> columnTypesRefuelings = new SparseArray<SpecialColumnType>();
+			columnTypesRefuelings.put(1, new CSVWriter.SpecialColumnType(
+					Date.class, dateFormat));
+
 			// Build SQL select statement for other costs
 			HashMap<String, String> replacementsOtherCosts = new HashMap<String, String>();
 			replacementsOtherCosts.put("%columns", Strings.join(new String[] {
@@ -176,15 +189,19 @@ public class CSVExportImport {
 					+ "JOIN %cars ON %othercosts.%car_id = %cars.%id",
 					replacementsOtherCosts);
 
+			SparseArray<SpecialColumnType> columnTypesOtherCosts = new SparseArray<SpecialColumnType>();
+			columnTypesOtherCosts.put(2, new CSVWriter.SpecialColumnType(
+					Date.class, dateFormat));
+
 			CSVWriter writerRefuelings = new CSVWriter();
 			CSVWriter writerOtherCosts = new CSVWriter();
 			synchronized (Helper.dbLock) {
 				SQLiteDatabase db = helper.getReadableDatabase();
 				Cursor cursor = db.rawQuery(sqlRefuelings, null);
-				writerRefuelings.write(cursor, true);
+				writerRefuelings.write(cursor, columnTypesRefuelings, true);
 				cursor.close();
 				cursor = db.rawQuery(sqlOtherCosts, null);
-				writerOtherCosts.write(cursor, true);
+				writerOtherCosts.write(cursor, columnTypesOtherCosts, true);
 				cursor.close();
 			}
 
@@ -198,22 +215,32 @@ public class CSVExportImport {
 			File exportOtherCosts = new File(dir, FILE_PREFIX
 					+ "_othercosts.csv");
 
+			SparseArray<SpecialColumnType> columnTypesCars = new SparseArray<CSVWriter.SpecialColumnType>();
+			SparseArray<SpecialColumnType> columnTypesRefuelings = new SparseArray<SpecialColumnType>();
+			columnTypesRefuelings.put(1, new CSVWriter.SpecialColumnType(
+					Date.class, dateFormat));
+			SparseArray<SpecialColumnType> columnTypesOtherCosts = new SparseArray<SpecialColumnType>();
+			columnTypesOtherCosts.put(2, new CSVWriter.SpecialColumnType(
+					Date.class, dateFormat));
+
 			CSVWriter writerCars = new CSVWriter();
 			CSVWriter writerRefuelings = new CSVWriter();
 			CSVWriter writerOtherCosts = new CSVWriter();
 			synchronized (Helper.dbLock) {
 				SQLiteDatabase db = helper.getReadableDatabase();
-				Cursor cursor = db.query(CarTable.NAME, null, null, null, null,
-						null, null);
-				writerCars.write(cursor, true);
+				Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS,
+						null, null, null, null, null);
+				writerCars.write(cursor, columnTypesCars, true);
 				cursor.close();
-				cursor = db.query(RefuelingTable.NAME, null, null, null, null,
-						null, null);
-				writerRefuelings.write(cursor, true);
+				cursor = db.query(RefuelingTable.NAME,
+						RefuelingTable.ALL_COLUMNS, null, null, null, null,
+						null);
+				writerRefuelings.write(cursor, columnTypesRefuelings, true);
 				cursor.close();
-				cursor = db.query(OtherCostTable.NAME, null, null, null, null,
-						null, null);
-				writerOtherCosts.write(cursor, true);
+				cursor = db.query(OtherCostTable.NAME,
+						OtherCostTable.ALL_COLUMNS, null, null, null, null,
+						null);
+				writerOtherCosts.write(cursor, columnTypesOtherCosts, true);
 				cursor.close();
 			}
 
@@ -386,7 +413,7 @@ public class CSVExportImport {
 
 	private void importRefueling(CSVReader reader, int row) {
 		int id = reader.getInt(row, BaseColumns._ID);
-		Date date = new Date(reader.getLong(row, RefuelingTable.COL_DATE));
+		Date date = reader.getDate(row, RefuelingTable.COL_DATE, dateFormat);
 		int mileage = reader.getInt(row, RefuelingTable.COL_TACHO);
 		float volume = reader.getFloat(row, RefuelingTable.COL_VOLUME);
 		float price = reader.getFloat(row, RefuelingTable.COL_PRICE);
@@ -414,7 +441,7 @@ public class CSVExportImport {
 	private void importOtherCost(CSVReader reader, int row) {
 		int id = reader.getInt(row, BaseColumns._ID);
 		String title = reader.getString(row, OtherCostTable.COL_TITLE);
-		Date date = new Date(reader.getLong(row, OtherCostTable.COL_DATE));
+		Date date = reader.getDate(row, OtherCostTable.COL_DATE, dateFormat);
 		int mileage = reader.getInt(row, OtherCostTable.COL_TACHO);
 		float price = reader.getFloat(row, OtherCostTable.COL_PRICE);
 		int repeatInterval = reader.getInt(row, OtherCostTable.COL_REP_INT);
