@@ -31,7 +31,6 @@ import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
-import me.kuehle.chartlib.data.PointD;
 import me.kuehle.chartlib.data.Series;
 import me.kuehle.chartlib.renderer.BarRenderer;
 import me.kuehle.chartlib.renderer.LineRenderer;
@@ -79,7 +78,6 @@ public class CostsReport extends AbstractReport {
 	}
 
 	private class ReportGraphData extends AbstractReportGraphData {
-		private static final int BAR_COUNT = 3;
 		private int option;
 
 		public ReportGraphData(Context context, Car car, int option) {
@@ -88,7 +86,7 @@ public class CostsReport extends AbstractReport {
 		}
 
 		public void add(DateTime date, double costs) {
-			if (option == 0) {
+			if (option == GRAPH_OPTION_MONTH) {
 				date = new DateTime(date.getYear(), date.getMonthOfYear(), 1,
 						0, 0);
 			} else {
@@ -117,64 +115,15 @@ public class CostsReport extends AbstractReport {
 			AbstractReportGraphData data = super.createRegressionData();
 			xValues.add(lastX);
 			yValues.add(lastY);
-
-			if (size() > BAR_COUNT && data.size() == 2) {
-				double m = (data.yValues.firstElement() - data.yValues
-						.lastElement())
-						/ (data.xValues.firstElement() - data.xValues
-								.lastElement());
-				long x = (long) getSeries().get(0).x;
-				double y = data.yValues.lastElement()
-						- ((data.xValues.lastElement() - x) * m);
-				data.xValues.set(0, x);
-				data.yValues.set(0, y);
-			}
-
 			return data;
-		}
-
-		public void fillXGaps() {
-			// Add missing elements.
-			DateTime date = new DateTime(xValues.firstElement());
-			while (date.isBeforeNow()) {
-				if (!xValues.contains(date.getMillis())) {
-					xValues.add(date.getMillis());
-					yValues.add(0.0);
-				}
-
-				if (option == 0) {
-					date = date.plusMonths(1);
-				} else {
-					date = date.plusYears(1);
-				}
-			}
-
-			// Sort entries.
-			ArrayList<PointD> points = new ArrayList<PointD>();
-			for (int i = 0; i < xValues.size(); i++) {
-				points.add(new PointD(xValues.get(i), yValues.get(i)));
-			}
-			Collections.sort(points);
-			xValues.clear();
-			yValues.clear();
-			for (PointD point : points) {
-				xValues.add((long) point.x);
-				yValues.add(point.y);
-			}
-		}
-
-		@Override
-		public Series getSeries() {
-			Series series = super.getSeries();
-			while (series.size() > BAR_COUNT) {
-				series.removeAt(0);
-			}
-			return series;
 		}
 	}
 
-	private static final long HALF_A_MONTH = 1000l * 60l * 60l * 24l * 15l;
-	private static final long HALF_A_YEAR = 1000l * 60l * 60l * 24l * 181l;
+	public static final int GRAPH_OPTION_MONTH = 0;
+	public static final int GRAPH_OPTION_YEAR = 1;
+
+	private static final long SEC_PER_MONTH = 1000l * 60l * 60l * 24l * 30l;
+	private static final long SEC_PER_YEAR = 1000l * 60l * 60l * 24l * 365l;
 
 	private SparseArray<ReportGraphData> costsPerMonth = new SparseArray<ReportGraphData>();
 	private SparseArray<ReportGraphData> costsPerYear = new SparseArray<ReportGraphData>();
@@ -204,9 +153,10 @@ public class CostsReport extends AbstractReport {
 				section = addDataSection(car.getName(), car.getColor());
 			}
 
-			costsPerMonth
-					.put(car.getId(), new ReportGraphData(context, car, 0));
-			costsPerYear.put(car.getId(), new ReportGraphData(context, car, 1));
+			costsPerMonth.put(car.getId(), new ReportGraphData(context, car,
+					GRAPH_OPTION_MONTH));
+			costsPerYear.put(car.getId(), new ReportGraphData(context, car,
+					GRAPH_OPTION_YEAR));
 
 			int startMileage = Integer.MAX_VALUE;
 			int endMileage = Integer.MIN_VALUE;
@@ -257,9 +207,8 @@ public class CostsReport extends AbstractReport {
 							otherCost.getPrice());
 					switch (recurrence.getInterval()) {
 					case ONCE:
-						date = DateTime.now().plusYears(1); // Set date after
-															// now, so the loop
-															// ends.
+						// Set date after now, so the loop ends.
+						date = DateTime.now().plusYears(1);
 						break;
 					case DAY:
 						date = date.plusDays(recurrence.getMultiplier());
@@ -285,9 +234,6 @@ public class CostsReport extends AbstractReport {
 					startDate = new DateTime(otherCost.getDate());
 				}
 			}
-
-			costsPerMonth.get(car.getId()).fillXGaps();
-			costsPerYear.get(car.getId()).fillXGaps();
 
 			// Calculate averages
 			Seconds elapsedSeconds = Seconds.secondsBetween(startDate, endDate);
@@ -334,8 +280,8 @@ public class CostsReport extends AbstractReport {
 
 		int series = 0;
 		for (Car car : Car.getAll()) {
-			ReportGraphData data = option == 0 ? costsPerMonth.get(car.getId())
-					: costsPerYear.get(car.getId());
+			ReportGraphData data = option == GRAPH_OPTION_MONTH ? costsPerMonth
+					.get(car.getId()) : costsPerYear.get(car.getId());
 			if (data.isEmpty()) {
 				continue;
 			}
@@ -362,7 +308,8 @@ public class CostsReport extends AbstractReport {
 				chart.getLegend().setSeriesVisible(i, false);
 			}
 		}
-		chart.getDomainAxis().setLabels(getXValues(dataset));
+		double[] xValues = getXValues(dataset);
+		chart.getDomainAxis().setLabels(xValues);
 		chart.getDomainAxis().setLabelFormatter(new AxisLabelFormatter() {
 			@Override
 			public String formatLabel(double value) {
@@ -371,10 +318,14 @@ public class CostsReport extends AbstractReport {
 			}
 		});
 		chart.getDomainAxis().setZoomable(false);
-		chart.getDomainAxis().setMovable(false);
-		long padding = option == 0 ? HALF_A_MONTH : HALF_A_YEAR;
-		chart.getDomainAxis().setDefaultBottomBound(dataset.minX() - padding);
-		chart.getDomainAxis().setDefaultTopBound(dataset.maxX() + padding);
+		double padding = (option == GRAPH_OPTION_MONTH ? SEC_PER_MONTH
+				: SEC_PER_YEAR) / 2;
+		double topBound = dataset.maxX();
+		double bottomBound = topBound
+				- ((option == GRAPH_OPTION_MONTH ? SEC_PER_MONTH : SEC_PER_YEAR) * Math
+						.min(2, xValues.length - 1));
+		chart.getDomainAxis().setDefaultBottomBound(bottomBound - padding);
+		chart.getDomainAxis().setDefaultTopBound(topBound + padding);
 		chart.getRangeAxis().setDefaultBottomBound(0);
 
 		return chart;
@@ -382,8 +333,10 @@ public class CostsReport extends AbstractReport {
 
 	@Override
 	public int[] getGraphOptions() {
-		return new int[] { R.string.report_graph_month_history,
-				R.string.report_graph_year_history };
+		int[] options = new int[2];
+		options[GRAPH_OPTION_MONTH] = R.string.report_graph_month_history;
+		options[GRAPH_OPTION_YEAR] = R.string.report_graph_year_history;
+		return options;
 	}
 
 	private double[] getXValues(Dataset dataset) {

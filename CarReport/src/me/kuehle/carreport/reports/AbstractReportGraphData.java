@@ -19,10 +19,13 @@ package me.kuehle.carreport.reports;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.util.Calculator;
+import me.kuehle.chartlib.data.PointD;
 import me.kuehle.chartlib.data.Series;
 import me.kuehle.chartlib.renderer.AbstractRenderer;
 import me.kuehle.chartlib.renderer.LineRenderer;
@@ -104,6 +107,7 @@ public abstract class AbstractReportGraphData {
 	}
 
 	public AbstractReportGraphData createRegressionData() {
+		this.sort();
 		return new RegressionReportData(this);
 	}
 
@@ -114,12 +118,27 @@ public abstract class AbstractReportGraphData {
 		}
 		return series;
 	}
-	
+
 	public boolean isEmpty() {
 		return xValues.size() == 0 || yValues.size() == 0;
 	}
 
 	public int size() {
 		return xValues.size();
+	}
+
+	public void sort() {
+		ArrayList<PointD> points = new ArrayList<PointD>();
+		for (int i = 0; i < xValues.size(); i++) {
+			points.add(new PointD(xValues.get(i), yValues.get(i)));
+		}
+
+		Collections.sort(points);
+		xValues.clear();
+		yValues.clear();
+		for (PointD point : points) {
+			xValues.add((long) point.x);
+			yValues.add(point.y);
+		}
 	}
 }
