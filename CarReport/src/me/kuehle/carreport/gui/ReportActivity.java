@@ -31,6 +31,7 @@ import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -148,10 +149,12 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	public boolean onMenuItemClick(MenuItem item) {
 		if (item.getItemId() == R.id.menu_show_trend) {
 			mCurrentReport.setShowTrend(!item.isChecked());
+			saveGraphSettings();
 			updateReportGraph();
 			return true;
 		} else if (item.getGroupId() == R.id.group_graph) {
 			mCurrentGraphOption = item.getOrder();
+			saveGraphSettings();
 			updateReportGraph();
 			return true;
 		} else {
@@ -198,8 +201,8 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		default:
 			return;
 		}
-		mCurrentGraphOption = 0;
 
+		loadGraphSettings();
 		updateReportGraph();
 
 		ListView lstData = (ListView) findViewById(R.id.lstData);
@@ -216,6 +219,29 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			graphHolder.setVisibility(View.GONE);
 		} else {
 			graphHolder.setVisibility(View.VISIBLE);
+		}
+	}
+
+	private void saveGraphSettings() {
+		SharedPreferences.Editor prefsEdit = getPreferences(
+				Context.MODE_PRIVATE).edit();
+		String reportName = mCurrentReport.getClass().getSimpleName();
+		prefsEdit.putBoolean(reportName + "_show_trend",
+				mCurrentReport.isShowTrend());
+		prefsEdit.putInt(reportName + "_current_graph_option",
+				mCurrentGraphOption);
+		prefsEdit.apply();
+	}
+
+	private void loadGraphSettings() {
+		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+		String reportName = mCurrentReport.getClass().getSimpleName();
+		mCurrentReport.setShowTrend(prefs.getBoolean(
+				reportName + "_show_trend", false));
+		mCurrentGraphOption = prefs.getInt(
+				reportName + "_current_graph_option", 0);
+		if (mCurrentGraphOption >= mCurrentReport.getGraphOptions().length) {
+			mCurrentGraphOption = 0;
 		}
 	}
 

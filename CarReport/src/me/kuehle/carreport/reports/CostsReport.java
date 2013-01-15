@@ -122,14 +122,15 @@ public class CostsReport extends AbstractReport {
 	public static final int GRAPH_OPTION_MONTH = 0;
 	public static final int GRAPH_OPTION_YEAR = 1;
 
-	private static final long SEC_PER_MONTH = 1000l * 60l * 60l * 24l * 30l;
-	private static final long SEC_PER_YEAR = 1000l * 60l * 60l * 24l * 365l;
+	private static final long[] SEC_PER_PERIOD = {
+			1000l * 60l * 60l * 24l * 30l, 1000l * 60l * 60l * 24l * 365l };
 
 	private SparseArray<ReportGraphData> costsPerMonth = new SparseArray<ReportGraphData>();
 	private SparseArray<ReportGraphData> costsPerYear = new SparseArray<ReportGraphData>();
 	private String unit;
 	private boolean showLegend;
-	private String[] xLabelFormat = { "MMM, yyyy", "yyyy" };
+	private String[] xLabelFormat = new String[2];
+	private int visibleBarCount;
 
 	public CostsReport(Context context) {
 		super(context);
@@ -137,8 +138,16 @@ public class CostsReport extends AbstractReport {
 		Preferences prefs = new Preferences(context);
 		unit = prefs.getUnitCurrency();
 		showLegend = prefs.isShowLegend();
+
+		// Settings, which are based on the screen size.
 		if (context.getResources().getConfiguration().smallestScreenWidthDp > 480) {
-			xLabelFormat[0] = "MMMM, yyyy";
+			xLabelFormat[GRAPH_OPTION_MONTH] = "MMMM, yyyy";
+			xLabelFormat[GRAPH_OPTION_YEAR] = "yyyy";
+			visibleBarCount = 4;
+		} else {
+			xLabelFormat[GRAPH_OPTION_MONTH] = "MMM, yyyy";
+			xLabelFormat[GRAPH_OPTION_YEAR] = "yyyy";
+			visibleBarCount = 3;
 		}
 
 		Car[] cars = Car.getAll();
@@ -317,13 +326,11 @@ public class CostsReport extends AbstractReport {
 				return date.toString(xLabelFormat[option]);
 			}
 		});
-		chart.getDomainAxis().setZoomable(false);
-		double padding = (option == GRAPH_OPTION_MONTH ? SEC_PER_MONTH
-				: SEC_PER_YEAR) / 2;
+		double padding = SEC_PER_PERIOD[option] / 2;
 		double topBound = dataset.maxX();
 		double bottomBound = topBound
-				- ((option == GRAPH_OPTION_MONTH ? SEC_PER_MONTH : SEC_PER_YEAR) * Math
-						.min(2, xValues.length - 1));
+				- (SEC_PER_PERIOD[option] * Math.min(visibleBarCount - 1,
+						xValues.length - 1));
 		chart.getDomainAxis().setDefaultBottomBound(bottomBound - padding);
 		chart.getDomainAxis().setDefaultTopBound(topBound + padding);
 		chart.getRangeAxis().setDefaultBottomBound(0);

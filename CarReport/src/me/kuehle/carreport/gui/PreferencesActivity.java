@@ -33,7 +33,6 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ListFragment;
-import android.app.backup.BackupManager;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
@@ -647,9 +646,8 @@ public class PreferencesActivity extends PreferenceActivity {
 				} else if (preference instanceof EditTextPreference) {
 					preference.setSummary(newValue.toString());
 				}
-				BackupManager backupManager = new BackupManager(getActivity()
-						.getApplicationContext());
-				backupManager.dataChanged();
+				
+				Helper.getInstance().dataChanged();
 				return true;
 			}
 		};
