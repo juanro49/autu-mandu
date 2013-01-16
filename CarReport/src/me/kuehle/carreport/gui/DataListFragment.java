@@ -17,7 +17,6 @@
 package me.kuehle.carreport.gui;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -34,6 +33,7 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -46,11 +46,12 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
+import android.widget.TextView;
 
 public class DataListFragment extends Fragment {
 	public abstract class AbstractTabHelper {
@@ -59,6 +60,7 @@ public class DataListFragment extends Fragment {
 
 		public AbstractTabHelper(ListView listView) {
 			mListView = listView;
+			mListView.setAdapter(new DataListAdapter());
 		}
 
 		protected abstract int getAlertDeleteManyMessage();
@@ -116,44 +118,45 @@ public class DataListFragment extends Fragment {
 
 		@Override
 		protected void updateListAdapter() {
-			ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
-			SimpleAdapter adapter = new SimpleAdapter(getActivity(), data,
-					R.layout.two_line_list_item_5, new String[] { "text_tl",
-							"text_tr", "text_bl", "text_bm", "text_br" },
-					new int[] { R.id.text_tl, R.id.text_tr, R.id.text_bl,
-							R.id.text_bm, R.id.text_br });
+			ArrayList<SparseArray<String>> data = new ArrayList<SparseArray<String>>();
 
 			Preferences prefs = new Preferences(getActivity());
 			java.text.DateFormat dateFmt = DateFormat
 					.getDateFormat(getActivity());
 			String[] repIntervals = getResources().getStringArray(
 					R.array.repeat_intervals);
-			for (AbstractItem item : mItems) {
-				OtherCost other = (OtherCost) item;
-				HashMap<String, String> map = new HashMap<String, String>();
-				map.put("text_tl", dateFmt.format(other.getDate()));
-				map.put("text_tr", other.getTitle());
+			for (int i = 0; i < mItems.length; i++) {
+				OtherCost other = (OtherCost) mItems[i];
+				SparseArray<String> dataItem = new SparseArray<String>();
+				dataItem.put(R.id.title, other.getTitle());
+				dataItem.put(R.id.date, dateFmt.format(other.getDate()));
 				if (other.getMileage() > -1) {
-					map.put("text_bl",
+					dataItem.put(
+							R.id.data1,
 							String.format("%d %s", other.getMileage(),
 									prefs.getUnitDistance()));
-				} else {
-					map.put("text_bl", "");
 				}
-				if (other.getRecurrence().getInterval()
-						.equals(RecurrenceInterval.ONCE)) {
-					map.put("text_bm", "");
-				} else {
-					map.put("text_bm", repIntervals[other.getRecurrence()
-							.getInterval().getValue()]);
-				}
-				map.put("text_br",
+				dataItem.put(
+						R.id.data2,
 						String.format("%.2f %s", other.getPrice(),
 								prefs.getUnitCurrency()));
-				data.add(map);
+				dataItem.put(R.id.data3, repIntervals[other.getRecurrence()
+						.getInterval().getValue()]);
+				if (!other.getRecurrence().getInterval()
+						.equals(RecurrenceInterval.ONCE)) {
+					int recurrences = other.getRecurrence()
+							.getRecurrencesSince(other.getDate());
+					dataItem.put(
+							R.id.data2_calculated,
+							String.format("%.2f %s", other.getPrice()
+									* recurrences, prefs.getUnitCurrency()));
+					dataItem.put(R.id.data3_calculated,
+							String.format("x%d", recurrences));
+				}
+				data.add(dataItem);
 			}
 
-			mListView.setAdapter(adapter);
+			((DataListAdapter) mListView.getAdapter()).setData(data);
 		}
 
 		@Override
@@ -194,41 +197,121 @@ public class DataListFragment extends Fragment {
 
 		@Override
 		protected void updateListAdapter() {
-			ArrayList<HashMap<String, String>> data = new ArrayList<HashMap<String, String>>();
-			SimpleAdapter adapter = new SimpleAdapter(getActivity(), data,
-					R.layout.two_line_list_item_5, new String[] { "text_tl",
-							"text_tr", "text_bl", "text_bm", "text_br" },
-					new int[] { R.id.text_tl, R.id.text_tr, R.id.text_bl,
-							R.id.text_bm, R.id.text_br });
+			ArrayList<SparseArray<String>> data = new ArrayList<SparseArray<String>>();
 
 			Preferences prefs = new Preferences(getActivity());
 			java.text.DateFormat dateFmt = DateFormat
 					.getDateFormat(getActivity());
-			for (AbstractItem item : mItems) {
-				Refueling refueling = (Refueling) item;
-				HashMap<String, String> map = new HashMap<String, String>();
-				map.put("text_tl", dateFmt.format(refueling.getDate()));
-				map.put("text_tr",
-						refueling.isPartial() ? getString(R.string.label_partial)
-								: "");
-				map.put("text_bl",
+			for (int i = 0; i < mItems.length; i++) {
+				Refueling refueling = (Refueling) mItems[i];
+				SparseArray<String> dataItem = new SparseArray<String>();
+				dataItem.put(R.id.title,
+						getString(R.string.edit_title_refueling));
+				dataItem.put(R.id.date, dateFmt.format(refueling.getDate()));
+				dataItem.put(
+						R.id.data1,
 						String.format("%d %s", refueling.getMileage(),
 								prefs.getUnitDistance()));
-				map.put("text_bm",
-						String.format("%.2f %s", refueling.getVolume(),
-								prefs.getUnitVolume()));
-				map.put("text_br",
+				if (i + 1 < mItems.length) {
+					Refueling nextRefueling = (Refueling) mItems[i + 1];
+					dataItem.put(
+							R.id.data1_calculated,
+							String.format("+ %d %s", refueling.getMileage()
+									- nextRefueling.getMileage(),
+									prefs.getUnitDistance()));
+				}
+				dataItem.put(
+						R.id.data2,
 						String.format("%.2f %s", refueling.getPrice(),
 								prefs.getUnitCurrency()));
-				data.add(map);
+				dataItem.put(
+						R.id.data2_calculated,
+						String.format("%.2f %s/%s", refueling.getPrice()
+								/ refueling.getVolume(),
+								prefs.getUnitCurrency(), prefs.getUnitVolume()));
+				dataItem.put(
+						R.id.data3,
+						String.format("%.2f %s", refueling.getVolume(),
+								prefs.getUnitVolume()));
+				if (refueling.isPartial()) {
+					dataItem.put(R.id.data3_calculated,
+							getString(R.string.label_partial));
+				} else if (i + 1 < mItems.length) {
+					float diffVolume = refueling.getVolume();
+					for (int j = i + 1; j < mItems.length; j++) {
+						Refueling nextRefueling = (Refueling) mItems[j];
+						if (nextRefueling.isPartial()) {
+							diffVolume += nextRefueling.getVolume();
+						} else {
+							int diffMileage = refueling.getMileage()
+									- nextRefueling.getMileage();
+							dataItem.put(
+									R.id.data3_calculated,
+									String.format("%.2f %s/100%s", diffVolume
+											/ diffMileage * 100,
+											prefs.getUnitVolume(),
+											prefs.getUnitDistance()));
+							break;
+						}
+					}
+				}
+				data.add(dataItem);
 			}
 
-			mListView.setAdapter(adapter);
+			((DataListAdapter) mListView.getAdapter()).setData(data);
 		}
 
 		@Override
 		protected int getExtraEdit() {
 			return DataDetailActivity.EXTRA_EDIT_REFUELING;
+		}
+	}
+
+	public class DataListAdapter extends BaseAdapter {
+		private ArrayList<SparseArray<String>> data = new ArrayList<SparseArray<String>>();
+		private int[] fields = { R.id.title, R.id.date, R.id.data1,
+				R.id.data1_calculated, R.id.data2, R.id.data2_calculated,
+				R.id.data3, R.id.data3_calculated };
+
+		@Override
+		public int getCount() {
+			return data.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return data.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+				convertView = getActivity().getLayoutInflater().inflate(
+						R.layout.data_list_item, parent, false);
+			}
+
+			SparseArray<String> item = data.get(position);
+			for (int field : fields) {
+				TextView textView = (TextView) convertView.findViewById(field);
+				String value = item.get(field);
+				if (value != null) {
+					textView.setText(value);
+					textView.setVisibility(View.VISIBLE);
+				} else {
+					textView.setVisibility(View.INVISIBLE);
+				}
+			}
+
+			return convertView;
+		}
+
+		public void setData(ArrayList<SparseArray<String>> data) {
+			this.data = data;
 		}
 	}
 
