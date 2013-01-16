@@ -34,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceListItem" />
         <TextView
             android:id="@+id/date"
@@ -41,6 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/title"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
     <RelativeLayout
@@ -56,6 +58,7 @@
             android:background="@drawable/data_list_item_calculated"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/primary_text_dark" />
         <TextView
@@ -64,10 +67,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@id/data1_calculated"
-            android:background="@drawable/data_list_item_calculated"
             android:layout_marginTop="2dp"
+            android:background="@drawable/data_list_item_calculated"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/primary_text_dark" />
         <TextView
@@ -80,29 +84,32 @@
             android:background="@drawable/data_list_item_calculated"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/primary_text_dark" />
-        
         <TextView
             android:id="@+id/data1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignBaseline="@id/data1_calculated"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <TextView
             android:id="@+id/data2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignBaseline="@id/data2_calculated"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <TextView
             android:id="@+id/data3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignBaseline="@id/data3_calculated"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </RelativeLayout>
 </LinearLayout>
