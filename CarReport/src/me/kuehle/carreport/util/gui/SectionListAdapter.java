@@ -63,7 +63,7 @@ public class SectionListAdapter extends BaseAdapter {
 			if (another instanceof Section) {
 				return -1;
 			} else {
-				//return label.compareTo(another.getLabel());
+				// return label.compareTo(another.getLabel());
 				return 0;
 			}
 		}
@@ -168,12 +168,14 @@ public class SectionListAdapter extends BaseAdapter {
 	private static final int ITEM_VIEW_TYPE_COUNT = 2;
 
 	private Context context;
+	private int itemViewID;
 	private AbstractListItem[] items;
 	private boolean colorSections;
 
-	public SectionListAdapter(Context context,
+	public SectionListAdapter(Context context, int itemViewID,
 			ArrayList<? extends AbstractListItem> data, boolean colorSections) {
 		this.context = context;
+		this.itemViewID = itemViewID;
 		ArrayList<AbstractListItem> items = new ArrayList<AbstractListItem>();
 		for (AbstractListItem item : data) {
 			items.add(item);
@@ -208,15 +210,14 @@ public class SectionListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final int type = getItemViewType(position);
+		int type = getItemViewType(position);
 
 		if (convertView == null) {
 			convertView = LayoutInflater
 					.from(context)
 					.inflate(
 							type == ITEM_VIEW_TYPE_SEPARATOR ? R.layout.separator_list_item
-									: android.R.layout.simple_list_item_2,
-							parent, false);
+									: itemViewID, parent, false);
 		}
 
 		if (type == ITEM_VIEW_TYPE_SEPARATOR) {

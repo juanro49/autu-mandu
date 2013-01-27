@@ -207,8 +207,9 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 
 		ListView lstData = (ListView) findViewById(R.id.lstData);
 		Preferences prefs = new Preferences(ReportActivity.this);
-		lstData.setAdapter(new SectionListAdapter(this, mCurrentReport
-				.getData().getData(), prefs.isColorSections()));
+		lstData.setAdapter(new SectionListAdapter(this,
+				R.layout.report_list_item, mCurrentReport.getData().getData(),
+				prefs.isColorSections()));
 	}
 
 	private void updateReportGraph() {

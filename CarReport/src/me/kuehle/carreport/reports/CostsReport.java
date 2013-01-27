@@ -47,18 +47,21 @@ public class CostsReport extends AbstractReport {
 	private class CalculableItem extends ReportData.AbstractCalculableItem {
 		private static final String FORMAT = "%.2f %s";
 		private double value;
-		private int pluralId;
+		private String calcLabel;
+		private int calcLabelPluralId;
 
-		public CalculableItem(int labelId, double value) {
-			super(context.getResources().getQuantityString(labelId, 1), String
-					.format(FORMAT, value, unit));
-			this.pluralId = labelId;
+		public CalculableItem(String defaultLabel, int calclabelPluralId,
+				double value) {
+			super(defaultLabel, String.format(FORMAT, value, unit));
+			this.calcLabelPluralId = calclabelPluralId;
 			this.value = value;
 		}
 
-		public CalculableItem(String label, double value) {
-			super(label, String.format(FORMAT, value, unit));
-			this.pluralId = -1;
+		public CalculableItem(String defaultLabel, String calcLabel,
+				double value) {
+			super(defaultLabel, String.format(FORMAT, value, unit));
+			this.calcLabel = calcLabel;
+			this.calcLabelPluralId = -1;
 			this.value = value;
 		}
 
@@ -67,10 +70,10 @@ public class CostsReport extends AbstractReport {
 			double result = value * value1;
 			setValue(String.format(FORMAT, result, unit));
 
-			String newLabel = origLabel;
-			if (pluralId != -1) {
-				newLabel = context.getResources().getQuantityString(pluralId,
-						value1 == 1 ? 1 : 2);
+			String newLabel = calcLabel;
+			if (calcLabelPluralId != -1) {
+				newLabel = context.getResources().getQuantityString(
+						calcLabelPluralId, value1 == 1 ? 1 : 2);
 			}
 			setLabel((value1 == (int) value1 ? String.valueOf((int) value1)
 					: String.valueOf(value1)) + " " + newLabel);
@@ -249,19 +252,26 @@ public class CostsReport extends AbstractReport {
 			double costsPerSecond = costs / elapsedSeconds.getSeconds();
 			// 60 seconds per minute * 60 minutes per hour * 24 hours per day =
 			// 86400 seconds per day
-			section.addItem(new CalculableItem(R.plurals.report_day,
+			section.addItem(new CalculableItem("\u00D8 "
+					+ context.getResources().getQuantityString(
+							R.plurals.report_day, 1), R.plurals.report_day,
 					costsPerSecond * 86400));
 			// 86400 seconds per day * 30,4375 days per month = 2629800 seconds
 			// per month
 			// (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
-			section.addItem(new CalculableItem(R.plurals.report_month,
+			section.addItem(new CalculableItem("\u00D8 "
+					+ context.getResources().getQuantityString(
+							R.plurals.report_month, 1), R.plurals.report_month,
 					costsPerSecond * 2629800));
 			// 86400 seconds per day * 365,25 days per year = 31557600 seconds
 			// per year
-			section.addItem(new CalculableItem(R.plurals.report_year,
+			section.addItem(new CalculableItem("\u00D8 "
+					+ context.getResources().getQuantityString(
+							R.plurals.report_year, 1), R.plurals.report_year,
 					costsPerSecond * 31557600));
 			int tachoDiff = Math.max(1, endMileage - startMileage);
-			section.addItem(new CalculableItem(prefs.getUnitDistance(), costs
+			section.addItem(new CalculableItem("\u00D8 "
+					+ prefs.getUnitDistance(), prefs.getUnitDistance(), costs
 					/ tachoDiff));
 
 			section.addItem(new Item(context.getString(R.string.report_since,

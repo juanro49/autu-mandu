@@ -101,7 +101,7 @@
     <string name="report_graph_year_history">Jahr Historie</string>
     <string name="report_not_enough_data">Zu wenige Daten</string>
     <string name="report_overall">Gesamt</string>
-    <string name="report_since">seit %s</string>
+    <string name="report_since">&#931; seit %s</string>
     <string name="report_lowest">Niedrigster</string>
     <string name="report_highest">Höchster</string>
     <string name="report_at_least">Mindestens</string>
