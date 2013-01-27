@@ -243,6 +243,8 @@ public class CSVExportImport {
 					+ "_othercosts.csv");
 
 			SparseArray<SpecialColumnType> columnTypesCars = new SparseArray<CSVWriter.SpecialColumnType>();
+			columnTypesCars.put(3, new CSVWriter.SpecialColumnType(Date.class,
+					dateFormat));
 			SparseArray<SpecialColumnType> columnTypesRefuelings = new SparseArray<SpecialColumnType>();
 			columnTypesRefuelings.put(1, new CSVWriter.SpecialColumnType(
 					Date.class, dateFormat));

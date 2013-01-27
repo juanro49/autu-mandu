@@ -115,12 +115,14 @@ public class CSVWriter {
 
 	public void writeColumn(String column) {
 		data.append(QUOTE);
-		for (int j = 0; j < column.length(); j++) {
-			char nextChar = column.charAt(j);
-			if (nextChar == QUOTE || nextChar == ESCAPE) {
-				data.append(ESCAPE).append(nextChar);
-			} else if (nextChar != NEW_LINE) {
-				data.append(nextChar);
+		if (column != null) {
+			for (int j = 0; j < column.length(); j++) {
+				char nextChar = column.charAt(j);
+				if (nextChar == QUOTE || nextChar == ESCAPE) {
+					data.append(ESCAPE).append(nextChar);
+				} else if (nextChar != NEW_LINE) {
+					data.append(nextChar);
+				}
 			}
 		}
 		data.append(QUOTE);
