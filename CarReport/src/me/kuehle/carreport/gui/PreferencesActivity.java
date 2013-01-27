@@ -389,6 +389,112 @@ public class PreferencesActivity extends PreferenceActivity {
 			public Button color;
 		}
 
+		private class CarMultiChoiceModeListener implements MultiChoiceModeListener {
+			private ActionMode mode;
+
+			private DialogInterface.OnClickListener deleteOnClickListener = new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					execActionAndFinish(new IForEach<Car>() {
+						public void action(Car car) {
+							car.delete();
+						}
+					});
+				}
+			};
+
+			@Override
+			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+				switch (item.getItemId()) {
+				case R.id.menu_suspend:
+					execActionAndFinish(new IForEach<Car>() {
+						Date now = new Date();
+
+						public void action(Car car) {
+							if (!car.isSuspended()) {
+								car.setSuspended(now);
+								car.save();
+							}
+						}
+					});
+					return true;
+				case R.id.menu_unsuspend:
+					execActionAndFinish(new IForEach<Car>() {
+						public void action(Car car) {
+							car.setSuspended(null);
+							car.save();
+						}
+					});
+					return true;
+				case R.id.menu_delete:
+					if (getListView().getCheckedItemCount() == cars.length) {
+						new AlertDialog.Builder(getActivity())
+								.setTitle(R.string.alert_delete_title)
+								.setMessage(
+										R.string.alert_cannot_delete_last_car)
+								.setPositiveButton(android.R.string.ok, null)
+								.show();
+					} else {
+						String message = getString(
+								R.string.alert_delete_cars_message,
+								getListView().getCheckedItemCount());
+						new AlertDialog.Builder(getActivity())
+								.setTitle(R.string.alert_delete_title)
+								.setMessage(message)
+								.setPositiveButton(android.R.string.yes,
+										deleteOnClickListener)
+								.setNegativeButton(android.R.string.no, null)
+								.show();
+					}
+					return true;
+				default:
+					return false;
+				}
+			}
+
+			@Override
+			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+				this.mode = mode;
+				MenuInflater inflater = mode.getMenuInflater();
+				inflater.inflate(R.menu.edit_cars_cab, menu);
+				return true;
+			}
+
+			@Override
+			public void onDestroyActionMode(ActionMode mode) {
+			}
+
+			@Override
+			public void onItemCheckedStateChanged(ActionMode mode,
+					int position, long id, boolean checked) {
+				int count = getListView().getCheckedItemCount();
+				mode.setTitle(String.format(
+						getString(R.string.cab_title_selected), count));
+			}
+
+			@Override
+			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+				return false;
+			}
+			
+			public void finishActionMode() {
+				mode.finish();
+			}
+
+			private void execActionAndFinish(IForEach<Car> forEach) {
+				SparseBooleanArray selected = getListView()
+						.getCheckedItemPositions();
+				for (int i = 0; i < cars.length; i++) {
+					if (selected.get(i)) {
+						forEach.action(cars[i]);
+					}
+				}
+
+				mode.finish();
+				fillList();
+			}
+		}
+		
 		private Car[] cars;
 
 		private OnItemClickListener onItemClickListener = new OnItemClickListener() {
@@ -461,108 +567,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			}
 		};
 
-		private MultiChoiceModeListener multiChoiceModeListener = new MultiChoiceModeListener() {
-			private ActionMode mode;
-
-			private DialogInterface.OnClickListener deleteOnClickListener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					execActionAndFinish(new IForEach<Car>() {
-						public void action(Car car) {
-							car.delete();
-						}
-					});
-				}
-			};
-
-			@Override
-			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-				this.mode = mode;
-
-				switch (item.getItemId()) {
-				case R.id.menu_suspend:
-					execActionAndFinish(new IForEach<Car>() {
-						Date now = new Date();
-
-						public void action(Car car) {
-							if (!car.isSuspended()) {
-								car.setSuspended(now);
-								car.save();
-							}
-						}
-					});
-					return true;
-				case R.id.menu_unsuspend:
-					execActionAndFinish(new IForEach<Car>() {
-						public void action(Car car) {
-							car.setSuspended(null);
-							car.save();
-						}
-					});
-					return true;
-				case R.id.menu_delete:
-					if (getListView().getCheckedItemCount() == cars.length) {
-						new AlertDialog.Builder(getActivity())
-								.setTitle(R.string.alert_delete_title)
-								.setMessage(
-										R.string.alert_cannot_delete_last_car)
-								.setPositiveButton(android.R.string.ok, null)
-								.show();
-					} else {
-						String message = getString(
-								R.string.alert_delete_cars_message,
-								getListView().getCheckedItemCount());
-						new AlertDialog.Builder(getActivity())
-								.setTitle(R.string.alert_delete_title)
-								.setMessage(message)
-								.setPositiveButton(android.R.string.yes,
-										deleteOnClickListener)
-								.setNegativeButton(android.R.string.no, null)
-								.show();
-					}
-					return true;
-				default:
-					return false;
-				}
-			}
-
-			@Override
-			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-				MenuInflater inflater = mode.getMenuInflater();
-				inflater.inflate(R.menu.edit_cars_cab, menu);
-				return true;
-			}
-
-			@Override
-			public void onDestroyActionMode(ActionMode mode) {
-			}
-
-			@Override
-			public void onItemCheckedStateChanged(ActionMode mode,
-					int position, long id, boolean checked) {
-				int count = getListView().getCheckedItemCount();
-				mode.setTitle(String.format(
-						getString(R.string.cab_title_selected), count));
-			}
-
-			@Override
-			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-				return false;
-			}
-
-			private void execActionAndFinish(IForEach<Car> forEach) {
-				SparseBooleanArray selected = getListView()
-						.getCheckedItemPositions();
-				for (int i = 0; i < cars.length; i++) {
-					if (selected.get(i)) {
-						forEach.action(cars[i]);
-					}
-				}
-
-				mode.finish();
-				fillList();
-			}
-		};
+		private CarMultiChoiceModeListener multiChoiceModeListener = new CarMultiChoiceModeListener();
 
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
@@ -571,7 +576,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			getListView().setOnItemClickListener(onItemClickListener);
 			getListView().setMultiChoiceModeListener(multiChoiceModeListener);
 			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
+			
 			fillList();
 		}
 
@@ -615,6 +620,12 @@ public class PreferencesActivity extends PreferenceActivity {
 			}
 		}
 
+		@Override
+		public void onStop() {
+			super.onStop();
+			multiChoiceModeListener.finishActionMode();
+		}
+		
 		private void fillList() {
 			cars = Car.getAll();
 			setListAdapter(new CarAdapter());
