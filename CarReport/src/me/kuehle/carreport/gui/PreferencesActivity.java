@@ -389,7 +389,8 @@ public class PreferencesActivity extends PreferenceActivity {
 			public Button color;
 		}
 
-		private class CarMultiChoiceModeListener implements MultiChoiceModeListener {
+		private class CarMultiChoiceModeListener implements
+				MultiChoiceModeListener {
 			private ActionMode mode;
 
 			private DialogInterface.OnClickListener deleteOnClickListener = new DialogInterface.OnClickListener() {
@@ -476,9 +477,11 @@ public class PreferencesActivity extends PreferenceActivity {
 			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 				return false;
 			}
-			
+
 			public void finishActionMode() {
-				mode.finish();
+				if (mode != null) {
+					mode.finish();
+				}
 			}
 
 			private void execActionAndFinish(IForEach<Car> forEach) {
@@ -494,7 +497,7 @@ public class PreferencesActivity extends PreferenceActivity {
 				fillList();
 			}
 		}
-		
+
 		private Car[] cars;
 
 		private OnItemClickListener onItemClickListener = new OnItemClickListener() {
@@ -576,7 +579,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			getListView().setOnItemClickListener(onItemClickListener);
 			getListView().setMultiChoiceModeListener(multiChoiceModeListener);
 			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-			
+
 			fillList();
 		}
 
@@ -625,7 +628,7 @@ public class PreferencesActivity extends PreferenceActivity {
 			super.onStop();
 			multiChoiceModeListener.finishActionMode();
 		}
-		
+
 		private void fillList() {
 			cars = Car.getAll();
 			setListAdapter(new CarAdapter());
@@ -657,7 +660,7 @@ public class PreferencesActivity extends PreferenceActivity {
 				} else if (preference instanceof EditTextPreference) {
 					preference.setSummary(newValue.toString());
 				}
-				
+
 				Helper.getInstance().dataChanged();
 				return true;
 			}
