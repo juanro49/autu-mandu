@@ -19,6 +19,7 @@
     <string-array name="reports">
         <item>Benzinverbrauch</item>
         <item>Benzinpreis</item>
+        <item>Kilometerstand</item>
         <item>Kosten</item>
     </string-array>
     <string-array name="overall_section_positions">

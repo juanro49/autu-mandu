@@ -99,6 +99,8 @@
     <string name="report_trend_label">%s (Trend)</string>
     <string name="report_graph_month_history">Monat Historie</string>
     <string name="report_graph_year_history">Jahr Historie</string>
+    <string name="report_graph_accumulated">Kumuliert</string>
+    <string name="report_graph_normal">Normal</string>
     <string name="report_not_enough_data">Zu wenige Daten</string>
     <string name="report_overall">Gesamt</string>
     <string name="report_since">&#931; seit %s</string>
@@ -109,6 +111,7 @@
     <string name="report_average">Durchschnitt</string>
     <string name="report_toast_car">Auto</string>
     <string name="report_toast_consumption">Verbrauch</string>
+    <string name="report_toast_mileage">Kilometer</string>
     <string name="report_toast_price">Preis</string>
     <string name="report_toast_date">Datum</string>
     <string name="report_calc_multiply_name">Multiplizieren</string>

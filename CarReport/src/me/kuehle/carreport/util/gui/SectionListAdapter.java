@@ -70,9 +70,9 @@ public class SectionListAdapter extends BaseAdapter {
 	}
 
 	public static class Section extends AbstractListItem {
-		public static final int DONT_STICK = -1;
-		public static final int STICK_TOP = 0;
-		public static final int STICK_BOTTOM = 1;
+		public static final int DONT_STICK = 0;
+		public static final int STICK_TOP = Integer.MIN_VALUE;
+		public static final int STICK_BOTTOM = Integer.MAX_VALUE;
 
 		private int color;
 		private int stick;
@@ -99,11 +99,9 @@ public class SectionListAdapter extends BaseAdapter {
 				return 1;
 			} else {
 				Section otherSection = (Section) another;
-				if (stick == STICK_TOP && otherSection.getStick() != STICK_TOP) {
-					return -1;
-				} else if (stick == STICK_BOTTOM
-						&& otherSection.getStick() != STICK_BOTTOM) {
-					return 1;
+				if (stick != otherSection.getStick()) {
+					return Integer.valueOf(stick).compareTo(
+							otherSection.getStick());
 				} else {
 					return label.compareTo(another.getLabel());
 				}

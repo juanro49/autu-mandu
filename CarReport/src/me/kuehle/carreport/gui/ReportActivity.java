@@ -23,6 +23,7 @@ import me.kuehle.carreport.reports.AbstractReport.CalculationOption;
 import me.kuehle.carreport.reports.CostsReport;
 import me.kuehle.carreport.reports.FuelConsumptionReport;
 import me.kuehle.carreport.reports.FuelPriceReport;
+import me.kuehle.carreport.reports.MileageReport;
 import me.kuehle.carreport.util.gui.SectionListAdapter;
 import me.kuehle.carreport.util.gui.WeightAnimator;
 import me.kuehle.chartlib.ChartView;
@@ -89,6 +90,15 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.report, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		if (mCurrentReport != null) {
+			menu.findItem(R.id.menu_calculate).setEnabled(
+					mCurrentReport.getCalculationOptions().length > 0);
+		}
 		return true;
 	}
 
@@ -196,6 +206,9 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			mCurrentReport = new FuelPriceReport(getApplicationContext());
 			break;
 		case 2:
+			mCurrentReport = new MileageReport(getApplicationContext());
+			break;
+		case 3:
 			mCurrentReport = new CostsReport(getApplicationContext());
 			break;
 		default:
