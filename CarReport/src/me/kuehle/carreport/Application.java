@@ -17,6 +17,7 @@
 package me.kuehle.carreport;
 
 import me.kuehle.carreport.db.Helper;
+import me.kuehle.carreport.util.backup.Dropbox;
 
 public class Application extends android.app.Application {
 	@Override
@@ -25,5 +26,10 @@ public class Application extends android.app.Application {
 		System.setProperty("org.joda.time.DateTimeZone.Provider",
 				"org.joda.time.tz.UTCProvider");
 		Helper.init(this);
+		Dropbox.init(this);
+
+		if (new Preferences(this).isSyncOnStart()) {
+			Dropbox.getInstance().synchronize();
+		}
 	}
 }

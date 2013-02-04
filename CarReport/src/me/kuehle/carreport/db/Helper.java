@@ -16,6 +16,8 @@
 
 package me.kuehle.carreport.db;
 
+import me.kuehle.carreport.Preferences;
+import me.kuehle.carreport.util.backup.Dropbox;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -44,6 +46,9 @@ public class Helper extends SQLiteOpenHelper {
 	public void dataChanged() {
 		BackupManager backupManager = new BackupManager(context);
 		backupManager.dataChanged();
+		if (new Preferences(context).isSyncOnChange()) {
+			Dropbox.getInstance().synchronize();
+		}
 	}
 
 	@Override

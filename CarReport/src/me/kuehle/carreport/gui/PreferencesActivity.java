@@ -29,10 +29,12 @@ import me.kuehle.carreport.db.Helper;
 import me.kuehle.carreport.util.IForEach;
 import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.backup.CSVExportImport;
+import me.kuehle.carreport.util.backup.Dropbox;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
@@ -112,8 +114,25 @@ public class PreferencesActivity extends PreferenceActivity {
 	}
 
 	public static class BackupFragment extends PreferenceFragment {
+		private Dropbox dropbox;
+		private boolean dropboxAuthenticationInProgress = false;
 		private Backup backup;
 		private CSVExportImport csvExportImport;
+
+		private OnPreferenceClickListener mSyncDropbox = new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				if (dropbox.isLinked()) {
+					dropbox.unlink();
+					setupDropdoxPreference();
+				} else {
+					dropboxAuthenticationInProgress = true;
+					dropbox.startAuthentication(getActivity());
+				}
+
+				return true;
+			}
+		};
 
 		private OnPreferenceClickListener mBackup = new OnPreferenceClickListener() {
 			@Override
@@ -279,9 +298,15 @@ public class PreferencesActivity extends PreferenceActivity {
 			super.onCreate(savedInstanceState);
 
 			addPreferencesFromResource(R.xml.preferences_backup);
+			dropbox = Dropbox.getInstance();
 			backup = new Backup();
 			csvExportImport = new CSVExportImport(
 					DateFormat.getDateTimeInstance());
+
+			// Sync Dropbox
+			{
+				setupDropdoxPreference();
+			}
 
 			// Backup
 			{
@@ -306,6 +331,81 @@ public class PreferencesActivity extends PreferenceActivity {
 			{
 				Preference import_ = findPreference("importcsv");
 				import_.setOnPreferenceClickListener(mImportCSV);
+			}
+		}
+
+		@Override
+		public void onResume() {
+			super.onResume();
+			
+			if (dropboxAuthenticationInProgress) {
+				dropboxAuthenticationInProgress = false;
+
+				final ProgressDialog progressDialog = new ProgressDialog(
+						getActivity());
+				progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				progressDialog
+						.setMessage(getString(R.string.alert_dropbox_finishing_authentication));
+				progressDialog.setCancelable(false);
+				progressDialog.show();
+
+				dropbox.finishAuthentication(new Dropbox.OnAuthenticationFinishedListener() {
+					@Override
+					public void authenticationFinished(boolean success,
+							String accountName, boolean remoteDataAvailable) {
+						progressDialog.dismiss();
+						if (success) {
+							setupDropdoxPreference();
+							if (remoteDataAvailable) {
+								dropboxFirstSynchronisation();
+							} else {
+								dropbox.synchronize(Dropbox.SYNC_UPLOAD);
+							}
+						} else {
+							Toast.makeText(
+									getActivity(),
+									R.string.toast_dropbox_authentication_failed,
+									Toast.LENGTH_SHORT).show();
+						}
+					}
+				});
+			}
+		}
+
+		private void dropboxFirstSynchronisation() {
+			new AlertDialog.Builder(getActivity())
+					.setTitle(R.string.alert_dropbox_first_sync_title)
+					.setMessage(R.string.alert_dropbox_first_sync_message)
+					.setPositiveButton(
+							R.string.alert_dropbox_first_sync_download,
+							new OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dropbox.synchronize(Dropbox.SYNC_DOWNLOAD);
+								}
+							})
+					.setNegativeButton(
+							R.string.alert_dropbox_first_sync_upload,
+							new OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dropbox.synchronize(Dropbox.SYNC_UPLOAD);
+								}
+							}).show();
+		}
+
+		private void setupDropdoxPreference() {
+			Preference sync = findPreference("sync_dropbox");
+			sync.setOnPreferenceClickListener(mSyncDropbox);
+
+			if (dropbox.isLinked()) {
+				sync.setSummary(getString(
+						R.string.pref_summary_sync_dropbox_unlink,
+						dropbox.getAccountName()));
+			} else {
+				sync.setSummary(R.string.pref_summary_sync_dropbox_link);
 			}
 		}
 
@@ -383,12 +483,6 @@ public class PreferencesActivity extends PreferenceActivity {
 			}
 		}
 
-		private static class CarViewHolder {
-			public TextView name;
-			public TextView suspended;
-			public Button color;
-		}
-
 		private class CarMultiChoiceModeListener implements
 				MultiChoiceModeListener {
 			private ActionMode mode;
@@ -403,6 +497,12 @@ public class PreferencesActivity extends PreferenceActivity {
 					});
 				}
 			};
+
+			public void finishActionMode() {
+				if (mode != null) {
+					mode.finish();
+				}
+			}
 
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -478,12 +578,6 @@ public class PreferencesActivity extends PreferenceActivity {
 				return false;
 			}
 
-			public void finishActionMode() {
-				if (mode != null) {
-					mode.finish();
-				}
-			}
-
 			private void execActionAndFinish(IForEach<Car> forEach) {
 				SparseBooleanArray selected = getListView()
 						.getCheckedItemPositions();
@@ -496,6 +590,12 @@ public class PreferencesActivity extends PreferenceActivity {
 				mode.finish();
 				fillList();
 			}
+		}
+
+		private static class CarViewHolder {
+			public TextView name;
+			public TextView suspended;
+			public Button color;
 		}
 
 		private Car[] cars;

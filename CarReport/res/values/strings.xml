@@ -32,6 +32,7 @@
     <string name="label_overwrite">Overwrite existing files</string>
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>
+    <string name="menu_synchronize">Synchronize</string>
     <string name="menu_add_refueling">Add refueling</string>
     <string name="menu_add_other">Add other</string>
     <string name="menu_settings">Settings</string>
@@ -72,6 +73,11 @@
     <string name="alert_validate_title">Additional values required</string>
     <string name="alert_validate_greater_zero">%s has to be greater 0.</string>
     <string name="alert_validate_not_empty">%s must not be empty.</string>
+    <string name="alert_dropbox_finishing_authentication">Finishing authentication…</string>
+    <string name="alert_dropbox_first_sync_title">First synchronization</string>
+    <string name="alert_dropbox_first_sync_message">There is remote data available. Please choose which data you want to use on your first synchronization.</string>
+    <string name="alert_dropbox_first_sync_download">Online data</string>
+    <string name="alert_dropbox_first_sync_upload">Local data</string>
     <string name="alert_backup_overwrite_title">Backup</string>
     <string name="alert_backup_overwrite_message">A previous backup file does already exist on SD card.</string>
     <string name="alert_restore_title">Restore</string>
@@ -80,10 +86,12 @@
     <string name="restore">Restore</string>
     <string name="export">Export</string>
     <string name="import_">Import</string>
+    <string name="toast_synchronization_failed">Synchronization failed.</string>
     <string name="toast_refueling_saved">Refueling saved.</string>
     <string name="toast_refueling_deleted">Refueling deleted.</string>
     <string name="toast_other_saved">Other cost saved.</string>
     <string name="toast_other_deleted">Other cost deleted.</string>
+    <string name="toast_dropbox_authentication_failed">Dropbox authentication failed.</string>
     <string name="toast_backup_success">Backup to file %s completed successfully.</string>
     <string name="toast_backup_failed">Backup failed.</string>
     <string name="toast_restore_success">Restore completed successfully.</string>
@@ -123,13 +131,13 @@
     <string name="pref_title_header_about">About Car Report</string>
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>
+    <string name="pref_title_category_syncronisation">Synchronisation</string>
     <string name="pref_title_header_backup">Backup &amp; Export</string>
     <string name="pref_title_category_defaults">Defaults</string>
     <string name="pref_title_category_appearance">Appearance</string>
     <string name="pref_title_category_units">Units</string>
     <string name="pref_title_category_backup">Backup &amp; Restore</string>
-    <string name="pref_title_category_export">Export</string>
-    <string name="pref_title_category_import">Import</string>
+    <string name="pref_title_category_export">Export &amp; Import</string>
     <string name="pref_title_default_car">Car</string>
     <string name="pref_title_default_report">Report</string>
     <string name="pref_title_appearance_overall_section_pos">Position of section Overall</string>
@@ -138,6 +146,9 @@
     <string name="pref_title_unit_currency">Currency</string>
     <string name="pref_title_unit_volume">Volume</string>
     <string name="pref_title_unit_distance">Distance</string>
+    <string name="pref_title_sync_dropbox">Dropbox</string>
+    <string name="pref_title_sync_on_start">Synchronize when app starts</string>
+    <string name="pref_title_sync_on_change">Synchronize when data has changed</string>
     <string name="pref_title_backup">Backup</string>
     <string name="pref_title_restore">Restore</string>
     <string name="pref_title_exportcsv">Export CSV</string>
@@ -145,6 +156,8 @@
     <string name="pref_summary_appearance_overall_section_pos">The section Overall displays average values, when you use the app for more than one car. Set position: %s</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
+    <string name="pref_summary_sync_dropbox_link">Setup synchronization with dropbox. Please note: This is a very simple synchronization. When you change something on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes.</string>
+    <string name="pref_summary_sync_dropbox_unlink">Linked to %s. Click to unlink.</string>
     <string name="pref_summary_backup">Backup the current data to SD card.</string>
     <string name="pref_summary_restore">Restore data from file %s on SD card.</string>
     <string name="pref_summary_restore_no_data">File %s does not exist on SD card.</string>

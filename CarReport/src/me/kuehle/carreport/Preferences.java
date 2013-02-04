@@ -19,6 +19,7 @@ package me.kuehle.carreport;
 import me.kuehle.carreport.db.Car;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
 public class Preferences {
@@ -41,6 +42,22 @@ public class Preferences {
 
 	public int getDefaultReport() {
 		return Integer.parseInt(prefs.getString("default_report", "0"));
+	}
+
+	public String getDropboxAccount() {
+		return prefs.getString("sync_dropbox_account", null);
+	}
+
+	public String getDropboxKey() {
+		return prefs.getString("sync_dropbox_key", null);
+	}
+
+	public String getDropboxLocalRev() {
+		return prefs.getString("sync_dropbox_rev", null);
+	}
+
+	public String getDropboxSecret() {
+		return prefs.getString("sync_dropbox_secret", null);
 	}
 
 	public int getOverallSectionPos() {
@@ -66,5 +83,37 @@ public class Preferences {
 
 	public boolean isShowLegend() {
 		return prefs.getBoolean("appearance_show_legend", false);
+	}
+
+	public boolean isSyncOnChange() {
+		return prefs.getBoolean("sync_on_change", true);
+	}
+
+	public boolean isSyncOnStart() {
+		return prefs.getBoolean("sync_on_start", true);
+	}
+
+	public void setDropboxAccount(String account) {
+		Editor edit = prefs.edit();
+		edit.putString("sync_dropbox_account", account);
+		edit.apply();
+	}
+
+	public void setDropboxKey(String key) {
+		Editor edit = prefs.edit();
+		edit.putString("sync_dropbox_key", key);
+		edit.apply();
+	}
+
+	public void setDropboxLocalRev(String rev) {
+		Editor edit = prefs.edit();
+		edit.putString("sync_dropbox_rev", rev);
+		edit.apply();
+	}
+
+	public void setDropboxSecret(String secret) {
+		Editor edit = prefs.edit();
+		edit.putString("sync_dropbox_secret", secret);
+		edit.apply();
 	}
 }
