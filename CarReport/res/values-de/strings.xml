@@ -73,7 +73,7 @@
     <string name="alert_validate_title">Weitere Werte benötigt</string>
     <string name="alert_validate_greater_zero">%s muss größer als 0 sein.</string>
     <string name="alert_validate_not_empty">%s darf nicht leer sein.</string>
-    <string name="alert_dropbox_finishing_authentication">Authentifiziering wird abgeschlossen…</string>
+    <string name="alert_dropbox_finishing_authentication">Authentifizierung wird abgeschlossen…</string>
     <string name="alert_dropbox_first_sync_title">Erste Synchronisierung</string>
     <string name="alert_dropbox_first_sync_message">Es sind Online-Daten vorhanden. Welche Daten möchten Sie bei der ersten Synchronisation behalten.</string>
     <string name="alert_dropbox_first_sync_download">Online-Daten</string>
