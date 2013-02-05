@@ -23,10 +23,12 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="sync_on_start"
+            android:summary="@string/pref_summary_sync_on_start"
             android:title="@string/pref_title_sync_on_start" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="sync_on_change"
+            android:summary="@string/pref_summary_sync_on_change"
             android:title="@string/pref_title_sync_on_change" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_backup" >

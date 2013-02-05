@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
-
     <header
         android:fragment="me.kuehle.carreport.gui.HelpActivity$GettingStartedFragment"
         android:title="@string/help_section_getting_started" />
@@ -25,5 +24,4 @@
     <header
         android:fragment="me.kuehle.carreport.gui.HelpActivity$CalculationsFragment"
         android:title="@string/help_section_calculations" />
-
 </preference-headers>

@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <resources>
-
     <string name="app_name">Car Report</string>
     <string name="app_version">2.6.1</string>
     <string name="app_description">Tragen Sie die laufenden Kosten Ihres Autos ein und erhalten Sie schöne Reports.</string>
@@ -147,8 +146,8 @@
     <string name="pref_title_unit_volume">Volumen</string>
     <string name="pref_title_unit_distance">Entfernung</string>
     <string name="pref_title_sync_dropbox">Dropbox</string>
-    <string name="pref_title_sync_on_start">Synchronisiere wenn die App startet</string>
-    <string name="pref_title_sync_on_change">Synchronisiere wenn Daten geändert wurden</string>
+    <string name="pref_title_sync_on_start">Beim App-Start</string>
+    <string name="pref_title_sync_on_change">Bei Datenänderung</string>
     <string name="pref_title_backup">Sichern</string>
     <string name="pref_title_restore">Wiederherstellen</string>
     <string name="pref_title_exportcsv">CSV exportieren</string>
@@ -156,8 +155,10 @@
     <string name="pref_summary_appearance_overall_section_pos">Der Abschnitt Gesamt zeigt Durchschnittswerte an, wenn Sie mehr als ein Auto haben. Eingestellte Position: %s</string>
     <string name="pref_summary_appearance_color_sections">Zeige die Überschriften der Abschnitte in der Farbe des dazugehörigen Autos.</string>
     <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
-    <string name="pref_summary_sync_dropbox_link">Richte eine Synchronisation über Dropbox ein. Bitte beachten Sie: Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das zum Schluss synchronisiert, seine Änderungen verlieren.</string>
-    <string name="pref_summary_sync_dropbox_unlink">Verbunden mit %s. Klicke um die Verbindung zu trennen.</string>
+    <string name="pref_summary_sync_dropbox_link">Synchronisation über Dropbox einrichten. Achtung: Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren.</string>
+    <string name="pref_summary_sync_dropbox_unlink">Verbunden mit %s. Klicke, um die Verbindung zu trennen.</string>
+    <string name="pref_summary_sync_on_start">Automatisch synchronisieren, wenn die App startet.</string>
+    <string name="pref_summary_sync_on_change">Automatisch synchronisieren, wenn Daten geändert werden.</string>
     <string name="pref_summary_backup">Sichere aktuelle Daten auf der SD-Karte.</string>
     <string name="pref_summary_restore">Stelle Daten aus der Datei %s von der SD-Karte wieder her.</string>
     <string name="pref_summary_restore_no_data">Datei %s wurde auf der SD-Karte nicht gefunden.</string>
@@ -166,5 +167,4 @@
     <string name="help_section_getting_started">Einstieg</string>
     <string name="help_section_tips">Tipps</string>
     <string name="help_section_calculations">Berechnungen</string>
-
 </resources>

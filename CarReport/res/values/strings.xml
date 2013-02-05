@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <resources>
-
     <string name="app_name">Car Report</string>
     <string name="app_version">2.6.1</string>
     <string name="app_description">Enter the costs of your car and receive nice reports and statistics.</string>
@@ -147,8 +146,8 @@
     <string name="pref_title_unit_volume">Volume</string>
     <string name="pref_title_unit_distance">Distance</string>
     <string name="pref_title_sync_dropbox">Dropbox</string>
-    <string name="pref_title_sync_on_start">Synchronize when app starts</string>
-    <string name="pref_title_sync_on_change">Synchronize when data has changed</string>
+    <string name="pref_title_sync_on_start">On start</string>
+    <string name="pref_title_sync_on_change">On data change</string>
     <string name="pref_title_backup">Backup</string>
     <string name="pref_title_restore">Restore</string>
     <string name="pref_title_exportcsv">Export CSV</string>
@@ -156,8 +155,10 @@
     <string name="pref_summary_appearance_overall_section_pos">The section Overall displays average values, when you use the app for more than one car. Set position: %s</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
-    <string name="pref_summary_sync_dropbox_link">Setup synchronization with dropbox. Please note: This is a very simple synchronization. When you change something on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes.</string>
+    <string name="pref_summary_sync_dropbox_link">Setup synchronization with dropbox. Warning: This is a very simple synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes.</string>
     <string name="pref_summary_sync_dropbox_unlink">Linked to %s. Click to unlink.</string>
+    <string name="pref_summary_sync_on_start">Automatically synchronize when the app starts.</string>
+    <string name="pref_summary_sync_on_change">Automatically synchronize when data is changed.</string>
     <string name="pref_summary_backup">Backup the current data to SD card.</string>
     <string name="pref_summary_restore">Restore data from file %s on SD card.</string>
     <string name="pref_summary_restore_no_data">File %s does not exist on SD card.</string>
@@ -166,5 +167,4 @@
     <string name="help_section_getting_started">Getting started</string>
     <string name="help_section_tips">Tips</string>
     <string name="help_section_calculations">Calculations</string>
-
 </resources>
