@@ -77,7 +77,7 @@ public class FuelConsumptionReport extends AbstractReport {
 			for (Refueling refueling : refuelings) {
 				volume += refueling.getVolume();
 				if (!refueling.isPartial()) {
-					if (lastTacho > -1 && lastTacho > refueling.getMileage()) {
+					if (lastTacho > -1 && lastTacho < refueling.getMileage()) {
 						double consumption = volume
 								/ (refueling.getMileage() - lastTacho) * 100;
 						xValues.add(refueling.getDate().getTime());
