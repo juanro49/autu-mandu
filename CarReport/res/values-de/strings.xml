@@ -16,7 +16,6 @@
 -->
 <resources>
     <string name="app_name">Car Report</string>
-    <string name="app_version">2.6.1</string>
     <string name="app_description">Tragen Sie die laufenden Kosten Ihres Autos ein und erhalten Sie schöne Reports.</string>
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
@@ -153,17 +152,17 @@
     <string name="pref_title_exportcsv">CSV exportieren</string>
     <string name="pref_title_importcsv">CSV importieren</string>
     <string name="pref_summary_appearance_overall_section_pos">Der Abschnitt Gesamt zeigt Durchschnittswerte an, wenn Sie mehr als ein Auto haben. Eingestellte Position: %s</string>
-    <string name="pref_summary_appearance_color_sections">Zeige die Überschriften der Abschnitte in der Farbe des dazugehörigen Autos.</string>
+    <string name="pref_summary_appearance_color_sections">Überschriften der Abschnitte in der Farbe des dazugehörigen Autos anzeigen.</string>
     <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
-    <string name="pref_summary_sync_dropbox_link">Synchronisation über Dropbox einrichten. Achtung: Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren.</string>
+    <string name="pref_summary_sync_dropbox_link">Synchronisation über Dropbox einrichten. Achtung: Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>
     <string name="pref_summary_sync_dropbox_unlink">Verbunden mit %s. Klicke, um die Verbindung zu trennen.</string>
     <string name="pref_summary_sync_on_start">Automatisch synchronisieren, wenn die App startet.</string>
     <string name="pref_summary_sync_on_change">Automatisch synchronisieren, wenn Daten geändert werden.</string>
-    <string name="pref_summary_backup">Sichere aktuelle Daten auf der SD-Karte.</string>
-    <string name="pref_summary_restore">Stelle Daten aus der Datei %s von der SD-Karte wieder her.</string>
+    <string name="pref_summary_backup">Daten auf der SD-Karte sichern.</string>
+    <string name="pref_summary_restore">Daten aus der Datei %s von der SD-Karte wiederherstellen.</string>
     <string name="pref_summary_restore_no_data">Datei %s wurde auf der SD-Karte nicht gefunden.</string>
-    <string name="pref_summary_exportcsv">Exportieren Sie die Daten als CSV, um sie in anderen Programmen wie Microsoft Excel oder LibreOffice Calc verwenden zu können.</string>
-    <string name="pref_summary_importcsv">Importieren Sie Daten aus CSV-Dateien. Die Dateien müssen so aussehen, wie die, die beim Export generiert werden. Beim Import werden bestehende Einträge aktualisiert und neue hinzugefügt, aber es werden keine Einträge gelöscht.</string>
+    <string name="pref_summary_exportcsv">Daten als CSV exportieren, um sie in anderen Programmen wie Microsoft Excel oder LibreOffice Calc verwenden zu können.</string>
+    <string name="pref_summary_importcsv">Daten von CSV-Dateien importieren. Die Dateien müssen so aussehen, wie die, die beim Export generiert werden. Beim Import werden bestehende Einträge aktualisiert und neue hinzugefügt, aber es werden keine Einträge gelöscht.</string>
     <string name="help_section_getting_started">Einstieg</string>
     <string name="help_section_tips">Tipps</string>
     <string name="help_section_calculations">Berechnungen</string>

@@ -37,6 +37,7 @@ import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.GradientDrawable;
@@ -102,14 +103,21 @@ public class PreferencesActivity extends PreferenceActivity {
 			View root = inflater.inflate(R.layout.fragment_prefs_about,
 					container, false);
 
-			String strVersion = String.format(
-					getString(R.string.about_version),
-					getString(R.string.app_version));
+			String strVersion = getString(R.string.about_version, getVersion());
 			((TextView) root.findViewById(R.id.txtVersion)).setText(strVersion);
 			((Button) root.findViewById(R.id.btnLicenses))
 					.setOnClickListener(licensesOnClickListener);
 
 			return root;
+		}
+
+		public String getVersion() {
+			try {
+				return getActivity().getPackageManager().getPackageInfo(
+						getActivity().getPackageName(), 0).versionName;
+			} catch (NameNotFoundException e) {
+				return "";
+			}
 		}
 	}
 
@@ -337,7 +345,7 @@ public class PreferencesActivity extends PreferenceActivity {
 		@Override
 		public void onResume() {
 			super.onResume();
-			
+
 			if (dropboxAuthenticationInProgress) {
 				dropboxAuthenticationInProgress = false;
 

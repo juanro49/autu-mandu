@@ -16,7 +16,6 @@
 -->
 <resources>
     <string name="app_name">Car Report</string>
-    <string name="app_version">2.6.1</string>
     <string name="app_description">Enter the costs of your car and receive nice reports and statistics.</string>
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
@@ -155,7 +154,7 @@
     <string name="pref_summary_appearance_overall_section_pos">The section Overall displays average values, when you use the app for more than one car. Set position: %s</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
-    <string name="pref_summary_sync_dropbox_link">Setup synchronization with dropbox. Warning: This is a very simple synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes.</string>
+    <string name="pref_summary_sync_dropbox_link">Setup synchronization with dropbox. Warning: This is a very simple synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>
     <string name="pref_summary_sync_dropbox_unlink">Linked to %s. Click to unlink.</string>
     <string name="pref_summary_sync_on_start">Automatically synchronize when the app starts.</string>
     <string name="pref_summary_sync_on_change">Automatically synchronize when data is changed.</string>
