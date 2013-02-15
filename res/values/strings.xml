@@ -58,7 +58,6 @@
     <string name="edit_message_no_entry_selected">No entry selected</string>
     <string name="alert_add_car_title">Add car</string>
     <string name="alert_edit_car_title">Edit car</string>
-    <string name="alert_add_car_message">Enter the name of the car:</string>
     <string name="alert_delete_refueling_message">This refueling will be deleted.</string>
     <string name="alert_delete_other_message">This other cost will be deleted.</string>
     <string name="alert_delete_cars_message">The %d selected cars will be deleted.</string>

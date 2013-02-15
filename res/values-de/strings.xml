@@ -58,7 +58,6 @@
     <string name="edit_message_no_entry_selected">Kein Eintrag ausgewählt</string>
     <string name="alert_add_car_title">Auto hinzufügen</string>
     <string name="alert_edit_car_title">Auto bearbeiten</string>
-    <string name="alert_add_car_message">Name des Autos eingeben:</string>
     <string name="alert_delete_refueling_message">Diese Tankfüllung wird gelöscht.</string>
     <string name="alert_delete_other_message">Diese anderen Kosten werden gelöscht.</string>
     <string name="alert_delete_cars_message">Die %d ausgewählten Autos werden gelöscht.</string>

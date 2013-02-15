@@ -25,12 +25,12 @@ import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.util.RecurrenceInterval;
+import me.kuehle.carreport.util.gui.MessageDialogFragment;
+import me.kuehle.carreport.util.gui.MessageDialogFragment.MessageDialogFragmentListener;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
@@ -53,7 +53,8 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
-public class DataListFragment extends Fragment {
+public class DataListFragment extends Fragment implements
+		MessageDialogFragmentListener {
 	public abstract class AbstractTabHelper {
 		protected AbstractItem[] mItems;
 		protected ListView mListView;
@@ -318,6 +319,7 @@ public class DataListFragment extends Fragment {
 	private static final String STATE_CURRENT_ITEM = "current_position";
 	private static final String STATE_CURRENT_CAR = "current_car";
 	private static final String STATE_CURRENT_TAB = "current_tab";
+	private static final int DELETE_REQUEST_CODE = 0;
 
 	private Car[] mCars;
 	private Car mCurrentCar = null;
@@ -355,22 +357,6 @@ public class DataListFragment extends Fragment {
 	};
 
 	private MultiChoiceModeListener mMultiChoiceModeListener = new MultiChoiceModeListener() {
-		private DialogInterface.OnClickListener deleteOnClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				SparseBooleanArray selected = mCurrentTab.mListView
-						.getCheckedItemPositions();
-				for (int i = 0; i < mCurrentTab.mItems.length; i++) {
-					if (selected.get(i)) {
-						mCurrentTab.mItems[i].delete();
-					}
-				}
-				mActionMode.finish();
-				mCurrentTab.updateItems(mCurrentCar);
-				mCurrentTab.updateListAdapter();
-			}
-		};
-
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			switch (item.getItemId()) {
@@ -378,12 +364,10 @@ public class DataListFragment extends Fragment {
 				String message = String.format(
 						getString(mCurrentTab.getAlertDeleteManyMessage()),
 						mCurrentTab.mListView.getCheckedItemCount());
-				new AlertDialog.Builder(getActivity())
-						.setTitle(R.string.alert_delete_title)
-						.setMessage(message)
-						.setPositiveButton(android.R.string.yes,
-								deleteOnClickListener)
-						.setNegativeButton(android.R.string.no, null).show();
+				MessageDialogFragment.newInstance(DataListFragment.this,
+						DELETE_REQUEST_CODE, R.string.alert_delete_title,
+						message, android.R.string.yes, android.R.string.no)
+						.show(getFragmentManager(), null);
 				return true;
 			default:
 				return false;
@@ -525,6 +509,27 @@ public class DataListFragment extends Fragment {
 	public void onDetach() {
 		super.onDetach();
 		mCallback = null;
+	}
+
+	@Override
+	public void onDialogNegativeClick(int requestCode) {
+
+	}
+
+	@Override
+	public void onDialogPositiveClick(int requestCode) {
+		if (requestCode == DELETE_REQUEST_CODE) {
+			SparseBooleanArray selected = mCurrentTab.mListView
+					.getCheckedItemPositions();
+			for (int i = 0; i < mCurrentTab.mItems.length; i++) {
+				if (selected.get(i)) {
+					mCurrentTab.mItems[i].delete();
+				}
+			}
+			mActionMode.finish();
+			mCurrentTab.updateItems(mCurrentCar);
+			mCurrentTab.updateListAdapter();
+		}
 	}
 
 	@Override

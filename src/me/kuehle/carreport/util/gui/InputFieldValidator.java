@@ -20,7 +20,7 @@ import java.util.Vector;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.util.Strings;
-import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
@@ -65,21 +65,24 @@ public class InputFieldValidator {
 			return true;
 		}
 	}
+
 	public interface ValidationCallback {
 		public void validationSuccessfull();
 	}
+
 	public enum ValidationType {
 		NotEmpty, GreaterZero
 	}
 
 	private Context context;
-
 	private Vector<Field> requiredFields = new Vector<Field>();
-
+	private FragmentManager fragmentManager;
 	private ValidationCallback callback;
 
-	public InputFieldValidator(Context context, ValidationCallback callback) {
+	public InputFieldValidator(Context context, FragmentManager fm,
+			ValidationCallback callback) {
 		this.context = context;
+		this.fragmentManager = fm;
 		this.callback = callback;
 	}
 
@@ -96,10 +99,10 @@ public class InputFieldValidator {
 		}
 
 		if (messages.size() > 0) {
-			new AlertDialog.Builder(context)
-					.setTitle(R.string.alert_validate_title)
-					.setMessage(Strings.join(messages, "\n"))
-					.setPositiveButton(android.R.string.ok, null).show();
+			MessageDialogFragment.newInstance(null, 0,
+					R.string.alert_validate_title,
+					Strings.join(messages, "\n"), android.R.string.ok, null)
+					.show(fragmentManager, null);
 		} else {
 			callback.validationSuccessfull();
 		}

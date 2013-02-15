@@ -30,8 +30,16 @@ import me.kuehle.carreport.util.IForEach;
 import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.backup.CSVExportImport;
 import me.kuehle.carreport.util.backup.Dropbox;
+import me.kuehle.carreport.util.gui.ColorPickerDialogFragment;
+import me.kuehle.carreport.util.gui.ColorPickerDialogFragment.ColorPickerDialogFragmentListener;
+import me.kuehle.carreport.util.gui.InputDialogFragment;
+import me.kuehle.carreport.util.gui.InputDialogFragment.InputDialogFragmentListener;
+import me.kuehle.carreport.util.gui.MessageDialogFragment;
+import me.kuehle.carreport.util.gui.MessageDialogFragment.MessageDialogFragmentListener;
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.ListFragment;
 import android.app.ProgressDialog;
@@ -39,7 +47,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -67,7 +74,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -75,9 +81,13 @@ import android.widget.Toast;
 
 public class PreferencesActivity extends PreferenceActivity {
 	public static class AboutFragment extends Fragment {
-		private View.OnClickListener licensesOnClickListener = new View.OnClickListener() {
+		public static class LicenseDialogFragment extends DialogFragment {
+			public static LicenseDialogFragment newInstance() {
+				return new LicenseDialogFragment();
+			}
+
 			@Override
-			public void onClick(View v) {
+			public Dialog onCreateDialog(Bundle savedInstanceState) {
 				TextView view = new TextView(getActivity());
 				view.setMovementMethod(LinkMovementMethod.getInstance());
 				view.setPadding(16, 16, 16, 16);
@@ -90,10 +100,19 @@ public class PreferencesActivity extends PreferenceActivity {
 					view.setText(Html.fromHtml(new String(buffer)));
 				} catch (IOException e) {
 				}
-				new AlertDialog.Builder(getActivity())
+
+				return new AlertDialog.Builder(getActivity())
 						.setTitle(R.string.alert_about_licenses_title)
 						.setView(view)
-						.setPositiveButton(android.R.string.ok, null).show();
+						.setPositiveButton(android.R.string.ok, null).create();
+			}
+		}
+
+		private View.OnClickListener licensesOnClickListener = new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				LicenseDialogFragment.newInstance().show(getFragmentManager(),
+						null);
 			}
 		};
 
@@ -121,7 +140,79 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 	}
 
-	public static class BackupFragment extends PreferenceFragment {
+	public static class BackupFragment extends PreferenceFragment implements
+			MessageDialogFragmentListener {
+		public static class ExportDialogFragment extends DialogFragment {
+			public static ExportDialogFragment newInstance(Fragment parent) {
+				ExportDialogFragment f = new ExportDialogFragment();
+				f.setTargetFragment(parent, 0);
+				return f;
+			}
+
+			@Override
+			public Dialog onCreateDialog(Bundle savedInstanceState) {
+				LayoutInflater inflater = getActivity().getLayoutInflater();
+				final View view = inflater.inflate(R.layout.dialog_exportcsv,
+						null);
+				return new AlertDialog.Builder(getActivity())
+						.setTitle(R.string.pref_title_exportcsv)
+						.setView(view)
+						.setPositiveButton(R.string.export,
+								new OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										int option = ((Spinner) view
+												.findViewById(R.id.spnSingleMultipleFile))
+												.getSelectedItemPosition();
+										boolean overwrite = ((CheckBox) view
+												.findViewById(R.id.chkOverwrite))
+												.isChecked();
+										((BackupFragment) getTargetFragment())
+												.doExport(option, overwrite);
+									}
+								})
+						.setNegativeButton(android.R.string.cancel, null)
+						.create();
+			}
+		}
+
+		public static class ImportDialogFragment extends DialogFragment {
+			public static ImportDialogFragment newInstance(Fragment parent) {
+				ImportDialogFragment f = new ImportDialogFragment();
+				f.setTargetFragment(parent, 0);
+				return f;
+			}
+
+			@Override
+			public Dialog onCreateDialog(Bundle savedInstanceState) {
+				LayoutInflater inflater = getActivity().getLayoutInflater();
+				final View view = inflater.inflate(R.layout.dialog_importcsv,
+						null);
+				return new AlertDialog.Builder(getActivity())
+						.setTitle(R.string.pref_title_importcsv)
+						.setView(view)
+						.setPositiveButton(R.string.import_,
+								new OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										int option = ((Spinner) view
+												.findViewById(R.id.spnSingleMultipleFile))
+												.getSelectedItemPosition();
+										((BackupFragment) getTargetFragment())
+												.doImport(option);
+									}
+								})
+						.setNegativeButton(android.R.string.cancel, null)
+						.create();
+			}
+		}
+
+		private static final int DROPBOX_FIRST_SYNC_REQUEST_CODE = 0;
+		private static final int BACKUP_OVERWRITE_REQUEST_CODE = 1;
+		private static final int RESTORE_REQUEST_CODE = 2;
+
 		private Dropbox dropbox;
 		private boolean dropboxAuthenticationInProgress = false;
 		private Backup backup;
@@ -146,158 +237,47 @@ public class PreferencesActivity extends PreferenceActivity {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
 				if (backup.backupFileExists()) {
-					new AlertDialog.Builder(getActivity())
-							.setTitle(R.string.alert_backup_overwrite_title)
-							.setMessage(R.string.alert_backup_overwrite_message)
-							.setPositiveButton(R.string.overwrite,
-									new OnClickListener() {
-										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											doBackup();
-										}
-									})
-							.setNegativeButton(android.R.string.cancel, null)
-							.show();
+					MessageDialogFragment.newInstance(BackupFragment.this,
+							BACKUP_OVERWRITE_REQUEST_CODE,
+							R.string.alert_backup_overwrite_title,
+							getString(R.string.alert_backup_overwrite_message),
+							R.string.overwrite, android.R.string.cancel).show(
+							getFragmentManager(), null);
 				} else {
 					doBackup();
 				}
 				return true;
 			}
 
-			private void doBackup() {
-				synchronized (Helper.dbLock) {
-					if (backup.backup()) {
-						Toast.makeText(
-								getActivity(),
-								getString(R.string.toast_backup_success,
-										Backup.FILE_NAME), Toast.LENGTH_SHORT)
-								.show();
-						setupRestorePreference();
-					} else {
-						Toast.makeText(getActivity(),
-								R.string.toast_backup_failed,
-								Toast.LENGTH_SHORT).show();
-					}
-				}
-			}
 		};
 
 		private OnPreferenceClickListener mRestore = new OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				new AlertDialog.Builder(getActivity())
-						.setTitle(R.string.alert_restore_title)
-						.setMessage(R.string.alert_restore_message)
-						.setPositiveButton(R.string.restore,
-								new OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										doRestore();
-									}
-								})
-						.setNegativeButton(android.R.string.cancel, null)
-						.show();
+				MessageDialogFragment.newInstance(BackupFragment.this,
+						RESTORE_REQUEST_CODE, R.string.alert_restore_title,
+						getString(R.string.alert_restore_message),
+						R.string.restore, android.R.string.cancel).show(
+						getFragmentManager(), null);
 				return true;
-			}
-
-			private void doRestore() {
-				synchronized (Helper.dbLock) {
-					if (backup.restore()) {
-						Toast.makeText(getActivity(),
-								R.string.toast_restore_success,
-								Toast.LENGTH_SHORT).show();
-					} else {
-						Toast.makeText(getActivity(),
-								R.string.toast_restore_failed,
-								Toast.LENGTH_SHORT).show();
-					}
-				}
 			}
 		};
 
 		private OnPreferenceClickListener mExportCSV = new OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				LayoutInflater inflater = getActivity().getLayoutInflater();
-				final View view = inflater.inflate(R.layout.dialog_exportcsv,
-						null);
-				new AlertDialog.Builder(getActivity())
-						.setTitle(R.string.pref_title_exportcsv)
-						.setView(view)
-						.setPositiveButton(R.string.export,
-								new OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										int option = ((Spinner) view
-												.findViewById(R.id.spnSingleMultipleFile))
-												.getSelectedItemPosition();
-										boolean overwrite = ((CheckBox) view
-												.findViewById(R.id.chkOverwrite))
-												.isChecked();
-										doExport(option, overwrite);
-									}
-								})
-						.setNegativeButton(android.R.string.cancel, null)
-						.show();
+				ExportDialogFragment.newInstance(BackupFragment.this).show(
+						getFragmentManager(), null);
 				return true;
-			}
-
-			private void doExport(int option, boolean overwrite) {
-				if (!overwrite && csvExportImport.anyExportFileExist(option)) {
-					Toast.makeText(getActivity(),
-							R.string.toast_export_failed_overwrite,
-							Toast.LENGTH_SHORT).show();
-				} else {
-					csvExportImport.export(option);
-					Toast.makeText(getActivity(),
-							R.string.toast_export_success, Toast.LENGTH_SHORT)
-							.show();
-				}
 			}
 		};
 
 		private OnPreferenceClickListener mImportCSV = new OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				LayoutInflater inflater = getActivity().getLayoutInflater();
-				final View view = inflater.inflate(R.layout.dialog_importcsv,
-						null);
-				new AlertDialog.Builder(getActivity())
-						.setTitle(R.string.pref_title_importcsv)
-						.setView(view)
-						.setPositiveButton(R.string.import_,
-								new OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										int option = ((Spinner) view
-												.findViewById(R.id.spnSingleMultipleFile))
-												.getSelectedItemPosition();
-										doImport(option);
-									}
-								})
-						.setNegativeButton(android.R.string.cancel, null)
-						.show();
+				ImportDialogFragment.newInstance(BackupFragment.this).show(
+						getFragmentManager(), null);
 				return true;
-			}
-
-			private void doImport(int option) {
-				if (!csvExportImport.allExportFilesExist(option)) {
-					Toast.makeText(getActivity(),
-							R.string.toast_import_files_dont_exist,
-							Toast.LENGTH_SHORT).show();
-				} else if (csvExportImport.import_(option)) {
-					Toast.makeText(getActivity(),
-							R.string.toast_import_success, Toast.LENGTH_SHORT)
-							.show();
-				} else {
-					Toast.makeText(getActivity(), R.string.toast_import_failed,
-							Toast.LENGTH_SHORT).show();
-				}
 			}
 		};
 
@@ -343,6 +323,24 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 
 		@Override
+		public void onDialogNegativeClick(int requestCode) {
+			if (requestCode == DROPBOX_FIRST_SYNC_REQUEST_CODE) {
+				dropbox.synchronize(Dropbox.SYNC_UPLOAD);
+			}
+		}
+
+		@Override
+		public void onDialogPositiveClick(int requestCode) {
+			if (requestCode == DROPBOX_FIRST_SYNC_REQUEST_CODE) {
+				dropbox.synchronize(Dropbox.SYNC_DOWNLOAD);
+			} else if (requestCode == BACKUP_OVERWRITE_REQUEST_CODE) {
+				doBackup();
+			} else if (requestCode == RESTORE_REQUEST_CODE) {
+				doRestore();
+			}
+		}
+
+		@Override
 		public void onResume() {
 			super.onResume();
 
@@ -380,28 +378,70 @@ public class PreferencesActivity extends PreferenceActivity {
 			}
 		}
 
+		private void doBackup() {
+			synchronized (Helper.dbLock) {
+				if (backup.backup()) {
+					Toast.makeText(
+							getActivity(),
+							getString(R.string.toast_backup_success,
+									Backup.FILE_NAME), Toast.LENGTH_SHORT)
+							.show();
+					setupRestorePreference();
+				} else {
+					Toast.makeText(getActivity(), R.string.toast_backup_failed,
+							Toast.LENGTH_SHORT).show();
+				}
+			}
+		}
+
+		private void doExport(int option, boolean overwrite) {
+			if (!overwrite && csvExportImport.anyExportFileExist(option)) {
+				Toast.makeText(getActivity(),
+						R.string.toast_export_failed_overwrite,
+						Toast.LENGTH_SHORT).show();
+			} else {
+				csvExportImport.export(option);
+				Toast.makeText(getActivity(), R.string.toast_export_success,
+						Toast.LENGTH_SHORT).show();
+			}
+		}
+
+		private void doImport(int option) {
+			if (!csvExportImport.allExportFilesExist(option)) {
+				Toast.makeText(getActivity(),
+						R.string.toast_import_files_dont_exist,
+						Toast.LENGTH_SHORT).show();
+			} else if (csvExportImport.import_(option)) {
+				Toast.makeText(getActivity(), R.string.toast_import_success,
+						Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(getActivity(), R.string.toast_import_failed,
+						Toast.LENGTH_SHORT).show();
+			}
+		}
+
+		private void doRestore() {
+			synchronized (Helper.dbLock) {
+				if (backup.restore()) {
+					Toast.makeText(getActivity(),
+							R.string.toast_restore_success, Toast.LENGTH_SHORT)
+							.show();
+				} else {
+					Toast.makeText(getActivity(),
+							R.string.toast_restore_failed, Toast.LENGTH_SHORT)
+							.show();
+				}
+			}
+		}
+
 		private void dropboxFirstSynchronisation() {
-			new AlertDialog.Builder(getActivity())
-					.setTitle(R.string.alert_dropbox_first_sync_title)
-					.setMessage(R.string.alert_dropbox_first_sync_message)
-					.setPositiveButton(
-							R.string.alert_dropbox_first_sync_download,
-							new OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									dropbox.synchronize(Dropbox.SYNC_DOWNLOAD);
-								}
-							})
-					.setNegativeButton(
-							R.string.alert_dropbox_first_sync_upload,
-							new OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									dropbox.synchronize(Dropbox.SYNC_UPLOAD);
-								}
-							}).show();
+			MessageDialogFragment.newInstance(this,
+					DROPBOX_FIRST_SYNC_REQUEST_CODE,
+					R.string.alert_dropbox_first_sync_title,
+					getString(R.string.alert_dropbox_first_sync_message),
+					R.string.alert_dropbox_first_sync_download,
+					R.string.alert_dropbox_first_sync_upload).show(
+					getFragmentManager(), null);
 		}
 
 		private void setupDropdoxPreference() {
@@ -432,7 +472,9 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 	}
 
-	public static class CarsFragment extends ListFragment {
+	public static class CarsFragment extends ListFragment implements
+			MessageDialogFragmentListener, InputDialogFragmentListener,
+			ColorPickerDialogFragmentListener {
 		private class CarAdapter extends BaseAdapter {
 			@Override
 			public int getCount() {
@@ -484,9 +526,7 @@ public class PreferencesActivity extends PreferenceActivity {
 					holder.suspended.setVisibility(View.GONE);
 				}
 				((GradientDrawable) holder.color.getBackground())
-						.setColorFilter(cars[position].getColor(),
-								Mode.SRC_ATOP);
-
+						.setColor(cars[position].getColor());
 				return convertView;
 			}
 		}
@@ -495,16 +535,18 @@ public class PreferencesActivity extends PreferenceActivity {
 				MultiChoiceModeListener {
 			private ActionMode mode;
 
-			private DialogInterface.OnClickListener deleteOnClickListener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					execActionAndFinish(new IForEach<Car>() {
-						public void action(Car car) {
-							car.delete();
-						}
-					});
+			public void execActionAndFinish(IForEach<Car> forEach) {
+				SparseBooleanArray selected = getListView()
+						.getCheckedItemPositions();
+				for (int i = 0; i < cars.length; i++) {
+					if (selected.get(i)) {
+						forEach.action(cars[i]);
+					}
 				}
-			};
+
+				mode.finish();
+				fillList();
+			}
 
 			public void finishActionMode() {
 				if (mode != null) {
@@ -537,23 +579,23 @@ public class PreferencesActivity extends PreferenceActivity {
 					return true;
 				case R.id.menu_delete:
 					if (getListView().getCheckedItemCount() == cars.length) {
-						new AlertDialog.Builder(getActivity())
-								.setTitle(R.string.alert_delete_title)
-								.setMessage(
-										R.string.alert_cannot_delete_last_car)
-								.setPositiveButton(android.R.string.ok, null)
-								.show();
+						MessageDialogFragment
+								.newInstance(
+										CarsFragment.this,
+										CANNOT_DELETE_REQUEST_CODE,
+										R.string.alert_delete_title,
+										getString(R.string.alert_cannot_delete_last_car),
+										android.R.string.ok, null).show(
+										getFragmentManager(), null);
 					} else {
 						String message = getString(
 								R.string.alert_delete_cars_message,
 								getListView().getCheckedItemCount());
-						new AlertDialog.Builder(getActivity())
-								.setTitle(R.string.alert_delete_title)
-								.setMessage(message)
-								.setPositiveButton(android.R.string.yes,
-										deleteOnClickListener)
-								.setNegativeButton(android.R.string.no, null)
-								.show();
+						MessageDialogFragment.newInstance(CarsFragment.this,
+								DELETE_REQUEST_CODE,
+								R.string.alert_delete_title, message,
+								android.R.string.yes, android.R.string.no)
+								.show(getFragmentManager(), null);
 					}
 					return true;
 				default:
@@ -585,19 +627,6 @@ public class PreferencesActivity extends PreferenceActivity {
 			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 				return false;
 			}
-
-			private void execActionAndFinish(IForEach<Car> forEach) {
-				SparseBooleanArray selected = getListView()
-						.getCheckedItemPositions();
-				for (int i = 0; i < cars.length; i++) {
-					if (selected.get(i)) {
-						forEach.action(cars[i]);
-					}
-				}
-
-				mode.finish();
-				fillList();
-			}
 		}
 
 		private static class CarViewHolder {
@@ -606,74 +635,37 @@ public class PreferencesActivity extends PreferenceActivity {
 			public Button color;
 		}
 
+		private static final int CANNOT_DELETE_REQUEST_CODE = 0;
+		private static final int DELETE_REQUEST_CODE = 1;
+		private static final int ADD_REQUEST_CODE = 2;
+		private static final int EDIT_REQUEST_CODE = 3;
+		private static final int EDIT_COLOR_REQUEST_CODE = 4;
+
 		private Car[] cars;
+		private Car carToEdit;
 
 		private OnItemClickListener onItemClickListener = new OnItemClickListener() {
-			private Car editCar;
-			private EditText editInput;
-
-			private DialogInterface.OnClickListener positiveOnClickListener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					String name = editInput.getText().toString();
-					if (name.length() > 0) {
-						editCar.setName(name);
-						editCar.save();
-						fillList();
-					}
-				}
-			};
-
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				editCar = cars[position];
-
-				editInput = new EditText(getActivity());
-				editInput.setText(editCar.getName());
-				new AlertDialog.Builder(getActivity())
-						.setTitle(R.string.alert_edit_car_title)
-						.setMessage(R.string.alert_add_car_message)
-						.setView(editInput)
-						.setPositiveButton(android.R.string.ok,
-								positiveOnClickListener)
-						.setNegativeButton(android.R.string.cancel, null)
-						.show();
+				carToEdit = cars[position];
+				InputDialogFragment.newInstance(CarsFragment.this,
+						EDIT_REQUEST_CODE, R.string.alert_edit_car_title,
+						carToEdit.getName()).show(getFragmentManager(), null);
 			}
 		};
 
 		private View.OnClickListener colorOnClickListener = new View.OnClickListener() {
-			private Car editCar;
-
-			private DialogInterface.OnClickListener selectItemOnClickListener = new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					editCar.setColor(getResources().getIntArray(R.array.colors)[which]);
-					editCar.save();
-					fillList();
-					dialog.dismiss();
-				}
-			};
-
 			@Override
 			public void onClick(View v) {
 				final int position = getListView().getPositionForView(v);
 				if (position != ListView.INVALID_POSITION) {
-					editCar = cars[position];
-					int[] colors = getResources().getIntArray(R.array.colors);
-					int colorIndex = -1;
-					for (int i = 0; i < colors.length; i++) {
-						if (colors[i] == editCar.getColor()) {
-							colorIndex = i;
-						}
-					}
-
-					new AlertDialog.Builder(getActivity())
-							.setTitle(R.string.alert_change_color_title)
-							.setSingleChoiceItems(R.array.color_names,
-									colorIndex, selectItemOnClickListener)
-							.setNegativeButton(android.R.string.cancel, null)
-							.show();
+					carToEdit = cars[position];
+					ColorPickerDialogFragment.newInstance(CarsFragment.this,
+							EDIT_COLOR_REQUEST_CODE,
+							R.string.alert_change_color_title,
+							carToEdit.getColor()).show(getFragmentManager(),
+							null);
 				}
 			}
 		};
@@ -703,28 +695,54 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 
 		@Override
+		public void onDialogNegativeClick(int requestCode) {
+
+		}
+
+		@Override
+		public void onDialogPositiveClick(int requestCode) {
+			if (requestCode == DELETE_REQUEST_CODE) {
+				multiChoiceModeListener
+						.execActionAndFinish(new IForEach<Car>() {
+							public void action(Car car) {
+								car.delete();
+							}
+						});
+			}
+		}
+
+		@Override
+		public void onDialogPositiveClick(int requestCode, int color) {
+			if (requestCode == EDIT_COLOR_REQUEST_CODE) {
+				carToEdit.setColor(color);
+				carToEdit.save();
+				fillList();
+			}
+		}
+
+		@Override
+		public void onDialogPositiveClick(int requestCode, String input) {
+			if (requestCode == ADD_REQUEST_CODE) {
+				if (input.length() > 0) {
+					Car.create(input, Color.BLUE, null);
+					fillList();
+				}
+			} else if (requestCode == EDIT_REQUEST_CODE) {
+				if (input.length() > 0) {
+					carToEdit.setName(input);
+					carToEdit.save();
+					fillList();
+				}
+			}
+		}
+
+		@Override
 		public boolean onOptionsItemSelected(MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.menu_add_car:
-				final EditText editInput = new EditText(getActivity());
-				new AlertDialog.Builder(getActivity())
-						.setTitle(R.string.alert_add_car_title)
-						.setMessage(R.string.alert_add_car_message)
-						.setView(editInput)
-						.setPositiveButton(android.R.string.ok,
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int whichButton) {
-										String name = editInput.getText()
-												.toString();
-										if (name.length() > 0) {
-											Car.create(name, Color.BLUE, null);
-											fillList();
-										}
-									}
-								})
-						.setNegativeButton(android.R.string.cancel, null)
-						.show();
+				InputDialogFragment.newInstance(this, ADD_REQUEST_CODE,
+						R.string.alert_add_car_title, "").show(
+						getFragmentManager(), null);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

@@ -22,13 +22,13 @@ import java.util.Date;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.AbstractItem;
+import me.kuehle.carreport.util.gui.MessageDialogFragment;
+import me.kuehle.carreport.util.gui.MessageDialogFragment.MessageDialogFragmentListener;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -42,7 +42,8 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-public abstract class AbstractDataDetailFragment extends Fragment {
+public abstract class AbstractDataDetailFragment extends Fragment implements
+		MessageDialogFragmentListener {
 	public class EditTextDateField implements View.OnClickListener,
 			DatePickerDialog.OnDateSetListener {
 		private EditText editText;
@@ -86,6 +87,7 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 					date));
 		}
 	}
+
 	public class EditTextTimeField implements View.OnClickListener,
 			TimePickerDialog.OnTimeSetListener {
 		private EditText editText;
@@ -128,6 +130,7 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 					time));
 		}
 	}
+
 	public interface OnItemActionListener {
 		public void itemCanceled();
 
@@ -138,14 +141,14 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 
 	public static final String EXTRA_ID = "id";
 	public static final int EXTRA_ID_DEFAULT = -1;
-
 	public static final String EXTRA_CAR_ID = "car_id";
-	protected OnItemActionListener onItemActionListener;
 
+	protected OnItemActionListener onItemActionListener;
 	protected AbstractItem editItem = null;
 
-	private CharSequence savedABTitle;
+	private static final int DELETE_REQUEST_CODE = 0;
 
+	private CharSequence savedABTitle;
 	private int savedABNavMode;
 
 	protected abstract void fillFields(View v);
@@ -278,28 +281,30 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 			onItemActionListener.itemCanceled();
 			return true;
 		case R.id.menu_delete:
-			new AlertDialog.Builder(getActivity())
-					.setTitle(R.string.alert_delete_title)
-					.setMessage(getAlertDeleteMessage())
-					.setPositiveButton(android.R.string.yes,
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									editItem.delete();
-									Toast.makeText(getActivity(),
-											getToastDeletedMessage(),
-											Toast.LENGTH_SHORT).show();
-									onItemActionListener.itemDeleted();
-								}
-							}).setNegativeButton(android.R.string.no, null)
-					.show();
+			MessageDialogFragment.newInstance(this, DELETE_REQUEST_CODE,
+					R.string.alert_delete_title,
+					getString(getAlertDeleteMessage()), android.R.string.yes,
+					android.R.string.no).show(getFragmentManager(), null);
 			return true;
 		case android.R.id.home:
 			onItemActionListener.itemCanceled();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onDialogNegativeClick(int requestCode) {
+	}
+
+	@Override
+	public void onDialogPositiveClick(int requestCode) {
+		if (requestCode == DELETE_REQUEST_CODE) {
+			editItem.delete();
+			Toast.makeText(getActivity(), getToastDeletedMessage(),
+					Toast.LENGTH_SHORT).show();
+			onItemActionListener.itemDeleted();
 		}
 	}
 

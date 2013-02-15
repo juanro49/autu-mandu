@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <resources>
-
     <string-array name="reports">
         <item>Fuel consumption</item>
         <item>Fuel price</item>
@@ -33,25 +32,9 @@
         <item>Repeat every quarter</item>
         <item>Repeat every year</item>
     </string-array>
-    <string-array name="color_names">
-        <item>Blue</item>
-        <item>Purple</item>
-        <item>Green</item>
-        <item>Yellow</item>
-        <item>Red</item>
-    </string-array>
     <string-array name="exportcsv_singlemultiplefile">
         <item>Single file</item>
         <item>Two files (refuelings, other costs)</item>
         <item>Three files (cars, refuelings, other costs)</item>
     </string-array>
-
-    <integer-array name="colors">
-        <item>0xff33b5e5</item>
-        <item>0xffaa66cc</item>
-        <item>0xff99cc00</item>
-        <item>0xffffbb33</item>
-        <item>0xffff4444</item>
-    </integer-array>
-
 </resources>

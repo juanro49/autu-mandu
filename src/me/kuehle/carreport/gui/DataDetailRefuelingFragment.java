@@ -149,7 +149,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 	@Override
 	protected void save() {
 		InputFieldValidator validator = new InputFieldValidator(getActivity(),
-				this);
+				getFragmentManager(), this);
 
 		validator.add(getView().findViewById(R.id.edtMileage),
 				InputFieldValidator.ValidationType.GreaterZero,

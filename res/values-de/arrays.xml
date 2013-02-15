@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <resources>
-
     <string-array name="reports">
         <item>Benzinverbrauch</item>
         <item>Benzinpreis</item>
@@ -33,17 +32,9 @@
         <item>Jedes Quartal wiederholen</item>
         <item>Jedes Jahr wiederholen</item>
     </string-array>
-    <string-array name="color_names">
-        <item>Blau</item>
-        <item>Lila</item>
-        <item>Grün</item>
-        <item>Gelb</item>
-        <item>Rot</item>
-    </string-array>
     <string-array name="exportcsv_singlemultiplefile">
         <item>Eine Datei</item>
         <item>Zwei Dateien (Tankfüllungen, Andere Kosten)</item>
         <item>Drei Dateien (Autos, Tankfüllungen, Andere Kosten)</item>
     </string-array>
-
 </resources>
