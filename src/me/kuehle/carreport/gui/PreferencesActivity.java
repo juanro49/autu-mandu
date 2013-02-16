@@ -36,13 +36,13 @@ import me.kuehle.carreport.util.gui.InputDialogFragment;
 import me.kuehle.carreport.util.gui.InputDialogFragment.InputDialogFragmentListener;
 import me.kuehle.carreport.util.gui.MessageDialogFragment;
 import me.kuehle.carreport.util.gui.MessageDialogFragment.MessageDialogFragmentListener;
+import me.kuehle.carreport.util.gui.ProgressDialogFragment;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.ListFragment;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -347,19 +347,17 @@ public class PreferencesActivity extends PreferenceActivity {
 			if (dropboxAuthenticationInProgress) {
 				dropboxAuthenticationInProgress = false;
 
-				final ProgressDialog progressDialog = new ProgressDialog(
-						getActivity());
-				progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				progressDialog
-						.setMessage(getString(R.string.alert_dropbox_finishing_authentication));
-				progressDialog.setCancelable(false);
-				progressDialog.show();
+				ProgressDialogFragment
+						.newInstance(
+								getString(R.string.alert_dropbox_finishing_authentication))
+						.show(getFragmentManager(), "progress");
 
 				dropbox.finishAuthentication(new Dropbox.OnAuthenticationFinishedListener() {
 					@Override
 					public void authenticationFinished(boolean success,
 							String accountName, boolean remoteDataAvailable) {
-						progressDialog.dismiss();
+						((ProgressDialogFragment) getFragmentManager()
+								.findFragmentByTag("progress")).dismiss();
 						if (success) {
 							setupDropdoxPreference();
 							if (remoteDataAvailable) {
