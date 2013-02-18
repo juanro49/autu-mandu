@@ -47,6 +47,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -524,7 +525,8 @@ public class PreferencesActivity extends PreferenceActivity {
 					holder.suspended.setVisibility(View.GONE);
 				}
 				((GradientDrawable) holder.color.getBackground())
-						.setColor(cars[position].getColor());
+						.setColorFilter(cars[position].getColor(),
+								PorterDuff.Mode.SRC);
 				return convertView;
 			}
 		}

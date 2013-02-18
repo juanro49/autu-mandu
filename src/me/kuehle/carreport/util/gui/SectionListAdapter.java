@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import me.kuehle.carreport.R;
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -225,7 +226,8 @@ public class SectionListAdapter extends BaseAdapter {
 				text.setTextColor(section.getColor());
 				GradientDrawable drawableBottom = (GradientDrawable) text
 						.getCompoundDrawables()[3];
-				drawableBottom.setColor(section.getColor());
+				drawableBottom.setColorFilter(section.getColor(),
+						PorterDuff.Mode.SRC);
 			}
 		} else {
 			Item item = (Item) getItem(position);
