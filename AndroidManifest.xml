@@ -18,8 +18,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="me.kuehle.carreport"
     android:installLocation="auto"
-    android:versionCode="19"
-    android:versionName="2.8.1" >
+    android:versionCode="20"
+    android:versionName="2.9" >
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="17" />
