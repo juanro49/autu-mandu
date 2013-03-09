@@ -240,6 +240,7 @@ public class Dropbox {
 									+ localFile.getName(), null, outputStream,
 									null);
 							prefs.setDropboxLocalRev(info.getMetadata().rev);
+							Helper.getInstance().reinitialize();
 						} catch (DropboxException e) {
 							return false;
 						} catch (FileNotFoundException e) {

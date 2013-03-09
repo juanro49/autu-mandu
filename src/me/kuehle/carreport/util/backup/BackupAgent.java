@@ -54,6 +54,7 @@ public class BackupAgent extends BackupAgentHelper {
 			ParcelFileDescriptor newState) throws IOException {
 		synchronized (Helper.dbLock) {
 			super.onRestore(data, appVersionCode, newState);
+			Helper.getInstance().reinitialize();
 		}
 	}
 }

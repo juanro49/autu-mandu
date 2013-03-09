@@ -13,9 +13,8 @@ public class FuelType extends AbstractItem {
 	private int tank;
 
 	public FuelType(int id) {
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.query(FuelTypeTable.NAME,
 					FuelTypeTable.ALL_COLUMNS, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) }, null, null, null);
@@ -68,31 +67,29 @@ public class FuelType extends AbstractItem {
 	@Override
 	public void delete() {
 		if (!isDeleted()) {
-			Helper helper = Helper.getInstance();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getWritableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 				db.delete(FuelTypeTable.NAME, BaseColumns._ID + "=?",
 						new String[] { String.valueOf(id) });
 			}
-			helper.dataChanged();
+			Helper.getInstance().dataChanged();
 			deleted = true;
 		}
 	}
 
 	public void save() {
 		if (!isDeleted()) {
-			Helper helper = Helper.getInstance();
 			ContentValues values = new ContentValues();
 			values.put(FuelTypeTable.COL_CAR, car.getId());
 			values.put(FuelTypeTable.COL_NAME, name);
 			values.put(FuelTypeTable.COL_TANK, tank);
 
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getWritableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 				db.update(FuelTypeTable.NAME, values, BaseColumns._ID + "=?",
 						new String[] { String.valueOf(id) });
 			}
-			helper.dataChanged();
+			Helper.getInstance().dataChanged();
 		}
 	}
 
@@ -109,9 +106,8 @@ public class FuelType extends AbstractItem {
 		values.put(FuelTypeTable.COL_NAME, name);
 		values.put(FuelTypeTable.COL_TANK, tank);
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getWritableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 			id = (int) db.insert(FuelTypeTable.NAME, null, values);
 		}
 
@@ -120,16 +116,15 @@ public class FuelType extends AbstractItem {
 					"A fuel type with this ID does already exist!");
 		}
 
-		helper.dataChanged();
+		Helper.getInstance().dataChanged();
 		return new FuelType(id, car, name, tank);
 	}
 
 	public static FuelType[] getAllForCar(Car car) {
 		ArrayList<FuelType> fuelTypes = new ArrayList<FuelType>();
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.query(FuelTypeTable.NAME,
 					FuelTypeTable.ALL_COLUMNS, FuelTypeTable.COL_CAR + "=?",
 					new String[] { String.valueOf(car.getId()) }, null, null,
@@ -150,9 +145,8 @@ public class FuelType extends AbstractItem {
 	public static String[] getAllNames() {
 		ArrayList<String> names = new ArrayList<String>();
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.rawQuery(String.format(
 					"SELECT DISTINCT %s FROM %s ORDER BY %s",
 					FuelTypeTable.COL_NAME, FuelTypeTable.NAME,

@@ -59,7 +59,6 @@ public class CSVExportImport {
 	}
 
 	public boolean export(int option) {
-		Helper helper = Helper.getInstance();
 		if (option == SINGLE_FILE) {
 			File export = new File(dir, FILE_PREFIX + ".csv");
 
@@ -152,7 +151,7 @@ public class CSVExportImport {
 
 			CSVWriter writer = new CSVWriter();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getReadableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 				Cursor cursor = db.rawQuery(sql, null);
 				writer.write(cursor, columnTypes, true);
 				cursor.close();
@@ -258,7 +257,7 @@ public class CSVExportImport {
 			CSVWriter writerRefuelings = new CSVWriter();
 			CSVWriter writerOtherCosts = new CSVWriter();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getReadableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 				Cursor cursor = db.rawQuery(sqlRefuelings, null);
 				writerRefuelings.write(cursor, columnTypesRefuelings, true);
 				cursor.close();
@@ -294,7 +293,7 @@ public class CSVExportImport {
 			CSVWriter writerOtherCosts = new CSVWriter();
 			CSVWriter writerFuelTypes = new CSVWriter();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getReadableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 				Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS,
 						null, null, null, null, null);
 				writerCars.write(cursor, columnTypesCars, true);

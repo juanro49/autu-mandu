@@ -57,7 +57,11 @@ public class Backup {
 
 	public boolean restore() {
 		synchronized (Helper.dbLock) {
-			return copyFile(backupFile, dbFile);
+			boolean result = copyFile(backupFile, dbFile);
+			if (result) {
+				Helper.getInstance().reinitialize();
+			}
+			return result;
 		}
 	}
 

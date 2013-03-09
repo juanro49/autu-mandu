@@ -36,9 +36,8 @@ public class OtherCost extends AbstractItem {
 	private Car car;
 
 	public OtherCost(int id) {
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.query(OtherCostTable.NAME,
 					OtherCostTable.ALL_COLUMNS, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) }, null, null, null);
@@ -133,13 +132,12 @@ public class OtherCost extends AbstractItem {
 
 	public void delete() {
 		if (!isDeleted()) {
-			Helper helper = Helper.getInstance();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getWritableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 				db.delete(OtherCostTable.NAME, BaseColumns._ID + "=?",
 						new String[] { String.valueOf(id) });
 			}
-			helper.dataChanged();
+			Helper.getInstance().dataChanged();
 			deleted = true;
 		}
 	}
@@ -157,13 +155,12 @@ public class OtherCost extends AbstractItem {
 			values.put(OtherCostTable.COL_NOTE, note);
 			values.put(OtherCostTable.COL_CAR, car.getId());
 
-			Helper helper = Helper.getInstance();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getWritableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 				db.update(OtherCostTable.NAME, values, BaseColumns._ID + "=?",
 						new String[] { String.valueOf(id) });
 			}
-			helper.dataChanged();
+			Helper.getInstance().dataChanged();
 		}
 	}
 
@@ -188,9 +185,8 @@ public class OtherCost extends AbstractItem {
 		values.put(OtherCostTable.COL_NOTE, note);
 		values.put(OtherCostTable.COL_CAR, car.getId());
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getWritableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 			id = (int) db.insert(OtherCostTable.NAME, null, values);
 		}
 		
@@ -199,7 +195,7 @@ public class OtherCost extends AbstractItem {
 					"An other cost with this ID does already exist!");
 		}
 		
-		helper.dataChanged();
+		Helper.getInstance().dataChanged();
 
 		return new OtherCost(id, title, date, mileage, price, recurrence,
 				note, car);
@@ -208,9 +204,8 @@ public class OtherCost extends AbstractItem {
 	public static OtherCost[] getAllForCar(Car car, boolean orderDateAsc) {
 		ArrayList<OtherCost> others = new ArrayList<OtherCost>();
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.query(OtherCostTable.NAME,
 					OtherCostTable.ALL_COLUMNS, OtherCostTable.COL_CAR + "=?",
 					new String[] { String.valueOf(car.getId()) }, null, null,
@@ -236,9 +231,8 @@ public class OtherCost extends AbstractItem {
 	public static String[] getAllTitles() {
 		ArrayList<String> titles = new ArrayList<String>();
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.rawQuery(String.format(
 					"SELECT DISTINCT %s FROM %s ORDER BY %s",
 					OtherCostTable.COL_TITLE, OtherCostTable.NAME,

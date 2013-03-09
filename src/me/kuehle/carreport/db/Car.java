@@ -30,9 +30,8 @@ public class Car extends AbstractItem {
 	private Date suspended;
 
 	public Car(int id) {
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS,
 					BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) }, null, null, null);
@@ -94,20 +93,18 @@ public class Car extends AbstractItem {
 		if (getCount() == 1) {
 			throw new RuntimeException("The last car cannot be deleted!");
 		} else if (!isDeleted()) {
-			Helper helper = Helper.getInstance();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getWritableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 				db.delete(CarTable.NAME, BaseColumns._ID + "=?",
 						new String[] { String.valueOf(id) });
 			}
-			helper.dataChanged();
+			Helper.getInstance().dataChanged();
 			deleted = true;
 		}
 	}
 
 	public void save() {
 		if (!isDeleted()) {
-			Helper helper = Helper.getInstance();
 			ContentValues values = new ContentValues();
 			values.put(CarTable.COL_NAME, name);
 			values.put(CarTable.COL_COLOR, color);
@@ -115,11 +112,11 @@ public class Car extends AbstractItem {
 					: suspended.getTime());
 
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getWritableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 				db.update(CarTable.NAME, values, BaseColumns._ID + "=?",
 						new String[] { String.valueOf(id) });
 			}
-			helper.dataChanged();
+			Helper.getInstance().dataChanged();
 		}
 	}
 
@@ -137,9 +134,8 @@ public class Car extends AbstractItem {
 		values.put(CarTable.COL_SUSPENDED,
 				suspended == null ? null : suspended.getTime());
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getWritableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 			id = (int) db.insert(CarTable.NAME, null, values);
 		}
 
@@ -148,16 +144,15 @@ public class Car extends AbstractItem {
 					"A car with this ID does already exist!");
 		}
 
-		helper.dataChanged();
+		Helper.getInstance().dataChanged();
 		return new Car(id, name, color, suspended);
 	}
 
 	public static Car[] getAll() {
 		ArrayList<Car> cars = new ArrayList<Car>();
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS, null,
 					null, null, null, CarTable.COL_SUSPENDED + " ASC");
 
@@ -179,9 +174,8 @@ public class Car extends AbstractItem {
 
 	public static int getCount() {
 		int count;
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.rawQuery(
 					"SELECT count(*) FROM " + CarTable.NAME, null);
 			cursor.moveToFirst();

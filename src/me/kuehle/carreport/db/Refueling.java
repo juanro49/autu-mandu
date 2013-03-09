@@ -35,9 +35,8 @@ public class Refueling extends AbstractItem {
 	private FuelType fuelType;
 
 	public Refueling(int id) {
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.query(RefuelingTable.NAME,
 					RefuelingTable.ALL_COLUMNS, BaseColumns._ID + "=?",
 					new String[] { String.valueOf(id) }, null, null, null);
@@ -142,13 +141,12 @@ public class Refueling extends AbstractItem {
 
 	public void delete() {
 		if (!isDeleted()) {
-			Helper helper = Helper.getInstance();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getWritableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 				db.delete(RefuelingTable.NAME, BaseColumns._ID + "=?",
 						new String[] { String.valueOf(id) });
 			}
-			helper.dataChanged();
+			Helper.getInstance().dataChanged();
 			deleted = true;
 		}
 	}
@@ -166,13 +164,12 @@ public class Refueling extends AbstractItem {
 			values.put(RefuelingTable.COL_FUELTYPE, fuelType == null ? null
 					: fuelType.getId());
 
-			Helper helper = Helper.getInstance();
 			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = helper.getWritableDatabase();
+				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 				db.update(RefuelingTable.NAME, values, BaseColumns._ID + "=?",
 						new String[] { String.valueOf(id) });
 			}
-			helper.dataChanged();
+			Helper.getInstance().dataChanged();
 		}
 	}
 
@@ -200,9 +197,8 @@ public class Refueling extends AbstractItem {
 		values.put(RefuelingTable.COL_FUELTYPE, fuelType == null ? null
 				: fuelType.getId());
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getWritableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
 			id = (int) db.insert(RefuelingTable.NAME, null, values);
 		}
 
@@ -211,7 +207,7 @@ public class Refueling extends AbstractItem {
 					"A refueling with this ID does already exist!");
 		}
 
-		helper.dataChanged();
+		Helper.getInstance().dataChanged();
 
 		return new Refueling(id, date, mileage, volume, price, partial, note,
 				car, fuelType);
@@ -220,8 +216,8 @@ public class Refueling extends AbstractItem {
 	public static Refueling[] getAllForCar(Car car, boolean orderDateAsc) {
 		ArrayList<Refueling> refuelings = new ArrayList<Refueling>();
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
+			Helper helper = Helper.getInstance();
 			SQLiteDatabase db = helper.getReadableDatabase();
 			Cursor cursor = db.query(RefuelingTable.NAME,
 					RefuelingTable.ALL_COLUMNS, RefuelingTable.COL_CAR + "=?",
@@ -260,9 +256,8 @@ public class Refueling extends AbstractItem {
 					String.valueOf(fuelType.getId()) };
 		}
 
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.query(RefuelingTable.NAME,
 					RefuelingTable.ALL_COLUMNS, selection, selectionArgs, null,
 					null, String.format("%s %s", RefuelingTable.COL_DATE,
@@ -284,9 +279,8 @@ public class Refueling extends AbstractItem {
 
 	public static int getCount() {
 		int count;
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.rawQuery("SELECT count(*) FROM "
 					+ RefuelingTable.NAME, null);
 			cursor.moveToFirst();
@@ -298,9 +292,8 @@ public class Refueling extends AbstractItem {
 
 	public static Refueling getFirst() {
 		Refueling fuel;
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db
 					.rawQuery("SELECT * FROM " + RefuelingTable.NAME
 							+ " ORDER BY " + RefuelingTable.COL_DATE
@@ -324,9 +317,8 @@ public class Refueling extends AbstractItem {
 
 	public static Refueling getLast() {
 		Refueling fuel;
-		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.rawQuery("SELECT * FROM " + RefuelingTable.NAME
 					+ " ORDER BY " + RefuelingTable.COL_DATE + " DESC LIMIT 1",
 					null);

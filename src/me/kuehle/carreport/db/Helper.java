@@ -81,6 +81,10 @@ public class Helper extends SQLiteOpenHelper {
 		OtherCostTable.onUpgrade(db, oldVersion, newVersion);
 	}
 
+	public void reinitialize() {
+		init(context);
+	}
+
 	public static Helper getInstance() {
 		return instance;
 	}

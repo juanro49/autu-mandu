@@ -88,8 +88,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		boolean partial = chkPartial.isChecked();
 		float price = (float) getDoubleFromEditText(edtPrice, 0);
 		FuelType fuelType = fuelTypes.length == 0 ? null
-				: fuelTypes.length == 1 ? fuelTypes[0] : fuelTypes[spnFuelType
-						.getSelectedItemPosition()];
+				: fuelTypes[spnFuelType.getSelectedItemPosition()];
 		String note = edtNote.getText().toString().trim();
 		Car car = cars[spnCar.getSelectedItemPosition()];
 
@@ -261,7 +260,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 				Car car = cars[position];
 				fuelTypes = FuelType.getAllForCar(car);
 
-				if (fuelTypes.length > 1) {
+				if (fuelTypes.length > 0) {
 					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 							getActivity(),
 							android.R.layout.simple_spinner_dropdown_item);

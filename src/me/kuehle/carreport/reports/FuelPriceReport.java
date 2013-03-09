@@ -110,8 +110,7 @@ public class FuelPriceReport extends AbstractReport {
 			query = Strings.replaceMap(query, replacements);
 
 			// Execute query and handle data.
-			Helper helper = Helper.getInstance();
-			SQLiteDatabase db = helper.getReadableDatabase();
+			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
 			Cursor cursor = db.rawQuery(query, args);
 			if (cursor.getCount() >= 2) {
 				cursor.moveToFirst();
