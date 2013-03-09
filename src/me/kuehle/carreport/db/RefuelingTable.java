@@ -31,10 +31,11 @@ public class RefuelingTable {
 	public static final String COL_NOTE = "note";
 	
 	public static final String COL_CAR = "cars_id";
+	public static final String COL_FUELTYPE = "fueltypes_id";
 	
 	public static final String[] ALL_COLUMNS = {
 		BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME,
-		COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR
+		COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR, COL_FUELTYPE
 	};
 	
 	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
@@ -46,13 +47,26 @@ public class RefuelingTable {
 			+ COL_PARTIAL + " INTEGER NOT NULL, "
 			+ COL_NOTE + " TEXT NOT NULL, "
 			+ COL_CAR + " INTEGER NOT NULL, "
-			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE CASCADE);";
+			+ COL_FUELTYPE + " INTEGER DEFAULT NULL, "
+			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE CASCADE, "
+	        + "FOREIGN KEY(" + COL_FUELTYPE + ") REFERENCES " + FuelTypeTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	// Add ON DELETE and ON UPDATE actions to cars_id column.
-	private static final String[] STMT_UPGRADE_1TO3 = {
+	private static final String[] STMT_UPGRADE_3 = {
 		STMT_CREATE.replaceFirst(NAME, NAME + "2"),
-		"INSERT INTO " + NAME + "2 (" + Strings.join(new String[] { BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME, COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR }, ", ") + ") "
-			+ "SELECT " + Strings.join(new String[] { NAME + "." + BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME, COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR }, ", ") + " "
+		"INSERT INTO " + NAME + "2 (" + Strings.join(", ", new String[] { BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME, COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR }) + ") "
+			+ "SELECT " + Strings.join(", ", new String[] { NAME + "." + BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME, COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR }) + " "
+			+ "FROM " + NAME + " "
+			+ "JOIN " + CarTable.NAME + " ON " + CarTable.NAME + "." + BaseColumns._ID + " = " + NAME + "." + COL_CAR + ";",
+		"DROP TABLE " + NAME + ";",
+		"ALTER TABLE " + NAME + "2 RENAME TO " + NAME + ";"
+	};
+	
+	// Add column fueltypes_id.
+	private static final String[] STMT_UPGRADE_6 = {
+		STMT_CREATE.replaceFirst(NAME, NAME + "2"),
+		"INSERT INTO " + NAME + "2 (" + Strings.join(", ", new String[] { BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME, COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR }) + ") "
+			+ "SELECT " + Strings.join(", ", new String[] { NAME + "." + BaseColumns._ID, COL_DATE, COL_TACHO, COL_VOLUME, COL_PRICE, COL_PARTIAL, COL_NOTE, COL_CAR }) + " "
 			+ "FROM " + NAME + " "
 			+ "JOIN " + CarTable.NAME + " ON " + CarTable.NAME + "." + BaseColumns._ID + " = " + NAME + "." + COL_CAR + ";",
 		"DROP TABLE " + NAME + ";",
@@ -65,8 +79,14 @@ public class RefuelingTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		if((oldVersion == 1 || oldVersion == 2) && newVersion == 3) {
-			for(String stmt : STMT_UPGRADE_1TO3) {
+		if (oldVersion < 3) {
+			for (String stmt : STMT_UPGRADE_3) {
+				db.execSQL(stmt);
+			}
+		}
+		
+		if (oldVersion < 6) {
+			for (String stmt : STMT_UPGRADE_6) {
 				db.execSQL(stmt);
 			}
 		}

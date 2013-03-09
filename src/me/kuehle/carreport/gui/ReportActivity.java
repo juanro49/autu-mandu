@@ -26,7 +26,7 @@ import me.kuehle.carreport.reports.FuelPriceReport;
 import me.kuehle.carreport.reports.MileageReport;
 import me.kuehle.carreport.util.backup.Dropbox;
 import me.kuehle.carreport.util.gui.SectionListAdapter;
-import me.kuehle.carreport.util.gui.WeightAnimator;
+import me.kuehle.carreport.util.gui.SimpleAnimator;
 import me.kuehle.chartlib.ChartView;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
@@ -96,7 +96,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	};
 
 	private ActionMode.Callback mCalculationActionMode = new ActionMode.Callback() {
-		private WeightAnimator graphAnim;
+		private SimpleAnimator graphAnimator;
 		private EditText input;
 		private int option;
 
@@ -125,7 +125,8 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			option = 0;
 
 			View graph = ReportActivity.this.findViewById(R.id.graph_holder);
-			graphAnim = new WeightAnimator(graph, 500);
+			graphAnimator = new SimpleAnimator(ReportActivity.this, graph,
+					SimpleAnimator.Property.Weight, 500);
 
 			input = new EditText(ReportActivity.this);
 			input.setInputType(InputType.TYPE_CLASS_NUMBER
@@ -151,7 +152,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			mode.setCustomView(input);
 			input.requestFocus();
 
-			graphAnim.collapse(null, new Runnable() {
+			graphAnimator.hide(null, new Runnable() {
 				@Override
 				public void run() {
 					InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -170,7 +171,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			keyboard.hideSoftInputFromWindow(input.getWindowToken(), 0);
 
-			graphAnim.expand(null, null);
+			graphAnimator.show(null, null);
 		}
 
 		@Override
@@ -185,7 +186,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			} catch (NumberFormatException e) {
 			}
 			mCurrentReport.getData().applyCalculation(value1, option);
-			((ListView) ReportActivity.this.findViewById(R.id.lstData))
+			((ListView) ReportActivity.this.findViewById(R.id.lst_data))
 					.invalidateViews();
 		}
 	};
@@ -381,11 +382,11 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		loadGraphSettings();
 		updateReportGraph();
 
-		ListView lstData = (ListView) findViewById(R.id.lstData);
+		ListView lstData = (ListView) findViewById(R.id.lst_data);
 		Preferences prefs = new Preferences(ReportActivity.this);
 		lstData.setAdapter(new SectionListAdapter(this,
-				R.layout.report_list_item, mCurrentReport.getData().getData(),
-				prefs.isColorSections()));
+				R.layout.list_item_report_data, mCurrentReport.getData()
+						.getData(), prefs.isColorSections()));
 	}
 
 	private void updateReportGraph() {

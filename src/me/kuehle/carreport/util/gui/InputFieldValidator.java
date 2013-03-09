@@ -101,7 +101,7 @@ public class InputFieldValidator {
 		if (messages.size() > 0) {
 			MessageDialogFragment.newInstance(null, 0,
 					R.string.alert_validate_title,
-					Strings.join(messages, "\n"), android.R.string.ok, null)
+					Strings.join("\n", messages), android.R.string.ok, null)
 					.show(fragmentManager, null);
 		} else {
 			callback.validationSuccessfull();

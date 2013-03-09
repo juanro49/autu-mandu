@@ -26,6 +26,7 @@ public class DataDetailActivity extends Activity implements
 
 	public static final int EXTRA_EDIT_REFUELING = 0;
 	public static final int EXTRA_EDIT_OTHER = 1;
+	public static final int EXTRA_EDIT_CAR = 2;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +40,10 @@ public class DataDetailActivity extends Activity implements
 			AbstractDataDetailFragment fragment;
 			if (edit == EXTRA_EDIT_REFUELING) {
 				fragment = new DataDetailRefuelingFragment();
-			} else {
+			} else if (edit == EXTRA_EDIT_OTHER) {
 				fragment = new DataDetailOtherFragment();
+			} else {
+				fragment = new DataDetailCarFragment();
 			}
 			fragment.setArguments(getIntent().getExtras());
 

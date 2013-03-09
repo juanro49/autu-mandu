@@ -23,6 +23,8 @@ import java.util.HashMap;
 
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.CarTable;
+import me.kuehle.carreport.db.FuelType;
+import me.kuehle.carreport.db.FuelTypeTable;
 import me.kuehle.carreport.db.Helper;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.OtherCostTable;
@@ -44,7 +46,7 @@ public class CSVExportImport {
 	public static final String FILE_PREFIX = "carreport_export";
 	public static final int SINGLE_FILE = 0;
 	public static final int TWO_FILES = 1;
-	public static final int THREE_FILES = 2;
+	public static final int FOUR_FILES = 2;
 
 	private static final String REFUELING_TITLE = "Refueling";
 
@@ -65,7 +67,7 @@ public class CSVExportImport {
 			HashMap<String, String> replacements = new HashMap<String, String>();
 			replacements.put(
 					"%r_columns",
-					Strings.join(new String[] {
+					Strings.join(", ", 
 							RefuelingTable.NAME + "." + BaseColumns._ID
 									+ " AS " + BaseColumns._ID,
 							"'" + REFUELING_TITLE + "' AS "
@@ -86,10 +88,18 @@ public class CSVExportImport {
 									+ CarTable.NAME + CarTable.COL_COLOR,
 							CarTable.NAME + "." + CarTable.COL_SUSPENDED
 									+ " AS " + CarTable.NAME
-									+ CarTable.COL_SUSPENDED }, ", "));
+									+ CarTable.COL_SUSPENDED,
+							FuelTypeTable.NAME + "." + BaseColumns._ID + " AS "
+									+ FuelTypeTable.NAME + BaseColumns._ID,
+							FuelTypeTable.NAME + "." + FuelTypeTable.COL_NAME
+									+ " AS " + FuelTypeTable.NAME
+									+ FuelTypeTable.COL_NAME,
+							FuelTypeTable.NAME + "." + FuelTypeTable.COL_TANK
+									+ " AS " + FuelTypeTable.NAME
+									+ FuelTypeTable.COL_TANK ));
 			replacements.put(
 					"%o_columns",
-					Strings.join(new String[] {
+					Strings.join(", ", new String[] {
 							OtherCostTable.NAME + "." + BaseColumns._ID
 									+ " AS " + BaseColumns._ID,
 							OtherCostTable.COL_TITLE,
@@ -109,19 +119,30 @@ public class CSVExportImport {
 									+ CarTable.NAME + CarTable.COL_COLOR,
 							CarTable.NAME + "." + CarTable.COL_SUSPENDED
 									+ " AS " + CarTable.NAME
-									+ CarTable.COL_SUSPENDED }, ", "));
+									+ CarTable.COL_SUSPENDED,
+							"'' AS " + FuelTypeTable.NAME + BaseColumns._ID,
+							"'' AS " + FuelTypeTable.NAME
+									+ FuelTypeTable.COL_NAME,
+							"'' AS " + FuelTypeTable.NAME
+									+ FuelTypeTable.COL_TANK }));
 			replacements.put("%refuelings", RefuelingTable.NAME);
 			replacements.put("%othercosts", OtherCostTable.NAME);
 			replacements.put("%cars", CarTable.NAME);
+			replacements.put("%fueltypes", FuelTypeTable.NAME);
 			replacements.put("%r_car_id", RefuelingTable.COL_CAR);
+			replacements.put("%r_fueltype_id", RefuelingTable.COL_FUELTYPE);
 			replacements.put("%o_car_id", OtherCostTable.COL_CAR);
 			replacements.put("%id", BaseColumns._ID);
-			String sql = Strings.replaceMap("SELECT %r_columns "
-					+ "FROM %refuelings "
-					+ "JOIN %cars ON %refuelings.%r_car_id = %cars.%id "
-					+ "UNION ALL SELECT %o_columns " + "FROM %othercosts "
-					+ "JOIN %cars ON %othercosts.%o_car_id = %cars.%id",
-					replacements);
+			String sql = Strings
+					.replaceMap(
+							"SELECT %r_columns "
+									+ "FROM %refuelings "
+									+ "JOIN %cars ON %refuelings.%r_car_id = %cars.%id "
+									+ "LEFT JOIN %fueltypes ON %refuelings.%r_fueltype_id = %fueltypes.%id "
+									+ "UNION ALL SELECT %o_columns "
+									+ "FROM %othercosts "
+									+ "JOIN %cars ON %othercosts.%o_car_id = %cars.%id",
+							replacements);
 
 			SparseArray<SpecialColumnType> columnTypes = new SparseArray<SpecialColumnType>();
 			columnTypes.put(2, new CSVWriter.SpecialColumnType(Date.class,
@@ -149,7 +170,7 @@ public class CSVExportImport {
 			HashMap<String, String> replacementsRefuelings = new HashMap<String, String>();
 			replacementsRefuelings.put(
 					"%columns",
-					Strings.join(new String[] {
+					Strings.join(", ", new String[] {
 							RefuelingTable.NAME + "." + BaseColumns._ID
 									+ " AS " + BaseColumns._ID,
 							RefuelingTable.COL_DATE,
@@ -166,15 +187,29 @@ public class CSVExportImport {
 									+ CarTable.NAME + CarTable.COL_COLOR,
 							CarTable.NAME + "." + CarTable.COL_SUSPENDED
 									+ " AS " + CarTable.NAME
-									+ CarTable.COL_SUSPENDED }, ", "));
+									+ CarTable.COL_SUSPENDED,
+							FuelTypeTable.NAME + "." + BaseColumns._ID + " AS "
+									+ FuelTypeTable.NAME + BaseColumns._ID,
+							FuelTypeTable.NAME + "." + FuelTypeTable.COL_NAME
+									+ " AS " + FuelTypeTable.NAME
+									+ FuelTypeTable.COL_NAME,
+							FuelTypeTable.NAME + "." + FuelTypeTable.COL_TANK
+									+ " AS " + FuelTypeTable.NAME
+									+ FuelTypeTable.COL_TANK }));
 			replacementsRefuelings.put("%refuelings", RefuelingTable.NAME);
 			replacementsRefuelings.put("%cars", CarTable.NAME);
 			replacementsRefuelings.put("%car_id", RefuelingTable.COL_CAR);
+			replacementsRefuelings.put("%fueltypes", FuelTypeTable.NAME);
+			replacementsRefuelings.put("%fueltype_id",
+					RefuelingTable.COL_FUELTYPE);
 			replacementsRefuelings.put("%id", BaseColumns._ID);
-			String sqlRefuelings = Strings.replaceMap("SELECT %columns "
-					+ "FROM %refuelings "
-					+ "JOIN %cars ON %refuelings.%car_id = %cars.%id ",
-					replacementsRefuelings);
+			String sqlRefuelings = Strings
+					.replaceMap(
+							"SELECT %columns "
+									+ "FROM %refuelings "
+									+ "JOIN %cars ON %refuelings.%car_id = %cars.%id "
+									+ "LEFT JOIN %fueltypes ON %refuelings.%fueltype_id = %fueltypes.%id ",
+							replacementsRefuelings);
 
 			SparseArray<SpecialColumnType> columnTypesRefuelings = new SparseArray<SpecialColumnType>();
 			columnTypesRefuelings.put(1, new CSVWriter.SpecialColumnType(
@@ -186,7 +221,7 @@ public class CSVExportImport {
 			HashMap<String, String> replacementsOtherCosts = new HashMap<String, String>();
 			replacementsOtherCosts.put(
 					"%columns",
-					Strings.join(new String[] {
+					Strings.join(", ", new String[] {
 							OtherCostTable.NAME + "." + BaseColumns._ID
 									+ " AS " + BaseColumns._ID,
 							OtherCostTable.COL_TITLE,
@@ -204,7 +239,7 @@ public class CSVExportImport {
 									+ CarTable.NAME + CarTable.COL_COLOR,
 							CarTable.NAME + "." + CarTable.COL_SUSPENDED
 									+ " AS " + CarTable.NAME
-									+ CarTable.COL_SUSPENDED }, ", "));
+									+ CarTable.COL_SUSPENDED }));
 			replacementsOtherCosts.put("%othercosts", OtherCostTable.NAME);
 			replacementsOtherCosts.put("%cars", CarTable.NAME);
 			replacementsOtherCosts.put("%car_id", OtherCostTable.COL_CAR);
@@ -235,12 +270,13 @@ public class CSVExportImport {
 			writerRefuelings.toFile(exportRefuelings);
 			writerOtherCosts.toFile(exportOtherCosts);
 			return true;
-		} else if (option == THREE_FILES) {
+		} else if (option == FOUR_FILES) {
 			File exportCars = new File(dir, FILE_PREFIX + "_cars.csv");
 			File exportRefuelings = new File(dir, FILE_PREFIX
 					+ "_refuelings.csv");
 			File exportOtherCosts = new File(dir, FILE_PREFIX
 					+ "_othercosts.csv");
+			File exportFuelTypes = new File(dir, FILE_PREFIX + "_fueltypes.csv");
 
 			SparseArray<SpecialColumnType> columnTypesCars = new SparseArray<CSVWriter.SpecialColumnType>();
 			columnTypesCars.put(3, new CSVWriter.SpecialColumnType(Date.class,
@@ -251,10 +287,12 @@ public class CSVExportImport {
 			SparseArray<SpecialColumnType> columnTypesOtherCosts = new SparseArray<SpecialColumnType>();
 			columnTypesOtherCosts.put(2, new CSVWriter.SpecialColumnType(
 					Date.class, dateFormat));
+			SparseArray<SpecialColumnType> columnTypesFuelTypes = new SparseArray<SpecialColumnType>();
 
 			CSVWriter writerCars = new CSVWriter();
 			CSVWriter writerRefuelings = new CSVWriter();
 			CSVWriter writerOtherCosts = new CSVWriter();
+			CSVWriter writerFuelTypes = new CSVWriter();
 			synchronized (Helper.dbLock) {
 				SQLiteDatabase db = helper.getReadableDatabase();
 				Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS,
@@ -271,11 +309,17 @@ public class CSVExportImport {
 						null);
 				writerOtherCosts.write(cursor, columnTypesOtherCosts, true);
 				cursor.close();
+				cursor = db
+						.query(FuelTypeTable.NAME, FuelTypeTable.ALL_COLUMNS,
+								null, null, null, null, null);
+				writerFuelTypes.write(cursor, columnTypesFuelTypes, true);
+				cursor.close();
 			}
 
 			writerCars.toFile(exportCars);
 			writerRefuelings.toFile(exportRefuelings);
 			writerOtherCosts.toFile(exportOtherCosts);
+			writerFuelTypes.toFile(exportFuelTypes);
 			return true;
 		} else {
 			return false;
@@ -286,8 +330,8 @@ public class CSVExportImport {
 		return dir.canWrite();
 	}
 
-	public boolean canImport() {
-		return false;
+	public boolean canImport(int option) {
+		return allExportFilesExist(option);
 	}
 
 	public boolean allExportFilesExist(int option) {
@@ -300,14 +344,15 @@ public class CSVExportImport {
 			File exportOtherCosts = new File(dir, FILE_PREFIX
 					+ "_othercosts.csv");
 			return exportRefuelings.isFile() && exportOtherCosts.isFile();
-		} else if (option == THREE_FILES) {
+		} else if (option == FOUR_FILES) {
 			File exportCars = new File(dir, FILE_PREFIX + "_cars.csv");
 			File exportRefuelings = new File(dir, FILE_PREFIX
 					+ "_refuelings.csv");
 			File exportOtherCosts = new File(dir, FILE_PREFIX
 					+ "_othercosts.csv");
+			File exportFuelTypes = new File(dir, FILE_PREFIX + "_fueltypes.csv");
 			return exportCars.isFile() && exportRefuelings.isFile()
-					&& exportOtherCosts.isFile();
+					&& exportOtherCosts.isFile() && exportFuelTypes.isFile();
 		} else {
 			return false;
 		}
@@ -323,14 +368,15 @@ public class CSVExportImport {
 			File exportOtherCosts = new File(dir, FILE_PREFIX
 					+ "_othercosts.csv");
 			return exportRefuelings.isFile() || exportOtherCosts.isFile();
-		} else if (option == THREE_FILES) {
+		} else if (option == FOUR_FILES) {
 			File exportCars = new File(dir, FILE_PREFIX + "_cars.csv");
 			File exportRefuelings = new File(dir, FILE_PREFIX
 					+ "_refuelings.csv");
 			File exportOtherCosts = new File(dir, FILE_PREFIX
 					+ "_othercosts.csv");
+			File exportFuelTypes = new File(dir, FILE_PREFIX + "_fueltypes.csv");
 			return exportCars.isFile() || exportRefuelings.isFile()
-					|| exportOtherCosts.isFile();
+					|| exportOtherCosts.isFile() || exportFuelTypes.isFile();
 		} else {
 			return false;
 		}
@@ -351,6 +397,7 @@ public class CSVExportImport {
 					importCar(reader, i, CarTable.NAME);
 					if (reader.getString(i, OtherCostTable.COL_TITLE).equals(
 							REFUELING_TITLE)) {
+						importFuelType(reader, i, FuelTypeTable.NAME);
 						importRefueling(reader, i);
 					} else {
 						importOtherCost(reader, i);
@@ -372,6 +419,7 @@ public class CSVExportImport {
 			for (int i = 0; i < readerRefuelings.getRowCount(); i++) {
 				try {
 					importCar(readerRefuelings, i, CarTable.NAME);
+					importFuelType(readerRefuelings, i, FuelTypeTable.NAME);
 					importRefueling(readerRefuelings, i);
 				} catch (Exception e) {
 					errors = true;
@@ -385,16 +433,19 @@ public class CSVExportImport {
 					errors = true;
 				}
 			}
-		} else if (option == THREE_FILES) {
+		} else if (option == FOUR_FILES) {
 			File exportCars = new File(dir, FILE_PREFIX + "_cars.csv");
 			File exportRefuelings = new File(dir, FILE_PREFIX
 					+ "_refuelings.csv");
 			File exportOtherCosts = new File(dir, FILE_PREFIX
 					+ "_othercosts.csv");
+			File exportFuelTypes = new File(dir, FILE_PREFIX + "_fueltypes.csv");
 			CSVReader readerCars = CSVReader.fromFile(exportCars, true);
 			CSVReader readerRefuelings = CSVReader.fromFile(exportRefuelings,
 					true);
 			CSVReader readerOtherCosts = CSVReader.fromFile(exportOtherCosts,
+					true);
+			CSVReader readerFuelTypes = CSVReader.fromFile(exportFuelTypes,
 					true);
 
 			for (int i = 0; i < readerCars.getRowCount(); i++) {
@@ -414,6 +465,13 @@ public class CSVExportImport {
 			for (int i = 0; i < readerOtherCosts.getRowCount(); i++) {
 				try {
 					importOtherCost(readerOtherCosts, i);
+				} catch (Exception e) {
+					errors = true;
+				}
+			}
+			for (int i = 0; i < readerFuelTypes.getRowCount(); i++) {
+				try {
+					importFuelType(readerFuelTypes, i, "");
 				} catch (Exception e) {
 					errors = true;
 				}
@@ -452,8 +510,15 @@ public class CSVExportImport {
 		boolean partial = reader.getInt(row, RefuelingTable.COL_PARTIAL) > 0;
 		String note = reader.getString(row, RefuelingTable.COL_NOTE);
 		int carID = reader.getInt(row, CarTable.NAME + BaseColumns._ID);
+		int fuelTypeID = reader.getInt(row, FuelTypeTable.NAME
+				+ BaseColumns._ID);
 
 		Car car = new Car(carID);
+		FuelType fuelType = null;
+		try {
+			fuelType = new FuelType(fuelTypeID);
+		} catch (Exception e) {
+		}
 		try {
 			Refueling refueling = new Refueling(id);
 			refueling.setDate(date);
@@ -463,10 +528,11 @@ public class CSVExportImport {
 			refueling.setPartial(partial);
 			refueling.setNote(note);
 			refueling.setCar(car);
+			refueling.setFuelType(fuelType);
 			refueling.save();
 		} catch (IllegalArgumentException e) {
 			Refueling.create(id, date, mileage, volume, price, partial, note,
-					car);
+					car, fuelType);
 		}
 	}
 
@@ -497,6 +563,29 @@ public class CSVExportImport {
 		} catch (IllegalArgumentException e) {
 			OtherCost.create(id, title, date, mileage, price, recurrence, note,
 					car);
+		}
+	}
+
+	private void importFuelType(CSVReader reader, int row, String titlePrefix) {
+		int id = reader.getInt(row, titlePrefix + BaseColumns._ID);
+		int carID = reader.getInt(row, CarTable.NAME + BaseColumns._ID);
+		String name = reader.getString(row, titlePrefix
+				+ FuelTypeTable.COL_NAME);
+		int tank = reader.getInt(row, titlePrefix + FuelTypeTable.COL_TANK);
+
+		if (id == 0 || name.isEmpty()) {
+			return;
+		}
+
+		Car car = new Car(carID);
+		try {
+			FuelType fuelType = new FuelType(id);
+			fuelType.setCar(car);
+			fuelType.setName(name);
+			fuelType.setTank(tank);
+			fuelType.save();
+		} catch (IllegalArgumentException e) {
+			FuelType.create(id, car, name, tank);
 		}
 	}
 }

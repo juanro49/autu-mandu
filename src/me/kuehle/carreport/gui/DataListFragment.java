@@ -109,7 +109,7 @@ public class DataListFragment extends Fragment implements
 
 		@Override
 		protected int getView() {
-			return R.id.tabOtherCosts;
+			return R.id.tab_other_costs;
 		}
 
 		@Override
@@ -188,7 +188,7 @@ public class DataListFragment extends Fragment implements
 
 		@Override
 		protected int getView() {
-			return R.id.tabRefuelings;
+			return R.id.tab_refuelings;
 		}
 
 		@Override
@@ -206,9 +206,15 @@ public class DataListFragment extends Fragment implements
 			for (int i = 0; i < mItems.length; i++) {
 				Refueling refueling = (Refueling) mItems[i];
 				SparseArray<String> dataItem = new SparseArray<String>();
+
 				dataItem.put(R.id.title,
 						getString(R.string.edit_title_refueling));
+				if (refueling.getFuelType() != null) {
+					dataItem.put(R.id.subtitle, refueling.getFuelType()
+							.getName());
+				}
 				dataItem.put(R.id.date, dateFmt.format(refueling.getDate()));
+
 				dataItem.put(
 						R.id.data1,
 						String.format("%d %s", refueling.getMileage(),
@@ -221,15 +227,17 @@ public class DataListFragment extends Fragment implements
 									- nextRefueling.getMileage(),
 									prefs.getUnitDistance()));
 				}
+
 				dataItem.put(
 						R.id.data2,
 						String.format("%.2f %s", refueling.getPrice(),
 								prefs.getUnitCurrency()));
 				dataItem.put(
 						R.id.data2_calculated,
-						String.format("%.2f %s/%s", refueling.getPrice()
+						String.format("%.3f %s/%s", refueling.getPrice()
 								/ refueling.getVolume(),
 								prefs.getUnitCurrency(), prefs.getUnitVolume()));
+
 				dataItem.put(
 						R.id.data3,
 						String.format("%.2f %s", refueling.getVolume(),
@@ -256,6 +264,7 @@ public class DataListFragment extends Fragment implements
 						}
 					}
 				}
+
 				data.add(dataItem);
 			}
 
@@ -270,9 +279,9 @@ public class DataListFragment extends Fragment implements
 
 	public class DataListAdapter extends BaseAdapter {
 		private ArrayList<SparseArray<String>> data = new ArrayList<SparseArray<String>>();
-		private int[] fields = { R.id.title, R.id.date, R.id.data1,
-				R.id.data1_calculated, R.id.data2, R.id.data2_calculated,
-				R.id.data3, R.id.data3_calculated };
+		private int[] fields = { R.id.title, R.id.subtitle, R.id.date,
+				R.id.data1, R.id.data1_calculated, R.id.data2,
+				R.id.data2_calculated, R.id.data3, R.id.data3_calculated };
 
 		@Override
 		public int getCount() {
@@ -293,7 +302,7 @@ public class DataListFragment extends Fragment implements
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
 				convertView = getActivity().getLayoutInflater().inflate(
-						R.layout.data_list_item, parent, false);
+						R.layout.list_item_data, parent, false);
 			}
 
 			SparseArray<String> item = data.get(position);
@@ -303,6 +312,8 @@ public class DataListFragment extends Fragment implements
 				if (value != null) {
 					textView.setText(value);
 					textView.setVisibility(View.VISIBLE);
+				} else if (field == R.id.subtitle) {
+					textView.setVisibility(View.GONE);
 				} else {
 					textView.setVisibility(View.INVISIBLE);
 				}
@@ -476,9 +487,9 @@ public class DataListFragment extends Fragment implements
 
 		mTabs = new AbstractTabHelper[2];
 		mTabs[0] = new RefuelingsTabHelper(
-				(ListView) mTabHost.findViewById(R.id.tabRefuelings));
+				(ListView) mTabHost.findViewById(R.id.tab_refuelings));
 		mTabs[1] = new OtherCostsTabHelper(
-				(ListView) mTabHost.findViewById(R.id.tabOtherCosts));
+				(ListView) mTabHost.findViewById(R.id.tab_other_costs));
 
 		mTabHost.setup();
 		for (AbstractTabHelper tab : mTabs) {

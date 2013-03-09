@@ -15,24 +15,10 @@
   limitations under the License.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <item
-        android:id="@+id/menu_suspend"
-        android:icon="@drawable/ic_suspend"
-        android:title="@string/menu_suspend"
-        android:showAsAction="ifRoom|withText">
-    </item>
-    <item
-        android:id="@+id/menu_unsuspend"
-        android:icon="@drawable/ic_unsuspend"
-        android:title="@string/menu_unsuspend"
-        android:showAsAction="ifRoom|withText">
-    </item>
     <item
         android:id="@+id/menu_delete"
         android:icon="@drawable/ic_discard"
-        android:title="@string/menu_delete"
-        android:showAsAction="ifRoom|withText">
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_delete">
     </item>
-
 </menu>

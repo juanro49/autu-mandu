@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2013 Jan Kühle
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <EditText
+        android:id="@+id/edt_name"
+        style="@style/edit_title"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="@string/hint_name" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp" >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:orientation="horizontal" >
+                <TextView
+                    style="@android:style/TextAppearance.Medium"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:paddingLeft="8dp"
+                    android:text="@string/label_color" />
+                <View
+                    android:id="@+id/btn_color"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/btn_choose_color" />
+            </LinearLayout>
+            <TextView
+                style="@style/section_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/section_fueltypes" />
+            <LinearLayout
+                android:id="@+id/layout_fueltypes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+            </LinearLayout>
+            <Button
+                android:id="@+id/btn_add_fueltype"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:gravity="left|center_vertical"
+                android:paddingLeft="8dp"
+                android:text="@string/label_add_fueltype"
+                android:textColor="@android:color/darker_gray" />
+            <TextView
+                style="@style/section_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/section_suspend" />
+            <CheckBox
+                android:id="@+id/chk_suspend"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="@string/label_suspend" />
+            <EditText
+                android:id="@+id/edt_suspend_date"
+                style="@android:style/Widget.Holo.Spinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:focusable="false"
+                android:inputType="date" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

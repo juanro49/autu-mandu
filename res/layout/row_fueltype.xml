@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright 2012 Jan Kühle
+  Copyright 2013 Jan Kühle
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,17 +16,25 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="4dp" >
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+    <AutoCompleteTextView
+        android:id="@+id/edt_name"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_weight="6"
+        android:hint="@string/hint_fueltype" />
     <Spinner
-        android:id="@+id/spn_single_multiple_file"
-        android:layout_width="match_parent"
+        android:id="@+id/spn_tank"
+        android:layout_width="0dp"
         android:layout_height="48dp"
-        android:entries="@array/exportcsv_singlemultiplefile" />
-    <CheckBox
-        android:id="@+id/chk_overwrite"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="@string/label_overwrite" />
+        android:layout_weight="4" />
+    <ImageButton
+        android:id="@+id/btn_remove"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="@string/remove_fueltype_desc"
+        android:src="@drawable/ic_cancel" />
 </LinearLayout>

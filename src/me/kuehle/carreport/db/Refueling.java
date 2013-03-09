@@ -32,6 +32,7 @@ public class Refueling extends AbstractItem {
 	private boolean partial;
 	private String note;
 	private Car car;
+	private FuelType fuelType;
 
 	public Refueling(int id) {
 		Helper helper = Helper.getInstance();
@@ -54,13 +55,16 @@ public class Refueling extends AbstractItem {
 				this.partial = cursor.getInt(5) > 0;
 				this.note = cursor.getString(6);
 				this.car = new Car(cursor.getInt(7));
+				this.fuelType = cursor.isNull(8) ? null : new FuelType(
+						cursor.getInt(8));
 				cursor.close();
 			}
 		}
 	}
 
 	private Refueling(int id, Date date, int mileage, float volume,
-			float price, boolean partial, String note, Car car) {
+			float price, boolean partial, String note, Car car,
+			FuelType fuelType) {
 		this.id = id;
 		this.date = date;
 		this.mileage = mileage;
@@ -69,6 +73,7 @@ public class Refueling extends AbstractItem {
 		this.partial = partial;
 		this.note = note;
 		this.car = car;
+		this.fuelType = fuelType;
 	}
 
 	public Date getDate() {
@@ -127,6 +132,14 @@ public class Refueling extends AbstractItem {
 		this.car = car;
 	}
 
+	public FuelType getFuelType() {
+		return fuelType;
+	}
+
+	public void setFuelType(FuelType fuelType) {
+		this.fuelType = fuelType;
+	}
+
 	public void delete() {
 		if (!isDeleted()) {
 			Helper helper = Helper.getInstance();
@@ -150,6 +163,8 @@ public class Refueling extends AbstractItem {
 			values.put(RefuelingTable.COL_PARTIAL, partial);
 			values.put(RefuelingTable.COL_NOTE, note);
 			values.put(RefuelingTable.COL_CAR, car.getId());
+			values.put(RefuelingTable.COL_FUELTYPE, fuelType == null ? null
+					: fuelType.getId());
 
 			Helper helper = Helper.getInstance();
 			synchronized (Helper.dbLock) {
@@ -162,12 +177,15 @@ public class Refueling extends AbstractItem {
 	}
 
 	public static Refueling create(Date date, int mileage, float volume,
-			float price, boolean partial, String note, Car car) {
-		return create(-1, date, mileage, volume, price, partial, note, car);
+			float price, boolean partial, String note, Car car,
+			FuelType fuelType) {
+		return create(-1, date, mileage, volume, price, partial, note, car,
+				fuelType);
 	}
-	
-	public static Refueling create(int id, Date date, int mileage, float volume,
-			float price, boolean partial, String note, Car car) {
+
+	public static Refueling create(int id, Date date, int mileage,
+			float volume, float price, boolean partial, String note, Car car,
+			FuelType fuelType) {
 		ContentValues values = new ContentValues();
 		if (id != -1) {
 			values.put(BaseColumns._ID, id);
@@ -179,22 +197,24 @@ public class Refueling extends AbstractItem {
 		values.put(RefuelingTable.COL_PARTIAL, partial);
 		values.put(RefuelingTable.COL_NOTE, note);
 		values.put(RefuelingTable.COL_CAR, car.getId());
+		values.put(RefuelingTable.COL_FUELTYPE, fuelType == null ? null
+				: fuelType.getId());
 
 		Helper helper = Helper.getInstance();
 		synchronized (Helper.dbLock) {
 			SQLiteDatabase db = helper.getWritableDatabase();
 			id = (int) db.insert(RefuelingTable.NAME, null, values);
 		}
-		
+
 		if (id == -1) {
 			throw new IllegalArgumentException(
 					"A refueling with this ID does already exist!");
 		}
-		
+
 		helper.dataChanged();
 
-		return new Refueling(id, date, mileage, volume, price, partial,
-				note, car);
+		return new Refueling(id, date, mileage, volume, price, partial, note,
+				car, fuelType);
 	}
 
 	public static Refueling[] getAllForCar(Car car, boolean orderDateAsc) {
@@ -211,10 +231,49 @@ public class Refueling extends AbstractItem {
 
 			cursor.moveToFirst();
 			while (!cursor.isAfterLast()) {
+				FuelType fuelType = cursor.isNull(8) ? null : new FuelType(
+						cursor.getInt(8));
 				refuelings.add(new Refueling(cursor.getInt(0), new Date(cursor
 						.getLong(1)), cursor.getInt(2), cursor.getFloat(3),
 						cursor.getFloat(4), cursor.getInt(5) > 0, cursor
-								.getString(6), car));
+								.getString(6), car, fuelType));
+				cursor.moveToNext();
+			}
+			cursor.close();
+		}
+
+		return refuelings.toArray(new Refueling[refuelings.size()]);
+	}
+
+	public static Refueling[] getAllForCar(Car car, FuelType fuelType,
+			boolean orderDateAsc) {
+		ArrayList<Refueling> refuelings = new ArrayList<Refueling>();
+
+		String selection = RefuelingTable.COL_CAR + " = ?";
+		String[] selectionArgs;
+		if (fuelType == null) {
+			selection += " AND " + RefuelingTable.COL_FUELTYPE + " IS NULL";
+			selectionArgs = new String[] { String.valueOf(car.getId()) };
+		} else {
+			selection += " AND " + RefuelingTable.COL_FUELTYPE + " = ?";
+			selectionArgs = new String[] { String.valueOf(car.getId()),
+					String.valueOf(fuelType.getId()) };
+		}
+
+		Helper helper = Helper.getInstance();
+		synchronized (Helper.dbLock) {
+			SQLiteDatabase db = helper.getReadableDatabase();
+			Cursor cursor = db.query(RefuelingTable.NAME,
+					RefuelingTable.ALL_COLUMNS, selection, selectionArgs, null,
+					null, String.format("%s %s", RefuelingTable.COL_DATE,
+							orderDateAsc ? "ASC" : "DESC"));
+
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				refuelings.add(new Refueling(cursor.getInt(0), new Date(cursor
+						.getLong(1)), cursor.getInt(2), cursor.getFloat(3),
+						cursor.getFloat(4), cursor.getInt(5) > 0, cursor
+								.getString(6), car, fuelType));
 				cursor.moveToNext();
 			}
 			cursor.close();
@@ -251,10 +310,12 @@ public class Refueling extends AbstractItem {
 				return null;
 			}
 			cursor.moveToFirst();
+			FuelType fuelType = cursor.isNull(8) ? null : new FuelType(
+					cursor.getInt(8));
 			fuel = new Refueling(cursor.getInt(0), new Date(cursor.getLong(1)),
 					cursor.getInt(2), cursor.getFloat(3), cursor.getFloat(4),
 					cursor.getInt(5) > 0, cursor.getString(6), new Car(
-							cursor.getInt(7)));
+							cursor.getInt(7)), fuelType);
 			cursor.close();
 		}
 
@@ -274,10 +335,12 @@ public class Refueling extends AbstractItem {
 				return null;
 			}
 			cursor.moveToFirst();
+			FuelType fuelType = cursor.isNull(8) ? null : new FuelType(
+					cursor.getInt(8));
 			fuel = new Refueling(cursor.getInt(0), new Date(cursor.getLong(1)),
 					cursor.getInt(2), cursor.getFloat(3), cursor.getFloat(4),
 					cursor.getInt(5) > 0, cursor.getString(6), new Car(
-							cursor.getInt(7)));
+							cursor.getInt(7)), fuelType);
 			cursor.close();
 		}
 

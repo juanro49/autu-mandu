@@ -158,7 +158,7 @@ public class CostsReport extends AbstractReport {
 			Section section;
 			if (car.isSuspended()) {
 				section = addDataSection(
-						String.format("%s (%s)", car.getName(),
+						String.format("%s [%s]", car.getName(),
 								context.getString(R.string.suspended)),
 						car.getColor(), Section.STICK_BOTTOM);
 			} else {

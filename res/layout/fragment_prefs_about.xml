@@ -32,7 +32,7 @@
             android:src="@drawable/ic_about" />
 
         <TextView
-            android:id="@+id/txtVersion"
+            android:id="@+id/txt_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -55,7 +55,7 @@
             android:text="@string/app_description" />
 
         <Button
-            android:id="@+id/btnLicenses"
+            android:id="@+id/btn_licenses"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

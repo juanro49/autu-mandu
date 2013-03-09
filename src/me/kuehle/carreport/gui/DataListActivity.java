@@ -169,7 +169,7 @@ public class DataListActivity extends Activity implements
 
 	@Override
 	public void onTabChanged(int edit) {
-		TextView v = (TextView) findViewById(R.id.txtNoEntrySelected);
+		TextView v = (TextView) findViewById(R.id.txt_no_entry_selected);
 		if (v != null) {
 			int id = edit == DataDetailActivity.EXTRA_EDIT_REFUELING ? R.drawable.ic_data_detail_refueling
 					: R.drawable.ic_data_detail_other;
@@ -178,7 +178,7 @@ public class DataListActivity extends Activity implements
 	}
 
 	private void setNoEntryMessageVisible(boolean visible) {
-		TextView v = (TextView) findViewById(R.id.txtNoEntrySelected);
+		TextView v = (TextView) findViewById(R.id.txt_no_entry_selected);
 		if (v != null) {
 			v.setVisibility(visible ? View.VISIBLE : View.GONE);
 		}

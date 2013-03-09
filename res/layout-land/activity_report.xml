@@ -30,7 +30,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         <ImageButton
-            android:id="@+id/btnMenu"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="right"
@@ -40,7 +39,7 @@
             android:src="@drawable/ic_menu_overflow" />
     </FrameLayout>
     <ListView
-        android:id="@+id/lstData"
+        android:id="@+id/lst_data"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.4" >

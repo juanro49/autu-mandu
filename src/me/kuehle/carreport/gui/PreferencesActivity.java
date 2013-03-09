@@ -19,7 +19,6 @@ package me.kuehle.carreport.gui;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
@@ -30,10 +29,6 @@ import me.kuehle.carreport.util.IForEach;
 import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.backup.CSVExportImport;
 import me.kuehle.carreport.util.backup.Dropbox;
-import me.kuehle.carreport.util.gui.ColorPickerDialogFragment;
-import me.kuehle.carreport.util.gui.ColorPickerDialogFragment.ColorPickerDialogFragmentListener;
-import me.kuehle.carreport.util.gui.InputDialogFragment;
-import me.kuehle.carreport.util.gui.InputDialogFragment.InputDialogFragmentListener;
 import me.kuehle.carreport.util.gui.MessageDialogFragment;
 import me.kuehle.carreport.util.gui.MessageDialogFragment.MessageDialogFragmentListener;
 import me.kuehle.carreport.util.gui.ProgressDialogFragment;
@@ -45,8 +40,8 @@ import android.app.Fragment;
 import android.app.ListFragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -117,20 +112,6 @@ public class PreferencesActivity extends PreferenceActivity {
 			}
 		};
 
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View root = inflater.inflate(R.layout.fragment_prefs_about,
-					container, false);
-
-			String strVersion = getString(R.string.about_version, getVersion());
-			((TextView) root.findViewById(R.id.txtVersion)).setText(strVersion);
-			((Button) root.findViewById(R.id.btnLicenses))
-					.setOnClickListener(licensesOnClickListener);
-
-			return root;
-		}
-
 		public String getVersion() {
 			try {
 				return getActivity().getPackageManager().getPackageInfo(
@@ -138,6 +119,21 @@ public class PreferencesActivity extends PreferenceActivity {
 			} catch (NameNotFoundException e) {
 				return "";
 			}
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			View root = inflater.inflate(R.layout.fragment_prefs_about,
+					container, false);
+
+			String strVersion = getString(R.string.about_version, getVersion());
+			((TextView) root.findViewById(R.id.txt_version))
+					.setText(strVersion);
+			((Button) root.findViewById(R.id.btn_licenses))
+					.setOnClickListener(licensesOnClickListener);
+
+			return root;
 		}
 	}
 
@@ -164,10 +160,10 @@ public class PreferencesActivity extends PreferenceActivity {
 									public void onClick(DialogInterface dialog,
 											int which) {
 										int option = ((Spinner) view
-												.findViewById(R.id.spnSingleMultipleFile))
+												.findViewById(R.id.spn_single_multiple_file))
 												.getSelectedItemPosition();
 										boolean overwrite = ((CheckBox) view
-												.findViewById(R.id.chkOverwrite))
+												.findViewById(R.id.chk_overwrite))
 												.isChecked();
 										((BackupFragment) getTargetFragment())
 												.doExport(option, overwrite);
@@ -199,7 +195,7 @@ public class PreferencesActivity extends PreferenceActivity {
 									public void onClick(DialogInterface dialog,
 											int which) {
 										int option = ((Spinner) view
-												.findViewById(R.id.spnSingleMultipleFile))
+												.findViewById(R.id.spn_single_multiple_file))
 												.getSelectedItemPosition();
 										((BackupFragment) getTargetFragment())
 												.doImport(option);
@@ -406,7 +402,7 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 
 		private void doImport(int option) {
-			if (!csvExportImport.allExportFilesExist(option)) {
+			if (!csvExportImport.canImport(option)) {
 				Toast.makeText(getActivity(),
 						R.string.toast_import_files_dont_exist,
 						Toast.LENGTH_SHORT).show();
@@ -472,8 +468,7 @@ public class PreferencesActivity extends PreferenceActivity {
 	}
 
 	public static class CarsFragment extends ListFragment implements
-			MessageDialogFragmentListener, InputDialogFragmentListener,
-			ColorPickerDialogFragmentListener {
+			MessageDialogFragmentListener {
 		private class CarAdapter extends BaseAdapter {
 			@Override
 			public int getCount() {
@@ -496,17 +491,15 @@ public class PreferencesActivity extends PreferenceActivity {
 
 				if (convertView == null) {
 					convertView = getActivity().getLayoutInflater().inflate(
-							R.layout.split_list_item_2, parent, false);
+							R.layout.list_item_car, parent, false);
 
 					holder = new CarViewHolder();
 					holder.name = (TextView) convertView
 							.findViewById(android.R.id.text1);
 					holder.suspended = (TextView) convertView
 							.findViewById(android.R.id.text2);
-					holder.color = ((Button) convertView
-							.findViewById(android.R.id.button1));
-					holder.color.setBackgroundResource(R.drawable.color_button);
-					holder.color.setOnClickListener(colorOnClickListener);
+					holder.color = convertView
+							.findViewById(android.R.id.custom);
 
 					convertView.setTag(holder);
 				} else {
@@ -557,26 +550,6 @@ public class PreferencesActivity extends PreferenceActivity {
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 				switch (item.getItemId()) {
-				case R.id.menu_suspend:
-					execActionAndFinish(new IForEach<Car>() {
-						Date now = new Date();
-
-						public void action(Car car) {
-							if (!car.isSuspended()) {
-								car.setSuspended(now);
-								car.save();
-							}
-						}
-					});
-					return true;
-				case R.id.menu_unsuspend:
-					execActionAndFinish(new IForEach<Car>() {
-						public void action(Car car) {
-							car.setSuspended(null);
-							car.save();
-						}
-					});
-					return true;
 				case R.id.menu_delete:
 					if (getListView().getCheckedItemCount() == cars.length) {
 						MessageDialogFragment
@@ -632,41 +605,20 @@ public class PreferencesActivity extends PreferenceActivity {
 		private static class CarViewHolder {
 			public TextView name;
 			public TextView suspended;
-			public Button color;
+			public View color;
 		}
 
 		private static final int CANNOT_DELETE_REQUEST_CODE = 0;
 		private static final int DELETE_REQUEST_CODE = 1;
-		private static final int ADD_REQUEST_CODE = 2;
-		private static final int EDIT_REQUEST_CODE = 3;
-		private static final int EDIT_COLOR_REQUEST_CODE = 4;
 
 		private Car[] cars;
-		private Car carToEdit;
+		private boolean carEditInProgress = false;
 
 		private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				carToEdit = cars[position];
-				InputDialogFragment.newInstance(CarsFragment.this,
-						EDIT_REQUEST_CODE, R.string.alert_edit_car_title,
-						carToEdit.getName()).show(getFragmentManager(), null);
-			}
-		};
-
-		private View.OnClickListener colorOnClickListener = new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				final int position = getListView().getPositionForView(v);
-				if (position != ListView.INVALID_POSITION) {
-					carToEdit = cars[position];
-					ColorPickerDialogFragment.newInstance(CarsFragment.this,
-							EDIT_COLOR_REQUEST_CODE,
-							R.string.alert_change_color_title,
-							carToEdit.getColor()).show(getFragmentManager(),
-							null);
-				}
+				editCar(cars[position].getId());
 			}
 		};
 
@@ -696,7 +648,6 @@ public class PreferencesActivity extends PreferenceActivity {
 
 		@Override
 		public void onDialogNegativeClick(int requestCode) {
-
 		}
 
 		@Override
@@ -712,37 +663,10 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 
 		@Override
-		public void onDialogPositiveClick(int requestCode, int color) {
-			if (requestCode == EDIT_COLOR_REQUEST_CODE) {
-				carToEdit.setColor(color);
-				carToEdit.save();
-				fillList();
-			}
-		}
-
-		@Override
-		public void onDialogPositiveClick(int requestCode, String input) {
-			if (requestCode == ADD_REQUEST_CODE) {
-				if (input.length() > 0) {
-					Car.create(input, Color.BLUE, null);
-					fillList();
-				}
-			} else if (requestCode == EDIT_REQUEST_CODE) {
-				if (input.length() > 0) {
-					carToEdit.setName(input);
-					carToEdit.save();
-					fillList();
-				}
-			}
-		}
-
-		@Override
 		public boolean onOptionsItemSelected(MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.menu_add_car:
-				InputDialogFragment.newInstance(this, ADD_REQUEST_CODE,
-						R.string.alert_add_car_title, "").show(
-						getFragmentManager(), null);
+				editCar(AbstractDataDetailFragment.EXTRA_ID_DEFAULT);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
@@ -750,9 +674,28 @@ public class PreferencesActivity extends PreferenceActivity {
 		}
 
 		@Override
+		public void onResume() {
+			super.onResume();
+			if (carEditInProgress) {
+				carEditInProgress = false;
+				fillList();
+			}
+		}
+
+		@Override
 		public void onStop() {
 			super.onStop();
 			multiChoiceModeListener.finishActionMode();
+		}
+
+		private void editCar(int id) {
+			Intent intent = new Intent(getActivity(), DataDetailActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+			intent.putExtra(DataDetailActivity.EXTRA_EDIT,
+					DataDetailActivity.EXTRA_EDIT_CAR);
+			intent.putExtra(AbstractDataDetailFragment.EXTRA_ID, id);
+			carEditInProgress = true;
+			startActivityForResult(intent, 0);
 		}
 
 		private void fillList() {
@@ -774,15 +717,6 @@ public class PreferencesActivity extends PreferenceActivity {
 							R.array.reports);
 					preference.setSummary(reports[Integer.parseInt(newValue
 							.toString())]);
-				} else if (preference.getKey().equals(
-						"appearance_overall_section_pos")) {
-					String[] positions = getResources().getStringArray(
-							R.array.overall_section_positions);
-					preference
-							.setSummary(getString(
-									R.string.pref_summary_appearance_overall_section_pos,
-									positions[Integer.parseInt(newValue
-											.toString())]));
 				} else if (preference instanceof EditTextPreference) {
 					preference.setSummary(newValue.toString());
 				}
@@ -835,23 +769,6 @@ public class PreferencesActivity extends PreferenceActivity {
 						.setOnPreferenceChangeListener(onPreferenceChangeListener);
 				defaultReport.setSummary(defaultEntries[prefs
 						.getDefaultReport()]);
-			}
-
-			// Appearance Overall section position
-			{
-				String[] entries = getResources().getStringArray(
-						R.array.overall_section_positions);
-				String[] entryValues = new String[entries.length];
-				for (int i = 0; i < entries.length; i++) {
-					entryValues[i] = String.valueOf(i);
-				}
-				ListPreference sectionPos = (ListPreference) findPreference("appearance_overall_section_pos");
-				sectionPos.setEntryValues(entryValues);
-				sectionPos
-						.setOnPreferenceChangeListener(onPreferenceChangeListener);
-				sectionPos.setSummary(getString(
-						R.string.pref_summary_appearance_overall_section_pos,
-						entries[prefs.getOverallSectionPos()]));
 			}
 
 			// Appearance color sections

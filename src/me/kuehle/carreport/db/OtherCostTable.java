@@ -52,16 +52,16 @@ public class OtherCostTable {
 			+ "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE CASCADE);";
 	
 	// Add recurrence columns.
-	private static final String[] STMT_UPGRADE_1TO2 = {
+	private static final String[] STMT_UPGRADE_2 = {
 		"ALTER TABLE " + NAME + " ADD COLUMN " + COL_REP_INT + " INTEGER NOT NULL DEFAULT 0;",
 		"ALTER TABLE " + NAME + " ADD COLUMN " + COL_REP_MULTI + " INTEGER NOT NULL DEFAULT 1;"
 	};
 	
 	// Add ON DELETE and ON UPDATE actions to cars_id column.
-	private static final String[] STMT_UPGRADE_2TO3 = {
+	private static final String[] STMT_UPGRADE_3 = {
 		STMT_CREATE.replaceFirst(NAME, NAME + "2"),
-		"INSERT INTO " + NAME + "2 (" + Strings.join(new String[] { BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO, COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE, COL_CAR }, ", ") + ") "
-			+ "SELECT " + Strings.join(new String[] { NAME + "." + BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO, COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE, COL_CAR }, ", ") + " "
+		"INSERT INTO " + NAME + "2 (" + Strings.join(", ", new String[] { BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO, COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE, COL_CAR }) + ") "
+			+ "SELECT " + Strings.join(", ", new String[] { NAME + "." + BaseColumns._ID, COL_TITLE, COL_DATE, COL_TACHO, COL_PRICE, COL_REP_INT, COL_REP_MULTI, COL_NOTE, COL_CAR }) + " "
 			+ "FROM " + NAME + " "
 			+ "JOIN " + CarTable.NAME + " ON " + CarTable.NAME + "." + BaseColumns._ID + " = " + NAME + "." + COL_CAR + ";",
 		"DROP TABLE " + NAME + ";",
@@ -74,13 +74,14 @@ public class OtherCostTable {
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		if (oldVersion == 1 && newVersion >= 2) {
-			for(String stmt : STMT_UPGRADE_1TO2) {
+		if (oldVersion < 2) {
+			for (String stmt : STMT_UPGRADE_2) {
 				db.execSQL(stmt);
 			}
 		}
-		if((oldVersion == 1 || oldVersion == 2) && newVersion == 3) {
-			for(String stmt : STMT_UPGRADE_2TO3) {
+		
+		if (oldVersion < 3) {
+			for (String stmt : STMT_UPGRADE_3) {
 				db.execSQL(stmt);
 			}
 		}

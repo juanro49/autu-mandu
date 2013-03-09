@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -26,111 +25,19 @@ import me.kuehle.carreport.util.gui.MessageDialogFragment;
 import me.kuehle.carreport.util.gui.MessageDialogFragment.MessageDialogFragmentListener;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.Fragment;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 public abstract class AbstractDataDetailFragment extends Fragment implements
 		MessageDialogFragmentListener {
-	public class EditTextDateField implements View.OnClickListener,
-			DatePickerDialog.OnDateSetListener {
-		private EditText editText;
-
-		public EditTextDateField(EditText view) {
-			editText = view;
-			editText.setOnClickListener(this);
-		}
-
-		public Date getDate() {
-			Date date = new Date();
-			try {
-				date = DateFormat.getDateFormat(getActivity()).parse(
-						editText.getText().toString());
-			} catch (ParseException e) {
-			}
-			return date;
-		}
-
-		@Override
-		public void onClick(View v) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(getDate());
-			new DatePickerDialog(getActivity(), this, cal.get(Calendar.YEAR),
-					cal.get(Calendar.MONTH), cal.get(Calendar.DATE)).show();
-		}
-
-		@Override
-		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {
-			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.YEAR, year);
-			cal.set(Calendar.MONTH, monthOfYear);
-			cal.set(Calendar.DATE, dayOfMonth);
-
-			setDate(cal.getTime());
-		}
-
-		public void setDate(Date date) {
-			editText.setText(DateFormat.getDateFormat(getActivity()).format(
-					date));
-		}
-	}
-
-	public class EditTextTimeField implements View.OnClickListener,
-			TimePickerDialog.OnTimeSetListener {
-		private EditText editText;
-
-		public EditTextTimeField(EditText view) {
-			editText = view;
-			editText.setOnClickListener(this);
-		}
-
-		public Date getTime() {
-			Date time = new Date();
-			try {
-				time = DateFormat.getTimeFormat(getActivity()).parse(
-						editText.getText().toString());
-			} catch (ParseException e) {
-			}
-			return time;
-		}
-
-		@Override
-		public void onClick(View v) {
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(getTime());
-			new TimePickerDialog(getActivity(), this,
-					cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
-					DateFormat.is24HourFormat(getActivity())).show();
-		}
-
-		@Override
-		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-			cal.set(Calendar.MINUTE, minute);
-
-			setTime(cal.getTime());
-		}
-
-		public void setTime(Date time) {
-			editText.setText(DateFormat.getTimeFormat(getActivity()).format(
-					time));
-		}
-	}
-
 	public interface OnItemActionListener {
 		public void itemCanceled();
 
@@ -169,8 +76,8 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 		return calDateTime.getTime();
 	}
 
-	protected double getDoubleFromEditText(int view, double defaultValue) {
-		EditText editText = (EditText) getView().findViewById(view);
+	protected double getDoubleFromEditText(EditText editText,
+			double defaultValue) {
 		String strDouble = editText.getText().toString();
 		try {
 			return Double.parseDouble(strDouble);
@@ -181,8 +88,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
 	protected abstract AbstractItem getEditObject(int id);
 
-	protected int getIntegerFromEditText(int view, int defaultValue) {
-		EditText editText = (EditText) getView().findViewById(view);
+	protected int getIntegerFromEditText(EditText editText, int defaultValue) {
 		String strInt = editText.getText().toString();
 		try {
 			return Integer.parseInt(strInt);

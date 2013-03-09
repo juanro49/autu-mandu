@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright 2012 Jan Kühle
+  Copyright 2013 Jan Kühle
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="4dp" >
-    <Spinner
-        android:id="@+id/spn_single_multiple_file"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:entries="@array/exportcsv_singlemultiplefile" />
-</LinearLayout>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:ordering="together" >
+    <animator
+        android:duration="@android:integer/config_shortAnimTime"
+        android:interpolator="@android:anim/linear_interpolator" />
+    <objectAnimator
+        android:duration="@android:integer/config_shortAnimTime"
+        android:interpolator="@android:anim/linear_interpolator"
+        android:propertyName="alpha"
+        android:valueFrom="1"
+        android:valueTo="0"
+        android:valueType="floatType" />
+</set>

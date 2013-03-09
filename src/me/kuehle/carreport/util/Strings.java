@@ -20,7 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 public class Strings {
-	public static String join(String[] elements, String separator) {
+	public static String concat(String... elements) {
+		return join("", elements);
+	}
+
+	public static String join(String separator, String... elements) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < elements.length; i++) {
 			if (i != 0) {
@@ -31,8 +35,8 @@ public class Strings {
 		return sb.toString();
 	}
 
-	public static String join(List<String> elements, String separator) {
-		return join(elements.toArray(new String[elements.size()]), separator);
+	public static String join(String separator, List<String> elements) {
+		return join(separator, elements.toArray(new String[elements.size()]));
 	}
 
 	public static String replaceMap(String s, Map<String, String> replacements) {

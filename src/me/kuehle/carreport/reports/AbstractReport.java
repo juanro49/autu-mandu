@@ -19,14 +19,11 @@ package me.kuehle.carreport.reports;
 import java.util.Collections;
 import java.util.Date;
 
-import me.kuehle.carreport.Preferences;
-import me.kuehle.carreport.R;
 import me.kuehle.carreport.util.gui.SectionListAdapter.Item;
 import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import android.content.Context;
-import android.graphics.Color;
 import android.text.format.DateFormat;
 import android.util.TypedValue;
 
@@ -79,15 +76,6 @@ public abstract class AbstractReport {
 
 	protected void addData(Item item) {
 		data.getData().add(item);
-	}
-
-	protected Section addDataOverallSection() {
-		String label = context.getString(R.string.report_overall);
-		Preferences prefs = new Preferences(context);
-		int position = prefs.getOverallSectionPos();
-		Section section = new Section(label, Color.GRAY, position);
-		data.getData().add(section);
-		return section;
 	}
 
 	protected Section addDataSection(String label, int color) {

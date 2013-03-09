@@ -214,7 +214,7 @@ public class SectionListAdapter extends BaseAdapter {
 			convertView = LayoutInflater
 					.from(context)
 					.inflate(
-							type == ITEM_VIEW_TYPE_SEPARATOR ? R.layout.separator_list_item
+							type == ITEM_VIEW_TYPE_SEPARATOR ? R.layout.list_item_separator
 									: itemViewID, parent, false);
 		}
 

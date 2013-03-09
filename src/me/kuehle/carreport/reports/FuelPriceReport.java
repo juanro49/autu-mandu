@@ -16,17 +16,24 @@
 
 package me.kuehle.carreport.reports;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.db.FuelType;
+import me.kuehle.carreport.db.FuelTypeTable;
 import me.kuehle.carreport.db.Helper;
 import me.kuehle.carreport.db.RefuelingTable;
+import me.kuehle.carreport.util.Strings;
+import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
 import me.kuehle.chartlib.data.PointD;
-import me.kuehle.chartlib.renderer.AbstractRenderer;
+import me.kuehle.chartlib.data.Series;
 import me.kuehle.chartlib.renderer.LineRenderer;
 import me.kuehle.chartlib.renderer.OnClickListener;
 import me.kuehle.chartlib.renderer.RendererList;
@@ -34,6 +41,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.provider.BaseColumns;
 import android.text.format.DateFormat;
 import android.widget.Toast;
 
@@ -71,20 +79,40 @@ public class FuelPriceReport extends AbstractReport {
 	}
 
 	private class ReportGraphData extends AbstractReportGraphData {
-		public ReportGraphData(Context context, String name, int color) {
-			super(context, name, color);
+		public ReportGraphData(Context context, String fuelType, int color) {
+			super(context, fuelType, color);
 
+			// Build query.
+			String query;
+			String[] args;
+			if (fuelType == null) {
+				query = "SELECT %date, (%price / %volume) AS fuelprice "
+						+ "FROM %refuelings " + "WHERE %fueltypes_id IS NULL "
+						+ "ORDER BY %date ASC";
+				args = null;
+			} else {
+				query = "SELECT %date, (%price / %volume) AS fuelprice "
+						+ "FROM %refuelings "
+						+ "JOIN %fueltypes ON %refuelings.%fueltypes_id = %fueltypes.%id "
+						+ "WHERE %fueltypes.%name = ? " + "ORDER BY %date ASC";
+				args = new String[] { fuelType };
+			}
+
+			HashMap<String, String> replacements = new HashMap<String, String>();
+			replacements.put("%refuelings", RefuelingTable.NAME);
+			replacements.put("%date", RefuelingTable.COL_DATE);
+			replacements.put("%price", RefuelingTable.COL_PRICE);
+			replacements.put("%volume", RefuelingTable.COL_VOLUME);
+			replacements.put("%fueltypes_id", RefuelingTable.COL_FUELTYPE);
+			replacements.put("%fueltypes", FuelTypeTable.NAME);
+			replacements.put("%id", BaseColumns._ID);
+			replacements.put("%name", FuelTypeTable.COL_NAME);
+			query = Strings.replaceMap(query, replacements);
+
+			// Execute query and handle data.
 			Helper helper = Helper.getInstance();
 			SQLiteDatabase db = helper.getReadableDatabase();
-			Cursor cursor = db
-					.rawQuery(
-							String.format(
-									"SELECT %s, (%s / %s) AS fuelprice FROM %s ORDER BY %s ASC",
-									RefuelingTable.COL_DATE,
-									RefuelingTable.COL_PRICE,
-									RefuelingTable.COL_VOLUME,
-									RefuelingTable.NAME,
-									RefuelingTable.COL_DATE), null);
+			Cursor cursor = db.rawQuery(query, args);
 			if (cursor.getCount() >= 2) {
 				cursor.moveToFirst();
 				while (!cursor.isAfterLast()) {
@@ -95,18 +123,9 @@ public class FuelPriceReport extends AbstractReport {
 			}
 			cursor.close();
 		}
-
-		@Override
-		public void applySeriesStyle(int series, AbstractRenderer renderer) {
-			super.applySeriesStyle(series, renderer);
-			if (renderer instanceof LineRenderer) {
-				((LineRenderer) renderer).setSeriesFillBelowLine(series, true);
-			}
-		}
 	}
 
-	private ReportGraphData reportData;
-
+	private ArrayList<ReportGraphData> reportData;
 	private String unit;
 
 	public FuelPriceReport(Context context) {
@@ -116,32 +135,51 @@ public class FuelPriceReport extends AbstractReport {
 		unit = String.format("%s/%s", prefs.getUnitCurrency(),
 				prefs.getUnitVolume());
 
-		reportData = new ReportGraphData(context, "", Color.rgb(51, 181, 229));
+		ArrayList<String> fuelTypes = new ArrayList<String>();
+		fuelTypes.add(null);
+		Collections.addAll(fuelTypes, FuelType.getAllNames());
 
-		Helper helper = Helper.getInstance();
-		SQLiteDatabase db = helper.getReadableDatabase();
-		Cursor cursor = db
-				.rawQuery(
-						String.format(
-								"SELECT max(fuelprice), min(fuelprice), avg(fuelprice) "
-										+ "FROM (SELECT (%s / %s) AS fuelprice FROM %s)",
-								RefuelingTable.COL_PRICE,
-								RefuelingTable.COL_VOLUME, RefuelingTable.NAME),
-						null);
-		cursor.moveToFirst();
+		float[] hsvColor = new float[3];
+		Color.colorToHSV(
+				context.getResources().getColor(android.R.color.holo_blue_dark),
+				hsvColor);
 
-		addData(new CalculableItem(context.getString(R.string.report_highest),
-				cursor.getFloat(0), new String[] {
-						context.getString(R.string.report_at_most),
-						context.getString(R.string.report_at_least) }));
-		addData(new CalculableItem(context.getString(R.string.report_lowest),
-				cursor.getFloat(1), new String[] {
-						context.getString(R.string.report_at_least),
-						context.getString(R.string.report_at_most) }));
-		addData(new CalculableItem(context.getString(R.string.report_average),
-				cursor.getFloat(2)));
+		reportData = new ArrayList<FuelPriceReport.ReportGraphData>();
+		for (String fuelType : fuelTypes) {
+			int color = Color.HSVToColor(hsvColor);
+			ReportGraphData data = new ReportGraphData(context, fuelType, color);
+			if (!data.isEmpty()) {
+				reportData.add(data);
 
-		cursor.close();
+				Series series = data.getSeries();
+				double avg = 0;
+				for (int i = 0; i < series.size(); i++) {
+					avg += series.get(i).y;
+				}
+				avg /= series.size();
+
+				Section section = addDataSection(
+						fuelType == null ? context.getString(R.string.report_no_fueltype)
+								: fuelType, color);
+				section.addItem(new CalculableItem(context
+						.getString(R.string.report_highest), series.maxY(),
+						new String[] {
+								context.getString(R.string.report_at_most),
+								context.getString(R.string.report_at_least) }));
+				section.addItem(new CalculableItem(context
+						.getString(R.string.report_lowest), series.minY(),
+						new String[] {
+								context.getString(R.string.report_at_least),
+								context.getString(R.string.report_at_most) }));
+				section.addItem(new CalculableItem(context
+						.getString(R.string.report_average), avg));
+
+				hsvColor[0] += 20;
+				if (hsvColor[0] > 360) {
+					hsvColor[0] -= 360;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -164,27 +202,39 @@ public class FuelPriceReport extends AbstractReport {
 		LineRenderer renderer = new LineRenderer(context);
 		renderers.addRenderer(renderer);
 
-		dataset.add(reportData.getSeries());
-		reportData.applySeriesStyle(0, renderer);
-		if (isShowTrend()) {
-			AbstractReportGraphData trendReportData = reportData
-					.createRegressionData();
-			dataset.add(trendReportData.getSeries());
-			trendReportData.applySeriesStyle(1, renderer);
+		int series = 0;
+		for (ReportGraphData data : reportData) {
+			dataset.add(data.getSeries());
+			data.applySeriesStyle(series++, renderer);
+			if (reportData.size() == 1) {
+				renderer.setSeriesFillBelowLine(0, true);
+			}
+
+			if (isShowTrend()) {
+				AbstractReportGraphData trendReportData = data
+						.createRegressionData();
+				dataset.add(trendReportData.getSeries());
+				trendReportData.applySeriesStyle(series++, renderer);
+			}
 		}
 
 		renderer.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onSeriesClick(int series, int point) {
-				PointD p = dataset.get(series).get(point);
+				Series s = dataset.get(series);
+				String fuelType = s.getTitle() == null ? context
+						.getString(R.string.report_toast_none) : s.getTitle();
+				PointD p = s.get(point);
 				String date = DateFormat.getDateFormat(context).format(
 						new Date((long) p.x));
 				Toast.makeText(
 						context,
-						String.format("%s: %.3f %s\n%s: %s",
+						String.format("%s: %s\n%s: %.3f %s\n%s: %s", context
+								.getString(R.string.report_toast_fueltype),
+								fuelType,
 								context.getString(R.string.report_toast_price),
-								p.y, unit,
-								context.getString(R.string.report_toast_date),
+								p.y, unit, context
+										.getString(R.string.report_toast_date),
 								date), Toast.LENGTH_LONG).show();
 			}
 		});

@@ -16,12 +16,15 @@
 
 package me.kuehle.carreport.reports;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.util.Calculator;
 import me.kuehle.carreport.util.gui.SectionListAdapter.Item;
@@ -68,10 +71,15 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	private class ReportGraphData extends AbstractReportGraphData {
-		public ReportGraphData(Context context, Car car) {
-			super(context, car.getName(), car.getColor());
+		public ReportGraphData(Context context, Car car, FuelType fuelType) {
+			super(context, null, car.getColor());
+			String fuelTypeName = fuelType == null ? context
+					.getString(R.string.report_no_fueltype) : fuelType
+					.getName();
+			name = String.format("%s (%s)", car.getName(), fuelTypeName);
 
-			Refueling[] refuelings = Refueling.getAllForCar(car, true);
+			Refueling[] refuelings = Refueling
+					.getAllForCar(car, fuelType, true);
 			int lastTacho = -1;
 			float volume = 0;
 			for (Refueling refueling : refuelings) {
@@ -108,37 +116,35 @@ public class FuelConsumptionReport extends AbstractReport {
 
 		// Collect report data and add info data which will be displayed
 		// next to the graph.
-		Vector<Double> consumptions = new Vector<Double>();
 		Car[] cars = Car.getAll();
 		for (Car car : cars) {
-			ReportGraphData carData = new ReportGraphData(context, car);
+			boolean sectionAdded = false;
 
-			Section section;
-			if (car.isSuspended()) {
-				section = addDataSection(
-						String.format("%s (%s)", car.getName(),
-								context.getString(R.string.suspended)),
-						car.getColor(), Section.STICK_BOTTOM);
-			} else {
-				section = addDataSection(car.getName(), car.getColor());
-				minXValue = Math.min(minXValue, carData.getSeries().minX());
+			ArrayList<FuelType> fuelTypes = new ArrayList<FuelType>();
+			fuelTypes.add(null);
+			Collections.addAll(fuelTypes, FuelType.getAllForCar(car));
+			for (FuelType fuelType : fuelTypes) {
+				ReportGraphData carData = new ReportGraphData(context, car,
+						fuelType);
+				if (carData.isEmpty()) {
+					continue;
+				}
+
+				reportData.add(carData);
+				Section section = addDataSection(car, fuelType, true);
+				addConsumptionData(section, carData.yValues);
+				sectionAdded = true;
+
+				if (!car.isSuspended()) {
+					minXValue = Math.min(minXValue, carData.getSeries().minX());
+				}
 			}
 
-			if (carData.size() == 0) {
+			if (!sectionAdded) {
+				Section section = addDataSection(car, null, false);
 				section.addItem(new Item(context
 						.getString(R.string.report_not_enough_data), ""));
-			} else {
-				reportData.add(carData);
-
-				consumptions.addAll(carData.yValues);
-				addConsumptionData(section, carData.yValues);
 			}
-		}
-
-		// Only display overall section, when at least report data for 2
-		// cars is present.
-		if (reportData.size() >= 2) {
-			addConsumptionData(addDataOverallSection(), consumptions);
 		}
 	}
 
@@ -153,6 +159,28 @@ public class FuelConsumptionReport extends AbstractReport {
 						context.getString(R.string.report_at_least) }));
 		section.addItem(new CalculableItem(context
 				.getString(R.string.report_average), Calculator.avg(numbers)));
+	}
+
+	private Section addDataSection(Car car, FuelType fuelType,
+			boolean displayFuelType) {
+		String name;
+		if (displayFuelType) {
+			String fuelTypeName = fuelType == null ? context
+					.getString(R.string.report_no_fueltype) : fuelType
+					.getName();
+			name = String.format("%s (%s)", car.getName(), fuelTypeName);
+		} else {
+			name = car.getName();
+		}
+
+		if (car.isSuspended()) {
+			return addDataSection(
+					String.format("%s [%s]", name,
+							context.getString(R.string.suspended)),
+					car.getColor(), Section.STICK_BOTTOM);
+		} else {
+			return addDataSection(name, car.getColor());
+		}
 	}
 
 	@Override
@@ -191,15 +219,21 @@ public class FuelConsumptionReport extends AbstractReport {
 			@Override
 			public void onSeriesClick(int series, int point) {
 				Series s = dataset.get(series);
-				String car = s.getTitle();
+				String car = s.getTitle()
+						.substring(0, s.getTitle().lastIndexOf('(') - 1);
+				String fuelType = s.getTitle().substring(
+						s.getTitle().lastIndexOf('(') + 1,
+						s.getTitle().length() - 1);
 				String date = DateFormat.getDateFormat(context).format(
 						new Date((long) s.get(point).x));
 				Toast.makeText(
 						context,
 						String.format(
-								"%s: %s\n%s: %.2f %s\n%s: %s",
+								"%s: %s\n%s: %s\n%s: %.2f %s\n%s: %s",
 								context.getString(R.string.report_toast_car),
 								car,
+								context.getString(R.string.report_toast_fueltype),
+								fuelType,
 								context.getString(R.string.report_toast_consumption),
 								s.get(point).y, unit, context
 										.getString(R.string.report_toast_date),

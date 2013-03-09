@@ -17,6 +17,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="-6dp"
     android:background="?android:attr/activatedBackgroundIndicator"
     android:baselineAligned="false"
     android:orientation="horizontal"
@@ -37,13 +38,23 @@
             android:singleLine="true"
             android:textAppearance="?android:attr/textAppearanceListItem" />
         <TextView
-            android:id="@+id/date"
+            android:id="@+id/subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/title"
+            android:layout_marginTop="-5dp"
             android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/subtitle"
+            android:layout_marginTop="-3dp"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="0dp"

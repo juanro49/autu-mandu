@@ -25,7 +25,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class Helper extends SQLiteOpenHelper {
 	public static final String DB_NAME = "data.db";
-	public static final int DB_VERSION = 4;
+	public static final int DB_VERSION = 6;
 	public static final Object[] dbLock = new Object[0];
 
 	private static Helper instance = null;
@@ -60,6 +60,7 @@ public class Helper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		CarTable.onCreate(db);
+		FuelTypeTable.onCreate(db);
 		RefuelingTable.onCreate(db);
 		OtherCostTable.onCreate(db);
 	}
@@ -75,6 +76,7 @@ public class Helper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		CarTable.onUpgrade(db, oldVersion, newVersion);
+		FuelTypeTable.onUpgrade(db, oldVersion, newVersion);
 		RefuelingTable.onUpgrade(db, oldVersion, newVersion);
 		OtherCostTable.onUpgrade(db, oldVersion, newVersion);
 	}

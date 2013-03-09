@@ -16,16 +16,24 @@
 
 package me.kuehle.carreport.gui;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.util.gui.DatePickerDialogFragment;
+import me.kuehle.carreport.util.gui.DatePickerDialogFragment.DatePickerDialogFragmentListener;
 import me.kuehle.carreport.util.gui.InputFieldValidator;
+import me.kuehle.carreport.util.gui.TimePickerDialogFragment;
+import me.kuehle.carreport.util.gui.TimePickerDialogFragment.TimePickerDialogFragmentListener;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -33,11 +41,144 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
-		implements InputFieldValidator.ValidationCallback {
-	private EditTextDateField edtDate;
-	private EditTextTimeField edtTime;
+		implements InputFieldValidator.ValidationCallback,
+		DatePickerDialogFragmentListener, TimePickerDialogFragmentListener {
+	private static final int PICK_DATE_REQUEST_CODE = 0;
+	private static final int PICK_TIME_REQUEST_CODE = 1;
+
+	public static DataDetailRefuelingFragment newInstance(int id) {
+		DataDetailRefuelingFragment f = new DataDetailRefuelingFragment();
+
+		Bundle args = new Bundle();
+		args.putInt(AbstractDataDetailFragment.EXTRA_ID, id);
+		f.setArguments(args);
+
+		return f;
+	}
+
+	private EditText edtDate;
+	private EditText edtTime;
+	private EditText edtMileage;
+	private EditText edtVolume;
+	private CheckBox chkPartial;
+	private EditText edtPrice;
+	private Spinner spnFuelType;
+	private EditText edtNote;
+	private Spinner spnCar;
 
 	private Car[] cars;
+	private FuelType[] fuelTypes;
+
+	@Override
+	public void onDialogPositiveClick(int requestCode, Date date) {
+		if (requestCode == PICK_DATE_REQUEST_CODE) {
+			edtDate.setText(DateFormat.getDateFormat(getActivity())
+					.format(date));
+		} else if (requestCode == PICK_TIME_REQUEST_CODE) {
+			edtTime.setText(DateFormat.getTimeFormat(getActivity())
+					.format(date));
+		}
+	}
+
+	@Override
+	public void validationSuccessfull() {
+		Date date = getDateTime(getDate(), getTime());
+		int mileage = getIntegerFromEditText(edtMileage, 0);
+		float volume = (float) getDoubleFromEditText(edtVolume, 0);
+		boolean partial = chkPartial.isChecked();
+		float price = (float) getDoubleFromEditText(edtPrice, 0);
+		FuelType fuelType = fuelTypes.length == 0 ? null
+				: fuelTypes.length == 1 ? fuelTypes[0] : fuelTypes[spnFuelType
+						.getSelectedItemPosition()];
+		String note = edtNote.getText().toString().trim();
+		Car car = cars[spnCar.getSelectedItemPosition()];
+
+		if (!isInEditMode()) {
+			Refueling.create(date, mileage, volume, price, partial, note, car,
+					fuelType);
+		} else {
+			Refueling refueling = (Refueling) editItem;
+			refueling.setDate(date);
+			refueling.setMileage(mileage);
+			refueling.setVolume(volume);
+			refueling.setPrice(price);
+			refueling.setPartial(partial);
+			refueling.setNote(note);
+			refueling.setCar(car);
+			refueling.setFuelType(fuelType);
+			refueling.save();
+		}
+
+		saveSuccess();
+	}
+
+	private Date getDate() {
+		try {
+			return DateFormat.getDateFormat(getActivity()).parse(
+					edtDate.getText().toString());
+		} catch (ParseException e) {
+			return new Date();
+		}
+	}
+
+	private Date getTime() {
+		try {
+			return DateFormat.getTimeFormat(getActivity()).parse(
+					edtTime.getText().toString());
+		} catch (ParseException e) {
+			return new Date();
+		}
+	}
+
+	@Override
+	protected void fillFields(View v) {
+		if (!isInEditMode()) {
+			Preferences prefs = new Preferences(getActivity());
+
+			edtDate.setText(DateFormat.getDateFormat(getActivity()).format(
+					new Date()));
+			edtTime.setText(DateFormat.getTimeFormat(getActivity()).format(
+					new Date()));
+
+			int selectCar = getArguments().getInt(EXTRA_CAR_ID);
+			if (selectCar == 0) {
+				selectCar = prefs.getDefaultCar();
+			}
+			for (int pos = 0; pos < cars.length; pos++) {
+				if (cars[pos].getId() == selectCar) {
+					spnCar.setSelection(pos);
+				}
+			}
+		} else {
+			Refueling refueling = (Refueling) editItem;
+
+			edtDate.setText(DateFormat.getDateFormat(getActivity()).format(
+					refueling.getDate()));
+			edtTime.setText(DateFormat.getTimeFormat(getActivity()).format(
+					refueling.getDate()));
+			edtMileage.setText(String.valueOf(refueling.getMileage()));
+			edtVolume.setText(String.valueOf(refueling.getVolume()));
+			chkPartial.setChecked(refueling.isPartial());
+			edtPrice.setText(String.valueOf(refueling.getPrice()));
+			edtNote.setText(refueling.getNote());
+
+			for (int pos = 0; pos < cars.length; pos++) {
+				if (cars[pos].getId() == refueling.getCar().getId()) {
+					spnCar.setSelection(pos);
+				}
+			}
+		}
+	}
+
+	@Override
+	protected int getAlertDeleteMessage() {
+		return R.string.alert_delete_refueling_message;
+	}
+
+	@Override
+	protected AbstractItem getEditObject(int id) {
+		return new Refueling(id);
+	}
 
 	@Override
 	protected int getLayout() {
@@ -55,13 +196,8 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 	}
 
 	@Override
-	protected int getAlertDeleteMessage() {
-		return R.string.alert_delete_refueling_message;
-	}
-
-	@Override
-	protected AbstractItem getEditObject(int id) {
-		return new Refueling(id);
+	protected int getToastDeletedMessage() {
+		return R.string.toast_refueling_deleted;
 	}
 
 	@Override
@@ -70,22 +206,44 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 	}
 
 	@Override
-	protected int getToastDeletedMessage() {
-		return R.string.toast_refueling_deleted;
-	}
-
-	@Override
 	protected void initFields(View v) {
 		Preferences prefs = new Preferences(getActivity());
 
-		edtDate = new EditTextDateField((EditText) v.findViewById(R.id.edtDate));
-		edtTime = new EditTextTimeField((EditText) v.findViewById(R.id.edtTime));
+		edtDate = (EditText) v.findViewById(R.id.edt_date);
+		edtTime = (EditText) v.findViewById(R.id.edt_time);
+		edtMileage = (EditText) v.findViewById(R.id.edt_mileage);
+		edtVolume = (EditText) v.findViewById(R.id.edt_volume);
+		chkPartial = (CheckBox) v.findViewById(R.id.chk_partial);
+		edtPrice = (EditText) v.findViewById(R.id.edt_price);
+		spnFuelType = (Spinner) v.findViewById(R.id.spn_fueltype);
+		edtNote = (EditText) v.findViewById(R.id.edt_note);
+		spnCar = (Spinner) v.findViewById(R.id.spn_car);
 
-		((TextView) v.findViewById(R.id.txtUnitCurrency)).setText(prefs
+		edtDate.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				DatePickerDialogFragment.newInstance(
+						DataDetailRefuelingFragment.this,
+						PICK_DATE_REQUEST_CODE, getDate()).show(
+						getFragmentManager(), null);
+			}
+		});
+
+		edtTime.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				TimePickerDialogFragment.newInstance(
+						DataDetailRefuelingFragment.this,
+						PICK_TIME_REQUEST_CODE, getTime()).show(
+						getFragmentManager(), null);
+			}
+		});
+
+		((TextView) v.findViewById(R.id.txt_unit_currency)).setText(prefs
 				.getUnitCurrency());
-		((TextView) v.findViewById(R.id.txtUnitDistance)).setText(prefs
+		((TextView) v.findViewById(R.id.txt_unit_distance)).setText(prefs
 				.getUnitDistance());
-		((TextView) v.findViewById(R.id.txtUnitVolume)).setText(prefs
+		((TextView) v.findViewById(R.id.txt_unit_volume)).setText(prefs
 				.getUnitVolume());
 
 		ArrayAdapter<String> carAdapter = new ArrayAdapter<String>(
@@ -94,56 +252,46 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		for (Car car : cars) {
 			carAdapter.add(car.getName());
 		}
-		Spinner spnCar = (Spinner) v.findViewById(R.id.spnCar);
 		spnCar.setAdapter(carAdapter);
-	}
 
-	@Override
-	protected void fillFields(View v) {
-		if (!isInEditMode()) {
-			Preferences prefs = new Preferences(getActivity());
+		spnCar.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView,
+					View selectedItemView, int position, long id) {
+				Car car = cars[position];
+				fuelTypes = FuelType.getAllForCar(car);
 
-			edtDate.setDate(new Date());
-			edtTime.setTime(new Date());
+				if (fuelTypes.length > 1) {
+					ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+							getActivity(),
+							android.R.layout.simple_spinner_dropdown_item);
+					for (FuelType fuelType : fuelTypes) {
+						adapter.add(fuelType.getName());
+					}
 
-			Spinner spnCar = (Spinner) v.findViewById(R.id.spnCar);
-			int selectCar = getArguments().getInt(EXTRA_CAR_ID);
-			if (selectCar == 0) {
-				selectCar = prefs.getDefaultCar();
-			}
-			for (int pos = 0; pos < cars.length; pos++) {
-				if (cars[pos].getId() == selectCar) {
-					spnCar.setSelection(pos);
+					spnFuelType.setAdapter(adapter);
+					spnFuelType.setVisibility(View.VISIBLE);
+				} else {
+					spnFuelType.setVisibility(View.GONE);
+				}
+
+				if (isInEditMode()) {
+					Refueling refueling = (Refueling) editItem;
+					if (refueling.getFuelType() != null) {
+						for (int pos = 0; pos < fuelTypes.length; pos++) {
+							if (fuelTypes[pos].getId() == refueling
+									.getFuelType().getId()) {
+								spnFuelType.setSelection(pos);
+							}
+						}
+					}
 				}
 			}
-		} else {
-			Refueling refueling = (Refueling) editItem;
 
-			edtDate.setDate(refueling.getDate());
-			edtTime.setTime(refueling.getDate());
-
-			EditText edtMileage = (EditText) v.findViewById(R.id.edtMileage);
-			edtMileage.setText(String.valueOf(refueling.getMileage()));
-
-			EditText edtVolume = (EditText) v.findViewById(R.id.edtVolume);
-			edtVolume.setText(String.valueOf(refueling.getVolume()));
-
-			CheckBox chkPartial = (CheckBox) v.findViewById(R.id.chkPartial);
-			chkPartial.setChecked(refueling.isPartial());
-
-			EditText edtPrice = (EditText) v.findViewById(R.id.edtPrice);
-			edtPrice.setText(String.valueOf(refueling.getPrice()));
-
-			EditText edtNote = (EditText) v.findViewById(R.id.edtNote);
-			edtNote.setText(refueling.getNote());
-
-			Spinner spnCar = (Spinner) v.findViewById(R.id.spnCar);
-			for (int pos = 0; pos < cars.length; pos++) {
-				if (cars[pos].getId() == refueling.getCar().getId()) {
-					spnCar.setSelection(pos);
-				}
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
 			}
-		}
+		});
 	}
 
 	@Override
@@ -151,56 +299,15 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		InputFieldValidator validator = new InputFieldValidator(getActivity(),
 				getFragmentManager(), this);
 
-		validator.add(getView().findViewById(R.id.edtMileage),
+		validator.add(edtMileage,
 				InputFieldValidator.ValidationType.GreaterZero,
 				R.string.hint_mileage);
-		validator.add(getView().findViewById(R.id.edtVolume),
+		validator.add(edtVolume,
 				InputFieldValidator.ValidationType.GreaterZero,
 				R.string.hint_volume);
-		validator.add(getView().findViewById(R.id.edtPrice),
-				InputFieldValidator.ValidationType.GreaterZero,
+		validator.add(edtPrice, InputFieldValidator.ValidationType.GreaterZero,
 				R.string.hint_price);
 
 		validator.validate();
-	}
-
-	@Override
-	public void validationSuccessfull() {
-		Date date = getDateTime(edtDate.getDate(), edtTime.getTime());
-		int mileage = getIntegerFromEditText(R.id.edtMileage, 0);
-		float volume = (float) getDoubleFromEditText(R.id.edtVolume, 0);
-		boolean partial = ((CheckBox) getView().findViewById(R.id.chkPartial))
-				.isChecked();
-		float price = (float) getDoubleFromEditText(R.id.edtPrice, 0);
-		String note = ((EditText) getView().findViewById(R.id.edtNote))
-				.getText().toString().trim();
-		Car car = cars[(int) ((Spinner) getView().findViewById(R.id.spnCar))
-				.getSelectedItemId()];
-
-		if (!isInEditMode()) {
-			Refueling.create(date, mileage, volume, price, partial, note, car);
-		} else {
-			Refueling refueling = (Refueling) editItem;
-			refueling.setDate(date);
-			refueling.setMileage(mileage);
-			refueling.setVolume(volume);
-			refueling.setPrice(price);
-			refueling.setPartial(partial);
-			refueling.setNote(note);
-			refueling.setCar(car);
-			refueling.save();
-		}
-
-		saveSuccess();
-	}
-
-	public static DataDetailRefuelingFragment newInstance(int id) {
-		DataDetailRefuelingFragment f = new DataDetailRefuelingFragment();
-
-		Bundle args = new Bundle();
-		args.putInt(AbstractDataDetailFragment.EXTRA_ID, id);
-		f.setArguments(args);
-
-		return f;
 	}
 }

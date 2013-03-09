@@ -27,11 +27,12 @@ import android.os.Environment;
 public class Backup {
 	public static final String FILE_NAME = "carreport.backup";
 
+	private File dir;
 	private File dbFile;
 	private File backupFile;
 
 	public Backup() {
-		File dir = Environment.getExternalStorageDirectory();
+		dir = Environment.getExternalStorageDirectory();
 		dbFile = new File(Helper.getInstance().getReadableDatabase().getPath());
 		backupFile = new File(dir, FILE_NAME);
 	}
@@ -47,7 +48,7 @@ public class Backup {
 	}
 
 	public boolean canBackup() {
-		return backupFile.canWrite();
+		return dir.canWrite();
 	}
 
 	public boolean canRestore() {

@@ -45,10 +45,10 @@
         android:layout_marginBottom="15dp"
         android:layout_marginTop="15dp"
         android:background="@android:drawable/dark_header" />
-    <Button
-        android:id="@android:id/button1"
+    <View
+        android:id="@android:id/custom"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_margin="10dp"
-        android:background="@drawable/color_button" />
+        android:background="@drawable/btn_choose_color" />
 </LinearLayout>

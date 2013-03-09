@@ -17,42 +17,33 @@
 package me.kuehle.carreport.db;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.provider.BaseColumns;
 
-public class CarTable {
-	public static final String NAME = "cars";
-	
+public class FuelTypeTable {
+	public static final String NAME = "fueltypes";
+
+	public static final String COL_CAR = "cars_id";
 	public static final String COL_NAME = "name";
-	public static final String COL_COLOR = "color";
-	public static final String COL_SUSPENDED = "suspended_since";
-	
-	public static final String[] ALL_COLUMNS = {
-		BaseColumns._ID, COL_NAME, COL_COLOR, COL_SUSPENDED
-	};
-	
+	public static final String COL_TANK = "tank";
+
+	public static final String[] ALL_COLUMNS = { BaseColumns._ID, COL_CAR,
+			COL_NAME, COL_TANK };
+
 	private static final String STMT_CREATE = "CREATE TABLE " + NAME + "( "
 			+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ COL_CAR + " INTEGER NOT NULL, "
 			+ COL_NAME + " TEXT NOT NULL, "
-			+ COL_COLOR + " INTEGER NOT NULL, "
-			+ COL_SUSPENDED + " INTEGER DEFAULT NULL);";
-	private static final String STMT_INSERT_DEFAULT = "INSERT INTO " + NAME
-			+ "(" + BaseColumns._ID + ", " + COL_NAME + ", " + COL_COLOR + ")"
-			+ " VALUES(1, 'Default Car', " + Color.BLUE + ");";
-	
-	// Add suspended column.
-	private static final String STMT_UPGRADE_4 =
-			"ALTER TABLE " + NAME + " ADD COLUMN " + COL_SUSPENDED + " INTEGER DEFAULT NULL;";
-	
+			+ COL_TANK + " INTEGER NOT NULL, "
+	        + "FOREIGN KEY(" + COL_CAR + ") REFERENCES " + CarTable.NAME + "(" + BaseColumns._ID + ") ON UPDATE CASCADE ON DELETE CASCADE);";
+
 	public static void onCreate(SQLiteDatabase db) {
 		db.execSQL(STMT_CREATE);
-		db.execSQL(STMT_INSERT_DEFAULT);
 	}
 
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion,
 			int newVersion) {
-		if (oldVersion < 4) {
-			db.execSQL(STMT_UPGRADE_4);
+		if (oldVersion < 5) {
+			onCreate(db);
 		}
 	}
 }

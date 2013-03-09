@@ -60,11 +60,6 @@ public class Preferences {
 		return prefs.getString("sync_dropbox_secret", null);
 	}
 
-	public int getOverallSectionPos() {
-		return Integer.parseInt(prefs.getString(
-				"appearance_overall_section_pos", "0"));
-	}
-
 	public String getUnitCurrency() {
 		return prefs.getString("unit_currency", "EUR");
 	}

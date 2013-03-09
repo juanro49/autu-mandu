@@ -33,7 +33,7 @@
         android:layout_weight="3"
         android:background="?android:attr/detailsElementBackground" >
         <TextView
-            android:id="@+id/txtNoEntrySelected"
+            android:id="@+id/txt_no_entry_selected"
             style="@android:style/TextAppearance.DeviceDefault.Large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
