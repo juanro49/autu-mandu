@@ -241,19 +241,27 @@ public class Refueling extends AbstractItem {
 		return refuelings.toArray(new Refueling[refuelings.size()]);
 	}
 
-	public static Refueling[] getAllForCar(Car car, FuelType fuelType,
+	public static Refueling[] getAllForCar(Car car, FuelType[] fuelTypes,
 			boolean orderDateAsc) {
 		ArrayList<Refueling> refuelings = new ArrayList<Refueling>();
 
 		String selection = RefuelingTable.COL_CAR + " = ?";
 		String[] selectionArgs;
-		if (fuelType == null) {
+		if (fuelTypes == null) {
 			selection += " AND " + RefuelingTable.COL_FUELTYPE + " IS NULL";
 			selectionArgs = new String[] { String.valueOf(car.getId()) };
 		} else {
-			selection += " AND " + RefuelingTable.COL_FUELTYPE + " = ?";
-			selectionArgs = new String[] { String.valueOf(car.getId()),
-					String.valueOf(fuelType.getId()) };
+			selection += " AND (";
+			selectionArgs = new String[fuelTypes.length + 1];
+			selectionArgs[0] = String.valueOf(car.getId());
+			for (int i = 0; i < fuelTypes.length; i++) {
+				if (i > 0) {
+					selection += " OR ";
+				}
+				selection += RefuelingTable.COL_FUELTYPE + " = ?";
+				selectionArgs[i + 1] = String.valueOf(fuelTypes[i].getId());
+			}
+			selection += ")";
 		}
 
 		synchronized (Helper.dbLock) {
@@ -265,6 +273,8 @@ public class Refueling extends AbstractItem {
 
 			cursor.moveToFirst();
 			while (!cursor.isAfterLast()) {
+				FuelType fuelType = cursor.isNull(8) ? null : new FuelType(
+						cursor.getInt(8));
 				refuelings.add(new Refueling(cursor.getInt(0), new Date(cursor
 						.getLong(1)), cursor.getInt(2), cursor.getFloat(3),
 						cursor.getFloat(4), cursor.getInt(5) > 0, cursor

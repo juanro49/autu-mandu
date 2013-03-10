@@ -34,6 +34,7 @@
     <string name="label_add_fueltype">Add</string>
     <string name="label_suspend">Suspend</string>
     <string name="label_tank">Tank %d</string>
+    <string name="label_add_tank">Add</string>
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>
     <string name="menu_synchronize">Synchronize</string>
@@ -149,6 +150,7 @@
     <string name="pref_title_category_export">Export &amp; Import</string>
     <string name="pref_title_default_car">Car</string>
     <string name="pref_title_default_report">Report</string>
+    <string name="pref_title_default_show_car_menu">Show car menu</string>
     <string name="pref_title_appearance_color_sections">Color sections</string>
     <string name="pref_title_appearance_show_legend">Show legend in graph</string>
     <string name="pref_title_unit_currency">Currency</string>
@@ -161,6 +163,7 @@
     <string name="pref_title_restore">Restore</string>
     <string name="pref_title_exportcsv">Export CSV</string>
     <string name="pref_title_importcsv">Import CSV</string>
+    <string name="pref_summary_default_show_car_menu">Show a car selection menu, when adding a refueling and you have more than one car.</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
     <string name="pref_summary_sync_dropbox_link">Setup synchronization with dropbox. Warning: This is a very simple synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>

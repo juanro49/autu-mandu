@@ -18,6 +18,7 @@ package me.kuehle.carreport.gui;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.reports.AbstractReport;
 import me.kuehle.carreport.reports.AbstractReport.CalculationOption;
 import me.kuehle.carreport.reports.CostsReport;
@@ -42,6 +43,7 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -53,11 +55,6 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Toast;
 
 public class ReportActivity extends Activity implements OnMenuItemClickListener {
-	private static final int ADD_REFUELING_REQUEST_CODE = 0;
-	private static final int ADD_OTHER_REQUEST_CODE = 1;
-	private static final int VIEW_DATA_REQUEST_CODE = 2;
-	private static final int PREFERENCES_REQUEST_CODE = 3;
-
 	private AbstractReport mCurrentReport;
 	private int mCurrentGraphOption;
 	private MenuItem mSyncMenuItem;
@@ -193,12 +190,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if ((requestCode == ADD_REFUELING_REQUEST_CODE && resultCode == RESULT_OK)
-				|| (requestCode == ADD_OTHER_REQUEST_CODE && resultCode == RESULT_OK)
-				|| requestCode == VIEW_DATA_REQUEST_CODE
-				|| requestCode == PREFERENCES_REQUEST_CODE) {
-			updateReport();
-		}
+		updateReport();
 	}
 
 	@Override
@@ -264,46 +256,62 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		case R.id.menu_synchronize:
 			Dropbox.getInstance().synchronize();
 			return true;
-		case R.id.menu_add_refueling:
-			Intent intent = new Intent(this, DataDetailActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			intent.putExtra(DataDetailActivity.EXTRA_EDIT,
-					DataDetailActivity.EXTRA_EDIT_REFUELING);
-			startActivityForResult(intent, ADD_REFUELING_REQUEST_CODE);
-			return true;
-		case R.id.menu_add_other:
-			Intent intent3 = new Intent(this, DataDetailActivity.class);
-			intent3.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			intent3.putExtra(DataDetailActivity.EXTRA_EDIT,
-					DataDetailActivity.EXTRA_EDIT_OTHER);
-			startActivityForResult(intent3, ADD_OTHER_REQUEST_CODE);
-			return true;
 		case R.id.menu_calculate:
 			startActionMode(mCalculationActionMode);
 			return true;
 		case R.id.menu_view_data:
-			Intent intent1 = new Intent(this, DataListActivity.class);
-			startActivityForResult(intent1, VIEW_DATA_REQUEST_CODE);
+			Intent intentData = new Intent(this, DataListActivity.class);
+			startActivityForResult(intentData, 0);
 			return true;
 		case R.id.menu_settings:
-			Intent intent2 = new Intent(this, PreferencesActivity.class);
-			startActivityForResult(intent2, PREFERENCES_REQUEST_CODE);
+			Intent intentPrefs = new Intent(this, PreferencesActivity.class);
+			startActivityForResult(intentPrefs, 0);
 			return true;
 		case R.id.menu_help:
-			Intent intent4 = new Intent(this, HelpActivity.class);
-			startActivity(intent4);
+			Intent intentHelp = new Intent(this, HelpActivity.class);
+			startActivity(intentHelp);
 			return true;
 		default:
-			return super.onOptionsItemSelected(item);
+			if (item.getIntent() != null) {
+				startActivityForResult(item.getIntent(), 0);
+				return true;
+			} else {
+				return super.onOptionsItemSelected(item);
+			}
 		}
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
+		Preferences prefs = new Preferences(this);
+		Car[] cars = Car.getAll();
+
+		MenuItem[] items = { menu.findItem(R.id.menu_add_refueling),
+				menu.findItem(R.id.menu_add_other) };
+		for (MenuItem item : items) {
+			SubMenu subMenu = item.getSubMenu();
+			subMenu.clear();
+
+			if (cars.length == 1 || !prefs.isShowCarMenu()) {
+				item.setIntent(getDetailActivityIntent(
+						DataDetailActivity.EXTRA_EDIT_REFUELING,
+						prefs.getDefaultCar()));
+			} else {
+				item.setIntent(null);
+				for (Car car : cars) {
+					Intent intent = getDetailActivityIntent(
+							DataDetailActivity.EXTRA_EDIT_REFUELING,
+							car.getId());
+					subMenu.add(car.getName()).setIntent(intent);
+				}
+			}
+		}
+
 		if (mCurrentReport != null) {
 			menu.findItem(R.id.menu_calculate).setEnabled(
 					mCurrentReport.getCalculationOptions().length > 0);
 		}
+
 		return true;
 	}
 
@@ -356,6 +364,13 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		prefsEdit.putInt(reportName + "_current_graph_option",
 				mCurrentGraphOption);
 		prefsEdit.apply();
+	}
+
+	private Intent getDetailActivityIntent(int edit, int carId) {
+		Intent intent = new Intent(this, DataDetailActivity.class);
+		intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
+		intent.putExtra(AbstractDataDetailFragment.EXTRA_CAR_ID, carId);
+		return intent;
 	}
 
 	private void updateReport() {

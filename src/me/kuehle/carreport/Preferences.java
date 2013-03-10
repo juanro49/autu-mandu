@@ -76,6 +76,10 @@ public class Preferences {
 		return prefs.getBoolean("appearance_color_sections", true);
 	}
 
+	public boolean isShowCarMenu() {
+		return prefs.getBoolean("default_show_car_menu", true);
+	}
+
 	public boolean isShowLegend() {
 		return prefs.getBoolean("appearance_show_legend", false);
 	}

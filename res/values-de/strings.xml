@@ -34,6 +34,7 @@
     <string name="label_add_fueltype">Hinzufügen</string>
     <string name="label_suspend">Stilllegen</string>
     <string name="label_tank">Tank %d</string>
+    <string name="label_add_tank">Hinzufügen</string>
     <string name="suspended">Stillgelegt</string>
     <string name="suspended_since">Stillgelegt seit %s</string>
     <string name="menu_synchronize">Synchronisieren</string>
@@ -149,6 +150,7 @@
     <string name="pref_title_category_export">Exportieren &amp; Importieren</string>
     <string name="pref_title_default_car">Auto</string>
     <string name="pref_title_default_report">Report</string>
+    <string name="pref_title_default_show_car_menu">Zeige Autoauswahlmenü</string>
     <string name="pref_title_appearance_color_sections">Farbige Abschnitte</string>
     <string name="pref_title_appearance_show_legend">Legende in Graphen anzeigen</string>
     <string name="pref_title_unit_currency">Währung</string>
@@ -161,6 +163,7 @@
     <string name="pref_title_restore">Wiederherstellen</string>
     <string name="pref_title_exportcsv">CSV exportieren</string>
     <string name="pref_title_importcsv">CSV importieren</string>
+    <string name="pref_summary_default_show_car_menu">Zeige ein Menü zur Autoauswahl, wenn Sie eine Tankfüllung hinzufügen und mehr als ein Auto haben.</string>
     <string name="pref_summary_appearance_color_sections">Überschriften der Abschnitte in der Farbe des dazugehörigen Autos anzeigen.</string>
     <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
     <string name="pref_summary_sync_dropbox_link">Synchronisation über Dropbox einrichten. Achtung: Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>

@@ -771,6 +771,13 @@ public class PreferencesActivity extends PreferenceActivity {
 						.getDefaultReport()]);
 			}
 
+			// Default car menu
+			{
+				CheckBoxPreference showCarMenu = (CheckBoxPreference) findPreference("default_show_car_menu");
+				showCarMenu
+						.setOnPreferenceChangeListener(onPreferenceChangeListener);
+			}
+
 			// Appearance color sections
 			{
 				CheckBoxPreference colorSections = (CheckBoxPreference) findPreference("appearance_color_sections");

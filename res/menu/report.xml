@@ -28,12 +28,14 @@
         android:icon="@drawable/ic_new"
         android:showAsAction="always"
         android:title="@string/menu_add_refueling">
+        <menu></menu>
     </item>
     <item
         android:id="@+id/menu_add_other"
         android:icon="@drawable/ic_new"
         android:showAsAction="never"
         android:title="@string/menu_add_other">
+        <menu></menu>
     </item>
     <item
         android:id="@+id/menu_view_data"
