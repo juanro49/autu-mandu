@@ -71,7 +71,7 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:gravity="left|center_vertical"
                 android:paddingLeft="8dp"
-                android:text="@string/label_add_fueltype"
+                android:text="@string/label_add_fuel_type"
                 android:textColor="@android:color/darker_gray" />
             <TextView
                 style="@style/section_header"

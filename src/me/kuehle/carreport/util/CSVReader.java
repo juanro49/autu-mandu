@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
+import me.kuehle.carreport.db.serializer.RecurrenceSerializer;
+
 public class CSVReader {
 	private static final char QUOTE = '"';
 	private static final char ESCAPE = '\\';
@@ -63,11 +65,19 @@ public class CSVReader {
 	private String[] header;
 	private String[][] data;
 
+	private RecurrenceSerializer recurrenceSerializer;
+	private DateFormat dateFormat;
+	private NumberFormat floatFormat;
+
 	public CSVReader(String data) {
 		this(data, false);
 	}
 
 	public CSVReader(String data, boolean hasHeader) {
+		recurrenceSerializer = new RecurrenceSerializer();
+		dateFormat = DateFormat.getDateTimeInstance();
+		floatFormat = NumberFormat.getInstance();
+
 		String[] rows = data.split(String.valueOf(NEW_LINE));
 		ArrayList<String[]> dataRows = new ArrayList<String[]>();
 		int maxColumnCount = 0;
@@ -144,12 +154,20 @@ public class CSVReader {
 		return null;
 	}
 
-	public Date getDate(int row, int col, DateFormat format) {
-		return parseDate(getString(row, col), format);
+	public Recurrence getRecurrence(int row, int col) {
+		return parseRecurrence(getString(row, col));
 	}
 
-	public Date getDate(int row, String title, DateFormat format) {
-		return parseDate(getString(row, title), format);
+	public Recurrence getRecurrence(int row, String title) {
+		return parseRecurrence(getString(row, title));
+	}
+
+	public Date getDate(int row, int col) {
+		return parseDate(getString(row, col));
+	}
+
+	public Date getDate(int row, String title) {
+		return parseDate(getString(row, title));
 	}
 
 	public float getFloat(int row, int col) {
@@ -176,9 +194,21 @@ public class CSVReader {
 		return parseLong(getString(row, title));
 	}
 
-	private Date parseDate(String value, DateFormat format) {
+	public boolean getBoolean(int row, int col) {
+		return parseBoolean(getString(row, col));
+	}
+
+	public boolean getBoolen(int row, String title) {
+		return parseBoolean(getString(row, title));
+	}
+
+	private Recurrence parseRecurrence(String value) {
+		return recurrenceSerializer.deserialize(value);
+	}
+
+	private Date parseDate(String value) {
 		try {
-			return format.parse(value);
+			return dateFormat.parse(value);
 		} catch (Exception e) {
 			return null;
 		}
@@ -186,7 +216,6 @@ public class CSVReader {
 
 	private float parseFloat(String value) {
 		try {
-			NumberFormat floatFormat = NumberFormat.getInstance();
 			return floatFormat.parse(value).floatValue();
 		} catch (Exception e) {
 			return 0;
@@ -207,5 +236,9 @@ public class CSVReader {
 		} catch (Exception e) {
 			return 0;
 		}
+	}
+
+	private boolean parseBoolean(String value) {
+		return Boolean.parseBoolean(value);
 	}
 }

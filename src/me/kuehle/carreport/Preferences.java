@@ -16,6 +16,8 @@
 
 package me.kuehle.carreport;
 
+import java.util.List;
+
 import me.kuehle.carreport.db.Car;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -29,15 +31,20 @@ public class Preferences {
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
 
-	public int getDefaultCar() {
+	public long getDefaultCar() {
 		int id = Integer.parseInt(prefs.getString("default_car", "1"));
-		Car[] cars = Car.getAll();
+		List<Car> cars = Car.getAll();
+		if (cars.size() == 0) {
+			return 0;
+		}
+
 		for (Car car : cars) {
 			if (car.getId() == id) {
 				return id;
 			}
 		}
-		return cars[0].getId();
+
+		return cars.get(0).getId();
 	}
 
 	public int getDefaultReport() {

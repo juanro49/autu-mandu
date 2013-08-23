@@ -17,18 +17,14 @@
 package me.kuehle.carreport.reports;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.FuelType;
-import me.kuehle.carreport.db.FuelTypeTable;
-import me.kuehle.carreport.db.Helper;
-import me.kuehle.carreport.db.RefuelingTable;
-import me.kuehle.carreport.util.Strings;
-import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
+import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
@@ -38,10 +34,7 @@ import me.kuehle.chartlib.renderer.LineRenderer;
 import me.kuehle.chartlib.renderer.OnClickListener;
 import me.kuehle.chartlib.renderer.RendererList;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.provider.BaseColumns;
 import android.text.format.DateFormat;
 import android.widget.Toast;
 
@@ -79,48 +72,14 @@ public class FuelPriceReport extends AbstractReport {
 	}
 
 	private class ReportGraphData extends AbstractReportGraphData {
-		public ReportGraphData(Context context, String fuelType, int color) {
-			super(context, fuelType, color);
+		public ReportGraphData(Context context, FuelType fuelType, int color) {
+			super(context, fuelType.name, color);
 
-			// Build query.
-			String query;
-			String[] args;
-			if (fuelType == null) {
-				query = "SELECT %date, (%price / %volume) AS fuelprice "
-						+ "FROM %refuelings " + "WHERE %fueltypes_id IS NULL "
-						+ "ORDER BY %date ASC";
-				args = null;
-			} else {
-				query = "SELECT %date, (%price / %volume) AS fuelprice "
-						+ "FROM %refuelings "
-						+ "JOIN %fueltypes ON %refuelings.%fueltypes_id = %fueltypes.%id "
-						+ "WHERE %fueltypes.%name = ? " + "ORDER BY %date ASC";
-				args = new String[] { fuelType };
+			List<Refueling> refuelings = fuelType.refuelings();
+			for (Refueling refueling : refuelings) {
+				xValues.add(refueling.date.getTime());
+				yValues.add((double) refueling.getFuelPrice());
 			}
-
-			HashMap<String, String> replacements = new HashMap<String, String>();
-			replacements.put("%refuelings", RefuelingTable.NAME);
-			replacements.put("%date", RefuelingTable.COL_DATE);
-			replacements.put("%price", RefuelingTable.COL_PRICE);
-			replacements.put("%volume", RefuelingTable.COL_VOLUME);
-			replacements.put("%fueltypes_id", RefuelingTable.COL_FUELTYPE);
-			replacements.put("%fueltypes", FuelTypeTable.NAME);
-			replacements.put("%id", BaseColumns._ID);
-			replacements.put("%name", FuelTypeTable.COL_NAME);
-			query = Strings.replaceMap(query, replacements);
-
-			// Execute query and handle data.
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db.rawQuery(query, args);
-			if (cursor.getCount() >= 2) {
-				cursor.moveToFirst();
-				while (!cursor.isAfterLast()) {
-					xValues.add(cursor.getLong(0));
-					yValues.add(cursor.getDouble(1));
-					cursor.moveToNext();
-				}
-			}
-			cursor.close();
 		}
 	}
 
@@ -134,9 +93,7 @@ public class FuelPriceReport extends AbstractReport {
 		unit = String.format("%s/%s", prefs.getUnitCurrency(),
 				prefs.getUnitVolume());
 
-		ArrayList<String> fuelTypes = new ArrayList<String>();
-		fuelTypes.add(null);
-		Collections.addAll(fuelTypes, FuelType.getAllNames());
+		List<FuelType> fuelTypes = FuelType.getAll();
 
 		float[] hsvColor = new float[3];
 		Color.colorToHSV(
@@ -144,7 +101,7 @@ public class FuelPriceReport extends AbstractReport {
 				hsvColor);
 
 		reportData = new ArrayList<FuelPriceReport.ReportGraphData>();
-		for (String fuelType : fuelTypes) {
+		for (FuelType fuelType : fuelTypes) {
 			int color = Color.HSVToColor(hsvColor);
 			ReportGraphData data = new ReportGraphData(context, fuelType, color);
 			if (!data.isEmpty()) {
@@ -157,9 +114,7 @@ public class FuelPriceReport extends AbstractReport {
 				}
 				avg /= series.size();
 
-				Section section = addDataSection(
-						fuelType == null ? context.getString(R.string.report_no_fueltype)
-								: fuelType, color);
+				Section section = addDataSection(fuelType.name, color);
 				section.addItem(new CalculableItem(context
 						.getString(R.string.report_highest), series.maxY(),
 						new String[] {

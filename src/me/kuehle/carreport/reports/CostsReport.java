@@ -19,15 +19,16 @@ package me.kuehle.carreport.reports;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Item;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Recurrence;
-import me.kuehle.carreport.util.gui.SectionListAdapter.Item;
-import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
@@ -84,7 +85,7 @@ public class CostsReport extends AbstractReport {
 		private int option;
 
 		public ReportGraphData(Context context, Car car, int option) {
-			super(context, car.getName(), car.getColor());
+			super(context, car.name, car.color);
 			this.option = option;
 		}
 
@@ -153,70 +154,72 @@ public class CostsReport extends AbstractReport {
 			visibleBarCount = 3;
 		}
 
-		Car[] cars = Car.getAll();
+		List<Car> cars = Car.getAll();
 		for (Car car : cars) {
 			Section section;
 			if (car.isSuspended()) {
 				section = addDataSection(
-						String.format("%s [%s]", car.getName(),
+						String.format("%s [%s]", car.name,
 								context.getString(R.string.suspended)),
-						car.getColor(), Section.STICK_BOTTOM);
+						car.color, Section.STICK_BOTTOM);
 			} else {
-				section = addDataSection(car.getName(), car.getColor());
+				section = addDataSection(car.name, car.color);
 			}
 
-			costsPerMonth.put(car.getId(), new ReportGraphData(context, car,
-					GRAPH_OPTION_MONTH));
-			costsPerYear.put(car.getId(), new ReportGraphData(context, car,
-					GRAPH_OPTION_YEAR));
+			costsPerMonth.put(car.getId().intValue(), new ReportGraphData(
+					context, car, GRAPH_OPTION_MONTH));
+			costsPerYear.put(car.getId().intValue(), new ReportGraphData(
+					context, car, GRAPH_OPTION_YEAR));
 
 			int startMileage = Integer.MAX_VALUE;
 			int endMileage = Integer.MIN_VALUE;
 			DateTime startDate = new DateTime();
 			DateTime endDate;
 			if (car.isSuspended()) {
-				endDate = new DateTime(car.getSuspended());
+				endDate = new DateTime(car.suspendedSince);
 			} else {
 				endDate = new DateTime();
 			}
 			double costs = 0;
 
-			Refueling[] refuelings = Refueling.getAllForCar(car, true);
-			OtherCost[] otherCosts = OtherCost.getAllForCar(car, true);
+			List<Refueling> refuelings = car.refuelings();
+			List<OtherCost> otherCosts = car.otherCosts();
 
-			if ((refuelings.length + otherCosts.length) < 2) {
+			if ((refuelings.size() + otherCosts.size()) < 2) {
 				section.addItem(new Item(context
 						.getString(R.string.report_not_enough_data), ""));
 				continue;
 			}
 
 			for (Refueling refueling : refuelings) {
-				costs += refueling.getPrice();
+				costs += refueling.price;
 
-				DateTime date = new DateTime(refueling.getDate());
+				DateTime date = new DateTime(refueling.date);
 
-				costsPerMonth.get(car.getId()).add(date, refueling.getPrice());
-				costsPerYear.get(car.getId()).add(date, refueling.getPrice());
+				costsPerMonth.get(car.getId().intValue()).add(date,
+						refueling.price);
+				costsPerYear.get(car.getId().intValue()).add(date,
+						refueling.price);
 
-				startMileage = Math.min(startMileage, refueling.getMileage());
-				endMileage = Math.max(endMileage, refueling.getMileage());
+				startMileage = Math.min(startMileage, refueling.mileage);
+				endMileage = Math.max(endMileage, refueling.mileage);
 				if (startDate.isAfter(date)) {
 					startDate = date;
 				}
 			}
 
 			for (OtherCost otherCost : otherCosts) {
-				costs += otherCost.getPrice()
-						* otherCost.getRecurrence().getRecurrencesSince(
-								otherCost.getDate());
+				costs += otherCost.price
+						* otherCost.recurrence
+								.getRecurrencesSince(otherCost.date);
 
-				Recurrence recurrence = otherCost.getRecurrence();
-				DateTime date = new DateTime(otherCost.getDate());
+				Recurrence recurrence = otherCost.recurrence;
+				DateTime date = new DateTime(otherCost.date);
 				while (date.isBefore(endDate)) {
-					costsPerMonth.get(car.getId()).add(date,
-							otherCost.getPrice());
-					costsPerYear.get(car.getId()).add(date,
-							otherCost.getPrice());
+					costsPerMonth.get(car.getId().intValue()).add(date,
+							otherCost.price);
+					costsPerYear.get(car.getId().intValue()).add(date,
+							otherCost.price);
 					switch (recurrence.getInterval()) {
 					case ONCE:
 						// Set date after now, so the loop ends.
@@ -237,13 +240,12 @@ public class CostsReport extends AbstractReport {
 					}
 				}
 
-				if (otherCost.getMileage() > -1) {
-					startMileage = Math.min(startMileage,
-							otherCost.getMileage());
-					endMileage = Math.max(endMileage, otherCost.getMileage());
+				if (otherCost.mileage > -1) {
+					startMileage = Math.min(startMileage, otherCost.mileage);
+					endMileage = Math.max(endMileage, otherCost.mileage);
 				}
-				if (startDate.isAfter(otherCost.getDate().getTime())) {
-					startDate = new DateTime(otherCost.getDate());
+				if (startDate.isAfter(otherCost.date.getTime())) {
+					startDate = new DateTime(otherCost.date);
 				}
 			}
 
@@ -300,7 +302,8 @@ public class CostsReport extends AbstractReport {
 		int series = 0;
 		for (Car car : Car.getAll()) {
 			ReportGraphData data = option == GRAPH_OPTION_MONTH ? costsPerMonth
-					.get(car.getId()) : costsPerYear.get(car.getId());
+					.get(car.getId().intValue()) : costsPerYear.get(car.getId()
+					.intValue());
 			if (data.isEmpty()) {
 				continue;
 			}

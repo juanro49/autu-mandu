@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Jan Kühle
+ * Copyright 2013 Jan Kühle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,336 +16,57 @@
 
 package me.kuehle.carreport.db;
 
-import java.util.ArrayList;
 import java.util.Date;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.provider.BaseColumns;
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Column.ForeignKeyAction;
+import com.activeandroid.annotation.Table;
 
-public class Refueling extends AbstractItem {
-	private Date date;
-	private int mileage;
-	private float volume;
-	private float price;
-	private boolean partial;
-	private String note;
-	private Car car;
-	private FuelType fuelType;
+@Table(name = "refuelings")
+public class Refueling extends Model {
+	@Column(name = "date", notNull = true)
+	public Date date;
 
-	public Refueling(int id) {
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db.query(RefuelingTable.NAME,
-					RefuelingTable.ALL_COLUMNS, BaseColumns._ID + "=?",
-					new String[] { String.valueOf(id) }, null, null, null);
-			if (cursor.getCount() != 1) {
-				cursor.close();
-				throw new IllegalArgumentException(
-						"A refueling with this ID does not exist!");
-			} else {
-				cursor.moveToFirst();
-				this.id = id;
-				this.date = new Date(cursor.getLong(1));
-				this.mileage = cursor.getInt(2);
-				this.volume = cursor.getFloat(3);
-				this.price = cursor.getFloat(4);
-				this.partial = cursor.getInt(5) > 0;
-				this.note = cursor.getString(6);
-				this.car = new Car(cursor.getInt(7));
-				this.fuelType = cursor.isNull(8) ? null : new FuelType(
-						cursor.getInt(8));
-				cursor.close();
-			}
-		}
+	@Column(name = "mileage", notNull = true)
+	public int mileage;
+
+	@Column(name = "volume", notNull = true)
+	public float volume;
+
+	@Column(name = "price", notNull = true)
+	public float price;
+
+	@Column(name = "partial", notNull = true)
+	public boolean partial;
+
+	@Column(name = "note", notNull = true)
+	public String note;
+
+	@Column(name = "fuel_type", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
+	public FuelType fuelType;
+
+	@Column(name = "fuel_tank", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
+	public FuelTank fuelTank;
+
+	public Refueling() {
+		super();
 	}
 
-	private Refueling(int id, Date date, int mileage, float volume,
-			float price, boolean partial, String note, Car car,
-			FuelType fuelType) {
-		this.id = id;
+	public Refueling(Date date, int mileage, float volume, float price,
+			boolean partial, String note, FuelType fuelType, FuelTank fuelTank) {
+		super();
 		this.date = date;
 		this.mileage = mileage;
 		this.volume = volume;
 		this.price = price;
 		this.partial = partial;
 		this.note = note;
-		this.car = car;
 		this.fuelType = fuelType;
+		this.fuelTank = fuelTank;
 	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public int getMileage() {
-		return mileage;
-	}
-
-	public void setMileage(int mileage) {
-		this.mileage = mileage;
-	}
-
-	public float getVolume() {
-		return volume;
-	}
-
-	public void setVolume(float volume) {
-		this.volume = volume;
-	}
-
-	public float getPrice() {
-		return price;
-	}
-
-	public void setPrice(float price) {
-		this.price = price;
-	}
-
-	public boolean isPartial() {
-		return partial;
-	}
-
-	public void setPartial(boolean partial) {
-		this.partial = partial;
-	}
-
-	public String getNote() {
-		return note;
-	}
-
-	public void setNote(String note) {
-		this.note = note;
-	}
-
-	public Car getCar() {
-		return car;
-	}
-
-	public void setCar(Car car) {
-		this.car = car;
-	}
-
-	public FuelType getFuelType() {
-		return fuelType;
-	}
-
-	public void setFuelType(FuelType fuelType) {
-		this.fuelType = fuelType;
-	}
-
-	public void delete() {
-		if (!isDeleted()) {
-			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
-				db.delete(RefuelingTable.NAME, BaseColumns._ID + "=?",
-						new String[] { String.valueOf(id) });
-			}
-			Helper.getInstance().dataChanged();
-			deleted = true;
-		}
-	}
-
-	public void save() {
-		if (!isDeleted()) {
-			ContentValues values = new ContentValues();
-			values.put(RefuelingTable.COL_DATE, date.getTime());
-			values.put(RefuelingTable.COL_TACHO, mileage);
-			values.put(RefuelingTable.COL_VOLUME, volume);
-			values.put(RefuelingTable.COL_PRICE, price);
-			values.put(RefuelingTable.COL_PARTIAL, partial);
-			values.put(RefuelingTable.COL_NOTE, note);
-			values.put(RefuelingTable.COL_CAR, car.getId());
-			values.put(RefuelingTable.COL_FUELTYPE, fuelType == null ? null
-					: fuelType.getId());
-
-			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
-				db.update(RefuelingTable.NAME, values, BaseColumns._ID + "=?",
-						new String[] { String.valueOf(id) });
-			}
-			Helper.getInstance().dataChanged();
-		}
-	}
-
-	public static Refueling create(Date date, int mileage, float volume,
-			float price, boolean partial, String note, Car car,
-			FuelType fuelType) {
-		return create(-1, date, mileage, volume, price, partial, note, car,
-				fuelType);
-	}
-
-	public static Refueling create(int id, Date date, int mileage,
-			float volume, float price, boolean partial, String note, Car car,
-			FuelType fuelType) {
-		ContentValues values = new ContentValues();
-		if (id != -1) {
-			values.put(BaseColumns._ID, id);
-		}
-		values.put(RefuelingTable.COL_DATE, date.getTime());
-		values.put(RefuelingTable.COL_TACHO, mileage);
-		values.put(RefuelingTable.COL_VOLUME, volume);
-		values.put(RefuelingTable.COL_PRICE, price);
-		values.put(RefuelingTable.COL_PARTIAL, partial);
-		values.put(RefuelingTable.COL_NOTE, note);
-		values.put(RefuelingTable.COL_CAR, car.getId());
-		values.put(RefuelingTable.COL_FUELTYPE, fuelType == null ? null
-				: fuelType.getId());
-
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
-			id = (int) db.insert(RefuelingTable.NAME, null, values);
-		}
-
-		if (id == -1) {
-			throw new IllegalArgumentException(
-					"A refueling with this ID does already exist!");
-		}
-
-		Helper.getInstance().dataChanged();
-
-		return new Refueling(id, date, mileage, volume, price, partial, note,
-				car, fuelType);
-	}
-
-	public static Refueling[] getAllForCar(Car car, boolean orderDateAsc) {
-		ArrayList<Refueling> refuelings = new ArrayList<Refueling>();
-
-		synchronized (Helper.dbLock) {
-			Helper helper = Helper.getInstance();
-			SQLiteDatabase db = helper.getReadableDatabase();
-			Cursor cursor = db.query(RefuelingTable.NAME,
-					RefuelingTable.ALL_COLUMNS, RefuelingTable.COL_CAR + "=?",
-					new String[] { String.valueOf(car.getId()) }, null, null,
-					String.format("%s %s", RefuelingTable.COL_DATE,
-							orderDateAsc ? "ASC" : "DESC"));
-
-			cursor.moveToFirst();
-			while (!cursor.isAfterLast()) {
-				FuelType fuelType = cursor.isNull(8) ? null : new FuelType(
-						cursor.getInt(8));
-				refuelings.add(new Refueling(cursor.getInt(0), new Date(cursor
-						.getLong(1)), cursor.getInt(2), cursor.getFloat(3),
-						cursor.getFloat(4), cursor.getInt(5) > 0, cursor
-								.getString(6), car, fuelType));
-				cursor.moveToNext();
-			}
-			cursor.close();
-		}
-
-		return refuelings.toArray(new Refueling[refuelings.size()]);
-	}
-
-	public static Refueling[] getAllForCar(Car car, FuelType[] fuelTypes,
-			boolean orderDateAsc) {
-		ArrayList<Refueling> refuelings = new ArrayList<Refueling>();
-
-		String selection = RefuelingTable.COL_CAR + " = ?";
-		String[] selectionArgs;
-		if (fuelTypes == null) {
-			selection += " AND " + RefuelingTable.COL_FUELTYPE + " IS NULL";
-			selectionArgs = new String[] { String.valueOf(car.getId()) };
-		} else {
-			selection += " AND (";
-			selectionArgs = new String[fuelTypes.length + 1];
-			selectionArgs[0] = String.valueOf(car.getId());
-			for (int i = 0; i < fuelTypes.length; i++) {
-				if (i > 0) {
-					selection += " OR ";
-				}
-				selection += RefuelingTable.COL_FUELTYPE + " = ?";
-				selectionArgs[i + 1] = String.valueOf(fuelTypes[i].getId());
-			}
-			selection += ")";
-		}
-
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db.query(RefuelingTable.NAME,
-					RefuelingTable.ALL_COLUMNS, selection, selectionArgs, null,
-					null, String.format("%s %s", RefuelingTable.COL_DATE,
-							orderDateAsc ? "ASC" : "DESC"));
-
-			cursor.moveToFirst();
-			while (!cursor.isAfterLast()) {
-				FuelType fuelType = cursor.isNull(8) ? null : new FuelType(
-						cursor.getInt(8));
-				refuelings.add(new Refueling(cursor.getInt(0), new Date(cursor
-						.getLong(1)), cursor.getInt(2), cursor.getFloat(3),
-						cursor.getFloat(4), cursor.getInt(5) > 0, cursor
-								.getString(6), car, fuelType));
-				cursor.moveToNext();
-			}
-			cursor.close();
-		}
-
-		return refuelings.toArray(new Refueling[refuelings.size()]);
-	}
-
-	public static int getCount() {
-		int count;
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db.rawQuery("SELECT count(*) FROM "
-					+ RefuelingTable.NAME, null);
-			cursor.moveToFirst();
-			count = cursor.getInt(0);
-			cursor.close();
-		}
-		return count;
-	}
-
-	public static Refueling getFirst() {
-		Refueling fuel;
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db
-					.rawQuery("SELECT * FROM " + RefuelingTable.NAME
-							+ " ORDER BY " + RefuelingTable.COL_DATE
-							+ " LIMIT 1", null);
-
-			if (cursor.getCount() != 1) {
-				return null;
-			}
-			cursor.moveToFirst();
-			FuelType fuelType = cursor.isNull(8) ? null : new FuelType(
-					cursor.getInt(8));
-			fuel = new Refueling(cursor.getInt(0), new Date(cursor.getLong(1)),
-					cursor.getInt(2), cursor.getFloat(3), cursor.getFloat(4),
-					cursor.getInt(5) > 0, cursor.getString(6), new Car(
-							cursor.getInt(7)), fuelType);
-			cursor.close();
-		}
-
-		return fuel;
-	}
-
-	public static Refueling getLast() {
-		Refueling fuel;
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db.rawQuery("SELECT * FROM " + RefuelingTable.NAME
-					+ " ORDER BY " + RefuelingTable.COL_DATE + " DESC LIMIT 1",
-					null);
-
-			if (cursor.getCount() != 1) {
-				return null;
-			}
-			cursor.moveToFirst();
-			FuelType fuelType = cursor.isNull(8) ? null : new FuelType(
-					cursor.getInt(8));
-			fuel = new Refueling(cursor.getInt(0), new Date(cursor.getLong(1)),
-					cursor.getInt(2), cursor.getFloat(3), cursor.getFloat(4),
-					cursor.getInt(5) > 0, cursor.getString(6), new Car(
-							cursor.getInt(7)), fuelType);
-			cursor.close();
-		}
-
-		return fuel;
+	
+	public float getFuelPrice() {
+		return price / volume;
 	}
 }

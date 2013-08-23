@@ -21,12 +21,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 
+import me.kuehle.carreport.Application;
 import me.kuehle.carreport.Preferences;
-import me.kuehle.carreport.db.Helper;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.activeandroid.Cache;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.DropboxFileInfo;
 import com.dropbox.client2.DropboxAPI.Entry;
@@ -58,6 +60,8 @@ public class Dropbox {
 	private final static String APP_SECRET = "1cw56rcn1bbnb7f";
 	private final static AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
 
+	private static final String TEMP_FILE_NAME = "dropbox";
+
 	private static Dropbox instance;
 
 	public static Dropbox getInstance() {
@@ -74,6 +78,8 @@ public class Dropbox {
 	private boolean synchronisationInProgress = false;
 	private OnSynchronizeListener synchronisationCallback;
 
+	private File tempFile;
+
 	private Dropbox(Context context) {
 		this.context = context;
 
@@ -86,6 +92,8 @@ public class Dropbox {
 		}
 
 		this.mDBApi = new DropboxAPI<AndroidAuthSession>(session);
+
+		this.tempFile = new File(context.getCacheDir(), TEMP_FILE_NAME);
 	}
 
 	public void finishAuthentication(
@@ -109,8 +117,8 @@ public class Dropbox {
 						}
 
 						// Check if remote data is available.
-						File localFile = new File(Helper.getInstance()
-								.getReadableDatabase().getPath());
+						File localFile = new File(Cache.openDatabase()
+								.getPath());
 						try {
 							Entry remoteEntry = mDBApi.metadata(
 									"/" + localFile.getName(), 1, null, false,
@@ -152,7 +160,7 @@ public class Dropbox {
 	public boolean isLinked() {
 		return mDBApi.getSession().isLinked();
 	}
-	
+
 	public boolean isSynchronisationInProgress() {
 		return synchronisationInProgress;
 	}
@@ -182,8 +190,7 @@ public class Dropbox {
 			@Override
 			protected Boolean doInBackground(Integer... params) {
 				Preferences prefs = new Preferences(context);
-				File localFile = new File(Helper.getInstance()
-						.getReadableDatabase().getPath());
+				File localFile = new File(Cache.openDatabase().getPath());
 				String localRev = prefs.getDropboxLocalRev();
 
 				String remoteRev = null;
@@ -209,51 +216,60 @@ public class Dropbox {
 						|| (params[0] != SYNC_DOWNLOAD && remoteRev
 								.equals(localRev))) {
 					// Upload
-					synchronized (Helper.dbLock) {
-						FileInputStream inputStream = null;
-						try {
-							inputStream = new FileInputStream(localFile);
-							Entry remoteEntry = mDBApi.putFile(
-									"/" + localFile.getName(), inputStream,
-									localFile.length(), remoteRev, null);
-							prefs.setDropboxLocalRev(remoteEntry.rev);
-						} catch (DropboxException e) {
-							return false;
-						} catch (FileNotFoundException e) {
-							return false;
-						} finally {
-							if (inputStream != null) {
-								try {
-									inputStream.close();
-								} catch (IOException e) {
-								}
+					if (!copyFile(localFile, tempFile)) {
+						return false;
+					}
+
+					FileInputStream inputStream = null;
+					try {
+						inputStream = new FileInputStream(tempFile);
+						Entry remoteEntry = mDBApi.putFile(
+								"/" + localFile.getName(), inputStream,
+								tempFile.length(), remoteRev, null);
+						prefs.setDropboxLocalRev(remoteEntry.rev);
+					} catch (DropboxException e) {
+						return false;
+					} catch (FileNotFoundException e) {
+						return false;
+					} finally {
+						if (inputStream != null) {
+							try {
+								inputStream.close();
+							} catch (IOException e) {
 							}
 						}
+
+						tempFile.delete();
 					}
 				} else {
 					// Download
-					synchronized (Helper.dbLock) {
-						FileOutputStream outputStream = null;
-						try {
-							outputStream = new FileOutputStream(localFile);
-							DropboxFileInfo info = mDBApi.getFile("/"
-									+ localFile.getName(), null, outputStream,
-									null);
-							prefs.setDropboxLocalRev(info.getMetadata().rev);
-							Helper.getInstance().reinitialize();
-						} catch (DropboxException e) {
-							return false;
-						} catch (FileNotFoundException e) {
-							return false;
-						} finally {
-							if (outputStream != null) {
-								try {
-									outputStream.close();
-								} catch (IOException e) {
-								}
+					FileOutputStream outputStream = null;
+					try {
+						outputStream = new FileOutputStream(tempFile);
+						DropboxFileInfo info = mDBApi.getFile(
+								"/" + localFile.getName(), null, outputStream,
+								null);
+						prefs.setDropboxLocalRev(info.getMetadata().rev);
+					} catch (DropboxException e) {
+						return false;
+					} catch (FileNotFoundException e) {
+						return false;
+					} finally {
+						if (outputStream != null) {
+							try {
+								outputStream.close();
+							} catch (IOException e) {
 							}
 						}
+
+						tempFile.delete();
 					}
+
+					if (copyFile(tempFile, localFile)) {
+						Application.reinitializeDatabase();
+					}
+
+					tempFile.delete();
 				}
 
 				return true;
@@ -282,6 +298,23 @@ public class Dropbox {
 		prefs.setDropboxAccount(null);
 		prefs.setDropboxKey(null);
 		prefs.setDropboxSecret(null);
+	}
+
+	private boolean copyFile(File from, File to) {
+		try {
+			FileInputStream inStream = new FileInputStream(from);
+			FileOutputStream outStream = new FileOutputStream(to);
+			FileChannel src = inStream.getChannel();
+			FileChannel dst = outStream.getChannel();
+			dst.transferFrom(src, 0, src.size());
+			src.close();
+			dst.close();
+			inStream.close();
+			outStream.close();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	private AccessTokenPair loadAccessTokens() {

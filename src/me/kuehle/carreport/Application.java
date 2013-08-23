@@ -16,20 +16,46 @@
 
 package me.kuehle.carreport;
 
-import me.kuehle.carreport.db.Helper;
+import com.activeandroid.ActiveAndroid;
+
 import me.kuehle.carreport.util.backup.Dropbox;
 
 public class Application extends android.app.Application {
+	private static Application instance;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		instance = this;
+
 		System.setProperty("org.joda.time.DateTimeZone.Provider",
 				"org.joda.time.tz.UTCProvider");
-		Helper.init(this);
+		ActiveAndroid.initialize(this);
 		Dropbox.init(this);
 
 		if (new Preferences(this).isSyncOnStart()) {
 			Dropbox.getInstance().synchronize();
+		}
+	}
+
+	@Override
+	public void onTerminate() {
+		super.onTerminate();
+		ActiveAndroid.dispose();
+	}
+
+	public static void reinitializeDatabase() {
+		if (instance != null) {
+			ActiveAndroid.dispose();
+			ActiveAndroid.initialize(instance);
+		}
+	}
+
+	public static void dataChanged() {
+		if (instance != null) {
+			if (new Preferences(instance).isSyncOnChange()) {
+				Dropbox.getInstance().synchronize();
+			}
 		}
 	}
 }

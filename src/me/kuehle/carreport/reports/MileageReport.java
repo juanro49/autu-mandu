@@ -17,15 +17,16 @@
 package me.kuehle.carreport.reports;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Item;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Calculator;
-import me.kuehle.carreport.util.gui.SectionListAdapter.Item;
-import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
 import me.kuehle.chartlib.data.Series;
@@ -39,32 +40,34 @@ import android.widget.Toast;
 public class MileageReport extends AbstractReport {
 	private class ReportGraphDataAccumulated extends AbstractReportGraphData {
 		public ReportGraphDataAccumulated(Context context, Car car) {
-			super(context, car.getName(), car.getColor());
-			for (Refueling refueling : Refueling.getAllForCar(car, true)) {
-				xValues.add(refueling.getDate().getTime());
-				yValues.add((double) refueling.getMileage());
+			super(context, car.name, car.color);
+
+			List<Refueling> refuelings = car.refuelings();
+			for (Refueling refueling : refuelings) {
+				xValues.add(refueling.date.getTime());
+				yValues.add((double) refueling.mileage);
 			}
 		}
 	}
 
-	private class ReportGraphDataNormal extends AbstractReportGraphData {
-		public ReportGraphDataNormal(Context context, Car car) {
-			super(context, car.getName(), car.getColor());
+	private class ReportGraphDataPerRefueling extends AbstractReportGraphData {
+		public ReportGraphDataPerRefueling(Context context, Car car) {
+			super(context, car.name, car.color);
 
-			Refueling[] refuelings = Refueling.getAllForCar(car, true);
-			for (int i = 1; i < refuelings.length; i++) {
-				xValues.add(refuelings[i].getDate().getTime());
-				yValues.add((double) (refuelings[i].getMileage() - refuelings[i - 1]
-						.getMileage()));
+			List<Refueling> refuelings = car.refuelings();
+			for (int i = 1; i < refuelings.size(); i++) {
+				xValues.add(refuelings.get(i).date.getTime());
+				yValues.add((double) (refuelings.get(i).mileage - refuelings
+						.get(i - 1).mileage));
 			}
 		}
 	}
 
 	public static final int GRAPH_OPTION_ACCUMULATED = 0;
-	public static final int GRAPH_OPTION_NORMAL = 1;
+	public static final int GRAPH_OPTION_PER_REFUELING = 1;
 
 	private Vector<AbstractReportGraphData> reportDataAccumulated = new Vector<AbstractReportGraphData>();
-	private Vector<AbstractReportGraphData> reportDataNormal = new Vector<AbstractReportGraphData>();
+	private Vector<AbstractReportGraphData> reportDataPerRefueling = new Vector<AbstractReportGraphData>();
 	private double[] minXValue = { Long.MAX_VALUE, Long.MAX_VALUE };
 
 	private String unit;
@@ -79,17 +82,17 @@ public class MileageReport extends AbstractReport {
 		showLegend = prefs.isShowLegend();
 
 		// Car data
-		Car[] cars = Car.getAll();
+		List<Car> cars = Car.getAll();
 		for (Car car : cars) {
 			// Add section for car
 			Section section;
 			if (car.isSuspended()) {
 				section = addDataSection(
-						String.format("%s [%s]", car.getName(),
+						String.format("%s [%s]", car.name,
 								context.getString(R.string.suspended)),
-						car.getColor(), Section.STICK_BOTTOM);
+						car.color, Section.STICK_BOTTOM);
 			} else {
-				section = addDataSection(car.getName(), car.getColor());
+				section = addDataSection(car.name, car.color);
 			}
 
 			// Accumulated data
@@ -103,15 +106,15 @@ public class MileageReport extends AbstractReport {
 			}
 
 			// Normal data
-			ReportGraphDataNormal carDataNormal = new ReportGraphDataNormal(
+			ReportGraphDataPerRefueling carDataNormal = new ReportGraphDataPerRefueling(
 					context, car);
 			if (carDataNormal.size() == 0) {
 				section.addItem(new Item(context
 						.getString(R.string.report_not_enough_data), ""));
 			} else {
-				reportDataNormal.add(carDataNormal);
-				minXValue[GRAPH_OPTION_NORMAL] = Math.min(
-						minXValue[GRAPH_OPTION_NORMAL], carDataNormal
+				reportDataPerRefueling.add(carDataNormal);
+				minXValue[GRAPH_OPTION_PER_REFUELING] = Math.min(
+						minXValue[GRAPH_OPTION_PER_REFUELING], carDataNormal
 								.getSeries().minX());
 
 				section.addItem(new Item(context
@@ -143,7 +146,7 @@ public class MileageReport extends AbstractReport {
 		renderers.addRenderer(renderer);
 
 		Vector<AbstractReportGraphData> reportData = option == GRAPH_OPTION_ACCUMULATED ? reportDataAccumulated
-				: reportDataNormal;
+				: reportDataPerRefueling;
 		Vector<AbstractReportGraphData> chartReportData = new Vector<AbstractReportGraphData>();
 		if (isShowTrend()) {
 			for (AbstractReportGraphData data : reportData) {
@@ -194,7 +197,7 @@ public class MileageReport extends AbstractReport {
 	public int[] getGraphOptions() {
 		int[] options = new int[2];
 		options[GRAPH_OPTION_ACCUMULATED] = R.string.report_graph_accumulated;
-		options[GRAPH_OPTION_NORMAL] = R.string.report_graph_normal;
+		options[GRAPH_OPTION_PER_REFUELING] = R.string.report_graph_per_refueling;
 		return options;
 	}
 }

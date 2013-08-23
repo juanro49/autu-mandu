@@ -16,15 +16,15 @@
 -->
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesActivity$GeneralFragment"
+        android:fragment="me.kuehle.carreport.gui.PreferencesGeneralFragment"
         android:title="@string/pref_title_header_general" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesActivity$CarsFragment"
+        android:fragment="me.kuehle.carreport.gui.PreferencesCarsFragment"
         android:title="@string/pref_title_header_cars" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesActivity$BackupFragment"
+        android:fragment="me.kuehle.carreport.gui.PreferencesBackupFragment"
         android:title="@string/pref_title_header_backup" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesActivity$AboutFragment"
+        android:fragment="me.kuehle.carreport.gui.PreferencesAboutFragment"
         android:title="@string/pref_title_header_about" />
 </preference-headers>

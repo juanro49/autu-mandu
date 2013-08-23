@@ -19,38 +19,14 @@ package me.kuehle.carreport.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.text.Format;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import android.database.Cursor;
-import android.util.SparseArray;
+import me.kuehle.carreport.db.serializer.RecurrenceSerializer;
 
 public class CSVWriter {
-	public static class SpecialColumnType {
-		private Class<?> type;
-		private Format format;
-
-		public SpecialColumnType(Class<?> type, Format format) {
-			this.type = type;
-			this.format = format;
-		}
-
-		public String format(String value) {
-			if (type == Date.class) {
-				try {
-					Date date = new Date(Long.parseLong(value));
-					return format.format(date);
-				} catch (NumberFormatException e) {
-					return "";
-				}
-			} else {
-				return "";
-			}
-		}
-	}
-
 	private static final char QUOTE = '"';
 	private static final char ESCAPE = '\\';
 	private static final char SEPARATOR;
@@ -68,56 +44,46 @@ public class CSVWriter {
 
 	private StringBuilder data;
 
+	private RecurrenceSerializer recurrenceSerializer;
+	private DateFormat dateFormat;
+	private NumberFormat floatFormat;
+
 	public CSVWriter() {
 		data = new StringBuilder();
+
+		recurrenceSerializer = new RecurrenceSerializer();
+		dateFormat = DateFormat.getDateTimeInstance();
+		floatFormat = NumberFormat.getInstance();
 	}
 
-	public void write(Cursor cursor, SparseArray<SpecialColumnType> columnTypes) {
-		write(cursor, columnTypes, false);
-	}
-
-	public void write(Cursor cursor,
-			SparseArray<SpecialColumnType> columnTypes, boolean includeHeader) {
-		if (includeHeader) {
-			writeLine(cursor.getColumnNames());
-		}
-
-		NumberFormat floatFormat = NumberFormat.getInstance();
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			for (int i = 0; i < cursor.getColumnCount(); i++) {
-				if (i != 0) {
-					data.append(SEPARATOR);
-				}
-
-				if (columnTypes.get(i) != null) {
-					writeColumn(columnTypes.get(i).format(cursor.getString(i)));
-				} else if (cursor.getType(i) == Cursor.FIELD_TYPE_FLOAT) {
-					writeColumn(floatFormat.format(cursor.getFloat(i)));
-				} else {
-					writeColumn(cursor.getString(i));
-				}
-			}
-			data.append(NEW_LINE);
-			cursor.moveToNext();
-		}
-	}
-
-	public void writeLine(String[] line) {
-		for (int i = 0; i < line.length; i++) {
+	public void writeLine(Object... columns) {
+		for (int i = 0; i < columns.length; i++) {
 			if (i != 0) {
 				data.append(SEPARATOR);
 			}
-			writeColumn(line[i]);
+
+			writeColumn(columns[i]);
 		}
+
 		data.append(NEW_LINE);
 	}
 
-	public void writeColumn(String column) {
+	private void writeColumn(Object value) {
 		data.append(QUOTE);
-		if (column != null) {
-			for (int j = 0; j < column.length(); j++) {
-				char nextChar = column.charAt(j);
+		if (value != null) {
+			String strValue;
+			if (value instanceof Recurrence) {
+				strValue = format((Recurrence) value);
+			} else if (value instanceof Date) {
+				strValue = format((Date) value);
+			} else if (value instanceof Float) {
+				strValue = format((Float) value);
+			} else {
+				strValue = value.toString();
+			}
+
+			for (int j = 0; j < strValue.length(); j++) {
+				char nextChar = strValue.charAt(j);
 				if (nextChar == QUOTE || nextChar == ESCAPE) {
 					data.append(ESCAPE).append(nextChar);
 				} else if (nextChar != NEW_LINE) {
@@ -125,6 +91,7 @@ public class CSVWriter {
 				}
 			}
 		}
+
 		data.append(QUOTE);
 	}
 
@@ -140,5 +107,25 @@ public class CSVWriter {
 	@Override
 	public String toString() {
 		return data.toString();
+	}
+
+	private String format(Recurrence value) {
+		return recurrenceSerializer.serialize(value);
+	}
+
+	private String format(Date value) {
+		try {
+			return dateFormat.format(value);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private String format(Float value) {
+		try {
+			return floatFormat.format(value);
+		} catch (Exception e) {
+			return "";
+		}
 	}
 }

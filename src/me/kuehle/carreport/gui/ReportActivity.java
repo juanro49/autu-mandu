@@ -16,9 +16,13 @@
 
 package me.kuehle.carreport.gui;
 
+import java.util.List;
+
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.gui.util.SectionListAdapter;
+import me.kuehle.carreport.gui.util.SimpleAnimator;
 import me.kuehle.carreport.reports.AbstractReport;
 import me.kuehle.carreport.reports.AbstractReport.CalculationOption;
 import me.kuehle.carreport.reports.CostsReport;
@@ -26,8 +30,6 @@ import me.kuehle.carreport.reports.FuelConsumptionReport;
 import me.kuehle.carreport.reports.FuelPriceReport;
 import me.kuehle.carreport.reports.MileageReport;
 import me.kuehle.carreport.util.backup.Dropbox;
-import me.kuehle.carreport.util.gui.SectionListAdapter;
-import me.kuehle.carreport.util.gui.SimpleAnimator;
 import me.kuehle.chartlib.ChartView;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
@@ -55,6 +57,11 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.Toast;
 
 public class ReportActivity extends Activity implements OnMenuItemClickListener {
+	private static final int REQUEST_FIRST_START = 0;
+	private static final int REQUEST_ADD_DATA = 1;
+	private static final int REQUEST_VIEW_DATA = 2;
+	private static final int REQUEST_SETTINGS = 3;
+
 	private AbstractReport mCurrentReport;
 	private int mCurrentGraphOption;
 	private MenuItem mSyncMenuItem;
@@ -190,7 +197,11 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		updateReport();
+		if (requestCode == REQUEST_FIRST_START && resultCode == RESULT_CANCELED) {
+			finish();
+		} else {
+			updateReport();
+		}
 	}
 
 	@Override
@@ -218,6 +229,12 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		ChartView graph = (ChartView) findViewById(R.id.graph);
 		graph.setNotEnoughDataView(View.inflate(this,
 				R.layout.chart_not_enough_data, null));
+
+		// When there is no car, show the first start activity.
+		if (Car.getCount() == 0) {
+			Intent intent = new Intent(this, FirstStartActivity.class);
+			startActivityForResult(intent, REQUEST_FIRST_START);
+		}
 	}
 
 	@Override
@@ -261,11 +278,11 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			return true;
 		case R.id.menu_view_data:
 			Intent intentData = new Intent(this, DataListActivity.class);
-			startActivityForResult(intentData, 0);
+			startActivityForResult(intentData, REQUEST_VIEW_DATA);
 			return true;
 		case R.id.menu_settings:
 			Intent intentPrefs = new Intent(this, PreferencesActivity.class);
-			startActivityForResult(intentPrefs, 0);
+			startActivityForResult(intentPrefs, REQUEST_SETTINGS);
 			return true;
 		case R.id.menu_help:
 			Intent intentHelp = new Intent(this, HelpActivity.class);
@@ -273,7 +290,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			return true;
 		default:
 			if (item.getIntent() != null) {
-				startActivityForResult(item.getIntent(), 0);
+				startActivityForResult(item.getIntent(), REQUEST_ADD_DATA);
 				return true;
 			} else {
 				return super.onOptionsItemSelected(item);
@@ -284,25 +301,25 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		Preferences prefs = new Preferences(this);
-		Car[] cars = Car.getAll();
+		List<Car> cars = Car.getAll();
 
 		MenuItem[] items = { menu.findItem(R.id.menu_add_refueling),
 				menu.findItem(R.id.menu_add_other) };
-		for (MenuItem item : items) {
-			SubMenu subMenu = item.getSubMenu();
+		int extraEdit[] = { DataDetailActivity.EXTRA_EDIT_REFUELING,
+				DataDetailActivity.EXTRA_EDIT_OTHER };
+
+		for (int i = 0; i < items.length; i++) {
+			SubMenu subMenu = items[i].getSubMenu();
 			subMenu.clear();
 
-			if (cars.length == 1 || !prefs.isShowCarMenu()) {
-				item.setIntent(getDetailActivityIntent(
-						DataDetailActivity.EXTRA_EDIT_REFUELING,
+			if (cars.size() == 1 || !prefs.isShowCarMenu()) {
+				items[i].setIntent(getDetailActivityIntent(extraEdit[i],
 						prefs.getDefaultCar()));
 			} else {
-				item.setIntent(null);
+				items[i].setIntent(null);
 				for (Car car : cars) {
-					Intent intent = getDetailActivityIntent(
-							DataDetailActivity.EXTRA_EDIT_REFUELING,
-							car.getId());
-					subMenu.add(car.getName()).setIntent(intent);
+					subMenu.add(car.name).setIntent(
+							getDetailActivityIntent(extraEdit[i], car.getId()));
 				}
 			}
 		}
@@ -366,7 +383,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		prefsEdit.apply();
 	}
 
-	private Intent getDetailActivityIntent(int edit, int carId) {
+	private Intent getDetailActivityIntent(int edit, long carId) {
 		Intent intent = new Intent(this, DataDetailActivity.class);
 		intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
 		intent.putExtra(AbstractDataDetailFragment.EXTRA_CAR_ID, carId);

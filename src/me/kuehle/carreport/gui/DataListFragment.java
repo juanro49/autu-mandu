@@ -17,21 +17,22 @@
 package me.kuehle.carreport.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
 import me.kuehle.carreport.util.RecurrenceInterval;
-import me.kuehle.carreport.util.gui.MessageDialogFragment;
-import me.kuehle.carreport.util.gui.MessageDialogFragment.MessageDialogFragmentListener;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
@@ -53,10 +54,12 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
+import com.activeandroid.Model;
+
 public class DataListFragment extends Fragment implements
 		MessageDialogFragmentListener {
 	public abstract class AbstractTabHelper {
-		protected AbstractItem[] mItems;
+		protected List<? extends Model> mItems;
 		protected ListView mListView;
 
 		public AbstractTabHelper(ListView listView) {
@@ -82,7 +85,7 @@ public class DataListFragment extends Fragment implements
 	public interface Callback {
 		public abstract void onItemClosed();
 
-		public abstract void onItemSelected(int edit, int carId, int id);
+		public abstract void onItemSelected(int edit, long carId, long id);
 
 		public abstract void onTabChanged(int edit);
 	}
@@ -114,7 +117,8 @@ public class DataListFragment extends Fragment implements
 
 		@Override
 		protected void updateItems(Car car) {
-			mItems = OtherCost.getAllForCar(car, false);
+			mItems = car.otherCosts();
+			Collections.reverse(mItems);
 		}
 
 		@Override
@@ -126,31 +130,30 @@ public class DataListFragment extends Fragment implements
 					.getDateFormat(getActivity());
 			String[] repIntervals = getResources().getStringArray(
 					R.array.repeat_intervals);
-			for (int i = 0; i < mItems.length; i++) {
-				OtherCost other = (OtherCost) mItems[i];
+			for (int i = 0; i < mItems.size(); i++) {
+				OtherCost other = (OtherCost) mItems.get(i);
 				SparseArray<String> dataItem = new SparseArray<String>();
-				dataItem.put(R.id.title, other.getTitle());
-				dataItem.put(R.id.date, dateFmt.format(other.getDate()));
-				if (other.getMileage() > -1) {
+				dataItem.put(R.id.title, other.title);
+				dataItem.put(R.id.date, dateFmt.format(other.date));
+				if (other.mileage > -1) {
 					dataItem.put(
 							R.id.data1,
-							String.format("%d %s", other.getMileage(),
+							String.format("%d %s", other.mileage,
 									prefs.getUnitDistance()));
 				}
 				dataItem.put(
 						R.id.data2,
-						String.format("%.2f %s", other.getPrice(),
+						String.format("%.2f %s", other.price,
 								prefs.getUnitCurrency()));
-				dataItem.put(R.id.data3, repIntervals[other.getRecurrence()
+				dataItem.put(R.id.data3, repIntervals[other.recurrence
 						.getInterval().getValue()]);
-				if (!other.getRecurrence().getInterval()
-						.equals(RecurrenceInterval.ONCE)) {
-					int recurrences = other.getRecurrence()
-							.getRecurrencesSince(other.getDate());
-					dataItem.put(
-							R.id.data2_calculated,
-							String.format("%.2f %s", other.getPrice()
-									* recurrences, prefs.getUnitCurrency()));
+				if (!other.recurrence.getInterval().equals(
+						RecurrenceInterval.ONCE)) {
+					int recurrences = other.recurrence
+							.getRecurrencesSince(other.date);
+					dataItem.put(R.id.data2_calculated, String.format(
+							"%.2f %s", other.price * recurrences,
+							prefs.getUnitCurrency()));
 					dataItem.put(R.id.data3_calculated,
 							String.format("x%d", recurrences));
 				}
@@ -193,7 +196,8 @@ public class DataListFragment extends Fragment implements
 
 		@Override
 		protected void updateItems(Car car) {
-			mItems = Refueling.getAllForCar(car, false);
+			mItems = car.refuelings();
+			Collections.reverse(mItems);
 		}
 
 		@Override
@@ -203,57 +207,52 @@ public class DataListFragment extends Fragment implements
 			Preferences prefs = new Preferences(getActivity());
 			java.text.DateFormat dateFmt = DateFormat
 					.getDateFormat(getActivity());
-			for (int i = 0; i < mItems.length; i++) {
-				Refueling refueling = (Refueling) mItems[i];
+			for (int i = 0; i < mItems.size(); i++) {
+				Refueling refueling = (Refueling) mItems.get(i);
 				SparseArray<String> dataItem = new SparseArray<String>();
 
 				dataItem.put(R.id.title,
 						getString(R.string.edit_title_refueling));
-				if (refueling.getFuelType() != null) {
-					dataItem.put(R.id.subtitle, refueling.getFuelType()
-							.getName());
-				}
-				dataItem.put(R.id.date, dateFmt.format(refueling.getDate()));
+				dataItem.put(R.id.subtitle, refueling.fuelType.name);
+				dataItem.put(R.id.date, dateFmt.format(refueling.date));
 
 				dataItem.put(
 						R.id.data1,
-						String.format("%d %s", refueling.getMileage(),
+						String.format("%d %s", refueling.mileage,
 								prefs.getUnitDistance()));
-				if (i + 1 < mItems.length) {
-					Refueling nextRefueling = (Refueling) mItems[i + 1];
+				if (i + 1 < mItems.size()) {
+					Refueling nextRefueling = (Refueling) mItems.get(i + 1);
 					dataItem.put(
 							R.id.data1_calculated,
-							String.format("+ %d %s", refueling.getMileage()
-									- nextRefueling.getMileage(),
+							String.format("+ %d %s", refueling.mileage
+									- nextRefueling.mileage,
 									prefs.getUnitDistance()));
 				}
 
 				dataItem.put(
 						R.id.data2,
-						String.format("%.2f %s", refueling.getPrice(),
+						String.format("%.2f %s", refueling.price,
 								prefs.getUnitCurrency()));
-				dataItem.put(
-						R.id.data2_calculated,
-						String.format("%.3f %s/%s", refueling.getPrice()
-								/ refueling.getVolume(),
-								prefs.getUnitCurrency(), prefs.getUnitVolume()));
+				dataItem.put(R.id.data2_calculated, String.format("%.3f %s/%s",
+						refueling.price / refueling.volume,
+						prefs.getUnitCurrency(), prefs.getUnitVolume()));
 
 				dataItem.put(
 						R.id.data3,
-						String.format("%.2f %s", refueling.getVolume(),
+						String.format("%.2f %s", refueling.volume,
 								prefs.getUnitVolume()));
-				if (refueling.isPartial()) {
+				if (refueling.partial) {
 					dataItem.put(R.id.data3_calculated,
 							getString(R.string.label_partial));
-				} else if (i + 1 < mItems.length) {
-					float diffVolume = refueling.getVolume();
-					for (int j = i + 1; j < mItems.length; j++) {
-						Refueling nextRefueling = (Refueling) mItems[j];
-						if (nextRefueling.isPartial()) {
-							diffVolume += nextRefueling.getVolume();
+				} else if (i + 1 < mItems.size()) {
+					float diffVolume = refueling.volume;
+					for (int j = i + 1; j < mItems.size(); j++) {
+						Refueling nextRefueling = (Refueling) mItems.get(j);
+						if (nextRefueling.partial) {
+							diffVolume += nextRefueling.volume;
 						} else {
-							int diffMileage = refueling.getMileage()
-									- nextRefueling.getMileage();
+							int diffMileage = refueling.mileage
+									- nextRefueling.mileage;
 							dataItem.put(
 									R.id.data3_calculated,
 									String.format("%.2f %s/100%s", diffVolume
@@ -332,7 +331,7 @@ public class DataListFragment extends Fragment implements
 	private static final String STATE_CURRENT_TAB = "current_tab";
 	private static final int DELETE_REQUEST_CODE = 0;
 
-	private Car[] mCars;
+	private List<Car> mCars;
 	private Car mCurrentCar = null;
 
 	private TabHost mTabHost;
@@ -362,7 +361,7 @@ public class DataListFragment extends Fragment implements
 			setCurrentPosition(position);
 
 			int edit = mCurrentTab.getExtraEdit();
-			int itemId = mCurrentTab.mItems[mCurrentItem].getId();
+			long itemId = mCurrentTab.mItems.get(mCurrentItem).getId();
 			mCallback.onItemSelected(edit, mCurrentCar.getId(), itemId);
 		}
 	};
@@ -375,7 +374,7 @@ public class DataListFragment extends Fragment implements
 				String message = String.format(
 						getString(mCurrentTab.getAlertDeleteManyMessage()),
 						mCurrentTab.mListView.getCheckedItemCount());
-				MessageDialogFragment.newInstance(DataListFragment.this,
+				SupportMessageDialogFragment.newInstance(DataListFragment.this,
 						DELETE_REQUEST_CODE, R.string.alert_delete_title,
 						message, android.R.string.yes, android.R.string.no)
 						.show(getFragmentManager(), null);
@@ -426,7 +425,7 @@ public class DataListFragment extends Fragment implements
 	private OnNavigationListener mListNavigationCallback = new OnNavigationListener() {
 		@Override
 		public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-			mCurrentCar = mCars[itemPosition];
+			mCurrentCar = mCars.get(itemPosition);
 			mCallback.onItemClosed();
 			updateLists();
 			return true;
@@ -468,7 +467,7 @@ public class DataListFragment extends Fragment implements
 				android.R.layout.simple_spinner_dropdown_item);
 		mCars = Car.getAll();
 		for (Car car : mCars) {
-			adapter.add(car.getName());
+			adapter.add(car.name);
 		}
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setListNavigationCallbacks(adapter, mListNavigationCallback);
@@ -476,7 +475,7 @@ public class DataListFragment extends Fragment implements
 		// Set selected car from config instance of preferences
 		Preferences prefs = new Preferences(getActivity());
 		if (savedInstanceState != null) {
-			selectCarById(savedInstanceState.getInt(STATE_CURRENT_CAR,
+			selectCarById(savedInstanceState.getLong(STATE_CURRENT_CAR,
 					prefs.getDefaultCar()));
 		} else {
 			selectCarById(prefs.getDefaultCar());
@@ -532,9 +531,9 @@ public class DataListFragment extends Fragment implements
 		if (requestCode == DELETE_REQUEST_CODE) {
 			SparseBooleanArray selected = mCurrentTab.mListView
 					.getCheckedItemPositions();
-			for (int i = 0; i < mCurrentTab.mItems.length; i++) {
+			for (int i = 0; i < mCurrentTab.mItems.size(); i++) {
 				if (selected.get(i)) {
-					mCurrentTab.mItems[i].delete();
+					mCurrentTab.mItems.get(i).delete();
 				}
 			}
 			mActionMode.finish();
@@ -546,16 +545,16 @@ public class DataListFragment extends Fragment implements
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putInt(STATE_CURRENT_CAR, mCurrentCar.getId());
+		outState.putLong(STATE_CURRENT_CAR, mCurrentCar.getId());
 		outState.putInt(STATE_CURRENT_TAB, mTabHost.getCurrentTab());
 		outState.putInt(STATE_CURRENT_ITEM, mCurrentItem);
 	}
 
-	private void selectCarById(int id) {
+	private void selectCarById(long id) {
 		ActionBar actionBar = getActivity().getActionBar();
-		for (int pos = 0; pos < mCars.length; pos++) {
-			if (mCars[pos].getId() == id) {
-				mCurrentCar = mCars[pos];
+		for (int pos = 0; pos < mCars.size(); pos++) {
+			if (mCars.get(pos).getId() == id) {
+				mCurrentCar = mCars.get(pos);
 				actionBar.setSelectedNavigationItem(pos);
 			}
 		}

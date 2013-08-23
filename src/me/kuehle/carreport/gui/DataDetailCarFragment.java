@@ -17,27 +17,30 @@
 package me.kuehle.carreport.gui;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.FuelType;
-import me.kuehle.carreport.util.gui.ColorPickerDialogFragment;
-import me.kuehle.carreport.util.gui.ColorPickerDialogFragment.ColorPickerDialogFragmentListener;
-import me.kuehle.carreport.util.gui.DatePickerDialogFragment;
-import me.kuehle.carreport.util.gui.DatePickerDialogFragment.DatePickerDialogFragmentListener;
-import me.kuehle.carreport.util.gui.InputFieldValidator;
-import me.kuehle.carreport.util.gui.InputFieldValidator.ValidationCallback;
-import me.kuehle.carreport.util.gui.SimpleAnimator;
+import me.kuehle.carreport.db.PossibleFuelTypeForFuelTank;
+import me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment.ColorPickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment.DatePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.InputDialogFragment;
+import me.kuehle.carreport.gui.dialog.InputDialogFragment.InputDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
+import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
+import me.kuehle.carreport.gui.util.FormValidator;
+import me.kuehle.carreport.gui.util.SimpleAnimator;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.text.format.DateFormat;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,7 +49,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -54,33 +56,42 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.Model;
+
 public class DataDetailCarFragment extends AbstractDataDetailFragment implements
-		ColorPickerDialogFragmentListener, ValidationCallback,
-		DatePickerDialogFragmentListener {
+		ColorPickerDialogFragmentListener, DatePickerDialogFragmentListener,
+		InputDialogFragmentListener {
 	private static final int PICK_COLOR_REQUEST_CODE = 1;
 	private static final int PICK_SUSPEND_DATE_REQUEST_CODE = 2;
+	private static final int ENTER_FUEL_TYPE_NAME = 3;
+	private static final int ENTER_FUEL_TANK_NAME = 4;
 
 	private EditText edtName;
 	private View colorIndicator;
 	private int color;
-	private ViewGroup fuelTypeGroup;
-	private ArrayList<FuelType> fuelTypeRemovals = new ArrayList<FuelType>();
-	private HashMap<View, FuelType> fuelTypeInputMappings = new HashMap<View, FuelType>();
-	private ArrayAdapter<String> fuelTypeNameAdapter;
-	private ArrayAdapter<String> fuelTypeTankAdapter;
+	private ViewGroup possibleFuelTypeGroup;
+	private ArrayAdapter<String> fuelTypeAdapter;
+	private SparseArray<Long> fuelTypePositionIDMap;
+	private ArrayAdapter<String> fuelTankAdapter;
+	private SparseArray<Long> fuelTankPositionIDMap;
+	private AdapterView<?> currentlyClickedFuelTankTypeSpinner;
 	private CheckBox chkSuspend;
 	private EditText edtSuspendDate;
 	private SimpleAnimator edtSuspendDateAnimator;
 
-	private OnItemSelectedListener tankSelectedListener = new OnItemSelectedListener() {
+	private OnItemSelectedListener fuelTypeSelectedListener = new OnItemSelectedListener() {
 		@Override
 		public void onItemSelected(AdapterView<?> parentView,
 				View selectedItemView, int position, long id) {
+			// Check if the last item (Add Type) has been selected.
 			int count = parentView.getCount();
 			if (position + 1 == count) {
-				int tank = count;
-				fuelTypeTankAdapter.insert(
-						getString(R.string.label_tank, tank), tank - 1);
+				currentlyClickedFuelTankTypeSpinner = parentView;
+				InputDialogFragment.newInstance(DataDetailCarFragment.this,
+						ENTER_FUEL_TYPE_NAME,
+						R.string.alert_add_fuel_type_title, null).show(
+						getFragmentManager(), null);
 			}
 		}
 
@@ -89,23 +100,37 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		}
 	};
 
-	private View.OnClickListener removeFuelTypeListener = new View.OnClickListener() {
+	private OnItemSelectedListener fuelTankSelectedListener = new OnItemSelectedListener() {
+		@Override
+		public void onItemSelected(AdapterView<?> parentView,
+				View selectedItemView, int position, long id) {
+			// Check if the last item (Add Tank) has been selected.
+			int count = parentView.getCount();
+			if (position + 1 == count) {
+				currentlyClickedFuelTankTypeSpinner = parentView;
+				InputDialogFragment.newInstance(DataDetailCarFragment.this,
+						ENTER_FUEL_TANK_NAME,
+						R.string.alert_add_fuel_tank_title, null).show(
+						getFragmentManager(), null);
+			}
+		}
+
+		@Override
+		public void onNothingSelected(AdapterView<?> parentView) {
+		}
+	};
+
+	private View.OnClickListener removePossibleFuelTypeListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			final View ftView = (View) v.getParent();
-
-			FuelType fuelType = fuelTypeInputMappings.get(ftView);
-			fuelTypeInputMappings.remove(ftView);
-			if (fuelType != null) {
-				fuelTypeRemovals.add(fuelType);
-			}
 
 			SimpleAnimator animator = new SimpleAnimator(getActivity(), ftView,
 					SimpleAnimator.Property.Height);
 			animator.hide(null, new Runnable() {
 				@Override
 				public void run() {
-					fuelTypeGroup.removeView(ftView);
+					possibleFuelTypeGroup.removeView(ftView);
 				}
 			});
 		}
@@ -141,72 +166,69 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 	}
 
 	@Override
-	public void validationSuccessfull() {
-		String name = edtName.getText().toString();
-		Date suspended = null;
-		if (chkSuspend.isChecked()) {
-			suspended = getSuspendDate();
-		}
-
-		Car car;
-		if (!isInEditMode()) {
-			car = Car.create(name, color, suspended);
-		} else {
-			car = (Car) editItem;
-			car.setName(name);
-			car.setColor(color);
-			car.setSuspended(suspended);
-			car.save();
-		}
-
-		Set<View> ftViews = fuelTypeInputMappings.keySet();
-		for (View ftView : ftViews) {
-			name = ((EditText) ftView.findViewById(R.id.edt_name)).getText()
-					.toString().trim();
-			int tank = ((Spinner) ftView.findViewById(R.id.spn_tank))
-					.getSelectedItemPosition() + 1;
-
-			FuelType fuelType = fuelTypeInputMappings.get(ftView);
-			if (fuelType == null && !name.isEmpty()) {
-				FuelType.create(car, name, tank);
-			} else if (fuelType != null && !name.isEmpty()) {
-				fuelType.setName(name);
-				fuelType.setTank(tank);
-				fuelType.save();
-			} else if (fuelType != null && name.isEmpty()) {
-				fuelType.delete();
+	public void onDialogPositiveClick(int requestCode, String input) {
+		input = input.trim();
+		if (requestCode == ENTER_FUEL_TYPE_NAME) {
+			if (!input.isEmpty()) {
+				if (fuelTypeAdapter.getPosition(input) != AdapterView.INVALID_POSITION) {
+					SupportMessageDialogFragment.newInstance(null, 0, null,
+							getString(R.string.alert_fuel_type_exists_message),
+							android.R.string.ok, null).show(
+							getFragmentManager(), null);
+				} else {
+					fuelTypeAdapter.insert(input,
+							fuelTypeAdapter.getCount() - 1);
+					currentlyClickedFuelTankTypeSpinner
+							.setSelection(fuelTypeAdapter.getCount() - 2);
+				}
+			}
+		} else if (requestCode == ENTER_FUEL_TANK_NAME) {
+			if (!input.isEmpty()) {
+				if (fuelTypeAdapter.getPosition(input) != AdapterView.INVALID_POSITION) {
+					SupportMessageDialogFragment.newInstance(null, 0, null,
+							getString(R.string.alert_fuel_tank_exists_message),
+							android.R.string.ok, null).show(
+							getFragmentManager(), null);
+				} else {
+					fuelTankAdapter.insert(input,
+							fuelTankAdapter.getCount() - 1);
+					currentlyClickedFuelTankTypeSpinner
+							.setSelection(fuelTankAdapter.getCount() - 2);
+				}
 			}
 		}
-
-		for (FuelType fuelType : fuelTypeRemovals) {
-			fuelType.delete();
-		}
-
-		saveSuccess();
 	}
 
-	private View addFuelTypeView(FuelType fuelType) {
+	private View addPossibleFuelTypeView(FuelType fuelType, FuelTank fuelTank) {
 		final View ftView = getActivity().getLayoutInflater().inflate(
-				R.layout.row_fueltype, null);
-		fuelTypeGroup.addView(ftView);
+				R.layout.row_possible_fuel_type, null);
+		possibleFuelTypeGroup.addView(ftView);
 
-		AutoCompleteTextView edtName = (AutoCompleteTextView) ftView
-				.findViewById(R.id.edt_name);
-		edtName.setAdapter(fuelTypeNameAdapter);
+		Spinner spnType = (Spinner) ftView.findViewById(R.id.spn_type);
+		spnType.setAdapter(fuelTypeAdapter);
+		spnType.setOnItemSelectedListener(fuelTypeSelectedListener);
 
 		Spinner spnTank = (Spinner) ftView.findViewById(R.id.spn_tank);
-		spnTank.setAdapter(fuelTypeTankAdapter);
-		spnTank.setOnItemSelectedListener(tankSelectedListener);
+		spnTank.setAdapter(fuelTankAdapter);
+		spnTank.setOnItemSelectedListener(fuelTankSelectedListener);
 
 		View btnRemove = ftView.findViewById(R.id.btn_remove);
-		btnRemove.setOnClickListener(removeFuelTypeListener);
-
-		if (fuelType != null) {
-			edtName.setText(fuelType.getName());
-			spnTank.setSelection(fuelType.getTank() - 1);
+		btnRemove.setOnClickListener(removePossibleFuelTypeListener);
+		if (possibleFuelTypeGroup.getChildCount() == 1) {
+			btnRemove.setVisibility(View.INVISIBLE);
 		}
 
-		// The view has wrap_context as height and setting it to 48dp in
+		if (fuelType != null) {
+			int index = fuelTypePositionIDMap.indexOfValue(fuelType.getId());
+			spnType.setSelection(fuelTypePositionIDMap.keyAt(index));
+		}
+
+		if (fuelTank != null) {
+			int index = fuelTankPositionIDMap.indexOfValue(fuelTank.getId());
+			spnTank.setSelection(fuelTankPositionIDMap.keyAt(index));
+		}
+
+		// The view has wrap_content as height and setting it to 48dp in
 		// the layouts file doesn't change this, so we change it here.
 		ftView.getLayoutParams().height = (int) TypedValue.applyDimension(
 				TypedValue.COMPLEX_UNIT_DIP, 48, getResources()
@@ -217,7 +239,6 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		ftView.getLayoutParams().height = 0;
 		animator.show();
 
-		fuelTypeInputMappings.put(ftView, fuelType);
 		return ftView;
 	}
 
@@ -236,39 +257,31 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		if (isInEditMode()) {
 			Car car = (Car) editItem;
 
-			edtName.setText(car.getName());
-			color = car.getColor();
+			edtName.setText(car.name);
+			color = car.color;
 
-			FuelType[] fuelTypes = FuelType.getAllForCar(car);
-			ArrayList<String> fuelTypeNames = new ArrayList<String>();
-			int maxTank = 0;
-			for (FuelType fuelType : fuelTypes) {
-				if (!fuelTypeNames.contains(fuelType.getName())) {
-					fuelTypeNames.add(fuelType.getName());
+			List<FuelTank> fuelTanks = car.fuelTanks();
+			for (FuelTank fuelTank : fuelTanks) {
+				fuelTankAdapter.insert(fuelTank.name,
+						fuelTankAdapter.getCount() - 1);
+				fuelTankPositionIDMap.append(fuelTankAdapter.getCount() - 2,
+						fuelTank.getId());
+
+				List<FuelType> fuelTypes = fuelTank.fuelTypes();
+				for (FuelType fuelType : fuelTypes) {
+					addPossibleFuelTypeView(fuelType, fuelTank);
 				}
-				maxTank = Math.max(maxTank, fuelType.getTank());
-			}
-			Collections.sort(fuelTypeNames);
-
-			for (String name : fuelTypeNames) {
-				fuelTypeNameAdapter.add(name);
-			}
-			for (int tank = 1; tank <= maxTank; tank++) {
-				fuelTypeTankAdapter.insert(
-						getString(R.string.label_tank, tank), tank - 1);
-			}
-
-			for (FuelType fuelType : fuelTypes) {
-				addFuelTypeView(fuelType);
 			}
 
 			chkSuspend.setChecked(car.isSuspended());
 			if (car.isSuspended()) {
-				suspendDate = car.getSuspended();
+				suspendDate = car.suspendedSince;
 			}
 		} else {
 			color = Color.BLUE;
-			addFuelTypeView(null);
+
+			fuelTankAdapter.insert("Fuel", fuelTankAdapter.getCount() - 1);
+			addPossibleFuelTypeView(null, null);
 		}
 
 		((GradientDrawable) colorIndicator.getBackground()).setColorFilter(
@@ -287,8 +300,8 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 	}
 
 	@Override
-	protected AbstractItem getEditObject(int id) {
-		return new Car(id);
+	protected Model getEditItem(long id) {
+		return Car.load(Car.class, id);
 	}
 
 	@Override
@@ -320,11 +333,14 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 	protected void initFields(View v) {
 		edtName = (EditText) v.findViewById(R.id.edt_name);
 		colorIndicator = v.findViewById(R.id.btn_color);
-		fuelTypeGroup = (ViewGroup) v.findViewById(R.id.layout_fueltypes);
-		fuelTypeNameAdapter = new ArrayAdapter<String>(getActivity(),
+		possibleFuelTypeGroup = (ViewGroup) v
+				.findViewById(R.id.layout_fueltypes);
+		fuelTypeAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item);
-		fuelTypeTankAdapter = new ArrayAdapter<String>(getActivity(),
+		fuelTypePositionIDMap = new SparseArray<Long>();
+		fuelTankAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item);
+		fuelTankPositionIDMap = new SparseArray<Long>();
 		chkSuspend = (CheckBox) v.findViewById(R.id.chk_suspend);
 		edtSuspendDate = (EditText) v.findViewById(R.id.edt_suspend_date);
 		edtSuspendDateAnimator = new SimpleAnimator(getActivity(),
@@ -341,13 +357,25 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 			}
 		});
 
-		fuelTypeTankAdapter.add(getString(R.string.label_add_tank));
+		List<FuelType> fuelTypes = FuelType.getAll();
+		if (fuelTypes.size() > 0) {
+			for (FuelType fuelType : fuelTypes) {
+				fuelTypeAdapter.add(fuelType.name);
+				fuelTypePositionIDMap.append(fuelTypeAdapter.getCount() - 1,
+						fuelType.getId());
+			}
+		} else {
+			fuelTypeAdapter.add("Super");
+		}
+		fuelTypeAdapter.add(getString(R.string.label_add_fuel_type));
+
+		fuelTankAdapter.add(getString(R.string.label_add_fuel_tank));
 
 		Button btnAddFuelType = (Button) v.findViewById(R.id.btn_add_fueltype);
 		btnAddFuelType.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				addFuelTypeView(null);
+				addPossibleFuelTypeView(null, null);
 			}
 		});
 
@@ -375,11 +403,77 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 	}
 
 	@Override
+	protected boolean validate() {
+		FormValidator validator = new FormValidator();
+		validator.add(new FormFieldNotEmptyValidator(edtName));
+		return validator.validate();
+	}
+
+	@Override
 	protected void save() {
-		InputFieldValidator validator = new InputFieldValidator(getActivity(),
-				getFragmentManager(), this);
-		validator.add(edtName, InputFieldValidator.ValidationType.NotEmpty,
-				R.string.hint_name);
-		validator.validate();
+		String name = edtName.getText().toString();
+		Date suspended = chkSuspend.isChecked() ? getSuspendDate() : null;
+
+		ActiveAndroid.beginTransaction();
+		try {
+			Car car;
+			if (!isInEditMode()) {
+				car = new Car(name, color, suspended);
+			} else {
+				car = (Car) editItem;
+				car.name = name;
+				car.color = color;
+				car.suspendedSince = suspended;
+			}
+			car.save();
+
+			// Delete old fuel tank <> fuel type associations.
+			PossibleFuelTypeForFuelTank.deleteAll(car);
+
+			// Create new fuel tanks, types and associations.
+			HashSet<String> addedPossibleTypes = new HashSet<String>();
+			for (int i = 0; i < possibleFuelTypeGroup.getChildCount(); i++) {
+				View ftView = possibleFuelTypeGroup.getChildAt(i);
+
+				int typePos = ((Spinner) ftView.findViewById(R.id.spn_type))
+						.getSelectedItemPosition();
+				int tankPos = ((Spinner) ftView.findViewById(R.id.spn_tank))
+						.getSelectedItemPosition();
+
+				FuelType type;
+				Long typeId = fuelTypePositionIDMap.get(typePos);
+				if (typeId == null) {
+					type = new FuelType(fuelTypeAdapter.getItem(typePos));
+					type.save();
+					fuelTypePositionIDMap.put(typePos, type.getId());
+				} else {
+					type = FuelType.load(FuelType.class, typeId);
+				}
+
+				FuelTank tank;
+				Long tankId = fuelTankPositionIDMap.get(tankPos);
+				if (tankId == null) {
+					tank = new FuelTank(car, fuelTankAdapter.getItem(tankPos));
+					tank.save();
+					fuelTankPositionIDMap.put(tankPos, tank.getId());
+				} else {
+					tank = FuelTank.load(FuelTank.class, tankId);
+				}
+
+				// Only create an association, when the same has not been
+				// created before.
+				if (addedPossibleTypes.add(type.getId() + "<>" + tank.getId())) {
+					new PossibleFuelTypeForFuelTank(type, tank).save();
+				}
+			}
+
+			// Clean up fuel types and tanks.
+			FuelType.cleanUp();
+			FuelTank.cleanUp();
+
+			ActiveAndroid.setTransactionSuccessful();
+		} finally {
+			ActiveAndroid.endTransaction();
+		}
 	}
 }

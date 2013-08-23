@@ -31,10 +31,10 @@
     <string name="label_partial">Teilfüllung</string>
     <string name="label_overwrite">Bereits vorhandene Dateien überschreiben</string>
     <string name="label_color">Farbe</string>
-    <string name="label_add_fueltype">Hinzufügen</string>
+    <string name="label_add_fuel_type">Hinzufügen</string>
     <string name="label_suspend">Stilllegen</string>
     <string name="label_tank">Tank %d</string>
-    <string name="label_add_tank">Hinzufügen</string>
+    <string name="label_add_fuel_tank">Hinzufügen</string>
     <string name="suspended">Stillgelegt</string>
     <string name="suspended_since">Stillgelegt seit %s</string>
     <string name="menu_synchronize">Synchronisieren</string>
@@ -116,7 +116,7 @@
     <string name="report_graph_month_history">Monat Historie</string>
     <string name="report_graph_year_history">Jahr Historie</string>
     <string name="report_graph_accumulated">Kumuliert</string>
-    <string name="report_graph_normal">Normal</string>
+    <string name="report_graph_per_refueling">Pro Tankfüllung</string>
     <string name="report_not_enough_data">Zu wenige Daten</string>
     <string name="report_no_fueltype">Keine Kraftstoffart</string>
     <string name="report_since">&#931; seit %s</string>

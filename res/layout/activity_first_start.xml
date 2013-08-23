@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="?attr/detailsElementLayoutWidth"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:background="?attr/detailsElementBackground"
+    android:orientation="vertical" >
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        android:layout_weight="1" >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".gui.DataDetailActivity" >
+            <TextView
+                android:id="@+id/txt_hi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:text="@string/first_start_hi"
+                android:textSize="30sp" />
+            <TextView
+                android:id="@+id/txt_intro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_hi"
+                android:layout_marginTop="24dp"
+                android:text="@string/first_start_intro"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <ImageView
+                android:id="@+id/img_step1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_intro"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/first_start_step1_img_desc"
+                android:src="@drawable/ic_first_start_step1" />
+            <TextView
+                android:id="@+id/txt_step1_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/img_step1"
+                android:layout_marginTop="8dp"
+                android:layout_toRightOf="@+id/img_step1"
+                android:text="@string/first_start_step1_text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <ImageView
+                android:id="@+id/img_step2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_step1_text"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/first_start_step2_img_desc"
+                android:src="@drawable/ic_first_start_step2" />
+            <TextView
+                android:id="@+id/txt_step2_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/img_step2"
+                android:layout_marginTop="8dp"
+                android:layout_toRightOf="@+id/img_step2"
+                android:text="@string/first_start_step2_text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <ImageView
+                android:id="@+id/img_step3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_step2_text"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/first_start_step3_img_desc"
+                android:src="@drawable/ic_first_start_step3" />
+            <TextView
+                android:id="@+id/txt_step3_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/img_step3"
+                android:layout_marginTop="8dp"
+                android:layout_toRightOf="@+id/img_step3"
+                android:text="@string/first_start_step3_text"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </RelativeLayout>
+    </ScrollView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="startByCreatingCar"
+            android:text="@string/first_start_create_car" />
+    </LinearLayout>
+</LinearLayout>

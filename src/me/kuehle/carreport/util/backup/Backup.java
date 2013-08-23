@@ -21,8 +21,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 
-import me.kuehle.carreport.db.Helper;
+import me.kuehle.carreport.Application;
+
 import android.os.Environment;
+
+import com.activeandroid.Cache;
 
 public class Backup {
 	public static final String FILE_NAME = "carreport.backup";
@@ -33,14 +36,12 @@ public class Backup {
 
 	public Backup() {
 		dir = Environment.getExternalStorageDirectory();
-		dbFile = new File(Helper.getInstance().getReadableDatabase().getPath());
+		dbFile = new File(Cache.openDatabase().getPath());
 		backupFile = new File(dir, FILE_NAME);
 	}
 
 	public boolean backup() {
-		synchronized (Helper.dbLock) {
-			return copyFile(dbFile, backupFile);
-		}
+		return copyFile(dbFile, backupFile);
 	}
 
 	public boolean backupFileExists() {
@@ -56,13 +57,11 @@ public class Backup {
 	}
 
 	public boolean restore() {
-		synchronized (Helper.dbLock) {
-			boolean result = copyFile(backupFile, dbFile);
-			if (result) {
-				Helper.getInstance().reinitialize();
-			}
-			return result;
+		boolean result = copyFile(backupFile, dbFile);
+		if (result) {
+			Application.reinitializeDatabase();
 		}
+		return result;
 	}
 
 	private boolean copyFile(File from, File to) {

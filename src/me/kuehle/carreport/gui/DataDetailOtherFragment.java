@@ -18,19 +18,20 @@ package me.kuehle.carreport.gui;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.AbstractItem;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
+import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment.DatePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.TimePickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.TimePickerDialogFragment.TimePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
+import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.util.Recurrence;
 import me.kuehle.carreport.util.RecurrenceInterval;
-import me.kuehle.carreport.util.gui.DatePickerDialogFragment;
-import me.kuehle.carreport.util.gui.DatePickerDialogFragment.DatePickerDialogFragmentListener;
-import me.kuehle.carreport.util.gui.InputFieldValidator;
-import me.kuehle.carreport.util.gui.TimePickerDialogFragment;
-import me.kuehle.carreport.util.gui.TimePickerDialogFragment.TimePickerDialogFragmentListener;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -40,17 +41,19 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.activeandroid.Model;
+
 public class DataDetailOtherFragment extends AbstractDataDetailFragment
-		implements InputFieldValidator.ValidationCallback,
-		DatePickerDialogFragmentListener, TimePickerDialogFragmentListener {
+		implements DatePickerDialogFragmentListener,
+		TimePickerDialogFragmentListener {
 	private static final int PICK_DATE_REQUEST_CODE = 0;
 	private static final int PICK_TIME_REQUEST_CODE = 1;
 
-	public static DataDetailOtherFragment newInstance(int id) {
+	public static DataDetailOtherFragment newInstance(long id) {
 		DataDetailOtherFragment f = new DataDetailOtherFragment();
 
 		Bundle args = new Bundle();
-		args.putInt(AbstractDataDetailFragment.EXTRA_ID, id);
+		args.putLong(AbstractDataDetailFragment.EXTRA_ID, id);
 		f.setArguments(args);
 
 		return f;
@@ -65,7 +68,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 	private EditText edtNote;
 	private Spinner spnCar;
 
-	private Car[] cars;
+	private List<Car> cars;
 
 	@Override
 	public void onDialogPositiveClick(int requestCode, Date date) {
@@ -76,36 +79,6 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			edtTime.setText(DateFormat.getTimeFormat(getActivity())
 					.format(date));
 		}
-	}
-
-	@Override
-	public void validationSuccessfull() {
-		String title = edtTitle.getText().toString().trim();
-		Date date = getDateTime(getDate(), getTime());
-		int mileage = getIntegerFromEditText(edtMileage, -1);
-		float price = (float) getDoubleFromEditText(edtPrice, 0);
-		RecurrenceInterval repInterval = RecurrenceInterval
-				.getByValue(spnRepeat.getSelectedItemPosition());
-		Recurrence recurrence = new Recurrence(repInterval);
-		String note = edtNote.getText().toString().trim();
-		Car car = cars[spnCar.getSelectedItemPosition()];
-
-		if (!isInEditMode()) {
-			OtherCost
-					.create(title, date, mileage, price, recurrence, note, car);
-		} else {
-			OtherCost other = (OtherCost) editItem;
-			other.setTitle(title);
-			other.setDate(date);
-			other.setMileage(mileage);
-			other.setPrice(price);
-			other.setRecurrence(recurrence);
-			other.setNote(note);
-			other.setCar(car);
-			other.save();
-		}
-
-		saveSuccess();
 	}
 
 	private Date getDate() {
@@ -136,12 +109,13 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			edtTime.setText(DateFormat.getTimeFormat(getActivity()).format(
 					new Date()));
 
-			int selectCar = getArguments().getInt(EXTRA_CAR_ID);
+			long selectCar = getArguments().getLong(EXTRA_CAR_ID);
 			if (selectCar == 0) {
 				selectCar = prefs.getDefaultCar();
 			}
-			for (int pos = 0; pos < cars.length; pos++) {
-				if (cars[pos].getId() == selectCar) {
+
+			for (int pos = 0; pos < cars.size(); pos++) {
+				if (cars.get(pos).getId() == selectCar) {
 					spnCar.setSelection(pos);
 				}
 			}
@@ -149,20 +123,19 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			OtherCost other = (OtherCost) editItem;
 
 			edtDate.setText(DateFormat.getDateFormat(getActivity()).format(
-					other.getDate()));
+					other.date));
 			edtTime.setText(DateFormat.getTimeFormat(getActivity()).format(
-					other.getDate()));
-			edtTitle.setText(String.valueOf(other.getTitle()));
-			if (other.getMileage() > -1) {
-				edtMileage.setText(String.valueOf(other.getMileage()));
+					other.date));
+			edtTitle.setText(String.valueOf(other.title));
+			if (other.mileage > -1) {
+				edtMileage.setText(String.valueOf(other.mileage));
 			}
-			edtPrice.setText(String.valueOf(other.getPrice()));
-			spnRepeat.setSelection(other.getRecurrence().getInterval()
-					.getValue());
-			edtNote.setText(other.getNote());
+			edtPrice.setText(String.valueOf(other.price));
+			spnRepeat.setSelection(other.recurrence.getInterval().getValue());
+			edtNote.setText(other.note);
 
-			for (int pos = 0; pos < cars.length; pos++) {
-				if (cars[pos].getId() == other.getCar().getId()) {
+			for (int pos = 0; pos < cars.size(); pos++) {
+				if (cars.get(pos).getId() == other.car.getId()) {
 					spnCar.setSelection(pos);
 				}
 			}
@@ -175,8 +148,8 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 	}
 
 	@Override
-	protected AbstractItem getEditObject(int id) {
-		return new OtherCost(id);
+	protected Model getEditItem(long id) {
+		return OtherCost.load(OtherCost.class, id);
 	}
 
 	@Override
@@ -249,19 +222,43 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 				getActivity(), android.R.layout.simple_spinner_dropdown_item);
 		cars = Car.getAll();
 		for (Car car : cars) {
-			carAdapter.add(car.getName());
+			carAdapter.add(car.name);
 		}
 		spnCar.setAdapter(carAdapter);
 	}
 
 	@Override
+	protected boolean validate() {
+		FormValidator validator = new FormValidator();
+		validator.add(new FormFieldGreaterZeroValidator(edtPrice));
+		return validator.validate();
+	}
+
+	@Override
 	protected void save() {
-		InputFieldValidator validator = new InputFieldValidator(getActivity(),
-				getFragmentManager(), this);
+		String title = edtTitle.getText().toString().trim();
+		Date date = getDateTime(getDate(), getTime());
+		int mileage = getIntegerFromEditText(edtMileage, -1);
+		float price = (float) getDoubleFromEditText(edtPrice, 0);
+		RecurrenceInterval repInterval = RecurrenceInterval
+				.getByValue(spnRepeat.getSelectedItemPosition());
+		Recurrence recurrence = new Recurrence(repInterval);
+		String note = edtNote.getText().toString().trim();
+		Car car = cars.get(spnCar.getSelectedItemPosition());
 
-		validator.add(edtPrice, InputFieldValidator.ValidationType.GreaterZero,
-				R.string.hint_price);
-
-		validator.validate();
+		if (!isInEditMode()) {
+			new OtherCost(title, date, mileage, price, recurrence, note, car)
+					.save();
+		} else {
+			OtherCost other = (OtherCost) editItem;
+			other.title = title;
+			other.date = date;
+			other.mileage = mileage;
+			other.price = price;
+			other.recurrence = recurrence;
+			other.note = note;
+			other.car = car;
+			other.save();
+		}
 	}
 }

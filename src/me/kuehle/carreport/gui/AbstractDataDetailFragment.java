@@ -19,14 +19,14 @@ package me.kuehle.carreport.gui;
 import java.util.Calendar;
 import java.util.Date;
 
+import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.AbstractItem;
-import me.kuehle.carreport.util.gui.MessageDialogFragment;
-import me.kuehle.carreport.util.gui.MessageDialogFragment.MessageDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.MessageDialogFragmentListener;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,6 +35,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.activeandroid.Model;
 
 public abstract class AbstractDataDetailFragment extends Fragment implements
 		MessageDialogFragmentListener {
@@ -47,16 +49,19 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	}
 
 	public static final String EXTRA_ID = "id";
-	public static final int EXTRA_ID_DEFAULT = -1;
+	public static final long EXTRA_ID_DEFAULT = -1;
 	public static final String EXTRA_CAR_ID = "car_id";
+	public static final String EXTRA_ALLOW_CANCEL = "allow_cancel";
+	public static final boolean EXTRA_ALLOW_CANCEL_DEFAULT = true;
 
 	protected OnItemActionListener onItemActionListener;
-	protected AbstractItem editItem = null;
+	protected Model editItem = null;
 
 	private static final int DELETE_REQUEST_CODE = 0;
 
 	private CharSequence savedABTitle;
 	private int savedABNavMode;
+	private boolean allowCancel;
 
 	protected abstract void fillFields(View v);
 
@@ -86,7 +91,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 		}
 	}
 
-	protected abstract AbstractItem getEditObject(int id);
+	protected abstract Model getEditItem(long id);
 
 	protected int getIntegerFromEditText(EditText editText, int defaultValue) {
 		String strInt = editText.getText().toString();
@@ -117,7 +122,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayHomeAsUpEnabled(allowCancel);
 
 		savedABTitle = actionBar.getTitle();
 		savedABNavMode = actionBar.getNavigationMode();
@@ -127,6 +132,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 		} else {
 			actionBar.setTitle(getTitleForNew());
 		}
+
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 	}
 
@@ -144,10 +150,14 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		int id = getArguments().getInt(EXTRA_ID, EXTRA_ID_DEFAULT);
+		long id = getArguments().getLong(EXTRA_ID, EXTRA_ID_DEFAULT);
 		if (id != EXTRA_ID_DEFAULT) {
-			editItem = getEditObject(id);
+			editItem = getEditItem(id);
 		}
+
+		allowCancel = getArguments().getBoolean(EXTRA_ALLOW_CANCEL,
+				EXTRA_ALLOW_CANCEL_DEFAULT);
+
 		setHasOptionsMenu(true);
 	}
 
@@ -155,8 +165,13 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
 		inflater.inflate(R.menu.edit, menu);
+
 		if (!isInEditMode()) {
 			menu.removeItem(R.id.menu_delete);
+		}
+
+		if (!allowCancel) {
+			menu.removeItem(R.id.menu_cancel);
 		}
 	}
 
@@ -181,13 +196,21 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_save:
-			save();
+			if (validate()) {
+				save();
+
+				Toast.makeText(getActivity(), getToastSavedMessage(),
+						Toast.LENGTH_SHORT).show();
+				onItemActionListener.itemSaved();
+
+				Application.dataChanged();
+			}
 			return true;
 		case R.id.menu_cancel:
 			onItemActionListener.itemCanceled();
 			return true;
 		case R.id.menu_delete:
-			MessageDialogFragment.newInstance(this, DELETE_REQUEST_CODE,
+			SupportMessageDialogFragment.newInstance(this, DELETE_REQUEST_CODE,
 					R.string.alert_delete_title,
 					getString(getAlertDeleteMessage()), android.R.string.yes,
 					android.R.string.no).show(getFragmentManager(), null);
@@ -208,17 +231,14 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	public void onDialogPositiveClick(int requestCode) {
 		if (requestCode == DELETE_REQUEST_CODE) {
 			editItem.delete();
+
 			Toast.makeText(getActivity(), getToastDeletedMessage(),
 					Toast.LENGTH_SHORT).show();
 			onItemActionListener.itemDeleted();
 		}
 	}
 
-	protected abstract void save();
+	protected abstract boolean validate();
 
-	protected void saveSuccess() {
-		Toast.makeText(getActivity(), getToastSavedMessage(),
-				Toast.LENGTH_SHORT).show();
-		onItemActionListener.itemSaved();
-	}
+	protected abstract void save();
 }

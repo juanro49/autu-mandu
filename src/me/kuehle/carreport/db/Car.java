@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Jan Kühle
+ * Copyright 2013 Jan Kühle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,172 +16,74 @@
 
 package me.kuehle.carreport.db;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import android.content.ContentValues;
+import me.kuehle.carreport.db.query.SafeSelect;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.provider.BaseColumns;
 
-public class Car extends AbstractItem {
-	private String name;
-	private int color;
-	private Date suspended;
+import com.activeandroid.Cache;
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
-	public Car(int id) {
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS,
-					BaseColumns._ID + "=?",
-					new String[] { String.valueOf(id) }, null, null, null);
-			if (cursor.getCount() != 1) {
-				cursor.close();
-				throw new IllegalArgumentException(
-						"A car with this ID does not exist!");
-			} else {
-				cursor.moveToFirst();
-				this.id = id;
-				this.name = cursor.getString(1);
-				this.color = cursor.getInt(2);
-				if (cursor.isNull(3)) {
-					this.suspended = null;
-				} else {
-					this.suspended = new Date(cursor.getLong(3));
-				}
-				cursor.close();
-			}
-		}
+@Table(name = "cars")
+public class Car extends Model {
+	@Column(name = "name", notNull = true)
+	public String name;
+
+	@Column(name = "color", notNull = true)
+	public int color;
+
+	@Column(name = "suspended_since")
+	public Date suspendedSince;
+
+	public Car() {
+		super();
 	}
 
-	private Car(int id, String name, int color, Date suspended) {
-		this.id = id;
+	public Car(String name, int color, Date suspendedSince) {
+		super();
 		this.name = name;
 		this.color = color;
-		this.suspended = suspended;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public int getColor() {
-		return color;
-	}
-
-	public void setColor(int color) {
-		this.color = color;
-	}
-
-	public Date getSuspended() {
-		return this.suspended;
+		this.suspendedSince = suspendedSince;
 	}
 
 	public boolean isSuspended() {
-		return this.suspended != null;
+		return suspendedSince != null;
 	}
 
-	public void setSuspended(Date suspended) {
-		this.suspended = suspended;
+	public List<Refueling> refuelings() {
+		return SafeSelect.from(Refueling.class).join(FuelTank.class)
+				.on("refuelings.fuel_tank = fuel_tanks.Id")
+				.where("fuel_tanks.car = ?", getId())
+				.orderBy("refuelings.date ASC").execute();
 	}
 
-	public void delete() {
-		if (getCount() == 1) {
-			throw new RuntimeException("The last car cannot be deleted!");
-		} else if (!isDeleted()) {
-			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
-				db.delete(CarTable.NAME, BaseColumns._ID + "=?",
-						new String[] { String.valueOf(id) });
-			}
-			Helper.getInstance().dataChanged();
-			deleted = true;
-		}
+	public List<OtherCost> otherCosts() {
+		return new Select().from(OtherCost.class).where("car = ?", getId())
+				.orderBy("date ASC").execute();
 	}
 
-	public void save() {
-		if (!isDeleted()) {
-			ContentValues values = new ContentValues();
-			values.put(CarTable.COL_NAME, name);
-			values.put(CarTable.COL_COLOR, color);
-			values.put(CarTable.COL_SUSPENDED, suspended == null ? null
-					: suspended.getTime());
-
-			synchronized (Helper.dbLock) {
-				SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
-				db.update(CarTable.NAME, values, BaseColumns._ID + "=?",
-						new String[] { String.valueOf(id) });
-			}
-			Helper.getInstance().dataChanged();
-		}
+	public List<FuelTank> fuelTanks() {
+		return getMany(FuelTank.class, "car");
 	}
 
-	public static Car create(String name, int color, Date suspended) {
-		return create(-1, name, color, suspended);
-	}
-
-	public static Car create(int id, String name, int color, Date suspended) {
-		ContentValues values = new ContentValues();
-		if (id != -1) {
-			values.put(BaseColumns._ID, id);
-		}
-		values.put(CarTable.COL_NAME, name);
-		values.put(CarTable.COL_COLOR, color);
-		values.put(CarTable.COL_SUSPENDED,
-				suspended == null ? null : suspended.getTime());
-
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getWritableDatabase();
-			id = (int) db.insert(CarTable.NAME, null, values);
-		}
-
-		if (id == -1) {
-			throw new IllegalArgumentException(
-					"A car with this ID does already exist!");
-		}
-
-		Helper.getInstance().dataChanged();
-		return new Car(id, name, color, suspended);
-	}
-
-	public static Car[] getAll() {
-		ArrayList<Car> cars = new ArrayList<Car>();
-
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db.query(CarTable.NAME, CarTable.ALL_COLUMNS, null,
-					null, null, null, CarTable.COL_SUSPENDED + " ASC");
-
-			cursor.moveToFirst();
-			while (!cursor.isAfterLast()) {
-				Date suspended = null;
-				if (!cursor.isNull(3)) {
-					suspended = new Date(cursor.getLong(3));
-				}
-				cars.add(new Car(cursor.getInt(0), cursor.getString(1), cursor
-						.getInt(2), suspended));
-				cursor.moveToNext();
-			}
-			cursor.close();
-		}
-
-		return cars.toArray(new Car[cars.size()]);
+	public static List<Car> getAll() {
+		return new Select().from(Car.class).orderBy("name ASC").execute();
 	}
 
 	public static int getCount() {
-		int count;
-		synchronized (Helper.dbLock) {
-			SQLiteDatabase db = Helper.getInstance().getReadableDatabase();
-			Cursor cursor = db.rawQuery(
-					"SELECT count(*) FROM " + CarTable.NAME, null);
-			cursor.moveToFirst();
+		String sql = new Select("COUNT(*)").from(Car.class).toSql();
+		Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
+
+		int count = 0;
+		if (cursor.moveToFirst() && cursor.getColumnCount() == 1) {
 			count = cursor.getInt(0);
-			cursor.close();
 		}
+
+		cursor.close();
 		return count;
 	}
 }

@@ -18,17 +18,19 @@ package me.kuehle.carreport.reports;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Item;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Calculator;
 import me.kuehle.carreport.util.Strings;
-import me.kuehle.carreport.util.gui.SectionListAdapter.Item;
-import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
@@ -38,7 +40,6 @@ import me.kuehle.chartlib.renderer.OnClickListener;
 import me.kuehle.chartlib.renderer.RendererList;
 import android.content.Context;
 import android.text.format.DateFormat;
-import android.util.SparseArray;
 import android.widget.Toast;
 
 public class FuelConsumptionReport extends AbstractReport {
@@ -72,24 +73,25 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	private class ReportGraphData extends AbstractReportGraphData {
-		public ReportGraphData(Context context, Car car, FuelType[] fuelTypes) {
-			super(context, String.format("%s (%s)", car.getName(),
-					getCommaSeparatedFuelTypeNames(fuelTypes)), car.getColor());
+		public ReportGraphData(Context context, FuelTank fuelTank) {
+			super(context, String.format("%s (%s)", fuelTank.car.name,
+					getCommaSeparatedFuelTypeNames(fuelTank.fuelTypes())),
+					fuelTank.car.color);
 
-			Refueling[] refuelings = Refueling.getAllForCar(car, fuelTypes,
-					true);
+			List<Refueling> refuelings = fuelTank.refuelings();
 			int lastTacho = -1;
 			float volume = 0;
 			for (Refueling refueling : refuelings) {
-				volume += refueling.getVolume();
-				if (!refueling.isPartial()) {
-					if (lastTacho > -1 && lastTacho < refueling.getMileage()) {
+				volume += refueling.volume;
+				if (!refueling.partial) {
+					if (lastTacho > -1 && lastTacho < refueling.mileage) {
 						double consumption = volume
-								/ (refueling.getMileage() - lastTacho) * 100;
-						xValues.add(refueling.getDate().getTime());
+								/ (refueling.mileage - lastTacho) * 100;
+						xValues.add(refueling.date.getTime());
 						yValues.add(consumption);
 					}
-					lastTacho = refueling.getMileage();
+
+					lastTacho = refueling.mileage;
 					volume = 0;
 				}
 			}
@@ -114,32 +116,19 @@ public class FuelConsumptionReport extends AbstractReport {
 
 		// Collect report data and add info data which will be displayed
 		// next to the graph.
-		Car[] cars = Car.getAll();
+		List<Car> cars = Car.getAll();
 		for (Car car : cars) {
 			boolean sectionAdded = false;
 
-			FuelType[] fuelTypes = FuelType.getAllForCar(car);
-			SparseArray<ArrayList<FuelType>> tanks = new SparseArray<ArrayList<FuelType>>();
-			tanks.put(0, null);
-			for (FuelType fuelType : fuelTypes) {
-				if (tanks.get(fuelType.getTank()) == null) {
-					tanks.put(fuelType.getTank(), new ArrayList<FuelType>());
-				}
-
-				tanks.get(fuelType.getTank()).add(fuelType);
-			}
-
-			for (int i = 0; i < tanks.size(); i++) {
-				FuelType[] tankFuelTypes = tanks.valueAt(i) == null ? null
-						: tanks.valueAt(i).toArray(new FuelType[0]);
-				ReportGraphData carData = new ReportGraphData(context, car,
-						tankFuelTypes);
+			List<FuelTank> fuelTanks = car.fuelTanks();
+			for (FuelTank fuelTank : fuelTanks) {
+				ReportGraphData carData = new ReportGraphData(context, fuelTank);
 				if (carData.isEmpty()) {
 					continue;
 				}
 
 				reportData.add(carData);
-				Section section = addDataSection(car, tankFuelTypes, true);
+				Section section = addDataSection(fuelTank);
 				addConsumptionData(section, carData.yValues);
 				sectionAdded = true;
 
@@ -149,7 +138,7 @@ public class FuelConsumptionReport extends AbstractReport {
 			}
 
 			if (!sectionAdded) {
-				Section section = addDataSection(car, null, false);
+				Section section = addDataSection(car);
 				section.addItem(new Item(context
 						.getString(R.string.report_not_enough_data), ""));
 			}
@@ -169,36 +158,41 @@ public class FuelConsumptionReport extends AbstractReport {
 				.getString(R.string.report_average), Calculator.avg(numbers)));
 	}
 
-	private Section addDataSection(Car car, FuelType[] fuelTypes,
-			boolean displayFuelType) {
-		String name;
-		if (displayFuelType) {
-			String fuelTypeName = getCommaSeparatedFuelTypeNames(fuelTypes);
-			name = String.format("%s (%s)", car.getName(), fuelTypeName);
-		} else {
-			name = car.getName();
-		}
+	private Section addDataSection(Car car) {
+		String name = car.name;
 
 		if (car.isSuspended()) {
 			return addDataSection(
 					String.format("%s [%s]", name,
-							context.getString(R.string.suspended)),
-					car.getColor(), Section.STICK_BOTTOM);
+							context.getString(R.string.suspended)), car.color,
+					Section.STICK_BOTTOM);
 		} else {
-			return addDataSection(name, car.getColor());
+			return addDataSection(name, car.color);
 		}
 	}
 
-	private String getCommaSeparatedFuelTypeNames(FuelType[] fuelTypes) {
-		if (fuelTypes == null) {
-			return context.getString(R.string.report_no_fueltype);
+	private Section addDataSection(FuelTank fuelTank) {
+		String fuelTypeName = getCommaSeparatedFuelTypeNames(fuelTank
+				.fuelTypes());
+		String name = String.format("%s (%s)", fuelTank.car.name, fuelTypeName);
+
+		if (fuelTank.car.isSuspended()) {
+			return addDataSection(
+					String.format("%s [%s]", name,
+							context.getString(R.string.suspended)),
+					fuelTank.car.color, Section.STICK_BOTTOM);
 		} else {
-			ArrayList<String> names = new ArrayList<String>();
-			for (FuelType fuelType : fuelTypes) {
-				names.add(fuelType.getName());
-			}
-			return Strings.join(", ", names);
+			return addDataSection(name, fuelTank.car.color);
 		}
+	}
+
+	private String getCommaSeparatedFuelTypeNames(List<FuelType> fuelTypes) {
+		ArrayList<String> names = new ArrayList<String>();
+		for (FuelType fuelType : fuelTypes) {
+			names.add(fuelType.name);
+		}
+
+		return Strings.join(", ", names);
 	}
 
 	@Override

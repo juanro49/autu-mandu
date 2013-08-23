@@ -19,12 +19,13 @@ package me.kuehle.carreport.gui;
 import me.kuehle.carreport.R;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentManager.OnBackStackChangedListener;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,7 +33,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class DataListActivity extends Activity implements
+public class DataListActivity extends FragmentActivity implements
 		AbstractDataDetailFragment.OnItemActionListener,
 		DataListFragment.Callback {
 	private DataListFragment mList;
@@ -43,7 +44,7 @@ public class DataListActivity extends Activity implements
 
 		@Override
 		public void onBackStackChanged() {
-			FragmentManager fm = getFragmentManager();
+			FragmentManager fm = getSupportFragmentManager();
 			if (fm.getBackStackEntryCount() < count) {
 				Fragment fragment = fm.findFragmentById(R.id.detail);
 				if (fragment != null) {
@@ -94,14 +95,14 @@ public class DataListActivity extends Activity implements
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
-		mList = (DataListFragment) getFragmentManager().findFragmentById(
-				R.id.list);
+		mList = (DataListFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.list);
 		if (findViewById(R.id.detail) != null) {
 			mTwoPane = true;
 			mList.setActivateOnItemClick(true);
 		}
 
-		getFragmentManager().addOnBackStackChangedListener(
+		getSupportFragmentManager().addOnBackStackChangedListener(
 				mOnBackStackChangeListener);
 	}
 
@@ -118,7 +119,7 @@ public class DataListActivity extends Activity implements
 	}
 
 	@Override
-	public void onItemSelected(int edit, int carId, int id) {
+	public void onItemSelected(int edit, long carId, long id) {
 		if (mTwoPane) {
 			setNoEntryMessageVisible(false);
 
@@ -129,9 +130,9 @@ public class DataListActivity extends Activity implements
 				fragment = DataDetailOtherFragment.newInstance(id);
 			}
 
-			FragmentManager fm = getFragmentManager();
-			FragmentTransaction ft = getFragmentManager().beginTransaction()
-					.replace(R.id.detail, fragment);
+			FragmentManager fm = getSupportFragmentManager();
+			FragmentTransaction ft = fm.beginTransaction().replace(R.id.detail,
+					fragment);
 			if (fm.findFragmentById(R.id.detail) == null) {
 				ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 				ft.addToBackStack(null);
@@ -184,7 +185,7 @@ public class DataListActivity extends Activity implements
 		}
 	}
 
-	private void startDetailActivity(int edit, int carId, int id) {
+	private void startDetailActivity(int edit, long carId, long id) {
 		Intent detailIntent = new Intent(this, DataDetailActivity.class);
 		detailIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
 		detailIntent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);

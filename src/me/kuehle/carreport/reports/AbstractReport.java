@@ -19,8 +19,8 @@ package me.kuehle.carreport.reports;
 import java.util.Collections;
 import java.util.Date;
 
-import me.kuehle.carreport.util.gui.SectionListAdapter.Item;
-import me.kuehle.carreport.util.gui.SectionListAdapter.Section;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Item;
+import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import android.content.Context;

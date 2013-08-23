@@ -17,10 +17,11 @@
 package me.kuehle.carreport.gui;
 
 import me.kuehle.carreport.R;
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
-public class DataDetailActivity extends Activity implements
+public class DataDetailActivity extends FragmentActivity implements
 		AbstractDataDetailFragment.OnItemActionListener {
 	public static final String EXTRA_EDIT = "edit";
 
@@ -35,9 +36,9 @@ public class DataDetailActivity extends Activity implements
 
 		if (savedInstanceState == null) {
 			// During initial setup, plug in the details fragment.
+			Fragment fragment;
 			int edit = getIntent()
 					.getIntExtra(EXTRA_EDIT, EXTRA_EDIT_REFUELING);
-			AbstractDataDetailFragment fragment;
 			if (edit == EXTRA_EDIT_REFUELING) {
 				fragment = new DataDetailRefuelingFragment();
 			} else if (edit == EXTRA_EDIT_OTHER) {
@@ -45,10 +46,11 @@ public class DataDetailActivity extends Activity implements
 			} else {
 				fragment = new DataDetailCarFragment();
 			}
+
 			fragment.setArguments(getIntent().getExtras());
 
-			getFragmentManager().beginTransaction().add(R.id.detail, fragment)
-					.commit();
+			getSupportFragmentManager().beginTransaction()
+					.add(R.id.detail, fragment).commit();
 		}
 	}
 
