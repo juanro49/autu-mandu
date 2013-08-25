@@ -27,8 +27,6 @@ import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.gui.util.SectionListAdapter.Item;
-import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Calculator;
 import me.kuehle.carreport.util.Strings;
 import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
@@ -43,35 +41,6 @@ import android.text.format.DateFormat;
 import android.widget.Toast;
 
 public class FuelConsumptionReport extends AbstractReport {
-	private class CalculableItem extends ReportData.AbstractCalculableItem {
-		private static final String FORMAT = "%.2f %s";
-		private double value;
-		private String[] calcLabels;
-
-		public CalculableItem(String label, double value) {
-			this(label, value, new String[] { label, label });
-		}
-
-		public CalculableItem(String label, double value, String[] calcLabels) {
-			super(label, String.format(FORMAT, value, unit));
-			this.value = value;
-			this.calcLabels = calcLabels;
-		}
-
-		@Override
-		public void applyCalculation(double value1, int option) {
-			Preferences prefs = new Preferences(context);
-			if (option == 0) {
-				double result = value1 / (value / 100);
-				setValue(String.format(FORMAT, result, prefs.getUnitDistance()));
-			} else if (option == 1) {
-				double result = (value / 100) * value1;
-				setValue(String.format(FORMAT, result, prefs.getUnitVolume()));
-			}
-			setLabel(calcLabels[option]);
-		}
-	}
-
 	private class ReportGraphData extends AbstractReportGraphData {
 		public ReportGraphData(Context context, FuelTank fuelTank) {
 			super(context, String.format("%s (%s)", fuelTank.car.name,
@@ -146,16 +115,12 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	private void addConsumptionData(Section section, Vector<Double> numbers) {
-		section.addItem(new CalculableItem(context
-				.getString(R.string.report_highest), Calculator.max(numbers),
-				new String[] { context.getString(R.string.report_at_least),
-						context.getString(R.string.report_at_most) }));
-		section.addItem(new CalculableItem(context
-				.getString(R.string.report_lowest), Calculator.min(numbers),
-				new String[] { context.getString(R.string.report_at_most),
-						context.getString(R.string.report_at_least) }));
-		section.addItem(new CalculableItem(context
-				.getString(R.string.report_average), Calculator.avg(numbers)));
+		section.addItem(new Item(context.getString(R.string.report_highest),
+				String.format("%.2f %s", Calculator.max(numbers), unit)));
+		section.addItem(new Item(context.getString(R.string.report_lowest),
+				String.format("%.2f %s", Calculator.min(numbers), unit)));
+		section.addItem(new Item(context.getString(R.string.report_average),
+				String.format("%.2f %s", Calculator.avg(numbers), unit)));
 	}
 
 	private Section addDataSection(Car car) {
@@ -165,7 +130,7 @@ public class FuelConsumptionReport extends AbstractReport {
 			return addDataSection(
 					String.format("%s [%s]", name,
 							context.getString(R.string.suspended)), car.color,
-					Section.STICK_BOTTOM);
+					1);
 		} else {
 			return addDataSection(name, car.color);
 		}
@@ -180,7 +145,7 @@ public class FuelConsumptionReport extends AbstractReport {
 			return addDataSection(
 					String.format("%s [%s]", name,
 							context.getString(R.string.suspended)),
-					fuelTank.car.color, Section.STICK_BOTTOM);
+					fuelTank.car.color, 1);
 		} else {
 			return addDataSection(name, fuelTank.car.color);
 		}
@@ -196,20 +161,7 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	@Override
-	public CalculationOption[] getCalculationOptions() {
-		Preferences prefs = new Preferences(context);
-		return new CalculationOption[] {
-				new CalculationOption(context.getString(
-						R.string.report_calc_vol2mileage_name,
-						prefs.getUnitVolume()), prefs.getUnitVolume()),
-				new CalculationOption(context.getString(
-						R.string.report_calc_mileage2vol_name,
-						prefs.getUnitVolume(), prefs.getUnitDistance()),
-						prefs.getUnitDistance()) };
-	}
-
-	@Override
-	public Chart getChart(int option) {
+	public Chart getChart() {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
@@ -270,7 +222,12 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getGraphOptions() {
+	public int[] getAvailableChartOptions() {
 		return new int[1];
+	}
+
+	@Override
+	public String getTitle() {
+		return context.getString(R.string.report_title_fuel_consumption);
 	}
 }

@@ -24,8 +24,6 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.gui.util.SectionListAdapter.Item;
-import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Calculator;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
@@ -90,7 +88,7 @@ public class MileageReport extends AbstractReport {
 				section = addDataSection(
 						String.format("%s [%s]", car.name,
 								context.getString(R.string.suspended)),
-						car.color, Section.STICK_BOTTOM);
+						car.color, 1);
 			} else {
 				section = addDataSection(car.name, car.color);
 			}
@@ -134,18 +132,13 @@ public class MileageReport extends AbstractReport {
 	}
 
 	@Override
-	public CalculationOption[] getCalculationOptions() {
-		return new CalculationOption[0];
-	}
-
-	@Override
-	public Chart getChart(int option) {
+	public Chart getChart() {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
 		renderers.addRenderer(renderer);
 
-		Vector<AbstractReportGraphData> reportData = option == GRAPH_OPTION_ACCUMULATED ? reportDataAccumulated
+		Vector<AbstractReportGraphData> reportData = getChartOption() == GRAPH_OPTION_ACCUMULATED ? reportDataAccumulated
 				: reportDataPerRefueling;
 		Vector<AbstractReportGraphData> chartReportData = new Vector<AbstractReportGraphData>();
 		if (isShowTrend()) {
@@ -188,16 +181,22 @@ public class MileageReport extends AbstractReport {
 			}
 		}
 		chart.getDomainAxis().setLabelFormatter(dateLabelFormatter);
-		chart.getDomainAxis().setDefaultBottomBound(minXValue[option]);
+		chart.getDomainAxis()
+				.setDefaultBottomBound(minXValue[getChartOption()]);
 
 		return chart;
 	}
 
 	@Override
-	public int[] getGraphOptions() {
+	public int[] getAvailableChartOptions() {
 		int[] options = new int[2];
 		options[GRAPH_OPTION_ACCUMULATED] = R.string.report_graph_accumulated;
 		options[GRAPH_OPTION_PER_REFUELING] = R.string.report_graph_per_refueling;
 		return options;
+	}
+
+	@Override
+	public String getTitle() {
+		return context.getString(R.string.report_title_mileage);
 	}
 }

@@ -26,8 +26,6 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.gui.util.SectionListAdapter.Item;
-import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.carreport.util.Recurrence;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
@@ -45,42 +43,6 @@ import android.text.format.DateFormat;
 import android.util.SparseArray;
 
 public class CostsReport extends AbstractReport {
-	private class CalculableItem extends ReportData.AbstractCalculableItem {
-		private static final String FORMAT = "%.2f %s";
-		private double value;
-		private String calcLabel;
-		private int calcLabelPluralId;
-
-		public CalculableItem(String defaultLabel, int calclabelPluralId,
-				double value) {
-			super(defaultLabel, String.format(FORMAT, value, unit));
-			this.calcLabelPluralId = calclabelPluralId;
-			this.value = value;
-		}
-
-		public CalculableItem(String defaultLabel, String calcLabel,
-				double value) {
-			super(defaultLabel, String.format(FORMAT, value, unit));
-			this.calcLabel = calcLabel;
-			this.calcLabelPluralId = -1;
-			this.value = value;
-		}
-
-		@Override
-		public void applyCalculation(double value1, int option) {
-			double result = value * value1;
-			setValue(String.format(FORMAT, result, unit));
-
-			String newLabel = calcLabel;
-			if (calcLabelPluralId != -1) {
-				newLabel = context.getResources().getQuantityString(
-						calcLabelPluralId, value1 == 1 ? 1 : 2);
-			}
-			setLabel((value1 == (int) value1 ? String.valueOf((int) value1)
-					: String.valueOf(value1)) + " " + newLabel);
-		}
-	}
-
 	private class ReportGraphData extends AbstractReportGraphData {
 		private int option;
 
@@ -161,7 +123,7 @@ public class CostsReport extends AbstractReport {
 				section = addDataSection(
 						String.format("%s [%s]", car.name,
 								context.getString(R.string.suspended)),
-						car.color, Section.STICK_BOTTOM);
+						car.color, 1);
 			} else {
 				section = addDataSection(car.name, car.color);
 			}
@@ -254,27 +216,23 @@ public class CostsReport extends AbstractReport {
 			double costsPerSecond = costs / elapsedSeconds.getSeconds();
 			// 60 seconds per minute * 60 minutes per hour * 24 hours per day =
 			// 86400 seconds per day
-			section.addItem(new CalculableItem("\u00D8 "
-					+ context.getResources().getQuantityString(
-							R.plurals.report_day, 1), R.plurals.report_day,
-					costsPerSecond * 86400));
+			section.addItem(new Item("\u00D8 "
+					+ context.getString(R.string.report_day), String.format(
+					"%.2f %s", costsPerSecond * 86400, unit)));
 			// 86400 seconds per day * 30,4375 days per month = 2629800 seconds
 			// per month
 			// (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
-			section.addItem(new CalculableItem("\u00D8 "
-					+ context.getResources().getQuantityString(
-							R.plurals.report_month, 1), R.plurals.report_month,
-					costsPerSecond * 2629800));
+			section.addItem(new Item("\u00D8 "
+					+ context.getString(R.string.report_month), String.format(
+					"%.2f %s", costsPerSecond * 2629800, unit)));
 			// 86400 seconds per day * 365,25 days per year = 31557600 seconds
 			// per year
-			section.addItem(new CalculableItem("\u00D8 "
-					+ context.getResources().getQuantityString(
-							R.plurals.report_year, 1), R.plurals.report_year,
-					costsPerSecond * 31557600));
+			section.addItem(new Item("\u00D8 "
+					+ context.getString(R.string.report_year), String.format(
+					"%.2f %s", costsPerSecond * 31557600, unit)));
 			int tachoDiff = Math.max(1, endMileage - startMileage);
-			section.addItem(new CalculableItem("\u00D8 "
-					+ prefs.getUnitDistance(), prefs.getUnitDistance(), costs
-					/ tachoDiff));
+			section.addItem(new Item("\u00D8 " + prefs.getUnitDistance(),
+					String.format("%.2f %s", costs / tachoDiff, unit)));
 
 			section.addItem(new Item(context.getString(R.string.report_since,
 					DateFormat.getDateFormat(context)
@@ -284,14 +242,15 @@ public class CostsReport extends AbstractReport {
 	}
 
 	@Override
-	public CalculationOption[] getCalculationOptions() {
-		return new CalculationOption[] { new CalculationOption(
-				R.string.report_calc_multiply_name,
-				R.string.report_calc_multiply_hint1) };
+	public int[] getAvailableChartOptions() {
+		int[] options = new int[2];
+		options[GRAPH_OPTION_MONTH] = R.string.report_graph_month_history;
+		options[GRAPH_OPTION_YEAR] = R.string.report_graph_year_history;
+		return options;
 	}
 
 	@Override
-	public Chart getChart(final int option) {
+	public Chart getChart() {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		BarRenderer renderer = new BarRenderer(context);
@@ -301,7 +260,7 @@ public class CostsReport extends AbstractReport {
 
 		int series = 0;
 		for (Car car : Car.getAll()) {
-			ReportGraphData data = option == GRAPH_OPTION_MONTH ? costsPerMonth
+			ReportGraphData data = getChartOption() == GRAPH_OPTION_MONTH ? costsPerMonth
 					.get(car.getId().intValue()) : costsPerYear.get(car.getId()
 					.intValue());
 			if (data.isEmpty()) {
@@ -336,14 +295,14 @@ public class CostsReport extends AbstractReport {
 			@Override
 			public String formatLabel(double value) {
 				DateTime date = new DateTime((long) value);
-				return date.toString(xLabelFormat[option]);
+				return date.toString(xLabelFormat[getChartOption()]);
 			}
 		});
-		double padding = SEC_PER_PERIOD[option] / 2;
+		double padding = SEC_PER_PERIOD[getChartOption()] / 2;
 		double topBound = dataset.maxX();
 		double bottomBound = topBound
-				- (SEC_PER_PERIOD[option] * Math.min(visibleBarCount - 1,
-						xValues.length - 1));
+				- (SEC_PER_PERIOD[getChartOption()] * Math.min(
+						visibleBarCount - 1, xValues.length - 1));
 		chart.getDomainAxis().setDefaultBottomBound(bottomBound - padding);
 		chart.getDomainAxis().setDefaultTopBound(topBound + padding);
 		chart.getRangeAxis().setDefaultBottomBound(0);
@@ -352,11 +311,8 @@ public class CostsReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getGraphOptions() {
-		int[] options = new int[2];
-		options[GRAPH_OPTION_MONTH] = R.string.report_graph_month_history;
-		options[GRAPH_OPTION_YEAR] = R.string.report_graph_year_history;
-		return options;
+	public String getTitle() {
+		return context.getString(R.string.report_title_costs);
 	}
 
 	private double[] getXValues(Dataset dataset) {

@@ -14,33 +14,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-    <FrameLayout
-        android:id="@+id/graph_holder"
+    android:layout_height="match_parent" >
+    <LinearLayout
+        android:id="@+id/list1"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:padding="16dp" >
-        <me.kuehle.chartlib.ChartView
-            android:id="@+id/graph"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-        <ImageButton
-            android:id="@+id/btn_report_options"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="right"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="@string/graph_options_desc"
-            android:src="@drawable/ic_menu_overflow" />
-    </FrameLayout>
-    <ListView
-        android:id="@+id/lst_data"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5" >
-    </ListView>
-</LinearLayout>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp" />
+</ScrollView>

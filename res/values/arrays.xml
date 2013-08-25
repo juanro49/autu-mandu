@@ -20,12 +20,6 @@
         <item>Data</item>
         <item>Calculator</item>
     </string-array>
-    <string-array name="reports">
-        <item>Fuel consumption</item>
-        <item>Fuel price</item>
-        <item>Mileage</item>
-        <item>Costs</item>
-    </string-array>
     <string-array name="data_list_page_titles">
         <item>Refuelings</item>
         <item>Other Costs</item>

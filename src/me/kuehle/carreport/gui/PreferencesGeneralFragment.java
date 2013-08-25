@@ -22,11 +22,6 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 				Car car = Car.load(Car.class,
 						Long.parseLong(newValue.toString()));
 				preference.setSummary(car.name);
-			} else if (preference.getKey().equals("default_report")) {
-				String[] reports = getResources().getStringArray(
-						R.array.reports);
-				preference.setSummary(reports[Integer.parseInt(newValue
-						.toString())]);
 			} else if (preference instanceof EditTextPreference) {
 				preference.setSummary(newValue.toString());
 			}
@@ -62,22 +57,6 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			Car car = Car.load(Car.class, prefs.getDefaultCar());
 			defaultCar.setSummary(car.name);
-		}
-
-		// Default Report
-		{
-			String[] defaultEntries = getResources().getStringArray(
-					R.array.reports);
-			String[] defaultEntryValues = new String[defaultEntries.length];
-			for (int i = 0; i < defaultEntries.length; i++) {
-				defaultEntryValues[i] = String.valueOf(i);
-			}
-			ListPreference defaultReport = (ListPreference) findPreference("default_report");
-			defaultReport.setEntries(R.array.reports);
-			defaultReport.setEntryValues(defaultEntryValues);
-			defaultReport
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-			defaultReport.setSummary(defaultEntries[prefs.getDefaultReport()]);
 		}
 
 		// Default car menu

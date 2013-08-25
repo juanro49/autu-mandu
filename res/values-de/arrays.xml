@@ -20,12 +20,6 @@
         <item>Daten</item>
         <item>Rechner</item>
     </string-array>
-    <string-array name="reports">
-        <item>Benzinverbrauch</item>
-        <item>Benzinpreis</item>
-        <item>Kilometerstand</item>
-        <item>Kosten</item>
-    </string-array>
     <string-array name="data_list_page_titles">
         <item>Tankfüllungen</item>
         <item>Andere Kosten</item>

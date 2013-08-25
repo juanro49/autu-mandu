@@ -19,79 +19,56 @@ package me.kuehle.carreport.gui;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
+import me.kuehle.carreport.data.report.AbstractReport.AbstractListItem;
+import me.kuehle.carreport.data.report.AbstractReport.Item;
+import me.kuehle.carreport.data.report.AbstractReport.Section;
 import me.kuehle.carreport.data.report.CostsReport;
 import me.kuehle.carreport.data.report.FuelConsumptionReport;
 import me.kuehle.carreport.data.report.FuelPriceReport;
 import me.kuehle.carreport.data.report.MileageReport;
 import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
-import me.kuehle.carreport.gui.util.SectionListAdapter;
 import me.kuehle.chartlib.ChartView;
+import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.ActionBar;
-import android.app.ActionBar.OnNavigationListener;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
+import android.widget.TextView;
 
 public class ReportFragment extends Fragment implements
 		OnMenuItemClickListener, DataChangeListener {
-	private FrameLayout mGraphHolder;
-	private ChartView mGraph;
-	private ListView mLstData;
-	private AbstractReport mCurrentReport;
-	private int mCurrentGraphOption;
-
-	private OnNavigationListener navigationListener = new OnNavigationListener() {
-		@Override
-		public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-			updateReport();
-			return true;
-		}
-	};
+	private AbstractReport[] mReports;
+	private AbstractReport mCurrentMenuReport;
+	private ViewGroup mCurrentMenuReportView;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				getActivity(), R.array.reports,
-				android.R.layout.simple_spinner_dropdown_item);
-
-		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		actionBar.setListNavigationCallbacks(adapter, navigationListener);
+		updateReports();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.fragment_report, container, false);
+		return inflater.inflate(R.layout.fragment_report, container, false);
+	}
 
-		mLstData = (ListView) v.findViewById(R.id.lst_data);
-		mGraphHolder = (FrameLayout) v.findViewById(R.id.graph_holder);
-		mGraph = (ChartView) v.findViewById(R.id.graph);
-		mGraph.setNotEnoughDataView(View.inflate(getActivity(),
-				R.layout.chart_not_enough_data, null));
-
-		View btnReportOptions = v.findViewById(R.id.btn_report_options);
-		btnReportOptions.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showReportOptions(v);
-			}
-		});
-
-		return v;
+	@Override
+	public void onDataChanged() {
+		updateReports();
 	}
 
 	@Override
@@ -105,40 +82,67 @@ public class ReportFragment extends Fragment implements
 	@Override
 	public boolean onMenuItemClick(MenuItem item) {
 		if (item.getItemId() == R.id.menu_show_trend) {
-			mCurrentReport.setShowTrend(!item.isChecked());
-			saveGraphSettings();
-			updateReportGraph();
+			mCurrentMenuReport.setShowTrend(!item.isChecked());
+			saveGraphSettings(mCurrentMenuReport);
+			((ChartView) mCurrentMenuReportView.findViewById(R.id.graph))
+					.setChart(mCurrentMenuReport.getChart());
 			return true;
 		} else if (item.getGroupId() == R.id.group_graph) {
-			mCurrentGraphOption = item.getOrder();
-			saveGraphSettings();
-			updateReportGraph();
+			mCurrentMenuReport.setChartOption(item.getOrder());
+			saveGraphSettings(mCurrentMenuReport);
+			((ChartView) mCurrentMenuReportView.findViewById(R.id.graph))
+					.setChart(mCurrentMenuReport.getChart());
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	@Override
-	public void onDataChanged() {
-		updateReport();
+	public void showReportDetails(View v) {
+		ViewGroup card = (ViewGroup) v.getParent().getParent().getParent();
+
+		final View main = card.findViewById(R.id.main);
+		final View details = card.findViewById(R.id.details);
+		final ViewGroup.MarginLayoutParams detailsParams = (ViewGroup.MarginLayoutParams) details
+				.getLayoutParams();
+
+		int from = detailsParams.topMargin;
+		int to = detailsParams.topMargin == main.getHeight() ? (main
+				.getHeight() - details.getHeight()) : main.getHeight();
+
+		ValueAnimator animator = new ValueAnimator();
+		animator.setDuration(getResources().getInteger(
+				android.R.integer.config_longAnimTime));
+		animator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));
+		animator.addUpdateListener(new AnimatorUpdateListener() {
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation) {
+				detailsParams.topMargin = (Integer) animation
+						.getAnimatedValue();
+				details.requestLayout();
+			}
+		});
+		animator.start();
 	}
 
-	public void showReportOptions(View v) {
+	public void showReportOptions(AbstractReport report, View v) {
+		mCurrentMenuReport = report;
+		mCurrentMenuReportView = (ViewGroup) v.getParent().getParent()
+				.getParent();
+
 		PopupMenu popup = new PopupMenu(getActivity(), v);
 		popup.inflate(R.menu.report_options);
 		popup.setOnMenuItemClickListener(this);
 
 		Menu menu = popup.getMenu();
-		MenuItem item = menu.findItem(R.id.menu_show_trend);
-		item.setChecked(mCurrentReport.isShowTrend());
+		menu.findItem(R.id.menu_show_trend).setChecked(report.isShowTrend());
 
-		int[] graphOptions = mCurrentReport.getGraphOptions();
+		int[] graphOptions = report.getAvailableChartOptions();
 		if (graphOptions.length >= 2) {
 			for (int i = 0; i < graphOptions.length; i++) {
-				item = menu
-						.add(R.id.group_graph, Menu.NONE, i, graphOptions[i]);
-				item.setChecked(i == mCurrentGraphOption);
+				MenuItem item = menu.add(R.id.group_graph, Menu.NONE, i,
+						graphOptions[i]);
+				item.setChecked(i == report.getChartOption());
 			}
 			menu.setGroupCheckable(R.id.group_graph, true, true);
 		}
@@ -146,70 +150,111 @@ public class ReportFragment extends Fragment implements
 		popup.show();
 	}
 
-	private void loadGraphSettings() {
+	private void loadGraphSettings(AbstractReport report) {
 		SharedPreferences prefs = getActivity().getPreferences(
 				Context.MODE_PRIVATE);
-		String reportName = mCurrentReport.getClass().getSimpleName();
-		mCurrentReport.setShowTrend(prefs.getBoolean(
-				reportName + "_show_trend", false));
-		mCurrentGraphOption = prefs.getInt(
-				reportName + "_current_graph_option", 0);
-		if (mCurrentGraphOption >= mCurrentReport.getGraphOptions().length) {
-			mCurrentGraphOption = 0;
-		}
+		String reportName = report.getClass().getSimpleName();
+		report.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
+		report.setChartOption(prefs.getInt(
+				reportName + "_current_chart_option", 0));
 	}
 
-	private void saveGraphSettings() {
+	private void saveGraphSettings(AbstractReport report) {
 		SharedPreferences.Editor prefsEdit = getActivity().getPreferences(
 				Context.MODE_PRIVATE).edit();
-		String reportName = mCurrentReport.getClass().getSimpleName();
-		prefsEdit.putBoolean(reportName + "_show_trend",
-				mCurrentReport.isShowTrend());
-		prefsEdit.putInt(reportName + "_current_graph_option",
-				mCurrentGraphOption);
+		String reportName = report.getClass().getSimpleName();
+		prefsEdit.putBoolean(reportName + "_show_trend", report.isShowTrend());
+		prefsEdit.putInt(reportName + "_current_chart_option",
+				report.getChartOption());
 		prefsEdit.apply();
 	}
 
-	private void updateReport() {
-		ActionBar actionBar = getActivity().getActionBar();
-		int reportIndex = actionBar.getSelectedNavigationIndex();
+	private void updateReports() {
+		Preferences prefs = new Preferences(getActivity());
 
-		switch (reportIndex) {
-		case 0:
-			mCurrentReport = new FuelConsumptionReport(getActivity()
-					.getApplicationContext());
-			break;
-		case 1:
-			mCurrentReport = new FuelPriceReport(getActivity()
-					.getApplicationContext());
-			break;
-		case 2:
-			mCurrentReport = new MileageReport(getActivity()
-					.getApplicationContext());
-			break;
-		case 3:
-			mCurrentReport = new CostsReport(getActivity()
-					.getApplicationContext());
-			break;
-		default:
-			return;
+		mReports = new AbstractReport[] {
+				new FuelConsumptionReport(getActivity()),
+				new FuelPriceReport(getActivity()),
+				new MileageReport(getActivity()),
+				new CostsReport(getActivity()) };
+
+		ViewGroup list1 = (ViewGroup) getView().findViewById(R.id.list1);
+		list1.removeAllViews();
+		ViewGroup list2 = (ViewGroup) getView().findViewById(R.id.list2);
+		if (list2 != null) {
+			list2.removeAllViews();
 		}
 
-		loadGraphSettings();
-		updateReportGraph();
+		for (int i = 0; i < mReports.length; i++) {
+			final AbstractReport report = mReports[i];
+			loadGraphSettings(report);
 
-		Preferences prefs = new Preferences(getActivity());
-		mLstData.setAdapter(new SectionListAdapter(getActivity(),
-				R.layout.list_item_report_data, mCurrentReport.getData()
-						.getData(), prefs.isColorSections()));
-	}
+			ViewGroup list = i % 2 != 0 && list2 != null ? list2 : list1;
+			View card = View.inflate(getActivity(), R.layout.report, null);
+			list.addView(card);
 
-	private void updateReportGraph() {
-		mGraph.setChart(mCurrentReport.getChart(mCurrentGraphOption));
-		if (mGraph.getChart() == null) {
-			mGraphHolder.setVisibility(View.GONE);
-		} else {
-			mGraphHolder.setVisibility(View.VISIBLE);
+			((TextView) card.findViewById(R.id.txt_title)).setText(report
+					.getTitle());
+
+			View btnReportDetails = card.findViewById(R.id.btn_report_details);
+			btnReportDetails.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showReportDetails(v);
+				}
+			});
+
+			View btnReportOptions = card.findViewById(R.id.btn_report_options);
+			btnReportOptions.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showReportOptions(report, v);
+				}
+			});
+
+			ChartView graph = (ChartView) card.findViewById(R.id.graph);
+			graph.setNotEnoughDataView(View.inflate(getActivity(),
+					R.layout.chart_not_enough_data, null));
+			graph.setChart(report.getChart());
+
+			ViewGroup details = (ViewGroup) card.findViewById(R.id.details);
+			for (AbstractListItem item : report.getData(true)) {
+				View itemView = View.inflate(getActivity(),
+						item instanceof Section ? R.layout.row_section
+								: R.layout.row_report_data, null);
+
+				if (item instanceof Section) {
+					Section section = (Section) item;
+					TextView text = (TextView) itemView;
+
+					text.setText(section.getLabel());
+					if (prefs.isColorSections()) {
+						text.setTextColor(section.getColor());
+						GradientDrawable drawableBottom = (GradientDrawable) text
+								.getCompoundDrawables()[3];
+						drawableBottom.setColorFilter(section.getColor(),
+								PorterDuff.Mode.SRC);
+					}
+				} else {
+					((TextView) itemView.findViewById(android.R.id.text1))
+							.setText(item.getLabel());
+					((TextView) itemView.findViewById(android.R.id.text2))
+							.setText(((Item) item).getValue());
+				}
+
+				details.addView(itemView);
+			}
+
+			// Set position of details view.
+			View main = card.findViewById(R.id.main);
+			int widthMeasureSpec = MeasureSpec.makeMeasureSpec(
+					ViewGroup.LayoutParams.MATCH_PARENT, MeasureSpec.EXACTLY);
+			int heightMeasureSpec = MeasureSpec.makeMeasureSpec(
+					ViewGroup.LayoutParams.WRAP_CONTENT, MeasureSpec.EXACTLY);
+			main.measure(widthMeasureSpec, heightMeasureSpec);
+			details.measure(widthMeasureSpec, heightMeasureSpec);
+			((ViewGroup.MarginLayoutParams) details.getLayoutParams()).topMargin = main
+					.getMeasuredHeight() - details.getMeasuredHeight();
 		}
 	}
 }

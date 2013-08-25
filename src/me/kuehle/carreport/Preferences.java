@@ -47,10 +47,6 @@ public class Preferences {
 		return cars.get(0).getId();
 	}
 
-	public int getDefaultReport() {
-		return Integer.parseInt(prefs.getString("default_report", "0"));
-	}
-
 	public String getDropboxAccount() {
 		return prefs.getString("sync_dropbox_account", null);
 	}

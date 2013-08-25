@@ -16,11 +16,11 @@
 
 package me.kuehle.carreport.data.report;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
-import me.kuehle.carreport.gui.util.SectionListAdapter.Item;
-import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import android.content.Context;
@@ -28,38 +28,127 @@ import android.text.format.DateFormat;
 import android.util.TypedValue;
 
 public abstract class AbstractReport {
-	public class CalculationOption {
-		private String name;
-		private String hint1;
+	public abstract static class AbstractListItem implements
+			Comparable<AbstractListItem> {
+		protected String label;
 
-		public CalculationOption(int name, int hint1) {
-			this.name = context.getString(name);
-			this.hint1 = context.getString(hint1);
+		public AbstractListItem(String label) {
+			this.label = label;
 		}
 
-		public CalculationOption(String name, String hint1) {
-			this.name = name;
-			this.hint1 = hint1;
-		}
-
-		public String getHint1() {
-			return hint1;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setHint1(String hint1) {
-			this.hint1 = hint1;
-		}
-
-		public void setName(String name) {
-			this.name = name;
+		public String getLabel() {
+			return label;
 		}
 	}
-	private ReportData data = new ReportData();
+
+	public static class Item extends AbstractListItem {
+		private String value;
+
+		public Item(String label, String value) {
+			super(label);
+			this.value = value;
+		}
+
+		@Override
+		public int compareTo(AbstractListItem another) {
+			if (another instanceof Section) {
+				return -1;
+			} else {
+				return label.compareTo(another.getLabel());
+			}
+		}
+
+		public String getValue() {
+			return value;
+		}
+	}
+
+	public static class Section extends AbstractListItem {
+		private int color;
+		private int order;
+		private ArrayList<Item> items;
+
+		public Section(String label, int color) {
+			this(label, color, 0);
+		}
+
+		public Section(String label, int color, int order) {
+			super(label);
+			this.color = color;
+			this.order = order;
+			this.items = new ArrayList<Item>();
+		}
+
+		public void addItem(Item item) {
+			items.add(item);
+		}
+
+		@Override
+		public int compareTo(AbstractListItem another) {
+			if (another instanceof Item) {
+				return 1;
+			} else {
+				Section otherSection = (Section) another;
+				if (order != otherSection.getOrder()) {
+					return Integer.valueOf(order).compareTo(
+							otherSection.getOrder());
+				} else {
+					return label.compareTo(another.getLabel());
+				}
+			}
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Section other = (Section) obj;
+			if (color != other.color)
+				return false;
+			if (items == null) {
+				if (other.items != null)
+					return false;
+			} else if (!items.equals(other.items))
+				return false;
+			if (order != other.order)
+				return false;
+			return true;
+		}
+
+		public int getColor() {
+			return color;
+		}
+
+		public ArrayList<Item> getItems() {
+			return items;
+		}
+
+		public int getOrder() {
+			return order;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + color;
+			result = prime * result + ((items == null) ? 0 : items.hashCode());
+			result = prime * result + order;
+			return result;
+		}
+
+		public void removeItem(Item item) {
+			items.remove(item);
+		}
+	}
+
+	private ArrayList<AbstractListItem> data = new ArrayList<AbstractListItem>();
 	private boolean showTrend = false;
+	private int chartOption = 0;
 	protected Context context;
 
 	protected AxisLabelFormatter dateLabelFormatter = new AxisLabelFormatter() {
@@ -74,17 +163,65 @@ public abstract class AbstractReport {
 		this.context = context;
 	}
 
-	protected void addData(Item item) {
-		data.getData().add(item);
+	public abstract int[] getAvailableChartOptions();
+
+	public abstract Chart getChart();
+
+	public int getChartOption() {
+		return chartOption;
+	}
+
+	public List<AbstractListItem> getData() {
+		return getData(false);
+	}
+
+	public List<AbstractListItem> getData(boolean flat) {
+		Collections.sort(data);
+
+		if (flat) {
+			ArrayList<AbstractListItem> items = new ArrayList<AbstractListItem>();
+			for (AbstractListItem item : data) {
+				items.add(item);
+				if (item instanceof Section) {
+					items.addAll(((Section) item).getItems());
+				}
+			}
+
+			return items;
+		} else {
+			return data;
+		}
+	}
+
+	public abstract String getTitle();
+
+	public boolean isShowTrend() {
+		return showTrend;
+	}
+
+	public void setChartOption(int chartOption) {
+		if (chartOption < getAvailableChartOptions().length) {
+			this.chartOption = chartOption;
+		} else {
+			this.chartOption = 0;
+		}
+	}
+
+	public void setShowTrend(boolean showTrend) {
+		this.showTrend = showTrend;
+	}
+
+	protected void addData(String label, String value) {
+		data.add(new Item(label, value));
 	}
 
 	protected Section addDataSection(String label, int color) {
-		return addDataSection(label, color, Section.DONT_STICK);
+		return addDataSection(label, color, 0);
 	}
-	
-	protected Section addDataSection(String label, int color, int stick) {
-		Section section = new Section(label, color, stick);
-		data.getData().add(section);
+
+	protected Section addDataSection(String label, int color, int order) {
+		Section section = new Section(label, color, order);
+		data.add(section);
 		return section;
 	}
 
@@ -95,34 +232,5 @@ public abstract class AbstractReport {
 		chart.getRangeAxis().setZoomable(false);
 		chart.getRangeAxis().setMovable(false);
 		chart.getLegend().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
-	}
-
-	public abstract CalculationOption[] getCalculationOptions();
-
-	public abstract Chart getChart(int option);
-
-	public ReportData getData() {
-		Collections.sort(data.getData());
-		return data;
-	}
-
-	protected String getDateFormatPattern() {
-		java.text.DateFormat dateFormat = DateFormat.getDateFormat(context);
-		if (dateFormat instanceof java.text.SimpleDateFormat) {
-			return ((java.text.SimpleDateFormat) dateFormat)
-					.toLocalizedPattern();
-		} else {
-			return null;
-		}
-	}
-
-	public abstract int[] getGraphOptions();
-
-	public boolean isShowTrend() {
-		return showTrend;
-	}
-
-	public void setShowTrend(boolean showTrend) {
-		this.showTrend = showTrend;
 	}
 }

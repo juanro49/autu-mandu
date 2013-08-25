@@ -112,8 +112,13 @@
     <string name="toast_importcsv_failed">Import fehlgeschlagen. Es wurden keine Daten verändert. Sind die Importdaten im richtigen Format?</string>
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
+    <string name="graph_details_desc">Graph-Details</string>
     <string name="graph_options_desc">Graph-Optionen</string>
     <string name="remove_fueltype_desc">Entfernen</string>
+    <string name="report_title_fuel_consumption">Benzinverbrauch</string>
+    <string name="report_title_fuel_price">Benzinpreis</string>
+    <string name="report_title_mileage">Kilometerstand</string>
+    <string name="report_title_costs">Kosten</string>
     <string name="report_trend_label">%s (Trend)</string>
     <string name="report_graph_month_history">Monat Historie</string>
     <string name="report_graph_year_history">Jahr Historie</string>
@@ -123,9 +128,10 @@
     <string name="report_since">&#931; seit %s</string>
     <string name="report_lowest">Niedrigster</string>
     <string name="report_highest">Höchster</string>
-    <string name="report_at_least">Mindestens</string>
-    <string name="report_at_most">Höchstens</string>
     <string name="report_average">Durchschnitt</string>
+    <string name="report_day">Tag</string>
+    <string name="report_month">Monat</string>
+    <string name="report_year">Jahr</string>
     <string name="report_toast_car">Auto</string>
     <string name="report_toast_consumption">Verbrauch</string>
     <string name="report_toast_mileage">Kilometer</string>
@@ -133,12 +139,6 @@
     <string name="report_toast_date">Datum</string>
     <string name="report_toast_fueltype">Kraftstoffart</string>
     <string name="report_toast_none">keine</string>
-    <string name="report_calc_multiply_name">Multiplizieren</string>
-    <string name="report_calc_multiply_hint1">Faktor</string>
-    <string name="report_calc_vol2mileage_name">Wie weit komme ich mit X %s?</string>
-    <string name="report_calc_mileage2vol_name">Wie viele %1$s brauche ich für X %2$s?</string>
-    <string name="report_calc_vol2price_name">Wie viel kosten X %s?</string>
-    <string name="report_calc_price2vol_name">Wie viele %1$s bekomme ich für X %2$s?</string>
     <string name="pref_title_header_about">Über Car Report</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>
     <string name="pref_title_header_cars">Autos</string>
@@ -150,7 +150,6 @@
     <string name="pref_title_category_backup">Sichern &amp; Wiederherstellen</string>
     <string name="pref_title_category_export">Exportieren &amp; Importieren</string>
     <string name="pref_title_default_car">Auto</string>
-    <string name="pref_title_default_report">Report</string>
     <string name="pref_title_default_show_car_menu">Zeige Autoauswahlmenü</string>
     <string name="pref_title_appearance_color_sections">Farbige Abschnitte</string>
     <string name="pref_title_appearance_show_legend">Legende in Graphen anzeigen</string>

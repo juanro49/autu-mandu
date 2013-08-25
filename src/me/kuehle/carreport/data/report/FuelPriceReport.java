@@ -24,7 +24,6 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.gui.util.SectionListAdapter.Section;
 import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
@@ -39,38 +38,6 @@ import android.text.format.DateFormat;
 import android.widget.Toast;
 
 public class FuelPriceReport extends AbstractReport {
-	private class CalculableItem extends ReportData.AbstractCalculableItem {
-		private static final String FORMAT_NORMAL = "%.3f %s";
-		private static final String FORMAT_CALCULATION = "%.2f %s";
-		private double value;
-		private String[] calcLabels;
-
-		public CalculableItem(String label, double value) {
-			this(label, value, new String[] { label, label });
-		}
-
-		public CalculableItem(String label, double value, String[] calcLabels) {
-			super(label, String.format(FORMAT_NORMAL, value, unit));
-			this.value = value;
-			this.calcLabels = calcLabels;
-		}
-
-		@Override
-		public void applyCalculation(double value1, int option) {
-			Preferences prefs = new Preferences(context);
-			if (option == 0) {
-				double result = value * value1;
-				setValue(String.format(FORMAT_CALCULATION, result,
-						prefs.getUnitCurrency()));
-			} else if (option == 1) {
-				double result = value1 / value;
-				setValue(String.format(FORMAT_CALCULATION, result,
-						prefs.getUnitVolume()));
-			}
-			setLabel(calcLabels[option]);
-		}
-	}
-
 	private class ReportGraphData extends AbstractReportGraphData {
 		public ReportGraphData(Context context, FuelType fuelType, int color) {
 			super(context, fuelType.name, color);
@@ -115,18 +82,15 @@ public class FuelPriceReport extends AbstractReport {
 				avg /= series.size();
 
 				Section section = addDataSection(fuelType.name, color);
-				section.addItem(new CalculableItem(context
-						.getString(R.string.report_highest), series.maxY(),
-						new String[] {
-								context.getString(R.string.report_at_most),
-								context.getString(R.string.report_at_least) }));
-				section.addItem(new CalculableItem(context
-						.getString(R.string.report_lowest), series.minY(),
-						new String[] {
-								context.getString(R.string.report_at_least),
-								context.getString(R.string.report_at_most) }));
-				section.addItem(new CalculableItem(context
-						.getString(R.string.report_average), avg));
+				section.addItem(new Item(context
+						.getString(R.string.report_highest), String.format(
+						"%.3f %s", series.maxY(), unit)));
+				section.addItem(new Item(context
+						.getString(R.string.report_lowest), String.format(
+						"%.3f %s", series.minY(), unit)));
+				section.addItem(new Item(context
+						.getString(R.string.report_average), String.format(
+						"%.3f %s", avg, unit)));
 
 				hsvColor[0] += 20;
 				if (hsvColor[0] > 360) {
@@ -137,20 +101,7 @@ public class FuelPriceReport extends AbstractReport {
 	}
 
 	@Override
-	public CalculationOption[] getCalculationOptions() {
-		Preferences prefs = new Preferences(context);
-		return new CalculationOption[] {
-				new CalculationOption(context.getString(
-						R.string.report_calc_vol2price_name,
-						prefs.getUnitVolume()), prefs.getUnitVolume()),
-				new CalculationOption(context.getString(
-						R.string.report_calc_price2vol_name,
-						prefs.getUnitVolume(), prefs.getUnitCurrency()),
-						prefs.getUnitCurrency()) };
-	}
-
-	@Override
-	public Chart getChart(int option) {
+	public Chart getChart() {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
@@ -204,7 +155,12 @@ public class FuelPriceReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getGraphOptions() {
+	public int[] getAvailableChartOptions() {
 		return new int[1];
+	}
+
+	@Override
+	public String getTitle() {
+		return context.getString(R.string.report_title_fuel_price);
 	}
 }
