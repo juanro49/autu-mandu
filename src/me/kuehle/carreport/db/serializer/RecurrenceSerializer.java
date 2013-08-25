@@ -52,11 +52,16 @@ public class RecurrenceSerializer extends TypeSerializer {
 			return null;
 		}
 
-		String[] values = ((String) data).split(" ");
+		try {
+			String[] values = ((String) data).split(" ");
 
-		String interval = values[0];
-		int multiplier = Integer.parseInt(values[1]);
+			String interval = values[0];
+			int multiplier = Integer.parseInt(values[1]);
 
-		return new Recurrence(RecurrenceInterval.valueOf(interval), multiplier);
+			return new Recurrence(RecurrenceInterval.valueOf(interval),
+					multiplier);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

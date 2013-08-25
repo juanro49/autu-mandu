@@ -30,12 +30,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         <ImageButton
+            android:id="@+id/btn_report_options"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="right"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/graph_options_desc"
-            android:onClick="showReportOptions"
             android:src="@drawable/ic_menu_overflow" />
     </FrameLayout>
     <ListView

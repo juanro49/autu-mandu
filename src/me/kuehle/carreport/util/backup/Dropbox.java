@@ -149,6 +149,8 @@ public class Dropbox {
 			} catch (IllegalStateException e) {
 				callback.authenticationFinished(false, null, false);
 			}
+		} else {
+			callback.authenticationFinished(false, null, false);
 		}
 	}
 

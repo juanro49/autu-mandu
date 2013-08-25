@@ -15,11 +15,20 @@
   limitations under the License.
 -->
 <resources>
+    <string-array name="main_views">
+        <item>Reports</item>
+        <item>Daten</item>
+        <item>Rechner</item>
+    </string-array>
     <string-array name="reports">
         <item>Benzinverbrauch</item>
         <item>Benzinpreis</item>
         <item>Kilometerstand</item>
         <item>Kosten</item>
+    </string-array>
+    <string-array name="data_list_page_titles">
+        <item>Tankfüllungen</item>
+        <item>Andere Kosten</item>
     </string-array>
     <string-array name="repeat_intervals">
         <item>Einmalig</item>
@@ -27,10 +36,5 @@
         <item>Jeden Monat wiederholen</item>
         <item>Jedes Quartal wiederholen</item>
         <item>Jedes Jahr wiederholen</item>
-    </string-array>
-    <string-array name="exportcsv_singlemultiplefile">
-        <item>Eine Datei</item>
-        <item>Zwei Dateien (Tankfüllungen, Andere Kosten)</item>
-        <item>Drei Dateien (Autos, Tankfüllungen, Andere Kosten)</item>
     </string-array>
 </resources>

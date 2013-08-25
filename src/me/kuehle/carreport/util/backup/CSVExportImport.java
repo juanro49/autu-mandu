@@ -21,8 +21,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import me.kuehle.carreport.util.CSVReader;
@@ -39,16 +42,17 @@ import com.activeandroid.query.Select;
 public class CSVExportImport {
 	public static final String DIRECTORY = "Car Report CSV";
 
-	private File dir;
+	private File externalStorageDir;
+	private File exportDir;
 
 	public CSVExportImport() {
-		this.dir = new File(Environment.getExternalStorageDirectory(),
-				DIRECTORY);
+		externalStorageDir = Environment.getExternalStorageDirectory();
+		exportDir = new File(externalStorageDir, DIRECTORY);
 	}
 
 	public boolean export() {
-		if (!this.dir.isDirectory()) {
-			if (!this.dir.mkdir()) {
+		if (!exportDir.isDirectory()) {
+			if (!exportDir.mkdir()) {
 				return false;
 			}
 		}
@@ -68,26 +72,34 @@ public class CSVExportImport {
 			for (Model entry : entries) {
 				List<Object> line = new ArrayList<Object>();
 				for (Field field : fields) {
+					Object value;
 					try {
-						line.add(field.get(entry));
+						value = field.get(entry);
 					} catch (IllegalArgumentException e) {
 						return false;
 					} catch (IllegalAccessException e) {
 						return false;
+					}
+
+					if (value != null
+							&& Model.class.isAssignableFrom(field.getType())) {
+						line.add(((Model) value).getId());
+					} else {
+						line.add(value);
 					}
 				}
 
 				csv.writeLine(line.toArray());
 			}
 
-			csv.toFile(new File(dir, table.getTableName() + ".csv"));
+			csv.toFile(new File(exportDir, table.getTableName() + ".csv"));
 		}
 
 		return true;
 	}
 
 	public boolean canExport() {
-		return dir.canWrite();
+		return externalStorageDir.canWrite();
 	}
 
 	public boolean canImport() {
@@ -97,7 +109,7 @@ public class CSVExportImport {
 	public boolean allExportFilesExist() {
 		Collection<TableInfo> tables = Cache.getTableInfos();
 		for (TableInfo table : tables) {
-			File file = new File(dir, table.getTableName() + ".csv");
+			File file = new File(exportDir, table.getTableName() + ".csv");
 			if (!file.isFile()) {
 				return false;
 			}
@@ -109,7 +121,7 @@ public class CSVExportImport {
 	public boolean anyExportFileExist() {
 		Collection<TableInfo> tables = Cache.getTableInfos();
 		for (TableInfo table : tables) {
-			File file = new File(dir, table.getTableName() + ".csv");
+			File file = new File(exportDir, table.getTableName() + ".csv");
 			if (file.isFile()) {
 				return true;
 			}
@@ -118,28 +130,37 @@ public class CSVExportImport {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean import_() {
 		if (!allExportFilesExist()) {
 			return false;
 		}
 
-		Collection<TableInfo> tables = Cache.getTableInfos();
+		TableInfo[] tables = Cache.getTableInfos().toArray(new TableInfo[0]);
+		sortByReferences(tables);
+
 		for (TableInfo table : tables) {
 			Collection<Field> fields = table.getFields();
 
 			CSVReader csv = CSVReader.fromFile(
-					new File(dir, table.getTableName() + ".csv"), true);
+					new File(exportDir, table.getTableName() + ".csv"), true);
 
 			ActiveAndroid.beginTransaction();
 			try {
 				for (int i = 0; i < csv.getRowCount(); i++) {
-					long id = csv.getLong(i, "Id");
+					Long id = csv.getLong(i, "Id");
 
-					Model entry = Model.load(table.getType(), id);
-					if (entry == null) {
+					Model entry;
+					if (id == null) {
 						Constructor<?> constructor = table.getType()
 								.getConstructor();
 						entry = (Model) constructor.newInstance();
+					} else {
+						entry = Model.load(table.getType(), id);
+						if(entry == null) {
+							// Id given, but no corresponding entry found.
+							return false;
+						}
 					}
 
 					for (Field field : fields) {
@@ -148,11 +169,12 @@ public class CSVExportImport {
 						Class<?> fieldType = field.getType();
 						if (fieldType.equals(Boolean.class)
 								|| fieldType.equals(boolean.class)) {
-							value = csv
-									.getBoolen(i, table.getColumnName(field));
+							value = csv.getBoolean(i,
+									table.getColumnName(field));
 						} else if (fieldType.equals(Integer.class)
 								|| fieldType.equals(int.class)) {
-							value = csv.getInt(i, table.getColumnName(field));
+							value = csv.getInteger(i,
+									table.getColumnName(field));
 						} else if (fieldType.equals(Long.class)
 								|| fieldType.equals(long.class)) {
 							value = csv.getLong(i, table.getColumnName(field));
@@ -167,6 +189,10 @@ public class CSVExportImport {
 						} else if (fieldType.equals(String.class)) {
 							value = csv
 									.getString(i, table.getColumnName(field));
+						} else if (Model.class.isAssignableFrom(fieldType)) {
+							value = Model.load(
+									(Class<? extends Model>) fieldType,
+									csv.getLong(i, table.getColumnName(field)));
 						}
 
 						field.set(entry, value);
@@ -192,5 +218,58 @@ public class CSVExportImport {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get table infos and sort them, so tables with foreign key constraints get
+	 * handled after their parent table. Therefore assign every table a number,
+	 * which indicates at which position it can be imported. The position will
+	 * be max(ref1.pos, ref2.pos, ...) + 1. The tables which do not have any
+	 * foreign keys have position 0 and can be imported first.
+	 */
+	private void sortByReferences(TableInfo[] tables) {
+		// Get position for every table.
+		final HashMap<Class<? extends Model>, Integer> order = new HashMap<Class<? extends Model>, Integer>();
+		while (order.size() < tables.length) {
+			for (TableInfo table : tables) {
+				// Do not process tables, which already have a position.
+				if (order.containsKey(table.getType())) {
+					continue;
+				}
+
+				int position = 0;
+				boolean skip = false;
+
+				// For every foreign key check the position of the referenced
+				// table. If any referenced table does not have a position yet,
+				// skip the current table. It will be handled in one of the next
+				// loops.
+				Collection<Field> fields = table.getFields();
+				for (Field field : fields) {
+					if (Model.class.isAssignableFrom(field.getType())) {
+						if (order.containsKey(field.getType())) {
+							position = Math.max(position,
+									order.get(field.getType()) + 1);
+						} else {
+							skip = true;
+							break;
+						}
+					}
+				}
+
+				if (!skip) {
+					order.put(table.getType(), position);
+				}
+			}
+		}
+
+		// Sort the tables by the assigned positions.
+		Arrays.sort(tables, new Comparator<TableInfo>() {
+			@Override
+			public int compare(TableInfo lhs, TableInfo rhs) {
+				return order.get(lhs.getType()).compareTo(
+						order.get(rhs.getType()));
+			}
+		});
 	}
 }

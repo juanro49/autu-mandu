@@ -11,15 +11,16 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
+import android.app.FragmentManager;
 import android.widget.Toast;
 
 public class PreferencesBackupFragment extends PreferenceFragment implements
 		MessageDialogFragmentListener {
-	private static final int DROPBOX_FIRST_SYNC_REQUEST_CODE = 0;
-	private static final int BACKUP_OVERWRITE_REQUEST_CODE = 1;
-	private static final int RESTORE_REQUEST_CODE = 2;
-	private static final int EXPORT_CSV_REQUEST_CODE = 3;
-	private static final int IMPORT_CSV_REQUEST_CODE = 4;
+	private static final int REQUEST_DROPBOX_FIRST_SYNC = 0;
+	private static final int REQUEST_BACKUP_OVERWRITE = 1;
+	private static final int REQUEST_RESTORE = 2;
+	private static final int REQUEST_EXPORT_CSV_OVERWRITE = 3;
+	private static final int REQUEST_IMPORT_CSV = 4;
 
 	private Dropbox dropbox;
 	private boolean dropboxAuthenticationInProgress = false;
@@ -45,8 +46,9 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 		@Override
 		public boolean onPreferenceClick(Preference preference) {
 			if (backup.backupFileExists()) {
-				MessageDialogFragment.newInstance(PreferencesBackupFragment.this,
-						BACKUP_OVERWRITE_REQUEST_CODE,
+				MessageDialogFragment.newInstance(
+						PreferencesBackupFragment.this,
+						REQUEST_BACKUP_OVERWRITE,
 						R.string.alert_backup_overwrite_title,
 						getString(R.string.alert_backup_overwrite_message),
 						R.string.overwrite, android.R.string.cancel).show(
@@ -63,7 +65,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 		@Override
 		public boolean onPreferenceClick(Preference preference) {
 			MessageDialogFragment.newInstance(PreferencesBackupFragment.this,
-					RESTORE_REQUEST_CODE, R.string.alert_restore_title,
+					REQUEST_RESTORE, R.string.alert_restore_title,
 					getString(R.string.alert_restore_message),
 					R.string.restore, android.R.string.cancel).show(
 					getFragmentManager(), null);
@@ -75,8 +77,9 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 		@Override
 		public boolean onPreferenceClick(Preference preference) {
 			if (csvExportImport.anyExportFileExist()) {
-				MessageDialogFragment.newInstance(PreferencesBackupFragment.this,
-						EXPORT_CSV_REQUEST_CODE,
+				MessageDialogFragment.newInstance(
+						PreferencesBackupFragment.this,
+						REQUEST_EXPORT_CSV_OVERWRITE,
 						R.string.alert_export_csv_overwrite_title,
 						getString(R.string.alert_export_csv_overwrite_message),
 						R.string.overwrite, android.R.string.cancel).show(
@@ -93,7 +96,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 		@Override
 		public boolean onPreferenceClick(Preference preference) {
 			MessageDialogFragment.newInstance(PreferencesBackupFragment.this,
-					IMPORT_CSV_REQUEST_CODE, R.string.alert_import_csv_title,
+					REQUEST_IMPORT_CSV, R.string.alert_import_csv_title,
 					getString(R.string.alert_import_csv_message),
 					R.string.import_, android.R.string.cancel).show(
 					getFragmentManager(), null);
@@ -142,22 +145,22 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 
 	@Override
 	public void onDialogNegativeClick(int requestCode) {
-		if (requestCode == DROPBOX_FIRST_SYNC_REQUEST_CODE) {
+		if (requestCode == REQUEST_DROPBOX_FIRST_SYNC) {
 			dropbox.synchronize(Dropbox.SYNC_UPLOAD);
 		}
 	}
 
 	@Override
 	public void onDialogPositiveClick(int requestCode) {
-		if (requestCode == DROPBOX_FIRST_SYNC_REQUEST_CODE) {
+		if (requestCode == REQUEST_DROPBOX_FIRST_SYNC) {
 			dropbox.synchronize(Dropbox.SYNC_DOWNLOAD);
-		} else if (requestCode == BACKUP_OVERWRITE_REQUEST_CODE) {
+		} else if (requestCode == REQUEST_BACKUP_OVERWRITE) {
 			doBackup();
-		} else if (requestCode == RESTORE_REQUEST_CODE) {
+		} else if (requestCode == REQUEST_RESTORE) {
 			doRestore();
-		} else if (requestCode == EXPORT_CSV_REQUEST_CODE) {
+		} else if (requestCode == REQUEST_EXPORT_CSV_OVERWRITE) {
 			doExportCSV();
-		} else if (requestCode == IMPORT_CSV_REQUEST_CODE) {
+		} else if (requestCode == REQUEST_IMPORT_CSV) {
 			doImportCSV();
 		}
 	}
@@ -177,15 +180,13 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 				@Override
 				public void authenticationFinished(boolean success,
 						String accountName, boolean remoteDataAvailable) {
-					((ProgressDialogFragment) getFragmentManager()
-							.findFragmentByTag("progress")).dismiss();
+					FragmentManager fm = getFragmentManager();
+					fm.executePendingTransactions();
+					((ProgressDialogFragment) fm.findFragmentByTag("progress"))
+							.dismiss();
 					if (success) {
 						setupDropdoxPreference();
-						if (remoteDataAvailable) {
-							dropboxFirstSynchronisation();
-						} else {
-							dropbox.synchronize(Dropbox.SYNC_UPLOAD);
-						}
+						dropboxFirstSynchronisation(remoteDataAvailable);
 					} else {
 						Toast.makeText(getActivity(),
 								R.string.toast_dropbox_authentication_failed,
@@ -231,22 +232,25 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 
 	private void doImportCSV() {
 		if (csvExportImport.import_()) {
-			Toast.makeText(getActivity(), R.string.toast_import_success,
+			Toast.makeText(getActivity(), R.string.toast_import_csv_success,
 					Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(getActivity(), R.string.toast_import_failed,
+			Toast.makeText(getActivity(), R.string.toast_importcsv_failed,
 					Toast.LENGTH_SHORT).show();
 		}
 	}
 
-	private void dropboxFirstSynchronisation() {
-		MessageDialogFragment.newInstance(this,
-				DROPBOX_FIRST_SYNC_REQUEST_CODE,
-				R.string.alert_dropbox_first_sync_title,
-				getString(R.string.alert_dropbox_first_sync_message),
-				R.string.alert_dropbox_first_sync_download,
-				R.string.alert_dropbox_first_sync_upload).show(
-				getFragmentManager(), null);
+	private void dropboxFirstSynchronisation(boolean remoteDataAvailable) {
+		if (remoteDataAvailable) {
+			MessageDialogFragment.newInstance(this, REQUEST_DROPBOX_FIRST_SYNC,
+					R.string.alert_dropbox_first_sync_title,
+					getString(R.string.alert_dropbox_first_sync_message),
+					R.string.alert_dropbox_first_sync_download,
+					R.string.alert_dropbox_first_sync_upload).show(
+					getFragmentManager(), null);
+		} else {
+			dropbox.synchronize(Dropbox.SYNC_UPLOAD);
+		}
 	}
 
 	private void setupDropdoxPreference() {
@@ -279,12 +283,12 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 	private void setupImportCSVPreference() {
 		Preference import_ = findPreference("importcsv");
 		if (csvExportImport.canImport()) {
-			import_.setSummary(getString(R.string.pref_summary_importcsv,
+			import_.setSummary(getString(R.string.pref_summary_import_csv,
 					Backup.FILE_NAME));
 			import_.setEnabled(true);
 		} else {
 			import_.setSummary(getString(
-					R.string.pref_summary_importcsv_no_data,
+					R.string.pref_summary_import_csv_no_data,
 					CSVExportImport.DIRECTORY));
 			import_.setEnabled(false);
 		}

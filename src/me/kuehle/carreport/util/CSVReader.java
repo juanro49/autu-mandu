@@ -170,35 +170,35 @@ public class CSVReader {
 		return parseDate(getString(row, title));
 	}
 
-	public float getFloat(int row, int col) {
+	public Float getFloat(int row, int col) {
 		return parseFloat(getString(row, col));
 	}
 
-	public float getFloat(int row, String title) {
+	public Float getFloat(int row, String title) {
 		return parseFloat(getString(row, title));
 	}
 
-	public int getInt(int row, int col) {
-		return parseInt(getString(row, col));
+	public Integer getInteger(int row, int col) {
+		return parseInteger(getString(row, col));
 	}
 
-	public int getInt(int row, String title) {
-		return parseInt(getString(row, title));
+	public Integer getInteger(int row, String title) {
+		return parseInteger(getString(row, title));
 	}
 
-	public long getLong(int row, int col) {
+	public Long getLong(int row, int col) {
 		return parseLong(getString(row, col));
 	}
 
-	public long getLong(int row, String title) {
+	public Long getLong(int row, String title) {
 		return parseLong(getString(row, title));
 	}
 
-	public boolean getBoolean(int row, int col) {
+	public Boolean getBoolean(int row, int col) {
 		return parseBoolean(getString(row, col));
 	}
 
-	public boolean getBoolen(int row, String title) {
+	public Boolean getBoolean(int row, String title) {
 		return parseBoolean(getString(row, title));
 	}
 
@@ -214,31 +214,35 @@ public class CSVReader {
 		}
 	}
 
-	private float parseFloat(String value) {
+	private Float parseFloat(String value) {
 		try {
 			return floatFormat.parse(value).floatValue();
 		} catch (Exception e) {
-			return 0;
+			return null;
 		}
 	}
 
-	private int parseInt(String value) {
+	private Integer parseInteger(String value) {
 		try {
 			return Integer.parseInt(value);
 		} catch (Exception e) {
-			return 0;
+			return null;
 		}
 	}
 
-	private long parseLong(String value) {
+	private Long parseLong(String value) {
 		try {
 			return Long.parseLong(value);
 		} catch (Exception e) {
-			return 0;
+			return null;
 		}
 	}
 
-	private boolean parseBoolean(String value) {
-		return Boolean.parseBoolean(value);
+	private Boolean parseBoolean(String value) {
+		if (value.isEmpty()) {
+			return null;
+		} else {
+			return Boolean.parseBoolean(value);
+		}
 	}
 }

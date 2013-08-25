@@ -15,11 +15,20 @@
   limitations under the License.
 -->
 <resources>
+    <string-array name="main_views">
+        <item>Reports</item>
+        <item>Data</item>
+        <item>Calculator</item>
+    </string-array>
     <string-array name="reports">
         <item>Fuel consumption</item>
         <item>Fuel price</item>
         <item>Mileage</item>
         <item>Costs</item>
+    </string-array>
+    <string-array name="data_list_page_titles">
+        <item>Refuelings</item>
+        <item>Other Costs</item>
     </string-array>
     <string-array name="repeat_intervals">
         <item>Once</item>
@@ -27,10 +36,5 @@
         <item>Repeat every month</item>
         <item>Repeat every quarter</item>
         <item>Repeat every year</item>
-    </string-array>
-    <string-array name="exportcsv_singlemultiplefile">
-        <item>Single file</item>
-        <item>Two files (refuelings, other costs)</item>
-        <item>Four files (cars, refuelings, other costs, fuel types)</item>
     </string-array>
 </resources>

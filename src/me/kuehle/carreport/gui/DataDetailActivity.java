@@ -55,19 +55,19 @@ public class DataDetailActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void itemSaved() {
+	public void onItemSaved() {
 		setResult(RESULT_OK);
 		finish();
 	}
 
 	@Override
-	public void itemCanceled() {
+	public void onItemCanceled() {
 		setResult(RESULT_CANCELED);
 		finish();
 	}
 
 	@Override
-	public void itemDeleted() {
+	public void onItemDeleted() {
 		setResult(RESULT_OK);
 		finish();
 	}

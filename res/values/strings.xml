@@ -12,7 +12,7 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License.
 -->
 <resources>
     <string name="app_name">Car Report</string>
@@ -27,14 +27,12 @@
     <string name="hint_note_optional">Note (optional)</string>
     <string name="hint_title">Title</string>
     <string name="hint_name">Name</string>
-    <string name="hint_fueltype">Fuel type</string>
     <string name="label_partial">Partial</string>
-    <string name="label_overwrite">Overwrite existing files</string>
     <string name="label_color">Color</string>
     <string name="label_suspend">Suspend</string>
     <string name="label_in_tank">in Tank</string>
-    <string name="label_add_fuel_type">Add</string>
-    <string name="label_add_fuel_tank">Add</string>
+    <string name="label_add">Add</string>
+    <string name="label_add_dialog">Add…</string>
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>
     <string name="menu_synchronize">Synchronize</string>
@@ -45,20 +43,19 @@
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
     <string name="menu_delete">Delete</string>
-    <string name="menu_view_data">View data</string>
-    <string name="menu_calculate">Calculate</string>
     <string name="menu_add_car">Add car</string>
     <string name="menu_show_trend">Show trend</string>
     <string name="section_car">Car</string>
     <string name="section_note">Note</string>
     <string name="section_fueltypes">Fuel types</string>
     <string name="section_suspend">Suspend</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
     <string name="title_first_start">First steps</string>
     <string name="title_add_refueling">Add refueling</string>
     <string name="title_edit_refueling">Edit refueling</string>
     <string name="title_settings">Settings</string>
     <string name="title_help">Help</string>
-    <string name="title_view_data">Data</string>
     <string name="title_add_other">Add other</string>
     <string name="title_edit_other">Edit other</string>
     <string name="title_add_car">Add car</string>
@@ -66,6 +63,7 @@
     <string name="cab_title_selected">%d selected</string>
     <string name="edit_title_refueling">Refueling</string>
     <string name="edit_message_no_entry_selected">No entry selected</string>
+    <string name="edit_message_no_entries_available">No entries available</string>
     <string name="alert_delete_refueling_message">This refueling will be deleted.</string>
     <string name="alert_delete_other_message">This other cost will be deleted.</string>
     <string name="alert_delete_car_message">This car will be deleted.</string>
@@ -95,7 +93,6 @@
     <string name="alert_fuel_tank_exists_message">A fuel tank with this name does already exist.</string>
     <string name="overwrite">Overwrite</string>
     <string name="restore">Restore</string>
-    <string name="export">Export</string>
     <string name="import_">Import</string>
     <string name="toast_synchronization_failed">Synchronization failed</string>
     <string name="toast_refueling_saved">Refueling saved</string>
@@ -111,12 +108,10 @@
     <string name="toast_restore_failed">Restore failed</string>
     <string name="toast_export_csv_succeeded">Export to SD card completed successfully.</string>
     <string name="toast_export_csv_failed">Export failed.</string>
-    <string name="toast_import_success">Import completed successfully.</string>
-    <string name="toast_import_failed">Import failed. No data was changed. Are your files in the correct format?</string>
-    <string name="validate_error_greater_zero">Has to be greater 0.</string>
-    <string name="validate_error_not_empty">Must not be empty.</string>
-    <string name="tab_indicator_refuelings">Refuelings</string>
-    <string name="tab_indicator_other">Other costs</string>
+    <string name="toast_import_csv_success">Import completed successfully.</string>
+    <string name="toast_importcsv_failed">Import failed. No data was changed. Are your files in the correct format?</string>
+    <string name="validate_error_greater_zero">Has to be greater 0</string>
+    <string name="validate_error_not_empty">Must not be empty</string>
     <string name="graph_options_desc">Graph options</string>
     <string name="remove_fueltype_desc">Remove</string>
     <string name="report_trend_label">%s (Trend)</string>
@@ -125,7 +120,6 @@
     <string name="report_graph_accumulated">Accumulated</string>
     <string name="report_graph_per_refueling">Per Refueling</string>
     <string name="report_not_enough_data">Not enough data</string>
-    <string name="report_no_fueltype">No fuel type</string>
     <string name="report_since">&#931; since %s</string>
     <string name="report_lowest">Lowest</string>
     <string name="report_highest">Highest</string>
@@ -180,9 +174,9 @@
     <string name="pref_summary_backup">Backup the current data to SD card.</string>
     <string name="pref_summary_restore">Restore data from file %s on SD card.</string>
     <string name="pref_summary_restore_no_data">File %s does not exist on SD card.</string>
-    <string name="pref_summary_exportcsv">Export data as CSV so you can use it in other programs like Microsoft Excel or LibreOffice Calc.</string>
-    <string name="pref_summary_importcsv">Import data from CSV files. The files must look like the ones, that are generated during CSV export.</string>
-    <string name="pref_summary_importcsv_no_data">Files do not exist in directory %s on SD card.</string>
+    <string name="pref_summary_export_csv">Export data as CSV so you can use it in other programs like Microsoft Excel or LibreOffice Calc.</string>
+    <string name="pref_summary_import_csv">Import data from CSV files. The files must look like the ones, that are generated during CSV export.</string>
+    <string name="pref_summary_import_csv_no_data">Files do not exist in directory %s on SD card.</string>
     <string name="help_section_getting_started">Getting started</string>
     <string name="help_section_tips">Tips</string>
     <string name="help_section_calculations">Calculations</string>

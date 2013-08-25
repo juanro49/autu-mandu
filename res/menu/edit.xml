@@ -25,13 +25,13 @@
     <item
         android:id="@+id/menu_cancel"
         android:icon="@drawable/ic_cancel"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="always|withText"
         android:title="@string/menu_cancel">
     </item>
     <item
         android:id="@+id/menu_save"
         android:icon="@drawable/ic_accept"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="always|withText"
         android:title="@string/menu_save">
     </item>
 

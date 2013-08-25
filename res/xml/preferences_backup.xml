@@ -44,11 +44,11 @@
     <PreferenceCategory android:title="@string/pref_title_category_export" >
         <Preference
             android:key="exportcsv"
-            android:summary="@string/pref_summary_exportcsv"
+            android:summary="@string/pref_summary_export_csv"
             android:title="@string/pref_title_exportcsv" />
         <Preference
             android:key="importcsv"
-            android:summary="@string/pref_summary_importcsv"
+            android:summary="@string/pref_summary_import_csv"
             android:title="@string/pref_title_importcsv" />
     </PreferenceCategory>
 </PreferenceScreen>

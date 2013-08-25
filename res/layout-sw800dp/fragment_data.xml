@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright 2012 Jan Kühle
+  Copyright 2013 Jan Kühle
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,12 +20,17 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle" >
-    <fragment
-        android:id="@+id/list"
-        android:name="me.kuehle.carreport.gui.DataListFragment"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2" />
+        android:layout_weight="2" >
+        <android.support.v4.view.PagerTabStrip
+            android:id="@+id/pager_tab_strip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top" />
+    </android.support.v4.view.ViewPager>
     <FrameLayout
         android:id="@+id/detail"
         android:layout_width="0dp"
@@ -34,11 +39,11 @@
         android:background="?android:attr/detailsElementBackground" >
         <TextView
             android:id="@+id/txt_no_entry_selected"
-            style="@android:style/TextAppearance.DeviceDefault.Large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:drawableTop="@drawable/ic_data_detail_refueling"
-            android:text="@string/edit_message_no_entry_selected" />
+            android:text="@string/edit_message_no_entry_selected"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </FrameLayout>
 </LinearLayout>

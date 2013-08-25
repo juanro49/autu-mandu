@@ -16,11 +16,9 @@
 
 package me.kuehle.carreport.gui;
 
-import java.util.List;
-
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.gui.util.DataChangeListener;
 import me.kuehle.carreport.gui.util.SectionListAdapter;
 import me.kuehle.carreport.gui.util.SimpleAnimator;
 import me.kuehle.carreport.reports.AbstractReport;
@@ -29,67 +27,38 @@ import me.kuehle.carreport.reports.CostsReport;
 import me.kuehle.carreport.reports.FuelConsumptionReport;
 import me.kuehle.carreport.reports.FuelPriceReport;
 import me.kuehle.carreport.reports.MileageReport;
-import me.kuehle.carreport.util.backup.Dropbox;
 import me.kuehle.chartlib.ChartView;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
-import android.widget.Toast;
 
-public class ReportActivity extends Activity implements OnMenuItemClickListener {
-	private static final int REQUEST_FIRST_START = 0;
-	private static final int REQUEST_ADD_DATA = 1;
-	private static final int REQUEST_VIEW_DATA = 2;
-	private static final int REQUEST_SETTINGS = 3;
-
+public class ReportFragment extends Fragment implements
+		OnMenuItemClickListener, DataChangeListener {
+	private FrameLayout mGraphHolder;
+	private ChartView mGraph;
+	private ListView mLstData;
 	private AbstractReport mCurrentReport;
 	private int mCurrentGraphOption;
-	private MenuItem mSyncMenuItem;
-
-	private Dropbox.OnSynchronizeListener mOnSynchronize = new Dropbox.OnSynchronizeListener() {
-		@Override
-		public void synchronizationFinished(boolean result) {
-			if (mSyncMenuItem != null) {
-				mSyncMenuItem.setActionView(null);
-			}
-
-			if (result) {
-				updateReport();
-			} else {
-				Toast.makeText(ReportActivity.this,
-						R.string.toast_synchronization_failed,
-						Toast.LENGTH_SHORT).show();
-			}
-		}
-
-		@Override
-		public void synchronizationStarted() {
-			if (mSyncMenuItem != null) {
-				mSyncMenuItem
-						.setActionView(R.layout.actionbar_indeterminate_progress);
-			}
-		}
-	};
 
 	private OnNavigationListener navigationListener = new OnNavigationListener() {
 		@Override
@@ -128,11 +97,10 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			}
 			option = 0;
 
-			View graph = ReportActivity.this.findViewById(R.id.graph_holder);
-			graphAnimator = new SimpleAnimator(ReportActivity.this, graph,
+			graphAnimator = new SimpleAnimator(getActivity(), mGraphHolder,
 					SimpleAnimator.Property.Weight, 500);
 
-			input = new EditText(ReportActivity.this);
+			input = new EditText(getActivity());
 			input.setInputType(InputType.TYPE_CLASS_NUMBER
 					| InputType.TYPE_NUMBER_FLAG_DECIMAL);
 			input.setLines(1);
@@ -159,7 +127,8 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			graphAnimator.hide(null, new Runnable() {
 				@Override
 				public void run() {
-					InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					InputMethodManager keyboard = (InputMethodManager) getActivity()
+							.getSystemService(Context.INPUT_METHOD_SERVICE);
 					keyboard.showSoftInput(input, 0);
 				}
 			});
@@ -172,7 +141,8 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		public void onDestroyActionMode(ActionMode mode) {
 			mCurrentReport.getData().resetCalculation();
 
-			InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			InputMethodManager keyboard = (InputMethodManager) getActivity()
+					.getSystemService(Context.INPUT_METHOD_SERVICE);
 			keyboard.hideSoftInputFromWindow(input.getWindowToken(), 0);
 
 			graphAnimator.show(null, null);
@@ -190,64 +160,43 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 			} catch (NumberFormatException e) {
 			}
 			mCurrentReport.getData().applyCalculation(value1, option);
-			((ListView) ReportActivity.this.findViewById(R.id.lst_data))
-					.invalidateViews();
+			mLstData.invalidateViews();
 		}
 	};
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_FIRST_START && resultCode == RESULT_CANCELED) {
-			finish();
-		} else {
-			updateReport();
-		}
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_report);
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.reports,
+				getActivity(), R.array.reports,
 				android.R.layout.simple_spinner_dropdown_item);
 
-		ActionBar actionBar = getActionBar();
-		actionBar.setDisplayShowTitleEnabled(false);
+		ActionBar actionBar = getActivity().getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setListNavigationCallbacks(adapter, navigationListener);
-
-		Object reportId = getLastNonConfigurationInstance();
-		if (reportId != null) {
-			actionBar.setSelectedNavigationItem((Integer) reportId);
-		} else {
-			Preferences prefs = new Preferences(this);
-			actionBar.setSelectedNavigationItem(prefs.getDefaultReport());
-		}
-
-		ChartView graph = (ChartView) findViewById(R.id.graph);
-		graph.setNotEnoughDataView(View.inflate(this,
-				R.layout.chart_not_enough_data, null));
-
-		// When there is no car, show the first start activity.
-		if (Car.getCount() == 0) {
-			Intent intent = new Intent(this, FirstStartActivity.class);
-			startActivityForResult(intent, REQUEST_FIRST_START);
-		}
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.report, menu);
-		mSyncMenuItem = menu.findItem(R.id.menu_synchronize);
-		mSyncMenuItem.setVisible(Dropbox.getInstance().isLinked());
-		if (Dropbox.getInstance().isSynchronisationInProgress()) {
-			mSyncMenuItem
-					.setActionView(R.layout.actionbar_indeterminate_progress);
-		}
-		return true;
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View v = inflater.inflate(R.layout.fragment_report, container, false);
+
+		mLstData = (ListView) v.findViewById(R.id.lst_data);
+		mGraphHolder = (FrameLayout) v.findViewById(R.id.graph_holder);
+		mGraph = (ChartView) v.findViewById(R.id.graph);
+		mGraph.setNotEnoughDataView(View.inflate(getActivity(),
+				R.layout.chart_not_enough_data, null));
+
+		View btnReportOptions = v.findViewById(R.id.btn_report_options);
+		btnReportOptions.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showReportOptions(v);
+			}
+		});
+
+		return v;
 	}
 
 	@Override
@@ -268,78 +217,12 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_synchronize:
-			Dropbox.getInstance().synchronize();
-			return true;
-		case R.id.menu_calculate:
-			startActionMode(mCalculationActionMode);
-			return true;
-		case R.id.menu_view_data:
-			Intent intentData = new Intent(this, DataListActivity.class);
-			startActivityForResult(intentData, REQUEST_VIEW_DATA);
-			return true;
-		case R.id.menu_settings:
-			Intent intentPrefs = new Intent(this, PreferencesActivity.class);
-			startActivityForResult(intentPrefs, REQUEST_SETTINGS);
-			return true;
-		case R.id.menu_help:
-			Intent intentHelp = new Intent(this, HelpActivity.class);
-			startActivity(intentHelp);
-			return true;
-		default:
-			if (item.getIntent() != null) {
-				startActivityForResult(item.getIntent(), REQUEST_ADD_DATA);
-				return true;
-			} else {
-				return super.onOptionsItemSelected(item);
-			}
-		}
-	}
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		Preferences prefs = new Preferences(this);
-		List<Car> cars = Car.getAll();
-
-		MenuItem[] items = { menu.findItem(R.id.menu_add_refueling),
-				menu.findItem(R.id.menu_add_other) };
-		int extraEdit[] = { DataDetailActivity.EXTRA_EDIT_REFUELING,
-				DataDetailActivity.EXTRA_EDIT_OTHER };
-
-		for (int i = 0; i < items.length; i++) {
-			SubMenu subMenu = items[i].getSubMenu();
-			subMenu.clear();
-
-			if (cars.size() == 1 || !prefs.isShowCarMenu()) {
-				items[i].setIntent(getDetailActivityIntent(extraEdit[i],
-						prefs.getDefaultCar()));
-			} else {
-				items[i].setIntent(null);
-				for (Car car : cars) {
-					subMenu.add(car.name).setIntent(
-							getDetailActivityIntent(extraEdit[i], car.getId()));
-				}
-			}
-		}
-
-		if (mCurrentReport != null) {
-			menu.findItem(R.id.menu_calculate).setEnabled(
-					mCurrentReport.getCalculationOptions().length > 0);
-		}
-
-		return true;
-	}
-
-	@Override
-	public Object onRetainNonConfigurationInstance() {
-		ActionBar actionBar = getActionBar();
-		return actionBar.getSelectedNavigationIndex();
+	public void onDataChanged() {
+		updateReport();
 	}
 
 	public void showReportOptions(View v) {
-		PopupMenu popup = new PopupMenu(this, v);
+		PopupMenu popup = new PopupMenu(getActivity(), v);
 		popup.inflate(R.menu.report_options);
 		popup.setOnMenuItemClickListener(this);
 
@@ -361,7 +244,8 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	}
 
 	private void loadGraphSettings() {
-		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences prefs = getActivity().getPreferences(
+				Context.MODE_PRIVATE);
 		String reportName = mCurrentReport.getClass().getSimpleName();
 		mCurrentReport.setShowTrend(prefs.getBoolean(
 				reportName + "_show_trend", false));
@@ -373,7 +257,7 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 	}
 
 	private void saveGraphSettings() {
-		SharedPreferences.Editor prefsEdit = getPreferences(
+		SharedPreferences.Editor prefsEdit = getActivity().getPreferences(
 				Context.MODE_PRIVATE).edit();
 		String reportName = mCurrentReport.getClass().getSimpleName();
 		prefsEdit.putBoolean(reportName + "_show_trend",
@@ -383,29 +267,26 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		prefsEdit.apply();
 	}
 
-	private Intent getDetailActivityIntent(int edit, long carId) {
-		Intent intent = new Intent(this, DataDetailActivity.class);
-		intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
-		intent.putExtra(AbstractDataDetailFragment.EXTRA_CAR_ID, carId);
-		return intent;
-	}
-
 	private void updateReport() {
-		ActionBar actionBar = getActionBar();
+		ActionBar actionBar = getActivity().getActionBar();
 		int reportIndex = actionBar.getSelectedNavigationIndex();
 
 		switch (reportIndex) {
 		case 0:
-			mCurrentReport = new FuelConsumptionReport(getApplicationContext());
+			mCurrentReport = new FuelConsumptionReport(getActivity()
+					.getApplicationContext());
 			break;
 		case 1:
-			mCurrentReport = new FuelPriceReport(getApplicationContext());
+			mCurrentReport = new FuelPriceReport(getActivity()
+					.getApplicationContext());
 			break;
 		case 2:
-			mCurrentReport = new MileageReport(getApplicationContext());
+			mCurrentReport = new MileageReport(getActivity()
+					.getApplicationContext());
 			break;
 		case 3:
-			mCurrentReport = new CostsReport(getApplicationContext());
+			mCurrentReport = new CostsReport(getActivity()
+					.getApplicationContext());
 			break;
 		default:
 			return;
@@ -414,36 +295,18 @@ public class ReportActivity extends Activity implements OnMenuItemClickListener 
 		loadGraphSettings();
 		updateReportGraph();
 
-		ListView lstData = (ListView) findViewById(R.id.lst_data);
-		Preferences prefs = new Preferences(ReportActivity.this);
-		lstData.setAdapter(new SectionListAdapter(this,
+		Preferences prefs = new Preferences(getActivity());
+		mLstData.setAdapter(new SectionListAdapter(getActivity(),
 				R.layout.list_item_report_data, mCurrentReport.getData()
 						.getData(), prefs.isColorSections()));
 	}
 
 	private void updateReportGraph() {
-		FrameLayout graphHolder = (FrameLayout) findViewById(R.id.graph_holder);
-		ChartView graph = (ChartView) findViewById(R.id.graph);
-		graph.setChart(mCurrentReport.getChart(mCurrentGraphOption));
-		if (graph.getChart() == null) {
-			graphHolder.setVisibility(View.GONE);
+		mGraph.setChart(mCurrentReport.getChart(mCurrentGraphOption));
+		if (mGraph.getChart() == null) {
+			mGraphHolder.setVisibility(View.GONE);
 		} else {
-			graphHolder.setVisibility(View.VISIBLE);
+			mGraphHolder.setVisibility(View.VISIBLE);
 		}
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		Dropbox.getInstance().setSynchronisationCallback(null);
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (mSyncMenuItem != null) {
-			mSyncMenuItem.setVisible(Dropbox.getInstance().isLinked());
-		}
-		Dropbox.getInstance().setSynchronisationCallback(mOnSynchronize);
 	}
 }

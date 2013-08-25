@@ -367,9 +367,9 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		} else {
 			fuelTypeAdapter.add("Super");
 		}
-		fuelTypeAdapter.add(getString(R.string.label_add_fuel_type));
+		fuelTypeAdapter.add(getString(R.string.label_add_dialog));
 
-		fuelTankAdapter.add(getString(R.string.label_add_fuel_tank));
+		fuelTankAdapter.add(getString(R.string.label_add_dialog));
 
 		Button btnAddFuelType = (Button) v.findViewById(R.id.btn_add_fueltype);
 		btnAddFuelType.setOnClickListener(new View.OnClickListener() {

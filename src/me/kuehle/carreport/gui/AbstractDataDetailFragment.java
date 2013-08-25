@@ -41,11 +41,11 @@ import com.activeandroid.Model;
 public abstract class AbstractDataDetailFragment extends Fragment implements
 		MessageDialogFragmentListener {
 	public interface OnItemActionListener {
-		public void itemCanceled();
+		public void onItemCanceled();
 
-		public void itemDeleted();
+		public void onItemDeleted();
 
-		public void itemSaved();
+		public void onItemSaved();
 	}
 
 	public static final String EXTRA_ID = "id";
@@ -62,6 +62,130 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	private CharSequence savedABTitle;
 	private int savedABNavMode;
 	private boolean allowCancel;
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		ActionBar actionBar = getActivity().getActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(allowCancel);
+
+		savedABTitle = actionBar.getTitle();
+		savedABNavMode = actionBar.getNavigationMode();
+
+		if (isInEditMode()) {
+			actionBar.setTitle(getTitleForEdit());
+		} else {
+			actionBar.setTitle(getTitleForNew());
+		}
+
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			if (getParentFragment() != null) {
+				onItemActionListener = (OnItemActionListener) getParentFragment();
+			} else {
+				onItemActionListener = (OnItemActionListener) activity;
+			}
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement OnItemActionListener");
+		}
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		long id = getArguments().getLong(EXTRA_ID, EXTRA_ID_DEFAULT);
+		if (id != EXTRA_ID_DEFAULT) {
+			editItem = getEditItem(id);
+		}
+
+		allowCancel = getArguments().getBoolean(EXTRA_ALLOW_CANCEL,
+				EXTRA_ALLOW_CANCEL_DEFAULT);
+
+		setHasOptionsMenu(true);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		inflater.inflate(R.menu.edit, menu);
+
+		if (!isInEditMode()) {
+			menu.removeItem(R.id.menu_delete);
+		}
+
+		if (!allowCancel) {
+			menu.removeItem(R.id.menu_cancel);
+		}
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View v = inflater.inflate(getLayout(), container, false);
+		initFields(v);
+		fillFields(v);
+		return v;
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		ActionBar actionBar = getActivity().getActionBar();
+		actionBar.setTitle(savedABTitle);
+		actionBar.setNavigationMode(savedABNavMode);
+	}
+
+	@Override
+	public void onDialogNegativeClick(int requestCode) {
+	}
+
+	@Override
+	public void onDialogPositiveClick(int requestCode) {
+		if (requestCode == DELETE_REQUEST_CODE) {
+			editItem.delete();
+
+			Toast.makeText(getActivity(), getToastDeletedMessage(),
+					Toast.LENGTH_SHORT).show();
+			onItemActionListener.onItemDeleted();
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_save:
+			if (validate()) {
+				save();
+
+				Toast.makeText(getActivity(), getToastSavedMessage(),
+						Toast.LENGTH_SHORT).show();
+				onItemActionListener.onItemSaved();
+
+				Application.dataChanged();
+			}
+			return true;
+		case R.id.menu_cancel:
+			onItemActionListener.onItemCanceled();
+			return true;
+		case R.id.menu_delete:
+			SupportMessageDialogFragment.newInstance(this, DELETE_REQUEST_CODE,
+					R.string.alert_delete_title,
+					getString(getAlertDeleteMessage()), android.R.string.yes,
+					android.R.string.no).show(getFragmentManager(), null);
+			return true;
+		case android.R.id.home:
+			onItemActionListener.onItemCanceled();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
 
 	protected abstract void fillFields(View v);
 
@@ -118,127 +242,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 		return editItem != null;
 	}
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(allowCancel);
-
-		savedABTitle = actionBar.getTitle();
-		savedABNavMode = actionBar.getNavigationMode();
-
-		if (isInEditMode()) {
-			actionBar.setTitle(getTitleForEdit());
-		} else {
-			actionBar.setTitle(getTitleForNew());
-		}
-
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-	}
-
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			onItemActionListener = (OnItemActionListener) activity;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement OnItemActionListener");
-		}
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		long id = getArguments().getLong(EXTRA_ID, EXTRA_ID_DEFAULT);
-		if (id != EXTRA_ID_DEFAULT) {
-			editItem = getEditItem(id);
-		}
-
-		allowCancel = getArguments().getBoolean(EXTRA_ALLOW_CANCEL,
-				EXTRA_ALLOW_CANCEL_DEFAULT);
-
-		setHasOptionsMenu(true);
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.clear();
-		inflater.inflate(R.menu.edit, menu);
-
-		if (!isInEditMode()) {
-			menu.removeItem(R.id.menu_delete);
-		}
-
-		if (!allowCancel) {
-			menu.removeItem(R.id.menu_cancel);
-		}
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View v = inflater.inflate(getLayout(), container, false);
-		initFields(v);
-		fillFields(v);
-		return v;
-	}
-
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setTitle(savedABTitle);
-		actionBar.setNavigationMode(savedABNavMode);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_save:
-			if (validate()) {
-				save();
-
-				Toast.makeText(getActivity(), getToastSavedMessage(),
-						Toast.LENGTH_SHORT).show();
-				onItemActionListener.itemSaved();
-
-				Application.dataChanged();
-			}
-			return true;
-		case R.id.menu_cancel:
-			onItemActionListener.itemCanceled();
-			return true;
-		case R.id.menu_delete:
-			SupportMessageDialogFragment.newInstance(this, DELETE_REQUEST_CODE,
-					R.string.alert_delete_title,
-					getString(getAlertDeleteMessage()), android.R.string.yes,
-					android.R.string.no).show(getFragmentManager(), null);
-			return true;
-		case android.R.id.home:
-			onItemActionListener.itemCanceled();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	public void onDialogNegativeClick(int requestCode) {
-	}
-
-	@Override
-	public void onDialogPositiveClick(int requestCode) {
-		if (requestCode == DELETE_REQUEST_CODE) {
-			editItem.delete();
-
-			Toast.makeText(getActivity(), getToastDeletedMessage(),
-					Toast.LENGTH_SHORT).show();
-			onItemActionListener.itemDeleted();
-		}
-	}
+	protected abstract void save();
 
 	protected abstract boolean validate();
-
-	protected abstract void save();
 }
