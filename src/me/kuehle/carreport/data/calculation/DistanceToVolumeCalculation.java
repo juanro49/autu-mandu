@@ -2,14 +2,12 @@ package me.kuehle.carreport.data.calculation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.util.Calculator;
 import android.content.Context;
 
 public class DistanceToVolumeCalculation extends AbstractCalculation {
@@ -41,26 +39,19 @@ public class DistanceToVolumeCalculation extends AbstractCalculation {
 		for (Car car : Car.getAll()) {
 			for (FuelTank fuelTank : car.fuelTanks()) {
 				List<Refueling> refuelings = fuelTank.refuelings();
-				Vector<Double> consumptions = new Vector<Double>();
-
-				int lastMileage = -1;
-				float volume = 0;
-				for (Refueling refueling : refuelings) {
-					volume += refueling.volume;
-					if (!refueling.partial) {
-						if (lastMileage > -1 && lastMileage < refueling.mileage) {
-							double consumption = volume
-									/ (refueling.mileage - lastMileage);
-							consumptions.add(consumption);
-						}
-
-						lastMileage = refueling.mileage;
-						volume = 0;
-					}
+				if (refuelings.size() < 2) {
+					continue;
 				}
 
-				if (consumptions.size() > 0) {
-					double avgConsumption = Calculator.avg(consumptions);
+				int totalDistance = refuelings.get(refuelings.size() - 1).mileage
+						- refuelings.get(0).mileage;
+				double totalVolume = 0;
+				for (int i = 1; i < refuelings.size(); i++) {
+					totalVolume += refuelings.get(i).volume;
+				}
+
+				if (totalDistance > 0 && totalVolume > 0) {
+					double avgConsumption = totalVolume / totalDistance;
 					items.add(new CalculationItem(String.format("%s (%s)",
 							car.name, fuelTank.name), input * avgConsumption));
 				}

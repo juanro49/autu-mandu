@@ -97,8 +97,27 @@ public class FuelConsumptionReport extends AbstractReport {
 				}
 
 				reportData.add(carData);
+
 				Section section = addDataSection(fuelTank);
-				addConsumptionData(section, carData.yValues);
+				section.addItem(new Item(context
+						.getString(R.string.report_highest), String.format(
+						"%.2f %s", Calculator.max(carData.yValues), unit)));
+				section.addItem(new Item(context
+						.getString(R.string.report_lowest), String.format(
+						"%.2f %s", Calculator.min(carData.yValues), unit)));
+
+				List<Refueling> refuelings = fuelTank.refuelings();
+				int totalDistance = refuelings.get(refuelings.size() - 1).mileage
+						- refuelings.get(0).mileage;
+				double totalVolume = 0;
+				for (int i = 1; i < refuelings.size(); i++) {
+					totalVolume += refuelings.get(i).volume;
+				}
+
+				section.addItem(new Item(context
+						.getString(R.string.report_average), String.format(
+						"%.2f %s", totalVolume / totalDistance * 100, unit)));
+
 				sectionAdded = true;
 
 				if (!car.isSuspended()) {
@@ -112,15 +131,6 @@ public class FuelConsumptionReport extends AbstractReport {
 						.getString(R.string.report_not_enough_data), ""));
 			}
 		}
-	}
-
-	private void addConsumptionData(Section section, Vector<Double> numbers) {
-		section.addItem(new Item(context.getString(R.string.report_highest),
-				String.format("%.2f %s", Calculator.max(numbers), unit)));
-		section.addItem(new Item(context.getString(R.string.report_lowest),
-				String.format("%.2f %s", Calculator.min(numbers), unit)));
-		section.addItem(new Item(context.getString(R.string.report_average),
-				String.format("%.2f %s", Calculator.avg(numbers), unit)));
 	}
 
 	private Section addDataSection(Car car) {
