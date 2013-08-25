@@ -22,7 +22,7 @@
     <string name="about_licenses">Lizenzen</string>
     <string name="hint_mileage">Kilometerstand</string>
     <string name="hint_mileage_optional">Kilometerstand (optional)</string>
-    <string name="hint_volume">Liter</string>
+    <string name="hint_volume">Volumen</string>
     <string name="hint_price">Preis</string>
     <string name="hint_note_optional">Notiz (optional)</string>
     <string name="hint_title">Titel</string>
@@ -189,4 +189,10 @@
     <string name="first_start_step3_img_desc">Dritter Schritt</string>
     <string name="first_start_step3_text">Nach zwei Tankfüllungen solltest du die ersten Graphen sehen.</string>
     <string name="first_start_create_car">Erstelle ein Auto</string>
+    <string name="calc_option_volume_to_distance">Volumen (%1$s) nach Strecke (%2$s)</string>
+    <string name="calc_option_distance_to_volume">Strecke (%1$s) nach Volumen (%2$s)</string>
+    <string name="calc_option_volume_to_price">Volumen (%1$s) nach Preis (%2$s)</string>
+    <string name="calc_option_price_to_volume">Preis (%1$s) nach Volumen (%2$s)</string>
+    <string name="calc_option_distance_to_price">Strecke (%1$s) nach Preis (%2$s)</string>
+    <string name="calc_option_price_to_distance">Preis (%1$s) nach Strecke (%2$s)</string>
 </resources>

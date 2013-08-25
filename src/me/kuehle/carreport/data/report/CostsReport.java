@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.kuehle.carreport.reports;
+package me.kuehle.carreport.data.report;
 
 import java.util.ArrayList;
 import java.util.Collections;

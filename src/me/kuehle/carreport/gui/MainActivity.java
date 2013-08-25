@@ -21,7 +21,6 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.gui.util.DataChangeListener;
 import me.kuehle.carreport.util.backup.Dropbox;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -43,6 +42,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
+	public static interface DataChangeListener {
+		public void onDataChanged();
+	}
+	
 	private class DrawerItemClickListener implements
 			ListView.OnItemClickListener {
 		@Override
@@ -275,6 +278,8 @@ public class MainActivity extends FragmentActivity {
 			fragment = new ReportFragment();
 		} else if (position == 1) {
 			fragment = new DataFragment();
+		} else if (position == 2) {
+			fragment = new CalculatorFragment();
 		} else {
 			return;
 		}

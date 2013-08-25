@@ -18,15 +18,13 @@ package me.kuehle.carreport.gui;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.gui.util.DataChangeListener;
+import me.kuehle.carreport.data.report.AbstractReport;
+import me.kuehle.carreport.data.report.CostsReport;
+import me.kuehle.carreport.data.report.FuelConsumptionReport;
+import me.kuehle.carreport.data.report.FuelPriceReport;
+import me.kuehle.carreport.data.report.MileageReport;
+import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 import me.kuehle.carreport.gui.util.SectionListAdapter;
-import me.kuehle.carreport.gui.util.SimpleAnimator;
-import me.kuehle.carreport.reports.AbstractReport;
-import me.kuehle.carreport.reports.AbstractReport.CalculationOption;
-import me.kuehle.carreport.reports.CostsReport;
-import me.kuehle.carreport.reports.FuelConsumptionReport;
-import me.kuehle.carreport.reports.FuelPriceReport;
-import me.kuehle.carreport.reports.MileageReport;
 import me.kuehle.chartlib.ChartView;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
@@ -34,20 +32,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
@@ -65,102 +56,6 @@ public class ReportFragment extends Fragment implements
 		public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 			updateReport();
 			return true;
-		}
-	};
-
-	private ActionMode.Callback mCalculationActionMode = new ActionMode.Callback() {
-		private SimpleAnimator graphAnimator;
-		private EditText input;
-		private int option;
-
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			option = item.getOrder();
-			input.setHint(mCurrentReport.getCalculationOptions()[option]
-					.getHint1());
-			applyCalculation(input.getText().toString());
-			return true;
-		}
-
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			CalculationOption[] options = mCurrentReport
-					.getCalculationOptions();
-			if (options.length == 0) {
-				return false;
-			} else if (options.length > 1) {
-				for (int i = 0; i < options.length; i++) {
-					MenuItem item = menu.add(Menu.NONE, Menu.NONE, i,
-							options[i].getName());
-					item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-				}
-			}
-			option = 0;
-
-			graphAnimator = new SimpleAnimator(getActivity(), mGraphHolder,
-					SimpleAnimator.Property.Weight, 500);
-
-			input = new EditText(getActivity());
-			input.setInputType(InputType.TYPE_CLASS_NUMBER
-					| InputType.TYPE_NUMBER_FLAG_DECIMAL);
-			input.setLines(1);
-			input.setHint(options[option].getHint1());
-			input.addTextChangedListener(new TextWatcher() {
-				@Override
-				public void afterTextChanged(Editable s) {
-					applyCalculation(s.toString());
-				}
-
-				@Override
-				public void beforeTextChanged(CharSequence s, int start,
-						int count, int after) {
-				}
-
-				@Override
-				public void onTextChanged(CharSequence s, int start,
-						int before, int count) {
-				}
-			});
-			mode.setCustomView(input);
-			input.requestFocus();
-
-			graphAnimator.hide(null, new Runnable() {
-				@Override
-				public void run() {
-					InputMethodManager keyboard = (InputMethodManager) getActivity()
-							.getSystemService(Context.INPUT_METHOD_SERVICE);
-					keyboard.showSoftInput(input, 0);
-				}
-			});
-
-			applyCalculation(input.getText().toString());
-			return true;
-		}
-
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-			mCurrentReport.getData().resetCalculation();
-
-			InputMethodManager keyboard = (InputMethodManager) getActivity()
-					.getSystemService(Context.INPUT_METHOD_SERVICE);
-			keyboard.hideSoftInputFromWindow(input.getWindowToken(), 0);
-
-			graphAnimator.show(null, null);
-		}
-
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
-		}
-
-		private void applyCalculation(String input) {
-			double value1 = 1;
-			try {
-				value1 = Double.parseDouble(input);
-			} catch (NumberFormatException e) {
-			}
-			mCurrentReport.getData().applyCalculation(value1, option);
-			mLstData.invalidateViews();
 		}
 	};
 
@@ -197,6 +92,14 @@ public class ReportFragment extends Fragment implements
 		});
 
 		return v;
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		ActionBar actionBar = getActivity().getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		actionBar.setListNavigationCallbacks(null, null);
 	}
 
 	@Override

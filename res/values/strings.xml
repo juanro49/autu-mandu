@@ -12,7 +12,7 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License.
 -->
 <resources>
     <string name="app_name">Car Report</string>
@@ -189,4 +189,10 @@
     <string name="first_start_step3_img_desc">Third step</string>
     <string name="first_start_step3_text">After two refuelings you should see the first graphs.</string>
     <string name="first_start_create_car">Create a car</string>
+    <string name="calc_option_volume_to_distance">Volume (%1$s) to Distance (%2$s)</string>
+    <string name="calc_option_distance_to_volume">Distance (%1$s) to Volume (%2$s)</string>
+    <string name="calc_option_volume_to_price">Volume (%1$s) to Price (%2$s)</string>
+    <string name="calc_option_price_to_volume">Price (%1$s) to Volume (%2$s)</string>
+    <string name="calc_option_distance_to_price">Distance (%1$s) to Price (%2$s)</string>
+    <string name="calc_option_price_to_distance">Price (%1$s) to Distance (%2$s)</string>
 </resources>

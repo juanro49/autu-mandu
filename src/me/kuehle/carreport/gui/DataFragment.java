@@ -5,7 +5,7 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.gui.util.DataChangeListener;
+import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.Intent;
@@ -183,6 +183,14 @@ public class DataFragment extends Fragment implements
 				((DataListListener) fragment).updateData();
 			}
 		}
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		ActionBar actionBar = getActivity().getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		actionBar.setListNavigationCallbacks(null, null);
 	}
 
 	@Override
