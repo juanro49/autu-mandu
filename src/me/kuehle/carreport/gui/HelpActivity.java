@@ -18,7 +18,6 @@ package me.kuehle.carreport.gui;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,12 +64,12 @@ public class HelpActivity extends PreferenceActivity {
 				Bundle savedInstanceState) {
 			TextView v = (TextView) inflater.inflate(
 					R.layout.fragment_help_detail, container, false);
-
 			v.setMovementMethod(LinkMovementMethod.getInstance());
+
 			try {
 				InputStream in = getActivity().getAssets().open(
-						String.format("help-%d-%s.html", getHelpId(),
-								getLocale()));
+						String.format("%s/%s.html",
+								getLocalizedDirectory("help"), getHelpId()));
 				byte[] buffer = new byte[in.available()];
 				in.read(buffer);
 				in.close();
@@ -81,38 +80,43 @@ public class HelpActivity extends PreferenceActivity {
 			return v;
 		}
 
-		protected abstract int getHelpId();
+		protected abstract String getHelpId();
 
-		private String getLocale() {
-			String[] availableLocales = { "de", "en" };
+		private String getLocalizedDirectory(String directory) {
 			String locale = Locale.getDefault().getLanguage().substring(0, 2)
 					.toLowerCase(Locale.US);
-			if (Arrays.binarySearch(availableLocales, locale) < 0) {
-				return availableLocales[0];
-			} else {
-				return locale;
+			String localizedDirectory = directory + "-" + locale;
+
+			try {
+				if (getActivity().getAssets().list(localizedDirectory).length > 0) {
+					return localizedDirectory;
+				} else {
+					return directory;
+				}
+			} catch (IOException e) {
+				return directory;
 			}
 		}
 	}
 
 	public static class GettingStartedFragment extends HelpFragment {
 		@Override
-		protected int getHelpId() {
-			return 0;
+		protected String getHelpId() {
+			return "getting_started";
 		}
 	}
 
 	public static class TipsFragment extends HelpFragment {
 		@Override
-		protected int getHelpId() {
-			return 1;
+		protected String getHelpId() {
+			return "tips";
 		}
 	}
 
 	public static class CalculationsFragment extends HelpFragment {
 		@Override
-		protected int getHelpId() {
-			return 2;
+		protected String getHelpId() {
+			return "calculations";
 		}
 	}
 }
