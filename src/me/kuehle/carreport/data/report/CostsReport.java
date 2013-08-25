@@ -153,8 +153,11 @@ public class CostsReport extends AbstractReport {
 				continue;
 			}
 
+			boolean first = true;
 			for (Refueling refueling : refuelings) {
-				costs += refueling.price;
+				if (!first) {
+					costs += refueling.price;
+				}
 
 				DateTime date = new DateTime(refueling.date);
 
@@ -168,12 +171,18 @@ public class CostsReport extends AbstractReport {
 				if (startDate.isAfter(date)) {
 					startDate = date;
 				}
+
+				first = false;
 			}
 
+			first = true;
 			for (OtherCost otherCost : otherCosts) {
-				costs += otherCost.price
-						* otherCost.recurrence
-								.getRecurrencesSince(otherCost.date);
+				if (!first
+						|| (otherCost.mileage > -1 && otherCost.mileage < startMileage)) {
+					costs += otherCost.price
+							* otherCost.recurrence
+									.getRecurrencesSince(otherCost.date);
+				}
 
 				Recurrence recurrence = otherCost.recurrence;
 				DateTime date = new DateTime(otherCost.date);
@@ -209,6 +218,8 @@ public class CostsReport extends AbstractReport {
 				if (startDate.isAfter(otherCost.date.getTime())) {
 					startDate = new DateTime(otherCost.date);
 				}
+
+				first = false;
 			}
 
 			// Calculate averages
