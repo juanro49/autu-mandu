@@ -45,7 +45,7 @@ public class MainActivity extends FragmentActivity {
 	public static interface DataChangeListener {
 		public void onDataChanged();
 	}
-	
+
 	private class DrawerItemClickListener implements
 			ListView.OnItemClickListener {
 		@Override
@@ -224,6 +224,11 @@ public class MainActivity extends FragmentActivity {
 
 		Preferences prefs = new Preferences(this);
 		List<Car> cars = Car.getAll();
+		for (int i = cars.size() - 1; i >= 0; i--) {
+			if (cars.get(i).isSuspended()) {
+				cars.remove(i);
+			}
+		}
 
 		MenuItem[] items = { menu.findItem(R.id.menu_add_refueling),
 				menu.findItem(R.id.menu_add_other) };

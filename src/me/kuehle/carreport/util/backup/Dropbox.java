@@ -251,7 +251,10 @@ public class Dropbox {
 						DropboxFileInfo info = mDBApi.getFile(
 								"/" + localFile.getName(), null, outputStream,
 								null);
-						prefs.setDropboxLocalRev(info.getMetadata().rev);
+						if (copyFile(tempFile, localFile)) {
+							prefs.setDropboxLocalRev(info.getMetadata().rev);
+							Application.reinitializeDatabase();
+						}
 					} catch (DropboxException e) {
 						return false;
 					} catch (FileNotFoundException e) {
@@ -266,12 +269,6 @@ public class Dropbox {
 
 						tempFile.delete();
 					}
-
-					if (copyFile(tempFile, localFile)) {
-						Application.reinitializeDatabase();
-					}
-
-					tempFile.delete();
 				}
 
 				return true;
