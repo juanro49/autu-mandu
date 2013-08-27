@@ -146,10 +146,12 @@ public abstract class AbstractReport {
 		}
 	}
 
+	protected Context context;
+
 	private ArrayList<AbstractListItem> data = new ArrayList<AbstractListItem>();
 	private boolean showTrend = false;
 	private int chartOption = 0;
-	protected Context context;
+	private boolean initialized = false;
 
 	protected AxisLabelFormatter dateLabelFormatter = new AxisLabelFormatter() {
 		@Override
@@ -165,7 +167,13 @@ public abstract class AbstractReport {
 
 	public abstract int[] getAvailableChartOptions();
 
-	public abstract Chart getChart(boolean zoomable, boolean moveable);
+	public Chart getChart(boolean zoomable, boolean moveable) {
+		if (initialized) {
+			return onGetChart(zoomable, moveable);
+		} else {
+			return null;
+		}
+	}
 
 	public int getChartOption() {
 		return chartOption;
@@ -211,6 +219,13 @@ public abstract class AbstractReport {
 		this.showTrend = showTrend;
 	}
 
+	public void update() {
+		initialized = false;
+		data.clear();
+		onUpdate();
+		initialized = true;
+	}
+
 	protected void addData(String label, String value) {
 		data.add(new Item(label, value));
 	}
@@ -231,4 +246,8 @@ public abstract class AbstractReport {
 		chart.getRangeAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
 		chart.getLegend().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
 	}
+
+	protected abstract Chart onGetChart(boolean zoomable, boolean moveable);
+
+	protected abstract void onUpdate();
 }

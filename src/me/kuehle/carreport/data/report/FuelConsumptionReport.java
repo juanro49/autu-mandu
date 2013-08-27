@@ -76,61 +76,16 @@ public class FuelConsumptionReport extends AbstractReport {
 
 	public FuelConsumptionReport(Context context) {
 		super(context);
+	}
 
-		// Preferences
-		Preferences prefs = new Preferences(context);
-		unit = String.format("%s/100%s", prefs.getUnitVolume(),
-				prefs.getUnitDistance());
-		showLegend = prefs.isShowLegend();
+	@Override
+	public int[] getAvailableChartOptions() {
+		return new int[1];
+	}
 
-		// Collect report data and add info data which will be displayed
-		// next to the graph.
-		List<Car> cars = Car.getAll();
-		for (Car car : cars) {
-			boolean sectionAdded = false;
-
-			List<FuelTank> fuelTanks = car.fuelTanks();
-			for (FuelTank fuelTank : fuelTanks) {
-				ReportGraphData carData = new ReportGraphData(context, fuelTank);
-				if (carData.isEmpty()) {
-					continue;
-				}
-
-				reportData.add(carData);
-
-				Section section = addDataSection(fuelTank);
-				section.addItem(new Item(context
-						.getString(R.string.report_highest), String.format(
-						"%.2f %s", Calculator.max(carData.yValues), unit)));
-				section.addItem(new Item(context
-						.getString(R.string.report_lowest), String.format(
-						"%.2f %s", Calculator.min(carData.yValues), unit)));
-
-				List<Refueling> refuelings = fuelTank.refuelings();
-				int totalDistance = refuelings.get(refuelings.size() - 1).mileage
-						- refuelings.get(0).mileage;
-				double totalVolume = 0;
-				for (int i = 1; i < refuelings.size(); i++) {
-					totalVolume += refuelings.get(i).volume;
-				}
-
-				section.addItem(new Item(context
-						.getString(R.string.report_average), String.format(
-						"%.2f %s", totalVolume / totalDistance * 100, unit)));
-
-				sectionAdded = true;
-
-				if (!car.isSuspended()) {
-					minXValue = Math.min(minXValue, carData.getSeries().minX());
-				}
-			}
-
-			if (!sectionAdded) {
-				Section section = addDataSection(car);
-				section.addItem(new Item(context
-						.getString(R.string.report_not_enough_data), ""));
-			}
-		}
+	@Override
+	public String getTitle() {
+		return context.getString(R.string.report_title_fuel_consumption);
 	}
 
 	private Section addDataSection(Car car) {
@@ -171,7 +126,7 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	@Override
-	public Chart getChart(boolean zoomable, boolean moveable) {
+	protected Chart onGetChart(boolean zoomable, boolean moveable) {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
@@ -236,12 +191,60 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getAvailableChartOptions() {
-		return new int[1];
-	}
+	protected void onUpdate() {
+		// Preferences
+		Preferences prefs = new Preferences(context);
+		unit = String.format("%s/100%s", prefs.getUnitVolume(),
+				prefs.getUnitDistance());
+		showLegend = prefs.isShowLegend();
 
-	@Override
-	public String getTitle() {
-		return context.getString(R.string.report_title_fuel_consumption);
+		// Collect report data and add info data which will be displayed
+		// next to the graph.
+		List<Car> cars = Car.getAll();
+		for (Car car : cars) {
+			boolean sectionAdded = false;
+
+			List<FuelTank> fuelTanks = car.fuelTanks();
+			for (FuelTank fuelTank : fuelTanks) {
+				ReportGraphData carData = new ReportGraphData(context, fuelTank);
+				if (carData.isEmpty()) {
+					continue;
+				}
+
+				reportData.add(carData);
+
+				Section section = addDataSection(fuelTank);
+				section.addItem(new Item(context
+						.getString(R.string.report_highest), String.format(
+						"%.2f %s", Calculator.max(carData.yValues), unit)));
+				section.addItem(new Item(context
+						.getString(R.string.report_lowest), String.format(
+						"%.2f %s", Calculator.min(carData.yValues), unit)));
+
+				List<Refueling> refuelings = fuelTank.refuelings();
+				int totalDistance = refuelings.get(refuelings.size() - 1).mileage
+						- refuelings.get(0).mileage;
+				double totalVolume = 0;
+				for (int i = 1; i < refuelings.size(); i++) {
+					totalVolume += refuelings.get(i).volume;
+				}
+
+				section.addItem(new Item(context
+						.getString(R.string.report_average), String.format(
+						"%.2f %s", totalVolume / totalDistance * 100, unit)));
+
+				sectionAdded = true;
+
+				if (!car.isSuspended()) {
+					minXValue = Math.min(minXValue, carData.getSeries().minX());
+				}
+			}
+
+			if (!sectionAdded) {
+				Section section = addDataSection(car);
+				section.addItem(new Item(context
+						.getString(R.string.report_not_enough_data), ""));
+			}
+		}
 	}
 }

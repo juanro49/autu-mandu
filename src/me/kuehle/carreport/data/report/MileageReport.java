@@ -73,66 +73,23 @@ public class MileageReport extends AbstractReport {
 
 	public MileageReport(Context context) {
 		super(context);
-
-		// Preferences
-		Preferences prefs = new Preferences(context);
-		unit = prefs.getUnitDistance();
-		showLegend = prefs.isShowLegend();
-
-		// Car data
-		List<Car> cars = Car.getAll();
-		for (Car car : cars) {
-			// Add section for car
-			Section section;
-			if (car.isSuspended()) {
-				section = addDataSection(
-						String.format("%s [%s]", car.name,
-								context.getString(R.string.suspended)),
-						car.color, 1);
-			} else {
-				section = addDataSection(car.name, car.color);
-			}
-
-			// Accumulated data
-			ReportGraphDataAccumulated carDataAccumulated = new ReportGraphDataAccumulated(
-					context, car);
-			if (carDataAccumulated.size() > 0) {
-				reportDataAccumulated.add(carDataAccumulated);
-				minXValue[GRAPH_OPTION_ACCUMULATED] = Math.min(
-						minXValue[GRAPH_OPTION_ACCUMULATED], carDataAccumulated
-								.getSeries().minX());
-			}
-
-			// Normal data
-			ReportGraphDataPerRefueling carDataNormal = new ReportGraphDataPerRefueling(
-					context, car);
-			if (carDataNormal.size() == 0) {
-				section.addItem(new Item(context
-						.getString(R.string.report_not_enough_data), ""));
-			} else {
-				reportDataPerRefueling.add(carDataNormal);
-				minXValue[GRAPH_OPTION_PER_REFUELING] = Math.min(
-						minXValue[GRAPH_OPTION_PER_REFUELING], carDataNormal
-								.getSeries().minX());
-
-				section.addItem(new Item(context
-						.getString(R.string.report_highest), String.format(
-						"%d %s", Calculator.max(carDataNormal.yValues)
-								.intValue(), unit)));
-				section.addItem(new Item(context
-						.getString(R.string.report_lowest), String.format(
-						"%d %s", Calculator.min(carDataNormal.yValues)
-								.intValue(), unit)));
-				section.addItem(new Item(context
-						.getString(R.string.report_average), String.format(
-						"%d %s", Calculator.avg(carDataNormal.yValues)
-								.intValue(), unit)));
-			}
-		}
 	}
 
 	@Override
-	public Chart getChart(boolean zoomable, boolean moveable) {
+	public int[] getAvailableChartOptions() {
+		int[] options = new int[2];
+		options[GRAPH_OPTION_ACCUMULATED] = R.string.report_graph_accumulated;
+		options[GRAPH_OPTION_PER_REFUELING] = R.string.report_graph_per_refueling;
+		return options;
+	}
+
+	@Override
+	public String getTitle() {
+		return context.getString(R.string.report_title_mileage);
+	}
+
+	@Override
+	protected Chart onGetChart(boolean zoomable, boolean moveable) {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
@@ -192,15 +149,61 @@ public class MileageReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getAvailableChartOptions() {
-		int[] options = new int[2];
-		options[GRAPH_OPTION_ACCUMULATED] = R.string.report_graph_accumulated;
-		options[GRAPH_OPTION_PER_REFUELING] = R.string.report_graph_per_refueling;
-		return options;
-	}
+	protected void onUpdate() {
+		// Preferences
+		Preferences prefs = new Preferences(context);
+		unit = prefs.getUnitDistance();
+		showLegend = prefs.isShowLegend();
 
-	@Override
-	public String getTitle() {
-		return context.getString(R.string.report_title_mileage);
+		// Car data
+		List<Car> cars = Car.getAll();
+		for (Car car : cars) {
+			// Add section for car
+			Section section;
+			if (car.isSuspended()) {
+				section = addDataSection(
+						String.format("%s [%s]", car.name,
+								context.getString(R.string.suspended)),
+						car.color, 1);
+			} else {
+				section = addDataSection(car.name, car.color);
+			}
+
+			// Accumulated data
+			ReportGraphDataAccumulated carDataAccumulated = new ReportGraphDataAccumulated(
+					context, car);
+			if (carDataAccumulated.size() > 0) {
+				reportDataAccumulated.add(carDataAccumulated);
+				minXValue[GRAPH_OPTION_ACCUMULATED] = Math.min(
+						minXValue[GRAPH_OPTION_ACCUMULATED], carDataAccumulated
+								.getSeries().minX());
+			}
+
+			// Normal data
+			ReportGraphDataPerRefueling carDataNormal = new ReportGraphDataPerRefueling(
+					context, car);
+			if (carDataNormal.size() == 0) {
+				section.addItem(new Item(context
+						.getString(R.string.report_not_enough_data), ""));
+			} else {
+				reportDataPerRefueling.add(carDataNormal);
+				minXValue[GRAPH_OPTION_PER_REFUELING] = Math.min(
+						minXValue[GRAPH_OPTION_PER_REFUELING], carDataNormal
+								.getSeries().minX());
+
+				section.addItem(new Item(context
+						.getString(R.string.report_highest), String.format(
+						"%d %s", Calculator.max(carDataNormal.yValues)
+								.intValue(), unit)));
+				section.addItem(new Item(context
+						.getString(R.string.report_lowest), String.format(
+						"%d %s", Calculator.min(carDataNormal.yValues)
+								.intValue(), unit)));
+				section.addItem(new Item(context
+						.getString(R.string.report_average), String.format(
+						"%d %s", Calculator.avg(carDataNormal.yValues)
+								.intValue(), unit)));
+			}
+		}
 	}
 }

@@ -55,53 +55,20 @@ public class FuelPriceReport extends AbstractReport {
 
 	public FuelPriceReport(Context context) {
 		super(context);
-
-		Preferences prefs = new Preferences(context);
-		unit = String.format("%s/%s", prefs.getUnitCurrency(),
-				prefs.getUnitVolume());
-
-		List<FuelType> fuelTypes = FuelType.getAll();
-
-		float[] hsvColor = new float[3];
-		Color.colorToHSV(
-				context.getResources().getColor(android.R.color.holo_blue_dark),
-				hsvColor);
-
-		reportData = new ArrayList<FuelPriceReport.ReportGraphData>();
-		for (FuelType fuelType : fuelTypes) {
-			int color = Color.HSVToColor(hsvColor);
-			ReportGraphData data = new ReportGraphData(context, fuelType, color);
-			if (!data.isEmpty()) {
-				reportData.add(data);
-
-				Series series = data.getSeries();
-				double avg = 0;
-				for (int i = 0; i < series.size(); i++) {
-					avg += series.get(i).y;
-				}
-				avg /= series.size();
-
-				Section section = addDataSection(fuelType.name, color);
-				section.addItem(new Item(context
-						.getString(R.string.report_highest), String.format(
-						"%.3f %s", series.maxY(), unit)));
-				section.addItem(new Item(context
-						.getString(R.string.report_lowest), String.format(
-						"%.3f %s", series.minY(), unit)));
-				section.addItem(new Item(context
-						.getString(R.string.report_average), String.format(
-						"%.3f %s", avg, unit)));
-
-				hsvColor[0] += 20;
-				if (hsvColor[0] > 360) {
-					hsvColor[0] -= 360;
-				}
-			}
-		}
 	}
 
 	@Override
-	public Chart getChart(boolean zoomable, boolean moveable) {
+	public int[] getAvailableChartOptions() {
+		return new int[1];
+	}
+
+	@Override
+	public String getTitle() {
+		return context.getString(R.string.report_title_fuel_price);
+	}
+
+	@Override
+	protected Chart onGetChart(boolean zoomable, boolean moveable) {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
@@ -159,12 +126,48 @@ public class FuelPriceReport extends AbstractReport {
 	}
 
 	@Override
-	public int[] getAvailableChartOptions() {
-		return new int[1];
-	}
+	protected void onUpdate() {
+		Preferences prefs = new Preferences(context);
+		unit = String.format("%s/%s", prefs.getUnitCurrency(),
+				prefs.getUnitVolume());
 
-	@Override
-	public String getTitle() {
-		return context.getString(R.string.report_title_fuel_price);
+		List<FuelType> fuelTypes = FuelType.getAll();
+
+		float[] hsvColor = new float[3];
+		Color.colorToHSV(
+				context.getResources().getColor(android.R.color.holo_blue_dark),
+				hsvColor);
+
+		reportData = new ArrayList<FuelPriceReport.ReportGraphData>();
+		for (FuelType fuelType : fuelTypes) {
+			int color = Color.HSVToColor(hsvColor);
+			ReportGraphData data = new ReportGraphData(context, fuelType, color);
+			if (!data.isEmpty()) {
+				reportData.add(data);
+
+				Series series = data.getSeries();
+				double avg = 0;
+				for (int i = 0; i < series.size(); i++) {
+					avg += series.get(i).y;
+				}
+				avg /= series.size();
+
+				Section section = addDataSection(fuelType.name, color);
+				section.addItem(new Item(context
+						.getString(R.string.report_highest), String.format(
+						"%.3f %s", series.maxY(), unit)));
+				section.addItem(new Item(context
+						.getString(R.string.report_lowest), String.format(
+						"%.3f %s", series.minY(), unit)));
+				section.addItem(new Item(context
+						.getString(R.string.report_average), String.format(
+						"%.3f %s", avg, unit)));
+
+				hsvColor[0] += 20;
+				if (hsvColor[0] > 360) {
+					hsvColor[0] -= 360;
+				}
+			}
+		}
 	}
 }

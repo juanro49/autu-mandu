@@ -100,7 +100,107 @@ public class CostsReport extends AbstractReport {
 
 	public CostsReport(Context context) {
 		super(context);
+	}
 
+	@Override
+	public int[] getAvailableChartOptions() {
+		int[] options = new int[2];
+		options[GRAPH_OPTION_MONTH] = R.string.report_graph_month_history;
+		options[GRAPH_OPTION_YEAR] = R.string.report_graph_year_history;
+		return options;
+	}
+
+	@Override
+	public String getTitle() {
+		return context.getString(R.string.report_title_costs);
+	}
+
+	private double[] getXValues(Dataset dataset) {
+		HashSet<Double> values = new HashSet<Double>();
+		for (int s = 0; s < dataset.size(); s++) {
+			Series series = dataset.get(s);
+			for (int p = 0; p < series.size(); p++) {
+				values.add(series.get(p).x);
+			}
+		}
+		ArrayList<Double> list = new ArrayList<Double>(values);
+		Collections.sort(list);
+
+		double[] arrValues = new double[list.size()];
+		for (int i = 0; i < arrValues.length; i++) {
+			arrValues[i] = list.get(i);
+		}
+
+		return arrValues;
+	}
+
+	@Override
+	protected Chart onGetChart(boolean zoomable, boolean moveable) {
+		final Dataset dataset = new Dataset();
+		RendererList renderers = new RendererList();
+		BarRenderer renderer = new BarRenderer(context);
+		LineRenderer trendRenderer = new LineRenderer(context);
+		renderers.addRenderer(renderer);
+		renderers.addRenderer(trendRenderer);
+
+		int series = 0;
+		for (Car car : Car.getAll()) {
+			ReportGraphData data = getChartOption() == GRAPH_OPTION_MONTH ? costsPerMonth
+					.get(car.getId().intValue()) : costsPerYear.get(car.getId()
+					.intValue());
+			if (data.isEmpty()) {
+				continue;
+			}
+
+			dataset.add(data.getSeries());
+			data.applySeriesStyle(series, renderer);
+			series++;
+
+			if (isShowTrend()) {
+				AbstractReportGraphData trendData = data.createRegressionData();
+				dataset.add(trendData.getSeries());
+				trendData.applySeriesStyle(series, trendRenderer);
+				renderers.mapSeriesToRenderer(series, trendRenderer);
+				series++;
+			}
+		}
+
+		// Draw report
+		final Chart chart = new Chart(context, dataset, renderers);
+		applyDefaultChartStyles(chart);
+		chart.setShowLegend(showLegend);
+		if (isShowTrend()) {
+			for (int i = 1; i < dataset.size(); i += 2) {
+				chart.getLegend().setSeriesVisible(i, false);
+			}
+		}
+		double[] xValues = getXValues(dataset);
+		chart.getDomainAxis().setLabels(xValues);
+		chart.getDomainAxis().setLabelFormatter(new AxisLabelFormatter() {
+			@Override
+			public String formatLabel(double value) {
+				DateTime date = new DateTime((long) value);
+				return date.toString(xLabelFormat[getChartOption()]);
+			}
+		});
+		double padding = SEC_PER_PERIOD[getChartOption()] / 2;
+		double topBound = dataset.maxX();
+		double bottomBound = topBound
+				- (SEC_PER_PERIOD[getChartOption()] * Math.min(
+						visibleBarCount - 1, xValues.length - 1));
+		chart.getDomainAxis().setDefaultBottomBound(bottomBound - padding);
+		chart.getDomainAxis().setDefaultTopBound(topBound + padding);
+		chart.getRangeAxis().setDefaultBottomBound(0);
+		chart.getDomainAxis().setZoomable(zoomable);
+		chart.getDomainAxis().setMovable(moveable);
+		chart.getRangeAxis().setZoomable(zoomable);
+		chart.getRangeAxis().setMovable(moveable);
+
+		return chart;
+	}
+
+	@Override
+	protected void onUpdate() {
 		Preferences prefs = new Preferences(context);
 		unit = prefs.getUnitCurrency();
 		showLegend = prefs.isShowLegend();
@@ -250,102 +350,5 @@ public class CostsReport extends AbstractReport {
 							.format(startDate.toDate())), String.format(
 					"%.2f %s", costs, unit)));
 		}
-	}
-
-	@Override
-	public int[] getAvailableChartOptions() {
-		int[] options = new int[2];
-		options[GRAPH_OPTION_MONTH] = R.string.report_graph_month_history;
-		options[GRAPH_OPTION_YEAR] = R.string.report_graph_year_history;
-		return options;
-	}
-
-	@Override
-	public Chart getChart(boolean zoomable, boolean moveable) {
-		final Dataset dataset = new Dataset();
-		RendererList renderers = new RendererList();
-		BarRenderer renderer = new BarRenderer(context);
-		LineRenderer trendRenderer = new LineRenderer(context);
-		renderers.addRenderer(renderer);
-		renderers.addRenderer(trendRenderer);
-
-		int series = 0;
-		for (Car car : Car.getAll()) {
-			ReportGraphData data = getChartOption() == GRAPH_OPTION_MONTH ? costsPerMonth
-					.get(car.getId().intValue()) : costsPerYear.get(car.getId()
-					.intValue());
-			if (data.isEmpty()) {
-				continue;
-			}
-
-			dataset.add(data.getSeries());
-			data.applySeriesStyle(series, renderer);
-			series++;
-
-			if (isShowTrend()) {
-				AbstractReportGraphData trendData = data.createRegressionData();
-				dataset.add(trendData.getSeries());
-				trendData.applySeriesStyle(series, trendRenderer);
-				renderers.mapSeriesToRenderer(series, trendRenderer);
-				series++;
-			}
-		}
-
-		// Draw report
-		final Chart chart = new Chart(context, dataset, renderers);
-		applyDefaultChartStyles(chart);
-		chart.setShowLegend(showLegend);
-		if (isShowTrend()) {
-			for (int i = 1; i < dataset.size(); i += 2) {
-				chart.getLegend().setSeriesVisible(i, false);
-			}
-		}
-		double[] xValues = getXValues(dataset);
-		chart.getDomainAxis().setLabels(xValues);
-		chart.getDomainAxis().setLabelFormatter(new AxisLabelFormatter() {
-			@Override
-			public String formatLabel(double value) {
-				DateTime date = new DateTime((long) value);
-				return date.toString(xLabelFormat[getChartOption()]);
-			}
-		});
-		double padding = SEC_PER_PERIOD[getChartOption()] / 2;
-		double topBound = dataset.maxX();
-		double bottomBound = topBound
-				- (SEC_PER_PERIOD[getChartOption()] * Math.min(
-						visibleBarCount - 1, xValues.length - 1));
-		chart.getDomainAxis().setDefaultBottomBound(bottomBound - padding);
-		chart.getDomainAxis().setDefaultTopBound(topBound + padding);
-		chart.getRangeAxis().setDefaultBottomBound(0);
-		chart.getDomainAxis().setZoomable(zoomable);
-		chart.getDomainAxis().setMovable(moveable);
-		chart.getRangeAxis().setZoomable(zoomable);
-		chart.getRangeAxis().setMovable(moveable);
-
-		return chart;
-	}
-
-	@Override
-	public String getTitle() {
-		return context.getString(R.string.report_title_costs);
-	}
-
-	private double[] getXValues(Dataset dataset) {
-		HashSet<Double> values = new HashSet<Double>();
-		for (int s = 0; s < dataset.size(); s++) {
-			Series series = dataset.get(s);
-			for (int p = 0; p < series.size(); p++) {
-				values.add(series.get(p).x);
-			}
-		}
-		ArrayList<Double> list = new ArrayList<Double>(values);
-		Collections.sort(list);
-
-		double[] arrValues = new double[list.size()];
-		for (int i = 0; i < arrValues.length; i++) {
-			arrValues[i] = list.get(i);
-		}
-
-		return arrValues;
 	}
 }

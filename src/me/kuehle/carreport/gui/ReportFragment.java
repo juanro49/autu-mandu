@@ -16,6 +16,9 @@
 
 package me.kuehle.carreport.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
@@ -29,6 +32,7 @@ import me.kuehle.carreport.data.report.MileageReport;
 import me.kuehle.carreport.gui.MainActivity.BackPressedListener;
 import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 import me.kuehle.chartlib.ChartView;
+import me.kuehle.chartlib.chart.Chart;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -43,13 +47,13 @@ import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.PopupMenu;
@@ -58,7 +62,112 @@ import android.widget.TextView;
 
 public class ReportFragment extends Fragment implements
 		OnMenuItemClickListener, DataChangeListener, BackPressedListener {
+	private class ReportUpdateTask extends AsyncTask<Void, Object, Void> {
+		private final int[] columnIDs = { R.id.list1, R.id.list2 };
+		private List<ViewGroup> columns;
+		private int currentColumn;
+
+		private ViewGroup getNextColumn() {
+			if (++currentColumn >= columns.size()) {
+				currentColumn = 0;
+			}
+
+			return columns.get(currentColumn);
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			for (AbstractReport report : mReports) {
+				report.update();
+				publishProgress(report, report.getChart(false, false));
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			currentColumn = -1;
+			columns = new ArrayList<ViewGroup>();
+			for (int columnId : columnIDs) {
+				ViewGroup column = (ViewGroup) getView().findViewById(columnId);
+				if (column != null) {
+					column.removeAllViews();
+					columns.add(column);
+				}
+			}
+		}
+
+		@Override
+		protected void onProgressUpdate(Object... values) {
+			Preferences prefs = new Preferences(getActivity());
+
+			final AbstractReport report = (AbstractReport) values[0];
+			View card = View.inflate(getActivity(), R.layout.report, null);
+			getNextColumn().addView(card);
+
+			((TextView) card.findViewById(R.id.txt_title)).setText(report
+					.getTitle());
+
+			View btnReportDetails = card.findViewById(R.id.btn_report_details);
+			btnReportDetails.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					toggleReportDetails(v);
+				}
+			});
+
+			View btnReportOptions = card.findViewById(R.id.btn_report_options);
+			btnReportOptions.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showReportOptions(report, v);
+				}
+			});
+
+			ChartView chart = (ChartView) card.findViewById(R.id.chart);
+			chart.setNotEnoughDataView(View.inflate(getActivity(),
+					R.layout.chart_not_enough_data, null));
+			chart.setChart((Chart) values[1]);
+			chart.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showFullScreenChart(report, v);
+				}
+			});
+
+			ViewGroup details = (ViewGroup) card.findViewById(R.id.details);
+			for (AbstractListItem item : report.getData(true)) {
+				View itemView = View.inflate(getActivity(),
+						item instanceof Section ? R.layout.row_section
+								: R.layout.row_report_data, null);
+
+				if (item instanceof Section) {
+					Section section = (Section) item;
+					TextView text = (TextView) itemView;
+
+					text.setText(section.getLabel());
+					if (prefs.isColorSections()) {
+						text.setTextColor(section.getColor());
+						GradientDrawable drawableBottom = (GradientDrawable) text
+								.getCompoundDrawables()[3];
+						drawableBottom.setColorFilter(section.getColor(),
+								PorterDuff.Mode.SRC);
+					}
+				} else {
+					((TextView) itemView.findViewById(android.R.id.text1))
+							.setText(item.getLabel());
+					((TextView) itemView.findViewById(android.R.id.text2))
+							.setText(((Item) item).getValue());
+				}
+
+				details.addView(itemView);
+			}
+		}
+	}
+
 	private AbstractReport[] mReports;
+	private ReportUpdateTask mReportUpdate;
 
 	private AbstractReport mCurrentMenuReport;
 	private ViewGroup mCurrentMenuReportView;
@@ -70,12 +179,6 @@ public class ReportFragment extends Fragment implements
 	private float mCurrentFullScreenStartScaleY;
 
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		updateReports();
-	}
-
-	@Override
 	public boolean onBackPressed() {
 		if (mCurrentFullScreenChart != null) {
 			hideFullScreenChart();
@@ -83,6 +186,23 @@ public class ReportFragment extends Fragment implements
 		}
 
 		return false;
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		mReports = new AbstractReport[] {
+				new FuelConsumptionReport(getActivity()),
+				new FuelPriceReport(getActivity()),
+				new MileageReport(getActivity()),
+				new CostsReport(getActivity()) };
+
+		for (AbstractReport report : mReports) {
+			loadGraphSettings(report);
+		}
+
+		mReportUpdate = new ReportUpdateTask();
+		mReportUpdate.execute();
 	}
 
 	@Override
@@ -103,7 +223,7 @@ public class ReportFragment extends Fragment implements
 
 	@Override
 	public void onDataChanged() {
-		updateReports();
+		mReportUpdate.execute();
 	}
 
 	@Override
@@ -253,7 +373,7 @@ public class ReportFragment extends Fragment implements
 		mFullScreenChartAnimator = set;
 	}
 
-	private void showReportDetails(View v) {
+	private void toggleReportDetails(View v) {
 		ViewGroup card = (ViewGroup) v.getParent().getParent().getParent();
 
 		final View main = card.findViewById(R.id.main);
@@ -261,7 +381,8 @@ public class ReportFragment extends Fragment implements
 		final ViewGroup.MarginLayoutParams detailsParams = (ViewGroup.MarginLayoutParams) details
 				.getLayoutParams();
 
-		int from = detailsParams.topMargin;
+		int from = detailsParams.topMargin == main.getHeight() ? main
+				.getHeight() : (main.getHeight() - details.getHeight());
 		int to = detailsParams.topMargin == main.getHeight() ? (main
 				.getHeight() - details.getHeight()) : main.getHeight();
 
@@ -305,100 +426,5 @@ public class ReportFragment extends Fragment implements
 		}
 
 		popup.show();
-	}
-
-	private void updateReports() {
-		Preferences prefs = new Preferences(getActivity());
-
-		mReports = new AbstractReport[] {
-				new FuelConsumptionReport(getActivity()),
-				new FuelPriceReport(getActivity()),
-				new MileageReport(getActivity()),
-				new CostsReport(getActivity()) };
-
-		ViewGroup list1 = (ViewGroup) getView().findViewById(R.id.list1);
-		list1.removeAllViews();
-		ViewGroup list2 = (ViewGroup) getView().findViewById(R.id.list2);
-		if (list2 != null) {
-			list2.removeAllViews();
-		}
-
-		for (int i = 0; i < mReports.length; i++) {
-			final AbstractReport report = mReports[i];
-			loadGraphSettings(report);
-
-			ViewGroup list = i % 2 != 0 && list2 != null ? list2 : list1;
-			View card = View.inflate(getActivity(), R.layout.report, null);
-			list.addView(card);
-
-			((TextView) card.findViewById(R.id.txt_title)).setText(report
-					.getTitle());
-
-			View btnReportDetails = card.findViewById(R.id.btn_report_details);
-			btnReportDetails.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					showReportDetails(v);
-				}
-			});
-
-			View btnReportOptions = card.findViewById(R.id.btn_report_options);
-			btnReportOptions.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					showReportOptions(report, v);
-				}
-			});
-
-			ChartView chart = (ChartView) card.findViewById(R.id.chart);
-			chart.setNotEnoughDataView(View.inflate(getActivity(),
-					R.layout.chart_not_enough_data, null));
-			chart.setChart(report.getChart(false, false));
-			chart.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					showFullScreenChart(report, v);
-				}
-			});
-
-			ViewGroup details = (ViewGroup) card.findViewById(R.id.details);
-			for (AbstractListItem item : report.getData(true)) {
-				View itemView = View.inflate(getActivity(),
-						item instanceof Section ? R.layout.row_section
-								: R.layout.row_report_data, null);
-
-				if (item instanceof Section) {
-					Section section = (Section) item;
-					TextView text = (TextView) itemView;
-
-					text.setText(section.getLabel());
-					if (prefs.isColorSections()) {
-						text.setTextColor(section.getColor());
-						GradientDrawable drawableBottom = (GradientDrawable) text
-								.getCompoundDrawables()[3];
-						drawableBottom.setColorFilter(section.getColor(),
-								PorterDuff.Mode.SRC);
-					}
-				} else {
-					((TextView) itemView.findViewById(android.R.id.text1))
-							.setText(item.getLabel());
-					((TextView) itemView.findViewById(android.R.id.text2))
-							.setText(((Item) item).getValue());
-				}
-
-				details.addView(itemView);
-			}
-
-			// Set position of details view.
-			View main = card.findViewById(R.id.main);
-			int widthMeasureSpec = MeasureSpec.makeMeasureSpec(
-					ViewGroup.LayoutParams.MATCH_PARENT, MeasureSpec.EXACTLY);
-			int heightMeasureSpec = MeasureSpec.makeMeasureSpec(
-					ViewGroup.LayoutParams.WRAP_CONTENT, MeasureSpec.EXACTLY);
-			main.measure(widthMeasureSpec, heightMeasureSpec);
-			details.measure(widthMeasureSpec, heightMeasureSpec);
-			((ViewGroup.MarginLayoutParams) details.getLayoutParams()).topMargin = main
-					.getMeasuredHeight() - details.getMeasuredHeight();
-		}
 	}
 }
