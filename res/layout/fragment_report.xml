@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright 2012 Jan Kühle
+  Copyright 2013 Jan Kühle
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,13 +14,40 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    <LinearLayout
-        android:id="@+id/list1"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp" />
-</ScrollView>
+        android:layout_height="match_parent"
+        android:background="#1a1a1a" >
+        <LinearLayout
+            android:id="@+id/list1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp" />
+    </ScrollView>
+    <FrameLayout
+        android:id="@+id/full_screen_chart_holder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000"
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp"
+        android:visibility="gone" >
+        <me.kuehle.chartlib.ChartView
+            android:id="@+id/full_screen_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <ImageButton
+            android:id="@+id/btn_close_full_screen"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="right"
+            android:layout_margin="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/graph_close_full_screen_desc"
+            android:src="@drawable/ic_close_full_screen" />
+    </FrameLayout>
+</FrameLayout>

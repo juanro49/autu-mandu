@@ -26,15 +26,22 @@ import me.kuehle.carreport.data.report.CostsReport;
 import me.kuehle.carreport.data.report.FuelConsumptionReport;
 import me.kuehle.carreport.data.report.FuelPriceReport;
 import me.kuehle.carreport.data.report.MileageReport;
+import me.kuehle.carreport.gui.MainActivity.BackPressedListener;
 import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 import me.kuehle.chartlib.ChartView;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -44,15 +51,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 
 public class ReportFragment extends Fragment implements
-		OnMenuItemClickListener, DataChangeListener {
+		OnMenuItemClickListener, DataChangeListener, BackPressedListener {
 	private AbstractReport[] mReports;
+
 	private AbstractReport mCurrentMenuReport;
 	private ViewGroup mCurrentMenuReportView;
+
+	private Animator mFullScreenChartAnimator;
+	private ChartView mCurrentFullScreenChart;
+	private Rect mCurrentFullScreenStartBounds;
+	private float mCurrentFullScreenStartScaleX;
+	private float mCurrentFullScreenStartScaleY;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -61,9 +76,29 @@ public class ReportFragment extends Fragment implements
 	}
 
 	@Override
+	public boolean onBackPressed() {
+		if (mCurrentFullScreenChart != null) {
+			hideFullScreenChart();
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_report, container, false);
+		View v = inflater.inflate(R.layout.fragment_report, container, false);
+
+		View btnCloseFullScreen = v.findViewById(R.id.btn_close_full_screen);
+		btnCloseFullScreen.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				hideFullScreenChart();
+			}
+		});
+
+		return v;
 	}
 
 	@Override
@@ -84,21 +119,141 @@ public class ReportFragment extends Fragment implements
 		if (item.getItemId() == R.id.menu_show_trend) {
 			mCurrentMenuReport.setShowTrend(!item.isChecked());
 			saveGraphSettings(mCurrentMenuReport);
-			((ChartView) mCurrentMenuReportView.findViewById(R.id.graph))
-					.setChart(mCurrentMenuReport.getChart());
+			((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
+					.setChart(mCurrentMenuReport.getChart(false, false));
 			return true;
 		} else if (item.getGroupId() == R.id.group_graph) {
 			mCurrentMenuReport.setChartOption(item.getOrder());
 			saveGraphSettings(mCurrentMenuReport);
-			((ChartView) mCurrentMenuReportView.findViewById(R.id.graph))
-					.setChart(mCurrentMenuReport.getChart());
+			((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
+					.setChart(mCurrentMenuReport.getChart(false, false));
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public void showReportDetails(View v) {
+	private void hideFullScreenChart() {
+		if (mFullScreenChartAnimator != null) {
+			mFullScreenChartAnimator.cancel();
+		}
+
+		final View chartHolder = getView().findViewById(
+				R.id.full_screen_chart_holder);
+
+		// Animate the four positioning/sizing properties in parallel, back to
+		// their original values.
+		AnimatorSet set = new AnimatorSet();
+		set.play(
+				ObjectAnimator.ofFloat(chartHolder, View.X,
+						mCurrentFullScreenStartBounds.left))
+				.with(ObjectAnimator.ofFloat(chartHolder, View.Y,
+						mCurrentFullScreenStartBounds.top))
+				.with(ObjectAnimator.ofFloat(chartHolder, View.SCALE_X,
+						mCurrentFullScreenStartScaleX))
+				.with(ObjectAnimator.ofFloat(chartHolder, View.SCALE_Y,
+						mCurrentFullScreenStartScaleY));
+		set.setDuration(getResources().getInteger(
+				android.R.integer.config_longAnimTime));
+		set.setInterpolator(new DecelerateInterpolator());
+		set.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				mCurrentFullScreenChart.setVisibility(View.VISIBLE);
+				mCurrentFullScreenChart = null;
+				chartHolder.setVisibility(View.GONE);
+				mFullScreenChartAnimator = null;
+			}
+		});
+		set.start();
+		mFullScreenChartAnimator = set;
+	}
+
+	private void loadGraphSettings(AbstractReport report) {
+		SharedPreferences prefs = getActivity().getSharedPreferences(
+				getClass().getName(), Context.MODE_PRIVATE);
+		String reportName = report.getClass().getSimpleName();
+		report.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
+		report.setChartOption(prefs.getInt(
+				reportName + "_current_chart_option", 0));
+	}
+
+	private void saveGraphSettings(AbstractReport report) {
+		SharedPreferences.Editor prefsEdit = getActivity()
+				.getSharedPreferences(getClass().getName(),
+						Context.MODE_PRIVATE).edit();
+		String reportName = report.getClass().getSimpleName();
+		prefsEdit.putBoolean(reportName + "_show_trend", report.isShowTrend());
+		prefsEdit.putInt(reportName + "_current_chart_option",
+				report.getChartOption());
+		prefsEdit.apply();
+	}
+
+	private void showFullScreenChart(AbstractReport report, View v) {
+		if (mFullScreenChartAnimator != null) {
+			mFullScreenChartAnimator.cancel();
+		}
+
+		mCurrentFullScreenChart = (ChartView) v;
+		View chartHolder = getView()
+				.findViewById(R.id.full_screen_chart_holder);
+		((ChartView) getView().findViewById(R.id.full_screen_chart))
+				.setChart(report.getChart(true, true));
+
+		// Calculate translation start and end point and scales.
+		mCurrentFullScreenStartBounds = new Rect();
+		final Rect finalBounds = new Rect();
+		final Point globalOffset = new Point();
+
+		mCurrentFullScreenChart
+				.getGlobalVisibleRect(mCurrentFullScreenStartBounds);
+		getView().getGlobalVisibleRect(finalBounds, globalOffset);
+		mCurrentFullScreenStartBounds.offset(-globalOffset.x, -globalOffset.y);
+		finalBounds.offset(-globalOffset.x, -globalOffset.y);
+
+		mCurrentFullScreenStartScaleX = (float) mCurrentFullScreenStartBounds
+				.width() / finalBounds.width();
+		mCurrentFullScreenStartScaleY = (float) mCurrentFullScreenStartBounds
+				.height() / finalBounds.height();
+
+		// Hide the small chart and show the zoomed-in view. When the animation
+		// begins, it will position the zoomed-in view in the place of the small
+		// chart.
+		mCurrentFullScreenChart.setVisibility(View.INVISIBLE);
+		chartHolder.setVisibility(View.VISIBLE);
+
+		// Set the pivot point for SCALE_X and SCALE_Y transformations to the
+		// top-left corner of the zoomed-in view (the default is the center of
+		// the view).
+		chartHolder.setPivotX(0f);
+		chartHolder.setPivotY(0f);
+
+		// Construct and run the parallel animation of the four translation and
+		// scale properties (X, Y, SCALE_X, and SCALE_Y).
+		AnimatorSet set = new AnimatorSet();
+		set.play(
+				ObjectAnimator.ofFloat(chartHolder, View.X,
+						mCurrentFullScreenStartBounds.left, finalBounds.left))
+				.with(ObjectAnimator.ofFloat(chartHolder, View.Y,
+						mCurrentFullScreenStartBounds.top, finalBounds.top))
+				.with(ObjectAnimator.ofFloat(chartHolder, View.SCALE_X,
+						mCurrentFullScreenStartScaleX, 1f))
+				.with(ObjectAnimator.ofFloat(chartHolder, View.SCALE_Y,
+						mCurrentFullScreenStartScaleY, 1f));
+		set.setDuration(getResources().getInteger(
+				android.R.integer.config_longAnimTime));
+		set.setInterpolator(new DecelerateInterpolator());
+		set.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				mFullScreenChartAnimator = null;
+			}
+		});
+		set.start();
+		mFullScreenChartAnimator = set;
+	}
+
+	private void showReportDetails(View v) {
 		ViewGroup card = (ViewGroup) v.getParent().getParent().getParent();
 
 		final View main = card.findViewById(R.id.main);
@@ -111,6 +266,7 @@ public class ReportFragment extends Fragment implements
 				.getHeight() - details.getHeight()) : main.getHeight();
 
 		ValueAnimator animator = new ValueAnimator();
+		animator.setInterpolator(new DecelerateInterpolator());
 		animator.setDuration(getResources().getInteger(
 				android.R.integer.config_longAnimTime));
 		animator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));
@@ -125,7 +281,7 @@ public class ReportFragment extends Fragment implements
 		animator.start();
 	}
 
-	public void showReportOptions(AbstractReport report, View v) {
+	private void showReportOptions(AbstractReport report, View v) {
 		mCurrentMenuReport = report;
 		mCurrentMenuReportView = (ViewGroup) v.getParent().getParent()
 				.getParent();
@@ -144,29 +300,11 @@ public class ReportFragment extends Fragment implements
 						graphOptions[i]);
 				item.setChecked(i == report.getChartOption());
 			}
+
 			menu.setGroupCheckable(R.id.group_graph, true, true);
 		}
 
 		popup.show();
-	}
-
-	private void loadGraphSettings(AbstractReport report) {
-		SharedPreferences prefs = getActivity().getPreferences(
-				Context.MODE_PRIVATE);
-		String reportName = report.getClass().getSimpleName();
-		report.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
-		report.setChartOption(prefs.getInt(
-				reportName + "_current_chart_option", 0));
-	}
-
-	private void saveGraphSettings(AbstractReport report) {
-		SharedPreferences.Editor prefsEdit = getActivity().getPreferences(
-				Context.MODE_PRIVATE).edit();
-		String reportName = report.getClass().getSimpleName();
-		prefsEdit.putBoolean(reportName + "_show_trend", report.isShowTrend());
-		prefsEdit.putInt(reportName + "_current_chart_option",
-				report.getChartOption());
-		prefsEdit.apply();
 	}
 
 	private void updateReports() {
@@ -212,10 +350,16 @@ public class ReportFragment extends Fragment implements
 				}
 			});
 
-			ChartView graph = (ChartView) card.findViewById(R.id.graph);
-			graph.setNotEnoughDataView(View.inflate(getActivity(),
+			ChartView chart = (ChartView) card.findViewById(R.id.chart);
+			chart.setNotEnoughDataView(View.inflate(getActivity(),
 					R.layout.chart_not_enough_data, null));
-			graph.setChart(report.getChart());
+			chart.setChart(report.getChart(false, false));
+			chart.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showFullScreenChart(report, v);
+				}
+			});
 
 			ViewGroup details = (ViewGroup) card.findViewById(R.id.details);
 			for (AbstractListItem item : report.getData(true)) {

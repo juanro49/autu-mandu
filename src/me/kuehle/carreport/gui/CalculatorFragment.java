@@ -64,7 +64,7 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
 		mSpnOptions = (Spinner) v.findViewById(R.id.spn_options);
 		mEdtInput = (EditText) v.findViewById(R.id.edt_input);
 		mTxtUnit = (TextView) v.findViewById(R.id.txt_unit);
-		mGraph = (ChartView) v.findViewById(R.id.graph);
+		mGraph = (ChartView) v.findViewById(R.id.chart);
 
 		ArrayAdapter<String> options = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item);

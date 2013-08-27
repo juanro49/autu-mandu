@@ -114,6 +114,7 @@
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
     <string name="graph_details_desc">Graph-Details</string>
     <string name="graph_options_desc">Graph-Optionen</string>
+    <string name="graph_close_full_screen_desc">Vollbildgraph schließen</string>
     <string name="remove_fueltype_desc">Entfernen</string>
     <string name="report_title_fuel_consumption">Benzinverbrauch</string>
     <string name="report_title_fuel_price">Benzinpreis</string>

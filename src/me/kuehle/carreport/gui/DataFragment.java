@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTabStrip;
@@ -36,6 +37,22 @@ public class DataFragment extends Fragment implements
 		public void updateData();
 	}
 
+	private class DataListBackStackListener implements
+			OnBackStackChangedListener {
+		@Override
+		public void onBackStackChanged() {
+			if (getChildFragmentManager().getBackStackEntryCount() == 0) {
+				setNoEntrySelectedTextVisible(true);
+				for (Fragment childFragment : getChildFragmentManager()
+						.getFragments()) {
+					if (childFragment instanceof DataListListener) {
+						((DataListListener) childFragment).unselectItem();
+					}
+				}
+			}
+		}
+	}
+
 	private class DataListNavigationListener implements OnNavigationListener {
 		@Override
 		public boolean onNavigationItemSelected(int itemPosition, long itemId) {
@@ -55,11 +72,6 @@ public class DataFragment extends Fragment implements
 		@Override
 		public void onPageSelected(int position) {
 			onItemUnselected();
-			for (Fragment fragment : getChildFragmentManager().getFragments()) {
-				if (fragment instanceof DataListListener) {
-					((DataListListener) fragment).unselectItem();
-				}
-			}
 
 			if (mTxtNoEntrySelected != null) {
 				int id = position == 0 ? R.drawable.ic_data_detail_refueling
@@ -150,6 +162,9 @@ public class DataFragment extends Fragment implements
 		}
 
 		mCurrentCar = Car.load(Car.class, carId);
+
+		getChildFragmentManager().addOnBackStackChangedListener(
+				new DataListBackStackListener());
 	}
 
 	@Override
@@ -196,11 +211,6 @@ public class DataFragment extends Fragment implements
 	@Override
 	public void onItemCanceled() {
 		onItemUnselected();
-		for (Fragment fragment : getChildFragmentManager().getFragments()) {
-			if (fragment instanceof DataListListener) {
-				((DataListListener) fragment).unselectItem();
-			}
-		}
 	}
 
 	@Override
@@ -249,12 +259,12 @@ public class DataFragment extends Fragment implements
 		getChildFragmentManager().popBackStack("detail",
 				FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-		setNoEntrySelectedTextVisible(true);
-		for (Fragment childFragment : getChildFragmentManager().getFragments()) {
-			if (childFragment instanceof DataListListener) {
-				((DataListListener) childFragment).unselectItem();
-			}
-		}
+		/*
+		 * setNoEntrySelectedTextVisible(true); for (Fragment childFragment :
+		 * getChildFragmentManager().getFragments()) { if (childFragment
+		 * instanceof DataListListener) { ((DataListListener)
+		 * childFragment).unselectItem(); } }
+		 */
 	}
 
 	@Override

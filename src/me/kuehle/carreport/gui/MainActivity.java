@@ -42,6 +42,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
+	public static interface BackPressedListener {
+		public boolean onBackPressed();
+	}
+
 	public static interface DataChangeListener {
 		public void onDataChanged();
 	}
@@ -63,8 +67,8 @@ public class MainActivity extends FragmentActivity {
 			}
 
 			if (result) {
-				if (mCurrentFragment != null) {
-					mCurrentFragment.onDataChanged();
+				if (mCurrentFragment instanceof DataChangeListener) {
+					((DataChangeListener) mCurrentFragment).onDataChanged();
 				}
 			} else {
 				Toast.makeText(MainActivity.this,
@@ -95,7 +99,7 @@ public class MainActivity extends FragmentActivity {
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
 
-	private DataChangeListener mCurrentFragment;
+	private Fragment mCurrentFragment;
 	private MenuItem mSyncMenuItem;
 
 	@Override
@@ -109,9 +113,30 @@ public class MainActivity extends FragmentActivity {
 				invalidateOptionsMenu();
 			}
 
-			if (mCurrentFragment != null) {
-				mCurrentFragment.onDataChanged();
+			if (mCurrentFragment instanceof DataChangeListener) {
+				((DataChangeListener) mCurrentFragment).onDataChanged();
 			}
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (mCurrentFragment != null
+				&& mCurrentFragment instanceof BackPressedListener) {
+			if (((BackPressedListener) mCurrentFragment).onBackPressed()) {
+				return;
+			}
+		}
+
+		// Currently the back stack of child fragment does not pop, when
+		// pressing the back button. This works around the issue.
+		// Bug report: http://code.google.com/p/android/issues/detail?id=40323
+		if (mCurrentFragment != null
+				&& mCurrentFragment.getChildFragmentManager()
+						.getBackStackEntryCount() > 0) {
+			mCurrentFragment.getChildFragmentManager().popBackStack();
+		} else {
+			super.onBackPressed();
 		}
 	}
 
@@ -259,12 +284,6 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		outState.putCharSequence(STATE_TITLE, mTitle);
-		super.onSaveInstanceState(outState);
-	}
-
-	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
 		getActionBar().setTitle(mTitle);
@@ -278,24 +297,20 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void selectItem(int position) {
-		Fragment fragment;
 		if (position == 0) {
-			fragment = new ReportFragment();
+			mCurrentFragment = new ReportFragment();
 		} else if (position == 1) {
-			fragment = new DataFragment();
+			mCurrentFragment = new DataFragment();
 		} else if (position == 2) {
-			fragment = new CalculatorFragment();
+			mCurrentFragment = new CalculatorFragment();
 		} else {
 			return;
 		}
 
-		if (fragment instanceof DataChangeListener) {
-			mCurrentFragment = (DataChangeListener) fragment;
-		}
-
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.beginTransaction()
-				.replace(R.id.content_frame, fragment).commit();
+		FragmentManager fm = getSupportFragmentManager();
+		fm.popBackStack();
+		fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment)
+				.commit();
 
 		mDrawerList.setItemChecked(position, true);
 		setTitle(mMainViews[position]);
@@ -322,5 +337,11 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		Dropbox.getInstance().setSynchronisationCallback(mOnSynchronize);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putCharSequence(STATE_TITLE, mTitle);
+		super.onSaveInstanceState(outState);
 	}
 }

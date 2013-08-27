@@ -101,7 +101,7 @@ public class FuelPriceReport extends AbstractReport {
 	}
 
 	@Override
-	public Chart getChart() {
+	public Chart getChart(boolean zoomable, boolean moveable) {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
@@ -150,6 +150,10 @@ public class FuelPriceReport extends AbstractReport {
 		chart.getDomainAxis().setLabelFormatter(dateLabelFormatter);
 		chart.getRangeAxis()
 				.setLabelFormatter(new DecimalAxisLabelFormatter(3));
+		chart.getDomainAxis().setZoomable(zoomable);
+		chart.getDomainAxis().setMovable(moveable);
+		chart.getRangeAxis().setZoomable(zoomable);
+		chart.getRangeAxis().setMovable(moveable);
 
 		return chart;
 	}

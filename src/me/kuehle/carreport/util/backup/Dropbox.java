@@ -296,6 +296,7 @@ public class Dropbox {
 		Preferences prefs = new Preferences(context);
 		prefs.setDropboxAccount(null);
 		prefs.setDropboxKey(null);
+		prefs.setDropboxLocalRev(null);
 		prefs.setDropboxSecret(null);
 	}
 

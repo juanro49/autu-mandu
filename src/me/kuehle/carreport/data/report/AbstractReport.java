@@ -165,7 +165,7 @@ public abstract class AbstractReport {
 
 	public abstract int[] getAvailableChartOptions();
 
-	public abstract Chart getChart();
+	public abstract Chart getChart(boolean zoomable, boolean moveable);
 
 	public int getChartOption() {
 		return chartOption;
@@ -229,8 +229,6 @@ public abstract class AbstractReport {
 		chart.getDomainAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
 		chart.getDomainAxis().setShowGrid(false);
 		chart.getRangeAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
-		chart.getRangeAxis().setZoomable(false);
-		chart.getRangeAxis().setMovable(false);
 		chart.getLegend().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
 	}
 }

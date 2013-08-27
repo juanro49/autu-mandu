@@ -32,7 +32,7 @@
         </FrameLayout>
     </LinearLayout>
     <me.kuehle.chartlib.ChartView
-        android:id="@+id/graph"
+        android:id="@+id/chart"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"

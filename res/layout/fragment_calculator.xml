@@ -26,7 +26,7 @@
             android:layout_marginRight="8dp" />
     </FrameLayout>
     <me.kuehle.chartlib.ChartView
-        android:id="@+id/graph"
+        android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"

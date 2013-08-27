@@ -132,7 +132,7 @@ public class MileageReport extends AbstractReport {
 	}
 
 	@Override
-	public Chart getChart() {
+	public Chart getChart(boolean zoomable, boolean moveable) {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
@@ -183,6 +183,10 @@ public class MileageReport extends AbstractReport {
 		chart.getDomainAxis().setLabelFormatter(dateLabelFormatter);
 		chart.getDomainAxis()
 				.setDefaultBottomBound(minXValue[getChartOption()]);
+		chart.getDomainAxis().setZoomable(zoomable);
+		chart.getDomainAxis().setMovable(moveable);
+		chart.getRangeAxis().setZoomable(zoomable);
+		chart.getRangeAxis().setMovable(moveable);
 
 		return chart;
 	}

@@ -29,7 +29,6 @@
             android:id="@+id/details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
             android:orientation="vertical" />
         <LinearLayout
             android:id="@+id/main"
@@ -65,9 +64,9 @@
                     android:src="@drawable/ic_menu_overflow" />
             </LinearLayout>
             <me.kuehle.chartlib.ChartView
-                android:id="@+id/graph"
+                android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="200dp"
                 android:layout_margin="8dp" />
         </LinearLayout>
     </FrameLayout>

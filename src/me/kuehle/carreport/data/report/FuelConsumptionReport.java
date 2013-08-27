@@ -171,7 +171,7 @@ public class FuelConsumptionReport extends AbstractReport {
 	}
 
 	@Override
-	public Chart getChart() {
+	public Chart getChart(boolean zoomable, boolean moveable) {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		LineRenderer renderer = new LineRenderer(context);
@@ -227,6 +227,10 @@ public class FuelConsumptionReport extends AbstractReport {
 		chart.getDomainAxis().setDefaultBottomBound(minXValue);
 		chart.getRangeAxis()
 				.setLabelFormatter(new DecimalAxisLabelFormatter(2));
+		chart.getDomainAxis().setZoomable(zoomable);
+		chart.getDomainAxis().setMovable(moveable);
+		chart.getRangeAxis().setZoomable(zoomable);
+		chart.getRangeAxis().setMovable(moveable);
 
 		return chart;
 	}

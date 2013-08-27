@@ -261,7 +261,7 @@ public class CostsReport extends AbstractReport {
 	}
 
 	@Override
-	public Chart getChart() {
+	public Chart getChart(boolean zoomable, boolean moveable) {
 		final Dataset dataset = new Dataset();
 		RendererList renderers = new RendererList();
 		BarRenderer renderer = new BarRenderer(context);
@@ -317,6 +317,10 @@ public class CostsReport extends AbstractReport {
 		chart.getDomainAxis().setDefaultBottomBound(bottomBound - padding);
 		chart.getDomainAxis().setDefaultTopBound(topBound + padding);
 		chart.getRangeAxis().setDefaultBottomBound(0);
+		chart.getDomainAxis().setZoomable(zoomable);
+		chart.getDomainAxis().setMovable(moveable);
+		chart.getRangeAxis().setZoomable(zoomable);
+		chart.getRangeAxis().setMovable(moveable);
 
 		return chart;
 	}

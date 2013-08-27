@@ -114,6 +114,7 @@
     <string name="validate_error_not_empty">Must not be empty</string>
     <string name="graph_details_desc">Graph details</string>
     <string name="graph_options_desc">Graph options</string>
+    <string name="graph_close_full_screen_desc">Close full screen graph</string>
     <string name="remove_fueltype_desc">Remove</string>
     <string name="report_title_fuel_consumption">Fuel consumption</string>
     <string name="report_title_fuel_price">Fuel price</string>
