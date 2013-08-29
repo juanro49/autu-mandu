@@ -17,24 +17,11 @@
 <resources>
     <string name="app_name">Car Report</string>
     <string name="app_description">Tragen Sie die laufenden Kosten Ihres Autos ein und erhalten Sie schöne Reports.</string>
+    
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Lizenzen</string>
-    <string name="hint_mileage">Kilometerstand</string>
-    <string name="hint_mileage_optional">Kilometerstand (optional)</string>
-    <string name="hint_volume">Volumen</string>
-    <string name="hint_price">Preis</string>
-    <string name="hint_note_optional">Notiz (optional)</string>
-    <string name="hint_title">Titel</string>
-    <string name="hint_name">Name</string>
-    <string name="label_partial">Teilfüllung</string>
-    <string name="label_color">Farbe</string>
-    <string name="label_suspend">Stilllegen</string>
-    <string name="label_in_tank">in Tank</string>
-    <string name="label_add">Hinzufügen</string>
-    <string name="label_add_dialog">Hinzufügen…</string>
-    <string name="suspended">Stillgelegt</string>
-    <string name="suspended_since">Stillgelegt seit %s</string>
+
     <string name="menu_synchronize">Synchronisieren</string>
     <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
     <string name="menu_add_other">Andere Kosten hinzufügen</string>
@@ -45,12 +32,36 @@
     <string name="menu_delete">Löschen</string>
     <string name="menu_add_car">Auto hinzufügen</string>
     <string name="menu_show_trend">Trend anzeigen</string>
+    
     <string name="section_car">Auto</string>
     <string name="section_note">Notiz</string>
     <string name="section_fueltypes">Kraftstoffarten</string>
     <string name="section_suspend">Stilllegen</string>
-    <string name="drawer_open">Navigation öffnen</string>
-    <string name="drawer_close">Navigation schließen</string>
+
+    <string name="hint_mileage">Kilometerstand</string>
+    <string name="hint_mileage_optional">Kilometerstand (optional)</string>
+    <string name="hint_volume">Volumen</string>
+    <string name="hint_price">Preis</string>
+    <string name="hint_note_optional">Notiz (optional)</string>
+    <string name="hint_title">Titel</string>
+    <string name="hint_name">Name</string>
+
+    <string name="label_partial">Teilfüllung</string>
+    <string name="label_color">Farbe</string>
+    <string name="label_suspend">Stilllegen</string>
+    <string name="label_in_tank">in Tank</string>
+    <string name="label_add">Hinzufügen</string>
+    <string name="label_add_dialog">Hinzufügen…</string>
+
+    <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
+    <string name="validate_error_not_empty">Darf nicht leer sein</string>
+
+    <string name="suspended">Stillgelegt</string>
+    <string name="suspended_since">Stillgelegt seit %s</string>
+    <string name="overwrite">Überschreiben</string>
+    <string name="restore">Wiederherstellen</string>
+    <string name="import_">Importieren</string>
+    
     <string name="title_first_start">Erste Schritte</string>
     <string name="title_add_refueling">Tankfüllung hinzufügen</string>
     <string name="title_edit_refueling">Tankfüllung bearbeiten</string>
@@ -62,8 +73,10 @@
     <string name="title_edit_car">Auto bearbeiten</string>
     <string name="cab_title_selected">%d ausgewählt</string>
     <string name="edit_title_refueling">Tankfüllung</string>
+
     <string name="edit_message_no_entry_selected">Kein Eintrag ausgewählt</string>
     <string name="edit_message_no_entries_available">Keine Einträge verfügbar</string>
+    
     <string name="alert_delete_refueling_message">Diese Tankfüllung wird gelöscht.</string>
     <string name="alert_delete_other_message">Diese anderen Kosten werden gelöscht.</string>
     <string name="alert_delete_car_message">Dieses Auto wird gelöscht.</string>
@@ -91,9 +104,7 @@
     <string name="alert_add_fuel_tank_title">Kraftstofftank hinzufügen</string>
     <string name="alert_fuel_type_exists_message">Diese Kaftstoffart existiert bereits.</string>
     <string name="alert_fuel_tank_exists_message">Es gibt bereits einen Kraftstofftank mit diesem Namen.</string>
-    <string name="overwrite">Überschreiben</string>
-    <string name="restore">Wiederherstellen</string>
-    <string name="import_">Importieren</string>
+    
     <string name="toast_synchronization_failed">Synchronisation fehlgeschlagen</string>
     <string name="toast_refueling_saved">Tankfüllung gespeichert</string>
     <string name="toast_refueling_deleted">Tankfüllung gelöscht</string>
@@ -110,12 +121,7 @@
     <string name="toast_export_csv_failed">Export fehlgeschlagen</string>
     <string name="toast_import_csv_success">Importieren der Daten war erfolgreich</string>
     <string name="toast_importcsv_failed">Import fehlgeschlagen. Es wurden keine Daten verändert. Sind die Importdaten im richtigen Format?</string>
-    <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
-    <string name="validate_error_not_empty">Darf nicht leer sein</string>
-    <string name="graph_details_desc">Graph-Details</string>
-    <string name="graph_options_desc">Graph-Optionen</string>
-    <string name="graph_close_full_screen_desc">Vollbildgraph schließen</string>
-    <string name="remove_fueltype_desc">Entfernen</string>
+    
     <string name="report_title_fuel_consumption">Benzinverbrauch</string>
     <string name="report_title_fuel_price">Benzinpreis</string>
     <string name="report_title_mileage">Kilometerstand</string>
@@ -140,18 +146,20 @@
     <string name="report_toast_date">Datum</string>
     <string name="report_toast_fueltype">Kraftstoffart</string>
     <string name="report_toast_none">keine</string>
+
     <string name="pref_title_header_about">Über Car Report</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>
     <string name="pref_title_header_cars">Autos</string>
     <string name="pref_title_header_backup">Sichern &amp; Exportieren</string>
-    <string name="pref_title_category_defaults">Standards</string>
+    <string name="pref_title_header_report_order">Reihenfolge der Reports</string>
+    <string name="pref_title_category_behavior">Verhalten</string>
     <string name="pref_title_category_appearance">Aussehen</string>
     <string name="pref_title_category_units">Einheiten</string>
     <string name="pref_title_category_syncronisation">Synchronisation</string>
     <string name="pref_title_category_backup">Sichern &amp; Wiederherstellen</string>
     <string name="pref_title_category_export">Exportieren &amp; Importieren</string>
-    <string name="pref_title_default_car">Auto</string>
-    <string name="pref_title_default_show_car_menu">Zeige Autoauswahlmenü</string>
+    <string name="pref_title_behavior_default_car">Standard-Auto</string>
+    <string name="pref_title_behavior_show_car_menu">Zeige Autoauswahlmenü</string>
     <string name="pref_title_appearance_color_sections">Farbige Abschnitte</string>
     <string name="pref_title_appearance_show_legend">Legende in Graphen anzeigen</string>
     <string name="pref_title_unit_currency">Währung</string>
@@ -164,7 +172,7 @@
     <string name="pref_title_restore">Wiederherstellen</string>
     <string name="pref_title_exportcsv">CSV exportieren</string>
     <string name="pref_title_importcsv">CSV importieren</string>
-    <string name="pref_summary_default_show_car_menu">Zeige ein Menü zur Autoauswahl, wenn Sie eine Tankfüllung hinzufügen und mehr als ein Auto haben.</string>
+    <string name="pref_summary_behavior_show_car_menu">Zeige ein Menü zur Autoauswahl, wenn Sie eine Tankfüllung hinzufügen und mehr als ein Auto haben.</string>
     <string name="pref_summary_appearance_color_sections">Überschriften der Abschnitte in der Farbe des dazugehörigen Autos anzeigen.</string>
     <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
     <string name="pref_summary_sync_dropbox_link">Synchronisation über Dropbox einrichten. Achtung: Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>
@@ -177,9 +185,11 @@
     <string name="pref_summary_export_csv">Daten als CSV exportieren, um sie in anderen Programmen wie Microsoft Excel oder LibreOffice Calc verwenden zu können.</string>
     <string name="pref_summary_import_csv">Daten von CSV-Dateien importieren. Die Dateien müssen so aussehen, wie die, die beim Export generiert werden.</string>
     <string name="pref_summary_import_csv_no_data">Es wurden Dateien im Ordner %s auf der SD-Karte gefunden.</string>
+    
     <string name="help_section_getting_started">Einstieg</string>
     <string name="help_section_tips">Tipps</string>
     <string name="help_section_calculations">Berechnungen</string>
+
     <string name="first_start_hi">Hallo!</string>
     <string name="first_start_intro">Car Report kann Reports über Ausgaben für deine Autos anzeigen, z.B. Benzinverbrauch und gesamte Kosten. Starte mit diesen einfachen Schritten:</string>
     <string name="first_start_step1_img_desc">Erster Schritt</string>
@@ -189,10 +199,19 @@
     <string name="first_start_step3_img_desc">Dritter Schritt</string>
     <string name="first_start_step3_text">Nach zwei Tankfüllungen solltest du die ersten Graphen sehen.</string>
     <string name="first_start_create_car">Erstelle ein Auto</string>
+
     <string name="calc_option_volume_to_distance">Volumen (%1$s) nach Strecke (%2$s)</string>
     <string name="calc_option_distance_to_volume">Strecke (%1$s) nach Volumen (%2$s)</string>
     <string name="calc_option_volume_to_price">Volumen (%1$s) nach Preis (%2$s)</string>
     <string name="calc_option_price_to_volume">Preis (%1$s) nach Volumen (%2$s)</string>
     <string name="calc_option_distance_to_price">Strecke (%1$s) nach Preis (%2$s)</string>
     <string name="calc_option_price_to_distance">Preis (%1$s) nach Strecke (%2$s)</string>
+
+    <string name="drawer_open">Navigation öffnen</string>
+    <string name="drawer_close">Navigation schließen</string>
+    <string name="graph_details_desc">Graph-Details</string>
+    <string name="graph_options_desc">Graph-Optionen</string>
+    <string name="graph_close_full_screen_desc">Vollbildgraph schließen</string>
+    <string name="remove_fueltype_desc">Entfernen</string>
+    <string name="drag_handle_desc">Drag-Bereich</string>
 </resources>

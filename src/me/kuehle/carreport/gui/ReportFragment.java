@@ -25,10 +25,6 @@ import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.data.report.AbstractReport.AbstractListItem;
 import me.kuehle.carreport.data.report.AbstractReport.Item;
 import me.kuehle.carreport.data.report.AbstractReport.Section;
-import me.kuehle.carreport.data.report.CostsReport;
-import me.kuehle.carreport.data.report.FuelConsumptionReport;
-import me.kuehle.carreport.data.report.FuelPriceReport;
-import me.kuehle.carreport.data.report.MileageReport;
 import me.kuehle.carreport.gui.MainActivity.BackPressedListener;
 import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 import me.kuehle.chartlib.ChartView;
@@ -77,7 +73,12 @@ public class ReportFragment extends Fragment implements
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			for (AbstractReport report : mReports) {
+			List<Class<? extends AbstractReport>> reportClasses = new Preferences(
+					getActivity()).getReportOrder();
+			for (Class<? extends AbstractReport> reportClass : reportClasses) {
+				AbstractReport report = AbstractReport.newInstance(reportClass,
+						getActivity());
+				loadGraphSettings(report);
 				report.update();
 				publishProgress(report, report.getChart(false, false));
 			}
@@ -163,11 +164,15 @@ public class ReportFragment extends Fragment implements
 
 				details.addView(itemView);
 			}
+
+			ObjectAnimator
+					.ofFloat(chart, View.ALPHA, 0f, 1f)
+					.setDuration(
+							getResources().getInteger(
+									android.R.integer.config_longAnimTime))
+					.start();
 		}
 	}
-
-	private AbstractReport[] mReports;
-	private ReportUpdateTask mReportUpdate;
 
 	private AbstractReport mCurrentMenuReport;
 	private ViewGroup mCurrentMenuReportView;
@@ -191,18 +196,7 @@ public class ReportFragment extends Fragment implements
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		mReports = new AbstractReport[] {
-				new FuelConsumptionReport(getActivity()),
-				new FuelPriceReport(getActivity()),
-				new MileageReport(getActivity()),
-				new CostsReport(getActivity()) };
-
-		for (AbstractReport report : mReports) {
-			loadGraphSettings(report);
-		}
-
-		mReportUpdate = new ReportUpdateTask();
-		mReportUpdate.execute();
+		new ReportUpdateTask().execute();
 	}
 
 	@Override
@@ -223,7 +217,7 @@ public class ReportFragment extends Fragment implements
 
 	@Override
 	public void onDataChanged() {
-		mReportUpdate.execute();
+		new ReportUpdateTask().execute();
 	}
 
 	@Override
@@ -362,7 +356,6 @@ public class ReportFragment extends Fragment implements
 						mCurrentFullScreenStartScaleY, 1f));
 		set.setDuration(getResources().getInteger(
 				android.R.integer.config_longAnimTime));
-		set.setInterpolator(new DecelerateInterpolator());
 		set.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(Animator animation) {
@@ -387,7 +380,6 @@ public class ReportFragment extends Fragment implements
 				.getHeight() - details.getHeight()) : main.getHeight();
 
 		ValueAnimator animator = new ValueAnimator();
-		animator.setInterpolator(new DecelerateInterpolator());
 		animator.setDuration(getResources().getInteger(
 				android.R.integer.config_longAnimTime));
 		animator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));

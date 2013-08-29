@@ -15,16 +15,20 @@
   limitations under the License.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <PreferenceCategory android:title="@string/pref_title_category_defaults" >
+    <PreferenceCategory android:title="@string/pref_title_category_behavior" >
+        <PreferenceScreen
+            android:fragment="me.kuehle.carreport.gui.PreferencesReportOrderFragment"
+            android:key="behavior_report_order"
+            android:title="@string/pref_title_header_report_order" />
         <ListPreference
             android:defaultValue="1"
-            android:key="default_car"
-            android:title="@string/pref_title_default_car" />
+            android:key="behavior_default_car"
+            android:title="@string/pref_title_behavior_default_car" />
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="default_show_car_menu"
-            android:summary="@string/pref_summary_default_show_car_menu"
-            android:title="@string/pref_title_default_show_car_menu" />
+            android:key="behavior_show_car_menu"
+            android:summary="@string/pref_summary_behavior_show_car_menu"
+            android:title="@string/pref_title_behavior_show_car_menu" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_appearance" >
         <CheckBoxPreference

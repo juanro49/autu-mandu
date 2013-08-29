@@ -16,6 +16,8 @@
 
 package me.kuehle.carreport.data.report;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -146,11 +148,27 @@ public abstract class AbstractReport {
 		}
 	}
 
-	protected Context context;
+	public static AbstractReport newInstance(
+			Class<? extends AbstractReport> reportClass, Context context) {
+		try {
+			Constructor<? extends AbstractReport> constructor = reportClass
+					.getConstructor(Context.class);
+			return constructor.newInstance(context);
+		} catch (NoSuchMethodException e) {
+		} catch (IllegalArgumentException e) {
+		} catch (java.lang.InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		}
 
+		return null;
+	}
+
+	protected Context context;
 	private ArrayList<AbstractListItem> data = new ArrayList<AbstractListItem>();
 	private boolean showTrend = false;
 	private int chartOption = 0;
+
 	private boolean initialized = false;
 
 	protected AxisLabelFormatter dateLabelFormatter = new AxisLabelFormatter() {

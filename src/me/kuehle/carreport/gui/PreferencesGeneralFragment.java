@@ -1,24 +1,28 @@
 package me.kuehle.carreport.gui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.util.Strings;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.PreferenceScreen;
 
 public class PreferencesGeneralFragment extends PreferenceFragment {
 	private OnPreferenceChangeListener onPreferenceChangeListener = new OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			if (preference.getKey().equals("default_car")) {
+			if (preference.getKey().equals("behavior_car")) {
 				Car car = Car.load(Car.class,
 						Long.parseLong(newValue.toString()));
 				preference.setSummary(car.name);
@@ -40,7 +44,12 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 
 		Preferences prefs = new Preferences(getActivity());
 
-		// Default Car
+		// Behavior report order
+		{
+			updateReportOrderSummary();
+		}
+
+		// Behavior default car
 		{
 			List<Car> cars = Car.getAll();
 			String[] defaultEntries = new String[cars.size()];
@@ -50,7 +59,7 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 				defaultEntryValues[i] = String.valueOf(cars.get(i).getId());
 			}
 
-			ListPreference defaultCar = (ListPreference) findPreference("default_car");
+			ListPreference defaultCar = (ListPreference) findPreference("behavior_default_car");
 			defaultCar.setEntries(defaultEntries);
 			defaultCar.setEntryValues(defaultEntryValues);
 			defaultCar
@@ -59,9 +68,9 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			defaultCar.setSummary(car.name);
 		}
 
-		// Default car menu
+		// Behavior car menu
 		{
-			CheckBoxPreference showCarMenu = (CheckBoxPreference) findPreference("default_show_car_menu");
+			CheckBoxPreference showCarMenu = (CheckBoxPreference) findPreference("behavior_show_car_menu");
 			showCarMenu
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 		}
@@ -103,5 +112,25 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			unitDistance.setSummary(prefs.getUnitDistance());
 		}
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		updateReportOrderSummary();
+	}
+
+	private void updateReportOrderSummary() {
+		List<Class<? extends AbstractReport>> reportClasses = new Preferences(
+				getActivity()).getReportOrder();
+		List<String> reportTitles = new ArrayList<String>();
+		for (Class<? extends AbstractReport> reportClass : reportClasses) {
+			AbstractReport report = AbstractReport.newInstance(reportClass,
+					getActivity());
+			reportTitles.add(report.getTitle());
+		}
+
+		PreferenceScreen reportOrder = (PreferenceScreen) findPreference("behavior_report_order");
+		reportOrder.setSummary(Strings.join(", ", reportTitles));
 	}
 }

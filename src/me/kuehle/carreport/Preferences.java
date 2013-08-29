@@ -16,9 +16,16 @@
 
 package me.kuehle.carreport;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import me.kuehle.carreport.data.report.AbstractReport;
+import me.kuehle.carreport.data.report.CostsReport;
+import me.kuehle.carreport.data.report.FuelConsumptionReport;
+import me.kuehle.carreport.data.report.FuelPriceReport;
+import me.kuehle.carreport.data.report.MileageReport;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.util.Strings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -32,7 +39,7 @@ public class Preferences {
 	}
 
 	public long getDefaultCar() {
-		int id = Integer.parseInt(prefs.getString("default_car", "1"));
+		int id = Integer.parseInt(prefs.getString("behavior_default_car", "1"));
 		List<Car> cars = Car.getAll();
 		if (cars.size() == 0) {
 			return 0;
@@ -63,6 +70,31 @@ public class Preferences {
 		return prefs.getString("sync_dropbox_secret", null);
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Class<? extends AbstractReport>> getReportOrder() {
+		List<Class<? extends AbstractReport>> reports = new ArrayList<Class<? extends AbstractReport>>();
+		String reportNames = prefs.getString("behavior_report_order",
+				null);
+		if (reportNames == null) {
+			reports.add(FuelConsumptionReport.class);
+			reports.add(FuelPriceReport.class);
+			reports.add(MileageReport.class);
+			reports.add(CostsReport.class);
+		} else {
+			for (String reportName : reportNames.split(",")) {
+				try {
+					Class<?> report = Class.forName(reportName);
+					if (AbstractReport.class.isAssignableFrom(report)) {
+						reports.add((Class<? extends AbstractReport>) report);
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
+
+		return reports;
+	}
+
 	public String getUnitCurrency() {
 		return prefs.getString("unit_currency", "EUR");
 	}
@@ -80,7 +112,7 @@ public class Preferences {
 	}
 
 	public boolean isShowCarMenu() {
-		return prefs.getBoolean("default_show_car_menu", true);
+		return prefs.getBoolean("behavior_show_car_menu", true);
 	}
 
 	public boolean isShowLegend() {
@@ -116,6 +148,17 @@ public class Preferences {
 	public void setDropboxSecret(String secret) {
 		Editor edit = prefs.edit();
 		edit.putString("sync_dropbox_secret", secret);
+		edit.apply();
+	}
+
+	public void setReportOrder(List<Class<? extends AbstractReport>> reports) {
+		List<String> reportNames = new ArrayList<String>();
+		for (Class<? extends AbstractReport> report : reports) {
+			reportNames.add(report.getName());
+		}
+
+		Editor edit = prefs.edit();
+		edit.putString("behavior_report_order", Strings.join(",", reportNames));
 		edit.apply();
 	}
 }

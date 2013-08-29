@@ -17,24 +17,11 @@
 <resources>
     <string name="app_name">Car Report</string>
     <string name="app_description">Enter the costs of your car and receive nice reports and statistics.</string>
+    
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Licenses</string>
-    <string name="hint_mileage">Mileage</string>
-    <string name="hint_mileage_optional">Mileage (optional)</string>
-    <string name="hint_volume">Volume</string>
-    <string name="hint_price">Price</string>
-    <string name="hint_note_optional">Note (optional)</string>
-    <string name="hint_title">Title</string>
-    <string name="hint_name">Name</string>
-    <string name="label_partial">Partial</string>
-    <string name="label_color">Color</string>
-    <string name="label_suspend">Suspend</string>
-    <string name="label_in_tank">in Tank</string>
-    <string name="label_add">Add</string>
-    <string name="label_add_dialog">Add…</string>
-    <string name="suspended">Suspended</string>
-    <string name="suspended_since">Suspended since %s</string>
+    
     <string name="menu_synchronize">Synchronize</string>
     <string name="menu_add_refueling">Add refueling</string>
     <string name="menu_add_other">Add other</string>
@@ -45,12 +32,36 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_add_car">Add car</string>
     <string name="menu_show_trend">Show trend</string>
+    
     <string name="section_car">Car</string>
     <string name="section_note">Note</string>
     <string name="section_fueltypes">Fuel types</string>
     <string name="section_suspend">Suspend</string>
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
+    
+    <string name="hint_mileage">Mileage</string>
+    <string name="hint_mileage_optional">Mileage (optional)</string>
+    <string name="hint_volume">Volume</string>
+    <string name="hint_price">Price</string>
+    <string name="hint_note_optional">Note (optional)</string>
+    <string name="hint_title">Title</string>
+    <string name="hint_name">Name</string>
+    
+    <string name="label_partial">Partial</string>
+    <string name="label_color">Color</string>
+    <string name="label_suspend">Suspend</string>
+    <string name="label_in_tank">in Tank</string>
+    <string name="label_add">Add</string>
+    <string name="label_add_dialog">Add…</string>
+    
+    <string name="validate_error_greater_zero">Has to be greater 0</string>
+    <string name="validate_error_not_empty">Must not be empty</string>
+    
+    <string name="suspended">Suspended</string>
+    <string name="suspended_since">Suspended since %s</string>
+    <string name="overwrite">Overwrite</string>
+    <string name="restore">Restore</string>
+    <string name="import_">Import</string>
+    
     <string name="title_first_start">First steps</string>
     <string name="title_add_refueling">Add refueling</string>
     <string name="title_edit_refueling">Edit refueling</string>
@@ -62,8 +73,10 @@
     <string name="title_edit_car">Edit car</string>
     <string name="cab_title_selected">%d selected</string>
     <string name="edit_title_refueling">Refueling</string>
+    
     <string name="edit_message_no_entry_selected">No entry selected</string>
     <string name="edit_message_no_entries_available">No entries available</string>
+    
     <string name="alert_delete_refueling_message">This refueling will be deleted.</string>
     <string name="alert_delete_other_message">This other cost will be deleted.</string>
     <string name="alert_delete_car_message">This car will be deleted.</string>
@@ -91,9 +104,7 @@
     <string name="alert_add_fuel_tank_title">Add fuel tank</string>
     <string name="alert_fuel_type_exists_message">This fuel type does already exist.</string>
     <string name="alert_fuel_tank_exists_message">A fuel tank with this name does already exist.</string>
-    <string name="overwrite">Overwrite</string>
-    <string name="restore">Restore</string>
-    <string name="import_">Import</string>
+    
     <string name="toast_synchronization_failed">Synchronization failed</string>
     <string name="toast_refueling_saved">Refueling saved</string>
     <string name="toast_refueling_deleted">Refueling deleted</string>
@@ -110,12 +121,7 @@
     <string name="toast_export_csv_failed">Export failed.</string>
     <string name="toast_import_csv_success">Import completed successfully.</string>
     <string name="toast_importcsv_failed">Import failed. No data was changed. Are your files in the correct format?</string>
-    <string name="validate_error_greater_zero">Has to be greater 0</string>
-    <string name="validate_error_not_empty">Must not be empty</string>
-    <string name="graph_details_desc">Graph details</string>
-    <string name="graph_options_desc">Graph options</string>
-    <string name="graph_close_full_screen_desc">Close full screen graph</string>
-    <string name="remove_fueltype_desc">Remove</string>
+    
     <string name="report_title_fuel_consumption">Fuel consumption</string>
     <string name="report_title_fuel_price">Fuel price</string>
     <string name="report_title_mileage">Mileage</string>
@@ -140,18 +146,20 @@
     <string name="report_toast_date">Date</string>
     <string name="report_toast_fueltype">Fuel type</string>
     <string name="report_toast_none">none</string>
+    
     <string name="pref_title_header_about">About Car Report</string>
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>
-    <string name="pref_title_category_syncronisation">Synchronisation</string>
+    <string name="pref_title_header_report_order">Report order</string>
     <string name="pref_title_header_backup">Backup &amp; Export</string>
-    <string name="pref_title_category_defaults">Defaults</string>
+    <string name="pref_title_category_syncronisation">Synchronisation</string>
+    <string name="pref_title_category_behavior">Behavior</string>
     <string name="pref_title_category_appearance">Appearance</string>
     <string name="pref_title_category_units">Units</string>
     <string name="pref_title_category_backup">Backup &amp; Restore</string>
     <string name="pref_title_category_export">Export &amp; Import</string>
-    <string name="pref_title_default_car">Car</string>
-    <string name="pref_title_default_show_car_menu">Show car menu</string>
+    <string name="pref_title_behavior_default_car">Default car</string>
+    <string name="pref_title_behavior_show_car_menu">Show car menu</string>
     <string name="pref_title_appearance_color_sections">Color sections</string>
     <string name="pref_title_appearance_show_legend">Show legend in graph</string>
     <string name="pref_title_unit_currency">Currency</string>
@@ -164,7 +172,7 @@
     <string name="pref_title_restore">Restore</string>
     <string name="pref_title_exportcsv">Export CSV</string>
     <string name="pref_title_importcsv">Import CSV</string>
-    <string name="pref_summary_default_show_car_menu">Show a car selection menu, when adding a refueling and you have more than one car.</string>
+    <string name="pref_summary_behavior_show_car_menu">Show a car selection menu, when adding a refueling and you have more than one car.</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
     <string name="pref_summary_sync_dropbox_link">Setup synchronization with dropbox. Warning: This is a very simple synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>
@@ -177,9 +185,11 @@
     <string name="pref_summary_export_csv">Export data as CSV so you can use it in other programs like Microsoft Excel or LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Import data from CSV files. The files must look like the ones, that are generated during CSV export.</string>
     <string name="pref_summary_import_csv_no_data">Files do not exist in directory %s on SD card.</string>
+    
     <string name="help_section_getting_started">Getting started</string>
     <string name="help_section_tips">Tips</string>
     <string name="help_section_calculations">Calculations</string>
+    
     <string name="first_start_hi">Hi there!</string>
     <string name="first_start_intro">Car Report can display nice reports for your car expenses, including fuel consumption and overall costs. Start with these simple steps:</string>
     <string name="first_start_step1_img_desc">First step</string>
@@ -189,10 +199,19 @@
     <string name="first_start_step3_img_desc">Third step</string>
     <string name="first_start_step3_text">After two refuelings you should see the first graphs.</string>
     <string name="first_start_create_car">Create a car</string>
+    
     <string name="calc_option_volume_to_distance">Volume (%1$s) to Distance (%2$s)</string>
     <string name="calc_option_distance_to_volume">Distance (%1$s) to Volume (%2$s)</string>
     <string name="calc_option_volume_to_price">Volume (%1$s) to Price (%2$s)</string>
     <string name="calc_option_price_to_volume">Price (%1$s) to Volume (%2$s)</string>
     <string name="calc_option_distance_to_price">Distance (%1$s) to Price (%2$s)</string>
     <string name="calc_option_price_to_distance">Price (%1$s) to Distance (%2$s)</string>
+    
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="graph_details_desc">Graph details</string>
+    <string name="graph_options_desc">Graph options</string>
+    <string name="graph_close_full_screen_desc">Close full screen graph</string>
+    <string name="remove_fueltype_desc">Remove</string>
+    <string name="drag_handle_desc">Drag handle</string>
 </resources>
