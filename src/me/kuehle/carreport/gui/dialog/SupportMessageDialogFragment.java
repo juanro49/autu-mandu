@@ -25,7 +25,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 
 public class SupportMessageDialogFragment extends DialogFragment {
-	public static interface MessageDialogFragmentListener {
+	public static interface SupportMessageDialogFragmentListener {
 		public void onDialogNegativeClick(int requestCode);
 
 		public void onDialogPositiveClick(int requestCode);
@@ -51,7 +51,7 @@ public class SupportMessageDialogFragment extends DialogFragment {
 		return f;
 	}
 
-	private MessageDialogFragmentListener mDefaultListener = new MessageDialogFragmentListener() {
+	private SupportMessageDialogFragmentListener mDefaultListener = new SupportMessageDialogFragmentListener() {
 		@Override
 		public void onDialogPositiveClick(int requestCode) {
 		}
@@ -92,8 +92,9 @@ public class SupportMessageDialogFragment extends DialogFragment {
 		return builder.create();
 	}
 
-	private MessageDialogFragmentListener getListener() {
+	private SupportMessageDialogFragmentListener getListener() {
 		Fragment f = getTargetFragment();
-		return f != null ? (MessageDialogFragmentListener) f : mDefaultListener;
+		return f != null ? (SupportMessageDialogFragmentListener) f
+				: mDefaultListener;
 	}
 }

@@ -19,6 +19,8 @@ package me.kuehle.carreport;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.api.client.util.DateTime;
+
 import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.data.report.CostsReport;
 import me.kuehle.carreport.data.report.FuelConsumptionReport;
@@ -70,11 +72,27 @@ public class Preferences {
 		return prefs.getString("sync_dropbox_secret", null);
 	}
 
+	public String getGoogleDriveAccount() {
+		return prefs.getString("sync_drive_account", null);
+	}
+
+	public String getGoogleDriveAppDataID() {
+		return prefs.getString("sync_drive_appdata_id", null);
+	}
+
+	public DateTime getGoogleDriveLocalModifiedDate() {
+		String date = prefs.getString("sync_drive_modified_date", null);
+		if (date == null) {
+			return null;
+		} else {
+			return DateTime.parseRfc3339(date);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Class<? extends AbstractReport>> getReportOrder() {
 		List<Class<? extends AbstractReport>> reports = new ArrayList<Class<? extends AbstractReport>>();
-		String reportNames = prefs.getString("behavior_report_order",
-				null);
+		String reportNames = prefs.getString("behavior_report_order", null);
 		if (reportNames == null) {
 			reports.add(FuelConsumptionReport.class);
 			reports.add(FuelPriceReport.class);
@@ -93,6 +111,10 @@ public class Preferences {
 		}
 
 		return reports;
+	}
+
+	public String getSynchronizationProvider() {
+		return prefs.getString("sync_current_provider", null);
 	}
 
 	public String getUnitCurrency() {
@@ -151,6 +173,24 @@ public class Preferences {
 		edit.apply();
 	}
 
+	public void setGoogleDriveAccount(String account) {
+		Editor edit = prefs.edit();
+		edit.putString("sync_drive_account", account);
+		edit.apply();
+	}
+
+	public void setGoogleDriveAppDataID(String id) {
+		Editor edit = prefs.edit();
+		edit.putString("sync_drive_appdata_id", id);
+		edit.apply();
+	}
+
+	public void setGoogleDriveLocalModifiedDate(DateTime date) {
+		Editor edit = prefs.edit();
+		edit.putString("sync_drive_modified_date", date.toStringRfc3339());
+		edit.apply();
+	}
+
 	public void setReportOrder(List<Class<? extends AbstractReport>> reports) {
 		List<String> reportNames = new ArrayList<String>();
 		for (Class<? extends AbstractReport> report : reports) {
@@ -159,6 +199,12 @@ public class Preferences {
 
 		Editor edit = prefs.edit();
 		edit.putString("behavior_report_order", Strings.join(",", reportNames));
+		edit.apply();
+	}
+
+	public void setSynchronizationProvider(String provider) {
+		Editor edit = prefs.edit();
+		edit.putString("sync_current_provider", provider);
 		edit.apply();
 	}
 }

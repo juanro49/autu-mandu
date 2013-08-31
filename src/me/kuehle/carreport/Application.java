@@ -16,32 +16,23 @@
 
 package me.kuehle.carreport;
 
-import com.activeandroid.ActiveAndroid;
+import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 
-import me.kuehle.carreport.util.backup.Dropbox;
+import com.activeandroid.ActiveAndroid;
 
 public class Application extends android.app.Application {
 	private static Application instance;
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		instance = this;
-
-		System.setProperty("org.joda.time.DateTimeZone.Provider",
-				"org.joda.time.tz.UTCProvider");
-		ActiveAndroid.initialize(this);
-		Dropbox.init(this);
-
-		if (new Preferences(this).isSyncOnStart()) {
-			Dropbox.getInstance().synchronize();
+	public static void dataChanged() {
+		if (instance != null) {
+			if (new Preferences(instance).isSyncOnChange()) {
+				AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
+						.getCurrent(instance);
+				if (provider != null) {
+					provider.synchronize();
+				}
+			}
 		}
-	}
-
-	@Override
-	public void onTerminate() {
-		super.onTerminate();
-		ActiveAndroid.dispose();
 	}
 
 	public static void reinitializeDatabase() {
@@ -51,11 +42,27 @@ public class Application extends android.app.Application {
 		}
 	}
 
-	public static void dataChanged() {
-		if (instance != null) {
-			if (new Preferences(instance).isSyncOnChange()) {
-				Dropbox.getInstance().synchronize();
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		instance = this;
+
+		System.setProperty("org.joda.time.DateTimeZone.Provider",
+				"org.joda.time.tz.UTCProvider");
+		ActiveAndroid.initialize(this);
+
+		if (new Preferences(this).isSyncOnStart()) {
+			AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
+					.getCurrent(this);
+			if (provider != null) {
+				provider.synchronize();
 			}
 		}
+	}
+
+	@Override
+	public void onTerminate() {
+		super.onTerminate();
+		ActiveAndroid.dispose();
 	}
 }

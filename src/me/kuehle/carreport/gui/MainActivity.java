@@ -21,6 +21,7 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 import me.kuehle.carreport.util.backup.Dropbox;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -61,7 +62,7 @@ public class MainActivity extends FragmentActivity {
 
 	private Dropbox.OnSynchronizeListener mOnSynchronize = new Dropbox.OnSynchronizeListener() {
 		@Override
-		public void synchronizationFinished(boolean result) {
+		public void onSynchronizationFinished(boolean result) {
 			if (mSyncMenuItem != null) {
 				mSyncMenuItem.setActionView(null);
 			}
@@ -78,7 +79,7 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		@Override
-		public void synchronizationStarted() {
+		public void onSynchronizationStarted() {
 			if (mSyncMenuItem != null) {
 				mSyncMenuItem
 						.setActionView(R.layout.actionbar_indeterminate_progress);
@@ -201,10 +202,17 @@ public class MainActivity extends FragmentActivity {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main, menu);
 		mSyncMenuItem = menu.findItem(R.id.menu_synchronize);
-		mSyncMenuItem.setVisible(Dropbox.getInstance().isLinked());
-		if (Dropbox.getInstance().isSynchronisationInProgress()) {
-			mSyncMenuItem
-					.setActionView(R.layout.actionbar_indeterminate_progress);
+
+		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
+				.getCurrent(this);
+		if (provider == null) {
+			mSyncMenuItem.setVisible(false);
+		} else {
+			mSyncMenuItem.setVisible(provider.isAuthenticated());
+			if (provider.isSynchronisationInProgress()) {
+				mSyncMenuItem
+						.setActionView(R.layout.actionbar_indeterminate_progress);
+			}
 		}
 
 		return super.onCreateOptionsMenu(menu);
@@ -220,7 +228,7 @@ public class MainActivity extends FragmentActivity {
 
 		switch (item.getItemId()) {
 		case R.id.menu_synchronize:
-			Dropbox.getInstance().synchronize();
+			AbstractSynchronizationProvider.getCurrent(this).synchronize();
 			return true;
 		case R.id.menu_settings:
 			Intent intentPrefs = new Intent(this, PreferencesActivity.class);
@@ -320,7 +328,11 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Dropbox.getInstance().setSynchronisationCallback(null);
+		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
+				.getCurrent(this);
+		if (provider != null) {
+			provider.setSynchronisationCallback(null);
+		}
 	}
 
 	@Override
@@ -332,11 +344,17 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
+				.getCurrent(this);
 		if (mSyncMenuItem != null) {
-			mSyncMenuItem.setVisible(Dropbox.getInstance().isLinked());
+			mSyncMenuItem.setVisible(provider != null
+					&& provider.isAuthenticated());
 		}
 
-		Dropbox.getInstance().setSynchronisationCallback(mOnSynchronize);
+		if (provider != null) {
+			provider.setSynchronisationCallback(mOnSynchronize);
+		}
 	}
 
 	@Override

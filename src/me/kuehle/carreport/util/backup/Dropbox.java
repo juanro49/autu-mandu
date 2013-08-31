@@ -21,11 +21,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.Preferences;
+import me.kuehle.carreport.R;
+import me.kuehle.carreport.gui.dialog.ProgressDialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 
 import com.activeandroid.Cache;
@@ -40,48 +42,16 @@ import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 
-public class Dropbox {
-	public interface OnAuthenticationFinishedListener {
-		public void authenticationFinished(boolean success, String account,
-				boolean remoteDataAvailable);
-	}
+public class Dropbox extends AbstractSynchronizationProvider {
+	private static final String APP_KEY = "a6edub2n9b029if";
+	private static final String APP_SECRET = "1cw56rcn1bbnb7f";
+	private static final AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
 
-	public interface OnSynchronizeListener {
-		public void synchronizationFinished(boolean result);
-
-		public void synchronizationStarted();
-	}
-
-	public static final int SYNC_NORMAL = 1;
-	public static final int SYNC_DOWNLOAD = 2;
-	public static final int SYNC_UPLOAD = 3;
-
-	private final static String APP_KEY = "a6edub2n9b029if";
-	private final static String APP_SECRET = "1cw56rcn1bbnb7f";
-	private final static AccessType ACCESS_TYPE = AccessType.APP_FOLDER;
-
-	private static final String TEMP_FILE_NAME = "dropbox";
-
-	private static Dropbox instance;
-
-	public static Dropbox getInstance() {
-		return instance;
-	}
-
-	public static void init(Context context) {
-		instance = new Dropbox(context);
-	}
-
-	private Context context;
 	private DropboxAPI<AndroidAuthSession> mDBApi;
+	private boolean authenticationInProgress = false;
 
-	private boolean synchronisationInProgress = false;
-	private OnSynchronizeListener synchronisationCallback;
-
-	private File tempFile;
-
-	private Dropbox(Context context) {
-		this.context = context;
+	public Dropbox(Context context) {
+		super(context);
 
 		AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
 		AndroidAuthSession session = new AndroidAuthSession(appKeys,
@@ -91,14 +61,60 @@ public class Dropbox {
 			session.setAccessTokenPair(tokens);
 		}
 
-		this.mDBApi = new DropboxAPI<AndroidAuthSession>(session);
-
-		this.tempFile = new File(context.getCacheDir(), TEMP_FILE_NAME);
+		mDBApi = new DropboxAPI<AndroidAuthSession>(session);
 	}
 
-	public void finishAuthentication(
-			final OnAuthenticationFinishedListener callback) {
+	@Override
+	public String getAccountName() {
+		Preferences prefs = new Preferences(mContext);
+		return prefs.getDropboxAccount();
+	}
+
+	@Override
+	public int getIcon() {
+		return R.drawable.ic_sync_dropbox;
+	}
+
+	@Override
+	public String getName() {
+		return "Dropbox";
+	}
+
+	@Override
+	public boolean isAuthenticated() {
+		return mDBApi.getSession().isLinked();
+	}
+
+	private AccessTokenPair loadAccessTokens() {
+		Preferences prefs = new Preferences(mContext);
+		String key = prefs.getDropboxKey();
+		String secret = prefs.getDropboxSecret();
+		if (key != null && secret != null) {
+			return new AccessTokenPair(key, secret);
+		} else {
+			return null;
+		}
+	}
+
+	private void saveAccessTokens(AccessTokenPair tokens) {
+		Preferences prefs = new Preferences(mContext);
+		prefs.setDropboxKey(tokens.key);
+		prefs.setDropboxSecret(tokens.secret);
+	}
+
+	@Override
+	protected void onContinueAuthentication(int requestCode, int resultCode,
+			Intent data) {
+		if (!authenticationInProgress) {
+			return;
+		}
+
 		if (mDBApi.getSession().authenticationSuccessful()) {
+			ProgressDialogFragment
+					.newInstance(
+							mContext.getString(R.string.alert_dropbox_finishing_authentication))
+					.show(mAuthenticationFragmentManager, "progress");
+
 			try {
 				mDBApi.getSession().finishAuthentication();
 				AccessTokenPair tokens = mDBApi.getSession()
@@ -107,11 +123,22 @@ public class Dropbox {
 
 				new AsyncTask<Void, Void, Boolean>() {
 					private String accountName;
-					private boolean remoteDataAvailable;
+					private boolean remoteDataAvailable = false;
 
 					@Override
 					protected Boolean doInBackground(Void... params) {
-						accountName = loadAccountName();
+						// Load account name.
+						try {
+							accountName = mDBApi.accountInfo().displayName;
+						} catch (DropboxUnlinkedException e) {
+							unlink();
+							return false;
+						} catch (DropboxException e) {
+							accountName = "- could not load account name -";
+						}
+
+						Preferences prefs = new Preferences(mContext);
+						prefs.setDropboxAccount(accountName);
 						if (accountName == null) {
 							return false;
 						}
@@ -127,8 +154,9 @@ public class Dropbox {
 								remoteDataAvailable = true;
 							}
 						} catch (DropboxServerException e) {
-							if (e.error != 404) {
-								remoteDataAvailable = false;
+							if (e.error == DropboxServerException._401_UNAUTHORIZED
+									|| e.error == DropboxServerException._403_FORBIDDEN) {
+								return false;
 							}
 						} catch (DropboxUnlinkedException e) {
 							unlink();
@@ -142,210 +170,116 @@ public class Dropbox {
 
 					@Override
 					protected void onPostExecute(Boolean result) {
-						callback.authenticationFinished(result, accountName,
-								remoteDataAvailable);
+						mAuthenticationFragmentManager
+								.executePendingTransactions();
+						((ProgressDialogFragment) mAuthenticationFragmentManager
+								.findFragmentByTag("progress")).dismiss();
+
+						authenticationFinished(result, remoteDataAvailable);
 					}
 				}.execute();
 			} catch (IllegalStateException e) {
-				callback.authenticationFinished(false, null, false);
+				authenticationFinished(false, false);
 			}
 		} else {
-			callback.authenticationFinished(false, null, false);
+			authenticationFinished(false, false);
 		}
 	}
 
-	public String getAccountName() {
-		Preferences prefs = new Preferences(context);
-		return prefs.getDropboxAccount();
+	@Override
+	protected void onStartAuthentication() {
+		authenticationInProgress = true;
+		mDBApi.getSession().startAuthentication(mContext);
 	}
 
-	public boolean isLinked() {
-		return mDBApi.getSession().isLinked();
-	}
+	@Override
+	protected boolean onSynchronize(int option) {
+		Preferences prefs = new Preferences(mContext);
+		File localFile = new File(Cache.openDatabase().getPath());
+		String localRev = prefs.getDropboxLocalRev();
 
-	public boolean isSynchronisationInProgress() {
-		return synchronisationInProgress;
-	}
-
-	public void setSynchronisationCallback(OnSynchronizeListener callback) {
-		synchronisationCallback = callback;
-		if (synchronisationCallback != null && synchronisationInProgress) {
-			synchronisationCallback.synchronizationStarted();
-		}
-	}
-
-	public void startAuthentication(Context context) {
-		mDBApi.getSession().startAuthentication(context);
-	}
-
-	public void synchronize() {
-		synchronize(SYNC_NORMAL);
-	}
-
-	public void synchronize(int option) {
-		if (synchronisationInProgress || !isLinked()) {
-			return;
+		String remoteRev = null;
+		try {
+			Entry remoteEntry = mDBApi.metadata("/" + localFile.getName(), 1,
+					null, false, null);
+			if (!remoteEntry.isDeleted) {
+				remoteRev = remoteEntry.rev;
+			}
+		} catch (DropboxServerException e) {
+			if (e.error != 404) {
+				return false;
+			}
+		} catch (DropboxUnlinkedException e) {
+			unlink();
+			return false;
+		} catch (DropboxException e) {
+			return false;
 		}
 
-		synchronisationInProgress = true;
-		new AsyncTask<Integer, Void, Boolean>() {
-			@Override
-			protected Boolean doInBackground(Integer... params) {
-				Preferences prefs = new Preferences(context);
-				File localFile = new File(Cache.openDatabase().getPath());
-				String localRev = prefs.getDropboxLocalRev();
+		if (option == SYNC_UPLOAD || remoteRev == null
+				|| (option != SYNC_DOWNLOAD && remoteRev.equals(localRev))) {
+			// Upload
+			if (!copyFile(localFile, mTempFile)) {
+				return false;
+			}
 
-				String remoteRev = null;
-				try {
-					Entry remoteEntry = mDBApi.metadata(
-							"/" + localFile.getName(), 1, null, false, null);
-					if (!remoteEntry.isDeleted) {
-						remoteRev = remoteEntry.rev;
-					}
-				} catch (DropboxServerException e) {
-					if (e.error != 404) {
-						return false;
-					}
-				} catch (DropboxUnlinkedException e) {
-					unlink();
-					return false;
-				} catch (DropboxException e) {
-					return false;
-				}
-
-				if (params[0] == SYNC_UPLOAD
-						|| remoteRev == null
-						|| (params[0] != SYNC_DOWNLOAD && remoteRev
-								.equals(localRev))) {
-					// Upload
-					if (!copyFile(localFile, tempFile)) {
-						return false;
-					}
-
-					FileInputStream inputStream = null;
+			FileInputStream inputStream = null;
+			try {
+				inputStream = new FileInputStream(mTempFile);
+				Entry remoteEntry = mDBApi.putFile("/" + localFile.getName(),
+						inputStream, mTempFile.length(), remoteRev, null);
+				prefs.setDropboxLocalRev(remoteEntry.rev);
+			} catch (DropboxException e) {
+				return false;
+			} catch (FileNotFoundException e) {
+				return false;
+			} finally {
+				if (inputStream != null) {
 					try {
-						inputStream = new FileInputStream(tempFile);
-						Entry remoteEntry = mDBApi.putFile(
-								"/" + localFile.getName(), inputStream,
-								tempFile.length(), remoteRev, null);
-						prefs.setDropboxLocalRev(remoteEntry.rev);
-					} catch (DropboxException e) {
-						return false;
-					} catch (FileNotFoundException e) {
-						return false;
-					} finally {
-						if (inputStream != null) {
-							try {
-								inputStream.close();
-							} catch (IOException e) {
-							}
-						}
-
-						tempFile.delete();
+						inputStream.close();
+					} catch (IOException e) {
 					}
-				} else {
-					// Download
-					FileOutputStream outputStream = null;
+				}
+
+				mTempFile.delete();
+			}
+		} else {
+			// Download
+			FileOutputStream outputStream = null;
+			try {
+				outputStream = new FileOutputStream(mTempFile);
+				DropboxFileInfo info = mDBApi.getFile(
+						"/" + localFile.getName(), null, outputStream, null);
+				if (copyFile(mTempFile, localFile)) {
+					prefs.setDropboxLocalRev(info.getMetadata().rev);
+					Application.reinitializeDatabase();
+				}
+			} catch (DropboxException e) {
+				return false;
+			} catch (FileNotFoundException e) {
+				return false;
+			} finally {
+				if (outputStream != null) {
 					try {
-						outputStream = new FileOutputStream(tempFile);
-						DropboxFileInfo info = mDBApi.getFile(
-								"/" + localFile.getName(), null, outputStream,
-								null);
-						if (copyFile(tempFile, localFile)) {
-							prefs.setDropboxLocalRev(info.getMetadata().rev);
-							Application.reinitializeDatabase();
-						}
-					} catch (DropboxException e) {
-						return false;
-					} catch (FileNotFoundException e) {
-						return false;
-					} finally {
-						if (outputStream != null) {
-							try {
-								outputStream.close();
-							} catch (IOException e) {
-							}
-						}
-
-						tempFile.delete();
+						outputStream.close();
+					} catch (IOException e) {
 					}
 				}
 
-				return true;
+				mTempFile.delete();
 			}
+		}
 
-			@Override
-			protected void onPostExecute(Boolean result) {
-				synchronisationInProgress = false;
-				if (synchronisationCallback != null) {
-					synchronisationCallback.synchronizationFinished(result);
-				}
-			}
-
-			@Override
-			protected void onPreExecute() {
-				if (synchronisationCallback != null) {
-					synchronisationCallback.synchronizationStarted();
-				}
-			}
-		}.execute(option);
+		return true;
 	}
 
-	public void unlink() {
+	@Override
+	protected void onUnlink() {
 		mDBApi.getSession().unlink();
-		Preferences prefs = new Preferences(context);
+		Preferences prefs = new Preferences(mContext);
 		prefs.setDropboxAccount(null);
 		prefs.setDropboxKey(null);
 		prefs.setDropboxLocalRev(null);
 		prefs.setDropboxSecret(null);
-	}
-
-	private boolean copyFile(File from, File to) {
-		try {
-			FileInputStream inStream = new FileInputStream(from);
-			FileOutputStream outStream = new FileOutputStream(to);
-			FileChannel src = inStream.getChannel();
-			FileChannel dst = outStream.getChannel();
-			dst.transferFrom(src, 0, src.size());
-			src.close();
-			dst.close();
-			inStream.close();
-			outStream.close();
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	private AccessTokenPair loadAccessTokens() {
-		Preferences prefs = new Preferences(context);
-		String key = prefs.getDropboxKey();
-		String secret = prefs.getDropboxSecret();
-		if (key != null && secret != null) {
-			return new AccessTokenPair(key, secret);
-		} else {
-			return null;
-		}
-	}
-
-	private String loadAccountName() {
-		String accountName = null;
-		try {
-			accountName = mDBApi.accountInfo().displayName;
-		} catch (DropboxUnlinkedException e) {
-			unlink();
-		} catch (DropboxException e) {
-			accountName = "- could not load account name -";
-		}
-
-		Preferences prefs = new Preferences(context);
-		prefs.setDropboxAccount(accountName);
-		return accountName;
-	}
-
-	private void saveAccessTokens(AccessTokenPair tokens) {
-		Preferences prefs = new Preferences(context);
-		prefs.setDropboxKey(tokens.key);
-		prefs.setDropboxSecret(tokens.secret);
 	}
 }

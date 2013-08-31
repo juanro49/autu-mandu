@@ -7,7 +7,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.DataFragment.DataListListener;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
-import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.MessageDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -28,7 +28,7 @@ import android.widget.TextView;
 import com.activeandroid.Model;
 
 public abstract class AbstractDataListFragment<T extends Model> extends
-		ListFragment implements MessageDialogFragmentListener, DataListListener {
+		ListFragment implements SupportMessageDialogFragmentListener, DataListListener {
 	public static interface DataListCallback {
 		public abstract void onItemSelected(int edit, long id);
 

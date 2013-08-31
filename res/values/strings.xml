@@ -88,10 +88,10 @@
     <string name="alert_delete_others_message">The %d selected other costs will be deleted.</string>
     <string name="alert_change_color_title">Choose color</string>
     <string name="alert_dropbox_finishing_authentication">Finishing authentication…</string>
-    <string name="alert_dropbox_first_sync_title">First synchronization</string>
-    <string name="alert_dropbox_first_sync_message">There is remote data available. Please choose which data you want to use on your first synchronization.</string>
-    <string name="alert_dropbox_first_sync_download">Online data</string>
-    <string name="alert_dropbox_first_sync_upload">Local data</string>
+    <string name="alert_sync_first_sync_title">First synchronization</string>
+    <string name="alert_sync_first_sync_message">There is remote data available. Please choose which data you want to use on your first synchronization.</string>
+    <string name="alert_sync_first_sync_download">Online data</string>
+    <string name="alert_sync_first_sync_upload">Local data</string>
     <string name="alert_backup_overwrite_title">Backup</string>
     <string name="alert_backup_overwrite_message">A previous backup file does already exist on SD card.</string>
     <string name="alert_restore_title">Restore</string>
@@ -112,7 +112,7 @@
     <string name="toast_other_deleted">Other cost deleted</string>
     <string name="toast_car_saved">Car saved</string>
     <string name="toast_car_deleted">Car deleted</string>
-    <string name="toast_dropbox_authentication_failed">Dropbox authentication failed</string>
+    <string name="toast_sync_authentication_failed">Authentication failed</string>
     <string name="toast_backup_success">Backup to file %s completed successfully.</string>
     <string name="toast_backup_failed">Backup failed</string>
     <string name="toast_restore_success">Restore completed successfully</string>
@@ -165,7 +165,7 @@
     <string name="pref_title_unit_currency">Currency</string>
     <string name="pref_title_unit_volume">Volume</string>
     <string name="pref_title_unit_distance">Distance</string>
-    <string name="pref_title_sync_dropbox">Dropbox</string>
+    <string name="pref_title_sync_setup">Set up synchronization</string>
     <string name="pref_title_sync_on_start">On start</string>
     <string name="pref_title_sync_on_change">On data change</string>
     <string name="pref_title_backup">Backup</string>
@@ -175,8 +175,8 @@
     <string name="pref_summary_behavior_show_car_menu">Show a car selection menu, when adding a refueling and you have more than one car.</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
-    <string name="pref_summary_sync_dropbox_link">Setup synchronization with dropbox. Warning: This is a very simple synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>
-    <string name="pref_summary_sync_dropbox_unlink">Linked to %s. Click to unlink.</string>
+    <string name="pref_summary_sync_setup">This is a very basic synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>
+    <string name="pref_summary_sync_current_provider">Linked to %s. Click to unlink.</string>
     <string name="pref_summary_sync_on_start">Automatically synchronize when the app starts.</string>
     <string name="pref_summary_sync_on_change">Automatically synchronize when data is changed.</string>
     <string name="pref_summary_backup">Backup the current data to SD card.</string>

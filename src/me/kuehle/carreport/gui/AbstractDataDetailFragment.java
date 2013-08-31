@@ -22,7 +22,7 @@ import java.util.Date;
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
-import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.MessageDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
@@ -39,7 +39,7 @@ import android.widget.Toast;
 import com.activeandroid.Model;
 
 public abstract class AbstractDataDetailFragment extends Fragment implements
-		MessageDialogFragmentListener {
+		SupportMessageDialogFragmentListener {
 	public interface OnItemActionListener {
 		public void onItemCanceled();
 

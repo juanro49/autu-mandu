@@ -16,10 +16,7 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory android:title="@string/pref_title_category_syncronisation" >
-        <Preference
-            android:icon="@drawable/ic_sync_dropbox"
-            android:key="sync_dropbox"
-            android:title="@string/pref_title_sync_dropbox" />
+        <Preference android:key="sync_current_provider" />
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="sync_on_start"

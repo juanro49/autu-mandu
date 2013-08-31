@@ -20,11 +20,19 @@ import java.util.List;
 
 import me.kuehle.carreport.R;
 import android.app.ActionBar;
+import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.MenuItem;
 
 public class PreferencesActivity extends PreferenceActivity {
+	private Fragment mCurrentFragment;
+
+	public void onAttachFragment(Fragment fragment) {
+		mCurrentFragment = fragment;
+	}
+
 	@Override
 	public void onBuildHeaders(List<Header> target) {
 		loadHeadersFromResource(R.xml.preference_headers, target);
@@ -45,6 +53,13 @@ public class PreferencesActivity extends PreferenceActivity {
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (mCurrentFragment != null) {
+			mCurrentFragment.onActivityResult(requestCode, resultCode, data);
 		}
 	}
 }
