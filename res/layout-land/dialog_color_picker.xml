@@ -31,12 +31,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:orientation="vertical" >
-        <com.larswerkman.colorpicker.SVBar
-            android:id="@+id/svbar"
+        <com.larswerkman.colorpicker.SaturationBar
+            android:id="@+id/saturationbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <com.larswerkman.colorpicker.OpacityBar
-            android:id="@+id/opacitybar"
+        <com.larswerkman.colorpicker.ValueBar
+            android:id="@+id/valuebar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp" />

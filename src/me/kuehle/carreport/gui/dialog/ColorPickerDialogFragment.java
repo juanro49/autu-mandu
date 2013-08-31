@@ -19,17 +19,17 @@ package me.kuehle.carreport.gui.dialog;
 import me.kuehle.carreport.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.larswerkman.colorpicker.ColorPicker;
-import com.larswerkman.colorpicker.OpacityBar;
-import com.larswerkman.colorpicker.SVBar;
+import com.larswerkman.colorpicker.SaturationBar;
+import com.larswerkman.colorpicker.ValueBar;
 
 public class ColorPickerDialogFragment extends DialogFragment {
 	public static interface ColorPickerDialogFragmentListener {
@@ -64,9 +64,9 @@ public class ColorPickerDialogFragment extends DialogFragment {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		View view = inflater.inflate(R.layout.dialog_color_picker, null);
 		mColorPicker = (ColorPicker) view.findViewById(R.id.picker);
-		mColorPicker.addSVBar((SVBar) view.findViewById(R.id.svbar));
-		mColorPicker.addOpacityBar((OpacityBar) view
-				.findViewById(R.id.opacitybar));
+		mColorPicker.addSaturationBar((SaturationBar) view
+				.findViewById(R.id.saturationbar));
+		mColorPicker.addValueBar((ValueBar) view.findViewById(R.id.valuebar));
 
 		mColorPicker.setOldCenterColor(args.getInt("color"));
 		if (savedInstanceState != null) {

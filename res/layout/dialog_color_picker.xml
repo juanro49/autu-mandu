@@ -12,7 +12,7 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License..
+  limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -26,13 +26,13 @@
         android:id="@+id/picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <com.larswerkman.colorpicker.SVBar
-        android:id="@+id/svbar"
+    <com.larswerkman.colorpicker.SaturationBar
+        android:id="@+id/saturationbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp" />
-    <com.larswerkman.colorpicker.OpacityBar
-        android:id="@+id/opacitybar"
+    <com.larswerkman.colorpicker.ValueBar
+        android:id="@+id/valuebar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp" />
