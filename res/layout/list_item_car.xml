@@ -44,7 +44,7 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="15dp"
-        android:background="@android:drawable/dark_header" />
+        android:background="?android:attr/listDivider" />
     <View
         android:id="@android:id/custom"
         android:layout_width="40dp"
