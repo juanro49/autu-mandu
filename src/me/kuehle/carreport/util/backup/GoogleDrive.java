@@ -23,6 +23,7 @@ import java.util.Arrays;
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.gui.dialog.ProgressDialogFragment;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
@@ -49,6 +50,14 @@ public class GoogleDrive extends AbstractSynchronizationProvider {
 		private UserRecoverableAuthIOException userRecovEx;
 		private Exception ex;
 		private boolean remoteDataAvailable = false;
+
+		@Override
+		protected void onPreExecute() {
+			ProgressDialogFragment
+					.newInstance(
+							mContext.getString(R.string.alert_sync_finishing_authentication))
+					.show(mAuthenticationFragmentManager, "progress");
+		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -84,6 +93,10 @@ public class GoogleDrive extends AbstractSynchronizationProvider {
 
 		@Override
 		protected void onPostExecute(Void result) {
+			mAuthenticationFragmentManager.executePendingTransactions();
+			((ProgressDialogFragment) mAuthenticationFragmentManager
+					.findFragmentByTag("progress")).dismiss();
+
 			if (userRecovEx != null) {
 				mAuthenticationFragment.startActivityForResult(
 						userRecovEx.getIntent(),

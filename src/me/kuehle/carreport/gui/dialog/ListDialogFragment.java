@@ -92,6 +92,7 @@ public class ListDialogFragment extends DialogFragment {
 			if (icons != null) {
 				text1.setCompoundDrawablesWithIntrinsicBounds(icons[position],
 						0, 0, 0);
+				text1.setCompoundDrawablePadding(8);
 			}
 
 			return convertView;

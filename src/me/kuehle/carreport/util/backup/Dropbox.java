@@ -112,7 +112,7 @@ public class Dropbox extends AbstractSynchronizationProvider {
 		if (mDBApi.getSession().authenticationSuccessful()) {
 			ProgressDialogFragment
 					.newInstance(
-							mContext.getString(R.string.alert_dropbox_finishing_authentication))
+							mContext.getString(R.string.alert_sync_finishing_authentication))
 					.show(mAuthenticationFragmentManager, "progress");
 
 			try {

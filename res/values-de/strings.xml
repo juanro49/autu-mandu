@@ -87,7 +87,7 @@
     <string name="alert_delete_title">Löschen bestätigen</string>
     <string name="alert_delete_others_message">Die %d ausgewählten anderen Kosten werden gelöscht.</string>
     <string name="alert_change_color_title">Farbe auswählen</string>
-    <string name="alert_dropbox_finishing_authentication">Authentifizierung wird abgeschlossen…</string>
+    <string name="alert_sync_finishing_authentication">Authentifizierung wird abgeschlossen…</string>
     <string name="alert_sync_first_sync_title">Erste Synchronisierung</string>
     <string name="alert_sync_first_sync_message">Es sind Online-Daten vorhanden. Welche Daten möchten Sie bei der ersten Synchronisation behalten.</string>
     <string name="alert_sync_first_sync_download">Online-Daten</string>
