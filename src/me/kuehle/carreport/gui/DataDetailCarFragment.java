@@ -287,6 +287,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 			color = Color.BLUE;
 
 			fuelTankAdapter.insert("Fuel", fuelTankAdapter.getCount() - 1);
+			fuelTankPositionModelMap.append(0, new FuelTank(null, "Fuel"));
 			addPossibleFuelTypeView(null, null);
 		}
 
@@ -372,6 +373,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 			}
 		} else {
 			fuelTypeAdapter.add("Super");
+			fuelTypePositionModelMap.append(0, new FuelType("Super"));
 		}
 		fuelTypeAdapter.add(getString(R.string.label_add_dialog));
 

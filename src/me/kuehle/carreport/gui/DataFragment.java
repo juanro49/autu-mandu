@@ -49,6 +49,8 @@ public class DataFragment extends Fragment implements
 						((DataListListener) childFragment).unselectItem();
 					}
 				}
+			} else {
+				setNoEntrySelectedTextVisible(false);
 			}
 		}
 	}
@@ -228,8 +230,6 @@ public class DataFragment extends Fragment implements
 	@Override
 	public void onItemSelected(int edit, long id) {
 		if (mTwoPane) {
-			setNoEntrySelectedTextVisible(false);
-
 			AbstractDataDetailFragment fragment;
 			if (edit == DataDetailActivity.EXTRA_EDIT_REFUELING) {
 				fragment = DataDetailRefuelingFragment.newInstance(id, true);

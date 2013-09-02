@@ -187,7 +187,8 @@ public class Preferences {
 
 	public void setGoogleDriveLocalModifiedDate(DateTime date) {
 		Editor edit = prefs.edit();
-		edit.putString("sync_drive_modified_date", date.toStringRfc3339());
+		edit.putString("sync_drive_modified_date",
+				date == null ? null : date.toStringRfc3339());
 		edit.apply();
 	}
 

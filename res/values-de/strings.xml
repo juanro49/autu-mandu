@@ -37,6 +37,7 @@
     <string name="section_note">Notiz</string>
     <string name="section_fueltypes">Kraftstoffarten</string>
     <string name="section_suspend">Stilllegen</string>
+    <string name="section_recurrence">Wiederholung</string>
 
     <string name="hint_mileage">Kilometerstand</string>
     <string name="hint_mileage_optional">Kilometerstand (optional)</string>
@@ -52,6 +53,7 @@
     <string name="label_in_tank">in Tank</string>
     <string name="label_add">Hinzufügen</string>
     <string name="label_add_dialog">Hinzufügen…</string>
+    <string name="label_set_end_date">Enddatum setzen</string>
 
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>

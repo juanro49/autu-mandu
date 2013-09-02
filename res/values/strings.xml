@@ -37,6 +37,7 @@
     <string name="section_note">Note</string>
     <string name="section_fueltypes">Fuel types</string>
     <string name="section_suspend">Suspend</string>
+    <string name="section_recurrence">Recurrence</string>
     
     <string name="hint_mileage">Mileage</string>
     <string name="hint_mileage_optional">Mileage (optional)</string>
@@ -52,6 +53,7 @@
     <string name="label_in_tank">in Tank</string>
     <string name="label_add">Add</string>
     <string name="label_add_dialog">Add…</string>
+    <string name="label_set_end_date">Set end date</string>
     
     <string name="validate_error_greater_zero">Has to be greater 0</string>
     <string name="validate_error_not_empty">Must not be empty</string>

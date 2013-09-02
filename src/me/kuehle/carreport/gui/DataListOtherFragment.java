@@ -10,8 +10,7 @@ import me.kuehle.carreport.util.RecurrenceInterval;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 
-public class DataListOtherFragment extends
-		AbstractDataListFragment<OtherCost> {
+public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
 	@Override
 	protected int getAlertDeleteManyMessage() {
 		return R.string.alert_delete_others_message;
@@ -26,8 +25,7 @@ public class DataListOtherFragment extends
 	protected SparseArray<String> getItemData(List<OtherCost> otherCosts,
 			int position) {
 		Preferences prefs = new Preferences(getActivity());
-		java.text.DateFormat dateFmt = DateFormat
-				.getDateFormat(getActivity());
+		java.text.DateFormat dateFmt = DateFormat.getDateFormat(getActivity());
 		String[] repIntervals = getResources().getStringArray(
 				R.array.repeat_intervals);
 		OtherCost other = (OtherCost) otherCosts.get(position);
@@ -41,19 +39,23 @@ public class DataListOtherFragment extends
 					String.format("%d %s", other.mileage,
 							prefs.getUnitDistance()));
 		}
-		data.put(
-				R.id.data2,
-				String.format("%.2f %s", other.price,
-						prefs.getUnitCurrency()));
+		data.put(R.id.data2,
+				String.format("%.2f %s", other.price, prefs.getUnitCurrency()));
 		data.put(R.id.data3, repIntervals[other.recurrence.getInterval()
 				.getValue()]);
 		if (!other.recurrence.getInterval().equals(RecurrenceInterval.ONCE)) {
-			int recurrences = other.recurrence
-					.getRecurrencesSince(other.date);
-			data.put(R.id.data2_calculated, String.format("%.2f %s",
-					other.price * recurrences, prefs.getUnitCurrency()));
-			data.put(R.id.data3_calculated,
-					String.format("x%d", recurrences));
+			int recurrences;
+			if (other.endDate == null) {
+				recurrences = other.recurrence.getRecurrencesSince(other.date);
+			} else {
+				recurrences = other.recurrence.getRecurrencesBetween(
+						other.date, other.endDate);
+			}
+			data.put(
+					R.id.data2_calculated,
+					String.format("%.2f %s", other.price * recurrences,
+							prefs.getUnitCurrency()));
+			data.put(R.id.data3_calculated, String.format("x%d", recurrences));
 		}
 
 		return data;

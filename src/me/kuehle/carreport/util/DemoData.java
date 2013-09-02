@@ -60,9 +60,10 @@ public class DemoData {
 					benzinE5, puntoTank);
 			createRefueling("05.09.2012 08:01", 124312, 45, 67.22f, false, "",
 					benzinE5, puntoTank);
-			createOtherCost("Rechtes Abblendlicht", "15.06.2012 07:25", 121009,
-					10, new Recurrence(RecurrenceInterval.ONCE), "", punto);
-			createOtherCost("Steuern", "01.06.2012 00:00", -1, 210,
+			createOtherCost("Rechtes Abblendlicht", "15.06.2012 07:25", null,
+					121009, 10, new Recurrence(RecurrenceInterval.ONCE), "",
+					punto);
+			createOtherCost("Steuern", "01.06.2012 00:00", null, -1, 210,
 					new Recurrence(RecurrenceInterval.YEAR), "", punto);
 
 			Car astra = createCar("Opel Astra", Color.RED);
@@ -86,9 +87,9 @@ public class DemoData {
 					benzinE5, astraTankBenzin);
 			createRefueling("02.09.2012 07:30", 46560, 42, 65.63f, false, "",
 					gas, astraTankGas);
-			createOtherCost("Steuern", "01.06.2012 00:00", -1, 250,
+			createOtherCost("Steuern", "01.06.2012 00:00", null, -1, 250,
 					new Recurrence(RecurrenceInterval.YEAR), "", astra);
-			createOtherCost("Versicherung", "15.06.2012 00:00", -1, 40,
+			createOtherCost("Versicherung", "15.06.2012 00:00", null, -1, 40,
 					new Recurrence(RecurrenceInterval.MONTH), "", astra);
 		} catch (ParseException e) {
 		}
@@ -130,10 +131,11 @@ public class DemoData {
 	}
 
 	private static OtherCost createOtherCost(String title, String date,
-			int mileage, float price, Recurrence recurrence, String note,
-			Car car) throws ParseException {
+			String endDate, int mileage, float price, Recurrence recurrence,
+			String note, Car car) throws ParseException {
 		OtherCost otherCost = new OtherCost(title, dateFormat.parse(date),
-				mileage, price, recurrence, note, car);
+				endDate == null ? null : dateFormat.parse(endDate), mileage,
+				price, recurrence, note, car);
 		otherCost.save();
 		return otherCost;
 	}

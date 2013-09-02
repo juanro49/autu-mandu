@@ -279,14 +279,28 @@ public class CostsReport extends AbstractReport {
 			for (OtherCost otherCost : otherCosts) {
 				if (!first
 						|| (otherCost.mileage > -1 && otherCost.mileage < startMileage)) {
-					costs += otherCost.price
-							* otherCost.recurrence
-									.getRecurrencesSince(otherCost.date);
+					int recurrences;
+					if (otherCost.endDate == null) {
+						recurrences = otherCost.recurrence
+								.getRecurrencesSince(otherCost.date);
+					} else {
+						recurrences = otherCost.recurrence
+								.getRecurrencesBetween(otherCost.date,
+										otherCost.endDate);
+					}
+					costs += otherCost.price * recurrences;
 				}
 
 				Recurrence recurrence = otherCost.recurrence;
 				DateTime date = new DateTime(otherCost.date);
-				while (date.isBefore(endDate)) {
+				DateTime recurrenceEndDate;
+				if (otherCost.endDate != null
+						&& endDate.isAfter(otherCost.endDate.getTime())) {
+					recurrenceEndDate = new DateTime(otherCost.endDate);
+				} else {
+					recurrenceEndDate = endDate;
+				}
+				while (date.isBefore(recurrenceEndDate)) {
 					costsPerMonth.get(car.getId().intValue()).add(date,
 							otherCost.price);
 					costsPerYear.get(car.getId().intValue()).add(date,

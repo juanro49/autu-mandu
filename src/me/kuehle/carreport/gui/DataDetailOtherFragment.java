@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -30,13 +29,19 @@ import me.kuehle.carreport.gui.dialog.TimePickerDialogFragment;
 import me.kuehle.carreport.gui.dialog.TimePickerDialogFragment.TimePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
+import me.kuehle.carreport.gui.util.SimpleAnimator;
 import me.kuehle.carreport.util.Recurrence;
 import me.kuehle.carreport.util.RecurrenceInterval;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -48,6 +53,8 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 		TimePickerDialogFragmentListener {
 	private static final int PICK_DATE_REQUEST_CODE = 0;
 	private static final int PICK_TIME_REQUEST_CODE = 1;
+	private static final int PICK_END_DATE_REQUEST_CODE = 2;
+	private static final int PICK_END_TIME_REQUEST_CODE = 3;
 
 	public static DataDetailOtherFragment newInstance(long id,
 			boolean allowCancel) {
@@ -68,6 +75,12 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 	private EditText edtMileage;
 	private EditText edtPrice;
 	private Spinner spnRepeat;
+	private CheckBox chkEndDate;
+	private SimpleAnimator chkEndDateAnimator;
+	private View layoutEndDate;
+	private SimpleAnimator layoutEndDateAnimator;
+	private EditText edtEndDate;
+	private EditText edtEndTime;
 	private EditText edtNote;
 	private Spinner spnCar;
 
@@ -75,30 +88,23 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 
 	@Override
 	public void onDialogPositiveClick(int requestCode, Date date) {
-		if (requestCode == PICK_DATE_REQUEST_CODE) {
+		switch (requestCode) {
+		case PICK_DATE_REQUEST_CODE:
 			edtDate.setText(DateFormat.getDateFormat(getActivity())
 					.format(date));
-		} else if (requestCode == PICK_TIME_REQUEST_CODE) {
+			break;
+		case PICK_TIME_REQUEST_CODE:
 			edtTime.setText(DateFormat.getTimeFormat(getActivity())
 					.format(date));
-		}
-	}
-
-	private Date getDate() {
-		try {
-			return DateFormat.getDateFormat(getActivity()).parse(
-					edtDate.getText().toString());
-		} catch (ParseException e) {
-			return new Date();
-		}
-	}
-
-	private Date getTime() {
-		try {
-			return DateFormat.getTimeFormat(getActivity()).parse(
-					edtTime.getText().toString());
-		} catch (ParseException e) {
-			return new Date();
+			break;
+		case PICK_END_DATE_REQUEST_CODE:
+			edtEndDate.setText(DateFormat.getDateFormat(getActivity()).format(
+					date));
+			break;
+		case PICK_END_TIME_REQUEST_CODE:
+			edtEndTime.setText(DateFormat.getTimeFormat(getActivity()).format(
+					date));
+			break;
 		}
 	}
 
@@ -110,6 +116,11 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			edtDate.setText(DateFormat.getDateFormat(getActivity()).format(
 					new Date()));
 			edtTime.setText(DateFormat.getTimeFormat(getActivity()).format(
+					new Date()));
+
+			edtEndDate.setText(DateFormat.getDateFormat(getActivity()).format(
+					new Date()));
+			edtEndTime.setText(DateFormat.getTimeFormat(getActivity()).format(
 					new Date()));
 
 			long selectCar = getArguments().getLong(EXTRA_CAR_ID);
@@ -135,6 +146,16 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			}
 			edtPrice.setText(String.valueOf(other.price));
 			spnRepeat.setSelection(other.recurrence.getInterval().getValue());
+			if (other.recurrence.getInterval() != RecurrenceInterval.ONCE) {
+				chkEndDate.setVisibility(View.VISIBLE);
+				if (other.endDate != null) {
+					chkEndDate.setChecked(true);
+				}
+			}
+			edtEndDate.setText(DateFormat.getDateFormat(getActivity()).format(
+					other.endDate == null ? new Date() : other.endDate));
+			edtEndTime.setText(DateFormat.getTimeFormat(getActivity()).format(
+					other.endDate == null ? new Date() : other.endDate));
 			edtNote.setText(other.note);
 
 			for (int pos = 0; pos < cars.size(); pos++) {
@@ -142,6 +163,15 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 					spnCar.setSelection(pos);
 				}
 			}
+		}
+
+		if (spnRepeat.getSelectedItemPosition() == 0) {
+			chkEndDate.getLayoutParams().height = 0;
+			chkEndDate.setAlpha(0);
+		}
+		if (!chkEndDate.isChecked()) {
+			layoutEndDate.getLayoutParams().height = 0;
+			layoutEndDate.setAlpha(0);
 		}
 	}
 
@@ -190,6 +220,14 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 		edtMileage = (EditText) v.findViewById(R.id.edt_mileage);
 		edtPrice = (EditText) v.findViewById(R.id.edt_price);
 		spnRepeat = (Spinner) v.findViewById(R.id.spn_repeat);
+		chkEndDate = (CheckBox) v.findViewById(R.id.chk_end_date);
+		chkEndDateAnimator = new SimpleAnimator(getActivity(), chkEndDate,
+				SimpleAnimator.Property.Height);
+		layoutEndDate = v.findViewById(R.id.layout_end_date);
+		layoutEndDateAnimator = new SimpleAnimator(getActivity(),
+				layoutEndDate, SimpleAnimator.Property.Height);
+		edtEndDate = (EditText) v.findViewById(R.id.edt_end_date);
+		edtEndTime = (EditText) v.findViewById(R.id.edt_end_time);
 		edtNote = (EditText) v.findViewById(R.id.edt_note);
 		spnCar = (Spinner) v.findViewById(R.id.spn_car);
 
@@ -203,7 +241,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			public void onClick(View v) {
 				DatePickerDialogFragment.newInstance(
 						DataDetailOtherFragment.this, PICK_DATE_REQUEST_CODE,
-						getDate()).show(getFragmentManager(), null);
+						getDate(edtDate)).show(getFragmentManager(), null);
 			}
 		});
 
@@ -212,7 +250,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			public void onClick(View v) {
 				TimePickerDialogFragment.newInstance(
 						DataDetailOtherFragment.this, PICK_TIME_REQUEST_CODE,
-						getTime()).show(getFragmentManager(), null);
+						getTime(edtTime)).show(getFragmentManager(), null);
 			}
 		});
 
@@ -220,6 +258,55 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 				.getUnitCurrency());
 		((TextView) v.findViewById(R.id.txt_unit_distance)).setText(prefs
 				.getUnitDistance());
+
+		spnRepeat.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parentView,
+					View selectedItemView, int position, long id) {
+				if (position > 0) {
+					chkEndDateAnimator.show();
+				} else {
+					chkEndDate.setChecked(false);
+					chkEndDateAnimator.hide();
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parentView) {
+			}
+		});
+
+		chkEndDate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				if (isChecked) {
+					layoutEndDateAnimator.show();
+				} else {
+					layoutEndDateAnimator.hide();
+				}
+			}
+		});
+
+		edtEndDate.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				DatePickerDialogFragment.newInstance(
+						DataDetailOtherFragment.this,
+						PICK_END_DATE_REQUEST_CODE, getDate(edtEndDate)).show(
+						getFragmentManager(), null);
+			}
+		});
+
+		edtEndTime.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				TimePickerDialogFragment.newInstance(
+						DataDetailOtherFragment.this,
+						PICK_END_TIME_REQUEST_CODE, getTime(edtEndTime)).show(
+						getFragmentManager(), null);
+			}
+		});
 
 		ArrayAdapter<String> carAdapter = new ArrayAdapter<String>(
 				getActivity(), android.R.layout.simple_spinner_dropdown_item);
@@ -231,31 +318,29 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 	}
 
 	@Override
-	protected boolean validate() {
-		FormValidator validator = new FormValidator();
-		validator.add(new FormFieldGreaterZeroValidator(edtPrice));
-		return validator.validate();
-	}
-
-	@Override
 	protected void save() {
 		String title = edtTitle.getText().toString().trim();
-		Date date = getDateTime(getDate(), getTime());
+		Date date = getDateTime(getDate(edtDate), getTime(edtTime));
 		int mileage = getIntegerFromEditText(edtMileage, -1);
 		float price = (float) getDoubleFromEditText(edtPrice, 0);
 		RecurrenceInterval repInterval = RecurrenceInterval
 				.getByValue(spnRepeat.getSelectedItemPosition());
 		Recurrence recurrence = new Recurrence(repInterval);
+		Date endDate = null;
+		if (repInterval != RecurrenceInterval.ONCE && chkEndDate.isChecked()) {
+			endDate = getDateTime(getDate(edtEndDate), getTime(edtEndTime));
+		}
 		String note = edtNote.getText().toString().trim();
 		Car car = cars.get(spnCar.getSelectedItemPosition());
 
 		if (!isInEditMode()) {
-			new OtherCost(title, date, mileage, price, recurrence, note, car)
-					.save();
+			new OtherCost(title, date, endDate, mileage, price, recurrence,
+					note, car).save();
 		} else {
 			OtherCost other = (OtherCost) editItem;
 			other.title = title;
 			other.date = date;
+			other.endDate = endDate;
 			other.mileage = mileage;
 			other.price = price;
 			other.recurrence = recurrence;
@@ -263,5 +348,12 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			other.car = car;
 			other.save();
 		}
+	}
+
+	@Override
+	protected boolean validate() {
+		FormValidator validator = new FormValidator();
+		validator.add(new FormFieldGreaterZeroValidator(edtPrice));
+		return validator.validate();
 	}
 }

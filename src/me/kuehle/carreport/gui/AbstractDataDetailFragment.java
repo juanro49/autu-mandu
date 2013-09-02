@@ -16,6 +16,7 @@
 
 package me.kuehle.carreport.gui;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -27,6 +28,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -191,6 +193,15 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
 	protected abstract int getAlertDeleteMessage();
 
+	protected Date getDate(EditText edt) {
+		try {
+			return DateFormat.getDateFormat(getActivity()).parse(
+					edt.getText().toString());
+		} catch (ParseException e) {
+			return new Date();
+		}
+	}
+
 	protected Date getDateTime(Date date, Date time) {
 		Calendar calTime = Calendar.getInstance();
 		calTime.setTime(time);
@@ -204,7 +215,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
 		return calDateTime.getTime();
 	}
-
+	
 	protected double getDoubleFromEditText(EditText editText,
 			double defaultValue) {
 		String strDouble = editText.getText().toString();
@@ -227,6 +238,15 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	}
 
 	protected abstract int getLayout();
+
+	protected Date getTime(EditText edt) {
+		try {
+			return DateFormat.getTimeFormat(getActivity()).parse(
+					edt.getText().toString());
+		} catch (ParseException e) {
+			return new Date();
+		}
+	}
 
 	protected abstract int getTitleForEdit();
 

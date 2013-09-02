@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -85,24 +84,6 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		} else if (requestCode == PICK_TIME_REQUEST_CODE) {
 			edtTime.setText(DateFormat.getTimeFormat(getActivity())
 					.format(date));
-		}
-	}
-
-	private Date getDate() {
-		try {
-			return DateFormat.getDateFormat(getActivity()).parse(
-					edtDate.getText().toString());
-		} catch (ParseException e) {
-			return new Date();
-		}
-	}
-
-	private Date getTime() {
-		try {
-			return DateFormat.getTimeFormat(getActivity()).parse(
-					edtTime.getText().toString());
-		} catch (ParseException e) {
-			return new Date();
 		}
 	}
 
@@ -200,7 +181,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			public void onClick(View v) {
 				DatePickerDialogFragment.newInstance(
 						DataDetailRefuelingFragment.this,
-						PICK_DATE_REQUEST_CODE, getDate()).show(
+						PICK_DATE_REQUEST_CODE, getDate(edtDate)).show(
 						getFragmentManager(), null);
 			}
 		});
@@ -210,7 +191,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			public void onClick(View v) {
 				TimePickerDialogFragment.newInstance(
 						DataDetailRefuelingFragment.this,
-						PICK_TIME_REQUEST_CODE, getTime()).show(
+						PICK_TIME_REQUEST_CODE, getTime(edtTime)).show(
 						getFragmentManager(), null);
 			}
 		});
@@ -285,7 +266,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 
 	@Override
 	protected void save() {
-		Date date = getDateTime(getDate(), getTime());
+		Date date = getDateTime(getDate(edtDate), getTime(edtTime));
 		int mileage = getIntegerFromEditText(edtMileage, 0);
 		float volume = (float) getDoubleFromEditText(edtVolume, 0);
 		boolean partial = chkPartial.isChecked();

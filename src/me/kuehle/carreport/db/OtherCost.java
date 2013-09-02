@@ -38,6 +38,9 @@ public class OtherCost extends Model {
 	@Column(name = "date", notNull = true)
 	public Date date;
 
+	@Column(name = "end_date")
+	public Date endDate;
+
 	@Column(name = "mileage")
 	public int mileage;
 
@@ -57,11 +60,12 @@ public class OtherCost extends Model {
 		super();
 	}
 
-	public OtherCost(String title, Date date, int mileage, float price,
-			Recurrence recurrence, String note, Car car) {
+	public OtherCost(String title, Date date, Date endDate, int mileage,
+			float price, Recurrence recurrence, String note, Car car) {
 		super();
 		this.title = title;
 		this.date = date;
+		this.endDate = endDate;
 		this.mileage = mileage;
 		this.price = price;
 		this.recurrence = recurrence;

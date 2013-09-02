@@ -44,9 +44,13 @@ public class Recurrence {
 		return multiplier;
 	}
 
-	public int getRecurrencesSince(Date date) {
-		DateTime then = new DateTime(date);
-		DateTime now = new DateTime();
+	public int getRecurrencesSince(Date start) {
+		return getRecurrencesBetween(start, new Date());
+	}
+
+	public int getRecurrencesBetween(Date start, Date end) {
+		DateTime then = new DateTime(start);
+		DateTime now = new DateTime(end);
 
 		int count = 1;
 		switch (interval) {
