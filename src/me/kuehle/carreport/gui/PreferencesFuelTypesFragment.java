@@ -127,8 +127,10 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 	private static final int REQUEST_ADD = 2;
 	private static final int REQUEST_EDIT = 3;
 
+	private static final String STATE_CURRENTLY_EDITED_FUEL_TYPE = "currently_edited_fuel_type";
+
 	private List<FuelType> fuelTypes;
-	private FuelType currentlyEditedFuelType;
+	private FuelType currentlyEditedFuelType = null;
 
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 		@Override
@@ -153,6 +155,14 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
 		fillList();
+		
+		if (savedInstanceState != null) {
+			long id = savedInstanceState.getLong(
+					STATE_CURRENTLY_EDITED_FUEL_TYPE, 0);
+			if (id != 0) {
+				currentlyEditedFuelType = FuelType.load(FuelType.class, id);
+			}
+		}
 	}
 
 	@Override
@@ -168,6 +178,7 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 
 	@Override
 	public void onDialogNegativeClick(int requestCode) {
+		currentlyEditedFuelType = null;
 	}
 
 	@Override
@@ -207,6 +218,7 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 		} else if (requestCode == REQUEST_EDIT) {
 			currentlyEditedFuelType.name = input;
 			currentlyEditedFuelType.save();
+			currentlyEditedFuelType = null;
 			fillList();
 		}
 	}
@@ -221,6 +233,15 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		if (currentlyEditedFuelType != null) {
+			outState.putLong(STATE_CURRENTLY_EDITED_FUEL_TYPE,
+					currentlyEditedFuelType.getId());
 		}
 	}
 

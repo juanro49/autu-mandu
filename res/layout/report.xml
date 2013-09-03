@@ -48,6 +48,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
+                    android:singleLine="true"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
                 <ImageButton
                     android:id="@+id/btn_report_details"
@@ -67,7 +68,7 @@
             <me.kuehle.chartlib.ChartView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="220dp"
                 android:layout_margin="8dp" />
         </LinearLayout>
     </FrameLayout>
