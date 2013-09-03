@@ -31,11 +31,12 @@
     <string name="menu_cancel">Abbrechen</string>
     <string name="menu_delete">Löschen</string>
     <string name="menu_add_car">Auto hinzufügen</string>
+    <string name="menu_add_fuel_type">Kraftstoff hinzufügen</string>
     <string name="menu_show_trend">Trend anzeigen</string>
     
     <string name="section_car">Auto</string>
     <string name="section_note">Notiz</string>
-    <string name="section_fueltypes">Kraftstoffarten</string>
+    <string name="section_fuel_tanks">Kraftstofftanks</string>
     <string name="section_suspend">Stilllegen</string>
     <string name="section_recurrence">Wiederholung</string>
 
@@ -46,17 +47,18 @@
     <string name="hint_note_optional">Notiz (optional)</string>
     <string name="hint_title">Titel</string>
     <string name="hint_name">Name</string>
+    <string name="hint_tank">Tank</string>
 
     <string name="label_partial">Teilfüllung</string>
     <string name="label_color">Farbe</string>
     <string name="label_suspend">Stilllegen</string>
-    <string name="label_in_tank">in Tank</string>
     <string name="label_add">Hinzufügen</string>
     <string name="label_add_dialog">Hinzufügen…</string>
     <string name="label_set_end_date">Enddatum setzen</string>
 
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
+    <string name="validate_error_no_fuel_types">Mindestens ein Kraftstoff muss zugewiesen werden</string>
 
     <string name="suspended">Stillgelegt</string>
     <string name="suspended_since">Stillgelegt seit %s</string>
@@ -73,6 +75,8 @@
     <string name="title_edit_other">Andere Kosten bearbeiten</string>
     <string name="title_add_car">Auto hinzufügen</string>
     <string name="title_edit_car">Auto bearbeiten</string>
+    <string name="title_add_fuel_type">Kraftstoff hinzufügen</string>
+    <string name="title_edit_fuel_type">Kraftstoff bearbeiten</string>
     <string name="cab_title_selected">%d ausgewählt</string>
     <string name="edit_title_refueling">Tankfüllung</string>
 
@@ -83,7 +87,9 @@
     <string name="alert_delete_other_message">Diese anderen Kosten werden gelöscht.</string>
     <string name="alert_delete_car_message">Dieses Auto wird gelöscht.</string>
     <string name="alert_delete_cars_message">Die %d ausgewählten Autos werden gelöscht.</string>
+    <string name="alert_delete_fuel_types_message">Die %d ausgewählten Kraftstoffe werden gelöscht.</string>
     <string name="alert_cannot_delete_last_car">Das letzte Auto kann nicht gelöscht werden.</string>
+    <string name="alert_cannot_delete_fuel_type">Der Kraftstoff kann nicht gelöscht werden, weil er von mindestens einer Tankfüllung oder einem Kraftstofftank verwendet wird.</string>
     <string name="alert_delete_refuelings_message">Die %d ausgewählten Tankfüllungen werden gelöscht.</string>
     <string name="alert_about_licenses_title">Lizenzen</string>
     <string name="alert_delete_title">Löschen bestätigen</string>
@@ -103,9 +109,8 @@
     <string name="alert_import_csv_title">CSV importieren</string>
     <string name="alert_import_csv_message">Der Import aktualisiert bestehende Einträge und fügt neue hinzu, löscht aber keine Einträge.</string>
     <string name="alert_add_fuel_type_title">Kaftstoffart hinzufügen</string>
-    <string name="alert_add_fuel_tank_title">Kraftstofftank hinzufügen</string>
     <string name="alert_fuel_type_exists_message">Diese Kaftstoffart existiert bereits.</string>
-    <string name="alert_fuel_tank_exists_message">Es gibt bereits einen Kraftstofftank mit diesem Namen.</string>
+    <string name="alert_cannot_remove_fuel_tank_message">Der Tank kann nicht entfernt werden, weil er von Tankfüllungen genutzt wird.</string>
     
     <string name="toast_synchronization_failed">Synchronisation fehlgeschlagen</string>
     <string name="toast_refueling_saved">Tankfüllung gespeichert</string>
@@ -152,6 +157,7 @@
     <string name="pref_title_header_about">Über Car Report</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>
     <string name="pref_title_header_cars">Autos</string>
+    <string name="pref_title_header_fuel_types">Kraftstoffe</string>
     <string name="pref_title_header_backup">Sichern &amp; Exportieren</string>
     <string name="pref_title_header_report_order">Reihenfolge der Reports</string>
     <string name="pref_title_category_behavior">Verhalten</string>

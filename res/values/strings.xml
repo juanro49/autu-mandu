@@ -31,11 +31,12 @@
     <string name="menu_cancel">Cancel</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_add_car">Add car</string>
+    <string name="menu_add_fuel_type">Add fuel type</string>
     <string name="menu_show_trend">Show trend</string>
     
     <string name="section_car">Car</string>
     <string name="section_note">Note</string>
-    <string name="section_fueltypes">Fuel types</string>
+    <string name="section_fuel_tanks">Fuel tanks</string>
     <string name="section_suspend">Suspend</string>
     <string name="section_recurrence">Recurrence</string>
     
@@ -46,17 +47,18 @@
     <string name="hint_note_optional">Note (optional)</string>
     <string name="hint_title">Title</string>
     <string name="hint_name">Name</string>
+    <string name="hint_tank">Tank</string>
     
     <string name="label_partial">Partial</string>
     <string name="label_color">Color</string>
     <string name="label_suspend">Suspend</string>
-    <string name="label_in_tank">in Tank</string>
     <string name="label_add">Add</string>
     <string name="label_add_dialog">Add…</string>
     <string name="label_set_end_date">Set end date</string>
     
     <string name="validate_error_greater_zero">Has to be greater 0</string>
     <string name="validate_error_not_empty">Must not be empty</string>
+    <string name="validate_error_no_fuel_types">At least one fuel type must be assigned</string>
     
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>
@@ -73,6 +75,8 @@
     <string name="title_edit_other">Edit other</string>
     <string name="title_add_car">Add car</string>
     <string name="title_edit_car">Edit car</string>
+    <string name="title_add_fuel_type">Add fuel type</string>
+    <string name="title_edit_fuel_type">Edit fuel type</string>
     <string name="cab_title_selected">%d selected</string>
     <string name="edit_title_refueling">Refueling</string>
     
@@ -83,7 +87,9 @@
     <string name="alert_delete_other_message">This other cost will be deleted.</string>
     <string name="alert_delete_car_message">This car will be deleted.</string>
     <string name="alert_delete_cars_message">The %d selected cars will be deleted.</string>
+    <string name="alert_delete_fuel_types_message">The %d selected fuel types will be deleted.</string>
     <string name="alert_cannot_delete_last_car">One car cannot be deleted.</string>
+    <string name="alert_cannot_delete_fuel_type">Cannot delete fuel type, because it is used by at least one refueling or fuel tank.</string>
     <string name="alert_delete_refuelings_message">The %d selected refuelings will be deleted.</string>
     <string name="alert_about_licenses_title">Licenses</string>
     <string name="alert_delete_title">Confirm delete</string>
@@ -103,9 +109,8 @@
     <string name="alert_import_csv_title">Import CSV</string>
     <string name="alert_import_csv_message">Import will update existing entries and add new ones, but it will not delete entries.</string>
     <string name="alert_add_fuel_type_title">Add fuel type</string>
-    <string name="alert_add_fuel_tank_title">Add fuel tank</string>
     <string name="alert_fuel_type_exists_message">This fuel type does already exist.</string>
-    <string name="alert_fuel_tank_exists_message">A fuel tank with this name does already exist.</string>
+    <string name="alert_cannot_remove_fuel_tank_message">The tank cannot be removed, because it is used by refuelings.</string>
     
     <string name="toast_synchronization_failed">Synchronization failed</string>
     <string name="toast_refueling_saved">Refueling saved</string>
@@ -152,6 +157,7 @@
     <string name="pref_title_header_about">About Car Report</string>
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>
+    <string name="pref_title_header_fuel_types">Fuel Types</string>
     <string name="pref_title_header_report_order">Report order</string>
     <string name="pref_title_header_backup">Backup &amp; Export</string>
     <string name="pref_title_category_syncronisation">Synchronisation</string>

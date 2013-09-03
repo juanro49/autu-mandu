@@ -57,15 +57,14 @@
                 style="@style/section_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/section_fueltypes" />
+                android:text="@string/section_fuel_tanks" />
             <LinearLayout
-                android:id="@+id/layout_fueltypes"
+                android:id="@+id/layout_fuel_tanks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
-            </LinearLayout>
+                android:orientation="vertical" />
             <Button
-                android:id="@+id/btn_add_fueltype"
+                android:id="@+id/btn_add_fuel_tank"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="?android:attr/selectableItemBackground"

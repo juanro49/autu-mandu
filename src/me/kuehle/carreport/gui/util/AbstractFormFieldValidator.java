@@ -33,17 +33,33 @@ public abstract class AbstractFormFieldValidator {
 		this.fields = fields;
 	}
 
-	protected abstract int getMessage();
-
-	protected abstract boolean isValid();
+	public void clear() {
+		for (TextView field : fields) {
+			field.setError(null);
+		}
+	}
 
 	public boolean validate() {
 		boolean valid = isValid();
 
 		for (TextView field : fields) {
-			field.setError(valid ? null : context.getString(getMessage()));
+			if (!valid) {
+				String error = (String) field.getError();
+				if (error == null) {
+					error = "";
+				} else {
+					error += "\n\n";
+				}
+				error += context.getString(getMessage());
+
+				field.setError(error);
+			}
 		}
 
 		return valid;
 	}
+
+	protected abstract int getMessage();
+
+	protected abstract boolean isValid();
 }

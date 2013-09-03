@@ -19,8 +19,8 @@ package me.kuehle.carreport.gui.dialog;
 import me.kuehle.carreport.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
@@ -28,16 +28,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-public class InputDialogFragment extends DialogFragment {
-	public static interface InputDialogFragmentListener {
+public class SupportInputDialogFragment extends DialogFragment {
+	public static interface SupportInputDialogFragmentListener {
 		public void onDialogNegativeClick(int requestCode);
 
 		public void onDialogPositiveClick(int requestCode, String input);
 	}
 
-	public static InputDialogFragment newInstance(Fragment parent,
+	public static SupportInputDialogFragment newInstance(Fragment parent,
 			int requestCode, Integer title, String input) {
-		InputDialogFragment f = new InputDialogFragment();
+		SupportInputDialogFragment f = new SupportInputDialogFragment();
 		f.setTargetFragment(parent, requestCode);
 
 		Bundle args = new Bundle();
@@ -98,7 +98,7 @@ public class InputDialogFragment extends DialogFragment {
 		outState.putString("input", mEditText.getText().toString());
 	}
 
-	private InputDialogFragmentListener getListener() {
-		return (InputDialogFragmentListener) getTargetFragment();
+	private SupportInputDialogFragmentListener getListener() {
+		return (SupportInputDialogFragmentListener) getTargetFragment();
 	}
 }

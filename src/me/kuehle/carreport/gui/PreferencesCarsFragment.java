@@ -77,7 +77,8 @@ public class PreferencesCarsFragment extends ListFragment implements
 
 				convertView.setTag(holder);
 			} else {
-				holder = (PreferencesCarsFragment.CarViewHolder) convertView.getTag();
+				holder = (PreferencesCarsFragment.CarViewHolder) convertView
+						.getTag();
 			}
 
 			holder.name.setText(cars.get(position).name);
@@ -124,8 +125,7 @@ public class PreferencesCarsFragment extends ListFragment implements
 			switch (item.getItemId()) {
 			case R.id.menu_delete:
 				if (getListView().getCheckedItemCount() == cars.size()) {
-					MessageDialogFragment.newInstance(PreferencesCarsFragment.this,
-							CANNOT_DELETE_REQUEST_CODE,
+					MessageDialogFragment.newInstance(null, 0,
 							R.string.alert_delete_title,
 							getString(R.string.alert_cannot_delete_last_car),
 							android.R.string.ok, null).show(
@@ -134,10 +134,11 @@ public class PreferencesCarsFragment extends ListFragment implements
 					String message = getString(
 							R.string.alert_delete_cars_message, getListView()
 									.getCheckedItemCount());
-					MessageDialogFragment.newInstance(PreferencesCarsFragment.this,
-							DELETE_REQUEST_CODE, R.string.alert_delete_title,
-							message, android.R.string.yes, android.R.string.no)
-							.show(getFragmentManager(), null);
+					MessageDialogFragment.newInstance(
+							PreferencesCarsFragment.this, DELETE_REQUEST_CODE,
+							R.string.alert_delete_title, message,
+							android.R.string.yes, android.R.string.no).show(
+							getFragmentManager(), null);
 				}
 				return true;
 			default:
@@ -177,7 +178,6 @@ public class PreferencesCarsFragment extends ListFragment implements
 		public View color;
 	}
 
-	private static final int CANNOT_DELETE_REQUEST_CODE = 0;
 	private static final int DELETE_REQUEST_CODE = 1;
 
 	private List<Car> cars;

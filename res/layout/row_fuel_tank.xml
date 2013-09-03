@@ -18,27 +18,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
-    <Spinner
-        android:id="@+id/spn_type"
+    <EditText
+        android:id="@+id/edt_name"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_weight="5" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:gravity="center"
-        android:text="@string/label_in_tank" />
-    <Spinner
-        android:id="@+id/spn_tank"
+        android:layout_weight="1"
+        android:hint="@string/hint_tank" />
+    <LinearLayout
+        android:id="@+id/layout_fuel_types"
         android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_weight="4" />
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical" />
     <ImageButton
         android:id="@+id/btn_remove"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_gravity="center_vertical"
+        android:layout_width="36dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="@string/remove_fueltype_desc"
+        android:cropToPadding="true"
+        android:padding="8dp"
         android:src="@drawable/ic_cancel" />
 </LinearLayout>

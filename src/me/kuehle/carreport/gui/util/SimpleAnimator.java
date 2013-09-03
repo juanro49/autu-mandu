@@ -26,6 +26,8 @@ import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.view.View;
+import android.view.View.MeasureSpec;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 public class SimpleAnimator {
@@ -40,6 +42,7 @@ public class SimpleAnimator {
 
 	private float origWeight;
 	private int origHeight;
+	private int origHeightMeasured;
 
 	public SimpleAnimator(Context context, View view, Property property) {
 		this(context, view, property, -1);
@@ -52,8 +55,17 @@ public class SimpleAnimator {
 		this.property = property;
 		this.duration = duration;
 
-		this.origWeight = ((LinearLayout.LayoutParams) view.getLayoutParams()).weight;
-		this.origHeight = view.getLayoutParams().height;
+		origWeight = ((LinearLayout.LayoutParams) view.getLayoutParams()).weight;
+		origHeight = view.getLayoutParams().height;
+		if (origHeight == ViewGroup.LayoutParams.WRAP_CONTENT
+				|| origHeight == ViewGroup.LayoutParams.MATCH_PARENT) {
+			int widthSpec = MeasureSpec.makeMeasureSpec(
+					view.getLayoutParams().width, MeasureSpec.EXACTLY);
+			int heightSpec = MeasureSpec.makeMeasureSpec(
+					view.getLayoutParams().height, MeasureSpec.EXACTLY);
+			view.measure(widthSpec, heightSpec);
+			origHeightMeasured = view.getMeasuredHeight();
+		}
 	}
 
 	public void show() {
@@ -67,8 +79,21 @@ public class SimpleAnimator {
 		ValueAnimator valueAnimator = (ValueAnimator) animator
 				.getChildAnimations().get(0);
 		if (property == Property.Height) {
-			int curHeight = view.getLayoutParams().height;
-			applyHeightUpdater(valueAnimator, curHeight, origHeight);
+			int from = view.getLayoutParams().height;
+			int to = origHeight;
+			if (to == ViewGroup.LayoutParams.WRAP_CONTENT
+					|| to == ViewGroup.LayoutParams.MATCH_PARENT) {
+				to = origHeightMeasured;
+				attachRunnable(animator, null, new Runnable() {
+					@Override
+					public void run() {
+						view.getLayoutParams().height = origHeight;
+						view.requestLayout();
+					}
+				});
+			}
+
+			applyHeightUpdater(valueAnimator, from, to);
 		} else {
 			float curWeight = ((LinearLayout.LayoutParams) view
 					.getLayoutParams()).weight;
@@ -89,8 +114,13 @@ public class SimpleAnimator {
 		ValueAnimator valueAnimator = (ValueAnimator) animator
 				.getChildAnimations().get(0);
 		if (property == Property.Height) {
-			int curHeight = view.getLayoutParams().height;
-			applyHeightUpdater(valueAnimator, curHeight, 0);
+			int from = view.getLayoutParams().height;
+			if (from == ViewGroup.LayoutParams.WRAP_CONTENT
+					|| from == ViewGroup.LayoutParams.MATCH_PARENT) {
+				from = origHeightMeasured;
+			}
+
+			applyHeightUpdater(valueAnimator, from, 0);
 		} else {
 			float curWeight = ((LinearLayout.LayoutParams) view
 					.getLayoutParams()).weight;

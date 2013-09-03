@@ -30,6 +30,10 @@ public class FormValidator {
 	}
 
 	public boolean validate() {
+		for (AbstractFormFieldValidator validator : fieldValidators) {
+			validator.clear();
+		}
+		
 		boolean valid = true;
 		for (AbstractFormFieldValidator validator : fieldValidators) {
 			if (!validator.validate()) {

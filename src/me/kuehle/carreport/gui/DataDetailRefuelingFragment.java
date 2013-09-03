@@ -47,6 +47,16 @@ import com.activeandroid.Model;
 public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		implements DatePickerDialogFragmentListener,
 		TimePickerDialogFragmentListener {
+	private class FuelTypeHolder {
+		public FuelTank tank;
+		public FuelType type;
+
+		public FuelTypeHolder(FuelTank tank, FuelType type) {
+			this.tank = tank;
+			this.type = type;
+		}
+	}
+
 	private static final int PICK_DATE_REQUEST_CODE = 0;
 	private static final int PICK_TIME_REQUEST_CODE = 1;
 
@@ -74,7 +84,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 	private Spinner spnCar;
 
 	private List<Car> cars;
-	private SparseArray<Long[]> fuelTypePositionIDMap;
+	private SparseArray<FuelTypeHolder> fuelTypePositionIDMap;
 
 	@Override
 	public void onDialogPositiveClick(int requestCode, Date date) {
@@ -216,11 +226,13 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			public void onItemSelected(AdapterView<?> parentView,
 					View selectedItemView, int position, long id) {
 				Car car = cars.get(position);
-
+				// TODO: Wenn eine Tankfüllung existiert mit FuelType und
+				// FuelTank, dann soll das in der auswahl angezeigt werden, auch
+				// wenn der PossibleFuelType nicht existiert.
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 						getActivity(),
 						android.R.layout.simple_spinner_dropdown_item);
-				fuelTypePositionIDMap = new SparseArray<Long[]>();
+				fuelTypePositionIDMap = new SparseArray<FuelTypeHolder>();
 
 				List<FuelTank> fuelTanks = car.fuelTanks();
 				for (FuelTank fuelTank : fuelTanks) {
@@ -228,9 +240,8 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 					for (FuelType fuelType : fuelTypes) {
 						adapter.add(String.format("%s (%s)", fuelType.name,
 								fuelTank.name));
-						fuelTypePositionIDMap.append(
-								adapter.getCount() - 1,
-								new Long[] { fuelType.getId(), fuelTank.getId() });
+						fuelTypePositionIDMap.append(adapter.getCount() - 1,
+								new FuelTypeHolder(fuelTank, fuelType));
 					}
 				}
 
@@ -238,13 +249,26 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 
 				if (isInEditMode()) {
 					Refueling refueling = (Refueling) editItem;
+					boolean matchFound = false;
 					for (int i = 0; i < fuelTypePositionIDMap.size(); i++) {
-						Long[] ids = fuelTypePositionIDMap.valueAt(i);
-						if (refueling.fuelType.getId() == ids[0]
-								&& refueling.fuelTank.getId() == ids[1]) {
+						FuelTypeHolder holder = fuelTypePositionIDMap
+								.valueAt(i);
+						if (refueling.fuelType.equals(holder.type)
+								&& refueling.fuelTank.equals(holder.tank)) {
 							spnFuelType.setSelection(fuelTypePositionIDMap
 									.keyAt(i));
+							matchFound = true;
 						}
+					}
+
+					if (!matchFound) {
+						adapter.add(String.format("%s (%s)",
+								refueling.fuelType.name,
+								refueling.fuelTank.name));
+						fuelTypePositionIDMap.append(adapter.getCount() - 1,
+								new FuelTypeHolder(refueling.fuelTank,
+										refueling.fuelType));
+						spnFuelType.setSelection(adapter.getCount() - 1);
 					}
 				}
 			}
@@ -271,15 +295,13 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		float volume = (float) getDoubleFromEditText(edtVolume, 0);
 		boolean partial = chkPartial.isChecked();
 		float price = (float) getDoubleFromEditText(edtPrice, 0);
-		Long[] fuelIDs = fuelTypePositionIDMap.get(spnFuelType
+		FuelTypeHolder holder = fuelTypePositionIDMap.get(spnFuelType
 				.getSelectedItemPosition());
-		FuelType fuelType = FuelType.load(FuelType.class, fuelIDs[0]);
-		FuelTank fuelTank = FuelTank.load(FuelTank.class, fuelIDs[1]);
 		String note = edtNote.getText().toString().trim();
 
 		if (!isInEditMode()) {
 			new Refueling(date, mileage, volume, price, partial, note,
-					fuelType, fuelTank).save();
+					holder.type, holder.tank).save();
 		} else {
 			Refueling refueling = (Refueling) editItem;
 			refueling.date = date;
@@ -288,8 +310,8 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			refueling.price = price;
 			refueling.partial = partial;
 			refueling.note = note;
-			refueling.fuelType = fuelType;
-			refueling.fuelTank = fuelTank;
+			refueling.fuelType = holder.type;
+			refueling.fuelTank = holder.tank;
 			refueling.save();
 		}
 	}

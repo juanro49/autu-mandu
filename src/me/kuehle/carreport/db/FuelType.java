@@ -18,6 +18,8 @@ package me.kuehle.carreport.db;
 
 import java.util.List;
 
+import me.kuehle.carreport.db.query.SafeSelect;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -38,6 +40,14 @@ public class FuelType extends Model {
 		this.name = name;
 	}
 
+	public List<FuelTank> fuelTanks() {
+		return SafeSelect.from(FuelTank.class)
+				.join(PossibleFuelTypeForFuelTank.class)
+				.on("fuel_tanks.Id = fuel_types_fuel_tanks.fuel_tank")
+				.where("fuel_types_fuel_tanks.fuel_type = ?", getId())
+				.execute();
+	}
+	
 	public List<Refueling> refuelings() {
 		return new Select().from(Refueling.class)
 				.where("fuel_type = ?", getId()).orderBy("date ASC").execute();
