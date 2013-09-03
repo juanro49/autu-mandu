@@ -111,8 +111,8 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 			} else if (position + 1 == parentView.getCount()) {
 				currentlyClickedFuelTypeSpinner = parentView;
 				parentView.setSelection(selectedPosition);
-				SupportInputDialogFragment.newInstance(DataDetailCarFragment.this,
-						REQUEST_ADD_FUEL_TYPE,
+				SupportInputDialogFragment.newInstance(
+						DataDetailCarFragment.this, REQUEST_ADD_FUEL_TYPE,
 						R.string.alert_add_fuel_type_title, null).show(
 						getFragmentManager(), null);
 			} else {
@@ -153,6 +153,15 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 				return;
 			}
 
+			// Hide remove buttons, when only one item will be left after
+			// removing this one.
+			for (FuelTankHolder h : fuelTankHolders) {
+				h.layout.findViewById(R.id.btn_remove).setVisibility(
+						layoutFuelTanks.getChildCount() == 2 ? View.INVISIBLE
+								: View.VISIBLE);
+			}
+
+			// Remove this tank with a nice animation.
 			SimpleAnimator animator = new SimpleAnimator(getActivity(),
 					holder.layout, SimpleAnimator.Property.Height);
 			animator.hide(null, new Runnable() {
@@ -260,6 +269,11 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		btnRemove.setOnClickListener(new RemoveFuelTankListener(holder));
 		if (layoutFuelTanks.getChildCount() == 1) {
 			btnRemove.setVisibility(View.INVISIBLE);
+		} else {
+			for (FuelTankHolder h : fuelTankHolders) {
+				h.layout.findViewById(R.id.btn_remove).setVisibility(
+						View.VISIBLE);
+			}
 		}
 
 		// Measure height, so the SimpleAnimator can store the original height.
@@ -463,6 +477,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 
 			// Create new fuel tanks, types and associations.
 			HashSet<String> addedPossibleTypes = new HashSet<String>();
+			HashSet<Long> remainingFuelTanks = new HashSet<Long>();
 			for (int i = 0; i < layoutFuelTanks.getChildCount(); i++) {
 				View ftView = layoutFuelTanks.getChildAt(i);
 				FuelTankHolder holder = fuelTankHolders.get(i);
@@ -472,6 +487,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 				holder.tank.car = car;
 				holder.tank.name = edtName.getText().toString().trim();
 				holder.tank.save();
+				remainingFuelTanks.add(holder.tank.getId());
 
 				for (Spinner spnType : holder.spnFuelTypes) {
 					int typePos = spnType.getSelectedItemPosition();
@@ -489,6 +505,13 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 						new PossibleFuelTypeForFuelTank(type, holder.tank)
 								.save();
 					}
+				}
+			}
+
+			// Delete removed fuel tanks.
+			for (FuelTank tank : car.fuelTanks()) {
+				if (!remainingFuelTanks.contains(tank.getId())) {
+					tank.delete();
 				}
 			}
 
