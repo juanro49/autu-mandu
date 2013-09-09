@@ -48,6 +48,7 @@
     <string name="hint_title">Titel</string>
     <string name="hint_name">Name</string>
     <string name="hint_tank">Tank</string>
+    <string name="hint_select_fuel_type">Kraftstoff auswählen</string>
 
     <string name="label_partial">Teilfüllung</string>
     <string name="label_color">Farbe</string>

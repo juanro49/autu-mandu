@@ -19,7 +19,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
     <EditText
-        android:id="@+id/edt_name"
+        android:id="@+id/edt_fuel_type_name"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_weight="1"

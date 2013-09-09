@@ -109,7 +109,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 	}
 
 	@Override
-	protected void fillFields(View v) {
+	protected void fillFields(Bundle savedInstanceState, View v) {
 		if (!isInEditMode()) {
 			Preferences prefs = new Preferences(getActivity());
 
@@ -211,7 +211,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 	}
 
 	@Override
-	protected void initFields(View v) {
+	protected void initFields(Bundle savedInstanceState, View v) {
 		Preferences prefs = new Preferences(getActivity());
 
 		edtTitle = (AutoCompleteTextView) v.findViewById(R.id.edt_title);

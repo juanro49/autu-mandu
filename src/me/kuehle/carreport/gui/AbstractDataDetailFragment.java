@@ -130,8 +130,8 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(getLayout(), container, false);
-		initFields(v);
-		fillFields(v);
+		initFields(savedInstanceState, v);
+		fillFields(savedInstanceState, v);
 		return v;
 	}
 
@@ -189,7 +189,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 		}
 	}
 
-	protected abstract void fillFields(View v);
+	protected abstract void fillFields(Bundle savedInstanceState, View v);
 
 	protected abstract int getAlertDeleteMessage();
 
@@ -215,7 +215,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
 		return calDateTime.getTime();
 	}
-	
+
 	protected double getDoubleFromEditText(EditText editText,
 			double defaultValue) {
 		String strDouble = editText.getText().toString();
@@ -256,7 +256,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
 	protected abstract int getToastSavedMessage();
 
-	protected abstract void initFields(View v);
+	protected abstract void initFields(Bundle savedInstanceState, View v);
 
 	protected boolean isInEditMode() {
 		return editItem != null;
