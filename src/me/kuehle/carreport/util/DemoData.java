@@ -35,31 +35,31 @@ public class DemoData {
 			"dd.MM.yyyy kk:mm");
 
 	public static void addDemoData() {
-		FuelType benzinE5 = createFuelType("Benzin E5");
-		FuelType benzinE10 = createFuelType("Benzin E10");
-		FuelType gas = createFuelType("Gas");
+		FuelType super95 = createFuelType("Super 95");
+		FuelType superE10 = createFuelType("Super E10");
+		FuelType lpg = createFuelType("LPG");
 
 		try {
 			Car punto = createCar("Fiat Punto", Color.BLUE);
-			FuelTank puntoTank = createFuelTank(punto, "A");
-			createPossibleFuelTypeForFuelTank(benzinE5, puntoTank);
-			createPossibleFuelTypeForFuelTank(benzinE10, puntoTank);
+			FuelTank puntoTank = createFuelTank(punto, "Fuel");
+			createPossibleFuelTypeForFuelTank(super95, puntoTank);
+			createPossibleFuelTypeForFuelTank(superE10, puntoTank);
 			createRefueling("01.06.2012 08:04", 120300, 41, 60.64f, false, "",
-					benzinE5, puntoTank);
+					super95, puntoTank);
 			createRefueling("13.06.2012 08:10", 120930, 44, 65.97f, false, "",
-					benzinE5, puntoTank);
+					super95, puntoTank);
 			createRefueling("28.06.2012 07:43", 121470, 37, 56.20f, true, "",
-					benzinE5, puntoTank);
+					super95, puntoTank);
 			createRefueling("10.07.2012 18:02", 122030, 40, 59.56f, false, "",
-					benzinE5, puntoTank);
+					super95, puntoTank);
 			createRefueling("25.07.2012 08:03", 122645, 42, 65.90f, false, "",
-					benzinE10, puntoTank);
+					superE10, puntoTank);
 			createRefueling("08.08.2012 17:14", 123205, 39, 58.46f, false, "",
-					benzinE10, puntoTank);
+					superE10, puntoTank);
 			createRefueling("27.08.2012 08:21", 123775, 41, 62.28f, false, "",
-					benzinE5, puntoTank);
+					super95, puntoTank);
 			createRefueling("05.09.2012 08:01", 124312, 45, 67.22f, false, "",
-					benzinE5, puntoTank);
+					super95, puntoTank);
 			createOtherCost("Rechtes Abblendlicht", "15.06.2012 07:25", null,
 					121009, 10, new Recurrence(RecurrenceInterval.ONCE), "",
 					punto);
@@ -67,26 +67,26 @@ public class DemoData {
 					new Recurrence(RecurrenceInterval.YEAR), "", punto);
 
 			Car astra = createCar("Opel Astra", Color.RED);
-			FuelTank astraTankBenzin = createFuelTank(astra, "A");
-			FuelTank astraTankGas = createFuelTank(astra, "B");
-			createPossibleFuelTypeForFuelTank(benzinE5, astraTankBenzin);
-			createPossibleFuelTypeForFuelTank(gas, astraTankGas);
+			FuelTank astraTankFuel = createFuelTank(astra, "Fuel");
+			FuelTank astraTankGas = createFuelTank(astra, "Gas");
+			createPossibleFuelTypeForFuelTank(super95, astraTankFuel);
+			createPossibleFuelTypeForFuelTank(lpg, astraTankGas);
 			createRefueling("03.07.2012 08:03", 43000, 45, 67.01f, false, "",
-					benzinE5, astraTankBenzin);
+					super95, astraTankFuel);
 			createRefueling("14.07.2012 18:15", 43640, 51, 76.45f, false, "",
-					benzinE5, astraTankBenzin);
+					super95, astraTankFuel);
 			createRefueling("24.07.2012 19:04", 44300, 52, 79.51f, false, "",
-					benzinE5, astraTankBenzin);
+					super95, astraTankFuel);
 			createRefueling("03.08.2012 08:11", 44701, 34, 49.95f, true, "",
-					gas, astraTankGas);
+					lpg, astraTankGas);
 			createRefueling("17.08.2012 17:16", 45316, 49, 74.92f, false, "",
-					benzinE5, astraTankBenzin);
+					super95, astraTankFuel);
 			createRefueling("24.08.2012 07:50", 45401, 07, 11.26f, true, "",
-					gas, astraTankGas);
+					lpg, astraTankGas);
 			createRefueling("25.08.2012 07:54", 46082, 53, 78.92f, false, "",
-					benzinE5, astraTankBenzin);
+					super95, astraTankFuel);
 			createRefueling("02.09.2012 07:30", 46560, 42, 65.63f, false, "",
-					gas, astraTankGas);
+					lpg, astraTankGas);
 			createOtherCost("Steuern", "01.06.2012 00:00", null, -1, 250,
 					new Recurrence(RecurrenceInterval.YEAR), "", astra);
 			createOtherCost("Versicherung", "15.06.2012 00:00", null, -1, 40,

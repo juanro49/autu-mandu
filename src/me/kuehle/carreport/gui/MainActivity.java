@@ -18,9 +18,11 @@ package me.kuehle.carreport.gui;
 
 import java.util.List;
 
+import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.util.DemoData;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 import me.kuehle.carreport.util.backup.Dropbox;
 import android.content.Intent;
@@ -215,6 +217,11 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 
+		// Add demo data item, when in debug mode.
+		if (BuildConfig.DEBUG) {
+			menu.add("Add Demo Data");
+		}
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -224,6 +231,15 @@ public class MainActivity extends FragmentActivity {
 		// true, then it has handled the app icon touch event.
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
 			return true;
+		}
+
+		// Respond to click on demo data item, which is only present
+		// in debug mode.
+		if (BuildConfig.DEBUG && item.getTitle().equals("Add Demo Data")) {
+			DemoData.addDemoData();
+			if (mCurrentFragment instanceof DataChangeListener) {
+				((DataChangeListener) mCurrentFragment).onDataChanged();
+			}
 		}
 
 		switch (item.getItemId()) {
