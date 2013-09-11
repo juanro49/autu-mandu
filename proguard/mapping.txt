@@ -7351,15 +7351,15 @@ me.kuehle.carreport.util.Strings -> me.kuehle.carreport.a.g:
     java.lang.String join(java.lang.String,java.lang.String[]) -> a
     java.lang.String join(java.lang.String,java.util.List) -> a
 me.kuehle.carreport.util.backup.AbstractSynchronizationProvider -> me.kuehle.carreport.a.a.a:
-    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider current -> g
-    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider[] avaialble -> h
+    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider current -> e
+    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider[] avaialble -> f
+    boolean mSynchronisationInProgress -> g
+    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener mSynchronisationListener -> h
     java.io.File mTempFile -> a
     android.content.Context mContext -> b
-    boolean mSynchronisationInProgress -> c
-    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener mSynchronisationListener -> d
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnAuthenticationListener mAuthenticationListener -> i
-    android.app.Fragment mAuthenticationFragment -> e
-    android.app.FragmentManager mAuthenticationFragmentManager -> f
+    android.app.Fragment mAuthenticationFragment -> c
+    android.app.FragmentManager mAuthenticationFragmentManager -> d
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider[] getAvailable(android.content.Context) -> a
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider getCurrent(android.content.Context) -> b
     void continueAuthentication(int,int,android.content.Intent) -> a
@@ -7367,16 +7367,20 @@ me.kuehle.carreport.util.backup.AbstractSynchronizationProvider -> me.kuehle.car
     int getIcon() -> b
     java.lang.String getName() -> c
     boolean isAuthenticated() -> d
+    boolean isSynchronisationInProgress() -> e
     void setSynchronisationCallback(me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener) -> a
     void startAuthentication(android.app.Fragment,me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnAuthenticationListener) -> a
+    void synchronize() -> f
     void synchronize(int) -> a
-    void unlink() -> e
+    void unlink() -> g
     void authenticationFinished(boolean,boolean) -> a
     boolean copyFile(java.io.File,java.io.File) -> a
     void onContinueAuthentication(int,int,android.content.Intent) -> b
-    void onStartAuthentication() -> f
+    void onStartAuthentication() -> h
     boolean onSynchronize(int) -> b
-    void onUnlink() -> g
+    void onUnlink() -> i
+    void access$0$1385ff() -> j
+    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener access$1() -> k
 me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$1 -> me.kuehle.carreport.a.a.b:
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider this$0 -> a
     void onPreExecute() -> onPreExecute
@@ -7403,17 +7407,17 @@ me.kuehle.carreport.util.backup.CSVExportImport$1 -> me.kuehle.carreport.a.a.g:
     java.util.HashMap val$order -> b
     int compare(java.lang.Object,java.lang.Object) -> compare
 me.kuehle.carreport.util.backup.Dropbox -> me.kuehle.carreport.a.a.h:
-    com.dropbox.client2.session.Session$AccessType ACCESS_TYPE -> g
-    com.dropbox.client2.DropboxAPI mDBApi -> h
-    boolean authenticationInProgress -> i
+    com.dropbox.client2.session.Session$AccessType ACCESS_TYPE -> e
+    com.dropbox.client2.DropboxAPI mDBApi -> f
+    boolean authenticationInProgress -> g
     java.lang.String getAccountName() -> a
     int getIcon() -> b
     java.lang.String getName() -> c
     boolean isAuthenticated() -> d
     void onContinueAuthentication(int,int,android.content.Intent) -> b
-    void onStartAuthentication() -> f
+    void onStartAuthentication() -> h
     boolean onSynchronize(int) -> b
-    void onUnlink() -> g
+    void onUnlink() -> i
     com.dropbox.client2.DropboxAPI access$0(me.kuehle.carreport.util.backup.Dropbox) -> a
 me.kuehle.carreport.util.backup.Dropbox$1 -> me.kuehle.carreport.a.a.i:
     java.lang.String accountName -> b
@@ -7423,16 +7427,16 @@ me.kuehle.carreport.util.backup.Dropbox$1 -> me.kuehle.carreport.a.a.i:
     void onPostExecute(java.lang.Object) -> onPostExecute
     java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
 me.kuehle.carreport.util.backup.GoogleDrive -> me.kuehle.carreport.a.a.j:
-    com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential credential -> g
+    com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential credential -> e
     java.lang.String getAccountName() -> a
     int getIcon() -> b
     java.lang.String getName() -> c
     boolean isAuthenticated() -> d
-    com.google.api.services.drive.Drive getService() -> h
+    com.google.api.services.drive.Drive getService() -> l
     void onContinueAuthentication(int,int,android.content.Intent) -> b
-    void onStartAuthentication() -> f
+    void onStartAuthentication() -> h
     boolean onSynchronize(int) -> b
-    void onUnlink() -> g
+    void onUnlink() -> i
     com.google.api.services.drive.Drive access$0(me.kuehle.carreport.util.backup.GoogleDrive) -> a
 me.kuehle.carreport.util.backup.GoogleDrive$AuthenticateTask -> me.kuehle.carreport.a.a.k:
     com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException userRecovEx -> b

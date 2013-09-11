@@ -328,11 +328,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
-				.getCurrent(this);
-		if (provider != null) {
-			provider.setSynchronisationCallback(null);
-		}
+		AbstractSynchronizationProvider.setSynchronisationCallback(null);
 	}
 
 	@Override
@@ -352,9 +348,8 @@ public class MainActivity extends FragmentActivity {
 					&& provider.isAuthenticated());
 		}
 
-		if (provider != null) {
-			provider.setSynchronisationCallback(mOnSynchronize);
-		}
+		AbstractSynchronizationProvider
+				.setSynchronisationCallback(mOnSynchronize);
 	}
 
 	@Override

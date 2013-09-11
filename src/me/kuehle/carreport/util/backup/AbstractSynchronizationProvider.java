@@ -46,6 +46,9 @@ public abstract class AbstractSynchronizationProvider {
 
 	private static AbstractSynchronizationProvider current;
 	private static AbstractSynchronizationProvider[] avaialble;
+	
+	private static boolean mSynchronisationInProgress = false;
+	private static OnSynchronizeListener mSynchronisationListener;
 
 	public static synchronized AbstractSynchronizationProvider[] getAvailable(
 			Context context) {
@@ -85,9 +88,6 @@ public abstract class AbstractSynchronizationProvider {
 	protected File mTempFile;
 	protected Context mContext;
 
-	private boolean mSynchronisationInProgress = false;
-	protected OnSynchronizeListener mSynchronisationListener;
-
 	private OnAuthenticationListener mAuthenticationListener;
 	protected Fragment mAuthenticationFragment;
 	protected FragmentManager mAuthenticationFragmentManager;
@@ -121,7 +121,7 @@ public abstract class AbstractSynchronizationProvider {
 		return mSynchronisationInProgress;
 	}
 
-	public void setSynchronisationCallback(OnSynchronizeListener callback) {
+	public static void setSynchronisationCallback(OnSynchronizeListener callback) {
 		mSynchronisationListener = callback;
 		if (mSynchronisationListener != null && mSynchronisationInProgress) {
 			mSynchronisationListener.onSynchronizationStarted();
@@ -172,6 +172,7 @@ public abstract class AbstractSynchronizationProvider {
 	public void unlink() {
 		Preferences prefs = new Preferences(mContext);
 		prefs.setSynchronizationProvider(null);
+		current = null;
 		onUnlink();
 	}
 
