@@ -92,7 +92,11 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 			// the last (add type) item has been selected. Otherwise
 			// safe the current selection to be able to restore it
 			// when the last item will be selected later.
-			if (position == 0 && holder.spnFuelTypes.size() > 1) {
+			if (position == 0) {
+				if(holder.spnFuelTypes.size() <= 1) {
+					return;
+				}
+				
 				boolean emptyElementExists = false;
 				for (int i = holder.spnFuelTypes.size() - 1; i >= 0; i--) {
 					final Spinner spn = holder.spnFuelTypes.get(i);
@@ -248,11 +252,11 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 						android.R.string.ok, null).show(getFragmentManager(),
 						null);
 			} else {
-				fuelTypeAdapter.insert(input, fuelTypeAdapter.getCount() - 1);
-				fuelTypePositionModelMap.put(fuelTypeAdapter.getCount() - 2,
+				int insertPosition = fuelTypeAdapter.getCount() - 1;
+				fuelTypeAdapter.insert(input, insertPosition);
+				fuelTypePositionModelMap.put(insertPosition,
 						new FuelType(input));
-				currentlyClickedFuelTypeSpinner.setSelection(fuelTypeAdapter
-						.getCount() - 2);
+				currentlyClickedFuelTypeSpinner.setSelection(insertPosition);
 			}
 		}
 
