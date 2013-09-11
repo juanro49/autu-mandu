@@ -74,6 +74,12 @@ public class DataFragment extends Fragment implements
 		@Override
 		public void onPageSelected(int position) {
 			onItemUnselected();
+			for (Fragment childFragment : getChildFragmentManager()
+					.getFragments()) {
+				if (childFragment instanceof DataListListener) {
+					((DataListListener) childFragment).unselectItem();
+				}
+			}
 
 			if (mTxtNoEntrySelected != null) {
 				int id = position == 0 ? R.drawable.ic_data_detail_refueling
@@ -258,13 +264,6 @@ public class DataFragment extends Fragment implements
 	public void onItemUnselected() {
 		getChildFragmentManager().popBackStack("detail",
 				FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-		/*
-		 * setNoEntrySelectedTextVisible(true); for (Fragment childFragment :
-		 * getChildFragmentManager().getFragments()) { if (childFragment
-		 * instanceof DataListListener) { ((DataListListener)
-		 * childFragment).unselectItem(); } }
-		 */
 	}
 
 	@Override

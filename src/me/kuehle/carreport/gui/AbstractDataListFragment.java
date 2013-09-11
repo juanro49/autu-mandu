@@ -28,7 +28,8 @@ import android.widget.TextView;
 import com.activeandroid.Model;
 
 public abstract class AbstractDataListFragment<T extends Model> extends
-		ListFragment implements SupportMessageDialogFragmentListener, DataListListener {
+		ListFragment implements SupportMessageDialogFragmentListener,
+		DataListListener {
 	public static interface DataListCallback {
 		public abstract void onItemSelected(int edit, long id);
 
@@ -253,6 +254,14 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 		setCurrentPosition(position);
 		mDataListCallback.onItemSelected(getExtraEdit(), getListAdapter()
 				.getItemId(position));
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		if (mActionMode != null) {
+			mActionMode.finish();
+		}
 	}
 
 	@Override
