@@ -247,35 +247,36 @@ android.support.v4.app.Fragment -> android.support.v4.app.Fragment:
     void onStart() -> g_
     void onSaveInstanceState(android.os.Bundle) -> e
     void onConfigurationChanged(android.content.res.Configuration) -> onConfigurationChanged
+    void onPause() -> s
     void onStop() -> c
     void onLowMemory() -> onLowMemory
     void onDestroyView() -> d
-    void initState() -> s
+    void initState() -> t
     void onDetach() -> h_
     void onCreateOptionsMenu(android.view.Menu,android.view.MenuInflater) -> a
-    void onDestroyOptionsMenu() -> t
+    void onDestroyOptionsMenu() -> u
     boolean onOptionsItemSelected(android.view.MenuItem) -> a
     void onCreateContextMenu(android.view.ContextMenu,android.view.View,android.view.ContextMenu$ContextMenuInfo) -> onCreateContextMenu
     void dump(java.lang.String,java.io.FileDescriptor,java.io.PrintWriter,java.lang.String[]) -> a
-    void instantiateChildFragmentManager() -> C
+    void instantiateChildFragmentManager() -> D
     void performCreate(android.os.Bundle) -> g
     android.view.View performCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> b
     void performActivityCreated(android.os.Bundle) -> h
-    void performStart() -> u
-    void performResume() -> v
+    void performStart() -> v
+    void performResume() -> w
     void performConfigurationChanged(android.content.res.Configuration) -> a
-    void performLowMemory() -> w
+    void performLowMemory() -> x
     boolean performCreateOptionsMenu(android.view.Menu,android.view.MenuInflater) -> b
     boolean performPrepareOptionsMenu(android.view.Menu) -> a
     boolean performOptionsItemSelected(android.view.MenuItem) -> b
     boolean performContextItemSelected(android.view.MenuItem) -> c
     void performOptionsMenuClosed(android.view.Menu) -> b
     void performSaveInstanceState(android.os.Bundle) -> i
-    void performPause() -> x
-    void performStop() -> y
-    void performReallyStop() -> z
-    void performDestroyView() -> A
-    void performDestroy() -> B
+    void performPause() -> y
+    void performStop() -> z
+    void performReallyStop() -> A
+    void performDestroyView() -> B
+    void performDestroy() -> C
 android.support.v4.app.Fragment$1 -> android.support.v4.app.n:
     android.support.v4.app.Fragment this$0 -> a
     android.view.View findViewById(int) -> a
@@ -574,9 +575,9 @@ android.support.v4.app.ListFragment -> android.support.v4.app.ak:
     void onDestroyView() -> d
     void onListItemClick$42a3bb55(int) -> a_
     void setListAdapter(android.widget.ListAdapter) -> a
-    android.widget.ListView getListView() -> C
+    android.widget.ListView getListView() -> D
     void setListShown(boolean,boolean) -> a
-    void ensureList() -> D
+    void ensureList() -> E
 android.support.v4.app.ListFragment$1 -> android.support.v4.app.al:
     android.support.v4.app.ListFragment this$0 -> a
     void run() -> run
@@ -6488,22 +6489,22 @@ me.kuehle.carreport.gui.AbstractDataDetailFragment -> me.kuehle.carreport.gui.a:
     void onDialogPositiveClick(int) -> b
     boolean onOptionsItemSelected(android.view.MenuItem) -> a
     void fillFields$15a3b733(android.os.Bundle) -> c
-    int getAlertDeleteMessage() -> D
+    int getAlertDeleteMessage() -> E
     java.util.Date getDate(android.widget.EditText) -> a
     java.util.Date getDateTime(java.util.Date,java.util.Date) -> a
     double getDoubleFromEditText$6a7437fe(android.widget.EditText) -> b
     com.activeandroid.Model getEditItem(long) -> a
     int getIntegerFromEditText(android.widget.EditText,int) -> a
-    int getLayout() -> E
+    int getLayout() -> F
     java.util.Date getTime(android.widget.EditText) -> c
-    int getTitleForEdit() -> F
-    int getTitleForNew() -> G
-    int getToastDeletedMessage() -> H
-    int getToastSavedMessage() -> I
+    int getTitleForEdit() -> G
+    int getTitleForNew() -> H
+    int getToastDeletedMessage() -> I
+    int getToastSavedMessage() -> J
     void initFields(android.os.Bundle,android.view.View) -> a
-    boolean isInEditMode() -> J
-    void save() -> K
-    boolean validate() -> L
+    boolean isInEditMode() -> K
+    void save() -> L
+    boolean validate() -> M
 me.kuehle.carreport.gui.AbstractDataDetailFragment$OnItemActionListener -> me.kuehle.carreport.gui.b:
     void onItemCanceled() -> e_
     void onItemDeleted() -> b
@@ -6524,14 +6525,15 @@ me.kuehle.carreport.gui.AbstractDataListFragment -> me.kuehle.carreport.gui.c:
     void onDialogNegativeClick$13462e() -> a_
     void onDialogPositiveClick(int) -> b
     void onListItemClick$42a3bb55(int) -> a_
+    void onPause() -> s
     void onSaveInstanceState(android.os.Bundle) -> e
     void setCurrentPosition(int) -> c
-    void unselectItem() -> D
-    void updateData() -> E
-    int getAlertDeleteManyMessage() -> F
-    int getExtraEdit() -> G
+    void unselectItem() -> E
+    void updateData() -> F
+    int getAlertDeleteManyMessage() -> G
+    int getExtraEdit() -> H
     android.util.SparseArray getItemData(java.util.List,int) -> a
-    java.util.List getItems() -> H
+    java.util.List getItems() -> I
     boolean access$0(me.kuehle.carreport.gui.AbstractDataListFragment) -> a
     void access$1$27ef9017(me.kuehle.carreport.gui.AbstractDataListFragment) -> b
     void access$2$27ef5046(me.kuehle.carreport.gui.AbstractDataListFragment) -> c
@@ -6565,9 +6567,9 @@ me.kuehle.carreport.gui.CalculatorFragment -> me.kuehle.carreport.gui.g:
     me.kuehle.carreport.data.calculation.AbstractCalculation[] mCalculations -> e
     void onAttach(android.app.Activity) -> a
     android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> a
-    void onDataChanged() -> C
+    void onDataChanged() -> D
     void onSaveInstanceState(android.os.Bundle) -> e
-    void calculate() -> D
+    void calculate() -> E
     me.kuehle.carreport.data.calculation.AbstractCalculation[] access$0(me.kuehle.carreport.gui.CalculatorFragment) -> a
     android.widget.TextView access$1(me.kuehle.carreport.gui.CalculatorFragment) -> b
     void access$2(me.kuehle.carreport.gui.CalculatorFragment) -> c
@@ -6610,18 +6612,18 @@ me.kuehle.carreport.gui.DataDetailCarFragment -> me.kuehle.carreport.gui.k:
     android.view.View addFuelTankView(me.kuehle.carreport.db.FuelTank,int[]) -> a
     void addFuelTypeView(me.kuehle.carreport.gui.DataDetailCarFragment$FuelTankHolder,int) -> a
     void addFuelTypeView(me.kuehle.carreport.gui.DataDetailCarFragment$FuelTankHolder,me.kuehle.carreport.db.FuelType) -> a
-    java.util.Date getSuspendDate() -> M
+    java.util.Date getSuspendDate() -> N
     void fillFields$15a3b733(android.os.Bundle) -> c
-    int getAlertDeleteMessage() -> D
+    int getAlertDeleteMessage() -> E
     com.activeandroid.Model getEditItem(long) -> a
-    int getLayout() -> E
-    int getTitleForEdit() -> F
-    int getTitleForNew() -> G
-    int getToastDeletedMessage() -> H
-    int getToastSavedMessage() -> I
+    int getLayout() -> F
+    int getTitleForEdit() -> G
+    int getTitleForNew() -> H
+    int getToastDeletedMessage() -> I
+    int getToastSavedMessage() -> J
     void initFields(android.os.Bundle,android.view.View) -> a
-    void save() -> K
-    boolean validate() -> L
+    void save() -> L
+    boolean validate() -> M
     void access$0(me.kuehle.carreport.gui.DataDetailCarFragment,android.widget.AdapterView) -> a
     void access$1$456c886e(me.kuehle.carreport.gui.DataDetailCarFragment,me.kuehle.carreport.gui.DataDetailCarFragment$FuelTankHolder) -> a
     java.util.List access$2(me.kuehle.carreport.gui.DataDetailCarFragment) -> a
@@ -6693,16 +6695,16 @@ me.kuehle.carreport.gui.DataDetailOtherFragment -> me.kuehle.carreport.gui.v:
     java.util.List cars -> af
     void onDialogPositiveClick(int,java.util.Date) -> a
     void fillFields$15a3b733(android.os.Bundle) -> c
-    int getAlertDeleteMessage() -> D
+    int getAlertDeleteMessage() -> E
     com.activeandroid.Model getEditItem(long) -> a
-    int getLayout() -> E
-    int getTitleForEdit() -> F
-    int getTitleForNew() -> G
-    int getToastDeletedMessage() -> H
-    int getToastSavedMessage() -> I
+    int getLayout() -> F
+    int getTitleForEdit() -> G
+    int getTitleForNew() -> H
+    int getToastDeletedMessage() -> I
+    int getToastSavedMessage() -> J
     void initFields(android.os.Bundle,android.view.View) -> a
-    void save() -> K
-    boolean validate() -> L
+    void save() -> L
+    boolean validate() -> M
     android.widget.EditText access$0(me.kuehle.carreport.gui.DataDetailOtherFragment) -> a
     android.widget.EditText access$1(me.kuehle.carreport.gui.DataDetailOtherFragment) -> b
     me.kuehle.carreport.gui.util.SimpleAnimator access$2(me.kuehle.carreport.gui.DataDetailOtherFragment) -> c
@@ -6743,16 +6745,16 @@ me.kuehle.carreport.gui.DataDetailRefuelingFragment -> me.kuehle.carreport.gui.a
     android.util.SparseArray fuelTypePositionIDMap -> ab
     void onDialogPositiveClick(int,java.util.Date) -> a
     void fillFields$15a3b733(android.os.Bundle) -> c
-    int getAlertDeleteMessage() -> D
+    int getAlertDeleteMessage() -> E
     com.activeandroid.Model getEditItem(long) -> a
-    int getLayout() -> E
-    int getTitleForEdit() -> F
-    int getTitleForNew() -> G
-    int getToastDeletedMessage() -> H
-    int getToastSavedMessage() -> I
+    int getLayout() -> F
+    int getTitleForEdit() -> G
+    int getTitleForNew() -> H
+    int getToastDeletedMessage() -> I
+    int getToastSavedMessage() -> J
     void initFields(android.os.Bundle,android.view.View) -> a
-    boolean validate() -> L
-    void save() -> K
+    boolean validate() -> M
+    void save() -> L
     android.widget.EditText access$0(me.kuehle.carreport.gui.DataDetailRefuelingFragment) -> a
     android.widget.EditText access$1(me.kuehle.carreport.gui.DataDetailRefuelingFragment) -> b
     java.util.List access$2(me.kuehle.carreport.gui.DataDetailRefuelingFragment) -> c
@@ -6783,7 +6785,7 @@ me.kuehle.carreport.gui.DataFragment -> me.kuehle.carreport.gui.ah:
     void onActivityCreated(android.os.Bundle) -> d
     void onCreate(android.os.Bundle) -> a
     android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> a
-    void onDataChanged() -> C
+    void onDataChanged() -> D
     void onDestroyView() -> d
     void onItemCanceled() -> e_
     void onItemDeleted() -> b
@@ -6803,8 +6805,8 @@ me.kuehle.carreport.gui.DataFragment$DataListBackStackListener -> me.kuehle.carr
     void onBackStackChanged() -> a
 me.kuehle.carreport.gui.DataFragment$DataListListener -> me.kuehle.carreport.gui.aj:
     void onCarChanged(me.kuehle.carreport.db.Car) -> a
-    void unselectItem() -> D
-    void updateData() -> E
+    void unselectItem() -> E
+    void updateData() -> F
 me.kuehle.carreport.gui.DataFragment$DataListNavigationListener -> me.kuehle.carreport.gui.ak:
     me.kuehle.carreport.gui.DataFragment this$0 -> a
     boolean onNavigationItemSelected(int,long) -> onNavigationItemSelected
@@ -6816,15 +6818,15 @@ me.kuehle.carreport.gui.DataFragment$DataListPagerAdapter -> me.kuehle.carreport
     android.support.v4.app.Fragment getItem(int) -> a
     java.lang.CharSequence getPageTitle(int) -> b
 me.kuehle.carreport.gui.DataListOtherFragment -> me.kuehle.carreport.gui.an:
-    int getAlertDeleteManyMessage() -> F
-    int getExtraEdit() -> G
+    int getAlertDeleteManyMessage() -> G
+    int getExtraEdit() -> H
     android.util.SparseArray getItemData(java.util.List,int) -> a
-    java.util.List getItems() -> H
+    java.util.List getItems() -> I
 me.kuehle.carreport.gui.DataListRefuelingFragment -> me.kuehle.carreport.gui.ao:
-    int getAlertDeleteManyMessage() -> F
-    int getExtraEdit() -> G
+    int getAlertDeleteManyMessage() -> G
+    int getExtraEdit() -> H
     android.util.SparseArray getItemData(java.util.List,int) -> a
-    java.util.List getItems() -> H
+    java.util.List getItems() -> I
 me.kuehle.carreport.gui.FirstStartActivity -> me.kuehle.carreport.gui.FirstStartActivity:
     void onCreate(android.os.Bundle) -> onCreate
     void onActivityResult(int,int,android.content.Intent) -> onActivityResult
@@ -6887,7 +6889,7 @@ me.kuehle.carreport.gui.MainActivity$2 -> me.kuehle.carreport.gui.aq:
 me.kuehle.carreport.gui.MainActivity$BackPressedListener -> me.kuehle.carreport.gui.ar:
     boolean onBackPressed() -> a
 me.kuehle.carreport.gui.MainActivity$DataChangeListener -> me.kuehle.carreport.gui.as:
-    void onDataChanged() -> C
+    void onDataChanged() -> D
 me.kuehle.carreport.gui.MainActivity$DrawerItemClickListener -> me.kuehle.carreport.gui.at:
     me.kuehle.carreport.gui.MainActivity this$0 -> a
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
@@ -7061,10 +7063,10 @@ me.kuehle.carreport.gui.ReportFragment -> me.kuehle.carreport.gui.au:
     boolean onBackPressed() -> a
     void onActivityCreated(android.os.Bundle) -> d
     android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> a
-    void onDataChanged() -> C
+    void onDataChanged() -> D
     void onDestroyView() -> d
     boolean onMenuItemClick(android.view.MenuItem) -> onMenuItemClick
-    void hideFullScreenChart() -> D
+    void hideFullScreenChart() -> E
     void saveGraphSettings(me.kuehle.carreport.data.report.AbstractReport) -> a
     void access$0(me.kuehle.carreport.gui.ReportFragment,me.kuehle.carreport.data.report.AbstractReport) -> a
     void access$1(me.kuehle.carreport.gui.ReportFragment,android.view.View) -> a
