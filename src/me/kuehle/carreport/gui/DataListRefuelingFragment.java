@@ -5,6 +5,7 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.db.Refueling;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
@@ -74,12 +75,12 @@ public class DataListRefuelingFragment extends
 				} else {
 					int diffMileage = refueling.mileage
 							- nextRefueling.mileage;
+					FuelConsumption fc = new FuelConsumption(getActivity());
 					data.put(
 							R.id.data3_calculated,
-							String.format("%.2f %s/100%s", diffVolume
-									/ diffMileage * 100,
-									prefs.getUnitVolume(),
-									prefs.getUnitDistance()));
+							String.format("%.2f %s",
+									fc.computeFuelConsumption(diffVolume, diffMileage),
+									fc.getUnitLabel()));
 					break;
 				}
 			}

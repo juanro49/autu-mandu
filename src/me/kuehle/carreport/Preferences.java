@@ -35,7 +35,7 @@ import android.preference.PreferenceManager;
 
 public class Preferences {
 	private SharedPreferences prefs;
-
+	
 	public Preferences(Context context) {
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
@@ -128,6 +128,11 @@ public class Preferences {
 	public String getUnitVolume() {
 		return prefs.getString("unit_volume", "l");
 	}
+	
+	public int getUnitFuelConsumption() {
+		int id = Integer.parseInt(prefs.getString("unit_fuel_consumption", "0"));
+		return id;
+	}
 
 	public boolean isColorSections() {
 		return prefs.getBoolean("appearance_color_sections", true);
@@ -207,5 +212,9 @@ public class Preferences {
 		Editor edit = prefs.edit();
 		edit.putString("sync_current_provider", provider);
 		edit.apply();
+	}
+	
+	public Editor edit() {
+		return this.prefs.edit();
 	}
 }
