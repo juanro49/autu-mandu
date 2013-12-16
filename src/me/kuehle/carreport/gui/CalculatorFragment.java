@@ -1,5 +1,10 @@
 package me.kuehle.carreport.gui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.calculation.AbstractCalculation;
 import me.kuehle.carreport.data.calculation.CalculationItem;
@@ -31,6 +36,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -40,7 +47,9 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
 	private Spinner mSpnOptions;
 	private EditText mEdtInput;
 	private TextView mTxtUnit;
+	private View mGraphHolder;
 	private ChartView mGraph;
+	private ListView mTable;
 
 	private AbstractCalculation[] mCalculations;
 
@@ -64,7 +73,9 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
 		mSpnOptions = (Spinner) v.findViewById(R.id.spn_options);
 		mEdtInput = (EditText) v.findViewById(R.id.edt_input);
 		mTxtUnit = (TextView) v.findViewById(R.id.txt_unit);
+		mGraphHolder = v.findViewById(R.id.chart_holder);
 		mGraph = (ChartView) v.findViewById(R.id.chart);
+		mTable = (ListView) v.findViewById(R.id.table);
 
 		ArrayAdapter<String> options = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_dropdown_item);
@@ -132,12 +143,14 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
 		try {
 			input = Double.parseDouble(mEdtInput.getText().toString());
 		} catch (NumberFormatException e) {
-			mGraph.setChart(null);
+			mGraphHolder.setVisibility(View.GONE);
+			mTable.setVisibility(View.GONE);
 			return;
 		}
 
 		final CalculationItem[] items = calculation.calculate(input);
 
+		// Update graph
 		Dataset dataset = new Dataset();
 		Series series = new Series(calculation.getOutputUnit());
 		dataset.add(series);
@@ -171,6 +184,23 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
 		chart.setShowLegend(false);
 
 		mGraph.setChart(chart);
+		mGraphHolder.setVisibility(View.VISIBLE);
+
+		// Update table
+		List<Map<String, String>> tableData = new ArrayList<Map<String, String>>();
+		for (CalculationItem item : items) {
+			Map<String, String> row = new HashMap<String, String>();
+			row.put("label", item.getName());
+			row.put("value",
+					String.format("%.2f %s", item.getValue(),
+							calculation.getOutputUnit()));
+			tableData.add(row);
+		}
+
+		mTable.setAdapter(new SimpleAdapter(getActivity(), tableData,
+				R.layout.row_report_data, new String[] { "label", "value" },
+				new int[] { android.R.id.text1, android.R.id.text2 }));
+		mTable.setVisibility(View.VISIBLE);
 	}
 
 	private double[] getXValues(Series series) {
