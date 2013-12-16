@@ -18,7 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="me.kuehle.carreport"
     android:installLocation="auto"
-    android:versionCode="22"
+    android:versionCode="23"
     android:versionName="3.1" >
     <uses-sdk
         android:minSdkVersion="14"
