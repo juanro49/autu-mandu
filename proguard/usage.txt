@@ -4250,10 +4250,6 @@ com.larswerkman.holocolorpicker.ColorPicker:
     private static final java.lang.String STATE_PARENT
     private static final java.lang.String STATE_ANGLE
     private static final java.lang.String STATE_OLD_COLOR
-    217:219:public ColorPicker(android.content.Context)
-    222:224:public ColorPicker(android.content.Context,android.util.AttributeSet)
-    227:229:public ColorPicker(android.content.Context,android.util.AttributeSet,int)
-    261:319:private void init(android.util.AttributeSet,int)
     617:621:public void addSVBar(com.larswerkman.holocolorpicker.SVBar)
     630:634:public void addOpacityBar(com.larswerkman.holocolorpicker.OpacityBar)
     704:707:public void changeSaturationBarColor(int)
@@ -4265,10 +4261,13 @@ com.larswerkman.holocolorpicker.OpacityBar:
     134:136:public OpacityBar(android.content.Context,android.util.AttributeSet)
     139:141:public OpacityBar(android.content.Context,android.util.AttributeSet,int)
     144:177:private void init(android.util.AttributeSet,int)
-com.larswerkman.holocolorpicker.R
+com.larswerkman.holocolorpicker.R:
+    9:9:public R()
 com.larswerkman.holocolorpicker.R$attr
-com.larswerkman.holocolorpicker.R$dimen
-com.larswerkman.holocolorpicker.R$styleable
+com.larswerkman.holocolorpicker.R$dimen:
+    22:22:public R$dimen()
+com.larswerkman.holocolorpicker.R$styleable:
+    34:34:public R$styleable()
 com.larswerkman.holocolorpicker.SVBar:
     private static final java.lang.String STATE_PARENT
     private static final java.lang.String STATE_COLOR
@@ -4282,18 +4281,10 @@ com.larswerkman.holocolorpicker.SaturationBar:
     private static final java.lang.String STATE_PARENT
     private static final java.lang.String STATE_COLOR
     private static final java.lang.String STATE_SATURATION
-    129:131:public SaturationBar(android.content.Context)
-    134:136:public SaturationBar(android.content.Context,android.util.AttributeSet)
-    139:141:public SaturationBar(android.content.Context,android.util.AttributeSet,int)
-    144:177:private void init(android.util.AttributeSet,int)
 com.larswerkman.holocolorpicker.ValueBar:
     private static final java.lang.String STATE_PARENT
     private static final java.lang.String STATE_COLOR
     private static final java.lang.String STATE_VALUE
-    129:131:public ValueBar(android.content.Context)
-    134:136:public ValueBar(android.content.Context,android.util.AttributeSet)
-    139:141:public ValueBar(android.content.Context,android.util.AttributeSet,int)
-    144:177:private void init(android.util.AttributeSet,int)
 com.mobeta.android.dslv.DragSortController:
     public static final int ON_DOWN
     public static final int ON_DRAG
@@ -4488,7 +4479,8 @@ me.kuehle.carreport.util.CSVWriter:
     private static final char NEW_LINE
 me.kuehle.carreport.util.Calculator:
     21:21:public Calculator()
-me.kuehle.carreport.util.DemoData
+me.kuehle.carreport.util.DemoData:
+    33:33:public DemoData()
 me.kuehle.carreport.util.Strings:
     22:22:public Strings()
     24:24:public static varargs java.lang.String concat(java.lang.String[])

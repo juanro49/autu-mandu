@@ -22,7 +22,7 @@
     android:orientation="horizontal"
     android:padding="8dp"
     tools:context=".util.gui.ColorPickerDialogFragment" >
-    <com.larswerkman.colorpicker.ColorPicker
+    <com.larswerkman.holocolorpicker.ColorPicker
         android:id="@+id/picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -31,11 +31,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:orientation="vertical" >
-        <com.larswerkman.colorpicker.SaturationBar
+        <com.larswerkman.holocolorpicker.SaturationBar
             android:id="@+id/saturationbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <com.larswerkman.colorpicker.ValueBar
+        <com.larswerkman.holocolorpicker.ValueBar
             android:id="@+id/valuebar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
