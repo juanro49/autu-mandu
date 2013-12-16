@@ -36,39 +36,46 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
 public class PreferencesGeneralFragment extends PreferenceFragment {
-	private class PreferenceChangeListener implements OnPreferenceChangeListener {
-			@Override
+	private class PreferenceChangeListener implements
+			OnPreferenceChangeListener {
+		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			FuelConsumption fuelConsumption = new FuelConsumption(getActivity());		
+			FuelConsumption fuelConsumption = new FuelConsumption(getActivity());
 			String prefKey = preference.getKey();
 			if (prefKey.equals("behavior_car")) {
 				Car car = Car.load(Car.class,
 						Long.parseLong(newValue.toString()));
 				preference.setSummary(car.name);
-				}
-			else if (preference instanceof EditTextPreference) {
+			} else if (preference instanceof EditTextPreference) {
 				preference.setSummary(newValue.toString());
+				
+				// Update fuel consumption label
 				if (prefKey.equals("unit_distance")) {
-					fuelConsumption.unit_distance = newValue.toString();
+					fuelConsumption.setUnitDistance(newValue.toString());
+				} else if (prefKey.equals("unit_volume")) {
+					fuelConsumption.setUnitVolume(newValue.toString());
 				}
-				else if (prefKey.equals("unit_volume")) {
-					fuelConsumption.unit_volume = newValue.toString();
-				}
+				
 				updateFuelConsumptionField(fuelConsumption);
-			}
-			else if (prefKey.equals("unit_fuel_consumption")) {
-				fuelConsumption.setConsumptionType(Integer.parseInt(newValue.toString()));
-				updateFuelConsumptionField(fuelConsumption, (ListPreference)preference);
+			} else if (prefKey.equals("unit_fuel_consumption")) {
+				fuelConsumption.setConsumptionType(Integer.parseInt(newValue
+						.toString()));
+				updateFuelConsumptionField(fuelConsumption,
+						(ListPreference) preference);
 			}
 			return true;
 		}
-		
-		public ListPreference updateFuelConsumptionField(FuelConsumption fuelConsumption) {
+
+		public ListPreference updateFuelConsumptionField(
+				FuelConsumption fuelConsumption) {
 			ListPreference prefFuelConsumption = (ListPreference) findPreference("unit_fuel_consumption");
-			return this.updateFuelConsumptionField(fuelConsumption, prefFuelConsumption);
+			return this.updateFuelConsumptionField(fuelConsumption,
+					prefFuelConsumption);
 		}
-			
-		public ListPreference updateFuelConsumptionField(FuelConsumption fuelConsumption, ListPreference prefFuelConsumption) {
+
+		public ListPreference updateFuelConsumptionField(
+				FuelConsumption fuelConsumption,
+				ListPreference prefFuelConsumption) {
 			String[] entries = fuelConsumption.getUnitsEntries();
 			String[] entryValues = fuelConsumption.getUnitsEntryValues();
 			prefFuelConsumption.setEntries(entries);
@@ -76,10 +83,10 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			prefFuelConsumption.setSummary(fuelConsumption.getUnitLabel());
 			return prefFuelConsumption;
 		}
-	};
-		
+	}
+
 	private PreferenceChangeListener onPreferenceChangeListener = new PreferenceChangeListener();
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -90,8 +97,7 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 
 		Preferences prefs = new Preferences(getActivity());
 		FuelConsumption fuelConsumption = new FuelConsumption(getActivity());
-		
-	
+
 		// Behavior report order
 		{
 			updateReportOrderSummary();
@@ -151,7 +157,6 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			unitVolume
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			unitVolume.setSummary(prefs.getUnitVolume());
-			fuelConsumption.unit_volume = prefs.getUnitVolume();
 		}
 
 		// Unit Distance
@@ -160,12 +165,14 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			unitDistance
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			unitDistance.setSummary(prefs.getUnitDistance());
-			fuelConsumption.unit_distance = prefs.getUnitDistance();
 		}
+
 		// Unit fuel consumption
 		{
-			ListPreference fieldFuelConsumption = onPreferenceChangeListener.updateFuelConsumptionField(fuelConsumption);
-			fieldFuelConsumption.setOnPreferenceChangeListener(onPreferenceChangeListener);
+			ListPreference fieldFuelConsumption = onPreferenceChangeListener
+					.updateFuelConsumptionField(fuelConsumption);
+			fieldFuelConsumption
+					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 		}
 
 	}

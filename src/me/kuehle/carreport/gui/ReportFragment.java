@@ -174,6 +174,8 @@ public class ReportFragment extends Fragment implements
 		}
 	}
 
+	private ReportUpdateTask mCurrentUpdateTask;
+
 	private AbstractReport mCurrentMenuReport;
 	private ViewGroup mCurrentMenuReportView;
 
@@ -196,7 +198,8 @@ public class ReportFragment extends Fragment implements
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		new ReportUpdateTask().execute();
+		mCurrentUpdateTask = new ReportUpdateTask();
+		mCurrentUpdateTask.execute();
 	}
 
 	@Override
@@ -217,7 +220,9 @@ public class ReportFragment extends Fragment implements
 
 	@Override
 	public void onDataChanged() {
-		new ReportUpdateTask().execute();
+		mCurrentUpdateTask.cancel(true);
+		mCurrentUpdateTask = new ReportUpdateTask();
+		mCurrentUpdateTask.execute();
 	}
 
 	@Override

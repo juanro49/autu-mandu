@@ -213,8 +213,4 @@ public class Preferences {
 		edit.putString("sync_current_provider", provider);
 		edit.apply();
 	}
-	
-	public Editor edit() {
-		return this.prefs.edit();
-	}
 }

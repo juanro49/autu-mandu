@@ -21,81 +21,93 @@ import me.kuehle.carreport.Preferences;
 
 public class FuelConsumption {
 	public enum Type {
-		VOL_FOR_DIST(0),
-		DIST_FOR_VOL(1);
-		
+		VOL_FOR_DIST(0), DIST_FOR_VOL(1);
+
 		public final int id;
+
 		Type(int id) {
 			this.id = id;
 		}
 	}
-	
+
 	private Type consumptionType;
-	public String unit_volume;
-	public String unit_distance;
+	private String unitVolume;
+	private String unitDistance;
 	private Preferences preferences;
 
 	public FuelConsumption(Context context) {
 		this.preferences = new Preferences(context);
 		reload();
 	}
-	
+
 	public static Type findConsumptionType(int id) {
 		if (id == Type.DIST_FOR_VOL.id)
 			return Type.DIST_FOR_VOL;
 		return Type.VOL_FOR_DIST;
 	}
-	
+
 	public void reload() {
 		int id = preferences.getUnitFuelConsumption();
 		this.setConsumptionType(id);
-		this.unit_volume = preferences.getUnitVolume();
-		this.unit_distance = preferences.getUnitDistance();
+		this.unitVolume = preferences.getUnitVolume();
+		this.unitDistance = preferences.getUnitDistance();
 	}
-	
+
 	public void setConsumptionType(int id) {
 		this.consumptionType = FuelConsumption.findConsumptionType(id);
 	}
-	
-	public double computeFuelConsumption(Type consumptionType, double volume, double distance) {
+
+	public void setUnitVolume(String unitVolume) {
+		this.unitVolume = unitVolume;
+	}
+
+	public void setUnitDistance(String unitDistance) {
+		this.unitDistance = unitDistance;
+	}
+
+	public double computeFuelConsumption(Type consumptionType, double volume,
+			double distance) {
 		if (consumptionType == Type.DIST_FOR_VOL) {
 			return distance / volume;
 		}
 		return 100.0 * volume / distance;
 	}
-	
+
 	public double computeFuelConsumption(double volume, double distance) {
 		return computeFuelConsumption(this.consumptionType, volume, distance);
 	}
-	
+
 	public String getUnitLabel(int consumptionTypeId) {
-		Type consumptionType = FuelConsumption.findConsumptionType(consumptionTypeId);
+		Type consumptionType = FuelConsumption
+				.findConsumptionType(consumptionTypeId);
 		return this.getUnitLabel(consumptionType);
 	}
-	
+
 	public String getUnitLabel(Type consumptionType) {
 		switch (consumptionType) {
 		case DIST_FOR_VOL:
-			return String.format("%s/%s", this.unit_distance, this.unit_volume);
+			return String.format("%s/%s", this.unitDistance, this.unitVolume);
 		default:
-			return String.format("%s/100%s", this.unit_volume , this.unit_distance); 
+			return String
+					.format("%s/100%s", this.unitVolume, this.unitDistance);
 		}
 	}
-	
+
 	public String getUnitLabel() {
 		return this.getUnitLabel(this.consumptionType);
 	}
-	
+
 	public String[] getUnitsEntries() {
 		String[] list = new String[2];
 		list[0] = this.getUnitLabel(Type.VOL_FOR_DIST);
 		list[1] = this.getUnitLabel(Type.DIST_FOR_VOL);
 		return list;
 	}
+
 	public String[] getUnitsEntryValues() {
 		String[] list = new String[2];
 		list[0] = String.valueOf(Type.VOL_FOR_DIST.id);
 		list[1] = String.valueOf(Type.DIST_FOR_VOL.id);
 		return list;
 	}
-};
+}

@@ -24,7 +24,6 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.util.DemoData;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
-import me.kuehle.carreport.util.backup.Dropbox;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -44,7 +43,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements
+		AbstractSynchronizationProvider.OnSynchronizeListener {
 	public static interface BackPressedListener {
 		public boolean onBackPressed();
 	}
@@ -61,33 +61,6 @@ public class MainActivity extends FragmentActivity {
 			selectItem(position);
 		}
 	}
-
-	private Dropbox.OnSynchronizeListener mOnSynchronize = new Dropbox.OnSynchronizeListener() {
-		@Override
-		public void onSynchronizationFinished(boolean result) {
-			if (mSyncMenuItem != null) {
-				mSyncMenuItem.setActionView(null);
-			}
-
-			if (result) {
-				if (mCurrentFragment instanceof DataChangeListener) {
-					((DataChangeListener) mCurrentFragment).onDataChanged();
-				}
-			} else {
-				Toast.makeText(MainActivity.this,
-						R.string.toast_synchronization_failed,
-						Toast.LENGTH_SHORT).show();
-			}
-		}
-
-		@Override
-		public void onSynchronizationStarted() {
-			if (mSyncMenuItem != null) {
-				mSyncMenuItem
-						.setActionView(R.layout.actionbar_indeterminate_progress);
-			}
-		}
-	};
 
 	private static final int REQUEST_FIRST_START = 0;
 	private static final int REQUEST_ADD_DATA = 1;
@@ -266,11 +239,15 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		// If the navigation drawer is open, hide action items related to the
+		// TODO: If the navigation drawer is open, hide action items related to
+		// the
 		// content view.
 		// boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		// menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 
+		// Show available cars in submenu of "Add refueling" and
+		// "Add other cost"
+		// option, if the setting is enabled.
 		Preferences prefs = new Preferences(this);
 		List<Car> cars = Car.getAll();
 		for (int i = cars.size() - 1; i >= 0; i--) {
@@ -305,6 +282,31 @@ public class MainActivity extends FragmentActivity {
 		}
 
 		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	public void onSynchronizationFinished(boolean result) {
+		if (mSyncMenuItem != null) {
+			mSyncMenuItem.setActionView(null);
+		}
+
+		if (result) {
+			if (mCurrentFragment instanceof DataChangeListener) {
+				((DataChangeListener) mCurrentFragment).onDataChanged();
+			}
+		} else {
+			Toast.makeText(MainActivity.this,
+					R.string.toast_synchronization_failed, Toast.LENGTH_SHORT)
+					.show();
+		}
+	}
+
+	@Override
+	public void onSynchronizationStarted() {
+		if (mSyncMenuItem != null) {
+			mSyncMenuItem
+					.setActionView(R.layout.actionbar_indeterminate_progress);
+		}
 	}
 
 	@Override
@@ -364,8 +366,7 @@ public class MainActivity extends FragmentActivity {
 					&& provider.isAuthenticated());
 		}
 
-		AbstractSynchronizationProvider
-				.setSynchronisationCallback(mOnSynchronize);
+		AbstractSynchronizationProvider.setSynchronisationCallback(this);
 	}
 
 	@Override

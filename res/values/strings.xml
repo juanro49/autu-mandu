@@ -174,6 +174,7 @@
     <string name="pref_title_unit_currency">Currency</string>
     <string name="pref_title_unit_volume">Volume</string>
     <string name="pref_title_unit_distance">Distance</string>
+    <string name="pref_title_unit_fuel_consumption">Fuel Consumption</string>
     <string name="pref_title_sync_setup">Set up synchronization</string>
     <string name="pref_title_sync_on_start">On start</string>
     <string name="pref_title_sync_on_change">On data change</string>
@@ -223,5 +224,4 @@
     <string name="graph_close_full_screen_desc">Close full screen graph</string>
     <string name="remove_fueltype_desc">Remove</string>
     <string name="drag_handle_desc">Drag handle</string>
-    <string name="pref_title_unit_fuel_consumption">Fuel Consumption</string>
 </resources>

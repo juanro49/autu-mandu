@@ -58,6 +58,13 @@ public class HelpActivity extends PreferenceActivity {
 		}
 	}
 
+	@Override
+	protected boolean isValidFragment(String fragmentName) {
+		return GettingStartedFragment.class.getName().equals(fragmentName)
+				|| TipsFragment.class.getName().equals(fragmentName)
+				|| CalculationsFragment.class.getName().equals(fragmentName);
+	}
+
 	private static abstract class HelpFragment extends Fragment {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
