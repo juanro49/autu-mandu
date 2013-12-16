@@ -56,7 +56,7 @@
             android:key="unit_distance"
             android:title="@string/pref_title_unit_distance" />
         <ListPreference
-            android:defaultValue="1"
+            android:defaultValue="0"
             android:key="unit_fuel_consumption"
             android:title="@string/pref_title_unit_fuel_consumption" />
     </PreferenceCategory>

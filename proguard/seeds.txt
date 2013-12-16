@@ -656,7 +656,11 @@ com.google.api.client.auth.oauth2.TokenResponse: java.lang.Long expiresInSeconds
 com.google.api.client.auth.oauth2.TokenResponse: java.lang.String refreshToken
 com.google.api.client.auth.oauth2.TokenResponse: java.lang.String scope
 com.google.api.client.auth.openidconnect.IdToken$Payload: java.lang.Long authorizationTimeSeconds
-com.google.api.client.auth.openidconnect.IdToken$Payload: java.lang.Object authorizedParty
+com.google.api.client.auth.openidconnect.IdToken$Payload: java.lang.String authorizedParty
+com.google.api.client.auth.openidconnect.IdToken$Payload: java.lang.String nonce
+com.google.api.client.auth.openidconnect.IdToken$Payload: java.lang.String accessTokenHash
+com.google.api.client.auth.openidconnect.IdToken$Payload: java.lang.String classReference
+com.google.api.client.auth.openidconnect.IdToken$Payload: java.util.List methodsReferences
 com.google.api.client.auth.openidconnect.IdTokenResponse: java.lang.String idToken
 com.google.api.client.googleapis.auth.clientlogin.ClientLogin: java.lang.String applicationName
 com.google.api.client.googleapis.auth.clientlogin.ClientLogin: java.lang.String authTokenType
@@ -682,7 +686,6 @@ com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets$Details: java.l
 com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets$Details: java.lang.String tokenUri
 com.google.api.client.googleapis.auth.oauth2.GoogleIdToken$Payload: java.lang.String userId
 com.google.api.client.googleapis.auth.oauth2.GoogleIdToken$Payload: java.lang.String issuee
-com.google.api.client.googleapis.auth.oauth2.GoogleIdToken$Payload: java.lang.String accessTokenHash
 com.google.api.client.googleapis.auth.oauth2.GoogleIdToken$Payload: java.lang.String hostedDomain
 com.google.api.client.googleapis.auth.oauth2.GoogleIdToken$Payload: java.lang.String email
 com.google.api.client.googleapis.auth.oauth2.GoogleIdToken$Payload: boolean emailVerified
@@ -741,6 +744,7 @@ com.google.api.client.json.webtoken.JsonWebSignature$Header: java.lang.String ke
 com.google.api.client.json.webtoken.JsonWebSignature$Header: java.lang.String x509Url
 com.google.api.client.json.webtoken.JsonWebSignature$Header: java.lang.String x509Thumbprint
 com.google.api.client.json.webtoken.JsonWebSignature$Header: java.lang.String x509Certificate
+com.google.api.client.json.webtoken.JsonWebSignature$Header: java.util.List critical
 com.google.api.client.json.webtoken.JsonWebToken$Header: java.lang.String type
 com.google.api.client.json.webtoken.JsonWebToken$Header: java.lang.String contentType
 com.google.api.client.json.webtoken.JsonWebToken$Payload: java.lang.Long expirationTimeSeconds
@@ -951,6 +955,8 @@ com.google.api.services.drive.model.About$ImportFormats: java.util.List targets
 com.google.api.services.drive.model.About$MaxUploadSizes: java.lang.Long size
 com.google.api.services.drive.model.About$MaxUploadSizes: java.lang.String type
 com.google.api.services.drive.model.App: java.lang.Boolean authorized
+com.google.api.services.drive.model.App: java.lang.String createInFolderTemplate
+com.google.api.services.drive.model.App: java.lang.String createUrl
 com.google.api.services.drive.model.App: java.util.List icons
 com.google.api.services.drive.model.App: java.lang.String id
 com.google.api.services.drive.model.App: java.lang.Boolean installed
@@ -1205,75 +1211,63 @@ com.google.gson.stream.JsonScope: com.google.gson.stream.JsonScope[] values()
 com.google.gson.stream.JsonScope: com.google.gson.stream.JsonScope valueOf(java.lang.String)
 com.google.gson.stream.JsonToken: com.google.gson.stream.JsonToken[] values()
 com.google.gson.stream.JsonToken: com.google.gson.stream.JsonToken valueOf(java.lang.String)
-com.larswerkman.colorpicker.ColorPicker
-com.larswerkman.colorpicker.ColorPicker: ColorPicker(android.content.Context)
-com.larswerkman.colorpicker.ColorPicker: ColorPicker(android.content.Context,android.util.AttributeSet)
-com.larswerkman.colorpicker.ColorPicker: ColorPicker(android.content.Context,android.util.AttributeSet,int)
-com.larswerkman.colorpicker.ColorPicker: void setOnColorChangedListener(com.larswerkman.colorpicker.ColorPicker$OnColorChangedListener)
-com.larswerkman.colorpicker.ColorPicker: com.larswerkman.colorpicker.ColorPicker$OnColorChangedListener getOnColorChangedListener()
-com.larswerkman.colorpicker.ColorPicker: int getColor()
-com.larswerkman.colorpicker.ColorPicker: void setColor(int)
-com.larswerkman.colorpicker.ColorPicker: void setNewCenterColor(int)
-com.larswerkman.colorpicker.ColorPicker: void setOldCenterColor(int)
-com.larswerkman.colorpicker.ColorPicker: int getOldCenterColor()
-com.larswerkman.colorpicker.OpacityBar: void setColor(int)
-com.larswerkman.colorpicker.OpacityBar: void setOpacity(int)
-com.larswerkman.colorpicker.OpacityBar: int getOpacity()
-com.larswerkman.colorpicker.OpacityBar: int getColor()
-com.larswerkman.colorpicker.OpacityBar: void setColorPicker(com.larswerkman.colorpicker.ColorPicker)
-com.larswerkman.colorpicker.R$attr: int bar_length
-com.larswerkman.colorpicker.R$attr: int bar_pointer_halo_radius
-com.larswerkman.colorpicker.R$attr: int bar_pointer_radius
-com.larswerkman.colorpicker.R$attr: int bar_thickness
-com.larswerkman.colorpicker.R$attr: int color_center_halo_radius
-com.larswerkman.colorpicker.R$attr: int color_center_radius
-com.larswerkman.colorpicker.R$attr: int color_pointer_halo_radius
-com.larswerkman.colorpicker.R$attr: int color_pointer_radius
-com.larswerkman.colorpicker.R$attr: int color_wheel_radius
-com.larswerkman.colorpicker.R$attr: int color_wheel_thickness
-com.larswerkman.colorpicker.R$dimen: int bar_length
-com.larswerkman.colorpicker.R$dimen: int bar_pointer_halo_radius
-com.larswerkman.colorpicker.R$dimen: int bar_pointer_radius
-com.larswerkman.colorpicker.R$dimen: int bar_thickness
-com.larswerkman.colorpicker.R$dimen: int color_center_halo_radius
-com.larswerkman.colorpicker.R$dimen: int color_center_radius
-com.larswerkman.colorpicker.R$dimen: int color_pointer_halo_radius
-com.larswerkman.colorpicker.R$dimen: int color_pointer_radius
-com.larswerkman.colorpicker.R$dimen: int color_wheel_radius
-com.larswerkman.colorpicker.R$dimen: int color_wheel_thickness
-com.larswerkman.colorpicker.R$styleable: int[] ColorBars
-com.larswerkman.colorpicker.R$styleable: int ColorBars_bar_length
-com.larswerkman.colorpicker.R$styleable: int ColorBars_bar_pointer_halo_radius
-com.larswerkman.colorpicker.R$styleable: int ColorBars_bar_pointer_radius
-com.larswerkman.colorpicker.R$styleable: int ColorBars_bar_thickness
-com.larswerkman.colorpicker.R$styleable: int[] ColorPicker
-com.larswerkman.colorpicker.R$styleable: int ColorPicker_color_center_halo_radius
-com.larswerkman.colorpicker.R$styleable: int ColorPicker_color_center_radius
-com.larswerkman.colorpicker.R$styleable: int ColorPicker_color_pointer_halo_radius
-com.larswerkman.colorpicker.R$styleable: int ColorPicker_color_pointer_radius
-com.larswerkman.colorpicker.R$styleable: int ColorPicker_color_wheel_radius
-com.larswerkman.colorpicker.R$styleable: int ColorPicker_color_wheel_thickness
-com.larswerkman.colorpicker.SVBar: void setSaturation(float)
-com.larswerkman.colorpicker.SVBar: void setValue(float)
-com.larswerkman.colorpicker.SVBar: void setColor(int)
-com.larswerkman.colorpicker.SVBar: int getColor()
-com.larswerkman.colorpicker.SVBar: void setColorPicker(com.larswerkman.colorpicker.ColorPicker)
-com.larswerkman.colorpicker.SaturationBar
-com.larswerkman.colorpicker.SaturationBar: SaturationBar(android.content.Context)
-com.larswerkman.colorpicker.SaturationBar: SaturationBar(android.content.Context,android.util.AttributeSet)
-com.larswerkman.colorpicker.SaturationBar: SaturationBar(android.content.Context,android.util.AttributeSet,int)
-com.larswerkman.colorpicker.SaturationBar: void setColor(int)
-com.larswerkman.colorpicker.SaturationBar: void setSaturation(float)
-com.larswerkman.colorpicker.SaturationBar: int getColor()
-com.larswerkman.colorpicker.SaturationBar: void setColorPicker(com.larswerkman.colorpicker.ColorPicker)
-com.larswerkman.colorpicker.ValueBar
-com.larswerkman.colorpicker.ValueBar: ValueBar(android.content.Context)
-com.larswerkman.colorpicker.ValueBar: ValueBar(android.content.Context,android.util.AttributeSet)
-com.larswerkman.colorpicker.ValueBar: ValueBar(android.content.Context,android.util.AttributeSet,int)
-com.larswerkman.colorpicker.ValueBar: void setColor(int)
-com.larswerkman.colorpicker.ValueBar: void setValue(float)
-com.larswerkman.colorpicker.ValueBar: int getColor()
-com.larswerkman.colorpicker.ValueBar: void setColorPicker(com.larswerkman.colorpicker.ColorPicker)
+com.larswerkman.holocolorpicker.ColorPicker: void setOnColorChangedListener(com.larswerkman.holocolorpicker.ColorPicker$OnColorChangedListener)
+com.larswerkman.holocolorpicker.ColorPicker: com.larswerkman.holocolorpicker.ColorPicker$OnColorChangedListener getOnColorChangedListener()
+com.larswerkman.holocolorpicker.ColorPicker: int getColor()
+com.larswerkman.holocolorpicker.ColorPicker: void setColor(int)
+com.larswerkman.holocolorpicker.ColorPicker: void setNewCenterColor(int)
+com.larswerkman.holocolorpicker.ColorPicker: void setOldCenterColor(int)
+com.larswerkman.holocolorpicker.ColorPicker: int getOldCenterColor()
+com.larswerkman.holocolorpicker.OpacityBar: void setColor(int)
+com.larswerkman.holocolorpicker.OpacityBar: void setOpacity(int)
+com.larswerkman.holocolorpicker.OpacityBar: int getOpacity()
+com.larswerkman.holocolorpicker.OpacityBar: int getColor()
+com.larswerkman.holocolorpicker.OpacityBar: void setColorPicker(com.larswerkman.holocolorpicker.ColorPicker)
+com.larswerkman.holocolorpicker.R$attr: int bar_length
+com.larswerkman.holocolorpicker.R$attr: int bar_pointer_halo_radius
+com.larswerkman.holocolorpicker.R$attr: int bar_pointer_radius
+com.larswerkman.holocolorpicker.R$attr: int bar_thickness
+com.larswerkman.holocolorpicker.R$attr: int color_center_halo_radius
+com.larswerkman.holocolorpicker.R$attr: int color_center_radius
+com.larswerkman.holocolorpicker.R$attr: int color_pointer_halo_radius
+com.larswerkman.holocolorpicker.R$attr: int color_pointer_radius
+com.larswerkman.holocolorpicker.R$attr: int color_wheel_radius
+com.larswerkman.holocolorpicker.R$attr: int color_wheel_thickness
+com.larswerkman.holocolorpicker.R$dimen: int bar_length
+com.larswerkman.holocolorpicker.R$dimen: int bar_pointer_halo_radius
+com.larswerkman.holocolorpicker.R$dimen: int bar_pointer_radius
+com.larswerkman.holocolorpicker.R$dimen: int bar_thickness
+com.larswerkman.holocolorpicker.R$dimen: int color_center_halo_radius
+com.larswerkman.holocolorpicker.R$dimen: int color_center_radius
+com.larswerkman.holocolorpicker.R$dimen: int color_pointer_halo_radius
+com.larswerkman.holocolorpicker.R$dimen: int color_pointer_radius
+com.larswerkman.holocolorpicker.R$dimen: int color_wheel_radius
+com.larswerkman.holocolorpicker.R$dimen: int color_wheel_thickness
+com.larswerkman.holocolorpicker.R$styleable: int[] ColorBars
+com.larswerkman.holocolorpicker.R$styleable: int ColorBars_bar_length
+com.larswerkman.holocolorpicker.R$styleable: int ColorBars_bar_pointer_halo_radius
+com.larswerkman.holocolorpicker.R$styleable: int ColorBars_bar_pointer_radius
+com.larswerkman.holocolorpicker.R$styleable: int ColorBars_bar_thickness
+com.larswerkman.holocolorpicker.R$styleable: int[] ColorPicker
+com.larswerkman.holocolorpicker.R$styleable: int ColorPicker_color_center_halo_radius
+com.larswerkman.holocolorpicker.R$styleable: int ColorPicker_color_center_radius
+com.larswerkman.holocolorpicker.R$styleable: int ColorPicker_color_pointer_halo_radius
+com.larswerkman.holocolorpicker.R$styleable: int ColorPicker_color_pointer_radius
+com.larswerkman.holocolorpicker.R$styleable: int ColorPicker_color_wheel_radius
+com.larswerkman.holocolorpicker.R$styleable: int ColorPicker_color_wheel_thickness
+com.larswerkman.holocolorpicker.SVBar: void setSaturation(float)
+com.larswerkman.holocolorpicker.SVBar: void setValue(float)
+com.larswerkman.holocolorpicker.SVBar: void setColor(int)
+com.larswerkman.holocolorpicker.SVBar: int getColor()
+com.larswerkman.holocolorpicker.SVBar: void setColorPicker(com.larswerkman.holocolorpicker.ColorPicker)
+com.larswerkman.holocolorpicker.SaturationBar: void setColor(int)
+com.larswerkman.holocolorpicker.SaturationBar: void setSaturation(float)
+com.larswerkman.holocolorpicker.SaturationBar: int getColor()
+com.larswerkman.holocolorpicker.SaturationBar: void setColorPicker(com.larswerkman.holocolorpicker.ColorPicker)
+com.larswerkman.holocolorpicker.ValueBar: void setColor(int)
+com.larswerkman.holocolorpicker.ValueBar: void setValue(float)
+com.larswerkman.holocolorpicker.ValueBar: int getColor()
+com.larswerkman.holocolorpicker.ValueBar: void setColorPicker(com.larswerkman.holocolorpicker.ColorPicker)
 com.mobeta.android.dslv.DragSortItemView: void setGravity(int)
 com.mobeta.android.dslv.DragSortItemView: int getGravity()
 com.mobeta.android.dslv.DragSortItemViewCheckable: void setChecked(boolean)
@@ -1338,6 +1332,8 @@ javax.annotation.meta.When: javax.annotation.meta.When[] values()
 javax.annotation.meta.When: javax.annotation.meta.When valueOf(java.lang.String)
 me.kuehle.carreport.Application
 me.kuehle.carreport.Application: Application()
+me.kuehle.carreport.FuelConsumption$Type: me.kuehle.carreport.FuelConsumption$Type[] values()
+me.kuehle.carreport.FuelConsumption$Type: me.kuehle.carreport.FuelConsumption$Type valueOf(java.lang.String)
 me.kuehle.carreport.R$animator: int hide
 me.kuehle.carreport.R$animator: int show
 me.kuehle.carreport.R$array: int data_list_page_titles
@@ -1469,6 +1465,7 @@ me.kuehle.carreport.R$id: int btn_remove
 me.kuehle.carreport.R$id: int btn_report_details
 me.kuehle.carreport.R$id: int btn_report_options
 me.kuehle.carreport.R$id: int chart
+me.kuehle.carreport.R$id: int chart_holder
 me.kuehle.carreport.R$id: int chk_end_date
 me.kuehle.carreport.R$id: int chk_partial
 me.kuehle.carreport.R$id: int chk_suspend
@@ -1540,6 +1537,7 @@ me.kuehle.carreport.R$id: int spn_fuel_type
 me.kuehle.carreport.R$id: int spn_options
 me.kuehle.carreport.R$id: int spn_repeat
 me.kuehle.carreport.R$id: int subtitle
+me.kuehle.carreport.R$id: int table
 me.kuehle.carreport.R$id: int terrain
 me.kuehle.carreport.R$id: int title
 me.kuehle.carreport.R$id: int txt_hi
@@ -1738,6 +1736,7 @@ me.kuehle.carreport.R$string: int pref_title_sync_on_start
 me.kuehle.carreport.R$string: int pref_title_sync_setup
 me.kuehle.carreport.R$string: int pref_title_unit_currency
 me.kuehle.carreport.R$string: int pref_title_unit_distance
+me.kuehle.carreport.R$string: int pref_title_unit_fuel_consumption
 me.kuehle.carreport.R$string: int pref_title_unit_volume
 me.kuehle.carreport.R$string: int remove_fueltype_desc
 me.kuehle.carreport.R$string: int report_average
@@ -1789,8 +1788,8 @@ me.kuehle.carreport.R$string: int toast_car_deleted
 me.kuehle.carreport.R$string: int toast_car_saved
 me.kuehle.carreport.R$string: int toast_export_csv_failed
 me.kuehle.carreport.R$string: int toast_export_csv_succeeded
+me.kuehle.carreport.R$string: int toast_import_csv_failed
 me.kuehle.carreport.R$string: int toast_import_csv_success
-me.kuehle.carreport.R$string: int toast_importcsv_failed
 me.kuehle.carreport.R$string: int toast_other_deleted
 me.kuehle.carreport.R$string: int toast_other_saved
 me.kuehle.carreport.R$string: int toast_refueling_deleted
@@ -2126,7 +2125,7 @@ me.kuehle.carreport.gui.PreferencesFuelTypesFragment
 me.kuehle.carreport.gui.PreferencesFuelTypesFragment$1
 me.kuehle.carreport.gui.PreferencesFuelTypesFragment$FuelTypesMultiChoiceModeListener
 me.kuehle.carreport.gui.PreferencesGeneralFragment
-me.kuehle.carreport.gui.PreferencesGeneralFragment$1
+me.kuehle.carreport.gui.PreferencesGeneralFragment$PreferenceChangeListener
 me.kuehle.carreport.gui.PreferencesReportOrderFragment
 me.kuehle.carreport.gui.PreferencesReportOrderFragment: PreferencesReportOrderFragment()
 me.kuehle.carreport.gui.PreferencesReportOrderFragment$ReportDropListener
@@ -2134,6 +2133,8 @@ me.kuehle.carreport.gui.util.SimpleAnimator$Property: me.kuehle.carreport.gui.ut
 me.kuehle.carreport.gui.util.SimpleAnimator$Property: me.kuehle.carreport.gui.util.SimpleAnimator$Property valueOf(java.lang.String)
 me.kuehle.carreport.util.RecurrenceInterval: me.kuehle.carreport.util.RecurrenceInterval[] values()
 me.kuehle.carreport.util.RecurrenceInterval: me.kuehle.carreport.util.RecurrenceInterval valueOf(java.lang.String)
+me.kuehle.carreport.util.backup.SynchronizationService
+me.kuehle.carreport.util.backup.SynchronizationService: SynchronizationService()
 me.kuehle.chartlib.ChartView
 me.kuehle.chartlib.ChartView: ChartView(android.content.Context)
 me.kuehle.chartlib.ChartView: ChartView(android.content.Context,android.util.AttributeSet)

@@ -69,8 +69,9 @@ public class FuelConsumption {
 			double distance) {
 		if (consumptionType == Type.DIST_FOR_VOL) {
 			return distance / volume;
+		} else {
+			return 100.0 * volume / distance;
 		}
-		return 100.0 * volume / distance;
 	}
 
 	public double computeFuelConsumption(double volume, double distance) {
@@ -84,10 +85,9 @@ public class FuelConsumption {
 	}
 
 	public String getUnitLabel(Type consumptionType) {
-		switch (consumptionType) {
-		case DIST_FOR_VOL:
+		if (consumptionType == Type.DIST_FOR_VOL) {
 			return String.format("%s/%s", this.unitDistance, this.unitVolume);
-		default:
+		} else {
 			return String
 					.format("%s/100%s", this.unitVolume, this.unitDistance);
 		}

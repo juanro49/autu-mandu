@@ -644,6 +644,29 @@ android.support.v4.content.Loader -> android.support.v4.a.a:
     void unregisterListener(android.support.v4.content.Loader$OnLoadCompleteListener) -> a
     java.lang.String toString() -> toString
 android.support.v4.content.Loader$OnLoadCompleteListener -> android.support.v4.a.b:
+android.support.v4.content.LocalBroadcastManager -> android.support.v4.a.c:
+    android.content.Context mAppContext -> a
+    java.util.HashMap mReceivers -> b
+    java.util.HashMap mActions -> c
+    java.util.ArrayList mPendingBroadcasts -> d
+    android.os.Handler mHandler -> e
+    java.lang.Object mLock -> f
+    android.support.v4.content.LocalBroadcastManager mInstance -> g
+    android.support.v4.content.LocalBroadcastManager getInstance(android.content.Context) -> a
+    void registerReceiver(android.content.BroadcastReceiver,android.content.IntentFilter) -> a
+    boolean sendBroadcast(android.content.Intent) -> a
+    void access$000(android.support.v4.content.LocalBroadcastManager) -> a
+android.support.v4.content.LocalBroadcastManager$1 -> android.support.v4.a.d:
+    android.support.v4.content.LocalBroadcastManager this$0 -> a
+    void handleMessage(android.os.Message) -> handleMessage
+android.support.v4.content.LocalBroadcastManager$BroadcastRecord -> android.support.v4.a.e:
+    android.content.Intent intent -> a
+    java.util.ArrayList receivers -> b
+android.support.v4.content.LocalBroadcastManager$ReceiverRecord -> android.support.v4.a.f:
+    android.content.IntentFilter filter -> a
+    android.content.BroadcastReceiver receiver -> b
+    boolean broadcasting -> c
+    java.lang.String toString() -> toString
 android.support.v4.os.ParcelableCompat -> android.support.v4.b.a:
 android.support.v4.os.ParcelableCompat$CompatCreator -> android.support.v4.b.b:
     android.support.v4.os.ParcelableCompatCreatorCallbacks mCallbacks -> a
@@ -4202,7 +4225,7 @@ com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCreden
     java.lang.String token -> b
     com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential this$0 -> c
     void intercept(com.google.api.client.http.HttpRequest) -> b
-    boolean handleResponse$3c6cc7fd(com.google.api.client.http.HttpResponse) -> a
+    boolean handleResponse(com.google.api.client.http.HttpRequest,com.google.api.client.http.HttpResponse,boolean) -> a
 com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException -> com.google.a.a.a.a.a.b.a.c:
     com.google.android.gms.auth.GoogleAuthException getCause() -> a
     java.lang.Throwable getCause() -> getCause
@@ -4241,33 +4264,37 @@ com.google.api.client.googleapis.json.GoogleJsonResponseException -> com.google.
     com.google.api.client.googleapis.json.GoogleJsonError details -> a
     com.google.api.client.googleapis.json.GoogleJsonResponseException from(com.google.api.client.json.JsonFactory,com.google.api.client.http.HttpResponse) -> a
 com.google.api.client.googleapis.media.MediaHttpUploader -> com.google.a.a.a.c.a:
-    com.google.api.client.googleapis.media.MediaHttpUploader$UploadState uploadState -> j
-    com.google.api.client.http.AbstractInputStreamContent mediaContent -> k
-    com.google.api.client.http.HttpRequestFactory requestFactory -> a
-    com.google.api.client.http.HttpTransport transport -> l
+    com.google.api.client.googleapis.media.MediaHttpUploader$UploadState uploadState -> a
+    com.google.api.client.http.AbstractInputStreamContent mediaContent -> i
+    com.google.api.client.http.HttpRequestFactory requestFactory -> j
+    com.google.api.client.http.HttpTransport transport -> k
     com.google.api.client.http.HttpContent metadata -> b
-    long mediaContentLength -> m
-    boolean isMediaContentLengthCalculated -> n
+    long mediaContentLength -> l
+    boolean isMediaContentLengthCalculated -> m
     java.lang.String initiationRequestMethod -> c
     com.google.api.client.http.HttpHeaders initiationHeaders -> d
-    com.google.api.client.http.HttpRequest currentRequest -> e
-    java.io.InputStream contentInputStream -> f
-    boolean backOffPolicyEnabled -> o
-    boolean directUploadEnabled -> p
+    com.google.api.client.http.HttpRequest currentRequest -> n
+    java.io.InputStream contentInputStream -> o
+    boolean backOffPolicyEnabled -> p
+    boolean directUploadEnabled -> e
     com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener progressListener -> q
-    long bytesUploaded -> g
-    int chunkSize -> r
-    java.lang.Byte cachedByte -> s
-    byte[] currentRequestContentBuffer -> t
-    boolean disableGZipContent -> h
-    com.google.api.client.util.Sleeper sleeper -> i
-    com.google.api.client.http.HttpResponse upload(com.google.api.client.http.GenericUrl) -> a
-    long getMediaContentLength() -> a
-    com.google.api.client.http.HttpResponse executeUploadInitiation(com.google.api.client.http.GenericUrl) -> b
-    com.google.api.client.http.HttpResponse executeCurrentRequest(com.google.api.client.http.HttpRequest) -> b
-    com.google.api.client.http.HttpResponse executeCurrentRequestWithBackOffAndGZip(com.google.api.client.http.HttpRequest) -> a
-    void setContentAndHeadersOnCurrentRequest(long) -> a
-    long getNextByteIndex(java.lang.String) -> a
+    java.lang.String mediaContentLengthStr -> f
+    long totalBytesServerReceived -> r
+    int chunkSize -> s
+    java.lang.Byte cachedByte -> t
+    long totalBytesClientSent -> u
+    int currentChunkLength -> v
+    byte[] currentRequestContentBuffer -> w
+    boolean disableGZipContent -> g
+    com.google.api.client.util.Sleeper sleeper -> h
+    com.google.api.client.http.HttpResponse directUpload(com.google.api.client.http.GenericUrl) -> a
+    com.google.api.client.http.HttpResponse resumableUpload(com.google.api.client.http.GenericUrl) -> b
+    boolean isMediaLengthKnown() -> b
+    long getMediaContentLength() -> c
+    com.google.api.client.http.HttpResponse executeUploadInitiation(com.google.api.client.http.GenericUrl) -> c
+    com.google.api.client.http.HttpResponse executeCurrentRequest(com.google.api.client.http.HttpRequest) -> a
+    com.google.api.client.http.HttpResponse executeCurrentRequestWithBackOffAndGZip(com.google.api.client.http.HttpRequest) -> b
+    void serverErrorCallback() -> a
     void updateStateAndNotifyListener(com.google.api.client.googleapis.media.MediaHttpUploader$UploadState) -> a
 com.google.api.client.googleapis.media.MediaHttpUploader$UploadState -> com.google.a.a.a.c.b:
     com.google.api.client.googleapis.media.MediaHttpUploader$UploadState NOT_STARTED -> a
@@ -4279,7 +4306,14 @@ com.google.api.client.googleapis.media.MediaHttpUploader$UploadState -> com.goog
     com.google.api.client.googleapis.media.MediaHttpUploader$UploadState[] values() -> values
     com.google.api.client.googleapis.media.MediaHttpUploader$UploadState valueOf(java.lang.String) -> valueOf
 com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener -> com.google.a.a.a.c.c:
-com.google.api.client.googleapis.media.MediaUploadExponentialBackOffPolicy -> com.google.a.a.a.c.d:
+com.google.api.client.googleapis.media.MediaUploadErrorHandler -> com.google.a.a.a.c.d:
+    java.util.logging.Logger LOGGER -> a
+    com.google.api.client.googleapis.media.MediaHttpUploader uploader -> b
+    com.google.api.client.http.HttpIOExceptionHandler originalIOExceptionHandler -> c
+    com.google.api.client.http.HttpUnsuccessfulResponseHandler originalUnsuccessfulHandler -> d
+    boolean handleIOException(com.google.api.client.http.HttpRequest,boolean) -> a
+    boolean handleResponse(com.google.api.client.http.HttpRequest,com.google.api.client.http.HttpResponse,boolean) -> a
+com.google.api.client.googleapis.media.MediaUploadExponentialBackOffPolicy -> com.google.a.a.a.c.e:
     com.google.api.client.googleapis.media.MediaHttpUploader uploader -> a
     long getNextBackOffMillis() -> a
 com.google.api.client.googleapis.services.AbstractGoogleClient -> com.google.a.a.a.d.a:
@@ -4517,7 +4551,7 @@ com.google.api.client.http.HttpHeaders$ParseHeaderState -> com.google.a.a.b.r:
     com.google.api.client.util.ClassInfo classInfo -> c
     java.util.List context -> d
 com.google.api.client.http.HttpIOExceptionHandler -> com.google.a.a.b.s:
-    boolean handleIOException$249598bb() -> a
+    boolean handleIOException(com.google.api.client.http.HttpRequest,boolean) -> a
 com.google.api.client.http.HttpMediaType -> com.google.a.a.b.t:
     java.util.regex.Pattern TYPE_REGEX -> a
     java.util.regex.Pattern TOKEN_REGEX -> b
@@ -4543,24 +4577,24 @@ com.google.api.client.http.HttpRequest -> com.google.a.a.b.u:
     com.google.api.client.http.HttpExecuteInterceptor executeInterceptor -> a
     com.google.api.client.http.HttpHeaders headers -> b
     com.google.api.client.http.HttpHeaders responseHeaders -> c
-    int numRetries -> p
+    int numRetries -> q
     int contentLoggingLimit -> d
     boolean loggingEnabled -> e
-    boolean curlLoggingEnabled -> q
+    boolean curlLoggingEnabled -> r
     com.google.api.client.http.HttpContent content -> f
     com.google.api.client.http.HttpTransport transport -> g
     java.lang.String requestMethod -> h
     com.google.api.client.http.GenericUrl url -> i
-    int connectTimeout -> r
-    int readTimeout -> s
+    int connectTimeout -> s
+    int readTimeout -> t
     com.google.api.client.http.HttpUnsuccessfulResponseHandler unsuccessfulResponseHandler -> j
-    com.google.api.client.http.HttpIOExceptionHandler ioExceptionHandler -> t
-    com.google.api.client.http.HttpResponseInterceptor responseInterceptor -> k
-    com.google.api.client.util.ObjectParser objectParser -> l
-    com.google.api.client.http.HttpEncoding encoding -> m
-    com.google.api.client.http.BackOffPolicy backOffPolicy -> n
+    com.google.api.client.http.HttpIOExceptionHandler ioExceptionHandler -> k
+    com.google.api.client.http.HttpResponseInterceptor responseInterceptor -> l
+    com.google.api.client.util.ObjectParser objectParser -> m
+    com.google.api.client.http.HttpEncoding encoding -> n
+    com.google.api.client.http.BackOffPolicy backOffPolicy -> o
     boolean followRedirects -> u
-    boolean throwExceptionOnExecuteError -> o
+    boolean throwExceptionOnExecuteError -> p
     boolean retryOnExecuteIOException -> v
     boolean suppressUserAgentSuffix -> w
     com.google.api.client.util.Sleeper sleeper -> x
@@ -4571,7 +4605,6 @@ com.google.api.client.http.HttpRequestFactory -> com.google.a.a.b.v:
     com.google.api.client.http.HttpTransport transport -> a
     com.google.api.client.http.HttpRequestInitializer initializer -> b
     com.google.api.client.http.HttpRequest buildRequest(java.lang.String,com.google.api.client.http.GenericUrl,com.google.api.client.http.HttpContent) -> a
-    com.google.api.client.http.HttpRequest buildPutRequest(com.google.api.client.http.GenericUrl,com.google.api.client.http.HttpContent) -> a
 com.google.api.client.http.HttpRequestInitializer -> com.google.a.a.b.w:
     void initialize(com.google.api.client.http.HttpRequest) -> a
 com.google.api.client.http.HttpResponse -> com.google.a.a.b.x:
@@ -4616,7 +4649,7 @@ com.google.api.client.http.HttpTransport -> com.google.a.a.b.ac:
     boolean supportsMethod(java.lang.String) -> a
     com.google.api.client.http.LowLevelHttpRequest buildRequest(java.lang.String,java.lang.String) -> a
 com.google.api.client.http.HttpUnsuccessfulResponseHandler -> com.google.a.a.b.ad:
-    boolean handleResponse$3c6cc7fd(com.google.api.client.http.HttpResponse) -> a
+    boolean handleResponse(com.google.api.client.http.HttpRequest,com.google.api.client.http.HttpResponse,boolean) -> a
 com.google.api.client.http.InputStreamContent -> com.google.a.a.b.ae:
     long length -> c
     boolean retrySupported -> d
@@ -4777,6 +4810,7 @@ com.google.api.client.json.Json -> com.google.a.a.c.c:
 com.google.api.client.json.JsonFactory -> com.google.a.a.c.d:
     com.google.api.client.json.JsonParser createJsonParser(java.io.InputStream) -> a
     com.google.api.client.json.JsonParser createJsonParser(java.io.InputStream,java.nio.charset.Charset) -> a
+    com.google.api.client.json.JsonParser createJsonParser(java.lang.String) -> a
     com.google.api.client.json.JsonGenerator createJsonGenerator(java.io.OutputStream,java.nio.charset.Charset) -> a
     java.lang.String toString(java.lang.Object,boolean) -> a
 com.google.api.client.json.JsonGenerator -> com.google.a.a.c.e:
@@ -4806,6 +4840,8 @@ com.google.api.client.json.JsonObjectParser$Builder -> com.google.a.a.c.g:
     java.util.Collection wrapperKeys -> b
     com.google.api.client.json.JsonObjectParser build() -> a
 com.google.api.client.json.JsonParser -> com.google.a.a.c.h:
+    java.util.WeakHashMap cachedTypemapFields -> a
+    java.util.concurrent.locks.Lock lock -> b
     com.google.api.client.json.JsonFactory getFactory() -> a
     void close() -> b
     com.google.api.client.json.JsonToken nextToken() -> c
@@ -4821,19 +4857,26 @@ com.google.api.client.json.JsonParser -> com.google.a.a.c.h:
     double getDoubleValue() -> m
     java.math.BigInteger getBigIntegerValue() -> n
     java.math.BigDecimal getDecimalValue() -> o
-    java.lang.Object parseAndClose$5939fbbb(java.lang.Class) -> a
+    java.lang.Object parseAndClose(java.lang.Class) -> a
+    java.lang.Object parseAndClose$5939fbbb(java.lang.Class) -> b
+    void skipToKey(java.lang.String) -> a
     java.lang.String skipToKey(java.util.Set) -> a
     com.google.api.client.json.JsonToken startParsing() -> p
     com.google.api.client.json.JsonToken startParsingObjectOrArray() -> q
+    java.lang.Object parse$5661d4c2(java.lang.reflect.Type) -> a
     java.lang.Object parse$33a1f6c3(java.lang.reflect.Type,boolean) -> a
-    void parse(java.util.ArrayList,java.lang.Object,com.google.api.client.json.CustomizeJsonParser) -> a
-    void parseArray(java.lang.reflect.Field,java.util.Collection,java.lang.reflect.Type,java.util.ArrayList,com.google.api.client.json.CustomizeJsonParser) -> a
     void parseMap(java.lang.reflect.Field,java.util.Map,java.lang.reflect.Type,java.util.ArrayList,com.google.api.client.json.CustomizeJsonParser) -> a
-    java.lang.Object parseValue$23ac558e(java.lang.reflect.Field,java.lang.reflect.Type,java.util.ArrayList,com.google.api.client.json.CustomizeJsonParser) -> a
+    java.lang.Object parseValue$67f27402(java.lang.reflect.Field,java.lang.reflect.Type,java.util.ArrayList,com.google.api.client.json.CustomizeJsonParser,boolean) -> a
+    java.lang.reflect.Field getCachedTypemapFieldFor(java.lang.Class) -> c
 com.google.api.client.json.JsonParser$1 -> com.google.a.a.c.i:
     int[] $SwitchMap$com$google$api$client$json$JsonToken -> a
-com.google.api.client.json.JsonString -> com.google.a.a.c.j:
-com.google.api.client.json.JsonToken -> com.google.a.a.c.k:
+com.google.api.client.json.JsonPolymorphicTypeMap -> com.google.a.a.c.j:
+    com.google.api.client.json.JsonPolymorphicTypeMap$TypeDef[] typeDefinitions() -> a
+com.google.api.client.json.JsonPolymorphicTypeMap$TypeDef -> com.google.a.a.c.k:
+    java.lang.String key() -> a
+    java.lang.Class ref() -> b
+com.google.api.client.json.JsonString -> com.google.a.a.c.l:
+com.google.api.client.json.JsonToken -> com.google.a.a.c.m:
     com.google.api.client.json.JsonToken START_ARRAY -> a
     com.google.api.client.json.JsonToken END_ARRAY -> b
     com.google.api.client.json.JsonToken START_OBJECT -> c
@@ -4852,6 +4895,7 @@ com.google.api.client.json.JsonToken -> com.google.a.a.c.k:
 com.google.api.client.json.gson.GsonFactory -> com.google.a.a.c.a.a:
     com.google.api.client.json.JsonParser createJsonParser(java.io.InputStream) -> a
     com.google.api.client.json.JsonParser createJsonParser(java.io.InputStream,java.nio.charset.Charset) -> a
+    com.google.api.client.json.JsonParser createJsonParser(java.lang.String) -> a
     com.google.api.client.json.JsonParser createJsonParser(java.io.Reader) -> a
     com.google.api.client.json.JsonGenerator createJsonGenerator(java.io.OutputStream,java.nio.charset.Charset) -> a
 com.google.api.client.json.gson.GsonGenerator -> com.google.a.a.c.a.b:
@@ -4974,6 +5018,7 @@ com.google.api.client.util.ByteCountingOutputStream -> com.google.a.a.e.j:
     void write(byte[],int,int) -> write
     void write(int) -> write
 com.google.api.client.util.ByteStreams -> com.google.a.a.e.k:
+    int read(java.io.InputStream,byte[],int,int) -> a
 com.google.api.client.util.ByteStreams$LimitedInputStream -> com.google.a.a.e.l:
     long left -> a
     long mark -> b
@@ -4999,6 +5044,7 @@ com.google.api.client.util.ClassInfo -> com.google.a.a.e.n:
     com.google.api.client.util.FieldInfo getFieldInfo(java.lang.String) -> a
     java.lang.reflect.Field getField(java.lang.String) -> b
     boolean isEnum() -> b
+    java.util.Collection getFieldInfos() -> c
 com.google.api.client.util.ClassInfo$1 -> com.google.a.a.e.o:
     com.google.api.client.util.ClassInfo this$0 -> a
     int compare(java.lang.Object,java.lang.Object) -> compare
@@ -5288,8 +5334,10 @@ com.google.api.services.drive.Drive$Files$Get -> com.google.a.b.a.d:
     java.lang.Boolean updateViewedDate -> updateViewedDate
     java.lang.String projection -> projection
     com.google.api.services.drive.Drive$Files this$1 -> c
+    com.google.api.services.drive.Drive$Files$Get setFields(java.lang.String) -> a
     com.google.api.services.drive.Drive$Files$Get set(java.lang.String,java.lang.Object) -> f
     com.google.api.services.drive.DriveRequest set(java.lang.String,java.lang.Object) -> e
+    com.google.api.services.drive.DriveRequest setFields(java.lang.String) -> b
     com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest set(java.lang.String,java.lang.Object) -> c
     com.google.api.client.googleapis.services.AbstractGoogleClientRequest set(java.lang.String,java.lang.Object) -> a
     com.google.api.client.util.GenericData set(java.lang.String,java.lang.Object) -> b
@@ -5305,6 +5353,7 @@ com.google.api.services.drive.Drive$Files$Insert -> com.google.a.b.a.e:
     com.google.api.services.drive.Drive$Files this$1 -> c
     com.google.api.services.drive.Drive$Files$Insert set(java.lang.String,java.lang.Object) -> f
     com.google.api.services.drive.DriveRequest set(java.lang.String,java.lang.Object) -> e
+    com.google.api.services.drive.DriveRequest setFields(java.lang.String) -> b
     com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest set(java.lang.String,java.lang.Object) -> c
     com.google.api.client.googleapis.services.AbstractGoogleClientRequest set(java.lang.String,java.lang.Object) -> a
     com.google.api.client.util.GenericData set(java.lang.String,java.lang.Object) -> b
@@ -5314,9 +5363,11 @@ com.google.api.services.drive.Drive$Files$List -> com.google.a.b.a.f:
     java.lang.String projection -> projection
     java.lang.Integer maxResults -> maxResults
     com.google.api.services.drive.Drive$Files this$1 -> c
-    com.google.api.services.drive.Drive$Files$List setQ(java.lang.String) -> a
+    com.google.api.services.drive.Drive$Files$List setFields(java.lang.String) -> a
+    com.google.api.services.drive.Drive$Files$List setQ(java.lang.String) -> c
     com.google.api.services.drive.Drive$Files$List set(java.lang.String,java.lang.Object) -> f
     com.google.api.services.drive.DriveRequest set(java.lang.String,java.lang.Object) -> e
+    com.google.api.services.drive.DriveRequest setFields(java.lang.String) -> b
     com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest set(java.lang.String,java.lang.Object) -> c
     com.google.api.client.googleapis.services.AbstractGoogleClientRequest set(java.lang.String,java.lang.Object) -> a
     com.google.api.client.util.GenericData set(java.lang.String,java.lang.Object) -> b
@@ -5335,6 +5386,7 @@ com.google.api.services.drive.Drive$Files$Update -> com.google.a.b.a.g:
     com.google.api.services.drive.Drive$Files this$1 -> c
     com.google.api.services.drive.Drive$Files$Update set(java.lang.String,java.lang.Object) -> f
     com.google.api.services.drive.DriveRequest set(java.lang.String,java.lang.Object) -> e
+    com.google.api.services.drive.DriveRequest setFields(java.lang.String) -> b
     com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest set(java.lang.String,java.lang.Object) -> c
     com.google.api.client.googleapis.services.AbstractGoogleClientRequest set(java.lang.String,java.lang.Object) -> a
     com.google.api.client.util.GenericData set(java.lang.String,java.lang.Object) -> b
@@ -5346,6 +5398,7 @@ com.google.api.services.drive.DriveRequest -> com.google.a.b.a.h:
     java.lang.Boolean prettyPrint -> prettyPrint
     java.lang.String quotaUser -> quotaUser
     java.lang.String userIp -> userIp
+    com.google.api.services.drive.DriveRequest setFields(java.lang.String) -> b
     com.google.api.services.drive.DriveRequest set(java.lang.String,java.lang.Object) -> e
     com.google.api.client.googleapis.services.json.AbstractGoogleJsonClientRequest set(java.lang.String,java.lang.Object) -> c
     com.google.api.client.googleapis.services.json.AbstractGoogleJsonClient getAbstractGoogleClient() -> d
@@ -5674,7 +5727,7 @@ com.google.gson.stream.MalformedJsonException -> com.google.b.b.h:
 com.google.gson.stream.StringPool -> com.google.b.b.i:
     java.lang.String[] pool -> a
     java.lang.String get(char[],int,int) -> a
-com.larswerkman.colorpicker.ColorPicker -> com.larswerkman.colorpicker.ColorPicker:
+com.larswerkman.holocolorpicker.ColorPicker -> com.a.a.a:
     int[] COLORS -> a
     android.graphics.Paint mColorWheelPaint -> b
     android.graphics.Paint mPointerHaloPaint -> c
@@ -5700,14 +5753,13 @@ com.larswerkman.colorpicker.ColorPicker -> com.larswerkman.colorpicker.ColorPick
     android.graphics.Paint mCenterNewPaint -> w
     android.graphics.Paint mCenterHaloPaint -> x
     float[] mHSV -> y
-    com.larswerkman.colorpicker.SVBar mSVbar -> z
-    com.larswerkman.colorpicker.OpacityBar mOpacityBar -> A
-    com.larswerkman.colorpicker.SaturationBar mSaturationBar -> B
-    com.larswerkman.colorpicker.ValueBar mValueBar -> C
-    com.larswerkman.colorpicker.ColorPicker$OnColorChangedListener onColorChangedListener -> D
-    void setOnColorChangedListener(com.larswerkman.colorpicker.ColorPicker$OnColorChangedListener) -> setOnColorChangedListener
-    com.larswerkman.colorpicker.ColorPicker$OnColorChangedListener getOnColorChangedListener() -> getOnColorChangedListener
-    void init(android.util.AttributeSet,int) -> a
+    com.larswerkman.holocolorpicker.SVBar mSVbar -> z
+    com.larswerkman.holocolorpicker.OpacityBar mOpacityBar -> A
+    com.larswerkman.holocolorpicker.SaturationBar mSaturationBar -> B
+    com.larswerkman.holocolorpicker.ValueBar mValueBar -> C
+    com.larswerkman.holocolorpicker.ColorPicker$OnColorChangedListener onColorChangedListener -> D
+    void setOnColorChangedListener(com.larswerkman.holocolorpicker.ColorPicker$OnColorChangedListener) -> setOnColorChangedListener
+    com.larswerkman.holocolorpicker.ColorPicker$OnColorChangedListener getOnColorChangedListener() -> getOnColorChangedListener
     void onDraw(android.graphics.Canvas) -> onDraw
     void onMeasure(int,int) -> onMeasure
     int ave(int,int,float) -> a
@@ -5716,8 +5768,8 @@ com.larswerkman.colorpicker.ColorPicker -> com.larswerkman.colorpicker.ColorPick
     void setColor(int) -> setColor
     boolean onTouchEvent(android.view.MotionEvent) -> onTouchEvent
     float[] calculatePointerPosition(float) -> b
-    void addSaturationBar(com.larswerkman.colorpicker.SaturationBar) -> a
-    void addValueBar(com.larswerkman.colorpicker.ValueBar) -> a
+    void addSaturationBar(com.larswerkman.holocolorpicker.SaturationBar) -> a
+    void addValueBar(com.larswerkman.holocolorpicker.ValueBar) -> a
     void setNewCenterColor(int) -> setNewCenterColor
     void setOldCenterColor(int) -> setOldCenterColor
     int getOldCenterColor() -> getOldCenterColor
@@ -5725,8 +5777,8 @@ com.larswerkman.colorpicker.ColorPicker -> com.larswerkman.colorpicker.ColorPick
     void changeValueBarColor(int) -> b
     android.os.Parcelable onSaveInstanceState() -> onSaveInstanceState
     void onRestoreInstanceState(android.os.Parcelable) -> onRestoreInstanceState
-com.larswerkman.colorpicker.ColorPicker$OnColorChangedListener -> com.larswerkman.colorpicker.a:
-com.larswerkman.colorpicker.OpacityBar -> com.larswerkman.colorpicker.b:
+com.larswerkman.holocolorpicker.ColorPicker$OnColorChangedListener -> com.a.a.b:
+com.larswerkman.holocolorpicker.OpacityBar -> com.a.a.c:
     int mBarThickness -> a
     int mBarLength -> b
     int mPreferredBarLength -> c
@@ -5743,7 +5795,7 @@ com.larswerkman.colorpicker.OpacityBar -> com.larswerkman.colorpicker.b:
     float[] mHSVColor -> n
     float mPosToOpacFactor -> o
     float mOpacToPosFactor -> p
-    com.larswerkman.colorpicker.ColorPicker mPicker -> q
+    com.larswerkman.holocolorpicker.ColorPicker mPicker -> q
     void onMeasure(int,int) -> onMeasure
     void onSizeChanged(int,int,int,int) -> onSizeChanged
     void onDraw(android.graphics.Canvas) -> onDraw
@@ -5753,35 +5805,10 @@ com.larswerkman.colorpicker.OpacityBar -> com.larswerkman.colorpicker.b:
     int getOpacity() -> getOpacity
     void calculateColor(int) -> a
     int getColor() -> getColor
-    void setColorPicker(com.larswerkman.colorpicker.ColorPicker) -> setColorPicker
+    void setColorPicker(com.larswerkman.holocolorpicker.ColorPicker) -> setColorPicker
     android.os.Parcelable onSaveInstanceState() -> onSaveInstanceState
     void onRestoreInstanceState(android.os.Parcelable) -> onRestoreInstanceState
-com.larswerkman.colorpicker.R -> com.larswerkman.colorpicker.c:
-com.larswerkman.colorpicker.R$dimen -> com.larswerkman.colorpicker.d:
-    int bar_length -> bar_length
-    int bar_pointer_halo_radius -> bar_pointer_halo_radius
-    int bar_pointer_radius -> bar_pointer_radius
-    int bar_thickness -> bar_thickness
-    int color_center_halo_radius -> color_center_halo_radius
-    int color_center_radius -> color_center_radius
-    int color_pointer_halo_radius -> color_pointer_halo_radius
-    int color_pointer_radius -> color_pointer_radius
-    int color_wheel_radius -> color_wheel_radius
-    int color_wheel_thickness -> color_wheel_thickness
-com.larswerkman.colorpicker.R$styleable -> com.larswerkman.colorpicker.e:
-    int[] ColorBars -> ColorBars
-    int ColorBars_bar_length -> ColorBars_bar_length
-    int ColorBars_bar_pointer_halo_radius -> ColorBars_bar_pointer_halo_radius
-    int ColorBars_bar_pointer_radius -> ColorBars_bar_pointer_radius
-    int ColorBars_bar_thickness -> ColorBars_bar_thickness
-    int[] ColorPicker -> ColorPicker
-    int ColorPicker_color_center_halo_radius -> ColorPicker_color_center_halo_radius
-    int ColorPicker_color_center_radius -> ColorPicker_color_center_radius
-    int ColorPicker_color_pointer_halo_radius -> ColorPicker_color_pointer_halo_radius
-    int ColorPicker_color_pointer_radius -> ColorPicker_color_pointer_radius
-    int ColorPicker_color_wheel_radius -> ColorPicker_color_wheel_radius
-    int ColorPicker_color_wheel_thickness -> ColorPicker_color_wheel_thickness
-com.larswerkman.colorpicker.SVBar -> com.larswerkman.colorpicker.f:
+com.larswerkman.holocolorpicker.SVBar -> com.a.a.d:
     int mBarThickness -> a
     int mBarLength -> b
     int mPreferredBarLength -> c
@@ -5798,7 +5825,7 @@ com.larswerkman.colorpicker.SVBar -> com.larswerkman.colorpicker.f:
     float[] mHSVColor -> n
     float mPosToSVFactor -> o
     float mSVToPosFactor -> p
-    com.larswerkman.colorpicker.ColorPicker mPicker -> q
+    com.larswerkman.holocolorpicker.ColorPicker mPicker -> q
     void onMeasure(int,int) -> onMeasure
     void onSizeChanged(int,int,int,int) -> onSizeChanged
     void onDraw(android.graphics.Canvas) -> onDraw
@@ -5808,10 +5835,10 @@ com.larswerkman.colorpicker.SVBar -> com.larswerkman.colorpicker.f:
     void setColor(int) -> setColor
     void calculateColor(int) -> a
     int getColor() -> getColor
-    void setColorPicker(com.larswerkman.colorpicker.ColorPicker) -> setColorPicker
+    void setColorPicker(com.larswerkman.holocolorpicker.ColorPicker) -> setColorPicker
     android.os.Parcelable onSaveInstanceState() -> onSaveInstanceState
     void onRestoreInstanceState(android.os.Parcelable) -> onRestoreInstanceState
-com.larswerkman.colorpicker.SaturationBar -> com.larswerkman.colorpicker.SaturationBar:
+com.larswerkman.holocolorpicker.SaturationBar -> com.a.a.e:
     int mBarThickness -> a
     int mBarLength -> b
     int mPreferredBarLength -> c
@@ -5828,8 +5855,7 @@ com.larswerkman.colorpicker.SaturationBar -> com.larswerkman.colorpicker.Saturat
     float[] mHSVColor -> n
     float mPosToSatFactor -> o
     float mSatToPosFactor -> p
-    com.larswerkman.colorpicker.ColorPicker mPicker -> q
-    void init(android.util.AttributeSet,int) -> a
+    com.larswerkman.holocolorpicker.ColorPicker mPicker -> q
     void onMeasure(int,int) -> onMeasure
     void onSizeChanged(int,int,int,int) -> onSizeChanged
     void onDraw(android.graphics.Canvas) -> onDraw
@@ -5838,10 +5864,10 @@ com.larswerkman.colorpicker.SaturationBar -> com.larswerkman.colorpicker.Saturat
     void setSaturation(float) -> setSaturation
     void calculateColor(int) -> a
     int getColor() -> getColor
-    void setColorPicker(com.larswerkman.colorpicker.ColorPicker) -> setColorPicker
+    void setColorPicker(com.larswerkman.holocolorpicker.ColorPicker) -> setColorPicker
     android.os.Parcelable onSaveInstanceState() -> onSaveInstanceState
     void onRestoreInstanceState(android.os.Parcelable) -> onRestoreInstanceState
-com.larswerkman.colorpicker.ValueBar -> com.larswerkman.colorpicker.ValueBar:
+com.larswerkman.holocolorpicker.ValueBar -> com.a.a.f:
     int mBarThickness -> a
     int mBarLength -> b
     int mPreferredBarLength -> c
@@ -5858,8 +5884,7 @@ com.larswerkman.colorpicker.ValueBar -> com.larswerkman.colorpicker.ValueBar:
     float[] mHSVColor -> n
     float mPosToSatFactor -> o
     float mSatToPosFactor -> p
-    com.larswerkman.colorpicker.ColorPicker mPicker -> q
-    void init(android.util.AttributeSet,int) -> a
+    com.larswerkman.holocolorpicker.ColorPicker mPicker -> q
     void onMeasure(int,int) -> onMeasure
     void onSizeChanged(int,int,int,int) -> onSizeChanged
     void onDraw(android.graphics.Canvas) -> onDraw
@@ -5868,7 +5893,7 @@ com.larswerkman.colorpicker.ValueBar -> com.larswerkman.colorpicker.ValueBar:
     void setValue(float) -> setValue
     void calculateColor(int) -> a
     int getColor() -> getColor
-    void setColorPicker(com.larswerkman.colorpicker.ColorPicker) -> setColorPicker
+    void setColorPicker(com.larswerkman.holocolorpicker.ColorPicker) -> setColorPicker
     android.os.Parcelable onSaveInstanceState() -> onSaveInstanceState
     void onRestoreInstanceState(android.os.Parcelable) -> onRestoreInstanceState
 com.mobeta.android.dslv.DragSortController -> com.mobeta.android.dslv.a:
@@ -6218,7 +6243,23 @@ me.kuehle.carreport.Application -> me.kuehle.carreport.Application:
     void reinitializeDatabase() -> b
     void onCreate() -> onCreate
     void onTerminate() -> onTerminate
-me.kuehle.carreport.Preferences -> me.kuehle.carreport.a:
+me.kuehle.carreport.FuelConsumption -> me.kuehle.carreport.a:
+    me.kuehle.carreport.FuelConsumption$Type consumptionType -> c
+    java.lang.String unitVolume -> a
+    java.lang.String unitDistance -> b
+    me.kuehle.carreport.Preferences preferences -> d
+    void setConsumptionType(int) -> a
+    double computeFuelConsumption(double,double) -> a
+    java.lang.String getUnitLabel(me.kuehle.carreport.FuelConsumption$Type) -> a
+    java.lang.String getUnitLabel() -> a
+me.kuehle.carreport.FuelConsumption$Type -> me.kuehle.carreport.b:
+    me.kuehle.carreport.FuelConsumption$Type VOL_FOR_DIST -> a
+    me.kuehle.carreport.FuelConsumption$Type DIST_FOR_VOL -> b
+    int id -> c
+    me.kuehle.carreport.FuelConsumption$Type[] ENUM$VALUES -> d
+    me.kuehle.carreport.FuelConsumption$Type[] values() -> values
+    me.kuehle.carreport.FuelConsumption$Type valueOf(java.lang.String) -> valueOf
+me.kuehle.carreport.Preferences -> me.kuehle.carreport.c:
     android.content.SharedPreferences prefs -> a
     long getDefaultCar() -> a
     java.util.List getReportOrder() -> b
@@ -6563,8 +6604,10 @@ me.kuehle.carreport.gui.CalculatorFragment -> me.kuehle.carreport.gui.g:
     android.widget.Spinner mSpnOptions -> a
     android.widget.EditText mEdtInput -> b
     android.widget.TextView mTxtUnit -> c
-    me.kuehle.chartlib.ChartView mGraph -> d
-    me.kuehle.carreport.data.calculation.AbstractCalculation[] mCalculations -> e
+    android.view.View mGraphHolder -> d
+    me.kuehle.chartlib.ChartView mGraph -> e
+    android.widget.ListView mTable -> f
+    me.kuehle.carreport.data.calculation.AbstractCalculation[] mCalculations -> g
     void onAttach(android.app.Activity) -> a
     android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> a
     void onDataChanged() -> D
@@ -6835,6 +6878,7 @@ me.kuehle.carreport.gui.HelpActivity -> me.kuehle.carreport.gui.HelpActivity:
     void onCreate(android.os.Bundle) -> onCreate
     void onBuildHeaders(java.util.List) -> onBuildHeaders
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
+    boolean isValidFragment(java.lang.String) -> isValidFragment
 me.kuehle.carreport.gui.HelpActivity$CalculationsFragment -> me.kuehle.carreport.gui.HelpActivity$CalculationsFragment:
     java.lang.String getHelpId() -> a
     android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> onCreateView
@@ -6849,15 +6893,14 @@ me.kuehle.carreport.gui.HelpActivity$TipsFragment -> me.kuehle.carreport.gui.Hel
     java.lang.String getHelpId() -> a
     android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> onCreateView
 me.kuehle.carreport.gui.MainActivity -> me.kuehle.carreport.gui.MainActivity:
-    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener mOnSynchronize -> n
-    java.lang.String[] mMainViews -> o
-    android.support.v4.widget.DrawerLayout mDrawerLayout -> p
-    android.support.v4.app.ActionBarDrawerToggle mDrawerToggle -> q
-    android.widget.ListView mDrawerList -> r
-    java.lang.CharSequence mDrawerTitle -> s
-    java.lang.CharSequence mTitle -> t
-    android.support.v4.app.Fragment mCurrentFragment -> u
-    android.view.MenuItem mSyncMenuItem -> v
+    java.lang.String[] mMainViews -> n
+    android.support.v4.widget.DrawerLayout mDrawerLayout -> o
+    android.support.v4.app.ActionBarDrawerToggle mDrawerToggle -> p
+    android.widget.ListView mDrawerList -> q
+    java.lang.CharSequence mDrawerTitle -> r
+    java.lang.CharSequence mTitle -> s
+    android.support.v4.app.Fragment mCurrentFragment -> t
+    android.view.MenuItem mSyncMenuItem -> u
     void onActivityResult(int,int,android.content.Intent) -> onActivityResult
     void onBackPressed() -> onBackPressed
     void onConfigurationChanged(android.content.res.Configuration) -> onConfigurationChanged
@@ -6865,6 +6908,8 @@ me.kuehle.carreport.gui.MainActivity -> me.kuehle.carreport.gui.MainActivity:
     boolean onCreateOptionsMenu(android.view.Menu) -> onCreateOptionsMenu
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     boolean onPrepareOptionsMenu(android.view.Menu) -> onPrepareOptionsMenu
+    void onSynchronizationFinished(boolean) -> b
+    void onSynchronizationStarted() -> d
     void setTitle(java.lang.CharSequence) -> setTitle
     android.content.Intent getDetailActivityIntent(int,long) -> a
     void selectItem(int) -> a
@@ -6872,25 +6917,19 @@ me.kuehle.carreport.gui.MainActivity -> me.kuehle.carreport.gui.MainActivity:
     void onPostCreate(android.os.Bundle) -> onPostCreate
     void onResume() -> onResume
     void onSaveInstanceState(android.os.Bundle) -> onSaveInstanceState
-    android.view.MenuItem access$0(me.kuehle.carreport.gui.MainActivity) -> a
-    android.support.v4.app.Fragment access$1(me.kuehle.carreport.gui.MainActivity) -> b
-    void access$2(me.kuehle.carreport.gui.MainActivity,int) -> a
-    java.lang.CharSequence access$3(me.kuehle.carreport.gui.MainActivity) -> c
-    void access$4(me.kuehle.carreport.gui.MainActivity,java.lang.CharSequence) -> a
-    java.lang.CharSequence access$5(me.kuehle.carreport.gui.MainActivity) -> d
+    void access$0(me.kuehle.carreport.gui.MainActivity,int) -> a
+    java.lang.CharSequence access$1(me.kuehle.carreport.gui.MainActivity) -> a
+    void access$2(me.kuehle.carreport.gui.MainActivity,java.lang.CharSequence) -> a
+    java.lang.CharSequence access$3(me.kuehle.carreport.gui.MainActivity) -> b
 me.kuehle.carreport.gui.MainActivity$1 -> me.kuehle.carreport.gui.ap:
-    me.kuehle.carreport.gui.MainActivity this$0 -> a
-    void onSynchronizationFinished(boolean) -> a
-    void onSynchronizationStarted() -> a
-me.kuehle.carreport.gui.MainActivity$2 -> me.kuehle.carreport.gui.aq:
     me.kuehle.carreport.gui.MainActivity this$0 -> a
     void onDrawerClosed$3c7ec8c3() -> d
     void onDrawerOpened$3c7ec8c3() -> c
-me.kuehle.carreport.gui.MainActivity$BackPressedListener -> me.kuehle.carreport.gui.ar:
+me.kuehle.carreport.gui.MainActivity$BackPressedListener -> me.kuehle.carreport.gui.aq:
     boolean onBackPressed() -> a
-me.kuehle.carreport.gui.MainActivity$DataChangeListener -> me.kuehle.carreport.gui.as:
+me.kuehle.carreport.gui.MainActivity$DataChangeListener -> me.kuehle.carreport.gui.ar:
     void onDataChanged() -> D
-me.kuehle.carreport.gui.MainActivity$DrawerItemClickListener -> me.kuehle.carreport.gui.at:
+me.kuehle.carreport.gui.MainActivity$DrawerItemClickListener -> me.kuehle.carreport.gui.as:
     me.kuehle.carreport.gui.MainActivity this$0 -> a
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
 me.kuehle.carreport.gui.PreferencesAboutFragment -> me.kuehle.carreport.gui.PreferencesAboutFragment:
@@ -6910,6 +6949,7 @@ me.kuehle.carreport.gui.PreferencesActivity -> me.kuehle.carreport.gui.Preferenc
     void onCreate(android.os.Bundle) -> onCreate
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     void onActivityResult(int,int,android.content.Intent) -> onActivityResult
+    boolean isValidFragment(java.lang.String) -> isValidFragment
 me.kuehle.carreport.gui.PreferencesBackupFragment -> me.kuehle.carreport.gui.PreferencesBackupFragment:
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider mCurrentSyncProvider -> a
     me.kuehle.carreport.util.backup.Backup mBackup -> b
@@ -7035,13 +7075,15 @@ me.kuehle.carreport.gui.PreferencesFuelTypesFragment$FuelTypesMultiChoiceModeLis
     void onItemCheckedStateChanged(android.view.ActionMode,int,long,boolean) -> onItemCheckedStateChanged
     boolean onPrepareActionMode(android.view.ActionMode,android.view.Menu) -> onPrepareActionMode
 me.kuehle.carreport.gui.PreferencesGeneralFragment -> me.kuehle.carreport.gui.PreferencesGeneralFragment:
-    android.preference.Preference$OnPreferenceChangeListener onPreferenceChangeListener -> a
+    me.kuehle.carreport.gui.PreferencesGeneralFragment$PreferenceChangeListener onPreferenceChangeListener -> a
     void onCreate(android.os.Bundle) -> onCreate
     void onResume() -> onResume
     void updateReportOrderSummary() -> a
-me.kuehle.carreport.gui.PreferencesGeneralFragment$1 -> me.kuehle.carreport.gui.PreferencesGeneralFragment$1:
+me.kuehle.carreport.gui.PreferencesGeneralFragment$PreferenceChangeListener -> me.kuehle.carreport.gui.PreferencesGeneralFragment$PreferenceChangeListener:
     me.kuehle.carreport.gui.PreferencesGeneralFragment this$0 -> a
     boolean onPreferenceChange(android.preference.Preference,java.lang.Object) -> onPreferenceChange
+    android.preference.ListPreference updateFuelConsumptionField(me.kuehle.carreport.FuelConsumption) -> a
+    android.preference.ListPreference updateFuelConsumptionField(me.kuehle.carreport.FuelConsumption,android.preference.ListPreference) -> a
 me.kuehle.carreport.gui.PreferencesReportOrderFragment -> me.kuehle.carreport.gui.PreferencesReportOrderFragment:
     android.widget.ArrayAdapter adapter -> a
     java.util.List reportClasses -> b
@@ -7052,14 +7094,15 @@ me.kuehle.carreport.gui.PreferencesReportOrderFragment -> me.kuehle.carreport.gu
 me.kuehle.carreport.gui.PreferencesReportOrderFragment$ReportDropListener -> me.kuehle.carreport.gui.PreferencesReportOrderFragment$ReportDropListener:
     me.kuehle.carreport.gui.PreferencesReportOrderFragment this$0 -> a
     void drop(int,int) -> a
-me.kuehle.carreport.gui.ReportFragment -> me.kuehle.carreport.gui.au:
-    me.kuehle.carreport.data.report.AbstractReport mCurrentMenuReport -> a
-    android.view.ViewGroup mCurrentMenuReportView -> b
-    android.animation.Animator mFullScreenChartAnimator -> c
-    me.kuehle.chartlib.ChartView mCurrentFullScreenChart -> d
-    android.graphics.Rect mCurrentFullScreenStartBounds -> e
-    float mCurrentFullScreenStartScaleX -> f
-    float mCurrentFullScreenStartScaleY -> g
+me.kuehle.carreport.gui.ReportFragment -> me.kuehle.carreport.gui.at:
+    me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask mCurrentUpdateTask -> a
+    me.kuehle.carreport.data.report.AbstractReport mCurrentMenuReport -> b
+    android.view.ViewGroup mCurrentMenuReportView -> c
+    android.animation.Animator mFullScreenChartAnimator -> d
+    me.kuehle.chartlib.ChartView mCurrentFullScreenChart -> e
+    android.graphics.Rect mCurrentFullScreenStartBounds -> f
+    float mCurrentFullScreenStartScaleX -> g
+    float mCurrentFullScreenStartScaleY -> h
     boolean onBackPressed() -> a
     void onActivityCreated(android.os.Bundle) -> d
     android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> a
@@ -7076,22 +7119,22 @@ me.kuehle.carreport.gui.ReportFragment -> me.kuehle.carreport.gui.au:
     me.kuehle.chartlib.ChartView access$5(me.kuehle.carreport.gui.ReportFragment) -> b
     void access$6$20be3d2b(me.kuehle.carreport.gui.ReportFragment) -> c
     void access$7$7e2e6710(me.kuehle.carreport.gui.ReportFragment) -> d
-me.kuehle.carreport.gui.ReportFragment$1 -> me.kuehle.carreport.gui.av:
+me.kuehle.carreport.gui.ReportFragment$1 -> me.kuehle.carreport.gui.au:
     me.kuehle.carreport.gui.ReportFragment this$0 -> a
     void onClick(android.view.View) -> onClick
-me.kuehle.carreport.gui.ReportFragment$2 -> me.kuehle.carreport.gui.aw:
+me.kuehle.carreport.gui.ReportFragment$2 -> me.kuehle.carreport.gui.av:
     me.kuehle.carreport.gui.ReportFragment this$0 -> a
     android.view.View val$chartHolder -> b
     void onAnimationEnd(android.animation.Animator) -> onAnimationEnd
-me.kuehle.carreport.gui.ReportFragment$3 -> me.kuehle.carreport.gui.ax:
+me.kuehle.carreport.gui.ReportFragment$3 -> me.kuehle.carreport.gui.aw:
     me.kuehle.carreport.gui.ReportFragment this$0 -> a
     void onAnimationEnd(android.animation.Animator) -> onAnimationEnd
-me.kuehle.carreport.gui.ReportFragment$4 -> me.kuehle.carreport.gui.ay:
+me.kuehle.carreport.gui.ReportFragment$4 -> me.kuehle.carreport.gui.ax:
     me.kuehle.carreport.gui.ReportFragment this$0 -> a
     android.view.ViewGroup$MarginLayoutParams val$detailsParams -> b
     android.view.View val$details -> c
     void onAnimationUpdate(android.animation.ValueAnimator) -> onAnimationUpdate
-me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask -> me.kuehle.carreport.gui.az:
+me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask -> me.kuehle.carreport.gui.ay:
     int[] columnIDs -> b
     java.util.List columns -> c
     int currentColumn -> d
@@ -7100,24 +7143,24 @@ me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask -> me.kuehle.carreport.g
     void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
     java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
     me.kuehle.carreport.gui.ReportFragment access$2(me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask) -> a
-me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$1 -> me.kuehle.carreport.gui.ba:
+me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$1 -> me.kuehle.carreport.gui.az:
     me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask this$1 -> a
     void onClick(android.view.View) -> onClick
-me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$2 -> me.kuehle.carreport.gui.bb:
+me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$2 -> me.kuehle.carreport.gui.ba:
     me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask this$1 -> a
     me.kuehle.carreport.data.report.AbstractReport val$report -> b
     void onClick(android.view.View) -> onClick
-me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$3 -> me.kuehle.carreport.gui.bc:
+me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$3 -> me.kuehle.carreport.gui.bb:
     me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask this$1 -> a
     me.kuehle.carreport.data.report.AbstractReport val$report -> b
     void onClick(android.view.View) -> onClick
 me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment -> me.kuehle.carreport.gui.a.a:
-    com.larswerkman.colorpicker.ColorPicker mColorPicker -> Y
+    com.larswerkman.holocolorpicker.ColorPicker mColorPicker -> Y
     me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment newInstance$7bf905fc(android.support.v4.app.Fragment,java.lang.Integer,int) -> a
     android.app.Dialog onCreateDialog(android.os.Bundle) -> c
     void onSaveInstanceState(android.os.Bundle) -> e
     me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment$ColorPickerDialogFragmentListener access$0(me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment) -> a
-    com.larswerkman.colorpicker.ColorPicker access$1(me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment) -> b
+    com.larswerkman.holocolorpicker.ColorPicker access$1(me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment) -> b
 me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment$1 -> me.kuehle.carreport.gui.a.b:
     me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
@@ -7290,7 +7333,7 @@ me.kuehle.carreport.gui.util.SimpleAnimator$Property -> me.kuehle.carreport.gui.
     me.kuehle.carreport.gui.util.SimpleAnimator$Property[] ENUM$VALUES -> c
     me.kuehle.carreport.gui.util.SimpleAnimator$Property[] values() -> values
     me.kuehle.carreport.gui.util.SimpleAnimator$Property valueOf(java.lang.String) -> valueOf
-me.kuehle.carreport.util.CSVReader -> me.kuehle.carreport.a.a:
+me.kuehle.carreport.util.CSVReader -> me.kuehle.carreport.util.a:
     char SEPARATOR -> a
     java.lang.String[] header -> b
     java.lang.String[][] data -> c
@@ -7310,7 +7353,7 @@ me.kuehle.carreport.util.CSVReader -> me.kuehle.carreport.a.a:
     java.lang.Float parseFloat(java.lang.String) -> b
     java.lang.Integer parseInteger(java.lang.String) -> c
     java.lang.Long parseLong(java.lang.String) -> d
-me.kuehle.carreport.util.CSVWriter -> me.kuehle.carreport.a.b:
+me.kuehle.carreport.util.CSVWriter -> me.kuehle.carreport.util.b:
     char SEPARATOR -> a
     java.lang.StringBuilder data -> b
     me.kuehle.carreport.db.serializer.RecurrenceSerializer recurrenceSerializer -> c
@@ -7321,14 +7364,14 @@ me.kuehle.carreport.util.CSVWriter -> me.kuehle.carreport.a.b:
     java.lang.String toString() -> toString
     java.lang.String format(java.util.Date) -> a
     java.lang.String format(java.lang.Float) -> a
-me.kuehle.carreport.util.Calculator -> me.kuehle.carreport.a.c:
+me.kuehle.carreport.util.Calculator -> me.kuehle.carreport.util.c:
     java.lang.Number avg(java.util.Vector) -> a
     java.lang.Number max(java.util.Vector) -> b
     java.lang.Number min(java.util.Vector) -> c
     java.lang.Number sum(java.util.Vector) -> d
-me.kuehle.carreport.util.IForEach -> me.kuehle.carreport.a.d:
+me.kuehle.carreport.util.IForEach -> me.kuehle.carreport.util.d:
     void action(java.lang.Object) -> a
-me.kuehle.carreport.util.Recurrence -> me.kuehle.carreport.a.e:
+me.kuehle.carreport.util.Recurrence -> me.kuehle.carreport.util.e:
     me.kuehle.carreport.util.RecurrenceInterval interval -> a
     int multiplier -> b
     int[] $SWITCH_TABLE$me$kuehle$carreport$util$RecurrenceInterval -> c
@@ -7337,7 +7380,7 @@ me.kuehle.carreport.util.Recurrence -> me.kuehle.carreport.a.e:
     int getRecurrencesSince(java.util.Date) -> a
     int getRecurrencesBetween(java.util.Date,java.util.Date) -> a
     int[] $SWITCH_TABLE$me$kuehle$carreport$util$RecurrenceInterval() -> c
-me.kuehle.carreport.util.RecurrenceInterval -> me.kuehle.carreport.a.f:
+me.kuehle.carreport.util.RecurrenceInterval -> me.kuehle.carreport.util.f:
     me.kuehle.carreport.util.RecurrenceInterval ONCE -> a
     me.kuehle.carreport.util.RecurrenceInterval DAY -> b
     me.kuehle.carreport.util.RecurrenceInterval MONTH -> c
@@ -7349,10 +7392,10 @@ me.kuehle.carreport.util.RecurrenceInterval -> me.kuehle.carreport.a.f:
     me.kuehle.carreport.util.RecurrenceInterval getByValue(int) -> a
     me.kuehle.carreport.util.RecurrenceInterval[] values() -> values
     me.kuehle.carreport.util.RecurrenceInterval valueOf(java.lang.String) -> valueOf
-me.kuehle.carreport.util.Strings -> me.kuehle.carreport.a.g:
+me.kuehle.carreport.util.Strings -> me.kuehle.carreport.util.g:
     java.lang.String join(java.lang.String,java.lang.String[]) -> a
     java.lang.String join(java.lang.String,java.util.List) -> a
-me.kuehle.carreport.util.backup.AbstractSynchronizationProvider -> me.kuehle.carreport.a.a.a:
+me.kuehle.carreport.util.backup.AbstractSynchronizationProvider -> me.kuehle.carreport.util.backup.a:
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider current -> e
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider[] avaialble -> f
     boolean mSynchronisationInProgress -> g
@@ -7364,13 +7407,14 @@ me.kuehle.carreport.util.backup.AbstractSynchronizationProvider -> me.kuehle.car
     android.app.FragmentManager mAuthenticationFragmentManager -> d
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider[] getAvailable(android.content.Context) -> a
     me.kuehle.carreport.util.backup.AbstractSynchronizationProvider getCurrent(android.content.Context) -> b
-    void continueAuthentication(int,int,android.content.Intent) -> a
-    java.lang.String getAccountName() -> a
-    int getIcon() -> b
-    java.lang.String getName() -> c
-    boolean isAuthenticated() -> d
-    boolean isSynchronisationInProgress() -> e
+    void initialize(android.content.Context) -> c
+    boolean isSynchronisationInProgress() -> a
     void setSynchronisationCallback(me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener) -> a
+    void continueAuthentication(int,int,android.content.Intent) -> a
+    java.lang.String getAccountName() -> b
+    int getIcon() -> c
+    java.lang.String getName() -> d
+    boolean isAuthenticated() -> e
     void startAuthentication(android.app.Fragment,me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnAuthenticationListener) -> a
     void synchronize() -> f
     void synchronize(int) -> a
@@ -7381,66 +7425,63 @@ me.kuehle.carreport.util.backup.AbstractSynchronizationProvider -> me.kuehle.car
     void onStartAuthentication() -> h
     boolean onSynchronize(int) -> b
     void onUnlink() -> i
-    void access$0$1385ff() -> j
-    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener access$1() -> k
-me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$1 -> me.kuehle.carreport.a.a.b:
-    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider this$0 -> a
-    void onPreExecute() -> onPreExecute
-    void onPostExecute(java.lang.Object) -> onPostExecute
-    java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
-me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnAuthenticationListener -> me.kuehle.carreport.a.a.c:
+    me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener access$0() -> j
+    void access$1$1385ff() -> k
+me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnAuthenticationListener -> me.kuehle.carreport.util.backup.b:
     void onAuthenticationFinished(boolean,boolean) -> a
-me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener -> me.kuehle.carreport.a.a.d:
-    void onSynchronizationFinished(boolean) -> a
-    void onSynchronizationStarted() -> a
-me.kuehle.carreport.util.backup.Backup -> me.kuehle.carreport.a.a.e:
+me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$OnSynchronizeListener -> me.kuehle.carreport.util.backup.c:
+    void onSynchronizationFinished(boolean) -> b
+    void onSynchronizationStarted() -> d
+me.kuehle.carreport.util.backup.AbstractSynchronizationProvider$SynchronizationStatusReceiver -> me.kuehle.carreport.util.backup.d:
+    void onReceive(android.content.Context,android.content.Intent) -> onReceive
+me.kuehle.carreport.util.backup.Backup -> me.kuehle.carreport.util.backup.e:
     java.io.File dir -> a
     java.io.File dbFile -> b
     java.io.File backupFile -> c
     boolean copyFile(java.io.File,java.io.File) -> a
-me.kuehle.carreport.util.backup.CSVExportImport -> me.kuehle.carreport.a.a.f:
+me.kuehle.carreport.util.backup.CSVExportImport -> me.kuehle.carreport.util.backup.f:
     java.io.File externalStorageDir -> a
     java.io.File exportDir -> b
     boolean export() -> a
     boolean allExportFilesExist() -> b
     boolean import_() -> c
-me.kuehle.carreport.util.backup.CSVExportImport$1 -> me.kuehle.carreport.a.a.g:
+me.kuehle.carreport.util.backup.CSVExportImport$1 -> me.kuehle.carreport.util.backup.g:
     me.kuehle.carreport.util.backup.CSVExportImport this$0 -> a
     java.util.HashMap val$order -> b
     int compare(java.lang.Object,java.lang.Object) -> compare
-me.kuehle.carreport.util.backup.Dropbox -> me.kuehle.carreport.a.a.h:
+me.kuehle.carreport.util.backup.Dropbox -> me.kuehle.carreport.util.backup.h:
     com.dropbox.client2.session.Session$AccessType ACCESS_TYPE -> e
     com.dropbox.client2.DropboxAPI mDBApi -> f
     boolean authenticationInProgress -> g
-    java.lang.String getAccountName() -> a
-    int getIcon() -> b
-    java.lang.String getName() -> c
-    boolean isAuthenticated() -> d
+    java.lang.String getAccountName() -> b
+    int getIcon() -> c
+    java.lang.String getName() -> d
+    boolean isAuthenticated() -> e
     void onContinueAuthentication(int,int,android.content.Intent) -> b
     void onStartAuthentication() -> h
     boolean onSynchronize(int) -> b
     void onUnlink() -> i
     com.dropbox.client2.DropboxAPI access$0(me.kuehle.carreport.util.backup.Dropbox) -> a
-me.kuehle.carreport.util.backup.Dropbox$1 -> me.kuehle.carreport.a.a.i:
+me.kuehle.carreport.util.backup.Dropbox$1 -> me.kuehle.carreport.util.backup.i:
     java.lang.String accountName -> b
     boolean remoteDataAvailable -> c
     me.kuehle.carreport.util.backup.Dropbox this$0 -> a
     java.lang.Boolean doInBackground$5f8445a4() -> a
     void onPostExecute(java.lang.Object) -> onPostExecute
     java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
-me.kuehle.carreport.util.backup.GoogleDrive -> me.kuehle.carreport.a.a.j:
+me.kuehle.carreport.util.backup.GoogleDrive -> me.kuehle.carreport.util.backup.j:
     com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential credential -> e
-    java.lang.String getAccountName() -> a
-    int getIcon() -> b
-    java.lang.String getName() -> c
-    boolean isAuthenticated() -> d
+    java.lang.String getAccountName() -> b
+    int getIcon() -> c
+    java.lang.String getName() -> d
+    boolean isAuthenticated() -> e
     com.google.api.services.drive.Drive getService() -> l
     void onContinueAuthentication(int,int,android.content.Intent) -> b
     void onStartAuthentication() -> h
     boolean onSynchronize(int) -> b
     void onUnlink() -> i
     com.google.api.services.drive.Drive access$0(me.kuehle.carreport.util.backup.GoogleDrive) -> a
-me.kuehle.carreport.util.backup.GoogleDrive$AuthenticateTask -> me.kuehle.carreport.a.a.k:
+me.kuehle.carreport.util.backup.GoogleDrive$AuthenticateTask -> me.kuehle.carreport.util.backup.k:
     com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException userRecovEx -> b
     java.lang.Exception ex -> c
     boolean remoteDataAvailable -> d
@@ -7449,6 +7490,8 @@ me.kuehle.carreport.util.backup.GoogleDrive$AuthenticateTask -> me.kuehle.carrep
     java.lang.Void doInBackground$10299ca() -> a
     void onPostExecute(java.lang.Object) -> onPostExecute
     java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
+me.kuehle.carreport.util.backup.SynchronizationService -> me.kuehle.carreport.util.backup.SynchronizationService:
+    void onHandleIntent(android.content.Intent) -> onHandleIntent
 me.kuehle.chartlib.ChartView -> me.kuehle.chartlib.ChartView:
     me.kuehle.chartlib.chart.Chart chart -> a
     android.view.View notEnoughDataView -> b
