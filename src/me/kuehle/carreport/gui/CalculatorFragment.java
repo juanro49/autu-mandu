@@ -143,8 +143,8 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
 		try {
 			input = Double.parseDouble(mEdtInput.getText().toString());
 		} catch (NumberFormatException e) {
-			mGraphHolder.setVisibility(View.GONE);
-			mTable.setVisibility(View.GONE);
+			mGraphHolder.setVisibility(View.INVISIBLE);
+			mTable.setVisibility(View.INVISIBLE);
 			return;
 		}
 
