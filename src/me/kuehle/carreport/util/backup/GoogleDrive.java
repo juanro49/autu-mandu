@@ -66,7 +66,8 @@ public class GoogleDrive extends AbstractSynchronizationProvider {
 
 			try {
 				// Load appdata folder id.
-				File appdata = service.files().get("appdata").execute();
+				File appdata = service.files().get("appdata").setFields("id")
+						.execute();
 				prefs.setGoogleDriveAppDataID(appdata.getId());
 
 				// Check if remote data is available.
@@ -75,8 +76,8 @@ public class GoogleDrive extends AbstractSynchronizationProvider {
 				FileList files = service
 						.files()
 						.list()
-						.setQ(String.format("'%s' in parents and title = '%s'",
-								appdata.getId(), localFile.getName()))
+						.setQ(String.format("title = '%s'", localFile.getName()))
+						.setFields("items(downloadUrl,id,modifiedDate)")
 						.execute();
 				if (files.getItems().size() > 0) {
 					remoteDataAvailable = true;
@@ -200,11 +201,9 @@ public class GoogleDrive extends AbstractSynchronizationProvider {
 		// Get id and modification date of the remote file.
 		File remoteFile = null;
 		try {
-			FileList files = service
-					.files()
-					.list()
-					.setQ(String.format("'%s' in parents and title = '%s'",
-							appdata, localFile.getName())).execute();
+			FileList files = service.files().list()
+					.setQ(String.format("title = '%s'", localFile.getName()))
+					.setFields("items(downloadUrl,id,modifiedDate)").execute();
 			if (files.getItems().size() > 0) {
 				remoteFile = files.getItems().get(0);
 			}

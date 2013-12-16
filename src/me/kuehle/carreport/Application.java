@@ -49,6 +49,7 @@ public class Application extends android.app.Application {
 
 		System.setProperty("org.joda.time.DateTimeZone.Provider",
 				"org.joda.time.tz.UTCProvider");
+		AbstractSynchronizationProvider.initialize(this);
 		ActiveAndroid.initialize(this);
 
 		if (new Preferences(this).isSyncOnStart()) {

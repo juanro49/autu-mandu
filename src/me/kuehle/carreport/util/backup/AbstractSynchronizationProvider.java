@@ -24,9 +24,11 @@ import java.nio.channels.FileChannel;
 import me.kuehle.carreport.Preferences;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 
 public abstract class AbstractSynchronizationProvider {
 	public interface OnAuthenticationListener {
@@ -40,13 +42,35 @@ public abstract class AbstractSynchronizationProvider {
 		public void onSynchronizationStarted();
 	}
 
+	private static class SynchronizationStatusReceiver extends
+			BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int status = intent.getIntExtra(
+					SynchronizationService.EXTRA_STATUS, -1);
+			boolean result = intent.getBooleanExtra(
+					SynchronizationService.EXTRA_RESULT, false);
+
+			if (status == SynchronizationService.STATUS_STARTED) {
+				if (mSynchronisationListener != null) {
+					mSynchronisationListener.onSynchronizationStarted();
+				}
+			} else if (status == SynchronizationService.STATUS_FINISHED) {
+				mSynchronisationInProgress = false;
+				if (mSynchronisationListener != null) {
+					mSynchronisationListener.onSynchronizationFinished(result);
+				}
+			}
+		}
+	}
+
 	public static final int SYNC_NORMAL = 1;
 	public static final int SYNC_DOWNLOAD = 2;
 	public static final int SYNC_UPLOAD = 3;
 
 	private static AbstractSynchronizationProvider current;
 	private static AbstractSynchronizationProvider[] avaialble;
-	
+
 	private static boolean mSynchronisationInProgress = false;
 	private static OnSynchronizeListener mSynchronisationListener;
 
@@ -85,6 +109,26 @@ public abstract class AbstractSynchronizationProvider {
 		return null;
 	}
 
+	public static void initialize(Context context) {
+		IntentFilter intentFilter = new IntentFilter(
+				SynchronizationService.BROADCAST_ACTION);
+		SynchronizationStatusReceiver receiver = new SynchronizationStatusReceiver();
+
+		LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
+				intentFilter);
+	}
+
+	public static boolean isSynchronisationInProgress() {
+		return mSynchronisationInProgress;
+	}
+
+	public static void setSynchronisationCallback(OnSynchronizeListener callback) {
+		mSynchronisationListener = callback;
+		if (mSynchronisationListener != null && mSynchronisationInProgress) {
+			mSynchronisationListener.onSynchronizationStarted();
+		}
+	}
+
 	protected File mTempFile;
 	protected Context mContext;
 
@@ -117,17 +161,6 @@ public abstract class AbstractSynchronizationProvider {
 
 	public abstract boolean isAuthenticated();
 
-	public boolean isSynchronisationInProgress() {
-		return mSynchronisationInProgress;
-	}
-
-	public static void setSynchronisationCallback(OnSynchronizeListener callback) {
-		mSynchronisationListener = callback;
-		if (mSynchronisationListener != null && mSynchronisationInProgress) {
-			mSynchronisationListener.onSynchronizationStarted();
-		}
-	}
-
 	public void startAuthentication(Fragment fragment,
 			OnAuthenticationListener listener) {
 		mAuthenticationFragment = fragment;
@@ -146,27 +179,11 @@ public abstract class AbstractSynchronizationProvider {
 		}
 
 		mSynchronisationInProgress = true;
-		new AsyncTask<Integer, Void, Boolean>() {
-			@Override
-			protected Boolean doInBackground(Integer... params) {
-				return onSynchronize(params[0]);
-			}
 
-			@Override
-			protected void onPostExecute(Boolean result) {
-				mSynchronisationInProgress = false;
-				if (mSynchronisationListener != null) {
-					mSynchronisationListener.onSynchronizationFinished(result);
-				}
-			}
-
-			@Override
-			protected void onPreExecute() {
-				if (mSynchronisationListener != null) {
-					mSynchronisationListener.onSynchronizationStarted();
-				}
-			}
-		}.execute(option);
+		Intent serviceIntent = new Intent(mContext,
+				SynchronizationService.class);
+		serviceIntent.putExtra(SynchronizationService.EXTRA_OPTION, option);
+		mContext.startService(serviceIntent);
 	}
 
 	public void unlink() {

@@ -184,7 +184,7 @@ public class MainActivity extends FragmentActivity implements
 			mSyncMenuItem.setVisible(false);
 		} else {
 			mSyncMenuItem.setVisible(provider.isAuthenticated());
-			if (provider.isSynchronisationInProgress()) {
+			if (AbstractSynchronizationProvider.isSynchronisationInProgress()) {
 				mSyncMenuItem
 						.setActionView(R.layout.actionbar_indeterminate_progress);
 			}
