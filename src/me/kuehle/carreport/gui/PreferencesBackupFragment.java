@@ -267,7 +267,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 			setupRestorePreference();
 		} else {
 			Toast.makeText(getActivity(), R.string.toast_backup_failed,
-					Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -278,7 +278,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 			setupImportCSVPreference();
 		} else {
 			Toast.makeText(getActivity(), R.string.toast_export_csv_failed,
-					Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -287,8 +287,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 			Toast.makeText(getActivity(), R.string.toast_import_csv_success,
 					Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(getActivity(), R.string.toast_importcsv_failed,
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), R.string.toast_import_csv_failed,
+					Toast.LENGTH_LONG).show();
 		}
 	}
 
@@ -298,7 +298,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Toast.makeText(getActivity(), R.string.toast_restore_failed,
-					Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_LONG).show();
 		}
 	}
 

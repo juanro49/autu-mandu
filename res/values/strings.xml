@@ -128,7 +128,7 @@
     <string name="toast_export_csv_succeeded">Export to SD card completed successfully.</string>
     <string name="toast_export_csv_failed">Export failed.</string>
     <string name="toast_import_csv_success">Import completed successfully.</string>
-    <string name="toast_importcsv_failed">Import failed. No data was changed. Are your files in the correct format?</string>
+    <string name="toast_import_csv_failed">Import failed. No data was changed.\n\nPossible reasons:\n - For new entries the Id column has to be empty.\n - Import data is not in the correct format.</string>
     
     <string name="report_title_fuel_consumption">Fuel consumption</string>
     <string name="report_title_fuel_price">Fuel price</string>

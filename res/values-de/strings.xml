@@ -128,7 +128,7 @@
     <string name="toast_export_csv_succeeded">Export auf die SD-Karte war erfolgreich</string>
     <string name="toast_export_csv_failed">Export fehlgeschlagen</string>
     <string name="toast_import_csv_success">Importieren der Daten war erfolgreich</string>
-    <string name="toast_importcsv_failed">Import fehlgeschlagen. Es wurden keine Daten verändert. Sind die Importdaten im richtigen Format?</string>
+    <string name="toast_import_csv_failed">Import fehlgeschlagen. Es wurden keine Daten verändert.\n\nMögliche Fehlerursachen:\n - Die Id-Spalte muss bei neuen Einträgen leer sein.\n - Die Importdaten sind nicht im CSV-Format.</string>
     
     <string name="report_title_fuel_consumption">Benzinverbrauch</string>
     <string name="report_title_fuel_price">Benzinpreis</string>
