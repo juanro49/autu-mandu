@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.FuelType;
@@ -47,6 +48,7 @@ public class FuelConsumptionReport extends AbstractReport {
 					getCommaSeparatedFuelTypeNames(fuelTank.fuelTypes())),
 					fuelTank.car.color);
 
+			FuelConsumption fuelConsumption = new FuelConsumption(context);
 			List<Refueling> refuelings = fuelTank.refuelings();
 			int lastTacho = -1;
 			float volume = 0;
@@ -54,8 +56,7 @@ public class FuelConsumptionReport extends AbstractReport {
 				volume += refueling.volume;
 				if (!refueling.partial) {
 					if (lastTacho > -1 && lastTacho < refueling.mileage) {
-						double consumption = volume
-								/ (refueling.mileage - lastTacho) * 100;
+						double consumption = fuelConsumption.computeFuelConsumption(volume, refueling.mileage - lastTacho);
 						xValues.add(refueling.date.getTime());
 						yValues.add(consumption);
 					}
@@ -194,8 +195,8 @@ public class FuelConsumptionReport extends AbstractReport {
 	protected void onUpdate() {
 		// Preferences
 		Preferences prefs = new Preferences(context);
-		unit = String.format("%s/100%s", prefs.getUnitVolume(),
-				prefs.getUnitDistance());
+		FuelConsumption fuelConsumption = new FuelConsumption(context);
+		unit = fuelConsumption.getUnitLabel();
 		showLegend = prefs.isShowLegend();
 
 		// Collect report data and add info data which will be displayed

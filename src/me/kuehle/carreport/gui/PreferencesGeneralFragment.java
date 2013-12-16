@@ -21,6 +21,7 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.util.Strings;
@@ -35,21 +36,50 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 
 public class PreferencesGeneralFragment extends PreferenceFragment {
-	private OnPreferenceChangeListener onPreferenceChangeListener = new OnPreferenceChangeListener() {
-		@Override
+	private class PreferenceChangeListener implements OnPreferenceChangeListener {
+			@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			if (preference.getKey().equals("behavior_car")) {
+			FuelConsumption fuelConsumption = new FuelConsumption(getActivity());		
+			String prefKey = preference.getKey();
+			if (prefKey.equals("behavior_car")) {
 				Car car = Car.load(Car.class,
 						Long.parseLong(newValue.toString()));
 				preference.setSummary(car.name);
-			} else if (preference instanceof EditTextPreference) {
+				}
+			else if (preference instanceof EditTextPreference) {
 				preference.setSummary(newValue.toString());
+				if (prefKey.equals("unit_distance")) {
+					fuelConsumption.unit_distance = newValue.toString();
+				}
+				else if (prefKey.equals("unit_volume")) {
+					fuelConsumption.unit_volume = newValue.toString();
+				}
+				updateFuelConsumptionField(fuelConsumption);
 			}
-
+			else if (prefKey.equals("unit_fuel_consumption")) {
+				fuelConsumption.setConsumptionType(Integer.parseInt(newValue.toString()));
+				updateFuelConsumptionField(fuelConsumption, (ListPreference)preference);
+			}
 			return true;
 		}
+		
+		public ListPreference updateFuelConsumptionField(FuelConsumption fuelConsumption) {
+			ListPreference prefFuelConsumption = (ListPreference) findPreference("unit_fuel_consumption");
+			return this.updateFuelConsumptionField(fuelConsumption, prefFuelConsumption);
+		}
+			
+		public ListPreference updateFuelConsumptionField(FuelConsumption fuelConsumption, ListPreference prefFuelConsumption) {
+			String[] entries = fuelConsumption.getUnitsEntries();
+			String[] entryValues = fuelConsumption.getUnitsEntryValues();
+			prefFuelConsumption.setEntries(entries);
+			prefFuelConsumption.setEntryValues(entryValues);
+			prefFuelConsumption.setSummary(fuelConsumption.getUnitLabel());
+			return prefFuelConsumption;
+		}
 	};
-
+		
+	private PreferenceChangeListener onPreferenceChangeListener = new PreferenceChangeListener();
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -59,7 +89,9 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 				R.xml.preferences_general, false);
 
 		Preferences prefs = new Preferences(getActivity());
-
+		FuelConsumption fuelConsumption = new FuelConsumption(getActivity());
+		
+	
 		// Behavior report order
 		{
 			updateReportOrderSummary();
@@ -119,15 +151,23 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			unitVolume
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			unitVolume.setSummary(prefs.getUnitVolume());
+			fuelConsumption.unit_volume = prefs.getUnitVolume();
 		}
 
-		// Unit Volume
+		// Unit Distance
 		{
 			EditTextPreference unitDistance = (EditTextPreference) findPreference("unit_distance");
 			unitDistance
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			unitDistance.setSummary(prefs.getUnitDistance());
+			fuelConsumption.unit_distance = prefs.getUnitDistance();
 		}
+		// Unit fuel consumption
+		{
+			ListPreference fieldFuelConsumption = onPreferenceChangeListener.updateFuelConsumptionField(fuelConsumption);
+			fieldFuelConsumption.setOnPreferenceChangeListener(onPreferenceChangeListener);
+		}
+
 	}
 
 	@Override
