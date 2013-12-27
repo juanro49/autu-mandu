@@ -187,7 +187,7 @@ public class PreferencesCarsFragment extends ListFragment implements
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			editCar(cars.get(position).getId());
+			editCar(cars.get(position).id);
 		}
 	};
 

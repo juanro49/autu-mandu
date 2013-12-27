@@ -7397,18 +7397,9 @@ me.kuehle.carreport.util.Calculator -> me.kuehle.carreport.util.c:
     java.lang.Number max(java.util.Vector) -> b
     java.lang.Number min(java.util.Vector) -> c
     java.lang.Number sum(java.util.Vector) -> d
-me.kuehle.carreport.util.DemoData -> me.kuehle.carreport.util.d:
-    java.text.DateFormat dateFormat -> a
-    void addDemoData() -> a
-    me.kuehle.carreport.db.Car createCar(java.lang.String,int) -> a
-    me.kuehle.carreport.db.FuelType createFuelType(java.lang.String) -> a
-    me.kuehle.carreport.db.FuelTank createFuelTank(me.kuehle.carreport.db.Car,java.lang.String) -> a
-    me.kuehle.carreport.db.PossibleFuelTypeForFuelTank createPossibleFuelTypeForFuelTank(me.kuehle.carreport.db.FuelType,me.kuehle.carreport.db.FuelTank) -> a
-    me.kuehle.carreport.db.Refueling createRefueling(java.lang.String,int,float,float,boolean,java.lang.String,me.kuehle.carreport.db.FuelType,me.kuehle.carreport.db.FuelTank) -> a
-    me.kuehle.carreport.db.OtherCost createOtherCost$22fadbca(java.lang.String,java.lang.String,int,float,me.kuehle.carreport.util.Recurrence,java.lang.String,me.kuehle.carreport.db.Car) -> a
-me.kuehle.carreport.util.IForEach -> me.kuehle.carreport.util.e:
+me.kuehle.carreport.util.IForEach -> me.kuehle.carreport.util.d:
     void action(java.lang.Object) -> a
-me.kuehle.carreport.util.Recurrence -> me.kuehle.carreport.util.f:
+me.kuehle.carreport.util.Recurrence -> me.kuehle.carreport.util.e:
     me.kuehle.carreport.util.RecurrenceInterval interval -> a
     int multiplier -> b
     int[] $SWITCH_TABLE$me$kuehle$carreport$util$RecurrenceInterval -> c
@@ -7417,7 +7408,7 @@ me.kuehle.carreport.util.Recurrence -> me.kuehle.carreport.util.f:
     int getRecurrencesSince(java.util.Date) -> a
     int getRecurrencesBetween(java.util.Date,java.util.Date) -> a
     int[] $SWITCH_TABLE$me$kuehle$carreport$util$RecurrenceInterval() -> c
-me.kuehle.carreport.util.RecurrenceInterval -> me.kuehle.carreport.util.g:
+me.kuehle.carreport.util.RecurrenceInterval -> me.kuehle.carreport.util.f:
     me.kuehle.carreport.util.RecurrenceInterval ONCE -> a
     me.kuehle.carreport.util.RecurrenceInterval DAY -> b
     me.kuehle.carreport.util.RecurrenceInterval MONTH -> c
@@ -7429,7 +7420,7 @@ me.kuehle.carreport.util.RecurrenceInterval -> me.kuehle.carreport.util.g:
     me.kuehle.carreport.util.RecurrenceInterval getByValue(int) -> a
     me.kuehle.carreport.util.RecurrenceInterval[] values() -> values
     me.kuehle.carreport.util.RecurrenceInterval valueOf(java.lang.String) -> valueOf
-me.kuehle.carreport.util.Strings -> me.kuehle.carreport.util.h:
+me.kuehle.carreport.util.Strings -> me.kuehle.carreport.util.g:
     java.lang.String join(java.lang.String,java.lang.String[]) -> a
     java.lang.String join(java.lang.String,java.util.List) -> a
 me.kuehle.carreport.util.backup.AbstractSynchronizationProvider -> me.kuehle.carreport.util.backup.a:

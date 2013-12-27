@@ -48,12 +48,12 @@ public class Preferences {
 		}
 
 		for (Car car : cars) {
-			if (car.getId() == id) {
+			if (car.id == id) {
 				return id;
 			}
 		}
 
-		return cars.get(0).getId();
+		return cars.get(0).id;
 	}
 
 	public String getDropboxAccount() {

@@ -83,7 +83,7 @@ public class CSVExportImport {
 
 					if (value != null
 							&& Model.class.isAssignableFrom(field.getType())) {
-						line.add(((Model) value).getId());
+						line.add(((Model) value).id);
 					} else {
 						line.add(value);
 					}
@@ -150,17 +150,15 @@ public class CSVExportImport {
 				for (int i = 0; i < csv.getRowCount(); i++) {
 					Long id = csv.getLong(i, "Id");
 
-					Model entry;
-					if (id == null) {
+					Model entry = null;
+					if (id != null) {
+						entry = Model.load(table.getType(), id);
+					}
+
+					if (entry == null) {
 						Constructor<?> constructor = table.getType()
 								.getConstructor();
 						entry = (Model) constructor.newInstance();
-					} else {
-						entry = Model.load(table.getType(), id);
-						if(entry == null) {
-							// Id given, but no corresponding entry found.
-							return false;
-						}
 					}
 
 					for (Field field : fields) {

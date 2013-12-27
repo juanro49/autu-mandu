@@ -112,8 +112,7 @@ public class DataFragment extends Fragment implements
 			Bundle args = new Bundle();
 			args.putBoolean(AbstractDataListFragment.EXTRA_ACTIVATE_ON_CLICK,
 					mTwoPane);
-			args.putLong(AbstractDataListFragment.EXTRA_CAR_ID,
-					mCurrentCar.getId());
+			args.putLong(AbstractDataListFragment.EXTRA_CAR_ID, mCurrentCar.id);
 			fragment.setArguments(args);
 			return fragment;
 		}
@@ -149,7 +148,7 @@ public class DataFragment extends Fragment implements
 		actionBar.setListNavigationCallbacks(adapter,
 				new DataListNavigationListener());
 		for (int i = 0; i < mCars.size(); i++) {
-			if (mCars.get(i).getId() == mCurrentCar.getId()) {
+			if (mCars.get(i).id == mCurrentCar.id) {
 				actionBar.setSelectedNavigationItem(i);
 			}
 		}
@@ -269,7 +268,7 @@ public class DataFragment extends Fragment implements
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putLong(STATE_CURRENT_CAR, mCurrentCar.getId());
+		outState.putLong(STATE_CURRENT_CAR, mCurrentCar.id);
 	}
 
 	private void setNoEntrySelectedTextVisible(boolean visible) {

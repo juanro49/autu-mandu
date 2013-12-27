@@ -129,7 +129,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			}
 
 			for (int pos = 0; pos < cars.size(); pos++) {
-				if (cars.get(pos).getId() == selectCar) {
+				if (cars.get(pos).id == selectCar) {
 					spnCar.setSelection(pos);
 				}
 			}
@@ -159,7 +159,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 			edtNote.setText(other.note);
 
 			for (int pos = 0; pos < cars.size(); pos++) {
-				if (cars.get(pos).getId() == other.car.getId()) {
+				if (cars.get(pos).id == other.car.id) {
 					spnCar.setSelection(pos);
 				}
 			}

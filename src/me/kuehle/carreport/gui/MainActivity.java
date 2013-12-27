@@ -18,11 +18,9 @@ package me.kuehle.carreport.gui;
 
 import java.util.List;
 
-import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.util.DemoData;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -191,9 +189,8 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		// Add demo data item, when in debug mode.
-		if (BuildConfig.DEBUG) {
-			menu.add("Add Demo Data");
-		}
+		// BuildConfig.DEBUG does not work reliable, so we just comment it out
+		// menu.add("Add Demo Data");
 
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -208,12 +205,11 @@ public class MainActivity extends FragmentActivity implements
 
 		// Respond to click on demo data item, which is only present
 		// in debug mode.
-		if (BuildConfig.DEBUG && item.getTitle().equals("Add Demo Data")) {
-			DemoData.addDemoData();
-			if (mCurrentFragment instanceof DataChangeListener) {
-				((DataChangeListener) mCurrentFragment).onDataChanged();
-			}
-		}
+		// BuildConfig.DEBUG does not work reliable, so we just comment it out
+		// DemoData.addDemoData();
+		// if (mCurrentFragment instanceof DataChangeListener) {
+		// ((DataChangeListener) mCurrentFragment).onDataChanged();
+		// }
 
 		switch (item.getItemId()) {
 		case R.id.menu_synchronize:
@@ -276,7 +272,7 @@ public class MainActivity extends FragmentActivity implements
 				items[i].setIntent(null);
 				for (Car car : cars) {
 					subMenu.add(car.name).setIntent(
-							getDetailActivityIntent(extraEdit[i], car.getId()));
+							getDetailActivityIntent(extraEdit[i], car.id));
 				}
 			}
 		}

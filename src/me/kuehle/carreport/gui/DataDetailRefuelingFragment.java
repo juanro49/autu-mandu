@@ -112,7 +112,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 				selectCar = prefs.getDefaultCar();
 			}
 			for (int pos = 0; pos < cars.size(); pos++) {
-				if (cars.get(pos).getId() == selectCar) {
+				if (cars.get(pos).id == selectCar) {
 					spnCar.setSelection(pos);
 				}
 			}
@@ -130,7 +130,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			edtNote.setText(refueling.note);
 
 			for (int pos = 0; pos < cars.size(); pos++) {
-				if (cars.get(pos).getId() == refueling.fuelTank.car.getId()) {
+				if (cars.get(pos).id == refueling.fuelTank.car.id) {
 					spnCar.setSelection(pos);
 				}
 			}

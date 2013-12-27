@@ -48,14 +48,14 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 				preference.setSummary(car.name);
 			} else if (preference instanceof EditTextPreference) {
 				preference.setSummary(newValue.toString());
-				
+
 				// Update fuel consumption label
 				if (prefKey.equals("unit_distance")) {
 					fuelConsumption.setUnitDistance(newValue.toString());
 				} else if (prefKey.equals("unit_volume")) {
 					fuelConsumption.setUnitVolume(newValue.toString());
 				}
-				
+
 				updateFuelConsumptionField(fuelConsumption);
 			} else if (prefKey.equals("unit_fuel_consumption")) {
 				fuelConsumption.setConsumptionType(Integer.parseInt(newValue
@@ -110,7 +110,7 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			String[] defaultEntryValues = new String[cars.size()];
 			for (int i = 0; i < cars.size(); i++) {
 				defaultEntries[i] = cars.get(i).name;
-				defaultEntryValues[i] = String.valueOf(cars.get(i).getId());
+				defaultEntryValues[i] = String.valueOf(cars.get(i).id);
 			}
 
 			ListPreference defaultCar = (ListPreference) findPreference("behavior_default_car");

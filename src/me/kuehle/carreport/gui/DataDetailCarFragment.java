@@ -93,10 +93,10 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 			// safe the current selection to be able to restore it
 			// when the last item will be selected later.
 			if (position == 0) {
-				if(holder.spnFuelTypes.size() <= 1) {
+				if (holder.spnFuelTypes.size() <= 1) {
 					return;
 				}
-				
+
 				boolean emptyElementExists = false;
 				for (int i = holder.spnFuelTypes.size() - 1; i >= 0; i--) {
 					final Spinner spn = holder.spnFuelTypes.get(i);
@@ -144,7 +144,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 
 		public RemoveFuelTankListener(FuelTankHolder holder) {
 			this.holder = holder;
-			removePossible = holder.tank.getId() == null
+			removePossible = holder.tank.id == null
 					|| holder.tank.refuelings().size() == 0;
 		}
 
@@ -275,8 +275,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		String[] fuelTankSelectedTypes = new String[fuelTankHolders.size()];
 		for (int i = 0; i < fuelTankHolders.size(); i++) {
 			FuelTankHolder holder = fuelTankHolders.get(i);
-			fuelTankIDs[i] = holder.tank.getId() == null ? 0 : holder.tank
-					.getId();
+			fuelTankIDs[i] = holder.tank.id == null ? 0 : holder.tank.id;
 			fuelTankNames[i] = ((EditText) holder.layout
 					.findViewById(R.id.edt_fuel_type_name)).getText()
 					.toString();
@@ -301,7 +300,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		for (int i = 0; i < fuelTypePositionModelMap.size(); i++) {
 			FuelType fuelType = fuelTypePositionModelMap
 					.get(fuelTypePositionModelMap.keyAt(i));
-			fuelTypeIDs[i] = fuelType.getId() == null ? 0 : fuelType.getId();
+			fuelTypeIDs[i] = fuelType.id == null ? 0 : fuelType.id;
 			fuelTypeNames[i] = fuelType.name;
 		}
 
@@ -342,7 +341,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		edtTank.setText(fuelTank.name);
 		edtTank.setSaveEnabled(false);
 
-		if (fuelTypePositions == null && fuelTank.getId() == null) {
+		if (fuelTypePositions == null && fuelTank.id == null) {
 			addFuelTypeView(holder, 0);
 		} else if (fuelTypePositions == null) {
 			List<FuelType> fuelTypes = fuelTank.fuelTypes();
@@ -638,7 +637,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 				holder.tank.car = car;
 				holder.tank.name = edtName.getText().toString().trim();
 				holder.tank.save();
-				remainingFuelTanks.add(holder.tank.getId());
+				remainingFuelTanks.add(holder.tank.id);
 
 				for (Spinner spnType : holder.spnFuelTypes) {
 					int typePos = spnType.getSelectedItemPosition();
@@ -651,8 +650,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 
 					// Only create an association, when the same has not been
 					// created before.
-					if (addedPossibleTypes.add(type.getId() + "<>"
-							+ holder.tank.getId())) {
+					if (addedPossibleTypes.add(type.id + "<>" + holder.tank.id)) {
 						new PossibleFuelTypeForFuelTank(type, holder.tank)
 								.save();
 					}
@@ -661,7 +659,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 
 			// Delete removed fuel tanks.
 			for (FuelTank tank : car.fuelTanks()) {
-				if (!remainingFuelTanks.contains(tank.getId())) {
+				if (!remainingFuelTanks.contains(tank.id)) {
 					tank.delete();
 				}
 			}

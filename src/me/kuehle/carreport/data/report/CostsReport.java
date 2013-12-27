@@ -146,7 +146,7 @@ public class CostsReport extends AbstractReport {
 		int series = 0;
 		for (Car car : Car.getAll()) {
 			ReportGraphData data = getChartOption() == GRAPH_OPTION_MONTH ? costsPerMonth
-					.get(car.getId().intValue()) : costsPerYear.get(car.getId()
+					.get(car.id.intValue()) : costsPerYear.get(car.id
 					.intValue());
 			if (data.isEmpty()) {
 				continue;
@@ -228,10 +228,10 @@ public class CostsReport extends AbstractReport {
 				section = addDataSection(car.name, car.color);
 			}
 
-			costsPerMonth.put(car.getId().intValue(), new ReportGraphData(
-					context, car, GRAPH_OPTION_MONTH));
-			costsPerYear.put(car.getId().intValue(), new ReportGraphData(
-					context, car, GRAPH_OPTION_YEAR));
+			costsPerMonth.put(car.id.intValue(), new ReportGraphData(context,
+					car, GRAPH_OPTION_MONTH));
+			costsPerYear.put(car.id.intValue(), new ReportGraphData(context,
+					car, GRAPH_OPTION_YEAR));
 
 			int startMileage = Integer.MAX_VALUE;
 			int endMileage = Integer.MIN_VALUE;
@@ -261,10 +261,8 @@ public class CostsReport extends AbstractReport {
 
 				DateTime date = new DateTime(refueling.date);
 
-				costsPerMonth.get(car.getId().intValue()).add(date,
-						refueling.price);
-				costsPerYear.get(car.getId().intValue()).add(date,
-						refueling.price);
+				costsPerMonth.get(car.id.intValue()).add(date, refueling.price);
+				costsPerYear.get(car.id.intValue()).add(date, refueling.price);
 
 				startMileage = Math.min(startMileage, refueling.mileage);
 				endMileage = Math.max(endMileage, refueling.mileage);
@@ -301,9 +299,9 @@ public class CostsReport extends AbstractReport {
 					recurrenceEndDate = endDate;
 				}
 				while (date.isBefore(recurrenceEndDate)) {
-					costsPerMonth.get(car.getId().intValue()).add(date,
+					costsPerMonth.get(car.id.intValue()).add(date,
 							otherCost.price);
-					costsPerYear.get(car.getId().intValue()).add(date,
+					costsPerYear.get(car.id.intValue()).add(date,
 							otherCost.price);
 					switch (recurrence.getInterval()) {
 					case ONCE:

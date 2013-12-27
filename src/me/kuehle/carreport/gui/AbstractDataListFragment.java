@@ -54,7 +54,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
 		@Override
 		public long getItemId(int position) {
-			return mItems.get(position).getId();
+			return mItems.get(position).id;
 		}
 
 		@Override
@@ -267,7 +267,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putLong(STATE_CURRENT_ITEM, mCar.getId());
+		outState.putLong(STATE_CURRENT_ITEM, mCar.id);
 		outState.putInt(STATE_CURRENT_ITEM, mCurrentItem);
 	}
 

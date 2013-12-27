@@ -4479,8 +4479,7 @@ me.kuehle.carreport.util.CSVWriter:
     private static final char NEW_LINE
 me.kuehle.carreport.util.Calculator:
     21:21:public Calculator()
-me.kuehle.carreport.util.DemoData:
-    33:33:public DemoData()
+me.kuehle.carreport.util.DemoData
 me.kuehle.carreport.util.Strings:
     22:22:public Strings()
     24:24:public static varargs java.lang.String concat(java.lang.String[])

@@ -155,7 +155,7 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
 		fillList();
-		
+
 		if (savedInstanceState != null) {
 			long id = savedInstanceState.getLong(
 					STATE_CURRENTLY_EDITED_FUEL_TYPE, 0);
@@ -241,7 +241,7 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 		super.onSaveInstanceState(outState);
 		if (currentlyEditedFuelType != null) {
 			outState.putLong(STATE_CURRENTLY_EDITED_FUEL_TYPE,
-					currentlyEditedFuelType.getId());
+					currentlyEditedFuelType.id);
 		}
 	}
 

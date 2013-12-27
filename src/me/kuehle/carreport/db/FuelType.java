@@ -44,13 +44,13 @@ public class FuelType extends Model {
 		return SafeSelect.from(FuelTank.class)
 				.join(PossibleFuelTypeForFuelTank.class)
 				.on("fuel_tanks.Id = fuel_types_fuel_tanks.fuel_tank")
-				.where("fuel_types_fuel_tanks.fuel_type = ?", getId())
+				.where("fuel_types_fuel_tanks.fuel_type = ?", id)
 				.execute();
 	}
 	
 	public List<Refueling> refuelings() {
 		return new Select().from(Refueling.class)
-				.where("fuel_type = ?", getId()).orderBy("date ASC").execute();
+				.where("fuel_type = ?", id).orderBy("date ASC").execute();
 	}
 
 	/**

@@ -46,7 +46,7 @@ public class PossibleFuelTypeForFuelTank extends Model {
 				.from(PossibleFuelTypeForFuelTank.class)
 				.where("fuel_types_fuel_tanks.fuel_tank IN ("
 						+ new Select("fuel_tanks.Id").from(FuelTank.class)
-								.where("fuel_tanks.car = " + car.getId())
+								.where("fuel_tanks.car = " + car.id)
 								.toSql() + ")").execute();
 	}
 }

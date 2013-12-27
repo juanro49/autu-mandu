@@ -57,12 +57,12 @@ public class Car extends Model {
 	public List<Refueling> refuelings() {
 		return SafeSelect.from(Refueling.class).join(FuelTank.class)
 				.on("refuelings.fuel_tank = fuel_tanks.Id")
-				.where("fuel_tanks.car = ?", getId())
+				.where("fuel_tanks.car = ?", id)
 				.orderBy("refuelings.date ASC").execute();
 	}
 
 	public List<OtherCost> otherCosts() {
-		return new Select().from(OtherCost.class).where("car = ?", getId())
+		return new Select().from(OtherCost.class).where("car = ?", id)
 				.orderBy("date ASC").execute();
 	}
 
