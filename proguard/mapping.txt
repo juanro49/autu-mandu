@@ -1838,10 +1838,10 @@ android.support.v4.widget.ViewDragHelper$Callback -> android.support.v4.widget.a
     int clampViewPositionHorizontal$17e143b0(android.view.View,int) -> b
     int clampViewPositionVertical$17e143b0(android.view.View) -> d
 com.activeandroid.ActiveAndroid -> com.activeandroid.ActiveAndroid:
-    void initialize(android.app.Application) -> initialize
-    void initialize(android.app.Application,int) -> initialize
-    void initialize(android.app.Application,boolean) -> initialize
-    void initialize(android.app.Application,int,boolean) -> initialize
+    void initialize(android.content.Context) -> initialize
+    void initialize(com.activeandroid.Configuration) -> initialize
+    void initialize(android.content.Context,boolean) -> initialize
+    void initialize(com.activeandroid.Configuration,boolean) -> initialize
     void clearCache() -> clearCache
     void dispose() -> dispose
     void setLoggingEnabled(boolean) -> setLoggingEnabled
@@ -1859,7 +1859,7 @@ com.activeandroid.Cache -> com.activeandroid.Cache:
     com.activeandroid.DatabaseHelper sDatabaseHelper -> sDatabaseHelper
     android.support.v4.util.LruCache sEntities -> sEntities
     boolean sIsInitialized -> sIsInitialized
-    void initialize(android.app.Application,int) -> initialize
+    void initialize(com.activeandroid.Configuration) -> initialize
     void clear() -> clear
     void dispose() -> dispose
     android.database.sqlite.SQLiteDatabase openDatabase() -> openDatabase
@@ -1869,30 +1869,76 @@ com.activeandroid.Cache -> com.activeandroid.Cache:
     java.lang.String getIdentifier(com.activeandroid.Model) -> getIdentifier
     void addEntity(com.activeandroid.Model) -> addEntity
     com.activeandroid.Model getEntity(java.lang.Class,long) -> getEntity
+    void updateEntityId(com.activeandroid.Model,long) -> updateEntityId
     void removeEntity(com.activeandroid.Model) -> removeEntity
     java.util.Collection getTableInfos() -> getTableInfos
     com.activeandroid.TableInfo getTableInfo(java.lang.Class) -> getTableInfo
     com.activeandroid.serializer.TypeSerializer getParserForType(java.lang.Class) -> getParserForType
     java.lang.String getTableName(java.lang.Class) -> getTableName
-com.activeandroid.DatabaseHelper -> com.activeandroid.DatabaseHelper:
+com.activeandroid.Configuration -> com.activeandroid.Configuration:
+    android.content.Context mContext -> mContext
+    java.lang.String mDatabaseName -> mDatabaseName
+    int mDatabaseVersion -> mDatabaseVersion
+    java.util.List mModelClasses -> mModelClasses
+    java.util.List mTypeSerializers -> mTypeSerializers
+    int mCacheSize -> mCacheSize
+    android.content.Context getContext() -> getContext
+    java.lang.String getDatabaseName() -> getDatabaseName
+    int getDatabaseVersion() -> getDatabaseVersion
+    java.util.List getModelClasses() -> getModelClasses
+    java.util.List getTypeSerializers() -> getTypeSerializers
+    int getCacheSize() -> getCacheSize
+    boolean isValid() -> isValid
+    int access$102(com.activeandroid.Configuration,int) -> access$102
+    java.lang.String access$202(com.activeandroid.Configuration,java.lang.String) -> access$202
+    int access$302(com.activeandroid.Configuration,int) -> access$302
+    java.util.List access$402(com.activeandroid.Configuration,java.util.List) -> access$402
+    java.util.List access$502(com.activeandroid.Configuration,java.util.List) -> access$502
+com.activeandroid.Configuration$1 -> com.activeandroid.Configuration$1:
+com.activeandroid.Configuration$Builder -> com.activeandroid.Configuration$Builder:
     java.lang.String AA_DB_NAME -> AA_DB_NAME
     java.lang.String AA_DB_VERSION -> AA_DB_VERSION
+    java.lang.String AA_MODELS -> AA_MODELS
+    java.lang.String AA_SERIALIZERS -> AA_SERIALIZERS
+    int DEFAULT_CACHE_SIZE -> DEFAULT_CACHE_SIZE
+    java.lang.String DEFAULT_DB_NAME -> DEFAULT_DB_NAME
+    android.content.Context mContext -> mContext
+    java.lang.Integer mCacheSize -> mCacheSize
+    java.lang.String mDatabaseName -> mDatabaseName
+    java.lang.Integer mDatabaseVersion -> mDatabaseVersion
+    java.util.List mModelClasses -> mModelClasses
+    java.util.List mTypeSerializers -> mTypeSerializers
+    com.activeandroid.Configuration$Builder setCacheSize(int) -> setCacheSize
+    com.activeandroid.Configuration$Builder setDatabaseName(java.lang.String) -> setDatabaseName
+    com.activeandroid.Configuration$Builder setDatabaseVersion(int) -> setDatabaseVersion
+    com.activeandroid.Configuration$Builder addModelClass(java.lang.Class) -> addModelClass
+    com.activeandroid.Configuration$Builder addModelClasses(java.lang.Class[]) -> addModelClasses
+    com.activeandroid.Configuration$Builder setModelClasses(java.lang.Class[]) -> setModelClasses
+    com.activeandroid.Configuration$Builder addTypeSerializer(java.lang.Class) -> addTypeSerializer
+    com.activeandroid.Configuration$Builder addTypeSerializers(java.lang.Class[]) -> addTypeSerializers
+    com.activeandroid.Configuration$Builder setTypeSerializers(java.lang.Class[]) -> setTypeSerializers
+    com.activeandroid.Configuration create() -> create
+    java.lang.String getMetaDataDatabaseNameOrDefault() -> getMetaDataDatabaseNameOrDefault
+    int getMetaDataDatabaseVersionOrDefault() -> getMetaDataDatabaseVersionOrDefault
+    java.util.List loadModelList(java.lang.String[]) -> loadModelList
+    java.util.List loadSerializerList(java.lang.String[]) -> loadSerializerList
+    java.lang.String ensurePackageInName(java.lang.String) -> ensurePackageInName
+com.activeandroid.DatabaseHelper -> com.activeandroid.DatabaseHelper:
     java.lang.String MIGRATION_PATH -> MIGRATION_PATH
-    boolean sDoInitialUpgrade -> sDoInitialUpgrade
     void onOpen(android.database.sqlite.SQLiteDatabase) -> onOpen
     void onCreate(android.database.sqlite.SQLiteDatabase) -> onCreate
     void onUpgrade(android.database.sqlite.SQLiteDatabase,int,int) -> onUpgrade
-    boolean copyAttachedDatabase(android.content.Context) -> copyAttachedDatabase
+    void copyAttachedDatabase(android.content.Context,java.lang.String) -> copyAttachedDatabase
     void executePragmas(android.database.sqlite.SQLiteDatabase) -> executePragmas
     void executeCreate(android.database.sqlite.SQLiteDatabase) -> executeCreate
     boolean executeMigrations(android.database.sqlite.SQLiteDatabase,int,int) -> executeMigrations
     void executeSqlScript(android.database.sqlite.SQLiteDatabase,java.lang.String) -> executeSqlScript
-    java.lang.String getDbName(android.content.Context) -> getDbName
-    int getDbVersion(android.content.Context) -> getDbVersion
 com.activeandroid.Model -> com.activeandroid.Model:
-    java.lang.Long mId -> mId
+    java.lang.Long id -> id
+    java.lang.Long mPersistedId -> mPersistedId
     com.activeandroid.TableInfo mTableInfo -> mTableInfo
     java.lang.Long getId() -> getId
+    java.lang.Long getPersistedId() -> getPersistedId
     void delete() -> delete
     void save() -> save
     void delete(java.lang.Class,long) -> delete
@@ -1902,19 +1948,13 @@ com.activeandroid.Model -> com.activeandroid.Model:
     java.lang.String toString() -> toString
     boolean equals(java.lang.Object) -> equals
 com.activeandroid.ModelInfo -> com.activeandroid.ModelInfo:
-    java.lang.String AA_MODELS -> AA_MODELS
-    java.lang.String AA_SERIALIZERS -> AA_SERIALIZERS
     java.util.Map mTableInfos -> mTableInfos
     java.util.Map mTypeSerializers -> mTypeSerializers
     java.util.Collection getTableInfos() -> getTableInfos
     com.activeandroid.TableInfo getTableInfo(java.lang.Class) -> getTableInfo
-    java.util.List getModelClasses() -> getModelClasses
     com.activeandroid.serializer.TypeSerializer getTypeSerializer(java.lang.Class) -> getTypeSerializer
-    boolean loadModelFromMetaData(android.app.Application) -> loadModelFromMetaData
-    void loadModelList(android.content.Context,java.lang.String[]) -> loadModelList
-    void loadSerializerList(android.content.Context,java.lang.String[]) -> loadSerializerList
-    java.lang.String ensureFullClassName(android.content.Context,java.lang.String) -> ensureFullClassName
-    void scanForModel(android.app.Application) -> scanForModel
+    boolean loadModelFromMetaData(com.activeandroid.Configuration) -> loadModelFromMetaData
+    void scanForModel(android.content.Context) -> scanForModel
     void scanForModelClasses(java.io.File,java.lang.String,java.lang.ClassLoader) -> scanForModelClasses
 com.activeandroid.ModelInfo$1 -> com.activeandroid.ModelInfo$1:
     com.activeandroid.ModelInfo this$0 -> this$0
@@ -1972,6 +2012,7 @@ com.activeandroid.content.ContentProvider -> com.activeandroid.content.ContentPr
     android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String) -> query
     android.net.Uri createUri(java.lang.Class,java.lang.Long) -> createUri
     java.lang.String getAuthority() -> getAuthority
+    com.activeandroid.Configuration getConfiguration() -> getConfiguration
     java.lang.Class getModelType(android.net.Uri) -> getModelType
     void notifyChange(android.net.Uri) -> notifyChange
 com.activeandroid.query.Delete -> com.activeandroid.query.Delete:
@@ -2059,6 +2100,13 @@ com.activeandroid.query.Update -> com.activeandroid.query.Update:
     com.activeandroid.query.Set set(java.lang.String,java.lang.Object[]) -> set
     java.lang.Class getType() -> getType
     java.lang.String toSql() -> toSql
+com.activeandroid.serializer.BigDecimalSerializer -> com.activeandroid.serializer.BigDecimalSerializer:
+    java.lang.Class getDeserializedType() -> getDeserializedType
+    java.lang.Class getSerializedType() -> getSerializedType
+    java.lang.String serialize(java.lang.Object) -> serialize
+    java.math.BigDecimal deserialize(java.lang.Object) -> deserialize
+    java.lang.Object deserialize(java.lang.Object) -> deserialize
+    java.lang.Object serialize(java.lang.Object) -> serialize
 com.activeandroid.serializer.CalendarSerializer -> com.activeandroid.serializer.CalendarSerializer:
     java.lang.Class getDeserializedType() -> getDeserializedType
     java.lang.Class getSerializedType() -> getSerializedType
@@ -2078,6 +2126,13 @@ com.activeandroid.serializer.TypeSerializer -> com.activeandroid.serializer.Type
     java.lang.Class getSerializedType() -> getSerializedType
     java.lang.Object serialize(java.lang.Object) -> serialize
     java.lang.Object deserialize(java.lang.Object) -> deserialize
+com.activeandroid.serializer.UUIDSerializer -> com.activeandroid.serializer.UUIDSerializer:
+    java.lang.Class getDeserializedType() -> getDeserializedType
+    java.lang.Class getSerializedType() -> getSerializedType
+    java.lang.String serialize(java.lang.Object) -> serialize
+    java.util.UUID deserialize(java.lang.Object) -> deserialize
+    java.lang.Object deserialize(java.lang.Object) -> deserialize
+    java.lang.Object serialize(java.lang.Object) -> serialize
 com.activeandroid.serializer.UtilDateSerializer -> com.activeandroid.serializer.UtilDateSerializer:
     java.lang.Class getDeserializedType() -> getDeserializedType
     java.lang.Class getSerializedType() -> getSerializedType
@@ -6346,6 +6401,7 @@ me.kuehle.carreport.data.report.AbstractReport -> me.kuehle.carreport.data.repor
     android.content.Context context -> context
     java.util.ArrayList data -> data
     boolean showTrend -> showTrend
+    boolean showOverallTrend -> showOverallTrend
     int chartOption -> chartOption
     boolean initialized -> initialized
     me.kuehle.chartlib.axis.AxisLabelFormatter dateLabelFormatter -> dateLabelFormatter
@@ -6357,8 +6413,10 @@ me.kuehle.carreport.data.report.AbstractReport -> me.kuehle.carreport.data.repor
     java.util.List getData(boolean) -> getData
     java.lang.String getTitle() -> getTitle
     boolean isShowTrend() -> isShowTrend
+    boolean isShowOverallTrend() -> isShowOverallTrend
     void setChartOption(int) -> setChartOption
     void setShowTrend(boolean) -> setShowTrend
+    void setShowOverallTrend(boolean) -> setShowOverallTrend
     void update() -> update
     void addData(java.lang.String,java.lang.String) -> addData
     me.kuehle.carreport.data.report.AbstractReport$Section addDataSection(java.lang.String,int) -> addDataSection
@@ -6397,12 +6455,16 @@ me.kuehle.carreport.data.report.AbstractReportGraphData -> me.kuehle.carreport.d
     java.util.Vector xValues -> xValues
     java.util.Vector yValues -> yValues
     void applySeriesStyle(int,me.kuehle.chartlib.renderer.AbstractRenderer) -> applySeriesStyle
-    me.kuehle.carreport.data.report.AbstractReportGraphData createRegressionData() -> createRegressionData
+    me.kuehle.carreport.data.report.AbstractReportGraphData createTrendData() -> createTrendData
+    me.kuehle.carreport.data.report.AbstractReportGraphData createOverallTrendData() -> createOverallTrendData
     me.kuehle.chartlib.data.Series getSeries() -> getSeries
     boolean isEmpty() -> isEmpty
     int size() -> size
     void sort() -> sort
-me.kuehle.carreport.data.report.AbstractReportGraphData$RegressionReportData -> me.kuehle.carreport.data.report.AbstractReportGraphData$RegressionReportData:
+me.kuehle.carreport.data.report.AbstractReportGraphData$OverallTrendReportData -> me.kuehle.carreport.data.report.AbstractReportGraphData$OverallTrendReportData:
+    me.kuehle.carreport.data.report.AbstractReportGraphData this$0 -> this$0
+    void applySeriesStyle(int,me.kuehle.chartlib.renderer.AbstractRenderer) -> applySeriesStyle
+me.kuehle.carreport.data.report.AbstractReportGraphData$TrendReportData -> me.kuehle.carreport.data.report.AbstractReportGraphData$TrendReportData:
     me.kuehle.carreport.data.report.AbstractReportGraphData this$0 -> this$0
     void applySeriesStyle(int,me.kuehle.chartlib.renderer.AbstractRenderer) -> applySeriesStyle
 me.kuehle.carreport.data.report.CostsReport -> me.kuehle.carreport.data.report.CostsReport:
@@ -6430,7 +6492,7 @@ me.kuehle.carreport.data.report.CostsReport$ReportGraphData -> me.kuehle.carrepo
     int option -> option
     me.kuehle.carreport.data.report.CostsReport this$0 -> this$0
     void add(org.joda.time.DateTime,double) -> add
-    me.kuehle.carreport.data.report.AbstractReportGraphData createRegressionData() -> createRegressionData
+    me.kuehle.carreport.data.report.AbstractReportGraphData createOverallTrendData() -> createOverallTrendData
 me.kuehle.carreport.data.report.FuelConsumptionReport -> me.kuehle.carreport.data.report.FuelConsumptionReport:
     java.util.Vector reportData -> reportData
     double minXValue -> minXValue
@@ -7704,6 +7766,7 @@ me.kuehle.chartlib.renderer.RendererList -> me.kuehle.chartlib.d.g:
     java.util.ArrayList renderers -> a
     android.util.SparseArray mapping -> b
     void addRenderer(me.kuehle.chartlib.renderer.AbstractRenderer) -> a
+    void mapSeriesToRenderer(int,me.kuehle.chartlib.renderer.AbstractRenderer) -> a
 me.kuehle.chartlib.util.Size -> me.kuehle.chartlib.e.a:
     android.content.Context context -> c
     int size -> a
