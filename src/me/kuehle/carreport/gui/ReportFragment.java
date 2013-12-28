@@ -241,6 +241,12 @@ public class ReportFragment extends Fragment implements
 			((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
 					.setChart(mCurrentMenuReport.getChart(false, false));
 			return true;
+		} else if (item.getItemId() == R.id.menu_show_overall_trend) {
+			mCurrentMenuReport.setShowOverallTrend(!item.isChecked());
+			saveGraphSettings(mCurrentMenuReport);
+			((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
+					.setChart(mCurrentMenuReport.getChart(false, false));
+			return true;
 		} else if (item.getGroupId() == R.id.group_graph) {
 			mCurrentMenuReport.setChartOption(item.getOrder());
 			saveGraphSettings(mCurrentMenuReport);
@@ -293,6 +299,8 @@ public class ReportFragment extends Fragment implements
 				getClass().getName(), Context.MODE_PRIVATE);
 		String reportName = report.getClass().getSimpleName();
 		report.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
+		report.setShowOverallTrend(prefs.getBoolean(reportName
+				+ "_show_overall_trend", false));
 		report.setChartOption(prefs.getInt(
 				reportName + "_current_chart_option", 0));
 	}
@@ -303,6 +311,8 @@ public class ReportFragment extends Fragment implements
 						Context.MODE_PRIVATE).edit();
 		String reportName = report.getClass().getSimpleName();
 		prefsEdit.putBoolean(reportName + "_show_trend", report.isShowTrend());
+		prefsEdit.putBoolean(reportName + "_show_overall_trend",
+				report.isShowOverallTrend());
 		prefsEdit.putInt(reportName + "_current_chart_option",
 				report.getChartOption());
 		prefsEdit.apply();
@@ -410,6 +420,8 @@ public class ReportFragment extends Fragment implements
 
 		Menu menu = popup.getMenu();
 		menu.findItem(R.id.menu_show_trend).setChecked(report.isShowTrend());
+		menu.findItem(R.id.menu_show_overall_trend).setChecked(
+				report.isShowOverallTrend());
 
 		int[] graphOptions = report.getAvailableChartOptions();
 		if (graphOptions.length >= 2) {

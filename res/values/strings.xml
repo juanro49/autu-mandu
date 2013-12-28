@@ -33,6 +33,7 @@
     <string name="menu_add_car">Add car</string>
     <string name="menu_add_fuel_type">Add fuel type</string>
     <string name="menu_show_trend">Show trend</string>
+    <string name="menu_show_overall_trend">Show overall trend</string>
     
     <string name="section_car">Car</string>
     <string name="section_note">Note</string>
@@ -135,6 +136,7 @@
     <string name="report_title_mileage">Mileage</string>
     <string name="report_title_costs">Costs</string>
     <string name="report_trend_label">%s (Trend)</string>
+    <string name="report_overall_trend_label">%s (Overall trend)</string>
     <string name="report_graph_month_history">Month History</string>
     <string name="report_graph_year_history">Year History</string>
     <string name="report_graph_accumulated">Accumulated</string>

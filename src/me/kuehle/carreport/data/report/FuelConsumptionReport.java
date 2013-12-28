@@ -134,12 +134,21 @@ public class FuelConsumptionReport extends AbstractReport {
 		renderers.addRenderer(renderer);
 
 		Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
+		
 		if (isShowTrend()) {
 			for (AbstractReportGraphData data : this.reportData) {
-				reportData.add(data.createRegressionData());
+				reportData.add(data.createTrendData());
 			}
 		}
+		
+		if (isShowOverallTrend()) {
+			for (AbstractReportGraphData data : this.reportData) {
+				reportData.add(data.createOverallTrendData());
+			}
+		}
+		
 		reportData.addAll(this.reportData);
+		
 		for (int i = 0; i < reportData.size(); i++) {
 			dataset.add(reportData.get(i).getSeries());
 			reportData.get(i).applySeriesStyle(i, renderer);

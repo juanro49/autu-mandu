@@ -69,16 +69,16 @@ public class CostsReport extends AbstractReport {
 		}
 
 		@Override
-		public AbstractReportGraphData createRegressionData() {
+		public AbstractReportGraphData createOverallTrendData() {
 			if (size() == 0) {
-				return super.createRegressionData();
+				return super.createOverallTrendData();
 			}
 
 			long lastX = xValues.lastElement();
 			xValues.remove(xValues.size() - 1);
 			double lastY = yValues.lastElement();
 			yValues.remove(yValues.size() - 1);
-			AbstractReportGraphData data = super.createRegressionData();
+			AbstractReportGraphData data = super.createOverallTrendData();
 			xValues.add(lastX);
 			yValues.add(lastY);
 			return data;
@@ -157,7 +157,15 @@ public class CostsReport extends AbstractReport {
 			series++;
 
 			if (isShowTrend()) {
-				AbstractReportGraphData trendData = data.createRegressionData();
+				AbstractReportGraphData trendData = data.createTrendData();
+				dataset.add(trendData.getSeries());
+				trendData.applySeriesStyle(series, trendRenderer);
+				renderers.mapSeriesToRenderer(series, trendRenderer);
+				series++;
+			}
+			
+			if (isShowOverallTrend()) {
+				AbstractReportGraphData trendData = data.createOverallTrendData();
 				dataset.add(trendData.getSeries());
 				trendData.applySeriesStyle(series, trendRenderer);
 				renderers.mapSeriesToRenderer(series, trendRenderer);

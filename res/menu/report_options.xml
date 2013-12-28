@@ -20,6 +20,11 @@
         android:checkable="true"
         android:title="@string/menu_show_trend">
     </item>
+    <item
+        android:id="@+id/menu_show_overall_trend"
+        android:checkable="true"
+        android:title="@string/menu_show_overall_trend">
+    </item>
     <group
         android:id="@+id/group_graph"
         android:checkableBehavior="single" >

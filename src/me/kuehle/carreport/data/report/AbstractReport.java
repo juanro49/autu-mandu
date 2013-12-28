@@ -167,6 +167,7 @@ public abstract class AbstractReport {
 	protected Context context;
 	private ArrayList<AbstractListItem> data = new ArrayList<AbstractListItem>();
 	private boolean showTrend = false;
+	private boolean showOverallTrend = false;
 	private int chartOption = 0;
 
 	private boolean initialized = false;
@@ -224,6 +225,10 @@ public abstract class AbstractReport {
 	public boolean isShowTrend() {
 		return showTrend;
 	}
+	
+	public boolean isShowOverallTrend() {
+		return showOverallTrend;
+	}
 
 	public void setChartOption(int chartOption) {
 		if (chartOption < getAvailableChartOptions().length) {
@@ -235,6 +240,10 @@ public abstract class AbstractReport {
 
 	public void setShowTrend(boolean showTrend) {
 		this.showTrend = showTrend;
+	}
+	
+	public void setShowOverallTrend(boolean showOverallTrend) {
+		this.showOverallTrend = showOverallTrend;
 	}
 
 	public void update() {

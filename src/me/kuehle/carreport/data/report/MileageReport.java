@@ -98,12 +98,21 @@ public class MileageReport extends AbstractReport {
 		Vector<AbstractReportGraphData> reportData = getChartOption() == GRAPH_OPTION_ACCUMULATED ? reportDataAccumulated
 				: reportDataPerRefueling;
 		Vector<AbstractReportGraphData> chartReportData = new Vector<AbstractReportGraphData>();
+
 		if (isShowTrend()) {
 			for (AbstractReportGraphData data : reportData) {
-				chartReportData.add(data.createRegressionData());
+				chartReportData.add(data.createTrendData());
 			}
 		}
+
+		if (isShowOverallTrend()) {
+			for (AbstractReportGraphData data : reportData) {
+				chartReportData.add(data.createOverallTrendData());
+			}
+		}
+
 		chartReportData.addAll(reportData);
+
 		for (int i = 0; i < chartReportData.size(); i++) {
 			dataset.add(chartReportData.get(i).getSeries());
 			chartReportData.get(i).applySeriesStyle(i, renderer);

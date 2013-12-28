@@ -84,7 +84,14 @@ public class FuelPriceReport extends AbstractReport {
 
 			if (isShowTrend()) {
 				AbstractReportGraphData trendReportData = data
-						.createRegressionData();
+						.createTrendData();
+				dataset.add(trendReportData.getSeries());
+				trendReportData.applySeriesStyle(series++, renderer);
+			}
+
+			if (isShowOverallTrend()) {
+				AbstractReportGraphData trendReportData = data
+						.createOverallTrendData();
 				dataset.add(trendReportData.getSeries());
 				trendReportData.applySeriesStyle(series++, renderer);
 			}
