@@ -13,6 +13,10 @@ and displays nice reports. The following are currently included:
 It provides basic synchronization with Dropbox and Google Drive and has basic backup/restore
 and CSV import/export functionality.
 
+## Get it
+
+https://play.google.com/store/apps/details?id=me.kuehle.carreport
+
 ## Used libraries
 
 * [Joda Time](http://joda-time.sourceforge.net)
