@@ -18,6 +18,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
+    <!-- Title -->
     <TextView
         style="@style/edit_title"
         android:layout_width="match_parent"
@@ -31,6 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
+            <!-- Date -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,22 +54,34 @@
                     android:focusable="false"
                     android:inputType="time" />
             </LinearLayout>
-            <FrameLayout
+            <!-- Mileage -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-                <EditText
-                    android:id="@+id/edt_mileage"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="@string/hint_mileage"
-                    android:inputType="number" />
-                <TextView
-                    android:id="@+id/txt_unit_distance"
-                    android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+	            <FrameLayout
+	                android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginRight="8dp" />
-            </FrameLayout>
+                    android:layout_weight="1" >
+	                <EditText
+	                    android:id="@+id/edt_mileage"
+	                    android:layout_width="match_parent"
+	                    android:layout_height="48dp"
+	                    android:inputType="number" />
+	                <TextView
+	                    android:id="@+id/txt_unit_distance"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:layout_gravity="right|center_vertical"
+	                    android:layout_marginRight="8dp" />
+	            </FrameLayout>
+	            <Spinner
+                    android:id="@+id/spn_distance_entry_mode"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="0.5" />
+            </LinearLayout>
+            <!-- Volume -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,11 +109,13 @@
                     android:layout_height="48dp"
                     android:layout_weight="0.5" />
             </LinearLayout>
+            <!-- Partial -->
             <CheckBox
                 android:id="@+id/chk_partial"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="@string/label_partial" />
+            <!-- Price -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
@@ -116,6 +132,7 @@
                     android:layout_gravity="right|center_vertical"
                     android:layout_marginRight="8dp" />
             </FrameLayout>
+            <!-- Note -->
             <TextView
                 style="@style/section_header"
                 android:layout_width="match_parent"
@@ -127,6 +144,7 @@
                 android:layout_height="48dp"
                 android:hint="@string/hint_note_optional"
                 android:inputType="text|textMultiLine" />
+            <!-- Car -->
             <TextView
                 style="@style/section_header"
                 android:layout_width="match_parent"

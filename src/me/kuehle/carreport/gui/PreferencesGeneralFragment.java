@@ -19,6 +19,7 @@ package me.kuehle.carreport.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.kuehle.carreport.DistanceEntryMode;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.FuelConsumption;
@@ -46,6 +47,10 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 				Car car = Car.load(Car.class,
 						Long.parseLong(newValue.toString()));
 				preference.setSummary(car.name);
+			} else if (prefKey.equals("behavior_distance_entry_mode")) {
+				DistanceEntryMode mode = DistanceEntryMode.valueOf(newValue
+						.toString());
+				preference.setSummary(getString(mode.nameResourceId));
 			} else if (preference instanceof EditTextPreference) {
 				preference.setSummary(newValue.toString());
 
@@ -63,6 +68,7 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 				updateFuelConsumptionField(fuelConsumption,
 						(ListPreference) preference);
 			}
+			
 			return true;
 		}
 
@@ -127,6 +133,25 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			CheckBoxPreference showCarMenu = (CheckBoxPreference) findPreference("behavior_show_car_menu");
 			showCarMenu
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
+		}
+
+		// Behavior distance entry mode
+		{
+			DistanceEntryMode[] modes = DistanceEntryMode.values();
+			String[] entries = new String[modes.length];
+			String[] entryValues = new String[modes.length];
+			for (int i = 0; i < modes.length; i++) {
+				entries[i] = getString(modes[i].nameResourceId);
+				entryValues[i] = modes[i].name();
+			}
+
+			ListPreference distanceEntryMode = (ListPreference) findPreference("behavior_distance_entry_mode");
+			distanceEntryMode.setEntries(entries);
+			distanceEntryMode.setEntryValues(entryValues);
+			distanceEntryMode
+					.setOnPreferenceChangeListener(onPreferenceChangeListener);
+			distanceEntryMode
+					.setSummary(getString(prefs.getDistanceEntryMode().nameResourceId));
 		}
 
 		// Appearance color sections

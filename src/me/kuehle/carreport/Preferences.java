@@ -35,7 +35,7 @@ import android.preference.PreferenceManager;
 
 public class Preferences {
 	private SharedPreferences prefs;
-	
+
 	public Preferences(Context context) {
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
 	}
@@ -54,6 +54,11 @@ public class Preferences {
 		}
 
 		return cars.get(0).id;
+	}
+
+	public DistanceEntryMode getDistanceEntryMode() {
+		String mode = prefs.getString("behavior_distance_entry_mode", "TOTAL");
+		return DistanceEntryMode.valueOf(mode);
 	}
 
 	public String getDropboxAccount() {
@@ -128,9 +133,10 @@ public class Preferences {
 	public String getUnitVolume() {
 		return prefs.getString("unit_volume", "l");
 	}
-	
+
 	public int getUnitFuelConsumption() {
-		int id = Integer.parseInt(prefs.getString("unit_fuel_consumption", "0"));
+		int id = Integer
+				.parseInt(prefs.getString("unit_fuel_consumption", "0"));
 		return id;
 	}
 

@@ -41,8 +41,7 @@
     <string name="section_suspend">Stilllegen</string>
     <string name="section_recurrence">Wiederholung</string>
 
-    <string name="hint_mileage">Kilometerstand</string>
-    <string name="hint_mileage_optional">Kilometerstand (optional)</string>
+    <string name="hint_mileage_optional">Gesamtkilometer (optional)</string>
     <string name="hint_volume">Volumen</string>
     <string name="hint_price">Preis</string>
     <string name="hint_note_optional">Notiz (optional)</string>
@@ -172,6 +171,7 @@
     <string name="pref_title_category_export">Exportieren &amp; Importieren</string>
     <string name="pref_title_behavior_default_car">Standard-Auto</string>
     <string name="pref_title_behavior_show_car_menu">Zeige Autoauswahlmenü</string>
+    <string name="pref_title_behavior_distance_entry_mode">Entfernungseingabe</string>
     <string name="pref_title_appearance_color_sections">Farbige Abschnitte</string>
     <string name="pref_title_appearance_show_legend">Legende in Graphen anzeigen</string>
     <string name="pref_title_unit_currency">Währung</string>
@@ -222,6 +222,9 @@
 
     <string name="drawer_open">Navigation öffnen</string>
     <string name="drawer_close">Navigation schließen</string>
+    <string name="distance_entry_mode_trip">Tageskilometer</string>
+    <string name="distance_entry_mode_total">Gesamtkilometer</string>
+    <string name="distance_entry_mode_show_selector">Auswahl anzeigen</string>
     <string name="graph_details_desc">Graph-Details</string>
     <string name="graph_options_desc">Graph-Optionen</string>
     <string name="graph_close_full_screen_desc">Vollbildgraph schließen</string>

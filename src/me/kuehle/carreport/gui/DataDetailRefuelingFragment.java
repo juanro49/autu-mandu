@@ -19,6 +19,7 @@ package me.kuehle.carreport.gui;
 import java.util.Date;
 import java.util.List;
 
+import me.kuehle.carreport.DistanceEntryMode;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
@@ -79,6 +80,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 	private EditText edtVolume;
 	private CheckBox chkPartial;
 	private EditText edtPrice;
+	private Spinner spnDistanceEntryMode;
 	private Spinner spnFuelType;
 	private EditText edtNote;
 	private Spinner spnCar;
@@ -123,7 +125,6 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 					refueling.date));
 			edtTime.setText(DateFormat.getTimeFormat(getActivity()).format(
 					refueling.date));
-			edtMileage.setText(String.valueOf(refueling.mileage));
 			edtVolume.setText(String.valueOf(refueling.volume));
 			chkPartial.setChecked(refueling.partial);
 			edtPrice.setText(String.valueOf(refueling.price));
@@ -133,6 +134,15 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 				if (cars.get(pos).id == refueling.fuelTank.car.id) {
 					spnCar.setSelection(pos);
 				}
+			}
+
+			Refueling previousRefueling = getPreviousRefueling();
+			if (getDistanceEntryMode() == DistanceEntryMode.TRIP
+					&& previousRefueling != null) {
+				edtMileage.setText(String.valueOf(refueling.mileage
+						- previousRefueling.mileage));
+			} else {
+				edtMileage.setText(String.valueOf(refueling.mileage));
 			}
 		}
 	}
@@ -182,10 +192,13 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		edtVolume = (EditText) v.findViewById(R.id.edt_volume);
 		chkPartial = (CheckBox) v.findViewById(R.id.chk_partial);
 		edtPrice = (EditText) v.findViewById(R.id.edt_price);
+		spnDistanceEntryMode = (Spinner) v
+				.findViewById(R.id.spn_distance_entry_mode);
 		spnFuelType = (Spinner) v.findViewById(R.id.spn_fuel_type);
 		edtNote = (EditText) v.findViewById(R.id.edt_note);
 		spnCar = (Spinner) v.findViewById(R.id.spn_car);
 
+		// Date and time
 		edtDate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -206,6 +219,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			}
 		});
 
+		// Units
 		((TextView) v.findViewById(R.id.txt_unit_currency)).setText(prefs
 				.getUnitCurrency());
 		((TextView) v.findViewById(R.id.txt_unit_distance)).setText(prefs
@@ -213,6 +227,40 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		((TextView) v.findViewById(R.id.txt_unit_volume)).setText(prefs
 				.getUnitVolume());
 
+		// Distance entry mode
+		ArrayAdapter<String> distanceEntryModeAdapter = new ArrayAdapter<String>(
+				getActivity(), android.R.layout.simple_spinner_dropdown_item);
+		distanceEntryModeAdapter
+				.add(getString(DistanceEntryMode.TRIP.nameResourceId));
+		distanceEntryModeAdapter
+				.add(getString(DistanceEntryMode.TOTAL.nameResourceId));
+		spnDistanceEntryMode.setAdapter(distanceEntryModeAdapter);
+		spnDistanceEntryMode
+				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+					@Override
+					public void onItemSelected(AdapterView<?> parentView,
+							View selectedItemView, int position, long id) {
+						DistanceEntryMode mode = getDistanceEntryMode();
+						edtMileage.setHint(mode.nameResourceId);
+					}
+
+					@Override
+					public void onNothingSelected(AdapterView<?> parentView) {
+					}
+				});
+
+		if (prefs.getDistanceEntryMode() != DistanceEntryMode.SHOW_SELECTOR) {
+			if (prefs.getDistanceEntryMode() == DistanceEntryMode.TRIP) {
+				spnDistanceEntryMode.setSelection(0);
+			} else if (prefs.getDistanceEntryMode() == DistanceEntryMode.TOTAL) {
+				spnDistanceEntryMode.setSelection(1);
+			}
+
+			spnDistanceEntryMode.setVisibility(View.GONE);
+			edtMileage.setHint(getDistanceEntryMode().nameResourceId);
+		}
+
+		// Car
 		ArrayAdapter<String> carAdapter = new ArrayAdapter<String>(
 				getActivity(), android.R.layout.simple_spinner_dropdown_item);
 		cars = Car.getAll();
@@ -226,9 +274,6 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			public void onItemSelected(AdapterView<?> parentView,
 					View selectedItemView, int position, long id) {
 				Car car = cars.get(position);
-				// TODO: Wenn eine Tankfüllung existiert mit FuelType und
-				// FuelTank, dann soll das in der auswahl angezeigt werden, auch
-				// wenn der PossibleFuelType nicht existiert.
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 						getActivity(),
 						android.R.layout.simple_spinner_dropdown_item);
@@ -299,6 +344,12 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 				.getSelectedItemPosition());
 		String note = edtNote.getText().toString().trim();
 
+		Refueling previousRefueling = getPreviousRefueling();
+		if (getDistanceEntryMode() == DistanceEntryMode.TRIP
+				&& previousRefueling != null) {
+			mileage += previousRefueling.mileage;
+		}
+
 		if (!isInEditMode()) {
 			new Refueling(date, mileage, volume, price, partial, note,
 					holder.type, holder.tank).save();
@@ -314,5 +365,20 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 			refueling.fuelTank = holder.tank;
 			refueling.save();
 		}
+	}
+
+	private DistanceEntryMode getDistanceEntryMode() {
+		if (spnDistanceEntryMode.getSelectedItemPosition() == 0) {
+			return DistanceEntryMode.TRIP;
+		} else {
+			return DistanceEntryMode.TOTAL;
+		}
+	}
+
+	private Refueling getPreviousRefueling() {
+		Car car = cars.get(spnCar.getSelectedItemPosition());
+		Date date = getDateTime(getDate(edtDate), getTime(edtTime));
+
+		return Refueling.getPrevious(car, date);
 	}
 }

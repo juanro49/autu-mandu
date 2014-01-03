@@ -18,6 +18,8 @@ package me.kuehle.carreport.db;
 
 import java.util.Date;
 
+import me.kuehle.carreport.db.query.SafeSelect;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Column.ForeignKeyAction;
@@ -65,8 +67,18 @@ public class Refueling extends Model {
 		this.fuelType = fuelType;
 		this.fuelTank = fuelTank;
 	}
-	
+
 	public float getFuelPrice() {
 		return price / volume;
+	}
+
+	public static Refueling getPrevious(Car car, Date date) {
+		return SafeSelect
+				.from(Refueling.class)
+				.join(FuelTank.class)
+				.on("fuel_tanks.Id = refuelings.fuel_tank")
+				.where("fuel_tanks.car = ? AND refuelings.date < ?", car.id,
+						date.getTime()).orderBy("refuelings.date DESC")
+				.executeSingle();
 	}
 }

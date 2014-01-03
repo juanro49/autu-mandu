@@ -41,8 +41,7 @@
     <string name="section_suspend">Suspend</string>
     <string name="section_recurrence">Recurrence</string>
     
-    <string name="hint_mileage">Mileage</string>
-    <string name="hint_mileage_optional">Mileage (optional)</string>
+    <string name="hint_mileage_optional">Total distance (optional)</string>
     <string name="hint_volume">Volume</string>
     <string name="hint_price">Price</string>
     <string name="hint_note_optional">Note (optional)</string>
@@ -172,6 +171,7 @@
     <string name="pref_title_category_export">Export &amp; Import</string>
     <string name="pref_title_behavior_default_car">Default car</string>
     <string name="pref_title_behavior_show_car_menu">Show car menu</string>
+    <string name="pref_title_behavior_distance_entry_mode">Distance Entry Mode</string>
     <string name="pref_title_appearance_color_sections">Color sections</string>
     <string name="pref_title_appearance_show_legend">Show legend in graph</string>
     <string name="pref_title_unit_currency">Currency</string>
@@ -222,6 +222,9 @@
     
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="distance_entry_mode_trip">Trip distance</string>
+    <string name="distance_entry_mode_total">Total distance</string>
+    <string name="distance_entry_mode_show_selector">Show selector</string>
     <string name="graph_details_desc">Graph details</string>
     <string name="graph_options_desc">Graph options</string>
     <string name="graph_close_full_screen_desc">Close full screen graph</string>
