@@ -15,7 +15,7 @@ and CSV import/export functionality.
 
 ## Get it
 
-https://play.google.com/store/apps/details?id=me.kuehle.carreport
+[Car Report on Play Store](https://play.google.com/store/apps/details?id=me.kuehle.carreport)
 
 ## Used libraries
 
