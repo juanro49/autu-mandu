@@ -44,7 +44,9 @@ public abstract class AbstractReportGraphData {
 					R.string.report_overall_trend_label, data.name), data
 					.getTrendColor());
 
-			if (data.xValues.size() == 0 || data.yValues.size() == 0) {
+			// It doesn't make sense to display a trend line with just 2 points
+			// or less because it would be the same as the original line.
+			if (data.xValues.size() <= 2 || data.yValues.size() <= 2) {
 				return;
 			}
 
@@ -101,10 +103,14 @@ public abstract class AbstractReportGraphData {
 			// Use higher order when more entries are available to calculate a
 			// more accurate trend.
 			int order = 1;
-			if (data.xValues.size() >= 7) {
+			if (data.xValues.size() > 7) {
 				order = 5;
-			} else if (data.xValues.size() >= 3) {
+			} else if (data.xValues.size() > 3) {
 				order = 3;
+			} else {
+				// It doesn't make sense to display a trend line with order 1
+				// because it would be the same as the original line.
+				return;
 			}
 
 			int k = (order - 1) / 2;
