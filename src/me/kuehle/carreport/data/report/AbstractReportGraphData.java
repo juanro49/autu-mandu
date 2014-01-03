@@ -30,65 +30,19 @@ import me.kuehle.chartlib.data.Series;
 import me.kuehle.chartlib.renderer.AbstractRenderer;
 import me.kuehle.chartlib.renderer.LineRenderer;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.util.TypedValue;
 
 public abstract class AbstractReportGraphData {
-	/**
-	 * Uses simple moving average to calculate a accurate trend line.
-	 */
-	private class TrendReportData extends AbstractReportGraphData {
-		public TrendReportData(AbstractReportGraphData data) {
-			super(data.context, data.context.getString(
-					R.string.report_trend_label, data.name), data.color);
-
-			// Use higher order when more entries are available to calculate a
-			// more accurate trend.
-			int order = 1;
-			if (data.xValues.size() >= 7) {
-				order = 5;
-			} else if (data.xValues.size() >= 3) {
-				order = 3;
-			}
-
-			int k = (order - 1) / 2;
-
-			for (int t = k; t < data.xValues.size() - k; t++) {
-				long x = data.xValues.get(t);
-
-				// y_t = (y_t-k + y_t-k+1 + ... + y_t + ... + y_t+k-1 + y_t+k) /
-				// order
-				double y = 0;
-				for (int i = t - k; i <= t + k; i++) {
-					y += data.yValues.get(i);
-				}
-
-				y /= order;
-
-				xValues.add(x);
-				yValues.add(y);
-			}
-		}
-
-		@Override
-		public void applySeriesStyle(int series, AbstractRenderer renderer) {
-			super.applySeriesStyle(series, renderer);
-			if (renderer instanceof LineRenderer) {
-				((LineRenderer) renderer).setSeriesLineWidth(series, 2,
-						TypedValue.COMPLEX_UNIT_DIP);
-				((LineRenderer) renderer).setSeriesPathEffect(series,
-						new DashPathEffect(new float[] { 5, 5 }, 0));
-			}
-		}
-	}
-
 	/**
 	 * Uses the method of least squares to calculate a straight regression line.
 	 */
 	private class OverallTrendReportData extends AbstractReportGraphData {
 		public OverallTrendReportData(AbstractReportGraphData data) {
 			super(data.context, data.context.getString(
-					R.string.report_overall_trend_label, data.name), data.color);
+					R.string.report_overall_trend_label, data.name), data
+					.getTrendColor());
 
 			if (data.xValues.size() == 0 || data.yValues.size() == 0) {
 				return;
@@ -135,6 +89,55 @@ public abstract class AbstractReportGraphData {
 		}
 	}
 
+	/**
+	 * Uses simple moving average to calculate a accurate trend line.
+	 */
+	private class TrendReportData extends AbstractReportGraphData {
+		public TrendReportData(AbstractReportGraphData data) {
+			super(data.context, data.context.getString(
+					R.string.report_trend_label, data.name), data
+					.getTrendColor());
+
+			// Use higher order when more entries are available to calculate a
+			// more accurate trend.
+			int order = 1;
+			if (data.xValues.size() >= 7) {
+				order = 5;
+			} else if (data.xValues.size() >= 3) {
+				order = 3;
+			}
+
+			int k = (order - 1) / 2;
+
+			for (int t = k; t < data.xValues.size() - k; t++) {
+				long x = data.xValues.get(t);
+
+				// y_t = (y_t-k + y_t-k+1 + ... + y_t + ... + y_t+k-1 + y_t+k) /
+				// order
+				double y = 0;
+				for (int i = t - k; i <= t + k; i++) {
+					y += data.yValues.get(i);
+				}
+
+				y /= order;
+
+				xValues.add(x);
+				yValues.add(y);
+			}
+		}
+
+		@Override
+		public void applySeriesStyle(int series, AbstractRenderer renderer) {
+			super.applySeriesStyle(series, renderer);
+			if (renderer instanceof LineRenderer) {
+				((LineRenderer) renderer).setSeriesLineWidth(series, 2,
+						TypedValue.COMPLEX_UNIT_DIP);
+				((LineRenderer) renderer).setSeriesPathEffect(series,
+						new DashPathEffect(new float[] { 5, 5 }, 0));
+			}
+		}
+	}
+
 	protected Context context;
 	protected String name;
 	protected int color;
@@ -157,14 +160,14 @@ public abstract class AbstractReportGraphData {
 		}
 	}
 
-	public AbstractReportGraphData createTrendData() {
-		this.sort();
-		return new TrendReportData(this);
-	}
-
 	public AbstractReportGraphData createOverallTrendData() {
 		this.sort();
 		return new OverallTrendReportData(this);
+	}
+
+	public AbstractReportGraphData createTrendData() {
+		this.sort();
+		return new TrendReportData(this);
 	}
 
 	public Series getSeries() {
@@ -196,5 +199,24 @@ public abstract class AbstractReportGraphData {
 			xValues.add((long) point.x);
 			yValues.add(point.y);
 		}
+	}
+
+	/**
+	 * Creates a color for the trend lines based on the original color. Alters
+	 * the original colors saturation by 0.5.
+	 * 
+	 * @return the color for trend lines
+	 */
+	protected int getTrendColor() {
+		float[] hsvColor = new float[3];
+		Color.colorToHSV(this.color, hsvColor);
+
+		if (hsvColor[1] > 0.5) {
+			hsvColor[1] -= 0.5;
+		} else {
+			hsvColor[1] += 0.5;
+		}
+
+		return Color.HSVToColor(hsvColor);
 	}
 }
