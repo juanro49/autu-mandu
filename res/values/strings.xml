@@ -141,6 +141,7 @@
     <string name="report_graph_year_history">Year History</string>
     <string name="report_graph_accumulated">Accumulated</string>
     <string name="report_graph_per_refueling">Per Refueling</string>
+    <string name="report_graph_per_month">Per Month</string>
     <string name="report_not_enough_data">Not enough data</string>
     <string name="report_since">&#931; since %s</string>
     <string name="report_lowest">Lowest</string>

@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
+import org.joda.time.DateTime;
+
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
@@ -61,12 +63,43 @@ public class MileageReport extends AbstractReport {
 		}
 	}
 
+	private class ReportGraphDataPerMonth extends AbstractReportGraphData {
+		public ReportGraphDataPerMonth(Context context, Car car) {
+			super(context, car.name, car.color);
+
+			List<Refueling> refuelings = car.refuelings();
+			for (int i = 1; i < refuelings.size(); i++) {
+				long x = getMonthTime(refuelings.get(i).date.getTime());
+				double y = (double) (refuelings.get(i).mileage - refuelings
+						.get(i - 1).mileage);
+
+				int xIndex = xValues.indexOf(x);
+				if (xIndex == -1) {
+					xValues.add(x);
+					yValues.add(y);
+				} else {
+					yValues.set(xIndex, yValues.get(xIndex) + y);
+				}
+			}
+		}
+
+		private long getMonthTime(long time) {
+			DateTime date = new DateTime(time);
+			date = new DateTime(date.getYear(), date.getMonthOfYear(), 1, 0, 0);
+
+			return date.getMillis();
+		}
+	}
+
 	public static final int GRAPH_OPTION_ACCUMULATED = 0;
 	public static final int GRAPH_OPTION_PER_REFUELING = 1;
+	public static final int GRAPH_OPTION_PER_MONTH = 2;
 
 	private Vector<AbstractReportGraphData> reportDataAccumulated = new Vector<AbstractReportGraphData>();
 	private Vector<AbstractReportGraphData> reportDataPerRefueling = new Vector<AbstractReportGraphData>();
-	private double[] minXValue = { Long.MAX_VALUE, Long.MAX_VALUE };
+	private Vector<AbstractReportGraphData> reportDataPerMonth = new Vector<AbstractReportGraphData>();
+	private double[] minXValue = { Long.MAX_VALUE, Long.MAX_VALUE,
+			Long.MAX_VALUE };
 
 	private String unit;
 	private boolean showLegend;
@@ -77,9 +110,10 @@ public class MileageReport extends AbstractReport {
 
 	@Override
 	public int[] getAvailableChartOptions() {
-		int[] options = new int[2];
+		int[] options = new int[3];
 		options[GRAPH_OPTION_ACCUMULATED] = R.string.report_graph_accumulated;
 		options[GRAPH_OPTION_PER_REFUELING] = R.string.report_graph_per_refueling;
+		options[GRAPH_OPTION_PER_MONTH] = R.string.report_graph_per_month;
 		return options;
 	}
 
@@ -95,8 +129,14 @@ public class MileageReport extends AbstractReport {
 		LineRenderer renderer = new LineRenderer(context);
 		renderers.addRenderer(renderer);
 
-		Vector<AbstractReportGraphData> reportData = getChartOption() == GRAPH_OPTION_ACCUMULATED ? reportDataAccumulated
-				: reportDataPerRefueling;
+		Vector<AbstractReportGraphData> reportData;
+		if (getChartOption() == GRAPH_OPTION_ACCUMULATED) {
+			reportData = reportDataAccumulated;
+		} else if (getChartOption() == GRAPH_OPTION_PER_REFUELING) {
+			reportData = reportDataPerRefueling;
+		} else {
+			reportData = reportDataPerMonth;
+		}
 		Vector<AbstractReportGraphData> chartReportData = new Vector<AbstractReportGraphData>();
 
 		if (isShowTrend()) {
@@ -188,30 +228,40 @@ public class MileageReport extends AbstractReport {
 								.getSeries().minX());
 			}
 
-			// Normal data
-			ReportGraphDataPerRefueling carDataNormal = new ReportGraphDataPerRefueling(
+			// Per refueling data
+			ReportGraphDataPerRefueling carDataPerRefueling = new ReportGraphDataPerRefueling(
 					context, car);
-			if (carDataNormal.size() == 0) {
+			if (carDataPerRefueling.size() == 0) {
 				section.addItem(new Item(context
 						.getString(R.string.report_not_enough_data), ""));
 			} else {
-				reportDataPerRefueling.add(carDataNormal);
+				reportDataPerRefueling.add(carDataPerRefueling);
 				minXValue[GRAPH_OPTION_PER_REFUELING] = Math.min(
-						minXValue[GRAPH_OPTION_PER_REFUELING], carDataNormal
-								.getSeries().minX());
+						minXValue[GRAPH_OPTION_PER_REFUELING],
+						carDataPerRefueling.getSeries().minX());
 
 				section.addItem(new Item(context
 						.getString(R.string.report_highest), String.format(
-						"%d %s", Calculator.max(carDataNormal.yValues)
+						"%d %s", Calculator.max(carDataPerRefueling.yValues)
 								.intValue(), unit)));
 				section.addItem(new Item(context
 						.getString(R.string.report_lowest), String.format(
-						"%d %s", Calculator.min(carDataNormal.yValues)
+						"%d %s", Calculator.min(carDataPerRefueling.yValues)
 								.intValue(), unit)));
 				section.addItem(new Item(context
 						.getString(R.string.report_average), String.format(
-						"%d %s", Calculator.avg(carDataNormal.yValues)
+						"%d %s", Calculator.avg(carDataPerRefueling.yValues)
 								.intValue(), unit)));
+			}
+
+			// Per month data
+			ReportGraphDataPerMonth carDataPerMonth = new ReportGraphDataPerMonth(
+					context, car);
+			if (carDataPerMonth.size() > 0) {
+				reportDataPerMonth.add(carDataPerMonth);
+				minXValue[GRAPH_OPTION_PER_MONTH] = Math.min(
+						minXValue[GRAPH_OPTION_PER_MONTH], carDataPerMonth
+								.getSeries().minX());
 			}
 		}
 	}
