@@ -23,6 +23,7 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
@@ -252,7 +253,8 @@ public class CostsReport extends AbstractReport {
 			}
 			double costs = 0;
 
-			List<Refueling> refuelings = car.refuelings();
+			RefuelingBalancer balancer = new RefuelingBalancer(context);
+			List<Refueling> refuelings = balancer.getBalancedRefuelings(car);
 			List<OtherCost> otherCosts = car.otherCosts();
 
 			if ((refuelings.size() + otherCosts.size()) < 2) {

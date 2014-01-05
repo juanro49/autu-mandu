@@ -140,6 +140,10 @@ public class Preferences {
 		return id;
 	}
 
+	public boolean isAutoGuessMissingDataEnabled() {
+		return prefs.getBoolean("behavior_auto_guess_missing_data", false);
+	}
+	
 	public boolean isColorSections() {
 		return prefs.getBoolean("appearance_color_sections", true);
 	}

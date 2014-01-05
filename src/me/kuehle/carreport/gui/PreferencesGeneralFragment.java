@@ -20,14 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.kuehle.carreport.DistanceEntryMode;
+import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.util.Strings;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -128,13 +127,6 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			defaultCar.setSummary(car.name);
 		}
 
-		// Behavior car menu
-		{
-			CheckBoxPreference showCarMenu = (CheckBoxPreference) findPreference("behavior_show_car_menu");
-			showCarMenu
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-		}
-
 		// Behavior distance entry mode
 		{
 			DistanceEntryMode[] modes = DistanceEntryMode.values();
@@ -152,20 +144,6 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 			distanceEntryMode
 					.setSummary(getString(prefs.getDistanceEntryMode().nameResourceId));
-		}
-
-		// Appearance color sections
-		{
-			CheckBoxPreference colorSections = (CheckBoxPreference) findPreference("appearance_color_sections");
-			colorSections
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-		}
-
-		// Appearance show legend
-		{
-			CheckBoxPreference colorSections = (CheckBoxPreference) findPreference("appearance_show_legend");
-			colorSections
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 		}
 
 		// Unit Currency
@@ -199,7 +177,6 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 			fieldFuelConsumption
 					.setOnPreferenceChangeListener(onPreferenceChangeListener);
 		}
-
 	}
 
 	@Override

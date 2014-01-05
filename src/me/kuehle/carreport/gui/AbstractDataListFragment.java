@@ -58,27 +58,60 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = getActivity().getLayoutInflater().inflate(
-						R.layout.list_item_data, parent, false);
+		public int getItemViewType(int position) {
+			if (isMissingData(mItems, position)) {
+				return 0;
+			} else {
+				return 1;
 			}
+		}
 
-			SparseArray<String> item = getItemData(mItems, position);
-			for (int field : fields) {
-				TextView textView = (TextView) convertView.findViewById(field);
-				String value = item.get(field);
-				if (value != null) {
-					textView.setText(value);
-					textView.setVisibility(View.VISIBLE);
-				} else if (field == R.id.subtitle) {
-					textView.setVisibility(View.GONE);
-				} else {
-					textView.setVisibility(View.INVISIBLE);
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (getItemViewType(position) == 0) {
+				if (convertView == null) {
+					convertView = getActivity().getLayoutInflater().inflate(
+							R.layout.list_item_data_missing, parent, false);
+				}
+
+				SparseArray<String> item = getItemData(mItems, position);
+				TextView textView = (TextView) convertView
+						.findViewById(R.id.title);
+				String value = item.get(R.id.title);
+				textView.setText(value);
+			} else {
+				if (convertView == null) {
+					convertView = getActivity().getLayoutInflater().inflate(
+							R.layout.list_item_data, parent, false);
+				}
+
+				SparseArray<String> item = getItemData(mItems, position);
+				for (int field : fields) {
+					TextView textView = (TextView) convertView
+							.findViewById(field);
+					String value = item.get(field);
+					if (value != null) {
+						textView.setText(value);
+						textView.setVisibility(View.VISIBLE);
+					} else if (field == R.id.subtitle) {
+						textView.setVisibility(View.GONE);
+					} else {
+						textView.setVisibility(View.INVISIBLE);
+					}
 				}
 			}
 
 			return convertView;
+		}
+
+		@Override
+		public int getViewTypeCount() {
+			return 2;
+		}
+
+		@Override
+		public boolean isEnabled(int position) {
+			return !isMissingData(mItems, position);
 		}
 
 		public void update() {
@@ -304,4 +337,6 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 			int position);
 
 	protected abstract List<T> getItems();
+
+	protected abstract boolean isMissingData(List<T> items, int position);
 }

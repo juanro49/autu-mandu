@@ -21,9 +21,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
+import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.FuelConsumption;
+import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.FuelType;
@@ -43,28 +44,65 @@ import android.widget.Toast;
 
 public class FuelConsumptionReport extends AbstractReport {
 	private class ReportGraphData extends AbstractReportGraphData {
+		private double avgConsumption;
+
 		public ReportGraphData(Context context, FuelTank fuelTank) {
 			super(context, String.format("%s (%s)", fuelTank.car.name,
 					getCommaSeparatedFuelTypeNames(fuelTank.fuelTypes())),
 					fuelTank.car.color);
 
 			FuelConsumption fuelConsumption = new FuelConsumption(context);
-			List<Refueling> refuelings = fuelTank.refuelings();
-			int lastTacho = -1;
-			float volume = 0;
-			for (Refueling refueling : refuelings) {
-				volume += refueling.volume;
-				if (!refueling.partial) {
-					if (lastTacho > -1 && lastTacho < refueling.mileage) {
-						double consumption = fuelConsumption.computeFuelConsumption(volume, refueling.mileage - lastTacho);
-						xValues.add(refueling.date.getTime());
-						yValues.add(consumption);
+			RefuelingBalancer balancer = new RefuelingBalancer(context);
+			List<Refueling> refuelings = balancer
+					.getBalancedRefuelings(fuelTank);
+
+			int totalDistance = 0, partialDistance = 0;
+			double totalVolume = 0, partialVolume = 0;
+			int lastFullRefueling = -1;
+			for (int i = 0; i < refuelings.size(); i++) {
+				Refueling refueling = refuelings.get(i);
+				if (lastFullRefueling < 0) {
+					if (!refueling.partial) {
+						lastFullRefueling = i;
 					}
 
-					lastTacho = refueling.mileage;
-					volume = 0;
+					continue;
+				}
+
+				partialDistance += refueling.mileage
+						- refuelings.get(i - 1).mileage;
+				partialVolume += refueling.volume;
+
+				if (!refueling.partial) {
+					totalDistance += partialDistance;
+					totalVolume += partialVolume;
+
+					double consumption = fuelConsumption
+							.computeFuelConsumption(partialVolume,
+									partialDistance);
+					xValues.add(refueling.date.getTime());
+					yValues.add(consumption);
+
+					if (refuelings.get(i).guessed) {
+						markLastPoint();
+						markLastLine();
+					} else if (refuelings.get(lastFullRefueling).guessed) {
+						markLastLine();
+					}
+
+					partialDistance = 0;
+					partialVolume = 0;
+
+					lastFullRefueling = i;
 				}
 			}
+
+			avgConsumption = fuelConsumption.computeFuelConsumption(
+					totalVolume, totalDistance);
+		}
+
+		public double getAverageConsumption() {
+			return avgConsumption;
 		}
 	}
 
@@ -134,21 +172,21 @@ public class FuelConsumptionReport extends AbstractReport {
 		renderers.addRenderer(renderer);
 
 		Vector<AbstractReportGraphData> reportData = new Vector<AbstractReportGraphData>();
-		
+
 		if (isShowTrend()) {
 			for (AbstractReportGraphData data : this.reportData) {
 				reportData.add(data.createTrendData());
 			}
 		}
-		
+
 		if (isShowOverallTrend()) {
 			for (AbstractReportGraphData data : this.reportData) {
 				reportData.add(data.createOverallTrendData());
 			}
 		}
-		
+
 		reportData.addAll(this.reportData);
-		
+
 		for (int i = 0; i < reportData.size(); i++) {
 			dataset.add(reportData.get(i).getSeries());
 			reportData.get(i).applySeriesStyle(i, renderer);
@@ -156,7 +194,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
 		renderer.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onSeriesClick(int series, int point) {
+			public void onSeriesClick(int series, int point, boolean marked) {
 				Series s = dataset.get(series);
 				String car = s.getTitle().substring(0,
 						s.getTitle().lastIndexOf('(') - 1);
@@ -165,6 +203,7 @@ public class FuelConsumptionReport extends AbstractReport {
 						s.getTitle().length() - 1);
 				String date = DateFormat.getDateFormat(context).format(
 						new Date((long) s.get(point).x));
+
 				Toast.makeText(
 						context,
 						String.format(
@@ -230,18 +269,9 @@ public class FuelConsumptionReport extends AbstractReport {
 				section.addItem(new Item(context
 						.getString(R.string.report_lowest), String.format(
 						"%.2f %s", Calculator.min(carData.yValues), unit)));
-
-				List<Refueling> refuelings = fuelTank.refuelings();
-				int totalDistance = refuelings.get(refuelings.size() - 1).mileage
-						- refuelings.get(0).mileage;
-				double totalVolume = 0;
-				for (int i = 1; i < refuelings.size(); i++) {
-					totalVolume += refuelings.get(i).volume;
-				}
-
 				section.addItem(new Item(context
 						.getString(R.string.report_average), String.format(
-						"%.2f %s", totalVolume / totalDistance * 100, unit)));
+						"%.2f %s", carData.getAverageConsumption(), unit)));
 
 				sectionAdded = true;
 

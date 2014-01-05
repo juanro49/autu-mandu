@@ -2,14 +2,13 @@ package me.kuehle.carreport.data.calculation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.util.Calculator;
 import android.content.Context;
 
 public class PriceToDistanceCalculation extends AbstractCalculation {
@@ -39,48 +38,49 @@ public class PriceToDistanceCalculation extends AbstractCalculation {
 	public CalculationItem[] calculate(double input) {
 		List<CalculationItem> items = new ArrayList<CalculationItem>();
 		for (Car car : Car.getAll()) {
-			Vector<Double> distancePricesRefuelings = new Vector<Double>();
-			Vector<Double> distancePricesOtherCosts = new Vector<Double>();
+			double totalCosts = 0;
+			int startMileage = -1;
+			int endMileage = -1;
 
-			int lastMileage = -1;
-			float price = 0;
-			for (Refueling refueling : car.refuelings()) {
-				price += refueling.price;
-				if (!refueling.partial) {
-					if (lastMileage > -1 && lastMileage < refueling.mileage) {
-						double distancePrice = price
-								/ (refueling.mileage - lastMileage);
-						distancePricesRefuelings.add(distancePrice);
+			RefuelingBalancer balancer = new RefuelingBalancer(context);
+			List<Refueling> refuelings = balancer.getBalancedRefuelings(car);
+			for (int i = 0; i < refuelings.size(); i++) {
+				Refueling refueling = refuelings.get(i);
+				if (startMileage == -1) {
+					if (!refueling.partial) {
+						startMileage = refueling.mileage;
 					}
 
-					lastMileage = refueling.mileage;
-					price = 0;
+					continue;
+				}
+
+				totalCosts += refueling.price;
+				endMileage = refueling.mileage;
+			}
+
+			List<OtherCost> otherCosts = car.otherCosts();
+			for (OtherCost otherCost : otherCosts) {
+				int recurrences;
+				if (otherCost.endDate == null) {
+					recurrences = otherCost.recurrence
+							.getRecurrencesSince(otherCost.date);
+				} else {
+					recurrences = otherCost.recurrence.getRecurrencesBetween(
+							otherCost.date, otherCost.endDate);
+				}
+
+				totalCosts += otherCost.price * recurrences;
+
+				if (otherCost.mileage > -1) {
+					startMileage = Math.min(startMileage, otherCost.mileage);
+					endMileage = Math.max(endMileage, otherCost.mileage);
 				}
 			}
 
-			lastMileage = -1;
-			for (OtherCost otherCost : car.otherCosts()) {
-				if (lastMileage > -1 && lastMileage < otherCost.mileage) {
-					double distancePrice = otherCost.price
-							/ (otherCost.mileage - lastMileage);
-					distancePricesOtherCosts.add(distancePrice);
-				}
-
-				lastMileage = otherCost.mileage;
-			}
-
-			if (distancePricesRefuelings.size() > 0
-					|| distancePricesOtherCosts.size() > 0) {
-				double avgDistancePrice = 0;
-				if (distancePricesRefuelings.size() > 0) {
-					avgDistancePrice += Calculator
-							.avg(distancePricesRefuelings);
-				}
-
-				if (distancePricesOtherCosts.size() > 0) {
-					avgDistancePrice += Calculator
-							.avg(distancePricesOtherCosts);
-				}
+			if (totalCosts > 0 && startMileage > -1
+					&& endMileage > startMileage) {
+				double avgDistancePrice = totalCosts
+						/ (endMileage - startMileage);
 
 				items.add(new CalculationItem(car.name, input
 						/ avgDistancePrice));

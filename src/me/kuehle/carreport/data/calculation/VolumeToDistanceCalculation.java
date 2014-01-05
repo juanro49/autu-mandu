@@ -5,6 +5,7 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.Refueling;
@@ -38,16 +39,36 @@ public class VolumeToDistanceCalculation extends AbstractCalculation {
 		List<CalculationItem> items = new ArrayList<CalculationItem>();
 		for (Car car : Car.getAll()) {
 			for (FuelTank fuelTank : car.fuelTanks()) {
-				List<Refueling> refuelings = fuelTank.refuelings();
-				if (refuelings.size() < 2) {
-					continue;
-				}
+				RefuelingBalancer balancer = new RefuelingBalancer(context);
+				List<Refueling> refuelings = balancer
+						.getBalancedRefuelings(fuelTank);
 
-				int totalDistance = refuelings.get(refuelings.size() - 1).mileage
-						- refuelings.get(0).mileage;
-				double totalVolume = 0;
-				for (int i = 1; i < refuelings.size(); i++) {
-					totalVolume += refuelings.get(i).volume;
+				int totalDistance = 0, distance = 0;
+				float totalVolume = 0, volume = 0;
+				int lastFullRefueling = -1;
+				for (int i = 0; i < refuelings.size(); i++) {
+					Refueling refueling = refuelings.get(i);
+					if (lastFullRefueling < 0) {
+						if (!refueling.partial) {
+							lastFullRefueling = i;
+						}
+
+						continue;
+					}
+
+					distance += refueling.mileage
+							- refuelings.get(i - 1).mileage;
+					volume += refueling.volume;
+
+					if (!refueling.partial) {
+						totalDistance += distance;
+						totalVolume += volume;
+
+						distance = 0;
+						volume = 0;
+
+						lastFullRefueling = i;
+					}
 				}
 
 				if (totalDistance > 0 && totalVolume > 0) {

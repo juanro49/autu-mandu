@@ -146,7 +146,7 @@ public class FuelPriceReport extends AbstractReport {
 		Color.colorToHSV(
 				context.getResources().getColor(android.R.color.holo_blue_dark),
 				hsvColor);
-		float hueDiff = Math.min(45, 360 / fuelTypes.size());
+		float hueDiff = Math.min(60, 360 / fuelTypes.size());
 
 		reportData = new ArrayList<FuelPriceReport.ReportGraphData>();
 		for (FuelType fuelType : fuelTypes) {

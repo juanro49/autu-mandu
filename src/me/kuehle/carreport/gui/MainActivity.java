@@ -188,10 +188,6 @@ public class MainActivity extends FragmentActivity implements
 			}
 		}
 
-		// Add demo data item, when in debug mode.
-		// BuildConfig.DEBUG does not work reliable, so we just comment it out
-		// menu.add("Add Demo Data");
-
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -203,9 +199,6 @@ public class MainActivity extends FragmentActivity implements
 			return true;
 		}
 
-		// Respond to click on demo data item, which is only present
-		// in debug mode.
-		// BuildConfig.DEBUG does not work reliable, so we just comment it out
 		// DemoData.addDemoData();
 		// if (mCurrentFragment instanceof DataChangeListener) {
 		// ((DataChangeListener) mCurrentFragment).onDataChanged();

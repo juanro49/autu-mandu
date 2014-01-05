@@ -172,6 +172,7 @@
     <string name="pref_title_behavior_default_car">Default car</string>
     <string name="pref_title_behavior_show_car_menu">Show car menu</string>
     <string name="pref_title_behavior_distance_entry_mode">Distance Entry Mode</string>
+    <string name="pref_title_behavior_auto_guess_missing_data">Balance missing refuelings (Beta)</string>
     <string name="pref_title_appearance_color_sections">Color sections</string>
     <string name="pref_title_appearance_show_legend">Show legend in graph</string>
     <string name="pref_title_unit_currency">Currency</string>
@@ -186,6 +187,7 @@
     <string name="pref_title_exportcsv">Export CSV</string>
     <string name="pref_title_importcsv">Import CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Show a car selection menu, when adding a refueling and you have more than one car.</string>
+    <string name="pref_summary_behavior_auto_guess_missing_data">Try to recognize missing refuelings. This will balance the significantly lower fuel consumptions, that occure when you forget to insert a refueling.</string>
     <string name="pref_summary_appearance_color_sections">Show the section headings in the color of their corresponding car.</string>
     <string name="pref_summary_appearance_show_legend">Show a legend in the graphs, displaying which line belongs to which car.</string>
     <string name="pref_summary_sync_setup">This is a very basic synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>
@@ -225,6 +227,7 @@
     <string name="distance_entry_mode_trip">Trip distance</string>
     <string name="distance_entry_mode_total">Total distance</string>
     <string name="distance_entry_mode_show_selector">Show selector</string>
+    <string name="missing_refueling">Missing refueling</string>
     <string name="graph_details_desc">Graph details</string>
     <string name="graph_options_desc">Graph options</string>
     <string name="graph_close_full_screen_desc">Close full screen graph</string>

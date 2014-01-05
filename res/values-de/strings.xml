@@ -172,6 +172,7 @@
     <string name="pref_title_behavior_default_car">Standard-Auto</string>
     <string name="pref_title_behavior_show_car_menu">Zeige Autoauswahlmenü</string>
     <string name="pref_title_behavior_distance_entry_mode">Entfernungseingabe</string>
+    <string name="pref_title_behavior_auto_guess_missing_data">Fehlende Tankfüllungen ausgleichen (Beta)</string>
     <string name="pref_title_appearance_color_sections">Farbige Abschnitte</string>
     <string name="pref_title_appearance_show_legend">Legende in Graphen anzeigen</string>
     <string name="pref_title_unit_currency">Währung</string>
@@ -186,6 +187,7 @@
     <string name="pref_title_exportcsv">CSV exportieren</string>
     <string name="pref_title_importcsv">CSV importieren</string>
     <string name="pref_summary_behavior_show_car_menu">Zeige ein Menü zur Autoauswahl, wenn Sie eine Tankfüllung hinzufügen und mehr als ein Auto haben.</string>
+    <string name="pref_summary_behavior_auto_guess_missing_data">Versuche fehlende Tankfüllungen zu erkennen. Dadurch werden die erheblich geringeren Benzinverbräuche, die entstehen, wenn eine Tankfüllung verbessen wird einzutragen, ausgeglichen.</string>
     <string name="pref_summary_appearance_color_sections">Überschriften der Abschnitte in der Farbe des dazugehörigen Autos anzeigen.</string>
     <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
     <string name="pref_summary_sync_setup">Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>
@@ -225,6 +227,7 @@
     <string name="distance_entry_mode_trip">Tageskilometer</string>
     <string name="distance_entry_mode_total">Gesamtkilometer</string>
     <string name="distance_entry_mode_show_selector">Auswahl anzeigen</string>
+    <string name="missing_refueling">Fehlende Tankfüllung</string>
     <string name="graph_details_desc">Graph-Details</string>
     <string name="graph_options_desc">Graph-Optionen</string>
     <string name="graph_close_full_screen_desc">Vollbildgraph schließen</string>

@@ -26,7 +26,7 @@ import com.activeandroid.annotation.Column.ForeignKeyAction;
 import com.activeandroid.annotation.Table;
 
 @Table(name = "refuelings")
-public class Refueling extends Model {
+public class Refueling extends Model implements Comparable<Refueling> {
 	@Column(name = "date", notNull = true)
 	public Date date;
 
@@ -51,6 +51,8 @@ public class Refueling extends Model {
 	@Column(name = "fuel_tank", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
 	public FuelTank fuelTank;
 
+	public boolean guessed = false;
+
 	public Refueling() {
 		super();
 	}
@@ -66,6 +68,11 @@ public class Refueling extends Model {
 		this.note = note;
 		this.fuelType = fuelType;
 		this.fuelTank = fuelTank;
+	}
+
+	@Override
+	public int compareTo(Refueling another) {
+		return date.compareTo(another.date);
 	}
 
 	public float getFuelPrice() {

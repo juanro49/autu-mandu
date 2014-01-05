@@ -33,6 +33,11 @@
             android:defaultValue="TOTAL"
             android:key="behavior_distance_entry_mode"
             android:title="@string/pref_title_behavior_distance_entry_mode" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="behavior_auto_guess_missing_data"
+            android:summary="@string/pref_summary_behavior_auto_guess_missing_data"
+            android:title="@string/pref_title_behavior_auto_guess_missing_data" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_appearance" >
         <CheckBoxPreference

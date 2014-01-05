@@ -16,82 +16,101 @@
 
 package me.kuehle.carreport.util;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.PossibleFuelTypeForFuelTank;
 import me.kuehle.carreport.db.Refueling;
-import android.annotation.SuppressLint;
+
+import org.joda.time.DateTime;
+
 import android.graphics.Color;
 
-@SuppressLint("SimpleDateFormat")
 public class DemoData {
-	private static DateFormat dateFormat = new SimpleDateFormat(
-			"dd.MM.yyyy kk:mm");
-
 	public static void addDemoData() {
 		FuelType super95 = createFuelType("Super 95");
 		FuelType superE10 = createFuelType("Super E10");
 		FuelType lpg = createFuelType("LPG");
 
-		try {
-			Car punto = createCar("Fiat Punto", Color.BLUE);
-			FuelTank puntoTank = createFuelTank(punto, "Fuel");
-			createPossibleFuelTypeForFuelTank(super95, puntoTank);
-			createPossibleFuelTypeForFuelTank(superE10, puntoTank);
-			createRefueling("01.06.2012 08:04", 120300, 41, 60.64f, false, "",
-					super95, puntoTank);
-			createRefueling("13.06.2012 08:10", 120930, 44, 65.97f, false, "",
-					super95, puntoTank);
-			createRefueling("28.06.2012 07:43", 121470, 37, 56.20f, true, "",
-					super95, puntoTank);
-			createRefueling("10.07.2012 18:02", 122030, 40, 59.56f, false, "",
-					super95, puntoTank);
-			createRefueling("25.07.2012 08:03", 122645, 42, 65.90f, false, "",
-					superE10, puntoTank);
-			createRefueling("08.08.2012 17:14", 123205, 39, 58.46f, false, "",
-					superE10, puntoTank);
-			createRefueling("27.08.2012 08:21", 123775, 41, 62.28f, false, "",
-					super95, puntoTank);
-			createRefueling("05.09.2012 08:01", 124312, 45, 67.22f, false, "",
-					super95, puntoTank);
-			createOtherCost("Rechtes Abblendlicht", "15.06.2012 07:25", null,
-					121009, 10, new Recurrence(RecurrenceInterval.ONCE), "",
-					punto);
-			createOtherCost("Steuern", "01.06.2012 00:00", null, -1, 210,
-					new Recurrence(RecurrenceInterval.YEAR), "", punto);
+		// Fiat Punto
 
-			Car astra = createCar("Opel Astra", Color.RED);
-			FuelTank astraTankFuel = createFuelTank(astra, "Fuel");
-			FuelTank astraTankGas = createFuelTank(astra, "Gas");
-			createPossibleFuelTypeForFuelTank(super95, astraTankFuel);
-			createPossibleFuelTypeForFuelTank(lpg, astraTankGas);
-			createRefueling("03.07.2012 08:03", 43000, 45, 67.01f, false, "",
-					super95, astraTankFuel);
-			createRefueling("14.07.2012 18:15", 43640, 51, 76.45f, false, "",
-					super95, astraTankFuel);
-			createRefueling("24.07.2012 19:04", 44300, 52, 79.51f, false, "",
-					super95, astraTankFuel);
-			createRefueling("03.08.2012 08:11", 44701, 34, 49.95f, true, "",
-					lpg, astraTankGas);
-			createRefueling("17.08.2012 17:16", 45316, 49, 74.92f, false, "",
-					super95, astraTankFuel);
-			createRefueling("24.08.2012 07:50", 45401, 07, 11.26f, true, "",
-					lpg, astraTankGas);
-			createRefueling("25.08.2012 07:54", 46082, 53, 78.92f, false, "",
-					super95, astraTankFuel);
-			createRefueling("02.09.2012 07:30", 46560, 42, 65.63f, false, "",
-					lpg, astraTankGas);
-			createOtherCost("Steuern", "01.06.2012 00:00", null, -1, 250,
-					new Recurrence(RecurrenceInterval.YEAR), "", astra);
-			createOtherCost("Versicherung", "15.06.2012 00:00", null, -1, 40,
-					new Recurrence(RecurrenceInterval.MONTH), "", astra);
-		} catch (ParseException e) {
+		Car punto = createCar("Fiat Punto", Color.BLUE);
+		FuelTank puntoTank = createFuelTank(punto, "Fuel");
+		createPossibleFuelTypeForFuelTank(super95, puntoTank);
+		createPossibleFuelTypeForFuelTank(superE10, puntoTank);
+
+		int puntoCount = 50;
+		DateTime puntoDate = DateTime.now().minusMonths(puntoCount / 2);
+		int puntoMileage = 15000;
+
+		createOtherCost("Rechtes Abblendlicht",
+				puntoDate.plusDays(randInt(50, 100)), null, 121009, 10,
+				new Recurrence(RecurrenceInterval.ONCE), "", punto);
+		createOtherCost("Steuern", puntoDate, null, -1, 210, new Recurrence(
+				RecurrenceInterval.YEAR), "", punto);
+
+		for (int i = 0; i < puntoCount; i++) {
+			puntoDate = puntoDate.plusDays(randInt(12, 18));
+			puntoMileage += randInt(570, 620);
+			float volume = randFloat(43, 51);
+			boolean partial = false;
+			if (randInt(0, 5) == 5) {
+				volume -= randFloat(20, 40);
+				partial = true;
+			}
+
+			float price = volume * randFloat(140, 170) / 100;
+			FuelType fuelType = super95;
+			if (randInt(0, 3) == 3) {
+				fuelType = superE10;
+			}
+
+			if (randInt(0, 9) != 9) {
+				createRefueling(puntoDate, puntoMileage, volume, price,
+						partial, "", fuelType, puntoTank);
+			}
+		}
+
+		// Opel Astra
+
+		Car astra = createCar("Opel Astra", Color.RED);
+		FuelTank astraTankFuel = createFuelTank(astra, "Fuel");
+		FuelTank astraTankGas = createFuelTank(astra, "Gas");
+		createPossibleFuelTypeForFuelTank(super95, astraTankFuel);
+		createPossibleFuelTypeForFuelTank(lpg, astraTankGas);
+
+		int astraCount = 30;
+		DateTime astraDate = DateTime.now().minusMonths(astraCount / 3);
+		int astraMileage = 120000;
+
+		createOtherCost("Steuern", astraDate, null, -1, 250, new Recurrence(
+				RecurrenceInterval.YEAR), "", astra);
+		createOtherCost("Versicherung", astraDate, null, -1, 40,
+				new Recurrence(RecurrenceInterval.MONTH), "", astra);
+
+		for (int i = 0; i < astraCount; i++) {
+			astraDate = astraDate.plusDays(randInt(8, 13));
+			astraMileage += randInt(570, 620);
+			float volume = randFloat(49, 60);
+			boolean partial = false;
+			if (randInt(0, 5) == 5) {
+				volume -= randFloat(20, 40);
+				partial = true;
+			}
+
+			float price = volume * randFloat(140, 170) / 100;
+			FuelTank fuelTank = astraTankFuel;
+			FuelType fuelType = super95;
+			if (randInt(0, 1) == 1) {
+				fuelTank = astraTankGas;
+				fuelType = lpg;
+			}
+
+			if (randInt(0, 9) != 9) {
+				createRefueling(astraDate, astraMileage, volume, price,
+						partial, "", fuelType, fuelTank);
+			}
 		}
 	}
 
@@ -121,22 +140,30 @@ public class DemoData {
 		return possibleFuelTypeForFuelTank;
 	}
 
-	private static Refueling createRefueling(String date, int mileage,
+	private static Refueling createRefueling(DateTime date, int mileage,
 			float volume, float price, boolean partial, String note,
-			FuelType fuelType, FuelTank fuelTank) throws ParseException {
-		Refueling refueling = new Refueling(dateFormat.parse(date), mileage,
-				volume, price, partial, note, fuelType, fuelTank);
+			FuelType fuelType, FuelTank fuelTank) {
+		Refueling refueling = new Refueling(date.toDate(), mileage, volume,
+				price, partial, note, fuelType, fuelTank);
 		refueling.save();
 		return refueling;
 	}
 
-	private static OtherCost createOtherCost(String title, String date,
-			String endDate, int mileage, float price, Recurrence recurrence,
-			String note, Car car) throws ParseException {
-		OtherCost otherCost = new OtherCost(title, dateFormat.parse(date),
-				endDate == null ? null : dateFormat.parse(endDate), mileage,
-				price, recurrence, note, car);
+	private static OtherCost createOtherCost(String title, DateTime date,
+			DateTime endDate, int mileage, float price, Recurrence recurrence,
+			String note, Car car) {
+		OtherCost otherCost = new OtherCost(title, date.toDate(),
+				endDate == null ? null : endDate.toDate(), mileage, price,
+				recurrence, note, car);
 		otherCost.save();
 		return otherCost;
+	}
+
+	private static int randInt(int min, int max) {
+		return min + (int) (Math.random() * ((max - min) + 1));
+	}
+
+	private static float randFloat(int min, int max) {
+		return (float) randInt(min * 10, max * 10) / 10;
 	}
 }

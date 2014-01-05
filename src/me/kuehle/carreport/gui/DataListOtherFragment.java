@@ -67,4 +67,9 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
 		Collections.reverse(otherCosts);
 		return otherCosts;
 	}
+
+	@Override
+	protected boolean isMissingData(List<OtherCost> otherCosts, int position) {
+		return false;
+	}
 }

@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 
 import me.kuehle.carreport.R;
@@ -151,6 +152,9 @@ public abstract class AbstractReportGraphData {
 	protected Vector<Long> xValues = new Vector<Long>();
 	protected Vector<Double> yValues = new Vector<Double>();
 
+	private List<List<PointD>> markLines = new ArrayList<List<PointD>>();
+	private List<PointD> markPoints = new ArrayList<PointD>();
+
 	public AbstractReportGraphData(Context context, String name, int color) {
 		this.context = context;
 		this.name = name;
@@ -163,6 +167,23 @@ public abstract class AbstractReportGraphData {
 			((LineRenderer) renderer).setSeriesLineWidth(series, 3,
 					TypedValue.COMPLEX_UNIT_DIP);
 			((LineRenderer) renderer).setSeriesPathEffect(series, null);
+
+			// Styles for marked lines and points
+			((LineRenderer) renderer).setSeriesMarkColor(
+					series,
+					Color.argb(63, Color.red(color), Color.green(color),
+							Color.blue(color)));
+			((LineRenderer) renderer).setSeriesMarkPathEffect(series,
+					new DashPathEffect(new float[] { 5, 5 }, 0));
+
+			for (PointD point : markPoints) {
+				((LineRenderer) renderer).addSeriesMarkPoint(series, point);
+			}
+
+			for (List<PointD> line : markLines) {
+				((LineRenderer) renderer).addSeriesMarkLine(series,
+						line.get(0), line.get(1));
+			}
 		}
 	}
 
@@ -224,5 +245,22 @@ public abstract class AbstractReportGraphData {
 		}
 
 		return Color.HSVToColor(hsvColor);
+	}
+
+	protected void markLastLine() {
+		if (xValues.size() < 2 || yValues.size() < 2) {
+			return;
+		}
+
+		List<PointD> line = new ArrayList<PointD>();
+		line.add(new PointD(xValues.get(xValues.size() - 2), yValues
+				.get(yValues.size() - 2)));
+		line.add(new PointD(xValues.lastElement(), yValues.lastElement()));
+		markLines.add(line);
+	}
+
+	protected void markLastPoint() {
+		markPoints
+				.add(new PointD(xValues.lastElement(), yValues.lastElement()));
 	}
 }
