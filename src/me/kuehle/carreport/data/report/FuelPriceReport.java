@@ -52,6 +52,7 @@ public class FuelPriceReport extends AbstractReport {
 
 	private ArrayList<ReportGraphData> reportData;
 	private String unit;
+	private boolean showLegend;
 
 	public FuelPriceReport(Context context) {
 		super(context);
@@ -99,7 +100,7 @@ public class FuelPriceReport extends AbstractReport {
 
 		renderer.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onSeriesClick(int series, int point) {
+			public void onSeriesClick(int series, int point, boolean marked) {
 				Series s = dataset.get(series);
 				String fuelType = s.getTitle() == null ? context
 						.getString(R.string.report_toast_none) : s.getTitle();
@@ -120,7 +121,7 @@ public class FuelPriceReport extends AbstractReport {
 
 		final Chart chart = new Chart(context, dataset, renderers);
 		applyDefaultChartStyles(chart);
-		chart.setShowLegend(false);
+		chart.setShowLegend(showLegend);
 		chart.getDomainAxis().setLabelFormatter(dateLabelFormatter);
 		chart.getRangeAxis()
 				.setLabelFormatter(new DecimalAxisLabelFormatter(3));
@@ -137,6 +138,7 @@ public class FuelPriceReport extends AbstractReport {
 		Preferences prefs = new Preferences(context);
 		unit = String.format("%s/%s", prefs.getUnitCurrency(),
 				prefs.getUnitVolume());
+		showLegend = prefs.isShowLegend();
 
 		List<FuelType> fuelTypes = FuelType.getAll();
 
@@ -144,6 +146,7 @@ public class FuelPriceReport extends AbstractReport {
 		Color.colorToHSV(
 				context.getResources().getColor(android.R.color.holo_blue_dark),
 				hsvColor);
+		float hueDiff = Math.min(45, 360 / fuelTypes.size());
 
 		reportData = new ArrayList<FuelPriceReport.ReportGraphData>();
 		for (FuelType fuelType : fuelTypes) {
@@ -170,7 +173,7 @@ public class FuelPriceReport extends AbstractReport {
 						.getString(R.string.report_average), String.format(
 						"%.3f %s", avg, unit)));
 
-				hsvColor[0] += 20;
+				hsvColor[0] += hueDiff;
 				if (hsvColor[0] > 360) {
 					hsvColor[0] -= 360;
 				}
