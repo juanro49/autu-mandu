@@ -9,12 +9,12 @@ import me.kuehle.carreport.gui.DataFragment.DataListListener;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +34,24 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 		public abstract void onItemSelected(int edit, long id);
 
 		public abstract void onItemUnselected();
+	}
+
+	private class DataListUpdateTask extends AsyncTask<Void, Void, List<T>> {
+		@Override
+		protected void onPreExecute() {
+			setListShown(false);
+		}
+
+		@Override
+		protected List<T> doInBackground(Void... params) {
+			return getItems();
+		}
+
+		@Override
+		protected void onPostExecute(List<T> result) {
+			mListAdapter.update(result);
+			setListShown(true);
+		}
 	}
 
 	private class DataListAdapter extends BaseAdapter {
@@ -114,8 +132,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 			return !isMissingData(mItems, position);
 		}
 
-		public void update() {
-			mItems = getItems();
+		public void update(List<T> items) {
+			mItems = items;
 			notifyDataSetChanged();
 		}
 	}
@@ -197,9 +215,10 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 		super.onActivityCreated(savedInstanceState);
 		mListAdapter = new DataListAdapter();
 		if (mCar != null) {
-			mListAdapter.update();
+			updateData();
 		}
 
+		setEmptyText(getString(R.string.edit_message_no_entries_available));
 		setListAdapter(mListAdapter);
 
 		getListView().setMultiChoiceModeListener(
@@ -231,8 +250,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 	public void onCarChanged(Car newCar) {
 		mCar = newCar;
 
-		setCurrentPosition(ListView.INVALID_POSITION);
-		mListAdapter.update();
+		updateData();
 	}
 
 	@Override
@@ -252,11 +270,11 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 		}
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_data_list, container, false);
-	}
+	/*
+	 * @Override public View onCreateView(LayoutInflater inflater, ViewGroup
+	 * container, Bundle savedInstanceState) { return
+	 * inflater.inflate(R.layout.fragment_data_list, container, false); }
+	 */
 
 	@Override
 	public void onDialogNegativeClick(int requestCode) {
@@ -274,7 +292,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 			}
 
 			mActionMode.finish();
-			mListAdapter.update();
+			updateData();
 		}
 	}
 
@@ -326,7 +344,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 	@Override
 	public void updateData() {
 		setCurrentPosition(ListView.INVALID_POSITION);
-		mListAdapter.update();
+
+		new DataListUpdateTask().execute();
 	}
 
 	protected abstract int getAlertDeleteManyMessage();
