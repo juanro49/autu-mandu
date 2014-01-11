@@ -188,8 +188,6 @@ android.support.v4.app.ListFragment:
     198:200:public void setSelection(int)
     206:207:public int getSelectedItemPosition()
     214:215:public long getSelectedItemId()
-    232:241:public void setEmptyText(java.lang.CharSequence)
-    258:259:public void setListShown(boolean)
     266:267:public void setListShownNoAnimation(boolean)
 android.support.v4.app.LoaderManager:
     public abstract android.support.v4.content.Loader initLoader(int,android.os.Bundle,android.support.v4.app.LoaderManager$LoaderCallbacks)
@@ -4397,6 +4395,8 @@ me.kuehle.carreport.R$string
 me.kuehle.carreport.R$style
 me.kuehle.carreport.R$styleable
 me.kuehle.carreport.R$xml
+me.kuehle.carreport.data.balancing.RefuelingBalancer:
+    public static final float MAX_RELATIVE_CONSUMPTION_DEVIATION
 me.kuehle.carreport.gui.AbstractDataDetailFragment:
     public static final java.lang.String EXTRA_ID
     public static final long EXTRA_ID_DEFAULT
@@ -4542,7 +4542,8 @@ me.kuehle.chartlib.renderer.Clickable:
 me.kuehle.chartlib.renderer.LineRenderer:
     protected static final float RELATIVE_POINT_RADIUS
     protected static final float RELATIVE_CLICK_RADIUS
-    416:417:public void setSeriesLineWidth(int,int)
+    protected static final int DEFAULT_MARK_COLOR
+    586:587:public void setSeriesLineWidth(int,int)
 me.kuehle.chartlib.renderer.RendererList:
     166:167:public void removeRenderer(me.kuehle.chartlib.renderer.AbstractRenderer)
 me.kuehle.chartlib.util.Size:

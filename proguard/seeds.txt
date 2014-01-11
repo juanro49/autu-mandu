@@ -1403,6 +1403,8 @@ javax.annotation.meta.When: javax.annotation.meta.When[] values()
 javax.annotation.meta.When: javax.annotation.meta.When valueOf(java.lang.String)
 me.kuehle.carreport.Application
 me.kuehle.carreport.Application: Application()
+me.kuehle.carreport.DistanceEntryMode: me.kuehle.carreport.DistanceEntryMode[] values()
+me.kuehle.carreport.DistanceEntryMode: me.kuehle.carreport.DistanceEntryMode valueOf(java.lang.String)
 me.kuehle.carreport.FuelConsumption$Type: me.kuehle.carreport.FuelConsumption$Type[] values()
 me.kuehle.carreport.FuelConsumption$Type: me.kuehle.carreport.FuelConsumption$Type valueOf(java.lang.String)
 me.kuehle.carreport.R$animator: int hide
@@ -1605,6 +1607,7 @@ me.kuehle.carreport.R$id: int picker
 me.kuehle.carreport.R$id: int satellite
 me.kuehle.carreport.R$id: int saturationbar
 me.kuehle.carreport.R$id: int spn_car
+me.kuehle.carreport.R$id: int spn_distance_entry_mode
 me.kuehle.carreport.R$id: int spn_fuel_type
 me.kuehle.carreport.R$id: int spn_options
 me.kuehle.carreport.R$id: int spn_repeat
@@ -1638,13 +1641,13 @@ me.kuehle.carreport.R$layout: int fragment_data
 me.kuehle.carreport.R$layout: int fragment_data_detail_car
 me.kuehle.carreport.R$layout: int fragment_data_detail_other
 me.kuehle.carreport.R$layout: int fragment_data_detail_refueling
-me.kuehle.carreport.R$layout: int fragment_data_list
 me.kuehle.carreport.R$layout: int fragment_help_detail
 me.kuehle.carreport.R$layout: int fragment_prefs_about
 me.kuehle.carreport.R$layout: int fragment_prefs_report_order
 me.kuehle.carreport.R$layout: int fragment_report
 me.kuehle.carreport.R$layout: int list_item_car
 me.kuehle.carreport.R$layout: int list_item_data
+me.kuehle.carreport.R$layout: int list_item_data_missing
 me.kuehle.carreport.R$layout: int list_item_drag
 me.kuehle.carreport.R$layout: int list_item_drawer
 me.kuehle.carreport.R$layout: int report
@@ -1721,6 +1724,9 @@ me.kuehle.carreport.R$string: int common_google_play_services_update_text
 me.kuehle.carreport.R$string: int common_google_play_services_update_title
 me.kuehle.carreport.R$string: int common_signin_button_text
 me.kuehle.carreport.R$string: int common_signin_button_text_long
+me.kuehle.carreport.R$string: int distance_entry_mode_show_selector
+me.kuehle.carreport.R$string: int distance_entry_mode_total
+me.kuehle.carreport.R$string: int distance_entry_mode_trip
 me.kuehle.carreport.R$string: int drag_handle_desc
 me.kuehle.carreport.R$string: int drawer_close
 me.kuehle.carreport.R$string: int drawer_open
@@ -1742,7 +1748,6 @@ me.kuehle.carreport.R$string: int graph_options_desc
 me.kuehle.carreport.R$string: int help_section_calculations
 me.kuehle.carreport.R$string: int help_section_getting_started
 me.kuehle.carreport.R$string: int help_section_tips
-me.kuehle.carreport.R$string: int hint_mileage
 me.kuehle.carreport.R$string: int hint_mileage_optional
 me.kuehle.carreport.R$string: int hint_name
 me.kuehle.carreport.R$string: int hint_note_optional
@@ -1770,10 +1775,12 @@ me.kuehle.carreport.R$string: int menu_settings
 me.kuehle.carreport.R$string: int menu_show_overall_trend
 me.kuehle.carreport.R$string: int menu_show_trend
 me.kuehle.carreport.R$string: int menu_synchronize
+me.kuehle.carreport.R$string: int missing_refueling
 me.kuehle.carreport.R$string: int overwrite
 me.kuehle.carreport.R$string: int pref_summary_appearance_color_sections
 me.kuehle.carreport.R$string: int pref_summary_appearance_show_legend
 me.kuehle.carreport.R$string: int pref_summary_backup
+me.kuehle.carreport.R$string: int pref_summary_behavior_auto_guess_missing_data
 me.kuehle.carreport.R$string: int pref_summary_behavior_show_car_menu
 me.kuehle.carreport.R$string: int pref_summary_export_csv
 me.kuehle.carreport.R$string: int pref_summary_import_csv
@@ -1787,7 +1794,9 @@ me.kuehle.carreport.R$string: int pref_summary_sync_setup
 me.kuehle.carreport.R$string: int pref_title_appearance_color_sections
 me.kuehle.carreport.R$string: int pref_title_appearance_show_legend
 me.kuehle.carreport.R$string: int pref_title_backup
+me.kuehle.carreport.R$string: int pref_title_behavior_auto_guess_missing_data
 me.kuehle.carreport.R$string: int pref_title_behavior_default_car
+me.kuehle.carreport.R$string: int pref_title_behavior_distance_entry_mode
 me.kuehle.carreport.R$string: int pref_title_behavior_show_car_menu
 me.kuehle.carreport.R$string: int pref_title_category_appearance
 me.kuehle.carreport.R$string: int pref_title_category_backup
@@ -1816,6 +1825,7 @@ me.kuehle.carreport.R$string: int report_average
 me.kuehle.carreport.R$string: int report_day
 me.kuehle.carreport.R$string: int report_graph_accumulated
 me.kuehle.carreport.R$string: int report_graph_month_history
+me.kuehle.carreport.R$string: int report_graph_per_month
 me.kuehle.carreport.R$string: int report_graph_per_refueling
 me.kuehle.carreport.R$string: int report_graph_year_history
 me.kuehle.carreport.R$string: int report_highest
@@ -1991,14 +2001,19 @@ me.kuehle.carreport.data.report.AbstractReportGraphData: java.lang.String name
 me.kuehle.carreport.data.report.AbstractReportGraphData: int color
 me.kuehle.carreport.data.report.AbstractReportGraphData: java.util.Vector xValues
 me.kuehle.carreport.data.report.AbstractReportGraphData: java.util.Vector yValues
+me.kuehle.carreport.data.report.AbstractReportGraphData: java.util.List markLines
+me.kuehle.carreport.data.report.AbstractReportGraphData: java.util.List markPoints
 me.kuehle.carreport.data.report.AbstractReportGraphData: AbstractReportGraphData(android.content.Context,java.lang.String,int)
 me.kuehle.carreport.data.report.AbstractReportGraphData: void applySeriesStyle(int,me.kuehle.chartlib.renderer.AbstractRenderer)
-me.kuehle.carreport.data.report.AbstractReportGraphData: me.kuehle.carreport.data.report.AbstractReportGraphData createTrendData()
 me.kuehle.carreport.data.report.AbstractReportGraphData: me.kuehle.carreport.data.report.AbstractReportGraphData createOverallTrendData()
+me.kuehle.carreport.data.report.AbstractReportGraphData: me.kuehle.carreport.data.report.AbstractReportGraphData createTrendData()
 me.kuehle.carreport.data.report.AbstractReportGraphData: me.kuehle.chartlib.data.Series getSeries()
 me.kuehle.carreport.data.report.AbstractReportGraphData: boolean isEmpty()
 me.kuehle.carreport.data.report.AbstractReportGraphData: int size()
 me.kuehle.carreport.data.report.AbstractReportGraphData: void sort()
+me.kuehle.carreport.data.report.AbstractReportGraphData: int getTrendColor()
+me.kuehle.carreport.data.report.AbstractReportGraphData: void markLastLine()
+me.kuehle.carreport.data.report.AbstractReportGraphData: void markLastPoint()
 me.kuehle.carreport.data.report.AbstractReportGraphData$OverallTrendReportData
 me.kuehle.carreport.data.report.AbstractReportGraphData$OverallTrendReportData: me.kuehle.carreport.data.report.AbstractReportGraphData this$0
 me.kuehle.carreport.data.report.AbstractReportGraphData$OverallTrendReportData: AbstractReportGraphData$OverallTrendReportData(me.kuehle.carreport.data.report.AbstractReportGraphData,me.kuehle.carreport.data.report.AbstractReportGraphData)
@@ -2056,13 +2071,16 @@ me.kuehle.carreport.data.report.FuelConsumptionReport$1
 me.kuehle.carreport.data.report.FuelConsumptionReport$1: me.kuehle.carreport.data.report.FuelConsumptionReport this$0
 me.kuehle.carreport.data.report.FuelConsumptionReport$1: me.kuehle.chartlib.data.Dataset val$dataset
 me.kuehle.carreport.data.report.FuelConsumptionReport$1: FuelConsumptionReport$1(me.kuehle.carreport.data.report.FuelConsumptionReport,me.kuehle.chartlib.data.Dataset)
-me.kuehle.carreport.data.report.FuelConsumptionReport$1: void onSeriesClick(int,int)
+me.kuehle.carreport.data.report.FuelConsumptionReport$1: void onSeriesClick(int,int,boolean)
 me.kuehle.carreport.data.report.FuelConsumptionReport$ReportGraphData
+me.kuehle.carreport.data.report.FuelConsumptionReport$ReportGraphData: double avgConsumption
 me.kuehle.carreport.data.report.FuelConsumptionReport$ReportGraphData: me.kuehle.carreport.data.report.FuelConsumptionReport this$0
 me.kuehle.carreport.data.report.FuelConsumptionReport$ReportGraphData: FuelConsumptionReport$ReportGraphData(me.kuehle.carreport.data.report.FuelConsumptionReport,android.content.Context,me.kuehle.carreport.db.FuelTank)
+me.kuehle.carreport.data.report.FuelConsumptionReport$ReportGraphData: double getAverageConsumption()
 me.kuehle.carreport.data.report.FuelPriceReport
 me.kuehle.carreport.data.report.FuelPriceReport: java.util.ArrayList reportData
 me.kuehle.carreport.data.report.FuelPriceReport: java.lang.String unit
+me.kuehle.carreport.data.report.FuelPriceReport: boolean showLegend
 me.kuehle.carreport.data.report.FuelPriceReport: FuelPriceReport(android.content.Context)
 me.kuehle.carreport.data.report.FuelPriceReport: int[] getAvailableChartOptions()
 me.kuehle.carreport.data.report.FuelPriceReport: java.lang.String getTitle()
@@ -2073,15 +2091,17 @@ me.kuehle.carreport.data.report.FuelPriceReport$1
 me.kuehle.carreport.data.report.FuelPriceReport$1: me.kuehle.carreport.data.report.FuelPriceReport this$0
 me.kuehle.carreport.data.report.FuelPriceReport$1: me.kuehle.chartlib.data.Dataset val$dataset
 me.kuehle.carreport.data.report.FuelPriceReport$1: FuelPriceReport$1(me.kuehle.carreport.data.report.FuelPriceReport,me.kuehle.chartlib.data.Dataset)
-me.kuehle.carreport.data.report.FuelPriceReport$1: void onSeriesClick(int,int)
+me.kuehle.carreport.data.report.FuelPriceReport$1: void onSeriesClick(int,int,boolean)
 me.kuehle.carreport.data.report.FuelPriceReport$ReportGraphData
 me.kuehle.carreport.data.report.FuelPriceReport$ReportGraphData: me.kuehle.carreport.data.report.FuelPriceReport this$0
 me.kuehle.carreport.data.report.FuelPriceReport$ReportGraphData: FuelPriceReport$ReportGraphData(me.kuehle.carreport.data.report.FuelPriceReport,android.content.Context,me.kuehle.carreport.db.FuelType,int)
 me.kuehle.carreport.data.report.MileageReport
 me.kuehle.carreport.data.report.MileageReport: int GRAPH_OPTION_ACCUMULATED
 me.kuehle.carreport.data.report.MileageReport: int GRAPH_OPTION_PER_REFUELING
+me.kuehle.carreport.data.report.MileageReport: int GRAPH_OPTION_PER_MONTH
 me.kuehle.carreport.data.report.MileageReport: java.util.Vector reportDataAccumulated
 me.kuehle.carreport.data.report.MileageReport: java.util.Vector reportDataPerRefueling
+me.kuehle.carreport.data.report.MileageReport: java.util.Vector reportDataPerMonth
 me.kuehle.carreport.data.report.MileageReport: double[] minXValue
 me.kuehle.carreport.data.report.MileageReport: java.lang.String unit
 me.kuehle.carreport.data.report.MileageReport: boolean showLegend
@@ -2095,13 +2115,17 @@ me.kuehle.carreport.data.report.MileageReport$1
 me.kuehle.carreport.data.report.MileageReport$1: me.kuehle.carreport.data.report.MileageReport this$0
 me.kuehle.carreport.data.report.MileageReport$1: me.kuehle.chartlib.data.Dataset val$dataset
 me.kuehle.carreport.data.report.MileageReport$1: MileageReport$1(me.kuehle.carreport.data.report.MileageReport,me.kuehle.chartlib.data.Dataset)
-me.kuehle.carreport.data.report.MileageReport$1: void onSeriesClick(int,int)
+me.kuehle.carreport.data.report.MileageReport$1: void onSeriesClick(int,int,boolean)
 me.kuehle.carreport.data.report.MileageReport$ReportGraphDataAccumulated
 me.kuehle.carreport.data.report.MileageReport$ReportGraphDataAccumulated: me.kuehle.carreport.data.report.MileageReport this$0
 me.kuehle.carreport.data.report.MileageReport$ReportGraphDataAccumulated: MileageReport$ReportGraphDataAccumulated(me.kuehle.carreport.data.report.MileageReport,android.content.Context,me.kuehle.carreport.db.Car)
+me.kuehle.carreport.data.report.MileageReport$ReportGraphDataPerMonth
+me.kuehle.carreport.data.report.MileageReport$ReportGraphDataPerMonth: me.kuehle.carreport.data.report.MileageReport this$0
+me.kuehle.carreport.data.report.MileageReport$ReportGraphDataPerMonth: MileageReport$ReportGraphDataPerMonth(me.kuehle.carreport.data.report.MileageReport,android.content.Context,me.kuehle.carreport.db.Car)
+me.kuehle.carreport.data.report.MileageReport$ReportGraphDataPerMonth: long getMonthTime(long)
 me.kuehle.carreport.data.report.MileageReport$ReportGraphDataPerRefueling
 me.kuehle.carreport.data.report.MileageReport$ReportGraphDataPerRefueling: me.kuehle.carreport.data.report.MileageReport this$0
-me.kuehle.carreport.data.report.MileageReport$ReportGraphDataPerRefueling: MileageReport$ReportGraphDataPerRefueling(me.kuehle.carreport.data.report.MileageReport,android.content.Context,me.kuehle.carreport.db.Car)
+me.kuehle.carreport.data.report.MileageReport$ReportGraphDataPerRefueling: MileageReport$ReportGraphDataPerRefueling(me.kuehle.carreport.data.report.MileageReport,android.content.Context,me.kuehle.carreport.db.FuelTank)
 me.kuehle.carreport.db.Car
 me.kuehle.carreport.db.Car: java.lang.String name
 me.kuehle.carreport.db.Car: int color
@@ -2157,9 +2181,13 @@ me.kuehle.carreport.db.Refueling: boolean partial
 me.kuehle.carreport.db.Refueling: java.lang.String note
 me.kuehle.carreport.db.Refueling: me.kuehle.carreport.db.FuelType fuelType
 me.kuehle.carreport.db.Refueling: me.kuehle.carreport.db.FuelTank fuelTank
+me.kuehle.carreport.db.Refueling: boolean guessed
 me.kuehle.carreport.db.Refueling: Refueling()
 me.kuehle.carreport.db.Refueling: Refueling(java.util.Date,int,float,float,boolean,java.lang.String,me.kuehle.carreport.db.FuelType,me.kuehle.carreport.db.FuelTank)
+me.kuehle.carreport.db.Refueling: int compareTo(me.kuehle.carreport.db.Refueling)
 me.kuehle.carreport.db.Refueling: float getFuelPrice()
+me.kuehle.carreport.db.Refueling: me.kuehle.carreport.db.Refueling getPrevious(me.kuehle.carreport.db.Car,java.util.Date)
+me.kuehle.carreport.db.Refueling: int compareTo(java.lang.Object)
 me.kuehle.carreport.db.query.SafeSelect
 me.kuehle.carreport.db.query.SafeSelect: SafeSelect()
 me.kuehle.carreport.db.query.SafeSelect: com.activeandroid.query.From from(java.lang.Class)
