@@ -7,3 +7,13 @@ kompletten Füllung berücksichtigt.</p>
 <p>Die Werte im Kosten-Report zeigen einen Durchschnittswert, der sich auf die gesamten
 eingegebenen Daten bezieht. Die Trendlinie im Graphen bezieht die aktuelle Periode nicht mit
 ein, weil sich dort noch Werte ändern können.</p>
+
+<h1>Fehlende Tankfüllungen ausgleichen</h1>
+<p>Die App erkennt fehlende Tankfüllungen an Benzinverbrauchswerten, die deutlich geringer (&lt; 80%)
+als der Durchschnitt sind. Sie versucht dann, auf Basis der durchschnittlichen gefahrenen Strecke
+zwischen zwei Tankfüllungen, zu erraten, wann die fehlenden Tankfüllungen wahrscheinlich stattgefunden
+haben. Die erratenen Tankfüllungen werden temporär hinzugefügt (wobei versucht wird den Durschnittverbauch
+und Preis zu erreichen), um ausgeglichenere Werte zu erhalten.</p>
+<p>Diese Werte werden im Benzinverbrauchsreport, Kilometerstandreport, Kostenreport und dem Recher verwendet.
+Die Liste der Daten enhält Hinweise auf wahrscheinlich fehlende Tankfüllungen, zeigt aber den richtigen Wert
+beim Benzinverbrauch an.</p>
