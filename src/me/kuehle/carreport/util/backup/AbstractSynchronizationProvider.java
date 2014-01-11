@@ -133,6 +133,7 @@ public abstract class AbstractSynchronizationProvider {
 	protected Context mContext;
 
 	private OnAuthenticationListener mAuthenticationListener;
+	private boolean mAuthenticationInProgess = false;
 	protected Fragment mAuthenticationFragment;
 	protected FragmentManager mAuthenticationFragmentManager;
 
@@ -144,7 +145,9 @@ public abstract class AbstractSynchronizationProvider {
 
 	public void continueAuthentication(int requestCode, int resultCode,
 			Intent data) {
-		onContinueAuthentication(requestCode, resultCode, data);
+		if (mAuthenticationInProgess) {
+			onContinueAuthentication(requestCode, resultCode, data);
+		}
 	}
 
 	public abstract String getAccountName();
@@ -166,6 +169,7 @@ public abstract class AbstractSynchronizationProvider {
 		mAuthenticationFragment = fragment;
 		mAuthenticationFragmentManager = fragment.getFragmentManager();
 		mAuthenticationListener = listener;
+		mAuthenticationInProgess = true;
 		onStartAuthentication();
 	}
 
@@ -200,6 +204,7 @@ public abstract class AbstractSynchronizationProvider {
 			prefs.setSynchronizationProvider(getClass().getName());
 		}
 
+		mAuthenticationInProgess = false;
 		mAuthenticationListener.onAuthenticationFinished(success,
 				remoteDataAvailable);
 	}
