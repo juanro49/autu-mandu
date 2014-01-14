@@ -265,10 +265,14 @@ public class FuelConsumptionReport extends AbstractReport {
 				Section section = addDataSection(fuelTank);
 				section.addItem(new Item(context
 						.getString(R.string.report_highest), String.format(
-						"%.2f %s", Calculator.max(carData.yValues), unit)));
+						"%.2f %s", Calculator.max(carData.yValues
+								.toArray(new Double[carData.yValues.size()])),
+						unit)));
 				section.addItem(new Item(context
 						.getString(R.string.report_lowest), String.format(
-						"%.2f %s", Calculator.min(carData.yValues), unit)));
+						"%.2f %s", Calculator.min(carData.yValues
+								.toArray(new Double[carData.yValues.size()])),
+						unit)));
 				section.addItem(new Item(context
 						.getString(R.string.report_average), String.format(
 						"%.2f %s", carData.getAverageConsumption(), unit)));

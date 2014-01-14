@@ -51,8 +51,10 @@ public abstract class AbstractReportGraphData {
 				return;
 			}
 
-			long avgX = Calculator.avg(data.xValues);
-			double avgY = Calculator.avg(data.yValues);
+			long avgX = Calculator.avg(data.xValues
+					.toArray(new Long[data.xValues.size()]));
+			double avgY = Calculator.avg(data.yValues
+					.toArray(new Double[data.yValues.size()]));
 
 			BigInteger sum1 = BigInteger.ZERO; // (x_i - avg(X)) ^ 2
 			BigDecimal sum2 = BigDecimal.ZERO; // (x_i - avg(X)) * (y_i -

@@ -331,7 +331,8 @@ public class RefuelingBalancer {
 			allDistances.remove(i);
 		}
 
-		int avgDistance = Calculator.avg(allDistances);
+		int avgDistance = Calculator.avg(allDistances
+				.toArray(new Integer[allDistances.size()]));
 
 		// Remove outstanding values from the average.
 		boolean updated;
@@ -343,7 +344,8 @@ public class RefuelingBalancer {
 				if (relativeDistance < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
 						|| relativeDistance > (1 + MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
 					allDistances.remove(i);
-					avgDistance = Calculator.avg(allDistances);
+					avgDistance = Calculator.avg(allDistances
+							.toArray(new Integer[allDistances.size()]));
 
 					updated = true;
 				}
@@ -362,10 +364,9 @@ public class RefuelingBalancer {
 	 * @return the average price per unit (e.g. EUR / liter).
 	 */
 	private static float getAveragePricePerUnit(List<Refueling> refuelings) {
-		Vector<Float> allPrices = new Vector<Float>();
-
-		for (Refueling refueling : refuelings) {
-			allPrices.add(refueling.getFuelPrice());
+		float[] allPrices = new float[refuelings.size()];
+		for (int i = 0; i < allPrices.length; i++) {
+			allPrices[i] = refuelings.get(i).getFuelPrice();
 		}
 
 		return Calculator.avg(allPrices);

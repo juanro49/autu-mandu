@@ -2,7 +2,6 @@ package me.kuehle.carreport.data.calculation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -38,13 +37,14 @@ public class PriceToVolumeCalculation extends AbstractCalculation {
 	public CalculationItem[] calculate(double input) {
 		List<CalculationItem> items = new ArrayList<CalculationItem>();
 		for (FuelType fuelType : FuelType.getAll()) {
-			Vector<Double> fuelPrices = new Vector<Double>();
-			for (Refueling refueling : fuelType.refuelings()) {
-				fuelPrices.add((double) refueling.getFuelPrice());
-			}
-
-			if (fuelPrices.size() > 0) {
-				double avgFuelPrice = Calculator.avg(fuelPrices);
+			List<Refueling> refuelings = fuelType.refuelings();
+			if (refuelings.size() > 0) {
+				float[] fuelPrices = new float[refuelings.size()];
+				for (int i = 0; i < fuelPrices.length; i++) {
+					fuelPrices[i] = refuelings.get(i).getFuelPrice();
+				}
+				
+				float avgFuelPrice = Calculator.avg(fuelPrices);
 				items.add(new CalculationItem(fuelType.name, input
 						/ avgFuelPrice));
 			}

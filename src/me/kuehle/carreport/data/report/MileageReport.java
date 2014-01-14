@@ -266,21 +266,21 @@ public class MileageReport extends AbstractReport {
 							minXValue[GRAPH_OPTION_PER_REFUELING],
 							carDataPerRefueling.getSeries().minX());
 
+					Double[] carYValues = carDataPerRefueling.yValues
+							.toArray(new Double[carDataPerRefueling.yValues
+									.size()]);
 					section.addItem(new Item(context
 							.getString(R.string.report_highest), String.format(
-							"%d %s", Calculator
-									.max(carDataPerRefueling.yValues)
-									.intValue(), unit)));
+							"%d %s", Calculator.max(carYValues).intValue(),
+							unit)));
 					section.addItem(new Item(context
 							.getString(R.string.report_lowest), String.format(
-							"%d %s", Calculator
-									.min(carDataPerRefueling.yValues)
-									.intValue(), unit)));
+							"%d %s", Calculator.min(carYValues).intValue(),
+							unit)));
 					section.addItem(new Item(context
 							.getString(R.string.report_average), String.format(
-							"%d %s", Calculator
-									.avg(carDataPerRefueling.yValues)
-									.intValue(), unit)));
+							"%d %s", Calculator.avg(carYValues).intValue(),
+							unit)));
 				}
 			}
 
