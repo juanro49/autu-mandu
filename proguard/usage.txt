@@ -4478,7 +4478,29 @@ me.kuehle.carreport.util.CSVWriter:
     private static final char ESCAPE
     private static final char NEW_LINE
 me.kuehle.carreport.util.Calculator:
-    21:21:public Calculator()
+    19:19:public Calculator()
+    21:21:public static varargs double avg(double[])
+    33:33:public static varargs java.lang.Float avg(java.lang.Float[])
+    37:37:public static varargs int avg(int[])
+    45:45:public static varargs long avg(long[])
+    53:60:public static varargs double max(double[])
+    75:82:public static varargs float max(float[])
+    86:93:public static varargs java.lang.Float max(java.lang.Float[])
+    97:104:public static varargs int max(int[])
+    108:115:public static varargs java.lang.Integer max(java.lang.Integer[])
+    119:126:public static varargs long max(long[])
+    130:137:public static varargs java.lang.Long max(java.lang.Long[])
+    141:148:public static varargs double min(double[])
+    163:170:public static varargs float min(float[])
+    174:181:public static varargs java.lang.Float min(java.lang.Float[])
+    185:192:public static varargs int min(int[])
+    196:203:public static varargs java.lang.Integer min(java.lang.Integer[])
+    207:214:public static varargs long min(long[])
+    218:225:public static varargs java.lang.Long min(java.lang.Long[])
+    229:234:public static varargs double sum(double[])
+    256:261:public static varargs java.lang.Float sum(java.lang.Float[])
+    265:270:public static varargs int sum(int[])
+    283:288:public static varargs long sum(long[])
 me.kuehle.carreport.util.DemoData
 me.kuehle.carreport.util.Strings:
     22:22:public Strings()

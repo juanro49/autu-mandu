@@ -7509,10 +7509,11 @@ me.kuehle.carreport.util.CSVWriter -> me.kuehle.carreport.util.b:
     java.lang.String format(java.util.Date) -> a
     java.lang.String format(java.lang.Float) -> a
 me.kuehle.carreport.util.Calculator -> me.kuehle.carreport.util.c:
-    java.lang.Number avg(java.util.Vector) -> a
-    java.lang.Number max(java.util.Vector) -> b
-    java.lang.Number min(java.util.Vector) -> c
-    java.lang.Number sum(java.util.Vector) -> d
+    java.lang.Double avg(java.lang.Double[]) -> a
+    float avg(float[]) -> a
+    java.lang.Integer avg(java.lang.Integer[]) -> a
+    java.lang.Double max(java.lang.Double[]) -> b
+    java.lang.Double min(java.lang.Double[]) -> c
 me.kuehle.carreport.util.IForEach -> me.kuehle.carreport.util.d:
     void action(java.lang.Object) -> a
 me.kuehle.carreport.util.Recurrence -> me.kuehle.carreport.util.e:
