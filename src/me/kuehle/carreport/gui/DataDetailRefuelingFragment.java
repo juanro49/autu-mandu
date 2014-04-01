@@ -26,10 +26,10 @@ import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment;
-import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment.DatePickerDialogFragmentListener;
-import me.kuehle.carreport.gui.dialog.TimePickerDialogFragment;
-import me.kuehle.carreport.gui.dialog.TimePickerDialogFragment.TimePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import android.os.Bundle;
@@ -46,8 +46,8 @@ import android.widget.TextView;
 import com.activeandroid.Model;
 
 public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
-		implements DatePickerDialogFragmentListener,
-		TimePickerDialogFragmentListener {
+		implements SupportDatePickerDialogFragmentListener,
+		SupportTimePickerDialogFragmentListener {
 	private class FuelTypeHolder {
 		public FuelTank tank;
 		public FuelType type;
@@ -202,7 +202,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		edtDate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				DatePickerDialogFragment.newInstance(
+				SupportDatePickerDialogFragment.newInstance(
 						DataDetailRefuelingFragment.this,
 						PICK_DATE_REQUEST_CODE, getDate(edtDate)).show(
 						getFragmentManager(), null);
@@ -212,7 +212,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		edtTime.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				TimePickerDialogFragment.newInstance(
+				SupportTimePickerDialogFragment.newInstance(
 						DataDetailRefuelingFragment.this,
 						PICK_TIME_REQUEST_CODE, getTime(edtTime)).show(
 						getFragmentManager(), null);

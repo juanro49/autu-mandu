@@ -23,10 +23,10 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.OtherCost;
-import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment;
-import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment.DatePickerDialogFragmentListener;
-import me.kuehle.carreport.gui.dialog.TimePickerDialogFragment;
-import me.kuehle.carreport.gui.dialog.TimePickerDialogFragment.TimePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.gui.util.SimpleAnimator;
@@ -49,8 +49,8 @@ import android.widget.TextView;
 import com.activeandroid.Model;
 
 public class DataDetailOtherFragment extends AbstractDataDetailFragment
-		implements DatePickerDialogFragmentListener,
-		TimePickerDialogFragmentListener {
+		implements SupportDatePickerDialogFragmentListener,
+		SupportTimePickerDialogFragmentListener {
 	private static final int PICK_DATE_REQUEST_CODE = 0;
 	private static final int PICK_TIME_REQUEST_CODE = 1;
 	private static final int PICK_END_DATE_REQUEST_CODE = 2;
@@ -239,7 +239,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 		edtDate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				DatePickerDialogFragment.newInstance(
+				SupportDatePickerDialogFragment.newInstance(
 						DataDetailOtherFragment.this, PICK_DATE_REQUEST_CODE,
 						getDate(edtDate)).show(getFragmentManager(), null);
 			}
@@ -248,7 +248,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 		edtTime.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				TimePickerDialogFragment.newInstance(
+				SupportTimePickerDialogFragment.newInstance(
 						DataDetailOtherFragment.this, PICK_TIME_REQUEST_CODE,
 						getTime(edtTime)).show(getFragmentManager(), null);
 			}
@@ -291,7 +291,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 		edtEndDate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				DatePickerDialogFragment.newInstance(
+				SupportDatePickerDialogFragment.newInstance(
 						DataDetailOtherFragment.this,
 						PICK_END_DATE_REQUEST_CODE, getDate(edtEndDate)).show(
 						getFragmentManager(), null);
@@ -301,7 +301,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 		edtEndTime.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				TimePickerDialogFragment.newInstance(
+				SupportTimePickerDialogFragment.newInstance(
 						DataDetailOtherFragment.this,
 						PICK_END_TIME_REQUEST_CODE, getTime(edtEndTime)).show(
 						getFragmentManager(), null);

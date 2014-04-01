@@ -19,27 +19,26 @@ package me.kuehle.carreport.gui.dialog;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.text.format.DateFormat;
-import android.widget.TimePicker;
+import android.widget.DatePicker;
 
-public class TimePickerDialogFragment extends DialogFragment implements
-		TimePickerDialog.OnTimeSetListener {
-	public static interface TimePickerDialogFragmentListener {
-		public void onDialogPositiveClick(int requestCode, Date time);
+public class SupportDatePickerDialogFragment extends DialogFragment implements
+		DatePickerDialog.OnDateSetListener {
+	public static interface SupportDatePickerDialogFragmentListener {
+		public void onDialogPositiveClick(int requestCode, Date date);
 	}
 
-	public static TimePickerDialogFragment newInstance(Fragment parent,
-			int requestCode, Date time) {
-		TimePickerDialogFragment f = new TimePickerDialogFragment();
+	public static SupportDatePickerDialogFragment newInstance(Fragment parent,
+			int requestCode, Date date) {
+		SupportDatePickerDialogFragment f = new SupportDatePickerDialogFragment();
 		f.setTargetFragment(parent, requestCode);
 
 		Bundle args = new Bundle();
-		args.putLong("time", time.getTime());
+		args.putLong("date", date.getTime());
 		f.setArguments(args);
 		return f;
 	}
@@ -49,24 +48,26 @@ public class TimePickerDialogFragment extends DialogFragment implements
 		Bundle args = getArguments();
 
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(args.getLong("time"));
+		cal.setTimeInMillis(args.getLong("date"));
 
-		return new TimePickerDialog(getActivity(), this,
-				cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE),
-				DateFormat.is24HourFormat(getActivity()));
+		return new DatePickerDialog(getActivity(), this,
+				cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
+				cal.get(Calendar.DATE));
 	}
 
 	@Override
-	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+	public void onDateSet(DatePicker view, int year, int monthOfYear,
+			int dayOfMonth) {
 		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-		cal.set(Calendar.MINUTE, minute);
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.MONTH, monthOfYear);
+		cal.set(Calendar.DATE, dayOfMonth);
 
 		getListener().onDialogPositiveClick(getTargetRequestCode(),
 				cal.getTime());
 	}
 
-	private TimePickerDialogFragmentListener getListener() {
-		return (TimePickerDialogFragmentListener) getTargetFragment();
+	private SupportDatePickerDialogFragmentListener getListener() {
+		return (SupportDatePickerDialogFragmentListener) getTargetFragment();
 	}
 }

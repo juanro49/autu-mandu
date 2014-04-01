@@ -31,16 +31,16 @@ import com.larswerkman.holocolorpicker.ColorPicker;
 import com.larswerkman.holocolorpicker.SaturationBar;
 import com.larswerkman.holocolorpicker.ValueBar;
 
-public class ColorPickerDialogFragment extends DialogFragment {
-	public static interface ColorPickerDialogFragmentListener {
+public class SupportColorPickerDialogFragment extends DialogFragment {
+	public static interface SupportColorPickerDialogFragmentListener {
 		public void onDialogNegativeClick(int requestCode);
 
 		public void onDialogPositiveClick(int requestCode, int color);
 	}
 
-	public static ColorPickerDialogFragment newInstance(Fragment parent,
+	public static SupportColorPickerDialogFragment newInstance(Fragment parent,
 			int requestCode, Integer title, int color) {
-		ColorPickerDialogFragment f = new ColorPickerDialogFragment();
+		SupportColorPickerDialogFragment f = new SupportColorPickerDialogFragment();
 		f.setTargetFragment(parent, requestCode);
 
 		Bundle args = new Bundle();
@@ -106,7 +106,7 @@ public class ColorPickerDialogFragment extends DialogFragment {
 		outState.putInt("color", mColorPicker.getColor());
 	}
 
-	private ColorPickerDialogFragmentListener getListener() {
-		return (ColorPickerDialogFragmentListener) getTargetFragment();
+	private SupportColorPickerDialogFragmentListener getListener() {
+		return (SupportColorPickerDialogFragmentListener) getTargetFragment();
 	}
 }

@@ -27,10 +27,10 @@ import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.db.PossibleFuelTypeForFuelTank;
-import me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment;
-import me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment.ColorPickerDialogFragmentListener;
-import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment;
-import me.kuehle.carreport.gui.dialog.DatePickerDialogFragment.DatePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment.SupportColorPickerDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportInputDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportInputDialogFragment.SupportInputDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
@@ -65,7 +65,7 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
 
 public class DataDetailCarFragment extends AbstractDataDetailFragment implements
-		ColorPickerDialogFragmentListener, DatePickerDialogFragmentListener,
+		SupportColorPickerDialogFragmentListener, SupportDatePickerDialogFragmentListener,
 		SupportInputDialogFragmentListener {
 	private class FuelTankHolder {
 		public ViewGroup layout;
@@ -537,7 +537,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		rowColor.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				ColorPickerDialogFragment.newInstance(
+				SupportColorPickerDialogFragment.newInstance(
 						DataDetailCarFragment.this, REQUEST_PICK_COLOR,
 						R.string.alert_change_color_title, color).show(
 						getFragmentManager(), null);
@@ -597,7 +597,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 		edtSuspendDate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				DatePickerDialogFragment.newInstance(
+				SupportDatePickerDialogFragment.newInstance(
 						DataDetailCarFragment.this, REQUEST_PICK_SUSPEND_DATE,
 						getSuspendDate()).show(getFragmentManager(), null);
 			}
