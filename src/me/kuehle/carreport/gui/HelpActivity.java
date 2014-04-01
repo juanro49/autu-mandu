@@ -126,4 +126,18 @@ public class HelpActivity extends PreferenceActivity {
 			return "calculations";
 		}
 	}
+	
+	public static class CSVFragment extends HelpFragment {
+		@Override
+		protected String getHelpId() {
+			return "csv";
+		}
+	}
+	
+	public static class FuelTanksFragment extends HelpFragment {
+		@Override
+		protected String getHelpId() {
+			return "fuel_tanks";
+		}
+	}
 }

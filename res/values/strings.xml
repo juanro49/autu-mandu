@@ -203,9 +203,11 @@
     <string name="pref_summary_import_csv">Import data from CSV files. The files must look like the ones, that are generated during CSV export.</string>
     <string name="pref_summary_import_csv_no_data">Files do not exist in directory %s on SD card.</string>
     
-    <string name="help_section_getting_started">Getting started</string>
+    <string name="help_section_getting_started">Getting Started</string>
     <string name="help_section_tips">Tips</string>
     <string name="help_section_calculations">Calculations</string>
+    <string name="help_section_fuel_tanks">Fuel Tanks</string>
+    <string name="help_section_csv">CSV</string>
     
     <string name="first_start_hi">Hi there!</string>
     <string name="first_start_intro">Car Report can display nice reports for your car expenses, including fuel consumption and overall costs. Start with these simple steps:</string>
