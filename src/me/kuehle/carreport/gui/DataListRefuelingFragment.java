@@ -100,6 +100,11 @@ public class DataListRefuelingFragment extends
 	protected boolean isMissingData(List<Refueling> refuelings, int position) {
 		return refuelings.get(position).guessed;
 	}
+	
+	@Override
+	protected boolean isInvalidData(List<Refueling> refuelings, int position) {
+		return !refuelings.get(position).valid;
+	}
 
 	private Refueling getNextRefueling(List<Refueling> refuelings, int position) {
 		while (++position < refuelings.size()) {

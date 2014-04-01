@@ -60,6 +60,8 @@
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
     <string name="validate_error_no_fuel_types">Mindestens ein Kraftstoff muss zugewiesen werden</string>
+    <string name="validate_error_mileage_out_of_range_total">Der Kilometerstand muss bei Eingabe der Gesamtkilometer zwischen dem der letzten und der nächsten Tankfüllung liegen. Wenn Sie Tageskilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
+    <string name="validate_error_mileage_out_of_range_trip">Der kumulierte Kilometerstand darf bei Eingabe der Tageskilometer den Kilometerstand der nächsten Tankfüllung nicht übersteigen. Wenn Sie Gesamtkilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
 
     <string name="suspended">Stillgelegt</string>
     <string name="suspended_since">Stillgelegt seit %s</string>
@@ -228,6 +230,7 @@
     <string name="distance_entry_mode_total">Gesamtkilometer</string>
     <string name="distance_entry_mode_show_selector">Auswahl anzeigen</string>
     <string name="missing_refueling">Fehlende Tankfüllung</string>
+    <string name="invalid_data">Dieser Eintrag ist fehlerhaft. Bearbeiten und speichern Sie ihn um detaillierte Meldungen zu erhalten.</string>
     <string name="graph_details_desc">Graph-Details</string>
     <string name="graph_options_desc">Graph-Optionen</string>
     <string name="graph_close_full_screen_desc">Vollbildgraph schließen</string>

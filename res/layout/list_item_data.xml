@@ -12,7 +12,7 @@
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
-  limitations under the License.
+  limitations under the License..
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -20,107 +20,120 @@
     android:layout_marginTop="-6dp"
     android:background="?android:attr/activatedBackgroundIndicator"
     android:baselineAligned="false"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:paddingBottom="8dp"
     android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
     android:paddingRight="?android:attr/listPreferredItemPaddingRight"
     android:paddingTop="8dp" >
-    <RelativeLayout
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5" >
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceListItem" />
-        <TextView
-            android:id="@+id/subtitle"
-            android:layout_width="wrap_content"
+            android:layout_weight="0.5" >
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceListItem" />
+            <TextView
+                android:id="@+id/subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/title"
+                android:layout_marginTop="-5dp"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/subtitle"
+                android:layout_marginTop="-3dp"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/title"
-            android:layout_marginTop="-5dp"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-        <TextView
-            android:id="@+id/date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/subtitle"
-            android:layout_marginTop="-3dp"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </RelativeLayout>
-    <RelativeLayout
-        android:layout_width="0dp"
+            android:layout_weight="0.5" >
+            <TextView
+                android:id="@+id/data1_calculated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/data_list_item_calculated"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/primary_text_dark" />
+            <TextView
+                android:id="@+id/data2_calculated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/data1_calculated"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/data_list_item_calculated"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/primary_text_dark" />
+            <TextView
+                android:id="@+id/data3_calculated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/data2_calculated"
+                android:layout_marginTop="2dp"
+                android:background="@drawable/data_list_item_calculated"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/primary_text_dark" />
+            <TextView
+                android:id="@+id/data1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/data1_calculated"
+                android:layout_alignParentLeft="true"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/data2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/data2_calculated"
+                android:layout_alignParentLeft="true"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/data3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/data3_calculated"
+                android:layout_alignParentLeft="true"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RelativeLayout>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/data_invalid"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5" >
-        <TextView
-            android:id="@+id/data1_calculated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/data_list_item_calculated"
-            android:paddingLeft="3dp"
-            android:paddingRight="3dp"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@android:color/primary_text_dark" />
-        <TextView
-            android:id="@+id/data2_calculated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/data1_calculated"
-            android:layout_marginTop="2dp"
-            android:background="@drawable/data_list_item_calculated"
-            android:paddingLeft="3dp"
-            android:paddingRight="3dp"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@android:color/primary_text_dark" />
-        <TextView
-            android:id="@+id/data3_calculated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/data2_calculated"
-            android:layout_marginTop="2dp"
-            android:background="@drawable/data_list_item_calculated"
-            android:paddingLeft="3dp"
-            android:paddingRight="3dp"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@android:color/primary_text_dark" />
-        <TextView
-            android:id="@+id/data1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/data1_calculated"
-            android:layout_alignParentLeft="true"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-        <TextView
-            android:id="@+id/data2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/data2_calculated"
-            android:layout_alignParentLeft="true"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-        <TextView
-            android:id="@+id/data3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/data3_calculated"
-            android:layout_alignParentLeft="true"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </RelativeLayout>
+        android:text="@string/invalid_data"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/holo_red_dark" />
 </LinearLayout>

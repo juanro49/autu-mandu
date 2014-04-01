@@ -72,4 +72,9 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
 	protected boolean isMissingData(List<OtherCost> otherCosts, int position) {
 		return false;
 	}
+	
+	@Override
+	protected boolean isInvalidData(List<OtherCost> otherCosts, int position) {
+		return false;
+	}
 }

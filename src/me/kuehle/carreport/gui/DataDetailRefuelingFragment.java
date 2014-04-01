@@ -30,6 +30,7 @@ import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
+import me.kuehle.carreport.gui.util.AbstractFormFieldValidator;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import android.os.Bundle;
@@ -327,9 +328,48 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 	@Override
 	protected boolean validate() {
 		FormValidator validator = new FormValidator();
+
 		validator.add(new FormFieldGreaterZeroValidator(edtMileage));
 		validator.add(new FormFieldGreaterZeroValidator(edtVolume));
 		validator.add(new FormFieldGreaterZeroValidator(edtPrice));
+
+		// Check if entered mileage is between the mileage of the
+		// previous and next refueling.
+		if (getDistanceEntryMode() == DistanceEntryMode.TOTAL) {
+			validator.add(new AbstractFormFieldValidator(edtMileage) {
+				@Override
+				protected boolean isValid() {
+					int mileage = getIntegerFromEditText(edtMileage, 0);
+					Refueling previousRefueling = getPreviousRefueling();
+					Refueling nextRefueling = getNextRefueling();
+
+					return !((previousRefueling != null && previousRefueling.mileage >= mileage) || (nextRefueling != null && nextRefueling.mileage <= mileage));
+				}
+
+				@Override
+				protected int getMessage() {
+					return R.string.validate_error_mileage_out_of_range_total;
+				}
+			});
+		} else {
+			validator.add(new AbstractFormFieldValidator(edtMileage) {
+				@Override
+				protected boolean isValid() {
+					int mileage = getIntegerFromEditText(edtMileage, 0);
+					Refueling previousRefueling = getPreviousRefueling();
+					Refueling nextRefueling = getNextRefueling();
+
+					return !(previousRefueling != null && nextRefueling != null && previousRefueling.mileage
+							+ mileage >= nextRefueling.mileage);
+				}
+
+				@Override
+				protected int getMessage() {
+					return R.string.validate_error_mileage_out_of_range_trip;
+				}
+			});
+		}
+
 		return validator.validate();
 	}
 
@@ -380,5 +420,12 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 		Date date = getDateTime(getDate(edtDate), getTime(edtTime));
 
 		return Refueling.getPrevious(car, date);
+	}
+
+	private Refueling getNextRefueling() {
+		Car car = cars.get(spnCar.getSelectedItemPosition());
+		Date date = getDateTime(getDate(edtDate), getTime(edtTime));
+
+		return Refueling.getNext(car, date);
 	}
 }

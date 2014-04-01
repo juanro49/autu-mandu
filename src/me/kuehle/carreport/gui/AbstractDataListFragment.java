@@ -117,6 +117,14 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 						textView.setVisibility(View.INVISIBLE);
 					}
 				}
+
+				View invalidDataView = convertView
+						.findViewById(R.id.data_invalid);
+				if (isInvalidData(mItems, position)) {
+					invalidDataView.setVisibility(View.VISIBLE);
+				} else {
+					invalidDataView.setVisibility(View.GONE);
+				}
 			}
 
 			return convertView;
@@ -358,4 +366,6 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 	protected abstract List<T> getItems();
 
 	protected abstract boolean isMissingData(List<T> items, int position);
+
+	protected abstract boolean isInvalidData(List<T> items, int position);
 }

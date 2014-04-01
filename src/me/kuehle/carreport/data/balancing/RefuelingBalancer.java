@@ -52,6 +52,10 @@ public class RefuelingBalancer {
 	public List<Refueling> getBalancedRefuelings(FuelTank fuelTank) {
 		List<Refueling> refuelings = fuelTank.refuelings();
 
+		if (!areRefuelingsValid(refuelings)) {
+			return refuelings;
+		}
+
 		if (!this.prefs.isAutoGuessMissingDataEnabled()) {
 			return refuelings;
 		}
@@ -370,5 +374,31 @@ public class RefuelingBalancer {
 		}
 
 		return Calculator.avg(allPrices);
+	}
+
+	/**
+	 * Checks if the specified refuelings (that are ordered by date) are ordered
+	 * by mileage as well. In previous versions and using the CSV import users
+	 * are able to insert refuelings with any mileage value.
+	 * 
+	 * When refuelings are found, that don't have an increasing mileage, they
+	 * are flagged as invalid and false is returned.
+	 * 
+	 * @param refuelings
+	 * @return
+	 */
+	private static boolean areRefuelingsValid(List<Refueling> refuelings) {
+		boolean valid = true;
+		for (int i = 1; i < refuelings.size(); i++) {
+			Refueling previousRefueling = refuelings.get(i - 1);
+			Refueling refueling = refuelings.get(i);
+
+			if (refueling.mileage <= previousRefueling.mileage) {
+				refueling.valid = false;
+				valid = false;
+			}
+		}
+
+		return valid;
 	}
 }

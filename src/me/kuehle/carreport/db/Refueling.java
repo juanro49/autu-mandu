@@ -52,6 +52,8 @@ public class Refueling extends Model implements Comparable<Refueling> {
 	public FuelTank fuelTank;
 
 	public boolean guessed = false;
+	
+	public boolean valid = true;
 
 	public Refueling() {
 		super();
@@ -86,6 +88,16 @@ public class Refueling extends Model implements Comparable<Refueling> {
 				.on("fuel_tanks.Id = refuelings.fuel_tank")
 				.where("fuel_tanks.car = ? AND refuelings.date < ?", car.id,
 						date.getTime()).orderBy("refuelings.date DESC")
+				.executeSingle();
+	}
+	
+	public static Refueling getNext(Car car, Date date) {
+		return SafeSelect
+				.from(Refueling.class)
+				.join(FuelTank.class)
+				.on("fuel_tanks.Id = refuelings.fuel_tank")
+				.where("fuel_tanks.car = ? AND refuelings.date > ?", car.id,
+						date.getTime()).orderBy("refuelings.date ASC")
 				.executeSingle();
 	}
 }
