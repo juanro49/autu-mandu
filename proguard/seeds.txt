@@ -1550,6 +1550,7 @@ me.kuehle.carreport.R$id: int data2
 me.kuehle.carreport.R$id: int data2_calculated
 me.kuehle.carreport.R$id: int data3
 me.kuehle.carreport.R$id: int data3_calculated
+me.kuehle.carreport.R$id: int data_invalid
 me.kuehle.carreport.R$id: int date
 me.kuehle.carreport.R$id: int detail
 me.kuehle.carreport.R$id: int details
@@ -1746,6 +1747,8 @@ me.kuehle.carreport.R$string: int graph_close_full_screen_desc
 me.kuehle.carreport.R$string: int graph_details_desc
 me.kuehle.carreport.R$string: int graph_options_desc
 me.kuehle.carreport.R$string: int help_section_calculations
+me.kuehle.carreport.R$string: int help_section_csv
+me.kuehle.carreport.R$string: int help_section_fuel_tanks
 me.kuehle.carreport.R$string: int help_section_getting_started
 me.kuehle.carreport.R$string: int help_section_tips
 me.kuehle.carreport.R$string: int hint_mileage_optional
@@ -1757,6 +1760,7 @@ me.kuehle.carreport.R$string: int hint_tank
 me.kuehle.carreport.R$string: int hint_title
 me.kuehle.carreport.R$string: int hint_volume
 me.kuehle.carreport.R$string: int import_
+me.kuehle.carreport.R$string: int invalid_data
 me.kuehle.carreport.R$string: int label_add
 me.kuehle.carreport.R$string: int label_add_dialog
 me.kuehle.carreport.R$string: int label_color
@@ -1883,6 +1887,8 @@ me.kuehle.carreport.R$string: int toast_restore_success
 me.kuehle.carreport.R$string: int toast_sync_authentication_failed
 me.kuehle.carreport.R$string: int toast_synchronization_failed
 me.kuehle.carreport.R$string: int validate_error_greater_zero
+me.kuehle.carreport.R$string: int validate_error_mileage_out_of_range_total
+me.kuehle.carreport.R$string: int validate_error_mileage_out_of_range_trip
 me.kuehle.carreport.R$string: int validate_error_no_fuel_types
 me.kuehle.carreport.R$string: int validate_error_not_empty
 me.kuehle.carreport.R$style: int Theme
@@ -2182,11 +2188,13 @@ me.kuehle.carreport.db.Refueling: java.lang.String note
 me.kuehle.carreport.db.Refueling: me.kuehle.carreport.db.FuelType fuelType
 me.kuehle.carreport.db.Refueling: me.kuehle.carreport.db.FuelTank fuelTank
 me.kuehle.carreport.db.Refueling: boolean guessed
+me.kuehle.carreport.db.Refueling: boolean valid
 me.kuehle.carreport.db.Refueling: Refueling()
 me.kuehle.carreport.db.Refueling: Refueling(java.util.Date,int,float,float,boolean,java.lang.String,me.kuehle.carreport.db.FuelType,me.kuehle.carreport.db.FuelTank)
 me.kuehle.carreport.db.Refueling: int compareTo(me.kuehle.carreport.db.Refueling)
 me.kuehle.carreport.db.Refueling: float getFuelPrice()
 me.kuehle.carreport.db.Refueling: me.kuehle.carreport.db.Refueling getPrevious(me.kuehle.carreport.db.Car,java.util.Date)
+me.kuehle.carreport.db.Refueling: me.kuehle.carreport.db.Refueling getNext(me.kuehle.carreport.db.Car,java.util.Date)
 me.kuehle.carreport.db.Refueling: int compareTo(java.lang.Object)
 me.kuehle.carreport.db.query.SafeSelect
 me.kuehle.carreport.db.query.SafeSelect: SafeSelect()
@@ -2207,7 +2215,9 @@ me.kuehle.carreport.gui.FirstStartActivity: FirstStartActivity()
 me.kuehle.carreport.gui.FirstStartActivity: void startByCreatingCar(android.view.View)
 me.kuehle.carreport.gui.HelpActivity
 me.kuehle.carreport.gui.HelpActivity: HelpActivity()
+me.kuehle.carreport.gui.HelpActivity$CSVFragment
 me.kuehle.carreport.gui.HelpActivity$CalculationsFragment
+me.kuehle.carreport.gui.HelpActivity$FuelTanksFragment
 me.kuehle.carreport.gui.HelpActivity$GettingStartedFragment
 me.kuehle.carreport.gui.HelpActivity$HelpFragment
 me.kuehle.carreport.gui.HelpActivity$TipsFragment

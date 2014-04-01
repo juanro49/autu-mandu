@@ -6623,9 +6623,11 @@ me.kuehle.carreport.db.Refueling -> me.kuehle.carreport.db.Refueling:
     me.kuehle.carreport.db.FuelType fuelType -> fuelType
     me.kuehle.carreport.db.FuelTank fuelTank -> fuelTank
     boolean guessed -> guessed
+    boolean valid -> valid
     int compareTo(me.kuehle.carreport.db.Refueling) -> compareTo
     float getFuelPrice() -> getFuelPrice
     me.kuehle.carreport.db.Refueling getPrevious(me.kuehle.carreport.db.Car,java.util.Date) -> getPrevious
+    me.kuehle.carreport.db.Refueling getNext(me.kuehle.carreport.db.Car,java.util.Date) -> getNext
     int compareTo(java.lang.Object) -> compareTo
 me.kuehle.carreport.db.query.SafeSelect -> me.kuehle.carreport.db.query.SafeSelect:
     com.activeandroid.query.From from(java.lang.Class) -> from
@@ -6698,6 +6700,7 @@ me.kuehle.carreport.gui.AbstractDataListFragment -> me.kuehle.carreport.gui.c:
     android.util.SparseArray getItemData(java.util.List,int) -> a
     java.util.List getItems() -> J
     boolean isMissingData(java.util.List,int) -> b
+    boolean isInvalidData(java.util.List,int) -> c
     me.kuehle.carreport.gui.AbstractDataListFragment$DataListAdapter access$0(me.kuehle.carreport.gui.AbstractDataListFragment) -> a
     boolean access$1(me.kuehle.carreport.gui.AbstractDataListFragment) -> b
     void access$2$27ef9017(me.kuehle.carreport.gui.AbstractDataListFragment) -> c
@@ -6941,6 +6944,8 @@ me.kuehle.carreport.gui.DataDetailRefuelingFragment -> me.kuehle.carreport.gui.a
     void access$5(me.kuehle.carreport.gui.DataDetailRefuelingFragment,android.util.SparseArray) -> a
     android.util.SparseArray access$6(me.kuehle.carreport.gui.DataDetailRefuelingFragment) -> f
     android.widget.Spinner access$7(me.kuehle.carreport.gui.DataDetailRefuelingFragment) -> g
+    me.kuehle.carreport.db.Refueling access$8(me.kuehle.carreport.gui.DataDetailRefuelingFragment) -> h
+    me.kuehle.carreport.db.Refueling access$9(me.kuehle.carreport.gui.DataDetailRefuelingFragment) -> i
 me.kuehle.carreport.gui.DataDetailRefuelingFragment$1 -> me.kuehle.carreport.gui.ae:
     me.kuehle.carreport.gui.DataDetailRefuelingFragment this$0 -> a
     void onClick(android.view.View) -> onClick
@@ -6955,11 +6960,19 @@ me.kuehle.carreport.gui.DataDetailRefuelingFragment$4 -> me.kuehle.carreport.gui
     me.kuehle.carreport.gui.DataDetailRefuelingFragment this$0 -> a
     void onItemSelected(android.widget.AdapterView,android.view.View,int,long) -> onItemSelected
     void onNothingSelected(android.widget.AdapterView) -> onNothingSelected
-me.kuehle.carreport.gui.DataDetailRefuelingFragment$FuelTypeHolder -> me.kuehle.carreport.gui.ai:
+me.kuehle.carreport.gui.DataDetailRefuelingFragment$5 -> me.kuehle.carreport.gui.ai:
+    me.kuehle.carreport.gui.DataDetailRefuelingFragment this$0 -> a
+    boolean isValid() -> a
+    int getMessage() -> b
+me.kuehle.carreport.gui.DataDetailRefuelingFragment$6 -> me.kuehle.carreport.gui.aj:
+    me.kuehle.carreport.gui.DataDetailRefuelingFragment this$0 -> a
+    boolean isValid() -> a
+    int getMessage() -> b
+me.kuehle.carreport.gui.DataDetailRefuelingFragment$FuelTypeHolder -> me.kuehle.carreport.gui.ak:
     me.kuehle.carreport.db.FuelTank tank -> a
     me.kuehle.carreport.db.FuelType type -> b
     me.kuehle.carreport.gui.DataDetailRefuelingFragment this$0 -> c
-me.kuehle.carreport.gui.DataFragment -> me.kuehle.carreport.gui.aj:
+me.kuehle.carreport.gui.DataFragment -> me.kuehle.carreport.gui.al:
     me.kuehle.carreport.gui.DataFragment$DataListPagerAdapter mAdapter -> a
     android.support.v4.view.ViewPager mPager -> b
     boolean mTwoPane -> c
@@ -6984,36 +6997,38 @@ me.kuehle.carreport.gui.DataFragment -> me.kuehle.carreport.gui.aj:
     me.kuehle.carreport.db.Car access$3(me.kuehle.carreport.gui.DataFragment) -> b
     android.widget.TextView access$4(me.kuehle.carreport.gui.DataFragment) -> c
     boolean access$5(me.kuehle.carreport.gui.DataFragment) -> d
-me.kuehle.carreport.gui.DataFragment$DataListBackStackListener -> me.kuehle.carreport.gui.ak:
+me.kuehle.carreport.gui.DataFragment$DataListBackStackListener -> me.kuehle.carreport.gui.am:
     me.kuehle.carreport.gui.DataFragment this$0 -> a
     void onBackStackChanged() -> a
-me.kuehle.carreport.gui.DataFragment$DataListListener -> me.kuehle.carreport.gui.al:
+me.kuehle.carreport.gui.DataFragment$DataListListener -> me.kuehle.carreport.gui.an:
     void onCarChanged(me.kuehle.carreport.db.Car) -> a
     void unselectItem() -> F
     void updateData() -> G
-me.kuehle.carreport.gui.DataFragment$DataListNavigationListener -> me.kuehle.carreport.gui.am:
+me.kuehle.carreport.gui.DataFragment$DataListNavigationListener -> me.kuehle.carreport.gui.ao:
     me.kuehle.carreport.gui.DataFragment this$0 -> a
     boolean onNavigationItemSelected(int,long) -> onNavigationItemSelected
-me.kuehle.carreport.gui.DataFragment$DataListOnPageChangeListener -> me.kuehle.carreport.gui.an:
+me.kuehle.carreport.gui.DataFragment$DataListOnPageChangeListener -> me.kuehle.carreport.gui.ap:
     me.kuehle.carreport.gui.DataFragment this$0 -> a
     void onPageSelected(int) -> a
-me.kuehle.carreport.gui.DataFragment$DataListPagerAdapter -> me.kuehle.carreport.gui.ao:
+me.kuehle.carreport.gui.DataFragment$DataListPagerAdapter -> me.kuehle.carreport.gui.aq:
     me.kuehle.carreport.gui.DataFragment this$0 -> a
     android.support.v4.app.Fragment getItem(int) -> a
     java.lang.CharSequence getPageTitle(int) -> b
-me.kuehle.carreport.gui.DataListOtherFragment -> me.kuehle.carreport.gui.ap:
+me.kuehle.carreport.gui.DataListOtherFragment -> me.kuehle.carreport.gui.ar:
     int getAlertDeleteManyMessage() -> H
     int getExtraEdit() -> I
     android.util.SparseArray getItemData(java.util.List,int) -> a
     java.util.List getItems() -> J
     boolean isMissingData(java.util.List,int) -> b
-me.kuehle.carreport.gui.DataListRefuelingFragment -> me.kuehle.carreport.gui.aq:
+    boolean isInvalidData(java.util.List,int) -> c
+me.kuehle.carreport.gui.DataListRefuelingFragment -> me.kuehle.carreport.gui.as:
     int getAlertDeleteManyMessage() -> H
     int getExtraEdit() -> I
     android.util.SparseArray getItemData(java.util.List,int) -> a
     java.util.List getItems() -> J
     boolean isMissingData(java.util.List,int) -> b
-    me.kuehle.carreport.db.Refueling getNextRefueling(java.util.List,int) -> c
+    boolean isInvalidData(java.util.List,int) -> c
+    me.kuehle.carreport.db.Refueling getNextRefueling(java.util.List,int) -> d
 me.kuehle.carreport.gui.FirstStartActivity -> me.kuehle.carreport.gui.FirstStartActivity:
     void onCreate(android.os.Bundle) -> onCreate
     void onActivityResult(int,int,android.content.Intent) -> onActivityResult
@@ -7023,7 +7038,13 @@ me.kuehle.carreport.gui.HelpActivity -> me.kuehle.carreport.gui.HelpActivity:
     void onBuildHeaders(java.util.List) -> onBuildHeaders
     boolean onOptionsItemSelected(android.view.MenuItem) -> onOptionsItemSelected
     boolean isValidFragment(java.lang.String) -> isValidFragment
+me.kuehle.carreport.gui.HelpActivity$CSVFragment -> me.kuehle.carreport.gui.HelpActivity$CSVFragment:
+    java.lang.String getHelpId() -> a
+    android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> onCreateView
 me.kuehle.carreport.gui.HelpActivity$CalculationsFragment -> me.kuehle.carreport.gui.HelpActivity$CalculationsFragment:
+    java.lang.String getHelpId() -> a
+    android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> onCreateView
+me.kuehle.carreport.gui.HelpActivity$FuelTanksFragment -> me.kuehle.carreport.gui.HelpActivity$FuelTanksFragment:
     java.lang.String getHelpId() -> a
     android.view.View onCreateView(android.view.LayoutInflater,android.view.ViewGroup,android.os.Bundle) -> onCreateView
 me.kuehle.carreport.gui.HelpActivity$GettingStartedFragment -> me.kuehle.carreport.gui.HelpActivity$GettingStartedFragment:
@@ -7065,15 +7086,15 @@ me.kuehle.carreport.gui.MainActivity -> me.kuehle.carreport.gui.MainActivity:
     java.lang.CharSequence access$1(me.kuehle.carreport.gui.MainActivity) -> a
     void access$2(me.kuehle.carreport.gui.MainActivity,java.lang.CharSequence) -> a
     java.lang.CharSequence access$3(me.kuehle.carreport.gui.MainActivity) -> b
-me.kuehle.carreport.gui.MainActivity$1 -> me.kuehle.carreport.gui.ar:
+me.kuehle.carreport.gui.MainActivity$1 -> me.kuehle.carreport.gui.at:
     me.kuehle.carreport.gui.MainActivity this$0 -> a
     void onDrawerClosed$3c7ec8c3() -> d
     void onDrawerOpened$3c7ec8c3() -> c
-me.kuehle.carreport.gui.MainActivity$BackPressedListener -> me.kuehle.carreport.gui.as:
+me.kuehle.carreport.gui.MainActivity$BackPressedListener -> me.kuehle.carreport.gui.au:
     boolean onBackPressed() -> a
-me.kuehle.carreport.gui.MainActivity$DataChangeListener -> me.kuehle.carreport.gui.at:
+me.kuehle.carreport.gui.MainActivity$DataChangeListener -> me.kuehle.carreport.gui.av:
     void onDataChanged() -> D
-me.kuehle.carreport.gui.MainActivity$DrawerItemClickListener -> me.kuehle.carreport.gui.au:
+me.kuehle.carreport.gui.MainActivity$DrawerItemClickListener -> me.kuehle.carreport.gui.aw:
     me.kuehle.carreport.gui.MainActivity this$0 -> a
     void onItemClick(android.widget.AdapterView,android.view.View,int,long) -> onItemClick
 me.kuehle.carreport.gui.PreferencesAboutFragment -> me.kuehle.carreport.gui.PreferencesAboutFragment:
@@ -7238,7 +7259,7 @@ me.kuehle.carreport.gui.PreferencesReportOrderFragment -> me.kuehle.carreport.gu
 me.kuehle.carreport.gui.PreferencesReportOrderFragment$ReportDropListener -> me.kuehle.carreport.gui.PreferencesReportOrderFragment$ReportDropListener:
     me.kuehle.carreport.gui.PreferencesReportOrderFragment this$0 -> a
     void drop(int,int) -> a
-me.kuehle.carreport.gui.ReportFragment -> me.kuehle.carreport.gui.av:
+me.kuehle.carreport.gui.ReportFragment -> me.kuehle.carreport.gui.ax:
     me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask mCurrentUpdateTask -> a
     me.kuehle.carreport.data.report.AbstractReport mCurrentMenuReport -> b
     android.view.ViewGroup mCurrentMenuReportView -> c
@@ -7263,22 +7284,22 @@ me.kuehle.carreport.gui.ReportFragment -> me.kuehle.carreport.gui.av:
     me.kuehle.chartlib.ChartView access$5(me.kuehle.carreport.gui.ReportFragment) -> b
     void access$6$20be3d2b(me.kuehle.carreport.gui.ReportFragment) -> c
     void access$7$7e2e6710(me.kuehle.carreport.gui.ReportFragment) -> d
-me.kuehle.carreport.gui.ReportFragment$1 -> me.kuehle.carreport.gui.aw:
+me.kuehle.carreport.gui.ReportFragment$1 -> me.kuehle.carreport.gui.ay:
     me.kuehle.carreport.gui.ReportFragment this$0 -> a
     void onClick(android.view.View) -> onClick
-me.kuehle.carreport.gui.ReportFragment$2 -> me.kuehle.carreport.gui.ax:
+me.kuehle.carreport.gui.ReportFragment$2 -> me.kuehle.carreport.gui.az:
     me.kuehle.carreport.gui.ReportFragment this$0 -> a
     android.view.View val$chartHolder -> b
     void onAnimationEnd(android.animation.Animator) -> onAnimationEnd
-me.kuehle.carreport.gui.ReportFragment$3 -> me.kuehle.carreport.gui.ay:
+me.kuehle.carreport.gui.ReportFragment$3 -> me.kuehle.carreport.gui.ba:
     me.kuehle.carreport.gui.ReportFragment this$0 -> a
     void onAnimationEnd(android.animation.Animator) -> onAnimationEnd
-me.kuehle.carreport.gui.ReportFragment$4 -> me.kuehle.carreport.gui.az:
+me.kuehle.carreport.gui.ReportFragment$4 -> me.kuehle.carreport.gui.bb:
     me.kuehle.carreport.gui.ReportFragment this$0 -> a
     android.view.ViewGroup$MarginLayoutParams val$detailsParams -> b
     android.view.View val$details -> c
     void onAnimationUpdate(android.animation.ValueAnimator) -> onAnimationUpdate
-me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask -> me.kuehle.carreport.gui.ba:
+me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask -> me.kuehle.carreport.gui.bc:
     int[] columnIDs -> b
     java.util.List columns -> c
     int currentColumn -> d
@@ -7287,71 +7308,49 @@ me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask -> me.kuehle.carreport.g
     void onProgressUpdate(java.lang.Object[]) -> onProgressUpdate
     java.lang.Object doInBackground(java.lang.Object[]) -> doInBackground
     me.kuehle.carreport.gui.ReportFragment access$2(me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask) -> a
-me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$1 -> me.kuehle.carreport.gui.bb:
+me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$1 -> me.kuehle.carreport.gui.bd:
     me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask this$1 -> a
     void onClick(android.view.View) -> onClick
-me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$2 -> me.kuehle.carreport.gui.bc:
-    me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask this$1 -> a
-    me.kuehle.carreport.data.report.AbstractReport val$report -> b
-    void onClick(android.view.View) -> onClick
-me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$3 -> me.kuehle.carreport.gui.bd:
+me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$2 -> me.kuehle.carreport.gui.be:
     me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask this$1 -> a
     me.kuehle.carreport.data.report.AbstractReport val$report -> b
     void onClick(android.view.View) -> onClick
-me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment -> me.kuehle.carreport.gui.a.a:
-    com.larswerkman.holocolorpicker.ColorPicker mColorPicker -> Y
-    me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment newInstance$7bf905fc(android.support.v4.app.Fragment,java.lang.Integer,int) -> a
-    android.app.Dialog onCreateDialog(android.os.Bundle) -> c
-    void onSaveInstanceState(android.os.Bundle) -> e
-    me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment$ColorPickerDialogFragmentListener access$0(me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment) -> a
-    com.larswerkman.holocolorpicker.ColorPicker access$1(me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment) -> b
-me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment$1 -> me.kuehle.carreport.gui.a.b:
-    me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment this$0 -> a
-    void onClick(android.content.DialogInterface,int) -> onClick
-me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment$2 -> me.kuehle.carreport.gui.a.c:
-    me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment this$0 -> a
-    void onClick(android.content.DialogInterface,int) -> onClick
-me.kuehle.carreport.gui.dialog.ColorPickerDialogFragment$ColorPickerDialogFragmentListener -> me.kuehle.carreport.gui.a.d:
-    void onDialogNegativeClick$13462e() -> a_
-    void onDialogPositiveClick(int,int) -> a
-me.kuehle.carreport.gui.dialog.DatePickerDialogFragment -> me.kuehle.carreport.gui.a.e:
-    me.kuehle.carreport.gui.dialog.DatePickerDialogFragment newInstance(android.support.v4.app.Fragment,int,java.util.Date) -> a
-    android.app.Dialog onCreateDialog(android.os.Bundle) -> c
-    void onDateSet(android.widget.DatePicker,int,int,int) -> onDateSet
-me.kuehle.carreport.gui.dialog.DatePickerDialogFragment$DatePickerDialogFragmentListener -> me.kuehle.carreport.gui.a.f:
-    void onDialogPositiveClick(int,java.util.Date) -> a
-me.kuehle.carreport.gui.dialog.InputDialogFragment -> me.kuehle.carreport.gui.a.g:
+me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask$3 -> me.kuehle.carreport.gui.bf:
+    me.kuehle.carreport.gui.ReportFragment$ReportUpdateTask this$1 -> a
+    me.kuehle.carreport.data.report.AbstractReport val$report -> b
+    void onClick(android.view.View) -> onClick
+me.kuehle.carreport.gui.dialog.InputDialogFragment -> me.kuehle.carreport.gui.a.a:
     android.widget.EditText mEditText -> a
     me.kuehle.carreport.gui.dialog.InputDialogFragment newInstance(android.app.Fragment,int,java.lang.Integer,java.lang.String) -> a
     android.app.Dialog onCreateDialog(android.os.Bundle) -> onCreateDialog
     void onSaveInstanceState(android.os.Bundle) -> onSaveInstanceState
     me.kuehle.carreport.gui.dialog.InputDialogFragment$InputDialogFragmentListener access$0(me.kuehle.carreport.gui.dialog.InputDialogFragment) -> a
     android.widget.EditText access$1(me.kuehle.carreport.gui.dialog.InputDialogFragment) -> b
-me.kuehle.carreport.gui.dialog.InputDialogFragment$1 -> me.kuehle.carreport.gui.a.h:
+me.kuehle.carreport.gui.dialog.InputDialogFragment$1 -> me.kuehle.carreport.gui.a.b:
     me.kuehle.carreport.gui.dialog.InputDialogFragment this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-me.kuehle.carreport.gui.dialog.InputDialogFragment$2 -> me.kuehle.carreport.gui.a.i:
+me.kuehle.carreport.gui.dialog.InputDialogFragment$2 -> me.kuehle.carreport.gui.a.c:
     me.kuehle.carreport.gui.dialog.InputDialogFragment this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-me.kuehle.carreport.gui.dialog.InputDialogFragment$InputDialogFragmentListener -> me.kuehle.carreport.gui.a.j:
+me.kuehle.carreport.gui.dialog.InputDialogFragment$InputDialogFragmentListener -> me.kuehle.carreport.gui.a.d:
     void onDialogNegativeClick(int) -> a
     void onDialogPositiveClick(int,java.lang.String) -> a
-me.kuehle.carreport.gui.dialog.ListDialogFragment -> me.kuehle.carreport.gui.a.k:
+me.kuehle.carreport.gui.dialog.ListDialogFragment -> me.kuehle.carreport.gui.a.e:
     me.kuehle.carreport.gui.dialog.ListDialogFragment$ListDialogFragmentListener mDefaultListener -> a
     me.kuehle.carreport.gui.dialog.ListDialogFragment newInstance$d10105b(android.app.Fragment,java.lang.String[],int[],java.lang.Integer) -> a
     android.app.Dialog onCreateDialog(android.os.Bundle) -> onCreateDialog
     me.kuehle.carreport.gui.dialog.ListDialogFragment$ListDialogFragmentListener access$0(me.kuehle.carreport.gui.dialog.ListDialogFragment) -> a
-me.kuehle.carreport.gui.dialog.ListDialogFragment$1 -> me.kuehle.carreport.gui.a.l:
+me.kuehle.carreport.gui.dialog.ListDialogFragment$1 -> me.kuehle.carreport.gui.a.f:
     me.kuehle.carreport.gui.dialog.ListDialogFragment this$0 -> a
     void onDialogNegativeClick(int) -> a
     void onDialogPositiveClick(int,int) -> a
-me.kuehle.carreport.gui.dialog.ListDialogFragment$2 -> me.kuehle.carreport.gui.a.m:
+me.kuehle.carreport.gui.dialog.ListDialogFragment$2 -> me.kuehle.carreport.gui.a.g:
     me.kuehle.carreport.gui.dialog.ListDialogFragment this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-me.kuehle.carreport.gui.dialog.ListDialogFragment$3 -> me.kuehle.carreport.gui.a.n:
+me.kuehle.carreport.gui.dialog.ListDialogFragment$3 -> me.kuehle.carreport.gui.a.h:
     me.kuehle.carreport.gui.dialog.ListDialogFragment this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-me.kuehle.carreport.gui.dialog.ListDialogFragment$DialogListAdapter -> me.kuehle.carreport.gui.a.o:
+me.kuehle.carreport.gui.dialog.ListDialogFragment$DialogListAdapter -> me.kuehle.carreport.gui.a.i:
     java.lang.String[] items -> b
     int[] icons -> c
     me.kuehle.carreport.gui.dialog.ListDialogFragment this$0 -> a
@@ -7359,30 +7358,52 @@ me.kuehle.carreport.gui.dialog.ListDialogFragment$DialogListAdapter -> me.kuehle
     long getItemId(int) -> getItemId
     android.view.View getView(int,android.view.View,android.view.ViewGroup) -> getView
     java.lang.Object getItem(int) -> getItem
-me.kuehle.carreport.gui.dialog.ListDialogFragment$ListDialogFragmentListener -> me.kuehle.carreport.gui.a.p:
+me.kuehle.carreport.gui.dialog.ListDialogFragment$ListDialogFragmentListener -> me.kuehle.carreport.gui.a.j:
     void onDialogNegativeClick(int) -> a
     void onDialogPositiveClick(int,int) -> a
-me.kuehle.carreport.gui.dialog.MessageDialogFragment -> me.kuehle.carreport.gui.a.q:
+me.kuehle.carreport.gui.dialog.MessageDialogFragment -> me.kuehle.carreport.gui.a.k:
     me.kuehle.carreport.gui.dialog.MessageDialogFragment$MessageDialogFragmentListener mDefaultListener -> a
     me.kuehle.carreport.gui.dialog.MessageDialogFragment newInstance(android.app.Fragment,int,java.lang.Integer,java.lang.String,int,java.lang.Integer) -> a
     android.app.Dialog onCreateDialog(android.os.Bundle) -> onCreateDialog
     me.kuehle.carreport.gui.dialog.MessageDialogFragment$MessageDialogFragmentListener access$0(me.kuehle.carreport.gui.dialog.MessageDialogFragment) -> a
-me.kuehle.carreport.gui.dialog.MessageDialogFragment$1 -> me.kuehle.carreport.gui.a.r:
+me.kuehle.carreport.gui.dialog.MessageDialogFragment$1 -> me.kuehle.carreport.gui.a.l:
     me.kuehle.carreport.gui.dialog.MessageDialogFragment this$0 -> a
     void onDialogPositiveClick(int) -> b
     void onDialogNegativeClick(int) -> a
-me.kuehle.carreport.gui.dialog.MessageDialogFragment$2 -> me.kuehle.carreport.gui.a.s:
+me.kuehle.carreport.gui.dialog.MessageDialogFragment$2 -> me.kuehle.carreport.gui.a.m:
     me.kuehle.carreport.gui.dialog.MessageDialogFragment this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-me.kuehle.carreport.gui.dialog.MessageDialogFragment$3 -> me.kuehle.carreport.gui.a.t:
+me.kuehle.carreport.gui.dialog.MessageDialogFragment$3 -> me.kuehle.carreport.gui.a.n:
     me.kuehle.carreport.gui.dialog.MessageDialogFragment this$0 -> a
     void onClick(android.content.DialogInterface,int) -> onClick
-me.kuehle.carreport.gui.dialog.MessageDialogFragment$MessageDialogFragmentListener -> me.kuehle.carreport.gui.a.u:
+me.kuehle.carreport.gui.dialog.MessageDialogFragment$MessageDialogFragmentListener -> me.kuehle.carreport.gui.a.o:
     void onDialogNegativeClick(int) -> a
     void onDialogPositiveClick(int) -> b
-me.kuehle.carreport.gui.dialog.ProgressDialogFragment -> me.kuehle.carreport.gui.a.v:
+me.kuehle.carreport.gui.dialog.ProgressDialogFragment -> me.kuehle.carreport.gui.a.p:
     me.kuehle.carreport.gui.dialog.ProgressDialogFragment newInstance(java.lang.String) -> a
     android.app.Dialog onCreateDialog(android.os.Bundle) -> onCreateDialog
+me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment -> me.kuehle.carreport.gui.a.q:
+    com.larswerkman.holocolorpicker.ColorPicker mColorPicker -> Y
+    me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment newInstance$5c98a831(android.support.v4.app.Fragment,java.lang.Integer,int) -> a
+    android.app.Dialog onCreateDialog(android.os.Bundle) -> c
+    void onSaveInstanceState(android.os.Bundle) -> e
+    me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment$SupportColorPickerDialogFragmentListener access$0(me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment) -> a
+    com.larswerkman.holocolorpicker.ColorPicker access$1(me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment) -> b
+me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment$1 -> me.kuehle.carreport.gui.a.r:
+    me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment$2 -> me.kuehle.carreport.gui.a.s:
+    me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment this$0 -> a
+    void onClick(android.content.DialogInterface,int) -> onClick
+me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment$SupportColorPickerDialogFragmentListener -> me.kuehle.carreport.gui.a.t:
+    void onDialogNegativeClick$13462e() -> a_
+    void onDialogPositiveClick(int,int) -> a
+me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment -> me.kuehle.carreport.gui.a.u:
+    me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment newInstance(android.support.v4.app.Fragment,int,java.util.Date) -> a
+    android.app.Dialog onCreateDialog(android.os.Bundle) -> c
+    void onDateSet(android.widget.DatePicker,int,int,int) -> onDateSet
+me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment$SupportDatePickerDialogFragmentListener -> me.kuehle.carreport.gui.a.v:
+    void onDialogPositiveClick(int,java.util.Date) -> a
 me.kuehle.carreport.gui.dialog.SupportInputDialogFragment -> me.kuehle.carreport.gui.a.w:
     android.widget.EditText mEditText -> Y
     me.kuehle.carreport.gui.dialog.SupportInputDialogFragment newInstance$14534b7f(android.support.v4.app.Fragment,java.lang.Integer) -> a
@@ -7417,11 +7438,11 @@ me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment$3 -> me.kuehle.carre
 me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment$SupportMessageDialogFragmentListener -> me.kuehle.carreport.gui.a.ae:
     void onDialogNegativeClick$13462e() -> a_
     void onDialogPositiveClick(int) -> b
-me.kuehle.carreport.gui.dialog.TimePickerDialogFragment -> me.kuehle.carreport.gui.a.af:
-    me.kuehle.carreport.gui.dialog.TimePickerDialogFragment newInstance(android.support.v4.app.Fragment,int,java.util.Date) -> a
+me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment -> me.kuehle.carreport.gui.a.af:
+    me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment newInstance(android.support.v4.app.Fragment,int,java.util.Date) -> a
     android.app.Dialog onCreateDialog(android.os.Bundle) -> c
     void onTimeSet(android.widget.TimePicker,int,int) -> onTimeSet
-me.kuehle.carreport.gui.dialog.TimePickerDialogFragment$TimePickerDialogFragmentListener -> me.kuehle.carreport.gui.a.ag:
+me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment$SupportTimePickerDialogFragmentListener -> me.kuehle.carreport.gui.a.ag:
     void onDialogPositiveClick(int,java.util.Date) -> a
 me.kuehle.carreport.gui.util.AbstractFormFieldValidator -> me.kuehle.carreport.gui.b.a:
     android.content.Context context -> b
