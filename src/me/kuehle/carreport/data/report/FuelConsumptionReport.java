@@ -73,7 +73,7 @@ public class FuelConsumptionReport extends AbstractReport {
 						- refuelings.get(i - 1).mileage;
 				partialVolume += refueling.volume;
 
-				if (!refueling.partial) {
+				if (!refueling.partial && partialDistance > 0) {
 					totalDistance += partialDistance;
 					totalVolume += partialVolume;
 
