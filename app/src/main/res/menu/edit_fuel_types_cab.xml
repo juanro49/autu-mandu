@@ -15,11 +15,12 @@
   limitations under the License.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/menu_delete"
         android:icon="@drawable/ic_delete"
-        app:showAsAction="ifRoom|withText"
-        android:title="@string/menu_delete">
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_delete"
+        tools:ignore="AppCompatResource">
     </item>
 </menu>

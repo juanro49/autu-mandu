@@ -14,66 +14,84 @@
   See the License for the specific language governing permissions and
   limitations under the License..
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#1a1a1a"
-    android:baselineAligned="false"
-    android:orientation="horizontal"
-    android:padding="16dp" >
+    android:layout_height="match_parent">
+
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:orientation="vertical" >
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#1a1a1a"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:padding="16dp" >
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical" >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_background"
+                android:orientation="vertical"
+                android:padding="8dp" >
+                <Spinner
+                    android:id="@+id/spn_options"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+                    <EditText
+                        android:id="@+id/edt_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:inputType="number" >
+                        <requestFocus />
+                    </EditText>
+                    <TextView
+                        android:id="@+id/txt_unit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right|center_vertical"
+                        android:layout_marginRight="8dp" />
+                </FrameLayout>
+            </LinearLayout>
+            <ListView
+                android:id="@+id/table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/card_background"
+                android:padding="8dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/chart_holder"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="3"
             android:background="@drawable/card_background"
             android:orientation="vertical"
-            android:padding="8dp" >
-            <Spinner
-                android:id="@+id/spn_options"
+            android:padding="16dp" >
+            <me.kuehle.chartlib.ChartView
+                android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="48dp" />
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-                <EditText
-                    android:id="@+id/edt_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:inputType="number" >
-                    <requestFocus />
-                </EditText>
-                <TextView
-                    android:id="@+id/txt_unit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginRight="8dp" />
-            </FrameLayout>
+                android:layout_height="match_parent" />
         </LinearLayout>
-        <ListView
-            android:id="@+id/table"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/card_background"
-            android:padding="8dp" />
     </LinearLayout>
-    <LinearLayout
-        android:id="@+id/chart_holder"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_weight="3"
-        android:background="@drawable/card_background"
-        android:orientation="vertical"
-        android:padding="16dp" >
-        <me.kuehle.chartlib.ChartView
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
-</LinearLayout>
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_add"
+        android:onClick="onFABClicked"
+        fab:fab_colorNormal="@color/fab_normal"
+        fab:fab_colorPressed="@color/fab_pressed" />
+
+</FrameLayout>

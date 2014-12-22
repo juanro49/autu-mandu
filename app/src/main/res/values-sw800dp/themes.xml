@@ -14,21 +14,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<resources>
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/action_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize" />
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <item name="detailsElementLayoutWidth">800dp</item>
+        <item name="detailsElementBackground">?android:attr/detailsElementBackground</item>
+    </style>
 
-    <FrameLayout
-        android:id="@+id/content_wrapper"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-</LinearLayout>
+</resources>

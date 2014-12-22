@@ -61,12 +61,12 @@
         <activity
             android:name=".gui.PreferencesActivity"
             android:label="@string/title_settings"
-            android:theme="@style/AppTheme.Settings" >
+            android:theme="@style/AppTheme.Preferences" >
         </activity>
         <activity
             android:name=".gui.HelpActivity"
             android:label="@string/title_help"
-            android:theme="@style/AppTheme.Settings" >
+            android:theme="@style/AppTheme.Help" >
         </activity>
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"

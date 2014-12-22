@@ -180,7 +180,9 @@ public class MainActivity extends ActionBarActivity implements
 			if (AbstractSynchronizationProvider.isSynchronisationInProgress()) {
                 MenuItemCompat.setActionView(mSyncMenuItem,
                         R.layout.actionbar_indeterminate_progress);
-			}
+			} else {
+                MenuItemCompat.setActionView(mSyncMenuItem, null);
+            }
 		}
 
 		return super.onCreateOptionsMenu(menu);
@@ -263,6 +265,21 @@ public class MainActivity extends ActionBarActivity implements
 		return super.onPrepareOptionsMenu(menu);
 	}
 
+    public void onFABClicked(View fab) {
+        Preferences prefs = new Preferences(this);
+
+        Intent intent = getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_REFUELING,
+                prefs.getDefaultCar());
+        startActivityForResult(intent, REQUEST_ADD_DATA);
+    }
+
+    @Override
+    public void onSynchronizationStarted() {
+        if (mSyncMenuItem != null) {
+            MenuItemCompat.setActionView(mSyncMenuItem, R.layout.actionbar_indeterminate_progress);
+        }
+    }
+
 	@Override
 	public void onSynchronizationFinished(boolean result) {
 		if (mSyncMenuItem != null) {
@@ -277,13 +294,6 @@ public class MainActivity extends ActionBarActivity implements
 			Toast.makeText(MainActivity.this,
                     R.string.toast_synchronization_failed, Toast.LENGTH_SHORT)
 					.show();
-		}
-	}
-
-	@Override
-	public void onSynchronizationStarted() {
-		if (mSyncMenuItem != null) {
-            MenuItemCompat.setActionView(mSyncMenuItem, R.layout.actionbar_indeterminate_progress);
 		}
 	}
 
