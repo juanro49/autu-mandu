@@ -39,5 +39,5 @@
         android:contentDescription="@string/remove_fueltype_desc"
         android:cropToPadding="true"
         android:padding="8dp"
-        android:src="@drawable/ic_cancel" />
+        android:src="@drawable/ic_close" />
 </LinearLayout>

@@ -36,7 +36,6 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -46,6 +45,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,8 +56,8 @@ import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 
-public class ReportFragment extends Fragment implements
-		OnMenuItemClickListener, DataChangeListener, BackPressedListener {
+public class ReportFragment extends Fragment implements OnMenuItemClickListener, DataChangeListener,
+        BackPressedListener {
 	private class ReportUpdateTask extends AsyncTask<Void, Object, Void> {
 		private final int[] columnIDs = { R.id.list1, R.id.list2 };
 		private List<ViewGroup> columns;
@@ -76,8 +76,7 @@ public class ReportFragment extends Fragment implements
 			List<Class<? extends AbstractReport>> reportClasses = new Preferences(
 					getActivity()).getReportOrder();
 			for (Class<? extends AbstractReport> reportClass : reportClasses) {
-				AbstractReport report = AbstractReport.newInstance(reportClass,
-						getActivity());
+				AbstractReport report = AbstractReport.newInstance(reportClass, getActivity());
 				loadGraphSettings(report);
 				report.update();
 				publishProgress(report, report.getChart(false, false));
@@ -89,7 +88,7 @@ public class ReportFragment extends Fragment implements
 		@Override
 		protected void onPreExecute() {
 			currentColumn = -1;
-			columns = new ArrayList<ViewGroup>();
+			columns = new ArrayList<>();
 			for (int columnId : columnIDs) {
 				ViewGroup column = (ViewGroup) getView().findViewById(columnId);
 				if (column != null) {
@@ -107,8 +106,7 @@ public class ReportFragment extends Fragment implements
 			View card = View.inflate(getActivity(), R.layout.report, null);
 			getNextColumn().addView(card);
 
-			((TextView) card.findViewById(R.id.txt_title)).setText(report
-					.getTitle());
+			((TextView) card.findViewById(R.id.txt_title)).setText(report.getTitle());
 
 			View btnReportDetails = card.findViewById(R.id.btn_report_details);
 			btnReportDetails.setOnClickListener(new View.OnClickListener() {
@@ -127,8 +125,8 @@ public class ReportFragment extends Fragment implements
 			});
 
 			ChartView chart = (ChartView) card.findViewById(R.id.chart);
-			chart.setNotEnoughDataView(View.inflate(getActivity(),
-					R.layout.chart_not_enough_data, null));
+			chart.setNotEnoughDataView(View.inflate(getActivity(), R.layout.chart_not_enough_data,
+                    null));
 			chart.setChart((Chart) values[1]);
 			chart.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -151,15 +149,13 @@ public class ReportFragment extends Fragment implements
 					if (prefs.isColorSections()) {
 						text.setTextColor(section.getColor());
 						GradientDrawable drawableBottom = (GradientDrawable) text
-								.getCompoundDrawables()[3];
-						drawableBottom.setColorFilter(section.getColor(),
-								PorterDuff.Mode.SRC);
+                                .getCompoundDrawables()[3];
+						drawableBottom.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
 					}
 				} else {
-					((TextView) itemView.findViewById(android.R.id.text1))
-							.setText(item.getLabel());
+					((TextView) itemView.findViewById(android.R.id.text1)).setText(item.getLabel());
 					((TextView) itemView.findViewById(android.R.id.text2))
-							.setText(((Item) item).getValue());
+                            .setText(((Item) item).getValue());
 				}
 
 				details.addView(itemView);
@@ -167,9 +163,7 @@ public class ReportFragment extends Fragment implements
 
 			ObjectAnimator
 					.ofFloat(chart, View.ALPHA, 0f, 1f)
-					.setDuration(
-							getResources().getInteger(
-									android.R.integer.config_longAnimTime))
+					.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime))
 					.start();
 		}
 	}
@@ -204,7 +198,7 @@ public class ReportFragment extends Fragment implements
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_report, container, false);
 
 		View btnCloseFullScreen = v.findViewById(R.id.btn_close_full_screen);
@@ -228,7 +222,7 @@ public class ReportFragment extends Fragment implements
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		ActionBar actionBar = getActivity().getActionBar();
+		ActionBar actionBar = MainActivity.getSupportActionBar(this);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setListNavigationCallbacks(null, null);
 	}
@@ -263,8 +257,7 @@ public class ReportFragment extends Fragment implements
 			mFullScreenChartAnimator.cancel();
 		}
 
-		final View chartHolder = getView().findViewById(
-				R.id.full_screen_chart_holder);
+		final View chartHolder = getView().findViewById(R.id.full_screen_chart_holder);
 
 		// Animate the four positioning/sizing properties in parallel, back to
 		// their original values.
@@ -324,8 +317,7 @@ public class ReportFragment extends Fragment implements
 		}
 
 		mCurrentFullScreenChart = (ChartView) v;
-		View chartHolder = getView()
-				.findViewById(R.id.full_screen_chart_holder);
+		View chartHolder = getView().findViewById(R.id.full_screen_chart_holder);
 		((ChartView) getView().findViewById(R.id.full_screen_chart))
 				.setChart(report.getChart(true, true));
 

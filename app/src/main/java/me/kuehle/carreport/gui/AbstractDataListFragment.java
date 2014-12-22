@@ -16,13 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
-import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,339 +35,330 @@ import android.widget.TextView;
 
 import com.activeandroid.Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import me.kuehle.carreport.R;
+import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
+
 public abstract class AbstractDataListFragment<T extends Model> extends
-		ListFragment implements SupportMessageDialogFragmentListener,
-		DataListListener {
-	private class DataListUpdateTask extends AsyncTask<Void, Void, List<T>> {
-		@Override
-		protected void onPreExecute() {
-			setListShown(false);
-		}
+        ListFragment implements SupportMessageDialogFragmentListener,
+        DataListListener {
+    public static final String EXTRA_ACTIVATE_ON_CLICK = "activate_on_click";
+    public static final boolean EXTRA_ACTIVATE_ON_CLICK_DEFAULT = false;
+    public static final String EXTRA_CAR_ID = "car_id";
+    private static final String STATE_CURRENT_CAR = "current_car";
+    private static final String STATE_CURRENT_ITEM = "current_item";
+    private static final int REQUEST_DELETE = 0;
+    protected Car mCar = null;
+    private DataListAdapter mListAdapter;
+    private int mCurrentItem = ListView.INVALID_POSITION;
+    private me.kuehle.carreport.gui.DataListCallback mDataListCallback;
+    private boolean mActivateOnClick = false;
+    private ActionMode mActionMode = null;
+    private boolean dontStartActionMode = false;
 
-		@Override
-		protected List<T> doInBackground(Void... params) {
-			return getItems();
-		}
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mListAdapter = new DataListAdapter();
+        if (mCar != null) {
+            updateData();
+        }
 
-		@Override
-		protected void onPostExecute(List<T> result) {
-			mListAdapter.update(result);
-			setListShown(true);
-		}
-	}
+        setEmptyText(getString(R.string.edit_message_no_entries_available));
+        setListAdapter(mListAdapter);
 
-	private class DataListAdapter extends BaseAdapter {
-		private List<T> mItems = new ArrayList<T>();
-		private final int[] fields = { R.id.title, R.id.subtitle, R.id.date,
-				R.id.data1, R.id.data1_calculated, R.id.data2,
-				R.id.data2_calculated, R.id.data3, R.id.data3_calculated };
+        getListView().setMultiChoiceModeListener(new DataListMultiChoiceModeListener());
+        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
-		@Override
-		public int getCount() {
-			return mItems.size();
-		}
+        if (savedInstanceState != null) {
+            setCurrentPosition(savedInstanceState.getInt(STATE_CURRENT_ITEM,
+                    ListView.INVALID_POSITION));
+        }
+    }
 
-		@Override
-		public T getItem(int position) {
-			return mItems.get(position);
-		}
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            if (getParentFragment() != null) {
+                mDataListCallback = (me.kuehle.carreport.gui.DataListCallback) getParentFragment();
+            } else {
+                mDataListCallback = (me.kuehle.carreport.gui.DataListCallback) activity;
+            }
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnItemSelectionListener");
+        }
+    }
 
-		@Override
-		public long getItemId(int position) {
-			return mItems.get(position).id;
-		}
+    @Override
+    public void onCarChanged(Car newCar) {
+        mCar = newCar;
 
-		@Override
-		public int getItemViewType(int position) {
-			if (isMissingData(mItems, position)) {
-				return 0;
-			} else {
-				return 1;
-			}
-		}
+        updateData();
+    }
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (getItemViewType(position) == 0) {
-				if (convertView == null) {
-					convertView = getActivity().getLayoutInflater().inflate(
-							R.layout.list_item_data_missing, parent, false);
-				}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        mActivateOnClick = args.getBoolean(EXTRA_ACTIVATE_ON_CLICK,
+                EXTRA_ACTIVATE_ON_CLICK_DEFAULT);
 
-				SparseArray<String> item = getItemData(mItems, position);
-				TextView textView = (TextView) convertView
-						.findViewById(R.id.title);
-				String value = item.get(R.id.title);
-				textView.setText(value);
-			} else {
-				if (convertView == null) {
-					convertView = getActivity().getLayoutInflater().inflate(
-							R.layout.list_item_data, parent, false);
-				}
+        long carId = args.getLong(EXTRA_CAR_ID);
+        if (savedInstanceState != null) {
+            carId = savedInstanceState.getLong(STATE_CURRENT_CAR, carId);
+        }
 
-				SparseArray<String> item = getItemData(mItems, position);
-				for (int field : fields) {
-					TextView textView = (TextView) convertView
-							.findViewById(field);
-					String value = item.get(field);
-					if (value != null) {
-						textView.setText(value);
-						textView.setVisibility(View.VISIBLE);
-					} else if (field == R.id.subtitle) {
-						textView.setVisibility(View.GONE);
-					} else {
-						textView.setVisibility(View.INVISIBLE);
-					}
-				}
+        if (carId != 0) {
+            mCar = Car.load(Car.class, carId);
+        }
+    }
 
-				View invalidDataView = convertView
-						.findViewById(R.id.data_invalid);
-				if (isInvalidData(mItems, position)) {
-					invalidDataView.setVisibility(View.VISIBLE);
-				} else {
-					invalidDataView.setVisibility(View.GONE);
-				}
-			}
+    @Override
+    public void onDialogNegativeClick(int requestCode) {
+    }
 
-			return convertView;
-		}
+    @Override
+    public void onDialogPositiveClick(int requestCode) {
+        if (requestCode == REQUEST_DELETE) {
+            SparseBooleanArray selected = getListView().getCheckedItemPositions();
+            for (int i = 0; i < mListAdapter.getCount(); i++) {
+                if (selected.get(i)) {
+                    mListAdapter.getItem(i).delete();
+                }
+            }
 
-		@Override
-		public int getViewTypeCount() {
-			return 2;
-		}
+            mActionMode.finish();
+            updateData();
+        }
+    }
 
-		@Override
-		public boolean isEnabled(int position) {
-			return !isMissingData(mItems, position);
-		}
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        if (mActionMode != null) {
+            return;
+        }
 
-		public void update(List<T> items) {
-			mItems = items;
-			notifyDataSetChanged();
-		}
-	}
+        setCurrentPosition(position);
+        mDataListCallback.onItemSelected(getExtraEdit(), getListAdapter().getItemId(position));
+    }
 
-	private class DataListMultiChoiceModeListener implements
-			MultiChoiceModeListener {
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			switch (item.getItemId()) {
-			case R.id.menu_delete:
-				String message = String.format(
-						getString(getAlertDeleteManyMessage()), getListView()
-								.getCheckedItemCount());
-				SupportMessageDialogFragment.newInstance(
-						AbstractDataListFragment.this, REQUEST_DELETE,
-						R.string.alert_delete_title, message,
-						android.R.string.yes, android.R.string.no).show(
-						getFragmentManager(), null);
-				return true;
-			default:
-				return false;
-			}
-		}
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
+    }
 
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			if (dontStartActionMode) {
-				dontStartActionMode = false;
-				return false;
-			}
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(STATE_CURRENT_ITEM, mCar.id);
+        outState.putInt(STATE_CURRENT_ITEM, mCurrentItem);
+    }
 
-			mCurrentItem = ListView.INVALID_POSITION;
-			mDataListCallback.onItemUnselected();
+    public void setCurrentPosition(int position) {
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
 
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.view_data_cab, menu);
+        getListView().setItemChecked(mCurrentItem, false);
+        if (position != ListView.INVALID_POSITION && mActivateOnClick) {
+            dontStartActionMode = true;
+            getListView().setItemChecked(position, true);
+        }
 
-			mActionMode = mode;
-			return true;
-		}
+        mCurrentItem = position;
+    }
 
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-			mActionMode = null;
-		}
+    @Override
+    public void unselectItem() {
+        setCurrentPosition(ListView.INVALID_POSITION);
+    }
 
-		@Override
-		public void onItemCheckedStateChanged(ActionMode mode, int position,
-				long id, boolean checked) {
-			int count = getListView().getCheckedItemCount();
-			mode.setTitle(String.format(getString(R.string.cab_title_selected),
-					count));
-		}
+    @Override
+    public void updateData() {
+        setCurrentPosition(ListView.INVALID_POSITION);
 
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
-		}
-	}
+        new DataListUpdateTask().execute();
+    }
 
-	public static final String EXTRA_ACTIVATE_ON_CLICK = "activate_on_click";
-	public static final boolean EXTRA_ACTIVATE_ON_CLICK_DEFAULT = false;
-	public static final String EXTRA_CAR_ID = "car_id";
+    protected abstract int getAlertDeleteManyMessage();
 
-	private static final String STATE_CURRENT_CAR = "current_car";
-	private static final String STATE_CURRENT_ITEM = "current_item";
-	private static final int REQUEST_DELETE = 0;
+    protected abstract int getExtraEdit();
 
-	protected Car mCar = null;
-	private DataListAdapter mListAdapter;
-	private int mCurrentItem = ListView.INVALID_POSITION;
-	private me.kuehle.carreport.gui.DataListCallback mDataListCallback;
-	private boolean mActivateOnClick = false;
-	private ActionMode mActionMode = null;
-	private boolean dontStartActionMode = false;
+    protected abstract SparseArray<String> getItemData(List<T> items, int position);
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		mListAdapter = new DataListAdapter();
-		if (mCar != null) {
-			updateData();
-		}
+    protected abstract List<T> getItems();
 
-		setEmptyText(getString(R.string.edit_message_no_entries_available));
-		setListAdapter(mListAdapter);
+    protected abstract boolean isMissingData(List<T> items, int position);
 
-		getListView().setMultiChoiceModeListener(
-				new DataListMultiChoiceModeListener());
-		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+    protected abstract boolean isInvalidData(List<T> items, int position);
 
-		if (savedInstanceState != null) {
-			setCurrentPosition(savedInstanceState.getInt(STATE_CURRENT_ITEM,
-					ListView.INVALID_POSITION));
-		}
-	}
+    private class DataListUpdateTask extends AsyncTask<Void, Void, List<T>> {
+        @Override
+        protected void onPreExecute() {
+            setListShown(false);
+        }
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			if (getParentFragment() != null) {
-				mDataListCallback = (me.kuehle.carreport.gui.DataListCallback) getParentFragment();
-			} else {
-				mDataListCallback = (me.kuehle.carreport.gui.DataListCallback) activity;
-			}
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement OnItemSelectionListener");
-		}
-	}
+        @Override
+        protected List<T> doInBackground(Void... params) {
+            return getItems();
+        }
 
-	@Override
-	public void onCarChanged(Car newCar) {
-		mCar = newCar;
+        @Override
+        protected void onPostExecute(List<T> result) {
+            mListAdapter.update(result);
+            setListShown(true);
+        }
+    }
 
-		updateData();
-	}
+    private class DataListAdapter extends BaseAdapter {
+        private final int[] fields = {R.id.title, R.id.subtitle, R.id.date,
+                R.id.data1, R.id.data1_calculated, R.id.data2,
+                R.id.data2_calculated, R.id.data3, R.id.data3_calculated};
+        private List<T> mItems = new ArrayList<T>();
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		Bundle args = getArguments();
-		mActivateOnClick = args.getBoolean(EXTRA_ACTIVATE_ON_CLICK,
-				EXTRA_ACTIVATE_ON_CLICK_DEFAULT);
+        @Override
+        public int getCount() {
+            return mItems.size();
+        }
 
-		long carId = args.getLong(EXTRA_CAR_ID);
-		if (savedInstanceState != null) {
-			carId = savedInstanceState.getLong(STATE_CURRENT_CAR, carId);
-		}
+        @Override
+        public T getItem(int position) {
+            return mItems.get(position);
+        }
 
-		if (carId != 0) {
-			mCar = Car.load(Car.class, carId);
-		}
-	}
+        @Override
+        public long getItemId(int position) {
+            return mItems.get(position).id;
+        }
 
-	/*
-	 * @Override public View onCreateView(LayoutInflater inflater, ViewGroup
-	 * container, Bundle savedInstanceState) { return
-	 * inflater.inflate(R.layout.fragment_data_list, container, false); }
-	 */
+        @Override
+        public int getItemViewType(int position) {
+            if (isMissingData(mItems, position)) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
 
-	@Override
-	public void onDialogNegativeClick(int requestCode) {
-	}
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (getItemViewType(position) == 0) {
+                if (convertView == null) {
+                    convertView = getActivity().getLayoutInflater().inflate(
+                            R.layout.list_item_data_missing, parent, false);
+                }
 
-	@Override
-	public void onDialogPositiveClick(int requestCode) {
-		if (requestCode == REQUEST_DELETE) {
-			SparseBooleanArray selected = getListView()
-					.getCheckedItemPositions();
-			for (int i = 0; i < mListAdapter.getCount(); i++) {
-				if (selected.get(i)) {
-					mListAdapter.getItem(i).delete();
-				}
-			}
+                SparseArray<String> item = getItemData(mItems, position);
+                TextView textView = (TextView) convertView.findViewById(R.id.title);
+                String value = item.get(R.id.title);
+                textView.setText(value);
+            } else {
+                if (convertView == null) {
+                    convertView = getActivity().getLayoutInflater().inflate(
+                            R.layout.list_item_data, parent, false);
+                }
 
-			mActionMode.finish();
-			updateData();
-		}
-	}
+                SparseArray<String> item = getItemData(mItems, position);
+                for (int field : fields) {
+                    TextView textView = (TextView) convertView.findViewById(field);
+                    String value = item.get(field);
+                    if (value != null) {
+                        textView.setText(value);
+                        textView.setVisibility(View.VISIBLE);
+                    } else if (field == R.id.subtitle) {
+                        textView.setVisibility(View.GONE);
+                    } else {
+                        textView.setVisibility(View.INVISIBLE);
+                    }
+                }
 
-	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		if (mActionMode != null) {
-			return;
-		}
+                View invalidDataView = convertView.findViewById(R.id.data_invalid);
+                if (isInvalidData(mItems, position)) {
+                    invalidDataView.setVisibility(View.VISIBLE);
+                } else {
+                    invalidDataView.setVisibility(View.GONE);
+                }
+            }
 
-		setCurrentPosition(position);
-		mDataListCallback.onItemSelected(getExtraEdit(), getListAdapter()
-				.getItemId(position));
-	}
+            return convertView;
+        }
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		if (mActionMode != null) {
-			mActionMode.finish();
-		}
-	}
+        @Override
+        public int getViewTypeCount() {
+            return 2;
+        }
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putLong(STATE_CURRENT_ITEM, mCar.id);
-		outState.putInt(STATE_CURRENT_ITEM, mCurrentItem);
-	}
+        @Override
+        public boolean isEnabled(int position) {
+            return !isMissingData(mItems, position);
+        }
 
-	public void setCurrentPosition(int position) {
-		if (mActionMode != null) {
-			mActionMode.finish();
-		}
+        public void update(List<T> items) {
+            mItems = items;
+            notifyDataSetChanged();
+        }
+    }
 
-		getListView().setItemChecked(mCurrentItem, false);
-		if (position != ListView.INVALID_POSITION && mActivateOnClick) {
-			dontStartActionMode = true;
-			getListView().setItemChecked(position, true);
-		}
+    private class DataListMultiChoiceModeListener implements MultiChoiceModeListener {
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_delete:
+                    String message = String.format(
+                            getString(getAlertDeleteManyMessage()), getListView()
+                                    .getCheckedItemCount());
+                    SupportMessageDialogFragment.newInstance(
+                            AbstractDataListFragment.this, REQUEST_DELETE,
+                            R.string.alert_delete_title, message,
+                            android.R.string.yes, android.R.string.no).show(
+                            getFragmentManager(), null);
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
-		mCurrentItem = position;
-	}
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            if (dontStartActionMode) {
+                dontStartActionMode = false;
+                return false;
+            }
 
-	@Override
-	public void unselectItem() {
-		setCurrentPosition(ListView.INVALID_POSITION);
-	}
+            mCurrentItem = ListView.INVALID_POSITION;
+            mDataListCallback.onItemUnselected();
 
-	@Override
-	public void updateData() {
-		setCurrentPosition(ListView.INVALID_POSITION);
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.view_data_cab, menu);
 
-		new DataListUpdateTask().execute();
-	}
+            mActionMode = mode;
+            return true;
+        }
 
-	protected abstract int getAlertDeleteManyMessage();
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+        }
 
-	protected abstract int getExtraEdit();
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position,
+                                              long id, boolean checked) {
+            int count = getListView().getCheckedItemCount();
+            mode.setTitle(String.format(getString(R.string.cab_title_selected), count));
+        }
 
-	protected abstract SparseArray<String> getItemData(List<T> items,
-			int position);
-
-	protected abstract List<T> getItems();
-
-	protected abstract boolean isMissingData(List<T> items, int position);
-
-	protected abstract boolean isInvalidData(List<T> items, int position);
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+    }
 }

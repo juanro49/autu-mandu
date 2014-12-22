@@ -22,15 +22,19 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
+
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,7 +45,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends FragmentActivity implements
+public class MainActivity extends ActionBarActivity implements
 		AbstractSynchronizationProvider.OnSynchronizeListener {
 	public static interface BackPressedListener {
 		public boolean onBackPressed();
@@ -51,11 +55,9 @@ public class MainActivity extends FragmentActivity implements
 		public void onDataChanged();
 	}
 
-	private class DrawerItemClickListener implements
-			ListView.OnItemClickListener {
+	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			selectItem(position);
 		}
 	}
@@ -81,8 +83,7 @@ public class MainActivity extends FragmentActivity implements
 		if (requestCode == REQUEST_FIRST_START && resultCode == RESULT_CANCELED) {
 			finish();
 		} else {
-			// Rebuild the menu, so a change in the show_car_menu option will
-			// take effect.
+			// Rebuild the menu, so a change in the show_car_menu option will take effect.
 			if (requestCode == REQUEST_SETTINGS) {
 				invalidateOptionsMenu();
 			}
@@ -95,8 +96,7 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public void onBackPressed() {
-		if (mCurrentFragment != null
-				&& mCurrentFragment instanceof BackPressedListener) {
+		if (mCurrentFragment != null && mCurrentFragment instanceof BackPressedListener) {
 			if (((BackPressedListener) mCurrentFragment).onBackPressed()) {
 				return;
 			}
@@ -106,8 +106,7 @@ public class MainActivity extends FragmentActivity implements
 		// pressing the back button. This works around the issue.
 		// Bug report: http://code.google.com/p/android/issues/detail?id=40323
 		if (mCurrentFragment != null
-				&& mCurrentFragment.getChildFragmentManager()
-						.getBackStackEntryCount() > 0) {
+				&& mCurrentFragment.getChildFragmentManager().getBackStackEntryCount() > 0) {
 			mCurrentFragment.getChildFragmentManager().popBackStack();
 		} else {
 			super.onBackPressed();
@@ -134,26 +133,23 @@ public class MainActivity extends FragmentActivity implements
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
-				GravityCompat.START);
-		mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-				R.layout.list_item_drawer, mMainViews));
+		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+		mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item_drawer, mMainViews));
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_drawer, R.string.drawer_open,
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open,
 				R.string.drawer_close) {
 			public void onDrawerClosed(View view) {
-				getActionBar().setTitle(mTitle);
+                getSupportActionBar().setTitle(mTitle);
 				invalidateOptionsMenu();
 			}
 
 			public void onDrawerOpened(View drawerView) {
-				mTitle = getActionBar().getTitle();
-				getActionBar().setTitle(mDrawerTitle);
+				mTitle = getSupportActionBar().getTitle();
+                getSupportActionBar().setTitle(mDrawerTitle);
 				invalidateOptionsMenu();
 			}
 		};
@@ -176,15 +172,14 @@ public class MainActivity extends FragmentActivity implements
 		inflater.inflate(R.menu.main, menu);
 		mSyncMenuItem = menu.findItem(R.id.menu_synchronize);
 
-		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
-				.getCurrent(this);
+		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider.getCurrent(this);
 		if (provider == null) {
 			mSyncMenuItem.setVisible(false);
 		} else {
 			mSyncMenuItem.setVisible(provider.isAuthenticated());
 			if (AbstractSynchronizationProvider.isSynchronisationInProgress()) {
-				mSyncMenuItem
-						.setActionView(R.layout.actionbar_indeterminate_progress);
+                MenuItemCompat.setActionView(mSyncMenuItem,
+                        R.layout.actionbar_indeterminate_progress);
 			}
 		}
 
@@ -228,15 +223,12 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		// TODO: If the navigation drawer is open, hide action items related to
-		// the
-		// content view.
+		// TODO: If the navigation drawer is open, hide action items related to the content view.
 		// boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
 		// menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 
-		// Show available cars in submenu of "Add refueling" and
-		// "Add other cost"
-		// option, if the setting is enabled.
+		// Show available cars in submenu of "Add refueling" and "Add other cost" option, if the
+		// setting is enabled.
 		Preferences prefs = new Preferences(this);
 		List<Car> cars = Car.getAll();
 		for (int i = cars.size() - 1; i >= 0; i--) {
@@ -259,13 +251,11 @@ public class MainActivity extends FragmentActivity implements
 			subMenu.clear();
 
 			if (cars.size() == 1 || !prefs.isShowCarMenu()) {
-				items[i].setIntent(getDetailActivityIntent(extraEdit[i],
-						prefs.getDefaultCar()));
+				items[i].setIntent(getDetailActivityIntent(extraEdit[i], prefs.getDefaultCar()));
 			} else {
 				items[i].setIntent(null);
 				for (Car car : cars) {
-					subMenu.add(car.name).setIntent(
-							getDetailActivityIntent(extraEdit[i], car.id));
+					subMenu.add(car.name).setIntent(getDetailActivityIntent(extraEdit[i], car.id));
 				}
 			}
 		}
@@ -276,7 +266,7 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onSynchronizationFinished(boolean result) {
 		if (mSyncMenuItem != null) {
-			mSyncMenuItem.setActionView(null);
+            MenuItemCompat.setActionView(mSyncMenuItem, null);
 		}
 
 		if (result) {
@@ -285,7 +275,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 		} else {
 			Toast.makeText(MainActivity.this,
-					R.string.toast_synchronization_failed, Toast.LENGTH_SHORT)
+                    R.string.toast_synchronization_failed, Toast.LENGTH_SHORT)
 					.show();
 		}
 	}
@@ -293,15 +283,14 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onSynchronizationStarted() {
 		if (mSyncMenuItem != null) {
-			mSyncMenuItem
-					.setActionView(R.layout.actionbar_indeterminate_progress);
+            MenuItemCompat.setActionView(mSyncMenuItem, R.layout.actionbar_indeterminate_progress);
 		}
 	}
 
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
-		getActionBar().setTitle(mTitle);
+        getSupportActionBar().setTitle(mTitle);
 	}
 
 	private Intent getDetailActivityIntent(int edit, long carId) {
@@ -324,8 +313,7 @@ public class MainActivity extends FragmentActivity implements
 
 		FragmentManager fm = getSupportFragmentManager();
 		fm.popBackStack();
-		fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment)
-				.commit();
+		fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
 
 		mDrawerList.setItemChecked(position, true);
 		setTitle(mMainViews[position]);
@@ -348,11 +336,9 @@ public class MainActivity extends FragmentActivity implements
 	protected void onResume() {
 		super.onResume();
 
-		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
-				.getCurrent(this);
+		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider.getCurrent(this);
 		if (mSyncMenuItem != null) {
-			mSyncMenuItem.setVisible(provider != null
-					&& provider.isAuthenticated());
+			mSyncMenuItem.setVisible(provider != null && provider.isAuthenticated());
 		}
 
 		AbstractSynchronizationProvider.setSynchronisationCallback(this);
@@ -363,4 +349,13 @@ public class MainActivity extends FragmentActivity implements
 		outState.putCharSequence(STATE_TITLE, mTitle);
 		super.onSaveInstanceState(outState);
 	}
+
+    public static ActionBar getSupportActionBar(Fragment fragment) {
+        Activity activity = fragment.getActivity();
+        if (activity instanceof ActionBarActivity) {
+            return ((ActionBarActivity) activity).getSupportActionBar();
+        }
+
+        return null;
+    }
 }

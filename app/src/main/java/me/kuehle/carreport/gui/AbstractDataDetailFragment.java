@@ -16,18 +16,10 @@
 
 package me.kuehle.carreport.gui;
 
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-
-import me.kuehle.carreport.Application;
-import me.kuehle.carreport.R;
-import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
-import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,229 +32,234 @@ import android.widget.Toast;
 
 import com.activeandroid.Model;
 
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+
+import me.kuehle.carreport.Application;
+import me.kuehle.carreport.R;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
+import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
+
 public abstract class AbstractDataDetailFragment extends Fragment implements
-		SupportMessageDialogFragmentListener {
-	public interface OnItemActionListener {
-		public void onItemCanceled();
+        SupportMessageDialogFragmentListener {
+    public interface OnItemActionListener {
+        public void onItemCanceled();
 
-		public void onItemDeleted();
+        public void onItemDeleted();
 
-		public void onItemSaved();
-	}
+        public void onItemSaved();
+    }
 
-	public static final String EXTRA_ID = "id";
-	public static final long EXTRA_ID_DEFAULT = -1;
-	public static final String EXTRA_CAR_ID = "car_id";
-	public static final String EXTRA_ALLOW_CANCEL = "allow_cancel";
-	public static final boolean EXTRA_ALLOW_CANCEL_DEFAULT = true;
+    public static final String EXTRA_ID = "id";
+    public static final long EXTRA_ID_DEFAULT = -1;
+    public static final String EXTRA_CAR_ID = "car_id";
+    public static final String EXTRA_ALLOW_CANCEL = "allow_cancel";
+    public static final boolean EXTRA_ALLOW_CANCEL_DEFAULT = true;
 
-	protected OnItemActionListener onItemActionListener;
-	protected Model editItem = null;
+    protected OnItemActionListener onItemActionListener;
+    protected Model editItem = null;
 
-	private static final int DELETE_REQUEST_CODE = 0;
+    private static final int DELETE_REQUEST_CODE = 0;
 
-	private CharSequence savedABTitle;
-	private int savedABNavMode;
-	private boolean allowCancel;
+    private CharSequence savedABTitle;
+    private int savedABNavMode;
+    private boolean allowCancel;
 
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(allowCancel);
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ActionBar actionBar = MainActivity.getSupportActionBar(this);
+        actionBar.setDisplayHomeAsUpEnabled(allowCancel);
 
-		savedABTitle = actionBar.getTitle();
-		savedABNavMode = actionBar.getNavigationMode();
+        savedABTitle = actionBar.getTitle();
+        savedABNavMode = actionBar.getNavigationMode();
 
-		if (isInEditMode()) {
-			actionBar.setTitle(getTitleForEdit());
-		} else {
-			actionBar.setTitle(getTitleForNew());
-		}
+        if (isInEditMode()) {
+            actionBar.setTitle(getTitleForEdit());
+        } else {
+            actionBar.setTitle(getTitleForNew());
+        }
 
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-	}
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+    }
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			if (getParentFragment() != null) {
-				onItemActionListener = (OnItemActionListener) getParentFragment();
-			} else {
-				onItemActionListener = (OnItemActionListener) activity;
-			}
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement OnItemActionListener");
-		}
-	}
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            if (getParentFragment() != null) {
+                onItemActionListener = (OnItemActionListener) getParentFragment();
+            } else {
+                onItemActionListener = (OnItemActionListener) activity;
+            }
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnItemActionListener");
+        }
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		long id = getArguments().getLong(EXTRA_ID, EXTRA_ID_DEFAULT);
-		if (id != EXTRA_ID_DEFAULT) {
-			editItem = getEditItem(id);
-		}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        long id = getArguments().getLong(EXTRA_ID, EXTRA_ID_DEFAULT);
+        if (id != EXTRA_ID_DEFAULT) {
+            editItem = getEditItem(id);
+        }
 
-		allowCancel = getArguments().getBoolean(EXTRA_ALLOW_CANCEL,
-				EXTRA_ALLOW_CANCEL_DEFAULT);
+        allowCancel = getArguments().getBoolean(EXTRA_ALLOW_CANCEL,
+                EXTRA_ALLOW_CANCEL_DEFAULT);
 
-		setHasOptionsMenu(true);
-	}
+        setHasOptionsMenu(true);
+    }
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.clear();
-		inflater.inflate(R.menu.edit, menu);
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.edit, menu);
 
-		if (!isInEditMode()) {
-			menu.removeItem(R.id.menu_delete);
-		}
+        if (!isInEditMode()) {
+            menu.removeItem(R.id.menu_delete);
+        }
 
-		if (!allowCancel) {
-			menu.removeItem(R.id.menu_cancel);
-		}
-	}
+        if (!allowCancel) {
+            menu.removeItem(R.id.menu_cancel);
+        }
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View v = inflater.inflate(getLayout(), container, false);
-		initFields(savedInstanceState, v);
-		fillFields(savedInstanceState, v);
-		return v;
-	}
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(getLayout(), container, false);
+        initFields(savedInstanceState, v);
+        fillFields(savedInstanceState, v);
+        return v;
+    }
 
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		ActionBar actionBar = getActivity().getActionBar();
-		actionBar.setTitle(savedABTitle);
-		actionBar.setNavigationMode(savedABNavMode);
-	}
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ActionBar actionBar = MainActivity.getSupportActionBar(this);
+        actionBar.setTitle(savedABTitle);
+        actionBar.setNavigationMode(savedABNavMode);
+    }
 
-	@Override
-	public void onDialogNegativeClick(int requestCode) {
-	}
+    @Override
+    public void onDialogNegativeClick(int requestCode) {
+    }
 
-	@Override
-	public void onDialogPositiveClick(int requestCode) {
-		if (requestCode == DELETE_REQUEST_CODE) {
-			editItem.delete();
+    @Override
+    public void onDialogPositiveClick(int requestCode) {
+        if (requestCode == DELETE_REQUEST_CODE) {
+            editItem.delete();
 
-			Toast.makeText(getActivity(), getToastDeletedMessage(),
-					Toast.LENGTH_SHORT).show();
-			onItemActionListener.onItemDeleted();
-		}
-	}
+            Toast.makeText(getActivity(), getToastDeletedMessage(), Toast.LENGTH_SHORT).show();
+            onItemActionListener.onItemDeleted();
+        }
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_save:
-			if (validate()) {
-				save();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_save:
+                if (validate()) {
+                    save();
 
-				Toast.makeText(getActivity(), getToastSavedMessage(),
-						Toast.LENGTH_SHORT).show();
-				onItemActionListener.onItemSaved();
+                    Toast.makeText(getActivity(), getToastSavedMessage(), Toast.LENGTH_SHORT).show();
+                    onItemActionListener.onItemSaved();
 
-				Application.dataChanged();
-			}
-			return true;
-		case R.id.menu_cancel:
-			onItemActionListener.onItemCanceled();
-			return true;
-		case R.id.menu_delete:
-			SupportMessageDialogFragment.newInstance(this, DELETE_REQUEST_CODE,
-					R.string.alert_delete_title,
-					getString(getAlertDeleteMessage()), android.R.string.yes,
-					android.R.string.no).show(getFragmentManager(), null);
-			return true;
-		case android.R.id.home:
-			onItemActionListener.onItemCanceled();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+                    Application.dataChanged();
+                }
 
-	protected abstract void fillFields(Bundle savedInstanceState, View v);
+                return true;
+            case R.id.menu_cancel:
+                onItemActionListener.onItemCanceled();
+                return true;
+            case R.id.menu_delete:
+                SupportMessageDialogFragment.newInstance(this, DELETE_REQUEST_CODE,
+                        R.string.alert_delete_title,
+                        getString(getAlertDeleteMessage()), android.R.string.yes,
+                        android.R.string.no).show(getFragmentManager(), null);
+                return true;
+            case android.R.id.home:
+                onItemActionListener.onItemCanceled();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-	protected abstract int getAlertDeleteMessage();
+    protected abstract void fillFields(Bundle savedInstanceState, View v);
 
-	protected Date getDate(EditText edt) {
-		try {
-			return DateFormat.getDateFormat(getActivity()).parse(
-					edt.getText().toString());
-		} catch (ParseException e) {
-			return new Date();
-		}
-	}
+    protected abstract int getAlertDeleteMessage();
 
-	protected Date getDateTime(Date date, Date time) {
-		Calendar calTime = Calendar.getInstance();
-		calTime.setTime(time);
+    protected Date getDate(EditText edt) {
+        try {
+            return DateFormat.getDateFormat(getActivity()).parse(edt.getText().toString());
+        } catch (ParseException e) {
+            return new Date();
+        }
+    }
 
-		Calendar calDateTime = Calendar.getInstance();
-		calDateTime.setTime(date);
-		calDateTime
-				.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY));
-		calDateTime.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE));
-		calDateTime.set(Calendar.SECOND, calTime.get(Calendar.SECOND));
+    protected Date getDateTime(Date date, Date time) {
+        Calendar calTime = Calendar.getInstance();
+        calTime.setTime(time);
 
-		return calDateTime.getTime();
-	}
+        Calendar calDateTime = Calendar.getInstance();
+        calDateTime.setTime(date);
+        calDateTime.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY));
+        calDateTime.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE));
+        calDateTime.set(Calendar.SECOND, calTime.get(Calendar.SECOND));
 
-	protected double getDoubleFromEditText(EditText editText,
-			double defaultValue) {
-		String strDouble = editText.getText().toString();
-		try {
-			return Double.parseDouble(strDouble);
-		} catch (NumberFormatException e) {
-			return defaultValue;
-		}
-	}
+        return calDateTime.getTime();
+    }
 
-	protected abstract Model getEditItem(long id);
+    protected double getDoubleFromEditText(EditText editText, double defaultValue) {
+        String strDouble = editText.getText().toString();
+        try {
+            return Double.parseDouble(strDouble);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 
-	protected int getIntegerFromEditText(EditText editText, int defaultValue) {
-		String strInt = editText.getText().toString();
-		try {
-			return Integer.parseInt(strInt);
-		} catch (NumberFormatException e) {
-			return defaultValue;
-		}
-	}
+    protected abstract Model getEditItem(long id);
 
-	protected abstract int getLayout();
+    protected int getIntegerFromEditText(EditText editText, int defaultValue) {
+        String strInt = editText.getText().toString();
+        try {
+            return Integer.parseInt(strInt);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 
-	protected Date getTime(EditText edt) {
-		try {
-			return DateFormat.getTimeFormat(getActivity()).parse(
-					edt.getText().toString());
-		} catch (ParseException e) {
-			return new Date();
-		}
-	}
+    protected abstract int getLayout();
 
-	protected abstract int getTitleForEdit();
+    protected Date getTime(EditText edt) {
+        try {
+            return DateFormat.getTimeFormat(getActivity()).parse(
+                    edt.getText().toString());
+        } catch (ParseException e) {
+            return new Date();
+        }
+    }
 
-	protected abstract int getTitleForNew();
+    protected abstract int getTitleForEdit();
 
-	protected abstract int getToastDeletedMessage();
+    protected abstract int getTitleForNew();
 
-	protected abstract int getToastSavedMessage();
+    protected abstract int getToastDeletedMessage();
 
-	protected abstract void initFields(Bundle savedInstanceState, View v);
+    protected abstract int getToastSavedMessage();
 
-	protected boolean isInEditMode() {
-		return editItem != null;
-	}
+    protected abstract void initFields(Bundle savedInstanceState, View v);
 
-	protected abstract void save();
+    protected boolean isInEditMode() {
+        return editItem != null;
+    }
 
-	protected abstract boolean validate();
+    protected abstract void save();
+
+    protected abstract boolean validate();
 }

@@ -56,8 +56,7 @@ public class SupportDatePickerDialogFragment extends DialogFragment implements
 	}
 
 	@Override
-	public void onDateSet(DatePicker view, int year, int monthOfYear,
-			int dayOfMonth) {
+	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, year);
 		cal.set(Calendar.MONTH, monthOfYear);

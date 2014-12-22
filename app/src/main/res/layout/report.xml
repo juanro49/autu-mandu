@@ -63,7 +63,7 @@
                     android:layout_height="32dp"
                     android:background="?android:attr/selectableItemBackground"
                     android:contentDescription="@string/graph_options_desc"
-                    android:src="@drawable/ic_menu_overflow" />
+                    android:src="@drawable/ic_more_vert" />
             </LinearLayout>
             <me.kuehle.chartlib.ChartView
                 android:id="@+id/chart"

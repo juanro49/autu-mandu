@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package me.kuehle.carreport.gui;
 
 import me.kuehle.carreport.db.Car;
 
-/**
- * Created by Jan on 17.12.2014.
- */
 public interface DataListListener {
     void onCarChanged(Car newCar);
 
