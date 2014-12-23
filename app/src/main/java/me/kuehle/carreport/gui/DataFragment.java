@@ -42,11 +42,9 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 
-public class DataFragment extends Fragment implements
-        DataListCallback,
+public class DataFragment extends Fragment implements DataListCallback,
         AbstractDataDetailFragment.OnItemActionListener, DataChangeListener {
-    private class DataListBackStackListener implements
-            OnBackStackChangedListener {
+    private class DataListBackStackListener implements OnBackStackChangedListener {
         @Override
         public void onBackStackChanged() {
             if (getChildFragmentManager().getBackStackEntryCount() == 0) {
@@ -80,6 +78,7 @@ public class DataFragment extends Fragment implements
         @Override
         public void onPageSelected(int position) {
             onItemUnselected();
+
             for (Fragment childFragment : getChildFragmentManager().getFragments()) {
                 if (childFragment instanceof DataListListener) {
                     ((DataListListener) childFragment).unselectItem();
@@ -163,16 +162,14 @@ public class DataFragment extends Fragment implements
         long carId;
         Preferences prefs = new Preferences(getActivity());
         if (savedInstanceState != null) {
-            carId = savedInstanceState.getLong(STATE_CURRENT_CAR,
-                    prefs.getDefaultCar());
+            carId = savedInstanceState.getLong(STATE_CURRENT_CAR, prefs.getDefaultCar());
         } else {
             carId = prefs.getDefaultCar();
         }
 
         mCurrentCar = Car.load(Car.class, carId);
 
-        getChildFragmentManager().addOnBackStackChangedListener(
-                new DataListBackStackListener());
+        getChildFragmentManager().addOnBackStackChangedListener(new DataListBackStackListener());
     }
 
     @Override
@@ -183,12 +180,10 @@ public class DataFragment extends Fragment implements
         ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
         mPager.setAdapter(new DataListPagerAdapter(getChildFragmentManager()));
         mPager.setOnPageChangeListener(new DataListOnPageChangeListener());
-        PagerTabStrip tabs = (PagerTabStrip) v
-                .findViewById(R.id.pager_tab_strip);
+        PagerTabStrip tabs = (PagerTabStrip) v.findViewById(R.id.pager_tab_strip);
         tabs.setTabIndicatorColorResource(android.R.color.holo_blue_dark);
 
-        mTxtNoEntrySelected = (TextView) v
-                .findViewById(R.id.txt_no_entry_selected);
+        mTxtNoEntrySelected = (TextView) v.findViewById(R.id.txt_no_entry_selected);
         if (getChildFragmentManager().findFragmentById(R.id.detail) != null) {
             setNoEntrySelectedTextVisible(false);
         }
@@ -201,8 +196,8 @@ public class DataFragment extends Fragment implements
     @Override
     public void onDataChanged() {
         for (Fragment fragment : getChildFragmentManager().getFragments()) {
-            if (fragment instanceof me.kuehle.carreport.gui.DataListListener) {
-                ((me.kuehle.carreport.gui.DataListListener) fragment).updateData();
+            if (fragment instanceof DataListListener) {
+                ((DataListListener) fragment).updateData();
             }
         }
     }

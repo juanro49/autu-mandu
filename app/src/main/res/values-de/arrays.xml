@@ -19,6 +19,9 @@
         <item>Reports</item>
         <item>Daten</item>
         <item>Rechner</item>
+        <item/>
+        <item>Einstellungen</item>
+        <item>Hilfe</item>
     </string-array>
     <string-array name="data_list_page_titles">
         <item>Tankfüllungen</item>

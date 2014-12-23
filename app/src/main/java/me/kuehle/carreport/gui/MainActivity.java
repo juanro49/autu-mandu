@@ -21,6 +21,7 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.gui.util.DrawerListAdapter;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 
 import android.app.Activity;
@@ -41,7 +42,6 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -76,6 +76,7 @@ public class MainActivity extends ActionBarActivity implements
 	private CharSequence mTitle;
 
 	private Fragment mCurrentFragment;
+    private int mCurrentDrawerPosition;
 	private MenuItem mSyncMenuItem;
 
 	@Override
@@ -130,11 +131,17 @@ public class MainActivity extends ActionBarActivity implements
 		}
 
 		mMainViews = getResources().getStringArray(R.array.main_views);
+        int[] mainViewIcons = {
+                R.drawable.ic_reports,
+                R.drawable.ic_list,
+                R.drawable.ic_functions
+        };
+
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
 		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-		mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item_drawer, mMainViews));
+		mDrawerList.setAdapter(new DrawerListAdapter(this, mMainViews, mainViewIcons));
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -142,14 +149,14 @@ public class MainActivity extends ActionBarActivity implements
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open,
 				R.string.drawer_close) {
+            public void onDrawerOpened(View drawerView) {
+                mTitle = getSupportActionBar().getTitle();
+                getSupportActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu();
+            }
+
 			public void onDrawerClosed(View view) {
                 getSupportActionBar().setTitle(mTitle);
-				invalidateOptionsMenu();
-			}
-
-			public void onDrawerOpened(View drawerView) {
-				mTitle = getSupportActionBar().getTitle();
-                getSupportActionBar().setTitle(mDrawerTitle);
 				invalidateOptionsMenu();
 			}
 		};
@@ -186,41 +193,6 @@ public class MainActivity extends ActionBarActivity implements
 		}
 
 		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Pass the event to ActionBarDrawerToggle, if it returns
-		// true, then it has handled the app icon touch event.
-		if (mDrawerToggle.onOptionsItemSelected(item)) {
-			return true;
-		}
-
-		// DemoData.addDemoData();
-		// if (mCurrentFragment instanceof DataChangeListener) {
-		// ((DataChangeListener) mCurrentFragment).onDataChanged();
-		// }
-
-		switch (item.getItemId()) {
-		case R.id.menu_synchronize:
-			AbstractSynchronizationProvider.getCurrent(this).synchronize();
-			return true;
-		case R.id.menu_settings:
-			Intent intentPrefs = new Intent(this, PreferencesActivity.class);
-			startActivityForResult(intentPrefs, REQUEST_SETTINGS);
-			return true;
-		case R.id.menu_help:
-			Intent intentHelp = new Intent(this, HelpActivity.class);
-			startActivity(intentHelp);
-			return true;
-		default:
-			if (item.getIntent() != null) {
-				startActivityForResult(item.getIntent(), REQUEST_ADD_DATA);
-				return true;
-			} else {
-				return super.onOptionsItemSelected(item);
-			}
-		}
 	}
 
 	@Override
@@ -264,6 +236,33 @@ public class MainActivity extends ActionBarActivity implements
 
 		return super.onPrepareOptionsMenu(menu);
 	}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event.
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        // DemoData.addDemoData();
+        // if (mCurrentFragment instanceof DataChangeListener) {
+        // ((DataChangeListener) mCurrentFragment).onDataChanged();
+        // }
+
+        switch (item.getItemId()) {
+            case R.id.menu_synchronize:
+                AbstractSynchronizationProvider.getCurrent(this).synchronize();
+                return true;
+            default:
+                if (item.getIntent() != null) {
+                    startActivityForResult(item.getIntent(), REQUEST_ADD_DATA);
+                    return true;
+                } else {
+                    return super.onOptionsItemSelected(item);
+                }
+        }
+    }
 
     public void onFABClicked(View fab) {
         Preferences prefs = new Preferences(this);
@@ -311,23 +310,33 @@ public class MainActivity extends ActionBarActivity implements
 	}
 
 	private void selectItem(int position) {
-		if (position == 0) {
-			mCurrentFragment = new ReportFragment();
-		} else if (position == 1) {
-			mCurrentFragment = new DataFragment();
-		} else if (position == 2) {
-			mCurrentFragment = new CalculatorFragment();
-		} else {
-			return;
-		}
+        if (position >= 0 && position <= 2) {
+            if (position == 0) {
+                mCurrentFragment = new ReportFragment();
+            } else if (position == 1) {
+                mCurrentFragment = new DataFragment();
+            } else if (position == 2) {
+                mCurrentFragment = new CalculatorFragment();
+            }
 
-		FragmentManager fm = getSupportFragmentManager();
-		fm.popBackStack();
-		fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
+            FragmentManager fm = getSupportFragmentManager();
+            fm.popBackStack();
+            fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
 
-		mDrawerList.setItemChecked(position, true);
-		setTitle(mMainViews[position]);
-		mDrawerLayout.closeDrawer(mDrawerList);
+            mCurrentDrawerPosition = position;
+        } else if (position >= 4 && position <= 5) {
+            if (position == 4) {
+                Intent intentPrefs = new Intent(this, PreferencesActivity.class);
+                startActivityForResult(intentPrefs, REQUEST_SETTINGS);
+            } else if (position == 5) {
+                Intent intentHelp = new Intent(this, HelpActivity.class);
+                startActivity(intentHelp);
+            }
+        }
+
+        mDrawerList.setItemChecked(mCurrentDrawerPosition, true);
+        setTitle(mMainViews[mCurrentDrawerPosition]);
+        mDrawerLayout.closeDrawer(mDrawerList);
 	}
 
 	@Override
