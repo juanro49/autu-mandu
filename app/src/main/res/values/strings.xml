@@ -25,8 +25,6 @@
     <string name="menu_synchronize">Synchronize</string>
     <string name="menu_add_refueling">Add refueling</string>
     <string name="menu_add_other">Add other</string>
-    <string name="menu_settings">Settings</string>
-    <string name="menu_help">Help</string>
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
     <string name="menu_delete">Delete</string>
@@ -65,6 +63,7 @@
     
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>
+    <string name="suspended_desc">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports zoom to active cars only in the small view.</string>
     <string name="overwrite">Overwrite</string>
     <string name="restore">Restore</string>
     <string name="import_">Import</string>

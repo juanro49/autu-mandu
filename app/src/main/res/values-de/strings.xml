@@ -25,8 +25,6 @@
     <string name="menu_synchronize">Synchronisieren</string>
     <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
     <string name="menu_add_other">Andere Kosten hinzufügen</string>
-    <string name="menu_settings">Einstellungen</string>
-    <string name="menu_help">Hilfe</string>
     <string name="menu_save">Fertig</string>
     <string name="menu_cancel">Abbrechen</string>
     <string name="menu_delete">Löschen</string>
@@ -238,4 +236,5 @@
     <string name="graph_close_full_screen_desc">Vollbildgraph schließen</string>
     <string name="remove_fueltype_desc">Entfernen</string>
     <string name="drag_handle_desc">Drag-Bereich</string>
+    <string name="suspended_desc">Wenn Sie ein Auto nicht mehr benutzen, können Sie es stilllegen. Dadurch werden sich wiederholenden Kosten zu dem Stilllegezeitpunkt beendet. Außerdem zoomen die Reports in der kleinen Ansicht nur auf aktive Autos.</string>
 </resources>
