@@ -15,18 +15,12 @@
   limitations under the License.
 -->
 <resources>
-    <string-array name="main_views">
-        <item>Reports</item>
-        <item>Daten</item>
-        <item>Rechner</item>
-        <item/>
-        <item>Einstellungen</item>
-        <item>Hilfe</item>
-    </string-array>
+
     <string-array name="data_list_page_titles">
         <item>Tankfüllungen</item>
         <item>Andere Kosten</item>
     </string-array>
+
     <string-array name="repeat_intervals">
         <item>Einmalig</item>
         <item>Jeden Tag wiederholen</item>
@@ -34,4 +28,5 @@
         <item>Jedes Quartal wiederholen</item>
         <item>Jedes Jahr wiederholen</item>
     </string-array>
+
 </resources>

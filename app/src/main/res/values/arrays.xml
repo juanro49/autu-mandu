@@ -15,18 +15,12 @@
   limitations under the License.
 -->
 <resources>
-    <string-array name="main_views">
-        <item>Reports</item>
-        <item>Data</item>
-        <item>Calculator</item>
-        <item/>
-        <item>Settings</item>
-        <item>Help</item>
-    </string-array>
+
     <string-array name="data_list_page_titles">
         <item>Refuelings</item>
         <item>Other Costs</item>
     </string-array>
+
     <string-array name="repeat_intervals">
         <item>Once</item>
         <item>Repeat every day</item>
@@ -34,4 +28,5 @@
         <item>Repeat every quarter</item>
         <item>Repeat every year</item>
     </string-array>
+
 </resources>

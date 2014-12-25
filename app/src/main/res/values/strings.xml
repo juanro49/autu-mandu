@@ -21,7 +21,15 @@
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Licenses</string>
-    
+
+    <string name="drawer_reports">Reports</string>
+    <string name="drawer_data">Data</string>
+    <string name="drawer_calculator">Calculator</string>
+    <string name="drawer_settings">Settings</string>
+    <string name="drawer_help">Help</string>
+    <string name="drawer_open">Open navigation</string>
+    <string name="drawer_close">Close navigation</string>
+
     <string name="menu_synchronize">Synchronize</string>
     <string name="menu_add_refueling">Add refueling</string>
     <string name="menu_add_other">Add other</string>
@@ -224,9 +232,7 @@
     <string name="calc_option_price_to_volume">Price (%1$s) to Volume (%2$s)</string>
     <string name="calc_option_distance_to_price">Distance (%1$s) to Price (%2$s)</string>
     <string name="calc_option_price_to_distance">Price (%1$s) to Distance (%2$s)</string>
-    
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
+
     <string name="distance_entry_mode_trip">Trip distance</string>
     <string name="distance_entry_mode_total">Total distance</string>
     <string name="distance_entry_mode_show_selector">Show selector</string>

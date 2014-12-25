@@ -22,6 +22,7 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.util.DrawerListAdapter;
+import me.kuehle.carreport.gui.util.DrawerListItem;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 
 import android.app.Activity;
@@ -58,20 +59,20 @@ public class MainActivity extends ActionBarActivity implements
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			selectItem(position);
+			selectDrawerItem(position);
 		}
 	}
 
 	private static final int REQUEST_FIRST_START = 0;
 	private static final int REQUEST_ADD_DATA = 1;
-	private static final int REQUEST_SETTINGS = 2;
+	private static final int REQUEST_FROM_DRAWER = 2;
 
 	private static final String STATE_TITLE = "title";
 
-	private String[] mMainViews;
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private ListView mDrawerList;
+    private DrawerListAdapter mDrawerAdapter;
 	private CharSequence mDrawerTitle;
 	private CharSequence mTitle;
 
@@ -79,19 +80,83 @@ public class MainActivity extends ActionBarActivity implements
     private int mCurrentDrawerPosition;
 	private MenuItem mSyncMenuItem;
 
-	@Override
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mTitle = mDrawerTitle = getTitle();
+        if (savedInstanceState != null) {
+            setTitle(savedInstanceState.getCharSequence(STATE_TITLE, mTitle));
+        }
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+        mDrawerAdapter = new DrawerListAdapter(this, buildDrawerItems());
+
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList.setAdapter(mDrawerAdapter);
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open,
+                R.string.drawer_close) {
+            public void onDrawerOpened(View drawerView) {
+                mTitle = getSupportActionBar().getTitle();
+                getSupportActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerClosed(View view) {
+                getSupportActionBar().setTitle(mTitle);
+                invalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        if (savedInstanceState == null) {
+            selectDrawerItem(0);
+        }
+
+        // When there is no car, show the first start activity.
+        if (Car.getCount() == 0) {
+            Intent intent = new Intent(this, FirstStartActivity.class);
+            startActivityForResult(intent, REQUEST_FIRST_START);
+        }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        AbstractSynchronizationProvider provider = AbstractSynchronizationProvider.getCurrent(this);
+        if (mSyncMenuItem != null) {
+            mSyncMenuItem.setVisible(provider != null && provider.isAuthenticated());
+        }
+
+        AbstractSynchronizationProvider.setSynchronisationCallback(this);
+    }
+
+    @Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_FIRST_START && resultCode == RESULT_CANCELED) {
 			finish();
 		} else {
 			// Rebuild the menu, so a change in the show_car_menu option will take effect.
-			if (requestCode == REQUEST_SETTINGS) {
+			if (requestCode == REQUEST_FROM_DRAWER) {
 				invalidateOptionsMenu();
 			}
 
-			if (mCurrentFragment instanceof DataChangeListener) {
-				((DataChangeListener) mCurrentFragment).onDataChanged();
-			}
+            dataChanged();
 		}
 	}
 
@@ -118,59 +183,6 @@ public class MainActivity extends ActionBarActivity implements
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		mDrawerToggle.onConfigurationChanged(newConfig);
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-
-		mTitle = mDrawerTitle = getTitle();
-		if (savedInstanceState != null) {
-			setTitle(savedInstanceState.getCharSequence(STATE_TITLE, mTitle));
-		}
-
-		mMainViews = getResources().getStringArray(R.array.main_views);
-        int[] mainViewIcons = {
-                R.drawable.ic_reports,
-                R.drawable.ic_list,
-                R.drawable.ic_functions
-        };
-
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-		mDrawerList.setAdapter(new DrawerListAdapter(this, mMainViews, mainViewIcons));
-		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open,
-				R.string.drawer_close) {
-            public void onDrawerOpened(View drawerView) {
-                mTitle = getSupportActionBar().getTitle();
-                getSupportActionBar().setTitle(mDrawerTitle);
-                invalidateOptionsMenu();
-            }
-
-			public void onDrawerClosed(View view) {
-                getSupportActionBar().setTitle(mTitle);
-				invalidateOptionsMenu();
-			}
-		};
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-		if (savedInstanceState == null) {
-			selectItem(0);
-		}
-
-		// When there is no car, show the first start activity.
-		if (Car.getCount() == 0) {
-			Intent intent = new Intent(this, FirstStartActivity.class);
-			startActivityForResult(intent, REQUEST_FIRST_START);
-		}
 	}
 
 	@Override
@@ -286,13 +298,10 @@ public class MainActivity extends ActionBarActivity implements
 		}
 
 		if (result) {
-			if (mCurrentFragment instanceof DataChangeListener) {
-				((DataChangeListener) mCurrentFragment).onDataChanged();
-			}
+            dataChanged();
 		} else {
-			Toast.makeText(MainActivity.this,
-                    R.string.toast_synchronization_failed, Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(MainActivity.this, R.string.toast_synchronization_failed,
+                    Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -302,43 +311,6 @@ public class MainActivity extends ActionBarActivity implements
         getSupportActionBar().setTitle(mTitle);
 	}
 
-	private Intent getDetailActivityIntent(int edit, long carId) {
-		Intent intent = new Intent(this, DataDetailActivity.class);
-		intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
-		intent.putExtra(AbstractDataDetailFragment.EXTRA_CAR_ID, carId);
-		return intent;
-	}
-
-	private void selectItem(int position) {
-        if (position >= 0 && position <= 2) {
-            if (position == 0) {
-                mCurrentFragment = new ReportFragment();
-            } else if (position == 1) {
-                mCurrentFragment = new DataFragment();
-            } else if (position == 2) {
-                mCurrentFragment = new CalculatorFragment();
-            }
-
-            FragmentManager fm = getSupportFragmentManager();
-            fm.popBackStack();
-            fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
-
-            mCurrentDrawerPosition = position;
-        } else if (position >= 4 && position <= 5) {
-            if (position == 4) {
-                Intent intentPrefs = new Intent(this, PreferencesActivity.class);
-                startActivityForResult(intentPrefs, REQUEST_SETTINGS);
-            } else if (position == 5) {
-                Intent intentHelp = new Intent(this, HelpActivity.class);
-                startActivity(intentHelp);
-            }
-        }
-
-        mDrawerList.setItemChecked(mCurrentDrawerPosition, true);
-        setTitle(mMainViews[mCurrentDrawerPosition]);
-        mDrawerLayout.closeDrawer(mDrawerList);
-	}
-
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -346,28 +318,75 @@ public class MainActivity extends ActionBarActivity implements
 	}
 
 	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		mDrawerToggle.syncState();
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider.getCurrent(this);
-		if (mSyncMenuItem != null) {
-			mSyncMenuItem.setVisible(provider != null && provider.isAuthenticated());
-		}
-
-		AbstractSynchronizationProvider.setSynchronisationCallback(this);
-	}
-
-	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putCharSequence(STATE_TITLE, mTitle);
 		super.onSaveInstanceState(outState);
 	}
+
+    private DrawerListItem[] buildDrawerItems() {
+        List<Car> cars = Car.getAll();
+
+        DrawerListItem[] items = new DrawerListItem[5 + cars.size()];
+        int i = 0;
+
+        items[i++] = new DrawerListItem(getString(R.string.drawer_reports), R.drawable.ic_reports,
+                new ReportFragment());
+
+        for (Car car : cars) {
+            Bundle args = new Bundle();
+            args.putLong(DataFragment.EXTRA_CAR_ID, car.id);
+
+            DataFragment fragment = new DataFragment();
+            fragment.setArguments(args);
+
+            items[i++] = new DrawerListItem(car.name, R.drawable.ic_list, fragment);
+        }
+
+        items[i++] = new DrawerListItem(getString(R.string.drawer_calculator),
+                R.drawable.ic_functions, new CalculatorFragment());
+        items[i++] = new DrawerListItem();
+        items[i++] = new DrawerListItem(getString(R.string.drawer_settings),
+                new Intent(this, PreferencesActivity.class));
+        items[i++] = new DrawerListItem(getString(R.string.drawer_help),
+                new Intent(this, HelpActivity.class));
+
+        return items;
+    }
+
+    private void dataChanged() {
+        if (mCurrentFragment instanceof DataChangeListener) {
+            ((DataChangeListener) mCurrentFragment).onDataChanged();
+        }
+
+        // Cars could have been changed, so the drawer has to be updated.
+        mDrawerAdapter.setItems(buildDrawerItems());
+    }
+
+    private Intent getDetailActivityIntent(int edit, long carId) {
+        Intent intent = new Intent(this, DataDetailActivity.class);
+        intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
+        intent.putExtra(AbstractDataDetailFragment.EXTRA_CAR_ID, carId);
+        return intent;
+    }
+
+    private void selectDrawerItem(int position) {
+        DrawerListItem selected = (DrawerListItem) mDrawerAdapter.getItem(position);
+        if (selected.getFragment() != null) {
+            mCurrentFragment = selected.getFragment();
+            mCurrentDrawerPosition = position;
+
+            FragmentManager fm = getSupportFragmentManager();
+            fm.popBackStack();
+            fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
+        } else if (selected.getIntent() != null) {
+            startActivityForResult(selected.getIntent(), REQUEST_FROM_DRAWER);
+        }
+
+        mDrawerList.setItemChecked(mCurrentDrawerPosition, true);
+        DrawerListItem current = (DrawerListItem) mDrawerAdapter.getItem(mCurrentDrawerPosition);
+        setTitle(current.getText());
+        mDrawerLayout.closeDrawer(mDrawerList);
+    }
 
     public static ActionBar getSupportActionBar(Fragment fragment) {
         Activity activity = fragment.getActivity();

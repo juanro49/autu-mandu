@@ -22,6 +22,14 @@
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Lizenzen</string>
 
+    <string name="drawer_reports">Reports</string>
+    <string name="drawer_data">Daten</string>
+    <string name="drawer_calculator">Rechner</string>
+    <string name="drawer_settings">Einstellungen</string>
+    <string name="drawer_help">Hilfe</string>
+    <string name="drawer_open">Navigation öffnen</string>
+    <string name="drawer_close">Navigation schließen</string>
+
     <string name="menu_synchronize">Synchronisieren</string>
     <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
     <string name="menu_add_other">Andere Kosten hinzufügen</string>
@@ -224,8 +232,6 @@
     <string name="calc_option_distance_to_price">Strecke (%1$s) nach Preis (%2$s)</string>
     <string name="calc_option_price_to_distance">Preis (%1$s) nach Strecke (%2$s)</string>
 
-    <string name="drawer_open">Navigation öffnen</string>
-    <string name="drawer_close">Navigation schließen</string>
     <string name="distance_entry_mode_trip">Tageskilometer</string>
     <string name="distance_entry_mode_total">Gesamtkilometer</string>
     <string name="distance_entry_mode_show_selector">Auswahl anzeigen</string>

@@ -15,11 +15,16 @@
  */
 package me.kuehle.carreport.gui.util;
 
+import android.content.Intent;
+import android.support.v4.app.Fragment;
+
 public class DrawerListItem {
     private CharSequence mText;
     private int mIcon;
     private boolean mIsSeparator;
     private boolean mIsPrimary;
+    private Fragment mFragment;
+    private Intent mIntent;
 
     /**
      * Creates a separator item.
@@ -32,8 +37,9 @@ public class DrawerListItem {
      * Creates a secondary item with the specified title.
      * @param text
      */
-    public DrawerListItem(CharSequence text) {
+    public DrawerListItem(CharSequence text, Intent intent) {
         mText = text;
+        mIntent = intent;
     }
 
     /**
@@ -41,10 +47,11 @@ public class DrawerListItem {
      * @param text
      * @param icon
      */
-    public DrawerListItem(CharSequence text, int icon) {
+    public DrawerListItem(CharSequence text, int icon, Fragment fragment) {
         mText = text;
         mIcon = icon;
         mIsPrimary = true;
+        mFragment = fragment;
     }
 
     public CharSequence getText() {
@@ -77,5 +84,21 @@ public class DrawerListItem {
 
     public void setPrimary(boolean isPrimary) {
         mIsPrimary = isPrimary;
+    }
+
+    public Fragment getFragment() {
+        return mFragment;
+    }
+
+    public void setFragment(Fragment fragment) {
+        mFragment = fragment;
+    }
+
+    public Intent getIntent() {
+        return mIntent;
+    }
+
+    public void setIntent(Intent intent) {
+        mIntent = intent;
     }
 }

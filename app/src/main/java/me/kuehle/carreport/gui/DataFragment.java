@@ -26,16 +26,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
-
-import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -45,32 +41,27 @@ import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 public class DataFragment extends Fragment implements DataListCallback,
         AbstractDataDetailFragment.OnItemActionListener, DataChangeListener {
     private class DataListBackStackListener implements OnBackStackChangedListener {
+        private boolean mSkipNextIfPop = false;
+
         @Override
         public void onBackStackChanged() {
-            if (getChildFragmentManager().getBackStackEntryCount() == 0) {
+            boolean isPop = getChildFragmentManager().getBackStackEntryCount() == 0;
+            if (isPop && !mSkipNextIfPop) {
                 setNoEntrySelectedTextVisible(true);
                 for (Fragment childFragment : getChildFragmentManager().getFragments()) {
                     if (childFragment instanceof DataListListener) {
                         ((DataListListener) childFragment).unselectItem();
                     }
                 }
-            } else {
+            } else if (!isPop) {
                 setNoEntrySelectedTextVisible(false);
             }
+
+            mSkipNextIfPop = false;
         }
-    }
 
-    private class DataListNavigationListener implements ActionBar.OnNavigationListener {
-        @Override
-        public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-            mCurrentCar = mCars.get(itemPosition);
-            for (Fragment fragment : getChildFragmentManager().getFragments()) {
-                if (fragment instanceof DataListListener) {
-                    ((DataListListener) fragment).onCarChanged(mCurrentCar);
-                }
-            }
-
-            return true;
+        public void skipNextIfPop() {
+            mSkipNextIfPop = true;
         }
     }
 
@@ -114,7 +105,7 @@ public class DataFragment extends Fragment implements DataListCallback,
 
             Bundle args = new Bundle();
             args.putBoolean(AbstractDataListFragment.EXTRA_ACTIVATE_ON_CLICK, mTwoPane);
-            args.putLong(AbstractDataListFragment.EXTRA_CAR_ID, mCurrentCar.id);
+            args.putLong(AbstractDataListFragment.EXTRA_CAR_ID, mCar.id);
             fragment.setArguments(args);
             return fragment;
         }
@@ -125,51 +116,27 @@ public class DataFragment extends Fragment implements DataListCallback,
         }
     }
 
-    private static final String STATE_CURRENT_CAR = "current_car";
+    public static final String EXTRA_CAR_ID = "car_id";
 
     private boolean mTwoPane;
     private TextView mTxtNoEntrySelected;
-
-    private List<Car> mCars;
-    private Car mCurrentCar = null;
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        ActionBar actionBar = MainActivity.getSupportActionBar(this);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_dropdown_item);
-        for (Car car : mCars) {
-            adapter.add(car.name);
-        }
-
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        actionBar.setListNavigationCallbacks(adapter,
-                new DataListNavigationListener());
-        for (int i = 0; i < mCars.size(); i++) {
-            if (mCars.get(i).id.equals(mCurrentCar.id)) {
-                actionBar.setSelectedNavigationItem(i);
-            }
-        }
-    }
+    private Car mCar;
+    private DataListBackStackListener mBackStackListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mCars = Car.getAll();
-        long carId;
-        Preferences prefs = new Preferences(getActivity());
-        if (savedInstanceState != null) {
-            carId = savedInstanceState.getLong(STATE_CURRENT_CAR, prefs.getDefaultCar());
-        } else {
+        long carId = getArguments().getLong(EXTRA_CAR_ID, 0);
+        if (carId == 0) {
+            Preferences prefs = new Preferences(getActivity());
             carId = prefs.getDefaultCar();
         }
 
-        mCurrentCar = Car.load(Car.class, carId);
+        mCar = Car.load(Car.class, carId);
 
-        getChildFragmentManager().addOnBackStackChangedListener(new DataListBackStackListener());
+        mBackStackListener = new DataListBackStackListener();
+        getChildFragmentManager().addOnBackStackChangedListener(mBackStackListener);
     }
 
     @Override
@@ -203,14 +170,6 @@ public class DataFragment extends Fragment implements DataListCallback,
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ActionBar actionBar = MainActivity.getSupportActionBar(this);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setListNavigationCallbacks(null, null);
-    }
-
-    @Override
     public void onItemCanceled() {
         onItemUnselected();
     }
@@ -237,6 +196,8 @@ public class DataFragment extends Fragment implements DataListCallback,
                 fragment = DataDetailOtherFragment.newInstance(id, true);
             }
 
+            mBackStackListener.skipNextIfPop();
+
             FragmentManager fm = getChildFragmentManager();
             fm.popBackStack("detail", FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
@@ -256,12 +217,6 @@ public class DataFragment extends Fragment implements DataListCallback,
     @Override
     public void onItemUnselected() {
         getChildFragmentManager().popBackStack("detail", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putLong(STATE_CURRENT_CAR, mCurrentCar.id);
     }
 
     private void setNoEntrySelectedTextVisible(boolean visible) {

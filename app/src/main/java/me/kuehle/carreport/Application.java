@@ -54,7 +54,7 @@ public class Application extends android.app.Application {
 
 		if (new Preferences(this).isSyncOnStart()) {
 			AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
-					.getCurrent(this);
+                    .getCurrent(this);
 			if (provider != null) {
 				provider.synchronize();
 			}

@@ -49,10 +49,12 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     public static final String EXTRA_ACTIVATE_ON_CLICK = "activate_on_click";
     public static final boolean EXTRA_ACTIVATE_ON_CLICK_DEFAULT = false;
     public static final String EXTRA_CAR_ID = "car_id";
-    private static final String STATE_CURRENT_CAR = "current_car";
+
     private static final String STATE_CURRENT_ITEM = "current_item";
     private static final int REQUEST_DELETE = 0;
-    protected Car mCar = null;
+
+    protected Car mCar;
+
     private DataListAdapter mListAdapter;
     private int mCurrentItem = ListView.INVALID_POSITION;
     private me.kuehle.carreport.gui.DataListCallback mDataListCallback;
@@ -96,13 +98,6 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     }
 
     @Override
-    public void onCarChanged(Car newCar) {
-        mCar = newCar;
-
-        updateData();
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
@@ -110,10 +105,6 @@ public abstract class AbstractDataListFragment<T extends Model> extends
                 EXTRA_ACTIVATE_ON_CLICK_DEFAULT);
 
         long carId = args.getLong(EXTRA_CAR_ID);
-        if (savedInstanceState != null) {
-            carId = savedInstanceState.getLong(STATE_CURRENT_CAR, carId);
-        }
-
         if (carId != 0) {
             mCar = Car.load(Car.class, carId);
         }
@@ -145,7 +136,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
         }
 
         setCurrentPosition(position);
-        mDataListCallback.onItemSelected(getExtraEdit(), getListAdapter().getItemId(position));
+        mDataListCallback.onItemSelected(getExtraEdit(), id);
     }
 
     @Override
@@ -159,7 +150,6 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(STATE_CURRENT_ITEM, mCar.id);
         outState.putInt(STATE_CURRENT_ITEM, mCurrentItem);
     }
 
@@ -223,7 +213,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
         private final int[] fields = {R.id.title, R.id.subtitle, R.id.date,
                 R.id.data1, R.id.data1_calculated, R.id.data2,
                 R.id.data2_calculated, R.id.data3, R.id.data3_calculated};
-        private List<T> mItems = new ArrayList<T>();
+        private List<T> mItems = new ArrayList<>();
 
         @Override
         public int getCount() {

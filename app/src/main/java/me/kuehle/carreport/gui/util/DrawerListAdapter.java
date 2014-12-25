@@ -34,24 +34,9 @@ public class DrawerListAdapter extends BaseAdapter {
     private Context mContext;
     private DrawerListItem[] mItems;
 
-    public DrawerListAdapter(Context context, DrawerListItem[] items){
+    public DrawerListAdapter(Context context, DrawerListItem[] items) {
         mContext = context;
         mItems = items;
-    }
-
-    public DrawerListAdapter(Context context, String[] items, int[] relatedIcons){
-        mContext = context;
-
-        mItems = new DrawerListItem[items.length];
-        for (int i = 0; i < items.length; i++) {
-            if(items[i] == null || items[i].isEmpty()) {
-                mItems[i] = new DrawerListItem();
-            } else if (i >= relatedIcons.length) {
-                mItems[i] = new DrawerListItem(items[i]);
-            } else {
-                mItems[i] = new DrawerListItem(items[i], relatedIcons[i]);
-            }
-        }
     }
 
     @Override
@@ -114,6 +99,11 @@ public class DrawerListAdapter extends BaseAdapter {
     @Override
     public boolean isEnabled(int position) {
         return getItemViewType(position) != VIEW_TYPE_SEPARATOR;
+    }
+
+    public void setItems(DrawerListItem[] items) {
+        mItems = items;
+        notifyDataSetChanged();
     }
 
     private int getViewTypeLayout(int viewType) {
