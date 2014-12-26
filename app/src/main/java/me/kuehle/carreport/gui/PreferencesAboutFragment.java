@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class PreferencesAboutFragment extends Fragment {
@@ -42,38 +43,46 @@ public class PreferencesAboutFragment extends Fragment {
 
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			TextView view = new TextView(getActivity());
-			view.setMovementMethod(LinkMovementMethod.getInstance());
-			view.setPadding(16, 16, 16, 16);
+            ScrollView v = new ScrollView(getActivity());
+            v.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            v.setPadding(16, 16, 16, 16);
+
+			TextView text = new TextView(getActivity());
+			text.setMovementMethod(LinkMovementMethod.getInstance());
 			try {
 				InputStream in = getActivity().getAssets().open(
 						"licenses.html");
 				byte[] buffer = new byte[in.available()];
 				in.read(buffer);
 				in.close();
-				view.setText(Html.fromHtml(new String(buffer)));
+				text.setText(Html.fromHtml(new String(buffer)));
 			} catch (IOException e) {
 			}
 
+            v.addView(text, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+
 			return new AlertDialog.Builder(getActivity())
 					.setTitle(R.string.alert_about_licenses_title)
-					.setView(view)
-					.setPositiveButton(android.R.string.ok, null).create();
+					.setView(v)
+					.setPositiveButton(android.R.string.ok, null)
+                    .create();
 		}
 	}
 
 	private View.OnClickListener licensesOnClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			LicenseDialogFragment.newInstance().show(getFragmentManager(),
-					null);
+			LicenseDialogFragment.newInstance().show(getFragmentManager(), null);
 		}
 	};
 
 	public String getVersion() {
 		try {
-			return getActivity().getPackageManager().getPackageInfo(
-					getActivity().getPackageName(), 0).versionName;
+			return getActivity().getPackageManager()
+                    .getPackageInfo(getActivity().getPackageName(), 0)
+                    .versionName;
 		} catch (NameNotFoundException e) {
 			return "";
 		}
@@ -82,14 +91,11 @@ public class PreferencesAboutFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View root = inflater.inflate(R.layout.fragment_prefs_about,
-				container, false);
+		View root = inflater.inflate(R.layout.fragment_prefs_about, container, false);
 
 		String strVersion = getString(R.string.about_version, getVersion());
-		((TextView) root.findViewById(R.id.txt_version))
-				.setText(strVersion);
-		((Button) root.findViewById(R.id.btn_licenses))
-				.setOnClickListener(licensesOnClickListener);
+		((TextView) root.findViewById(R.id.txt_version)).setText(strVersion);
+		root.findViewById(R.id.btn_licenses).setOnClickListener(licensesOnClickListener);
 
 		return root;
 	}

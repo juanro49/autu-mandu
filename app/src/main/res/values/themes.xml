@@ -19,6 +19,13 @@
     <style name="AppTheme" parent="Theme.AppCompat">
         <item name="detailsElementLayoutWidth">match_parent</item>
         <item name="detailsElementBackground">@android:color/transparent</item>
+
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/primary_text</item>
+        <item name="colorControlActivated">@color/accent</item>
+        <item name="colorControlHighlight">@color/ripple</item>
     </style>
 
     <style name="AppTheme.Preferences" parent="android:Theme.DeviceDefault">
@@ -32,7 +39,6 @@
 
     <style name="AppWidget.Toolbar" parent="@style/Widget.AppCompat.Toolbar">
         <item name="android:background">?attr/colorPrimary</item>
-        <!--<item name="android:navigationIcon">?attr/homeAsUpIndicator</item>-->
         <item name="navigationIcon">?attr/homeAsUpIndicator</item>
     </style>
 

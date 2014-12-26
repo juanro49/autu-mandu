@@ -20,8 +20,7 @@
     android:layout_height="match_parent">
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#1a1a1a" >
+        android:layout_height="match_parent" >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,8 +50,9 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_add"
         android:onClick="onFABClicked"
-        fab:fab_colorNormal="@color/fab_normal"
-        fab:fab_colorPressed="@color/fab_pressed" />
+        fab:fab_colorNormal="@color/button_accent"
+        fab:fab_colorPressed="@color/button_accent_pressed"
+        fab:fab_colorRipple="@color/ripple" />
 
     <FrameLayout
         android:id="@+id/full_screen_chart_holder"

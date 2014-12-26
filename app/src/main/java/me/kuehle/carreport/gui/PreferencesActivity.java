@@ -37,17 +37,17 @@ public class PreferencesActivity extends PreferenceActivity {
 	}
 
 	@Override
-	public void onBuildHeaders(List<Header> target) {
-		loadHeadersFromResource(R.xml.preference_headers, target);
-	}
-
-	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 	}
+
+    @Override
+    public void onBuildHeaders(List<Header> target) {
+        loadHeadersFromResource(R.xml.preference_headers, target);
+    }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

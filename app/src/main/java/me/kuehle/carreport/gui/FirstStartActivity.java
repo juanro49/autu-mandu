@@ -22,6 +22,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.db.Car;
 
 public class FirstStartActivity extends ActionBarActivity {
     @Override
@@ -32,14 +33,26 @@ public class FirstStartActivity extends ActionBarActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        setResult(resultCode);
-        finish();
+        if (Car.getCount() > 0) {
+            setResult(RESULT_OK);
+            finish();
+        }
     }
 
-    public void startByCreatingCar(View v) {
+    public void onCreateCarClick(View v) {
         Intent intent = new Intent(this, DataDetailActivity.class);
         intent.putExtra(DataDetailActivity.EXTRA_EDIT, DataDetailActivity.EXTRA_EDIT_CAR);
         intent.putExtra(AbstractDataDetailFragment.EXTRA_ALLOW_CANCEL, false);
+
+        startActivityForResult(intent, 0);
+    }
+
+    public void onSetupSyncClick(View v) {
+        Intent intent = new Intent(this, PreferencesActivity.class);
+        intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT,
+                PreferencesBackupFragment.class.getName());
+        intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT_TITLE,
+                R.string.pref_title_header_backup);
 
         startActivityForResult(intent, 0);
     }

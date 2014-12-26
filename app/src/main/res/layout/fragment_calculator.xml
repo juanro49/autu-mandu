@@ -84,7 +84,8 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_add"
         android:onClick="onFABClicked"
-        fab:fab_colorNormal="@color/fab_normal"
-        fab:fab_colorPressed="@color/fab_pressed" />
+        fab:fab_colorNormal="@color/button_accent"
+        fab:fab_colorPressed="@color/button_accent_pressed"
+        fab:fab_colorRipple="@color/ripple" />
 
 </FrameLayout>

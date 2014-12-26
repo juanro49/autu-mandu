@@ -223,7 +223,8 @@
     <string name="first_start_step2_text">Füge Tankfüllungen hinzu.</string>
     <string name="first_start_step3_img_desc">Dritter Schritt</string>
     <string name="first_start_step3_text">Nach zwei Tankfüllungen solltest du die ersten Graphen sehen.</string>
-    <string name="first_start_create_car">Erstelle ein Auto</string>
+    <string name="first_start_create_car">Auto erstellen</string>
+    <string name="first_start_setup_sync">Synchronisation einrichten</string>
 
     <string name="calc_option_volume_to_distance">Volumen (%1$s) nach Strecke (%2$s)</string>
     <string name="calc_option_distance_to_volume">Strecke (%1$s) nach Volumen (%2$s)</string>

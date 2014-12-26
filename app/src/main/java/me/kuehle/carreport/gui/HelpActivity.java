@@ -51,17 +51,6 @@ public class HelpActivity extends PreferenceActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     public void setContentView(int layoutResID) {
         ViewGroup contentView = (ViewGroup) LayoutInflater.from(this).inflate(
                 R.layout.activity_help, new LinearLayout(this), false);
@@ -93,9 +82,9 @@ public class HelpActivity extends PreferenceActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            TextView v = (TextView) inflater.inflate(R.layout.fragment_help_detail, container,
-                    false);
-            v.setMovementMethod(LinkMovementMethod.getInstance());
+            View v = inflater.inflate(R.layout.fragment_help_detail, container, false);
+            TextView text = (TextView) v.findViewById(android.R.id.text1);
+            text.setMovementMethod(LinkMovementMethod.getInstance());
 
             try {
                 InputStream in = getActivity().getAssets().open(
@@ -103,7 +92,8 @@ public class HelpActivity extends PreferenceActivity {
                 byte[] buffer = new byte[in.available()];
                 in.read(buffer);
                 in.close();
-                v.setText(Html.fromHtml(new String(buffer)));
+
+                text.setText(Html.fromHtml(new String(buffer)));
             } catch (IOException e) {
             }
 

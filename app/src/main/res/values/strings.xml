@@ -225,6 +225,7 @@
     <string name="first_start_step3_img_desc">Third step</string>
     <string name="first_start_step3_text">After two refuelings you should see the first graphs.</string>
     <string name="first_start_create_car">Create a car</string>
+    <string name="first_start_setup_sync">Setup synchronization</string>
     
     <string name="calc_option_volume_to_distance">Volume (%1$s) to Distance (%2$s)</string>
     <string name="calc_option_distance_to_volume">Distance (%1$s) to Volume (%2$s)</string>
