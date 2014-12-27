@@ -16,24 +16,14 @@
 -->
 <resources>
     
-    <style name="section_header" parent="android:Widget.Holo.TextView">
+    <style name="section_header" parent="android:Widget.DeviceDefault.TextView">
         <item name="android:drawableBottom">@drawable/section_header</item>
         <item name="android:drawablePadding">4dp</item>
         <item name="android:layout_marginTop">8dp</item>
         <item name="android:paddingLeft">4dp</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:textColor">@android:color/holo_blue_dark</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="edit_title" parent="android:Widget.Holo.EditText">
-        <item name="android:background">@android:color/holo_blue_dark</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-        <item name="android:textColor">@android:color/primary_text_dark</item>
-        <item name="android:textColorHint">@android:color/darker_gray</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>

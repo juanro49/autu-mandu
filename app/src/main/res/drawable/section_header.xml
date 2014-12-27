@@ -21,6 +21,6 @@
         android:height="2dp"
         android:width="2000dp" />
 
-    <solid android:color="@android:color/holo_blue_dark" />
+    <solid android:color="?attr/colorPrimary" />
 
 </shape>

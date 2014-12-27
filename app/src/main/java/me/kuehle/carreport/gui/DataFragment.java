@@ -147,8 +147,11 @@ public class DataFragment extends Fragment implements DataListCallback,
         ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
         mPager.setAdapter(new DataListPagerAdapter(getChildFragmentManager()));
         mPager.setOnPageChangeListener(new DataListOnPageChangeListener());
+
         PagerTabStrip tabs = (PagerTabStrip) v.findViewById(R.id.pager_tab_strip);
-        tabs.setTabIndicatorColorResource(android.R.color.holo_blue_dark);
+        tabs.setBackgroundResource(R.color.primary);
+        tabs.setTabIndicatorColorResource(R.color.accent);
+        tabs.setDrawFullUnderline(true);
 
         mTxtNoEntrySelected = (TextView) v.findViewById(R.id.txt_no_entry_selected);
         if (getChildFragmentManager().findFragmentById(R.id.detail) != null) {

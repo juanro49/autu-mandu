@@ -75,8 +75,7 @@
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:singleLine="true"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/primary_text_dark" />
+                android:textAppearance="?android:attr/textAppearanceSmallInverse" />
             <TextView
                 android:id="@+id/data2_calculated"
                 android:layout_width="wrap_content"
@@ -88,8 +87,7 @@
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:singleLine="true"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/primary_text_dark" />
+                android:textAppearance="?android:attr/textAppearanceSmallInverse" />
             <TextView
                 android:id="@+id/data3_calculated"
                 android:layout_width="wrap_content"
@@ -101,8 +99,7 @@
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:singleLine="true"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/primary_text_dark" />
+                android:textAppearance="?android:attr/textAppearanceSmallInverse" />
             <TextView
                 android:id="@+id/data1"
                 android:layout_width="wrap_content"
@@ -135,5 +132,5 @@
         android:layout_height="wrap_content"
         android:text="@string/invalid_data"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/holo_red_dark" />
+        android:textColor="@color/error_text" />
 </LinearLayout>

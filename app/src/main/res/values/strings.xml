@@ -238,7 +238,7 @@
     <string name="distance_entry_mode_total">Total distance</string>
     <string name="distance_entry_mode_show_selector">Show selector</string>
     <string name="missing_refueling">Missing refueling</string>
-    <string name="invalid_data">This entry contains invalid data. Edit and save it so see detailed errors.</string>
+    <string name="invalid_data">This entry contains invalid data. Edit and save it to see detailed errors.</string>
     <string name="graph_details_desc">Graph details</string>
     <string name="graph_options_desc">Graph options</string>
     <string name="graph_close_full_screen_desc">Close full screen graph</string>
