@@ -127,9 +127,7 @@ public class Preferences {
     }
 
     public int getUnitFuelConsumption() {
-        int id = Integer
-                .parseInt(prefs.getString("unit_fuel_consumption", "0"));
-        return id;
+        return Integer.parseInt(prefs.getString("unit_fuel_consumption", "0"));
     }
 
     public boolean isAutoGuessMissingDataEnabled() {

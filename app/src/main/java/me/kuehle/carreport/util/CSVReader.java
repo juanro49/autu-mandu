@@ -55,7 +55,6 @@ public class CSVReader {
 				data.append(line).append(NEW_LINE);
 			}
 			in.close();
-		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
 		}
 

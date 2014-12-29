@@ -36,6 +36,7 @@ public class DrawerListItem {
     /**
      * Creates a secondary item with the specified title.
      * @param text
+     * @param intent
      */
     public DrawerListItem(CharSequence text, Intent intent) {
         mText = text;
@@ -46,6 +47,7 @@ public class DrawerListItem {
      * Creates a primary item with the specified title and icon.
      * @param text
      * @param icon
+     * @param fragment
      */
     public DrawerListItem(CharSequence text, int icon, Fragment fragment) {
         mText = text;

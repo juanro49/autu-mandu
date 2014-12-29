@@ -71,8 +71,21 @@ public class Car extends Model {
 	}
 
 	public static List<Car> getAll() {
-		return new Select().from(Car.class).orderBy("name ASC").execute();
+		return new Select().from(Car.class)
+                .orderBy("name ASC")
+                .execute();
 	}
+
+    /**
+     * Gets all cars, which are not suspended.
+     * @return All not suspended cars.
+     */
+    public static List<Car> getAllActive() {
+        return new Select().from(Car.class)
+                .where("suspended_since IS NULL")
+                .orderBy("name ASC")
+                .execute();
+    }
 
 	public static int getCount() {
 		String sql = new Select("COUNT(*)").from(Car.class).toSql();

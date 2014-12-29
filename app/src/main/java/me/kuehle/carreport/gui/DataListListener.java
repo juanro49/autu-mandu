@@ -16,8 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import me.kuehle.carreport.db.Car;
-
 public interface DataListListener {
     void unselectItem();
 

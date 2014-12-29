@@ -92,8 +92,9 @@ public class PreferencesCarsFragment extends ListFragment implements
 			} else {
 				holder.suspended.setVisibility(View.GONE);
 			}
-			((GradientDrawable) holder.color.getBackground()).setColorFilter(
-					cars.get(position).color, PorterDuff.Mode.SRC);
+
+			holder.color.getBackground().setColorFilter(cars.get(position).color,
+                    PorterDuff.Mode.SRC);
 			return convertView;
 		}
 	}

@@ -154,14 +154,11 @@ public abstract class AbstractReport {
 			Constructor<? extends AbstractReport> constructor = reportClass
 					.getConstructor(Context.class);
 			return constructor.newInstance(context);
-		} catch (NoSuchMethodException e) {
-		} catch (IllegalArgumentException e) {
-		} catch (InstantiationException e) {
-		} catch (IllegalAccessException e) {
-		} catch (InvocationTargetException e) {
+		} catch (NoSuchMethodException | IllegalArgumentException | InstantiationException |
+                InvocationTargetException | IllegalAccessException e) {
 		}
 
-		return null;
+        return null;
 	}
 
 	protected Context context;

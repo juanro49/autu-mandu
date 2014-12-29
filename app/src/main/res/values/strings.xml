@@ -23,7 +23,6 @@
     <string name="about_licenses">Licenses</string>
 
     <string name="drawer_reports">Reports</string>
-    <string name="drawer_data">Data</string>
     <string name="drawer_calculator">Calculator</string>
     <string name="drawer_settings">Settings</string>
     <string name="drawer_help">Help</string>

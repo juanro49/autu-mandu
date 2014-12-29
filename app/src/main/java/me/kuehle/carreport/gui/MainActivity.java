@@ -213,12 +213,7 @@ public class MainActivity extends ActionBarActivity implements
 		MenuItem item = menu.findItem(R.id.menu_add_other);
         if (item != null) {
             Preferences prefs = new Preferences(this);
-            List<Car> cars = Car.getAll();
-            for (int i = cars.size() - 1; i >= 0; i--) {
-                if (cars.get(i).isSuspended()) {
-                    cars.remove(i);
-                }
-            }
+            List<Car> cars = Car.getAllActive();
 
             SubMenu subMenu = item.getSubMenu();
             subMenu.clear();
@@ -266,12 +261,7 @@ public class MainActivity extends ActionBarActivity implements
 
     public void onFABClicked(View fab) {
         Preferences prefs = new Preferences(this);
-        List<Car> cars = Car.getAll();
-        for (int i = cars.size() - 1; i >= 0; i--) {
-            if (cars.get(i).isSuspended()) {
-                cars.remove(i);
-            }
-        }
+        List<Car> cars = Car.getAllActive();
 
         if (cars.size() == 1 || !prefs.isShowCarMenu()) {
             Intent intent = getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_REFUELING,
