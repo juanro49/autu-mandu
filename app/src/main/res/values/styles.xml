@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 <resources>
-    
+
     <style name="section_header" parent="android:Widget.DeviceDefault.TextView">
         <item name="android:drawableBottom">@drawable/section_header</item>
         <item name="android:drawablePadding">4dp</item>
@@ -24,6 +24,18 @@
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="AppWidget.SectionHeader" parent="android:Widget.DeviceDefault.TextView">
+        <item name="android:layout_marginTop">32dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+
+    <style name="AppWidget.FloatingSpinnerLabel" parent="android:Widget.DeviceDefault.TextView">
+        <item name="android:textColor">?android:attr/textColorHint</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:translationY">8dp</item>
     </style>
 
 </resources>

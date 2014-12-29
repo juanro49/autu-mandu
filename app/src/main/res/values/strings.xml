@@ -31,7 +31,6 @@
     <string name="drawer_close">Close navigation</string>
 
     <string name="menu_synchronize">Synchronize</string>
-    <string name="menu_add_refueling">Add refueling</string>
     <string name="menu_add_other">Add other</string>
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
@@ -40,12 +39,10 @@
     <string name="menu_add_fuel_type">Add fuel type</string>
     <string name="menu_show_trend">Show trend</string>
     <string name="menu_show_overall_trend">Show overall trend</string>
-    
-    <string name="section_car">Car</string>
-    <string name="section_note">Note</string>
+
     <string name="section_fuel_tanks">Fuel tanks</string>
     <string name="section_suspend">Suspend</string>
-    <string name="section_recurrence">Recurrence</string>
+    <string name="section_advanced">Advanced options</string>
     
     <string name="hint_mileage_optional">Total distance (optional)</string>
     <string name="hint_volume">Volume</string>
@@ -55,6 +52,9 @@
     <string name="hint_name">Name</string>
     <string name="hint_tank">Tank</string>
     <string name="hint_select_fuel_type">Select fuel type</string>
+    <string name="hint_date">Date</string>
+    <string name="hint_time">Time</string>
+    <string name="hint_end_date">End date</string>
     
     <string name="label_partial">Partial</string>
     <string name="label_color">Color</string>
@@ -62,6 +62,8 @@
     <string name="label_add">Add</string>
     <string name="label_add_dialog">Add…</string>
     <string name="label_set_end_date">Set end date</string>
+    <string name="label_car">Car</string>
+    <string name="label_recurrence">Recurrence</string>
     
     <string name="validate_error_greater_zero">Has to be greater 0</string>
     <string name="validate_error_not_empty">Must not be empty</string>

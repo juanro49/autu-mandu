@@ -31,7 +31,6 @@
     <string name="drawer_close">Navigation schließen</string>
 
     <string name="menu_synchronize">Synchronisieren</string>
-    <string name="menu_add_refueling">Tankfüllung hinzufügen</string>
     <string name="menu_add_other">Andere Kosten hinzufügen</string>
     <string name="menu_save">Fertig</string>
     <string name="menu_cancel">Abbrechen</string>
@@ -40,12 +39,10 @@
     <string name="menu_add_fuel_type">Kraftstoff hinzufügen</string>
     <string name="menu_show_trend">Trend anzeigen</string>
     <string name="menu_show_overall_trend">Gesamttrend anzeigen</string>
-    
-    <string name="section_car">Auto</string>
-    <string name="section_note">Notiz</string>
+
     <string name="section_fuel_tanks">Kraftstofftanks</string>
     <string name="section_suspend">Stilllegen</string>
-    <string name="section_recurrence">Wiederholung</string>
+    <string name="section_advanced">Erweiterte Optionen</string>
 
     <string name="hint_mileage_optional">Gesamtkilometer (optional)</string>
     <string name="hint_volume">Volumen</string>
@@ -55,6 +52,9 @@
     <string name="hint_name">Name</string>
     <string name="hint_tank">Tank</string>
     <string name="hint_select_fuel_type">Kraftstoff auswählen</string>
+    <string name="hint_date">Datum</string>
+    <string name="hint_time">Uhrzeit</string>
+    <string name="hint_end_date">Enddatum</string>
 
     <string name="label_partial">Teilfüllung</string>
     <string name="label_color">Farbe</string>
@@ -62,6 +62,8 @@
     <string name="label_add">Hinzufügen</string>
     <string name="label_add_dialog">Hinzufügen…</string>
     <string name="label_set_end_date">Enddatum setzen</string>
+    <string name="label_car">Auto</string>
+    <string name="label_recurrence">Wiederholung</string>
 
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>

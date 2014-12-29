@@ -37,6 +37,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -209,42 +210,29 @@ public class MainActivity extends ActionBarActivity implements
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		// TODO: If the navigation drawer is open, hide action items related to the content view.
-		// boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-		// menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
+		MenuItem item = menu.findItem(R.id.menu_add_other);
+        if (item != null) {
+            Preferences prefs = new Preferences(this);
+            List<Car> cars = Car.getAll();
+            for (int i = cars.size() - 1; i >= 0; i--) {
+                if (cars.get(i).isSuspended()) {
+                    cars.remove(i);
+                }
+            }
 
-		// Show available cars in submenu of "Add refueling" and "Add other cost" option, if the
-		// setting is enabled.
-		Preferences prefs = new Preferences(this);
-		List<Car> cars = Car.getAll();
-		for (int i = cars.size() - 1; i >= 0; i--) {
-			if (cars.get(i).isSuspended()) {
-				cars.remove(i);
-			}
-		}
-
-		MenuItem[] items = { menu.findItem(R.id.menu_add_refueling),
-				menu.findItem(R.id.menu_add_other) };
-		int extraEdit[] = { DataDetailActivity.EXTRA_EDIT_REFUELING,
-				DataDetailActivity.EXTRA_EDIT_OTHER };
-
-		for (int i = 0; i < items.length; i++) {
-			if (items[i] == null) {
-				continue;
-			}
-
-			SubMenu subMenu = items[i].getSubMenu();
-			subMenu.clear();
-
-			if (cars.size() == 1 || !prefs.isShowCarMenu()) {
-				items[i].setIntent(getDetailActivityIntent(extraEdit[i], prefs.getDefaultCar()));
-			} else {
-				items[i].setIntent(null);
-				for (Car car : cars) {
-					subMenu.add(car.name).setIntent(getDetailActivityIntent(extraEdit[i], car.id));
-				}
-			}
-		}
+            SubMenu subMenu = item.getSubMenu();
+            subMenu.clear();
+            if (cars.size() == 1 || !prefs.isShowCarMenu()) {
+                item.setIntent(getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_OTHER,
+                        prefs.getDefaultCar()));
+            } else {
+                item.setIntent(null);
+                for (Car car : cars) {
+                    subMenu.add(car.name).setIntent(getDetailActivityIntent(
+                            DataDetailActivity.EXTRA_EDIT_OTHER, car.id));
+                }
+            }
+        }
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -278,10 +266,35 @@ public class MainActivity extends ActionBarActivity implements
 
     public void onFABClicked(View fab) {
         Preferences prefs = new Preferences(this);
+        List<Car> cars = Car.getAll();
+        for (int i = cars.size() - 1; i >= 0; i--) {
+            if (cars.get(i).isSuspended()) {
+                cars.remove(i);
+            }
+        }
 
-        Intent intent = getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_REFUELING,
-                prefs.getDefaultCar());
-        startActivityForResult(intent, REQUEST_ADD_DATA);
+        if (cars.size() == 1 || !prefs.isShowCarMenu()) {
+            Intent intent = getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_REFUELING,
+                    prefs.getDefaultCar());
+            startActivityForResult(intent, REQUEST_ADD_DATA);
+        } else {
+            PopupMenu popup = new PopupMenu(this, fab);
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    startActivityForResult(menuItem.getIntent(), REQUEST_ADD_DATA);
+                    return true;
+                }
+            });
+
+            Menu menu = popup.getMenu();
+            for (Car car : cars) {
+                menu.add(car.name).setIntent(getDetailActivityIntent(
+                        DataDetailActivity.EXTRA_EDIT_REFUELING, car.id));
+            }
+
+            popup.show();
+        }
     }
 
     @Override

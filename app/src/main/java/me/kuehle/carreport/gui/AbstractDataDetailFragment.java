@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,10 +30,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.activeandroid.Model;
-
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
@@ -63,7 +59,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     private static final int DELETE_REQUEST_CODE = 0;
 
     private CharSequence savedABTitle;
-    private int savedABNavMode;
     private boolean allowCancel;
 
     @Override
@@ -73,15 +68,11 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         actionBar.setDisplayHomeAsUpEnabled(allowCancel);
 
         savedABTitle = actionBar.getTitle();
-        savedABNavMode = actionBar.getNavigationMode();
-
         if (isInEditMode()) {
             actionBar.setTitle(getTitleForEdit());
         } else {
             actionBar.setTitle(getTitleForNew());
         }
-
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
     }
 
     @Override
@@ -141,7 +132,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         super.onDestroyView();
         ActionBar actionBar = MainActivity.getSupportActionBar(this);
         actionBar.setTitle(savedABTitle);
-        actionBar.setNavigationMode(savedABNavMode);
     }
 
     @Override
@@ -189,31 +179,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         }
     }
 
-    protected abstract void fillFields(Bundle savedInstanceState, View v);
-
-    protected abstract int getAlertDeleteMessage();
-
-    protected Date getDate(EditText edt) {
-        try {
-            return DateFormat.getDateFormat(getActivity()).parse(edt.getText().toString());
-        } catch (ParseException e) {
-            return new Date();
-        }
-    }
-
-    protected Date getDateTime(Date date, Date time) {
-        Calendar calTime = Calendar.getInstance();
-        calTime.setTime(time);
-
-        Calendar calDateTime = Calendar.getInstance();
-        calDateTime.setTime(date);
-        calDateTime.set(Calendar.HOUR_OF_DAY, calTime.get(Calendar.HOUR_OF_DAY));
-        calDateTime.set(Calendar.MINUTE, calTime.get(Calendar.MINUTE));
-        calDateTime.set(Calendar.SECOND, calTime.get(Calendar.SECOND));
-
-        return calDateTime.getTime();
-    }
-
     protected double getDoubleFromEditText(EditText editText, double defaultValue) {
         String strDouble = editText.getText().toString();
         try {
@@ -222,8 +187,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
             return defaultValue;
         }
     }
-
-    protected abstract Model getEditItem(long id);
 
     protected int getIntegerFromEditText(EditText editText, int defaultValue) {
         String strInt = editText.getText().toString();
@@ -234,16 +197,27 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         }
     }
 
-    protected abstract int getLayout();
+    protected boolean isInEditMode() {
+        return editItem != null;
+    }
 
-    protected Date getTime(EditText edt) {
-        try {
-            return DateFormat.getTimeFormat(getActivity()).parse(
-                    edt.getText().toString());
-        } catch (ParseException e) {
-            return new Date();
+    protected void addUnitToHint(EditText editText, CharSequence unit) {
+        CharSequence hint = editText.getHint();
+        CharSequence newHint = String.format("%s [%s]", hint, unit);
+
+        editText.setHint(newHint);
+        if (editText instanceof MaterialEditText) {
+            ((MaterialEditText)editText).setFloatingLabelText(newHint);
         }
     }
+
+    protected abstract void fillFields(Bundle savedInstanceState, View v);
+
+    protected abstract int getAlertDeleteMessage();
+
+    protected abstract Model getEditItem(long id);
+
+    protected abstract int getLayout();
 
     protected abstract int getTitleForEdit();
 
@@ -254,10 +228,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     protected abstract int getToastSavedMessage();
 
     protected abstract void initFields(Bundle savedInstanceState, View v);
-
-    protected boolean isInEditMode() {
-        return editItem != null;
-    }
 
     protected abstract void save();
 

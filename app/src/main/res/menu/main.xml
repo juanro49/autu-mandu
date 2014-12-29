@@ -25,13 +25,6 @@
         tools:ignore="AlwaysShowAction">
     </item>
     <item
-        android:id="@+id/menu_add_refueling"
-        android:icon="@drawable/ic_add"
-        app:showAsAction="always"
-        android:title="@string/menu_add_refueling">
-        <menu></menu>
-    </item>
-    <item
         android:id="@+id/menu_add_other"
         android:icon="@drawable/ic_add"
         app:showAsAction="never"

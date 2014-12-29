@@ -220,14 +220,6 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 	}
 
 	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		ActionBar actionBar = MainActivity.getSupportActionBar(this);
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setListNavigationCallbacks(null, null);
-	}
-
-	@Override
 	public boolean onMenuItemClick(MenuItem item) {
 		if (item.getItemId() == R.id.menu_show_trend) {
 			mCurrentMenuReport.setShowTrend(!item.isChecked());
@@ -288,26 +280,21 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 	}
 
 	private void loadGraphSettings(AbstractReport report) {
-		SharedPreferences prefs = getActivity().getSharedPreferences(
-				getClass().getName(), Context.MODE_PRIVATE);
+		SharedPreferences prefs = getActivity().getSharedPreferences(getClass().getName(),
+                Context.MODE_PRIVATE);
 		String reportName = report.getClass().getSimpleName();
 		report.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
-		report.setShowOverallTrend(prefs.getBoolean(reportName
-				+ "_show_overall_trend", false));
-		report.setChartOption(prefs.getInt(
-				reportName + "_current_chart_option", 0));
+		report.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
+		report.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
 	}
 
 	private void saveGraphSettings(AbstractReport report) {
-		SharedPreferences.Editor prefsEdit = getActivity()
-				.getSharedPreferences(getClass().getName(),
-						Context.MODE_PRIVATE).edit();
+		SharedPreferences.Editor prefsEdit = getActivity().getSharedPreferences(
+                getClass().getName(), Context.MODE_PRIVATE).edit();
 		String reportName = report.getClass().getSimpleName();
 		prefsEdit.putBoolean(reportName + "_show_trend", report.isShowTrend());
-		prefsEdit.putBoolean(reportName + "_show_overall_trend",
-				report.isShowOverallTrend());
-		prefsEdit.putInt(reportName + "_current_chart_option",
-				report.getChartOption());
+		prefsEdit.putBoolean(reportName + "_show_overall_trend", report.isShowOverallTrend());
+		prefsEdit.putInt(reportName + "_current_chart_option", report.getChartOption());
 		prefsEdit.apply();
 	}
 
@@ -403,8 +390,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
 	private void showReportOptions(AbstractReport report, View v) {
 		mCurrentMenuReport = report;
-		mCurrentMenuReportView = (ViewGroup) v.getParent().getParent()
-				.getParent();
+		mCurrentMenuReportView = (ViewGroup) v.getParent().getParent().getParent();
 
 		PopupMenu popup = new PopupMenu(getActivity(), v);
 		popup.inflate(R.menu.report_options);
@@ -412,8 +398,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
 		Menu menu = popup.getMenu();
 		menu.findItem(R.id.menu_show_trend).setChecked(report.isShowTrend());
-		menu.findItem(R.id.menu_show_overall_trend).setChecked(
-				report.isShowOverallTrend());
+		menu.findItem(R.id.menu_show_overall_trend).setChecked(report.isShowOverallTrend());
 
 		int[] graphOptions = report.getAvailableChartOptions();
 		if (graphOptions.length >= 2) {

@@ -48,21 +48,25 @@ public class SimpleAnimator {
 		this(context, view, property, -1);
 	}
 
-	public SimpleAnimator(Context context, View view, Property property,
-			int duration) {
+	public SimpleAnimator(Context context, View view, Property property, int duration) {
 		this.context = context;
 		this.view = view;
 		this.property = property;
 		this.duration = duration;
 
-		origWeight = ((LinearLayout.LayoutParams) view.getLayoutParams()).weight;
-		origHeight = view.getLayoutParams().height;
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (params instanceof LinearLayout.LayoutParams) {
+            origWeight = ((LinearLayout.LayoutParams) params).weight;
+        } else if (property == Property.Weight) {
+            throw new IllegalArgumentException("You can only animate weight property in linear " +
+                    "layouts.");
+        }
+
+		origHeight = params.height;
 		if (origHeight == ViewGroup.LayoutParams.WRAP_CONTENT
 				|| origHeight == ViewGroup.LayoutParams.MATCH_PARENT) {
-			int widthSpec = MeasureSpec.makeMeasureSpec(
-					view.getLayoutParams().width, MeasureSpec.EXACTLY);
-			int heightSpec = MeasureSpec.makeMeasureSpec(
-					view.getLayoutParams().height, MeasureSpec.EXACTLY);
+			int widthSpec = MeasureSpec.makeMeasureSpec(params.width, MeasureSpec.EXACTLY);
+			int heightSpec = MeasureSpec.makeMeasureSpec(params.height, MeasureSpec.EXACTLY);
 			view.measure(widthSpec, heightSpec);
 			origHeightMeasured = view.getMeasuredHeight();
 		}
@@ -73,11 +77,9 @@ public class SimpleAnimator {
 	}
 
 	public void show(Runnable onStart, Runnable onEnd) {
-		AnimatorSet animator = (AnimatorSet) createAnimator(R.animator.show,
-				onStart, onEnd);
+		AnimatorSet animator = (AnimatorSet) createAnimator(R.animator.show, onStart, onEnd);
 
-		ValueAnimator valueAnimator = (ValueAnimator) animator
-				.getChildAnimations().get(0);
+		ValueAnimator valueAnimator = (ValueAnimator) animator.getChildAnimations().get(0);
 		if (property == Property.Height) {
 			int from = view.getLayoutParams().height;
 			int to = origHeight;
@@ -95,8 +97,7 @@ public class SimpleAnimator {
 
 			applyHeightUpdater(valueAnimator, from, to);
 		} else {
-			float curWeight = ((LinearLayout.LayoutParams) view
-					.getLayoutParams()).weight;
+			float curWeight = ((LinearLayout.LayoutParams) view.getLayoutParams()).weight;
 			applyWeightUpdater(valueAnimator, curWeight, origWeight);
 		}
 
@@ -108,11 +109,9 @@ public class SimpleAnimator {
 	}
 
 	public void hide(Runnable onStart, Runnable onEnd) {
-		AnimatorSet animator = (AnimatorSet) createAnimator(R.animator.hide,
-				onStart, onEnd);
+		AnimatorSet animator = (AnimatorSet) createAnimator(R.animator.hide, onStart, onEnd);
 
-		ValueAnimator valueAnimator = (ValueAnimator) animator
-				.getChildAnimations().get(0);
+		ValueAnimator valueAnimator = (ValueAnimator) animator.getChildAnimations().get(0);
 		if (property == Property.Height) {
 			int from = view.getLayoutParams().height;
 			if (from == ViewGroup.LayoutParams.WRAP_CONTENT
@@ -122,21 +121,20 @@ public class SimpleAnimator {
 
 			applyHeightUpdater(valueAnimator, from, 0);
 		} else {
-			float curWeight = ((LinearLayout.LayoutParams) view
-					.getLayoutParams()).weight;
+			float curWeight = ((LinearLayout.LayoutParams) view.getLayoutParams()).weight;
 			applyWeightUpdater(valueAnimator, curWeight, 0);
 		}
 
 		animator.start();
 	}
 
-	private Animator createAnimator(int animatorId, Runnable onStart,
-			Runnable onEnd) {
+	private Animator createAnimator(int animatorId, Runnable onStart, Runnable onEnd) {
 		Animator animator = AnimatorInflater.loadAnimator(context, animatorId);
 		animator.setTarget(view);
 		if (duration > 0) {
 			animator.setDuration(duration);
 		}
+
 		attachRunnable(animator, onStart, onEnd);
 		return animator;
 	}
@@ -154,8 +152,7 @@ public class SimpleAnimator {
 	}
 
 	private void applyWeightUpdater(ValueAnimator animator, float from, float to) {
-		animator.setValues(PropertyValuesHolder
-				.ofFloat((String) null, from, to));
+		animator.setValues(PropertyValuesHolder.ofFloat((String) null, from, to));
 		animator.addUpdateListener(new AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
@@ -166,8 +163,7 @@ public class SimpleAnimator {
 		});
 	}
 
-	private void attachRunnable(Animator animator, final Runnable onStart,
-			final Runnable onEnd) {
+	private void attachRunnable(Animator animator, final Runnable onStart, final Runnable onEnd) {
 		if (onStart != null || onEnd != null) {
 			animator.addListener(new AnimatorListener() {
 				@Override

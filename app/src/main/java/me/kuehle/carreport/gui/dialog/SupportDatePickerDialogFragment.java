@@ -62,8 +62,7 @@ public class SupportDatePickerDialogFragment extends DialogFragment implements
 		cal.set(Calendar.MONTH, monthOfYear);
 		cal.set(Calendar.DATE, dayOfMonth);
 
-		getListener().onDialogPositiveClick(getTargetRequestCode(),
-				cal.getTime());
+		getListener().onDialogPositiveClick(getTargetRequestCode(), cal.getTime());
 	}
 
 	private SupportDatePickerDialogFragmentListener getListener() {

@@ -21,7 +21,6 @@
     android:orientation="vertical" >
     <EditText
         android:id="@+id/edt_name"
-        style="@style/edit_title"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:hint="@string/hint_name" />

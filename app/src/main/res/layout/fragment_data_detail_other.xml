@@ -14,141 +14,122 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-    <!-- Title -->
-    <AutoCompleteTextView
-        android:id="@+id/edt_title"
-        style="@style/edit_title"
+    android:layout_margin="16dp">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="@string/hint_title" />
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="16dp" >
-        <LinearLayout
+        android:layout_height="wrap_content" >
+        <!-- Title -->
+        <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
+            android:id="@+id/edt_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
-            <!-- Date -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
-                <EditText
-                    android:id="@+id/edt_date"
-                    style="@android:style/Widget.Holo.Spinner"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="0.6"
-                    android:focusable="false"
-                    android:inputType="date" />
-                <EditText
-                    android:id="@+id/edt_time"
-                    style="@android:style/Widget.Holo.Spinner"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="0.4"
-                    android:focusable="false"
-                    android:inputType="time" />
-            </LinearLayout>
-            <!-- Mileage -->
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-                <EditText
-                    android:id="@+id/edt_mileage"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="@string/hint_mileage_optional"
-                    android:inputType="number" />
-                <TextView
-                    android:id="@+id/txt_unit_distance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginRight="8dp" />
-            </FrameLayout>
-            <!-- Price -->
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-                <EditText
-                    android:id="@+id/edt_price"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="@string/hint_price"
-                    android:inputType="number|numberDecimal" />
-                <TextView
-                    android:id="@+id/txt_unit_currency"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginRight="8dp" />
-            </FrameLayout>
-            <!-- Recurrence -->
-            <TextView
-                style="@style/section_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/section_recurrence" />
-            <Spinner
-                android:id="@+id/spn_repeat"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:entries="@array/repeat_intervals" />
-            <CheckBox
-                android:id="@+id/chk_end_date"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="@string/label_set_end_date" />
-            <LinearLayout
-                android:id="@+id/layout_end_date"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:orientation="horizontal" >
-                <EditText
-                    android:id="@+id/edt_end_date"
-                    style="@android:style/Widget.Holo.Spinner"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="0.6"
-                    android:focusable="false"
-                    android:inputType="date" />
-                <EditText
-                    android:id="@+id/edt_end_time"
-                    style="@android:style/Widget.Holo.Spinner"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="0.4"
-                    android:focusable="false"
-                    android:inputType="time" />
-            </LinearLayout>
-            <!-- Note -->
-            <TextView
-                style="@style/section_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/section_note" />
-            <EditText
-                android:id="@+id/edt_note"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="@string/hint_note_optional"
-                android:inputType="text|textMultiLine" />
-            <!-- Car -->
-            <TextView
-                style="@style/section_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/section_car" />
-            <Spinner
-                android:id="@+id/spn_car"
-                android:layout_width="match_parent"
-                android:layout_height="48dp" />
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+            android:hint="@string/hint_title"
+            app:floatingLabel="highlight" />
+        <!-- Mileage -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_mileage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_title"
+            android:hint="@string/hint_mileage_optional"
+            android:inputType="number"
+            app:floatingLabel="highlight" />
+        <!-- Price -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_mileage"
+            android:hint="@string/hint_price"
+            android:inputType="number|numberDecimal"
+            app:floatingLabel="highlight" />
+        <!-- Section: Advanced -->
+        <TextView
+            style="@style/AppWidget.SectionHeader"
+            android:id="@+id/txt_section_advanced"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_price"
+            android:text="@string/section_advanced" />
+        <!-- Date -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_section_advanced"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/edt_time"
+            android:layout_toStartOf="@+id/edt_time"
+            android:hint="@string/hint_date"
+            app:floatingLabel="highlight" />
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_time"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/edt_date"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:hint="@string/hint_time"
+            app:floatingLabel="highlight" />
+        <!-- Recurrence -->
+        <TextView
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:id="@+id/txt_label_repeat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_date"
+            android:text="@string/label_recurrence" />
+        <Spinner
+            android:id="@+id/spn_repeat"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/txt_label_repeat"
+            android:entries="@array/repeat_intervals" />
+        <CheckBox
+            android:id="@+id/chk_end_date"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/spn_repeat"
+            android:layout_marginLeft="36dp"
+            android:layout_marginStart="36dp"
+            android:text="@string/label_set_end_date" />
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_end_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/chk_end_date"
+            android:layout_marginLeft="36dp"
+            android:layout_marginStart="36dp"
+            android:hint="@string/hint_end_date"
+            app:floatingLabel="highlight" />
+        <!-- Note -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_end_date"
+            android:hint="@string/hint_note_optional"
+            android:inputType="text|textMultiLine"
+            app:floatingLabel="highlight" />
+        <!-- Car -->
+        <TextView
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:id="@+id/txt_label_car"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_note"
+            android:text="@string/label_car" />
+        <Spinner
+            android:id="@+id/spn_car"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/txt_label_car" />
+    </RelativeLayout>
+</ScrollView>
