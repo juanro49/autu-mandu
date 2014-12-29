@@ -132,9 +132,8 @@ public class PreferencesCarsFragment extends ListFragment implements
 							android.R.string.ok, null).show(
 							getFragmentManager(), null);
 				} else {
-					String message = getString(
-							R.string.alert_delete_cars_message, getListView()
-									.getCheckedItemCount());
+					String message = getString(R.string.alert_delete_cars_message,
+                            getListView().getCheckedItemCount());
 					MessageDialogFragment.newInstance(
 							PreferencesCarsFragment.this, DELETE_REQUEST_CODE,
 							R.string.alert_delete_title, message,
@@ -160,8 +159,8 @@ public class PreferencesCarsFragment extends ListFragment implements
 		}
 
 		@Override
-		public void onItemCheckedStateChanged(ActionMode mode, int position,
-				long id, boolean checked) {
+		public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                                              boolean checked) {
 			int count = getListView().getCheckedItemCount();
 			mode.setTitle(String.format(getString(R.string.cab_title_selected),
 					count));
@@ -186,8 +185,7 @@ public class PreferencesCarsFragment extends ListFragment implements
 
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			editCar(cars.get(position).id);
 		}
 	};
@@ -260,8 +258,7 @@ public class PreferencesCarsFragment extends ListFragment implements
 	private void editCar(long id) {
 		Intent intent = new Intent(getActivity(), DataDetailActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-		intent.putExtra(DataDetailActivity.EXTRA_EDIT,
-				DataDetailActivity.EXTRA_EDIT_CAR);
+		intent.putExtra(DataDetailActivity.EXTRA_EDIT, DataDetailActivity.EXTRA_EDIT_CAR);
 		intent.putExtra(AbstractDataDetailFragment.EXTRA_ID, id);
 		carEditInProgress = true;
 		startActivityForResult(intent, 0);

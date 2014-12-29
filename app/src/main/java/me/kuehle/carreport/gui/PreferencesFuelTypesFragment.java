@@ -16,14 +16,16 @@
 
 package me.kuehle.carreport.gui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.FuelType;
-import me.kuehle.carreport.gui.dialog.InputDialogFragment;
-import me.kuehle.carreport.gui.dialog.InputDialogFragment.InputDialogFragmentListener;
+import me.kuehle.carreport.gui.dialog.EditFuelTypeDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
-import me.kuehle.carreport.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
+
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
@@ -35,21 +37,20 @@ import android.view.View;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 public class PreferencesFuelTypesFragment extends ListFragment implements
-		MessageDialogFragmentListener, InputDialogFragmentListener {
-	private class FuelTypesMultiChoiceModeListener implements
-			MultiChoiceModeListener {
+        MessageDialogFragment.MessageDialogFragmentListener,
+        EditFuelTypeDialogFragment.EditFuelTypeDialogFragmentListener {
+	private class FuelTypesMultiChoiceModeListener implements MultiChoiceModeListener {
 		private ActionMode mode;
 
 		public void deleteSelectedFuelTypes() {
-			SparseBooleanArray selected = getListView()
-					.getCheckedItemPositions();
-			for (int i = 0; i < fuelTypes.size(); i++) {
+			SparseBooleanArray selected = getListView().getCheckedItemPositions();
+			for (int i = 0; i < mFuelTypes.size(); i++) {
 				if (selected.get(i)) {
-					fuelTypes.get(i).delete();
+					mFuelTypes.get(i).delete();
 				}
 			}
 		}
@@ -64,33 +65,24 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			switch (item.getItemId()) {
 			case R.id.menu_delete:
-				SparseBooleanArray selected = getListView()
-						.getCheckedItemPositions();
-				for (int i = 0; i < fuelTypes.size(); i++) {
-					FuelType type = fuelTypes.get(i);
-					if (selected.get(i)
-							&& (type.refuelings().size() > 0 || type
-									.fuelTanks().size() > 0)) {
-						MessageDialogFragment
-								.newInstance(
-										null,
-										0,
-										R.string.alert_delete_title,
-										getString(R.string.alert_cannot_delete_fuel_type),
-										android.R.string.ok, null).show(
-										getFragmentManager(), null);
+				SparseBooleanArray selected = getListView().getCheckedItemPositions();
+				for (int i = 0; i < mFuelTypes.size(); i++) {
+					FuelType type = mFuelTypes.get(i);
+					if (selected.get(i) && type.getRefuelings().size() > 0) {
+						MessageDialogFragment.newInstance(null, 0, R.string.alert_delete_title,
+                                getString(R.string.alert_cannot_delete_fuel_type),
+                                android.R.string.ok, null)
+                                .show(getFragmentManager(), null);
 						return true;
 					}
 				}
 
-				MessageDialogFragment.newInstance(
-						PreferencesFuelTypesFragment.this,
-						REQUEST_DELETE,
-						R.string.alert_delete_title,
-						getString(R.string.alert_delete_fuel_types_message,
-								getListView().getCheckedItemCount()),
-						android.R.string.yes, android.R.string.no).show(
-						getFragmentManager(), null);
+				MessageDialogFragment.newInstance(PreferencesFuelTypesFragment.this, REQUEST_DELETE,
+                        R.string.alert_delete_title,
+                        getString(R.string.alert_delete_fuel_types_message,
+                                getListView().getCheckedItemCount()),
+                        android.R.string.yes, android.R.string.no)
+                        .show(getFragmentManager(), null);
 				return true;
 			default:
 				return false;
@@ -110,11 +102,10 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 		}
 
 		@Override
-		public void onItemCheckedStateChanged(ActionMode mode, int position,
-				long id, boolean checked) {
+		public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                                              boolean checked) {
 			int count = getListView().getCheckedItemCount();
-			mode.setTitle(String.format(getString(R.string.cab_title_selected),
-					count));
+			mode.setTitle(String.format(getString(R.string.cab_title_selected), count));
 		}
 
 		@Override
@@ -124,23 +115,16 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 	}
 
 	private static final int REQUEST_DELETE = 1;
-	private static final int REQUEST_ADD = 2;
-	private static final int REQUEST_EDIT = 3;
+    private static final int REQUEST_ADD = 2;
+    private static final int REQUEST_EDIT = 3;
 
-	private static final String STATE_CURRENTLY_EDITED_FUEL_TYPE = "currently_edited_fuel_type";
-
-	private List<FuelType> fuelTypes;
-	private FuelType currentlyEditedFuelType = null;
+	private List<FuelType> mFuelTypes;
 
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
-				long id) {
-			currentlyEditedFuelType = fuelTypes.get(position);
-			InputDialogFragment.newInstance(PreferencesFuelTypesFragment.this,
-					REQUEST_EDIT, R.string.title_edit_fuel_type,
-					currentlyEditedFuelType.name).show(getFragmentManager(),
-					null);
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            EditFuelTypeDialogFragment.newInstance(PreferencesFuelTypesFragment.this, REQUEST_EDIT,
+                    mFuelTypes.get(position)).show(getFragmentManager(), null);
 		}
 	};
 
@@ -155,14 +139,6 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
 		fillList();
-
-		if (savedInstanceState != null) {
-			long id = savedInstanceState.getLong(
-					STATE_CURRENTLY_EDITED_FUEL_TYPE, 0);
-			if (id != 0) {
-				currentlyEditedFuelType = FuelType.load(FuelType.class, id);
-			}
-		}
 	}
 
 	@Override
@@ -176,10 +152,17 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 		inflater.inflate(R.menu.edit_fuel_types, menu);
 	}
 
-	@Override
-	public void onDialogNegativeClick(int requestCode) {
-		currentlyEditedFuelType = null;
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_add_fuel_type:
+                EditFuelTypeDialogFragment.newInstance(PreferencesFuelTypesFragment.this,
+                        REQUEST_ADD, null).show(getFragmentManager(), null);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 	@Override
 	public void onDialogPositiveClick(int requestCode) {
@@ -187,63 +170,14 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 			multiChoiceModeListener.deleteSelectedFuelTypes();
 			multiChoiceModeListener.finishActionMode();
 			fillList();
-		}
+		} else if (requestCode == REQUEST_ADD || requestCode == REQUEST_EDIT) {
+            fillList();
+        }
 	}
 
-	@Override
-	public void onDialogPositiveClick(int requestCode, String input) {
-		if (input.isEmpty()) {
-			return;
-		}
-
-		// Check, if a fuel type with the same name does already exist.
-		if (requestCode == REQUEST_ADD || requestCode == REQUEST_EDIT) {
-			for (FuelType fuelType : fuelTypes) {
-				if (fuelType.name.equals(input)
-						&& !(requestCode == REQUEST_EDIT && fuelType
-								.equals(currentlyEditedFuelType))) {
-					MessageDialogFragment.newInstance(null, 0, null,
-							getString(R.string.alert_fuel_type_exists_message),
-							android.R.string.ok, null).show(
-							getFragmentManager(), null);
-					return;
-				}
-			}
-		}
-
-		// Save fuel type.
-		if (requestCode == REQUEST_ADD) {
-			new FuelType(input).save();
-			fillList();
-		} else if (requestCode == REQUEST_EDIT) {
-			currentlyEditedFuelType.name = input;
-			currentlyEditedFuelType.save();
-			currentlyEditedFuelType = null;
-			fillList();
-		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_add_fuel_type:
-			InputDialogFragment.newInstance(PreferencesFuelTypesFragment.this,
-					REQUEST_ADD, R.string.title_add_fuel_type, null).show(
-					getFragmentManager(), null);
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		if (currentlyEditedFuelType != null) {
-			outState.putLong(STATE_CURRENTLY_EDITED_FUEL_TYPE,
-					currentlyEditedFuelType.id);
-		}
-	}
+    @Override
+    public void onDialogNegativeClick(int requestCode) {
+    }
 
 	@Override
 	public void onStop() {
@@ -252,14 +186,19 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 	}
 
 	private void fillList() {
-		fuelTypes = FuelType.getAll();
-		String[] names = new String[fuelTypes.size()];
-		for (int i = 0; i < fuelTypes.size(); i++) {
-			names[i] = fuelTypes.get(i).name;
+		mFuelTypes = FuelType.getAll();
+
+		List<Map<String, String>> data = new ArrayList<>();
+		for (FuelType fuelType : mFuelTypes) {
+            Map<String, String> item = new HashMap<>();
+            item.put("name", fuelType.name);
+            item.put("category", fuelType.category);
+            data.add(item);
 		}
 
-		setListAdapter(new ArrayAdapter<String>(getActivity(),
-				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, names));
+        setListAdapter(new SimpleAdapter(getActivity(), data,
+                android.R.layout.simple_list_item_activated_2,
+                new String[] { "name", "category" },
+                new int[] { android.R.id.text1, android.R.id.text2 }));
 	}
 }

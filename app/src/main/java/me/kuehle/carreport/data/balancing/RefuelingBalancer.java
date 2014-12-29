@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.data.balancing;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +23,6 @@ import java.util.Vector;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.FuelTank;
 import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.util.Calculator;
 import android.content.Context;
@@ -38,20 +36,15 @@ public class RefuelingBalancer {
 		this.prefs = new Preferences(context);
 	}
 
-	public List<Refueling> getBalancedRefuelings(Car car) {
-		List<Refueling> refuelings = new ArrayList<Refueling>();
-		for (FuelTank fuelTank : car.fuelTanks()) {
-			refuelings.addAll(getBalancedRefuelings(fuelTank));
-		}
+    public List<Refueling> getBalancedRefuelings(Car car) {
+        return getBalancedRefuelings(car.getRefuelings());
+    }
 
-		Collections.sort(refuelings);
+    public List<Refueling> getBalancedRefuelings(Car car, String fuelTypeCategory) {
+        return getBalancedRefuelings(car.getRefuelingsByFuelTypeCategory(fuelTypeCategory));
+    }
 
-		return refuelings;
-	}
-
-	public List<Refueling> getBalancedRefuelings(FuelTank fuelTank) {
-		List<Refueling> refuelings = fuelTank.refuelings();
-
+	private List<Refueling> getBalancedRefuelings(List<Refueling> refuelings) {
 		if (!areRefuelingsValid(refuelings)) {
 			return refuelings;
 		}
@@ -156,7 +149,7 @@ public class RefuelingBalancer {
 						// "guessed".
 						Refueling guess = new Refueling(newDate, newMileage,
 								newVolume, newPrice, false, "",
-								refueling.fuelType, refueling.fuelTank);
+								refueling.fuelType, refueling.car);
 						guess.guessed = true;
 						refuelings.add(pI, guess);
 
@@ -217,7 +210,7 @@ public class RefuelingBalancer {
 					// Add the refueling to the list and mark it as "guessed".
 					Refueling guess = new Refueling(newDate, newMileage,
 							newVolume, newPrice, partial, "",
-							refueling.fuelType, refueling.fuelTank);
+							refueling.fuelType, refueling.car);
 					guess.guessed = true;
 					refuelings.add(i, guess);
 
@@ -247,9 +240,9 @@ public class RefuelingBalancer {
 	 */
 	private static float getBalancedAverageConsumption(
 			List<Refueling> refuelings) {
-		Vector<Float> allConsumptions = new Vector<Float>();
-		Vector<Integer> allDistances = new Vector<Integer>();
-		Vector<Float> allVolumes = new Vector<Float>();
+		Vector<Float> allConsumptions = new Vector<>();
+		Vector<Integer> allDistances = new Vector<>();
+		Vector<Float> allVolumes = new Vector<>();
 
 		// Calculate consumptions for all refuelings in the specified list.
 		// There is not need to use the fuel consumption class here because
@@ -317,9 +310,8 @@ public class RefuelingBalancer {
 	 *            a list of refuelings with the same fuel tank.
 	 * @return the average distance for full refuelings.
 	 */
-	private static int getBalancedAverageDistanceOfFullRefuelings(
-			List<Refueling> refuelings) {
-		Vector<Integer> allDistances = new Vector<Integer>();
+	private static int getBalancedAverageDistanceOfFullRefuelings(List<Refueling> refuelings) {
+		Vector<Integer> allDistances = new Vector<>();
 
 		for (int i = 1; i < refuelings.size(); i++) {
 			if (!refuelings.get(i).partial) {

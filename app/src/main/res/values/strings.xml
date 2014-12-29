@@ -39,7 +39,6 @@
     <string name="menu_show_trend">Show trend</string>
     <string name="menu_show_overall_trend">Show overall trend</string>
 
-    <string name="section_fuel_tanks">Fuel tanks</string>
     <string name="section_suspend">Suspend</string>
     <string name="section_advanced">Advanced options</string>
     
@@ -49,30 +48,30 @@
     <string name="hint_note_optional">Note (optional)</string>
     <string name="hint_title">Title</string>
     <string name="hint_name">Name</string>
-    <string name="hint_tank">Tank</string>
-    <string name="hint_select_fuel_type">Select fuel type</string>
     <string name="hint_date">Date</string>
     <string name="hint_time">Time</string>
     <string name="hint_end_date">End date</string>
+    <string name="hint_suspend_date">Suspend date</string>
+    <string name="hint_category">Category</string>
     
     <string name="label_partial">Partial</string>
     <string name="label_color">Color</string>
     <string name="label_suspend">Suspend</string>
-    <string name="label_add">Add</string>
-    <string name="label_add_dialog">Add…</string>
     <string name="label_set_end_date">Set end date</string>
     <string name="label_car">Car</string>
     <string name="label_recurrence">Recurrence</string>
-    
+
+    <string name="description_suspend">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports zoom to active cars only in the small view.</string>
+    <string name="description_category">Refuelings are grouped by this category for different reports. Examples: Petrol, Diesel, Gas.</string>
+
     <string name="validate_error_greater_zero">Has to be greater 0</string>
     <string name="validate_error_not_empty">Must not be empty</string>
-    <string name="validate_error_no_fuel_types">At least one fuel type must be assigned</string>
     <string name="validate_error_mileage_out_of_range_total">Mileage needs to be between the mileage of the previous and next refueling in total distance entry mode. If you meant to insert trip distance, you can change entry mode in the settings.</string>
     <string name="validate_error_mileage_out_of_range_trip">The cumulated mileage cannot be higher than the mileage of the next refueling in trip distance entry mode. If you meant to insert total distance, you can change entry mode in the settings.</string>
+    <string name="validate_error_fuel_type_exists">This fuel type does already exist.</string>
     
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>
-    <string name="suspended_desc">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports zoom to active cars only in the small view.</string>
     <string name="overwrite">Overwrite</string>
     <string name="restore">Restore</string>
     <string name="import_">Import</string>
@@ -119,10 +118,7 @@
     <string name="alert_export_csv_overwrite_message">Export files from a previous export do already exist on SD card.</string>
     <string name="alert_import_csv_title">Import CSV</string>
     <string name="alert_import_csv_message">Import will update existing entries and add new ones, but it will not delete entries.</string>
-    <string name="alert_add_fuel_type_title">Add fuel type</string>
-    <string name="alert_fuel_type_exists_message">This fuel type does already exist.</string>
-    <string name="alert_cannot_remove_fuel_tank_message">The tank cannot be removed, because it is used by refuelings.</string>
-    
+
     <string name="toast_synchronization_failed">Synchronization failed</string>
     <string name="toast_refueling_saved">Refueling saved</string>
     <string name="toast_refueling_deleted">Refueling deleted</string>
@@ -243,6 +239,5 @@
     <string name="graph_details_desc">Graph details</string>
     <string name="graph_options_desc">Graph options</string>
     <string name="graph_close_full_screen_desc">Close full screen graph</string>
-    <string name="remove_fueltype_desc">Remove</string>
     <string name="drag_handle_desc">Drag handle</string>
 </resources>

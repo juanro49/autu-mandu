@@ -14,85 +14,75 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-    <EditText
-        android:id="@+id/edt_name"
+    android:layout_margin="16dp">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="@string/hint_name" />
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="16dp" >
-        <LinearLayout
+        android:layout_height="wrap_content" >
+        <!-- Name -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?android:attr/selectableItemBackground"
-                android:orientation="horizontal" >
-                <TextView
-                    style="@android:style/TextAppearance.Medium"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:paddingLeft="8dp"
-                    android:text="@string/label_color" />
-                <View
-                    android:id="@+id/btn_color"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="4dp"
-                    android:background="@drawable/btn_choose_color" />
-            </LinearLayout>
+            android:hint="@string/hint_name"
+            app:floatingLabel="highlight" />
+        <!-- Color -->
+        <LinearLayout
+            android:id="@+id/layout_color"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_name"
+            android:background="?android:attr/selectableItemBackground"
+            android:orientation="horizontal" >
             <TextView
-                style="@style/section_header"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/section_fuel_tanks" />
-            <LinearLayout
-                android:id="@+id/layout_fuel_tanks"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-            <Button
-                android:id="@+id/btn_add_fuel_tank"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:gravity="left|center_vertical"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
                 android:paddingLeft="8dp"
-                android:text="@string/label_add"
-                android:textColor="@android:color/darker_gray" />
-            <TextView
-                style="@style/section_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/section_suspend" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/suspended_desc"
-                android:textAppearance="?android:attr/textAppearanceSmall"/>
-            <CheckBox
-                android:id="@+id/chk_suspend"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="@string/label_suspend" />
-            <EditText
-                android:id="@+id/edt_suspend_date"
-                style="@android:style/Widget.Holo.Spinner"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:focusable="false"
-                android:inputType="date" />
+                android:paddingRight="8dp"
+                android:text="@string/label_color"
+                android:textSize="16sp" />
+            <View
+                android:id="@+id/btn_color"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/btn_choose_color" />
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+        <!-- Suspend -->
+        <TextView
+            style="@style/AppWidget.SectionHeader"
+            android:id="@+id/txt_section_suspend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layout_color"
+            android:text="@string/section_suspend" />
+        <TextView
+            android:id="@+id/txt_description_suspend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_section_suspend"
+            android:layout_marginTop="8dp"
+            android:text="@string/description_suspend"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        <CheckBox
+            android:id="@+id/chk_suspend"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/txt_description_suspend"
+            android:text="@string/label_suspend" />
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_suspend_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/chk_suspend"
+            android:layout_marginLeft="36dp"
+            android:layout_marginStart="36dp"
+            android:hint="@string/hint_suspend_date"
+            app:floatingLabel="highlight" />
+    </RelativeLayout>
+</ScrollView>

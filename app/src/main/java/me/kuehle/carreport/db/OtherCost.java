@@ -75,7 +75,7 @@ public class OtherCost extends Model {
 
 	public static List<String> getAllTitles() {
 		String sql = new Select("title").distinct().from(OtherCost.class)
-				.orderBy("title ASC").toSql();
+                .orderBy("title ASC").toSql();
 		Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
 		List<String> titles = new ArrayList<String>();

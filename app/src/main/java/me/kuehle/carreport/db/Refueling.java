@@ -24,6 +24,7 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Column.ForeignKeyAction;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 @Table(name = "refuelings")
 public class Refueling extends Model implements Comparable<Refueling> {
@@ -48,8 +49,8 @@ public class Refueling extends Model implements Comparable<Refueling> {
 	@Column(name = "fuel_type", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
 	public FuelType fuelType;
 
-	@Column(name = "fuel_tank", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
-	public FuelTank fuelTank;
+	@Column(name = "car", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
+	public Car car;
 
 	public boolean guessed = false;
 	
@@ -60,7 +61,7 @@ public class Refueling extends Model implements Comparable<Refueling> {
 	}
 
 	public Refueling(Date date, int mileage, float volume, float price,
-			boolean partial, String note, FuelType fuelType, FuelTank fuelTank) {
+			boolean partial, String note, FuelType fuelType, Car car) {
 		super();
 		this.date = date;
 		this.mileage = mileage;
@@ -69,7 +70,7 @@ public class Refueling extends Model implements Comparable<Refueling> {
 		this.partial = partial;
 		this.note = note;
 		this.fuelType = fuelType;
-		this.fuelTank = fuelTank;
+		this.car = car;
 	}
 
 	@Override
@@ -82,22 +83,16 @@ public class Refueling extends Model implements Comparable<Refueling> {
 	}
 
 	public static Refueling getPrevious(Car car, Date date) {
-		return SafeSelect
-				.from(Refueling.class)
-				.join(FuelTank.class)
-				.on("fuel_tanks.Id = refuelings.fuel_tank")
-				.where("fuel_tanks.car = ? AND refuelings.date < ?", car.id,
-						date.getTime()).orderBy("refuelings.date DESC")
+		return new Select().from(Refueling.class)
+                .where("car = ? AND date < ?", car.id, date.getTime())
+                .orderBy("date DESC")
 				.executeSingle();
 	}
 	
 	public static Refueling getNext(Car car, Date date) {
-		return SafeSelect
-				.from(Refueling.class)
-				.join(FuelTank.class)
-				.on("fuel_tanks.Id = refuelings.fuel_tank")
-				.where("fuel_tanks.car = ? AND refuelings.date > ?", car.id,
-						date.getTime()).orderBy("refuelings.date ASC")
+		return new Select().from(Refueling.class)
+				.where("car = ? AND date > ?", car.id, date.getTime())
+                .orderBy("date ASC")
 				.executeSingle();
 	}
 }

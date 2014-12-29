@@ -72,7 +72,7 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
 
     @Override
     protected List<OtherCost> getItems() {
-        List<OtherCost> otherCosts = mCar.otherCosts();
+        List<OtherCost> otherCosts = mCar.getOtherCosts();
         Collections.reverse(otherCosts);
         return otherCosts;
     }

@@ -255,7 +255,7 @@ public class CostsReport extends AbstractReport {
 
 			RefuelingBalancer balancer = new RefuelingBalancer(context);
 			List<Refueling> refuelings = balancer.getBalancedRefuelings(car);
-			List<OtherCost> otherCosts = car.otherCosts();
+			List<OtherCost> otherCosts = car.getOtherCosts();
 
 			if ((refuelings.size() + otherCosts.size()) < 2) {
 				section.addItem(new Item(context

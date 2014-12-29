@@ -35,7 +35,7 @@
             android:value="data.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="7" />
+            android:value="8" />
         <meta-data
             android:name="AA_SERIALIZERS"
             android:value="me.kuehle.carreport.db.serializer.RecurrenceSerializer" />

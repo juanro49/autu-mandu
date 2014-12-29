@@ -16,62 +16,59 @@
 
 package me.kuehle.carreport.db;
 
-import java.util.List;
+import android.database.Cursor;
 
-import me.kuehle.carreport.db.query.SafeSelect;
-
+import com.activeandroid.Cache;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "fuel_types")
 public class FuelType extends Model {
-	@Column(name = "name", notNull = true, unique = true)
-	public String name;
+    @Column(name = "name", notNull = true, unique = true)
+    public String name;
 
-	public FuelType() {
-		super();
-	}
+    @Column(name = "category")
+    public String category;
 
-	public FuelType(String name) {
-		super();
-		this.name = name;
-	}
+    public FuelType() {
+        super();
+    }
 
-	public List<FuelTank> fuelTanks() {
-		return SafeSelect.from(FuelTank.class)
-				.join(PossibleFuelTypeForFuelTank.class)
-				.on("fuel_tanks.Id = fuel_types_fuel_tanks.fuel_tank")
-				.where("fuel_types_fuel_tanks.fuel_type = ?", id)
-				.execute();
-	}
-	
-	public List<Refueling> refuelings() {
-		return new Select().from(Refueling.class)
-				.where("fuel_type = ?", id).orderBy("date ASC").execute();
-	}
+    public FuelType(String name, String category) {
+        super();
+        this.name = name;
+        this.category = category;
+    }
 
-	/**
-	 * Removes all unused fuel types. These are the ones, not used by any
-	 * refuelings and fuel tanks.
-	 */
-	public static void cleanUp() {
-		String sqlRefuelings = new Select().from(Refueling.class)
-				.where("refuelings.fuel_type = fuel_types.Id").toSql();
-		String sqlPossibleTypes = new Select()
-				.from(PossibleFuelTypeForFuelTank.class)
-				.where("fuel_types_fuel_tanks.fuel_type = fuel_types.Id")
-				.toSql();
+    public List<Refueling> getRefuelings() {
+        return new Select().from(Refueling.class)
+                .where("fuel_type = ?", id)
+                .orderBy("date ASC")
+                .execute();
+    }
 
-		new Delete()
-				.from(FuelType.class)
-				.where("NOT EXISTS (" + sqlRefuelings + ") AND NOT EXISTS ("
-						+ sqlPossibleTypes + ")").execute();
-	}
+    public static List<FuelType> getAll() {
+        return new Select().from(FuelType.class).orderBy("name ASC").execute();
+    }
 
-	public static List<FuelType> getAll() {
-		return new Select().from(FuelType.class).orderBy("name ASC").execute();
-	}
+    public static List<String> getAllCategories() {
+        String sql = new Select("category").distinct().from(FuelType.class)
+                .orderBy("category ASC").toSql();
+        Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
+
+        List<String> titles = new ArrayList<String>();
+        if (cursor.moveToFirst()) {
+            do {
+                titles.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return titles;
+    }
 }

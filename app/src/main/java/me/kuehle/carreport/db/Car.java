@@ -16,8 +16,11 @@
 
 package me.kuehle.carreport.db;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import me.kuehle.carreport.db.query.SafeSelect;
 import android.database.Cursor;
@@ -54,21 +57,56 @@ public class Car extends Model {
 		return suspendedSince != null;
 	}
 
-	public List<Refueling> refuelings() {
-		return SafeSelect.from(Refueling.class).join(FuelTank.class)
-				.on("refuelings.fuel_tank = fuel_tanks.Id")
-				.where("fuel_tanks.car = ?", id)
-				.orderBy("refuelings.date ASC").execute();
+	public List<Refueling> getRefuelings() {
+        return new Select().from(Refueling.class)
+                .where("car = ?", id)
+                .orderBy("date ASC")
+                .execute();
 	}
 
-	public List<OtherCost> otherCosts() {
-		return new Select().from(OtherCost.class).where("car = ?", id)
-				.orderBy("date ASC").execute();
+    public List<Refueling> getRefuelingsByFuelTypeCategory(String category) {
+        return SafeSelect.from(Refueling.class)
+                .join(FuelType.class).on("fuel_types.Id = refuelings.fuel_type")
+                .where("refuelings.car = ? AND fuel_types.category = ?", id, category)
+                .orderBy("refuelings.date ASC")
+                .execute();
+    }
+
+	public List<OtherCost> getOtherCosts() {
+		return new Select().from(OtherCost.class)
+                .where("car = ?", id)
+				.orderBy("date ASC")
+                .execute();
 	}
 
-	public List<FuelTank> fuelTanks() {
-		return getMany(FuelTank.class, "car");
-	}
+    public FuelType getMostUsedFuelType() {
+        return SafeSelect.from(FuelType.class)
+                .join(Refueling.class).on("refuelings.fuel_type = fuel_types.Id")
+                .where("refuelings.car = ?", id)
+                .groupBy("fuel_types.Id")
+                .orderBy("COUNT(refuelings.Id) DESC")
+                .limit(1)
+                .executeSingle();
+    }
+
+    public List<String> getUsedFuelTypeCategories() {
+        String sql = new Select("category").distinct().from(FuelType.class)
+                .join(Refueling.class).on("refuelings.fuel_type = fuel_types.Id")
+                .where("refuelings.car = " + id) // toSql function does not support where arguments
+                .orderBy("category ASC")
+                .toSql();
+        Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
+
+        List<String> categories = new ArrayList<String>();
+        if (cursor.moveToFirst()) {
+            do {
+                categories.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return categories;
+    }
 
 	public static List<Car> getAll() {
 		return new Select().from(Car.class)

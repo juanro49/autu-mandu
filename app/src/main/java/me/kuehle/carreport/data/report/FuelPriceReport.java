@@ -42,7 +42,7 @@ public class FuelPriceReport extends AbstractReport {
 		public ReportGraphData(Context context, FuelType fuelType, int color) {
 			super(context, fuelType.name, color);
 
-			List<Refueling> refuelings = fuelType.refuelings();
+			List<Refueling> refuelings = fuelType.getRefuelings();
 			for (Refueling refueling : refuelings) {
 				xValues.add(refueling.date.getTime());
 				yValues.add((double) refueling.getFuelPrice());
@@ -149,7 +149,7 @@ public class FuelPriceReport extends AbstractReport {
 		float hueDiff = fuelTypes.size() == 0 ? 60 : Math.min(60,
 				360 / fuelTypes.size());
 
-		reportData = new ArrayList<ReportGraphData>();
+		reportData = new ArrayList<>();
 		for (FuelType fuelType : fuelTypes) {
 			int color = Color.HSVToColor(hsvColor);
 			ReportGraphData data = new ReportGraphData(context, fuelType, color);

@@ -35,9 +35,9 @@ public class PriceToVolumeCalculation extends AbstractCalculation {
 
 	@Override
 	public CalculationItem[] calculate(double input) {
-		List<CalculationItem> items = new ArrayList<CalculationItem>();
+		List<CalculationItem> items = new ArrayList<>();
 		for (FuelType fuelType : FuelType.getAll()) {
-			List<Refueling> refuelings = fuelType.refuelings();
+			List<Refueling> refuelings = fuelType.getRefuelings();
 			if (refuelings.size() > 0) {
 				float[] fuelPrices = new float[refuelings.size()];
 				for (int i = 0; i < fuelPrices.length; i++) {

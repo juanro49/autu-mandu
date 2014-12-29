@@ -39,7 +39,6 @@
     <string name="menu_show_trend">Trend anzeigen</string>
     <string name="menu_show_overall_trend">Gesamttrend anzeigen</string>
 
-    <string name="section_fuel_tanks">Kraftstofftanks</string>
     <string name="section_suspend">Stilllegen</string>
     <string name="section_advanced">Erweiterte Optionen</string>
 
@@ -49,26 +48,27 @@
     <string name="hint_note_optional">Notiz (optional)</string>
     <string name="hint_title">Titel</string>
     <string name="hint_name">Name</string>
-    <string name="hint_tank">Tank</string>
-    <string name="hint_select_fuel_type">Kraftstoff auswählen</string>
     <string name="hint_date">Datum</string>
     <string name="hint_time">Uhrzeit</string>
     <string name="hint_end_date">Enddatum</string>
+    <string name="hint_suspend_date">Silllegedatum</string>
+    <string name="hint_category">Kategorie</string>
 
     <string name="label_partial">Teilfüllung</string>
     <string name="label_color">Farbe</string>
     <string name="label_suspend">Stilllegen</string>
-    <string name="label_add">Hinzufügen</string>
-    <string name="label_add_dialog">Hinzufügen…</string>
     <string name="label_set_end_date">Enddatum setzen</string>
     <string name="label_car">Auto</string>
     <string name="label_recurrence">Wiederholung</string>
 
+    <string name="description_suspend">Wenn Sie ein Auto nicht mehr benutzen, können Sie es stilllegen. Dadurch werden sich wiederholenden Kosten zu dem Stilllegezeitpunkt beendet. Außerdem zoomen die Reports in der kleinen Ansicht nur auf aktive Autos.</string>
+    <string name="description_category">Tankfüllungen werden in verschiedenen Reports nach diesen Kateogrien gruppiert. Beispiele: Benzin, Diesel, Gas.</string>
+
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
-    <string name="validate_error_no_fuel_types">Mindestens ein Kraftstoff muss zugewiesen werden</string>
     <string name="validate_error_mileage_out_of_range_total">Der Kilometerstand muss bei Eingabe der Gesamtkilometer zwischen dem der letzten und der nächsten Tankfüllung liegen. Wenn Sie Tageskilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_mileage_out_of_range_trip">Der kumulierte Kilometerstand darf bei Eingabe der Tageskilometer den Kilometerstand der nächsten Tankfüllung nicht übersteigen. Wenn Sie Gesamtkilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
+    <string name="validate_error_fuel_type_exists">Diese Kaftstoffart existiert bereits.</string>
 
     <string name="suspended">Stillgelegt</string>
     <string name="suspended_since">Stillgelegt seit %s</string>
@@ -118,10 +118,7 @@
     <string name="alert_export_csv_overwrite_message">Es existieren bereits Exportdaten von einem vorigen Export auf der SD-Karte.</string>
     <string name="alert_import_csv_title">CSV importieren</string>
     <string name="alert_import_csv_message">Der Import aktualisiert bestehende Einträge und fügt neue hinzu, löscht aber keine Einträge.</string>
-    <string name="alert_add_fuel_type_title">Kaftstoffart hinzufügen</string>
-    <string name="alert_fuel_type_exists_message">Diese Kaftstoffart existiert bereits.</string>
-    <string name="alert_cannot_remove_fuel_tank_message">Der Tank kann nicht entfernt werden, weil er von Tankfüllungen genutzt wird.</string>
-    
+
     <string name="toast_synchronization_failed">Synchronisation fehlgeschlagen</string>
     <string name="toast_refueling_saved">Tankfüllung gespeichert</string>
     <string name="toast_refueling_deleted">Tankfüllung gelöscht</string>
@@ -242,7 +239,5 @@
     <string name="graph_details_desc">Graph-Details</string>
     <string name="graph_options_desc">Graph-Optionen</string>
     <string name="graph_close_full_screen_desc">Vollbildgraph schließen</string>
-    <string name="remove_fueltype_desc">Entfernen</string>
     <string name="drag_handle_desc">Drag-Bereich</string>
-    <string name="suspended_desc">Wenn Sie ein Auto nicht mehr benutzen, können Sie es stilllegen. Dadurch werden sich wiederholenden Kosten zu dem Stilllegezeitpunkt beendet. Außerdem zoomen die Reports in der kleinen Ansicht nur auf aktive Autos.</string>
 </resources>

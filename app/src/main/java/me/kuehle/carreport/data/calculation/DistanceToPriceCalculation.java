@@ -58,7 +58,7 @@ public class DistanceToPriceCalculation extends AbstractCalculation {
 				endMileage = refueling.mileage;
 			}
 
-			List<OtherCost> otherCosts = car.otherCosts();
+			List<OtherCost> otherCosts = car.getOtherCosts();
 			for (OtherCost otherCost : otherCosts) {
 				int recurrences;
 				if (otherCost.endDate == null) {
