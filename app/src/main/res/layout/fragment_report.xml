@@ -59,7 +59,7 @@
             android:id="@+id/btn_close_full_screen"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_gravity="end"
+            android:layout_gravity="right"
             android:layout_margin="16dp"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/graph_close_full_screen_desc"
