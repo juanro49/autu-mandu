@@ -38,6 +38,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -100,6 +101,7 @@ public class MainActivity extends ActionBarActivity implements
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
+        setSupportActionBar((Toolbar) findViewById(R.id.action_bar));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -119,7 +121,7 @@ public class MainActivity extends ActionBarActivity implements
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
-            selectDrawerItem(0);
+            selectDrawerItem(1);
         }
 
         // When there is no car, show the first start activity.
@@ -329,8 +331,17 @@ public class MainActivity extends ActionBarActivity implements
     private DrawerListItem[] buildDrawerItems() {
         List<Car> cars = Car.getAll();
 
-        DrawerListItem[] items = new DrawerListItem[5 + cars.size()];
+        DrawerListItem[] items = new DrawerListItem[6 + cars.size()];
         int i = 0;
+
+        // Profile section on top of drawer.
+        AbstractSynchronizationProvider syncProvider = AbstractSynchronizationProvider
+                .getCurrent(this);
+        if (syncProvider == null) {
+            items[i++] = new DrawerListItem();
+        } else {
+            items[i++] = new DrawerListItem(syncProvider.getAccountName(), syncProvider.getIcon());
+        }
 
         items[i++] = new DrawerListItem(getString(R.string.drawer_reports), R.drawable.ic_reports,
                 new ReportFragment());

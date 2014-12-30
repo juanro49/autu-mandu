@@ -22,4 +22,6 @@
     android:gravity="center_vertical"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+    android:fontFamily="@string/font_fontFamily_medium"
+    android:textStyle="@integer/font_textStyle_medium"
+    android:textSize="14sp" />

@@ -27,9 +27,10 @@ import android.widget.TextView;
 import me.kuehle.carreport.R;
 
 public class DrawerListAdapter extends BaseAdapter {
-    private static final int VIEW_TYPE_PRIMARY = 0;
-    private static final int VIEW_TYPE_SECONDARY = 1;
-    private static final int VIEW_TYPE_SEPARATOR = 2;
+    private static final int VIEW_TYPE_TOP = 0;
+    private static final int VIEW_TYPE_PRIMARY = 1;
+    private static final int VIEW_TYPE_SECONDARY = 2;
+    private static final int VIEW_TYPE_SEPARATOR = 3;
 
     private Context mContext;
     private DrawerListItem[] mItems;
@@ -57,9 +58,11 @@ public class DrawerListAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         DrawerListItem item = mItems[position];
-        if(item.isSeparator()) {
+        if (position == 0) {
+            return VIEW_TYPE_TOP;
+        } else if (item.isSeparator()) {
             return VIEW_TYPE_SEPARATOR;
-        } else if(item.isPrimary()) {
+        } else if (item.isPrimary()) {
             return VIEW_TYPE_PRIMARY;
         } else {
             return VIEW_TYPE_SECONDARY;
@@ -77,15 +80,14 @@ public class DrawerListAdapter extends BaseAdapter {
             convertView = inflater.inflate(getViewTypeLayout(viewType), parent, false);
         }
 
-        if (viewType == VIEW_TYPE_PRIMARY) {
-            ImageView icon = (ImageView) convertView.findViewById(android.R.id.icon1);
-            icon.setImageResource(item.getIcon());
+        TextView text = (TextView) convertView.findViewById(android.R.id.text1);
+        if(text != null) {
+            text.setText(item.getText());
+        }
 
-            TextView text = (TextView) convertView.findViewById(android.R.id.text1);
-            text.setText(item.getText());
-        } else if (viewType == VIEW_TYPE_SECONDARY) {
-            TextView text = (TextView) convertView.findViewById(android.R.id.text1);
-            text.setText(item.getText());
+        ImageView icon = (ImageView) convertView.findViewById(android.R.id.icon1);
+        if (icon != null) {
+            icon.setImageResource(item.getIcon());
         }
 
         return convertView;
@@ -93,12 +95,13 @@ public class DrawerListAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        return 3;
+        return 4;
     }
 
     @Override
     public boolean isEnabled(int position) {
-        return getItemViewType(position) != VIEW_TYPE_SEPARATOR;
+        return getItemViewType(position) == VIEW_TYPE_PRIMARY ||
+                getItemViewType(position) == VIEW_TYPE_SECONDARY;
     }
 
     public void setItems(DrawerListItem[] items) {
@@ -107,7 +110,9 @@ public class DrawerListAdapter extends BaseAdapter {
     }
 
     private int getViewTypeLayout(int viewType) {
-        if (viewType == VIEW_TYPE_PRIMARY) {
+        if (viewType==VIEW_TYPE_TOP) {
+            return R.layout.list_item_drawer_top;
+        } else if (viewType == VIEW_TYPE_PRIMARY) {
             return R.layout.list_item_drawer_primary;
         } else if (viewType == VIEW_TYPE_SECONDARY) {
             return R.layout.list_item_drawer_secondary;

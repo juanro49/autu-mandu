@@ -86,13 +86,11 @@ public class ListDialogFragment extends DialogFragment {
 						android.R.layout.simple_list_item_1, parent, false);
 			}
 
-			TextView text1 = (TextView) convertView
-					.findViewById(android.R.id.text1);
+			TextView text1 = (TextView) convertView.findViewById(android.R.id.text1);
 			text1.setText(items[position]);
 			if (icons != null) {
-				text1.setCompoundDrawablesWithIntrinsicBounds(icons[position],
-						0, 0, 0);
-				text1.setCompoundDrawablePadding(8);
+				text1.setCompoundDrawablesWithIntrinsicBounds(icons[position], 0, 0, 0);
+				text1.setCompoundDrawablePadding(16);
 			}
 
 			return convertView;
@@ -118,22 +116,21 @@ public class ListDialogFragment extends DialogFragment {
 				args.getIntArray("icons")), new OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				getListener().onDialogPositiveClick(getTargetRequestCode(),
-						which);
+				getListener().onDialogPositiveClick(getTargetRequestCode(), which);
 			}
 		});
+
 		if (args.containsKey("title")) {
 			builder.setTitle(args.getInt("title"));
 		}
+
 		if (args.containsKey("negative")) {
-			builder.setNegativeButton(args.getInt("negative"),
-					new OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							getListener().onDialogNegativeClick(
-									getTargetRequestCode());
-						}
-					});
+			builder.setNegativeButton(args.getInt("negative"), new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getListener().onDialogNegativeClick(getTargetRequestCode());
+                }
+            });
 		}
 
 		return builder.create();

@@ -36,11 +36,30 @@ public class DrawerListItem {
     /**
      * Creates a secondary item with the specified title.
      * @param text
+     */
+    public DrawerListItem(CharSequence text) {
+        mText = text;
+    }
+
+    /**
+     * Creates a secondary item with the specified title.
+     * @param text
      * @param intent
      */
     public DrawerListItem(CharSequence text, Intent intent) {
         mText = text;
         mIntent = intent;
+    }
+
+    /**
+     * Creates a primary item with the specified title and icon.
+     * @param text
+     * @param icon
+     */
+    public DrawerListItem(CharSequence text, int icon) {
+        mText = text;
+        mIcon = icon;
+        mIsPrimary = true;
     }
 
     /**
