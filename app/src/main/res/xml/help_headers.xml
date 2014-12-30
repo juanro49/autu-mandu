@@ -19,8 +19,8 @@
         android:fragment="me.kuehle.carreport.gui.HelpActivity$GettingStartedFragment"
         android:title="@string/help_section_getting_started" />
     <header
-        android:fragment="me.kuehle.carreport.gui.HelpActivity$FuelTanksFragment"
-        android:title="@string/help_section_fuel_tanks" />
+        android:fragment="me.kuehle.carreport.gui.HelpActivity$FuelTypesFragment"
+        android:title="@string/help_section_fuel_types" />
     <header
         android:fragment="me.kuehle.carreport.gui.HelpActivity$TipsFragment"
         android:title="@string/help_section_tips" />

@@ -1,28 +1,19 @@
-<h1>General</h1>
+<h1>Allgemein</h1>
 <p>Die gesamte interne Datenbank der App wird in eine Datei pro Tabelle exportiert. Dadurch sind die z.B. die Daten einer Tankfüllung
-in mehreren Dateien verteilt. Um das dazugehörige Auto einer Tankfüllung zu finden, suchen Sie den Wert der fuel_tank Spalte in der
-Id Spalte der fuel_tanks Tabelle. Dann wiederholen Sie das ganze für die car Spalte.
+in mehreren Dateien verteilt. Um das dazugehörige Auto einer Tankfüllung zu finden, suchen Sie den Wert der car Spalte in der
+Id Spalte der cars Tabelle.</p>
 
-<h1>Columns</h1>
+<h1>Spalten</h1>
 <big>cars</big>
 <p>Id: [int]<br>
 name: [string]<br>
 suspended_since: [date]<br>
 color: [int] In <a href="http://developer.android.com/reference/android/graphics/Color.html">der Android Dokumentation für Color</a> finden Sie detaillierte Informationen darüber, wie der Farbwert berechnet wird.</p>
 
-<big>fuel_tanks</big>
-<p>Id: [int]<br>
-name: [string]<br>
-car: [int] die Id des Autos.</p>
-
 <big>fuel_types</big>
 <p>Id: [int]<br>
-name: [string]</p>
-
-<big>fuel_types_fuel_tanks</big>
-<p>Id: [int]<br>
-fuel_tank: [int] die Id des Tanks.<br>
-fuel_type: [int] die Id der Spritart.</p>
+name: [string]<br>
+category: [string]</p>
 
 <big>other_costs</big>
 <p>Id: [int]<br>
@@ -40,8 +31,8 @@ end_date: [date] Beende die Wiederholungen an diesem Datum.</p>
 partial: "true|false"<br>
 date: [date]<br>
 note: [string]<br>
-fuel_tank: [int] die Id des Tanks.<br>
 volume: [float]<br>
 fuel_type: [int] die Id der Spritart.<br>
 price: [float]<br>
-mileage: [int] der Gesamtkilometerstand.</p>
+mileage: [int] der Gesamtkilometerstand.<br>
+car: [int] die Id des Autos.</p>

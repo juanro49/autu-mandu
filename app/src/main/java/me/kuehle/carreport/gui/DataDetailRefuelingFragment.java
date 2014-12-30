@@ -16,6 +16,7 @@
 
 package me.kuehle.carreport.gui;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -239,6 +240,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) edtMileage
                     .getLayoutParams();
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                params.addRule(RelativeLayout.ALIGN_PARENT_END);
+            }
         }
 
         // Fuel Type

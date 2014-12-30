@@ -210,7 +210,7 @@
     <string name="help_section_getting_started">Einstieg</string>
     <string name="help_section_tips">Tipps</string>
     <string name="help_section_calculations">Berechnungen</string>
-    <string name="help_section_fuel_tanks">Kraftstofftanks</string>
+    <string name="help_section_fuel_types">Kraftstoffarten</string>
     <string name="help_section_csv">CSV</string>
 
     <string name="first_start_hi">Hallo!</string>

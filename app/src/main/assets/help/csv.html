@@ -1,7 +1,7 @@
 <h1>General</h1>
 <p>The whole database gets exported with one file for each table. This means the data of one refueling is separated
-into multiple files. You can find the car by looking up the value of the fuel_tank column in the Id column of the fuel_tanks
-table and repeat this for the car column.</p>
+into multiple files. You can find the car by looking up the value of the car column in the Id column of the cars
+table.</p>
 
 <h1>Columns</h1>
 <big>cars</big>
@@ -10,19 +10,10 @@ name: [string]<br>
 suspended_since: [date]<br>
 color: [int] Have a look at <a href="http://developer.android.com/reference/android/graphics/Color.html">the android color documentation</a> for a more detailed explanation how the value is calculated.</p>
 
-<big>fuel_tanks</big>
-<p>Id: [int]<br>
-name: [string]<br>
-car: [int] the Id of the car.</p>
-
 <big>fuel_types</big>
 <p>Id: [int]<br>
-name: [string]</p>
-
-<big>fuel_types_fuel_tanks</big>
-<p>Id: [int]<br>
-fuel_tank: [int] the Id of the fuel tank.<br>
-fuel_type: [int] the Id of the fuel type.</p>
+name: [string]<br>
+category: [string]</p>
 
 <big>other_costs</big>
 <p>Id: [int]<br>
@@ -40,8 +31,8 @@ end_date: [date] End recurrence on this date.</p>
 partial: "true|false"<br>
 date: [date]<br>
 note: [string]<br>
-fuel_tank: [int] the Id of the fuel tank.<br>
 volume: [float]<br>
 fuel_type: [int] the Id of the fuel type.<br>
 price: [float]<br>
-mileage: [int] Total distance (odometer).</p>
+mileage: [int] Total distance (odometer).<br>
+car: [int] the Id of the car.</p>

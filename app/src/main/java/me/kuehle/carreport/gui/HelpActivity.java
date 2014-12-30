@@ -74,7 +74,7 @@ public class HelpActivity extends PreferenceActivity {
     @Override
     protected boolean isValidFragment(String fragmentName) {
         return GettingStartedFragment.class.getName().equals(fragmentName)
-                || FuelTanksFragment.class.getName().equals(fragmentName)
+                || FuelTypesFragment.class.getName().equals(fragmentName)
                 || TipsFragment.class.getName().equals(fragmentName)
                 || CalculationsFragment.class.getName().equals(fragmentName)
                 || CSVFragment.class.getName().equals(fragmentName);
@@ -150,10 +150,10 @@ public class HelpActivity extends PreferenceActivity {
         }
     }
 
-    public static class FuelTanksFragment extends HelpFragment {
+    public static class FuelTypesFragment extends HelpFragment {
         @Override
         protected String getHelpId() {
-            return "fuel_tanks";
+            return "fuel_types";
         }
     }
 }
