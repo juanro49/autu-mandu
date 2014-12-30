@@ -17,11 +17,14 @@
 package me.kuehle.carreport.gui.dialog;
 
 import me.kuehle.carreport.R;
+
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -57,7 +60,9 @@ public class SupportColorPickerDialogFragment extends DialogFragment {
 
 	private ColorPicker mColorPicker;
 
-	@Override
+    @NonNull
+    @Override
+    @SuppressLint("InflateParams")
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Bundle args = getArguments();
 

@@ -105,7 +105,7 @@ public abstract class AbstractReportGraphData {
 
 			// Use higher order when more entries are available to calculate a
 			// more accurate trend.
-			int order = 1;
+			int order;
 			if (data.xValues.size() > 7) {
 				order = 5;
 			} else if (data.xValues.size() > 3) {
@@ -151,11 +151,11 @@ public abstract class AbstractReportGraphData {
 	protected String name;
 	protected int color;
 
-	protected Vector<Long> xValues = new Vector<Long>();
-	protected Vector<Double> yValues = new Vector<Double>();
+	protected Vector<Long> xValues = new Vector<>();
+	protected Vector<Double> yValues = new Vector<>();
 
-	private List<List<PointD>> markLines = new ArrayList<List<PointD>>();
-	private List<PointD> markPoints = new ArrayList<PointD>();
+	private List<List<PointD>> markLines = new ArrayList<>();
+	private List<PointD> markPoints = new ArrayList<>();
 
 	public AbstractReportGraphData(Context context, String name, int color) {
 		this.context = context;
@@ -216,7 +216,7 @@ public abstract class AbstractReportGraphData {
 	}
 
 	public void sort() {
-		ArrayList<PointD> points = new ArrayList<PointD>();
+		ArrayList<PointD> points = new ArrayList<>();
 		for (int i = 0; i < xValues.size(); i++) {
 			points.add(new PointD(xValues.get(i), yValues.get(i)));
 		}
@@ -254,7 +254,7 @@ public abstract class AbstractReportGraphData {
 			return;
 		}
 
-		List<PointD> line = new ArrayList<PointD>();
+		List<PointD> line = new ArrayList<>();
 		line.add(new PointD(xValues.get(xValues.size() - 2), yValues
 				.get(yValues.size() - 2)));
 		line.add(new PointD(xValues.lastElement(), yValues.lastElement()));

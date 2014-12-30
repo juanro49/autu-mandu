@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.activeandroid.Cache;
 import com.google.android.gms.common.AccountPicker;
@@ -58,6 +59,8 @@ import me.kuehle.carreport.gui.dialog.ProgressDialogFragment;
 
 public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationProvider implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    private static final String TAG = "GoogleDriveSynchronizationProvider";
+
     private static final int REQUEST_PICK_ACCOUNT = 1000;
     private static final int REQUEST_RESOLVE_CONNECTION = 1001;
     private static final Scope SCOPE = Drive.SCOPE_APPFOLDER;
@@ -321,7 +324,9 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
             } catch (IOException e) {
                 return false;
             } finally {
-                mTempFile.delete();
+                if (!mTempFile.delete()) {
+                    Log.w(TAG, "Could not delete temp file after uploading.");
+                }
             }
         } else {
             // --------------------------------------------------

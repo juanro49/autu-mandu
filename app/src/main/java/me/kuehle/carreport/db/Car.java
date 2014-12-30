@@ -16,13 +16,6 @@
 
 package me.kuehle.carreport.db;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import me.kuehle.carreport.db.query.SafeSelect;
 import android.database.Cursor;
 
 import com.activeandroid.Cache;
@@ -31,38 +24,44 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import me.kuehle.carreport.db.query.SafeSelect;
+
 @Table(name = "cars")
 public class Car extends Model {
-	@Column(name = "name", notNull = true)
-	public String name;
+    @Column(name = "name", notNull = true)
+    public String name;
 
-	@Column(name = "color", notNull = true)
-	public int color;
+    @Column(name = "color", notNull = true)
+    public int color;
 
-	@Column(name = "suspended_since")
-	public Date suspendedSince;
+    @Column(name = "suspended_since")
+    public Date suspendedSince;
 
-	public Car() {
-		super();
-	}
+    public Car() {
+        super();
+    }
 
-	public Car(String name, int color, Date suspendedSince) {
-		super();
-		this.name = name;
-		this.color = color;
-		this.suspendedSince = suspendedSince;
-	}
+    public Car(String name, int color, Date suspendedSince) {
+        super();
+        this.name = name;
+        this.color = color;
+        this.suspendedSince = suspendedSince;
+    }
 
-	public boolean isSuspended() {
-		return suspendedSince != null;
-	}
+    public boolean isSuspended() {
+        return suspendedSince != null;
+    }
 
-	public List<Refueling> getRefuelings() {
+    public List<Refueling> getRefuelings() {
         return new Select().from(Refueling.class)
                 .where("car = ?", id)
                 .orderBy("date ASC")
                 .execute();
-	}
+    }
 
     public List<Refueling> getRefuelingsByFuelTypeCategory(String category) {
         return SafeSelect.from(Refueling.class)
@@ -72,12 +71,12 @@ public class Car extends Model {
                 .execute();
     }
 
-	public List<OtherCost> getOtherCosts() {
-		return new Select().from(OtherCost.class)
+    public List<OtherCost> getOtherCosts() {
+        return new Select().from(OtherCost.class)
                 .where("car = ?", id)
-				.orderBy("date ASC")
+                .orderBy("date ASC")
                 .execute();
-	}
+    }
 
     public FuelType getMostUsedFuelType() {
         return SafeSelect.from(FuelType.class)
@@ -97,7 +96,7 @@ public class Car extends Model {
                 .toSql();
         Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
-        List<String> categories = new ArrayList<String>();
+        List<String> categories = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 categories.add(cursor.getString(0));
@@ -108,14 +107,15 @@ public class Car extends Model {
         return categories;
     }
 
-	public static List<Car> getAll() {
-		return new Select().from(Car.class)
+    public static List<Car> getAll() {
+        return new Select().from(Car.class)
                 .orderBy("name ASC")
                 .execute();
-	}
+    }
 
     /**
      * Gets all cars, which are not suspended.
+     *
      * @return All not suspended cars.
      */
     public static List<Car> getAllActive() {
@@ -125,16 +125,16 @@ public class Car extends Model {
                 .execute();
     }
 
-	public static int getCount() {
-		String sql = new Select("COUNT(*)").from(Car.class).toSql();
-		Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
+    public static int getCount() {
+        String sql = new Select("COUNT(*)").from(Car.class).toSql();
+        Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
-		int count = 0;
-		if (cursor.moveToFirst() && cursor.getColumnCount() == 1) {
-			count = cursor.getInt(0);
-		}
+        int count = 0;
+        if (cursor.moveToFirst() && cursor.getColumnCount() == 1) {
+            count = cursor.getInt(0);
+        }
 
-		cursor.close();
-		return count;
-	}
+        cursor.close();
+        return count;
+    }
 }

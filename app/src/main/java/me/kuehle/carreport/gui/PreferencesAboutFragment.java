@@ -28,6 +28,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,8 @@ import android.widget.TextView;
 
 public class PreferencesAboutFragment extends Fragment {
 	public static class LicenseDialogFragment extends DialogFragment {
+        private static final String TAG = "LicenseDialogFragment";
+
 		public static LicenseDialogFragment newInstance() {
 			return new LicenseDialogFragment();
 		}
@@ -50,13 +53,13 @@ public class PreferencesAboutFragment extends Fragment {
 			TextView text = new TextView(getActivity());
 			text.setMovementMethod(LinkMovementMethod.getInstance());
 			try {
-				InputStream in = getActivity().getAssets().open(
-						"licenses.html");
+				InputStream in = getActivity().getAssets().open("licenses.html");
 				byte[] buffer = new byte[in.available()];
-				in.read(buffer);
+                in.read(buffer);
 				in.close();
 				text.setText(Html.fromHtml(new String(buffer)));
 			} catch (IOException e) {
+                Log.e(TAG, "Error loading license html file.", e);
 			}
 
             v.addView(text, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

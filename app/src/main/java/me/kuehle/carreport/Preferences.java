@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,9 +33,10 @@ import me.kuehle.carreport.data.report.FuelConsumptionReport;
 import me.kuehle.carreport.data.report.FuelPriceReport;
 import me.kuehle.carreport.data.report.MileageReport;
 import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.util.Strings;
 
 public class Preferences {
+    private static final String TAG = "Preferences";
+
     private SharedPreferences prefs;
 
     public Preferences(Context context) {
@@ -88,7 +91,7 @@ public class Preferences {
 
     @SuppressWarnings("unchecked")
     public List<Class<? extends AbstractReport>> getReportOrder() {
-        List<Class<? extends AbstractReport>> reports = new ArrayList<Class<? extends AbstractReport>>();
+        List<Class<? extends AbstractReport>> reports = new ArrayList<>();
         String reportNames = prefs.getString("behavior_report_order", null);
         if (reportNames == null) {
             reports.add(FuelConsumptionReport.class);
@@ -103,6 +106,7 @@ public class Preferences {
                         reports.add((Class<? extends AbstractReport>) report);
                     }
                 } catch (Exception e) {
+                    Log.e(TAG, "Error loading report order.", e);
                 }
             }
         }
@@ -185,13 +189,13 @@ public class Preferences {
     }
 
     public void setReportOrder(List<Class<? extends AbstractReport>> reports) {
-        List<String> reportNames = new ArrayList<String>();
+        List<String> reportNames = new ArrayList<>();
         for (Class<? extends AbstractReport> report : reports) {
             reportNames.add(report.getName());
         }
 
         Editor edit = prefs.edit();
-        edit.putString("behavior_report_order", Strings.join(",", reportNames));
+        edit.putString("behavior_report_order", TextUtils.join(",", reportNames));
         edit.apply();
     }
 

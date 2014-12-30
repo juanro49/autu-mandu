@@ -48,8 +48,7 @@ public abstract class AbstractSynchronizationProvider {
         public void onSynchronizationStarted();
     }
 
-    private static class SynchronizationStatusReceiver extends
-            BroadcastReceiver {
+    private static class SynchronizationStatusReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             int status = intent.getIntExtra(

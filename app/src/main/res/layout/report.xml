@@ -15,61 +15,65 @@
   limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
-    <FrameLayout
+    android:orientation="vertical">
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:background="@drawable/card_background"
-        tools:ignore="UselessParent" >
-        <LinearLayout
-            android:id="@+id/details"
+        card_view:cardBackgroundColor="#000">
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-9999dp"
-            android:orientation="vertical" />
-        <LinearLayout
-            android:id="@+id/main"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#000"
-            android:orientation="vertical"
-            android:padding="8dp" >
+            android:layout_margin="8dp">
             <LinearLayout
+                android:id="@+id/details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
-                <TextView
-                    android:id="@+id/txt_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:singleLine="true"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-                <ImageButton
-                    android:id="@+id/btn_report_details"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:contentDescription="@string/graph_details_desc"
-                    android:src="@drawable/ic_info" />
-                <ImageButton
-                    android:id="@+id/btn_report_options"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:contentDescription="@string/graph_options_desc"
-                    android:src="@drawable/ic_more_vert" />
-            </LinearLayout>
-            <me.kuehle.chartlib.ChartView
-                android:id="@+id/chart"
+                android:layout_marginTop="-9999dp"
+                android:orientation="vertical" />
+            <LinearLayout
+                android:id="@+id/main"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_margin="8dp" />
-        </LinearLayout>
-    </FrameLayout>
+                android:layout_height="wrap_content"
+                android:background="#000"
+                android:orientation="vertical"
+                android:padding="8dp" >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+                    <TextView
+                        android:id="@+id/txt_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+                    <ImageButton
+                        android:id="@+id/btn_report_details"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:contentDescription="@string/graph_details_desc"
+                        android:src="@drawable/ic_info" />
+                    <ImageButton
+                        android:id="@+id/btn_report_options"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:contentDescription="@string/graph_options_desc"
+                        android:src="@drawable/ic_more_vert" />
+                </LinearLayout>
+                <me.kuehle.chartlib.ChartView
+                    android:id="@+id/chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:layout_margin="8dp" />
+            </LinearLayout>
+        </FrameLayout>
+    </android.support.v7.widget.CardView>
 </LinearLayout>

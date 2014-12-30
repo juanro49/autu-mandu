@@ -144,8 +144,7 @@ public class SimpleAnimator {
 		animator.addUpdateListener(new AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				int height = (Integer) animation.getAnimatedValue();
-				view.getLayoutParams().height = height;
+                view.getLayoutParams().height = (Integer) animation.getAnimatedValue();
 				view.requestLayout();
 			}
 		});
@@ -156,8 +155,8 @@ public class SimpleAnimator {
 		animator.addUpdateListener(new AnimatorUpdateListener() {
 			@Override
 			public void onAnimationUpdate(ValueAnimator animation) {
-				float weight = (Float) animation.getAnimatedValue();
-				((LinearLayout.LayoutParams) view.getLayoutParams()).weight = weight;
+                ((LinearLayout.LayoutParams) view.getLayoutParams()).weight = (Float) animation
+                        .getAnimatedValue();
 				view.requestLayout();
 			}
 		});

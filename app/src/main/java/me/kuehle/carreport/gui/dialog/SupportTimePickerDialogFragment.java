@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import android.app.Dialog;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.app.TimePickerDialog;
@@ -44,7 +45,8 @@ public class SupportTimePickerDialogFragment extends DialogFragment implements
 		return f;
 	}
 
-	@Override
+	@NonNull
+    @Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Bundle args = getArguments();
 

@@ -52,7 +52,7 @@ public class DistanceToVolumeCalculation extends AbstractCalculation {
 
     @Override
     public CalculationItem[] calculate(double input) {
-        List<CalculationItem> items = new ArrayList<CalculationItem>();
+        List<CalculationItem> items = new ArrayList<>();
         for (Car car : Car.getAll()) {
             List<String> categories = car.getUsedFuelTypeCategories();
             for (String category : categories) {

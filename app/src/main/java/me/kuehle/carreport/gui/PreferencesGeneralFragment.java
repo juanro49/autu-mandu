@@ -25,7 +25,6 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.util.Strings;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -34,6 +33,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.text.TextUtils;
 
 public class PreferencesGeneralFragment extends PreferenceFragment {
 	private class PreferenceChangeListener implements
@@ -188,7 +188,7 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 	private void updateReportOrderSummary() {
 		List<Class<? extends AbstractReport>> reportClasses = new Preferences(
 				getActivity()).getReportOrder();
-		List<String> reportTitles = new ArrayList<String>();
+		List<String> reportTitles = new ArrayList<>();
 		for (Class<? extends AbstractReport> reportClass : reportClasses) {
 			AbstractReport report = AbstractReport.newInstance(reportClass,
 					getActivity());
@@ -196,6 +196,6 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 		}
 
 		PreferenceScreen reportOrder = (PreferenceScreen) findPreference("behavior_report_order");
-		reportOrder.setSummary(Strings.join(", ", reportTitles));
+		reportOrder.setSummary(TextUtils.join(", ", reportTitles));
 	}
 }

@@ -36,7 +36,7 @@ public class PriceToDistanceCalculation extends AbstractCalculation {
 
 	@Override
 	public CalculationItem[] calculate(double input) {
-		List<CalculationItem> items = new ArrayList<CalculationItem>();
+		List<CalculationItem> items = new ArrayList<>();
 		for (Car car : Car.getAll()) {
 			double totalCosts = 0;
 			int startMileage = -1;

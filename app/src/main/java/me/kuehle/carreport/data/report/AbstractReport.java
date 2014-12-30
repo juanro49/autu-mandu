@@ -26,10 +26,14 @@ import java.util.List;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.TypedValue;
 
 public abstract class AbstractReport {
+    private static final String TAG = "AbstractReport";
+
 	public abstract static class AbstractListItem implements
 			Comparable<AbstractListItem> {
 		protected String label;
@@ -52,7 +56,7 @@ public abstract class AbstractReport {
 		}
 
 		@Override
-		public int compareTo(AbstractListItem another) {
+		public int compareTo(@NonNull AbstractListItem another) {
 			if (another instanceof Section) {
 				return -1;
 			} else {
@@ -78,7 +82,7 @@ public abstract class AbstractReport {
 			super(label);
 			this.color = color;
 			this.order = order;
-			this.items = new ArrayList<Item>();
+			this.items = new ArrayList<>();
 		}
 
 		public void addItem(Item item) {
@@ -86,7 +90,7 @@ public abstract class AbstractReport {
 		}
 
 		@Override
-		public int compareTo(AbstractListItem another) {
+		public int compareTo(@NonNull AbstractListItem another) {
 			if (another instanceof Item) {
 				return 1;
 			} else {
@@ -116,10 +120,8 @@ public abstract class AbstractReport {
 					return false;
 			} else if (!items.equals(other.items))
 				return false;
-			if (order != other.order)
-				return false;
-			return true;
-		}
+            return order == other.order;
+        }
 
 		public int getColor() {
 			return color;
@@ -142,10 +144,6 @@ public abstract class AbstractReport {
 			result = prime * result + order;
 			return result;
 		}
-
-		public void removeItem(Item item) {
-			items.remove(item);
-		}
 	}
 
 	public static AbstractReport newInstance(
@@ -156,13 +154,14 @@ public abstract class AbstractReport {
 			return constructor.newInstance(context);
 		} catch (NoSuchMethodException | IllegalArgumentException | InstantiationException |
                 InvocationTargetException | IllegalAccessException e) {
+            Log.e(TAG, "Error creating report.", e);
 		}
 
         return null;
 	}
 
 	protected Context context;
-	private ArrayList<AbstractListItem> data = new ArrayList<AbstractListItem>();
+	private ArrayList<AbstractListItem> data = new ArrayList<>();
 	private boolean showTrend = false;
 	private boolean showOverallTrend = false;
 	private int chartOption = 0;
@@ -203,7 +202,7 @@ public abstract class AbstractReport {
 		Collections.sort(data);
 
 		if (flat) {
-			ArrayList<AbstractListItem> items = new ArrayList<AbstractListItem>();
+			ArrayList<AbstractListItem> items = new ArrayList<>();
 			for (AbstractListItem item : data) {
 				items.add(item);
 				if (item instanceof Section) {

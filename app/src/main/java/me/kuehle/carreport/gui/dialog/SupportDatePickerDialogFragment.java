@@ -21,6 +21,7 @@ import java.util.Date;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -43,7 +44,8 @@ public class SupportDatePickerDialogFragment extends DialogFragment implements
 		return f;
 	}
 
-	@Override
+	@NonNull
+    @Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Bundle args = getArguments();
 

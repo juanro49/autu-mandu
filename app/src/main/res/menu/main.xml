@@ -29,6 +29,6 @@
         android:icon="@drawable/ic_add"
         app:showAsAction="never"
         android:title="@string/menu_add_other">
-        <menu></menu>
+        <menu/>
     </item>
 </menu>

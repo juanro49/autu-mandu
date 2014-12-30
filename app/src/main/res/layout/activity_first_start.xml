@@ -59,6 +59,7 @@
             android:layout_alignTop="@+id/img_step1"
             android:layout_marginTop="8dp"
             android:layout_toRightOf="@+id/img_step1"
+            android:layout_toEndOf="@+id/img_step1"
             android:text="@string/first_start_step1_text"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <ImageView
@@ -78,6 +79,7 @@
             android:layout_alignTop="@+id/img_step2"
             android:layout_marginTop="8dp"
             android:layout_toRightOf="@+id/img_step2"
+            android:layout_toEndOf="@+id/img_step2"
             android:text="@string/first_start_step2_text"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <ImageView
@@ -97,6 +99,7 @@
             android:layout_alignTop="@+id/img_step3"
             android:layout_marginTop="8dp"
             android:layout_toRightOf="@+id/img_step3"
+            android:layout_toEndOf="@+id/img_step3"
             android:text="@string/first_start_step3_text"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <Button

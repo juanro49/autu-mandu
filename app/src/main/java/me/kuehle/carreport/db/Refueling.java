@@ -16,9 +16,7 @@
 
 package me.kuehle.carreport.db;
 
-import java.util.Date;
-
-import me.kuehle.carreport.db.query.SafeSelect;
+import android.support.annotation.NonNull;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
@@ -26,73 +24,75 @@ import com.activeandroid.annotation.Column.ForeignKeyAction;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import java.util.Date;
+
 @Table(name = "refuelings")
 public class Refueling extends Model implements Comparable<Refueling> {
-	@Column(name = "date", notNull = true)
-	public Date date;
+    @Column(name = "date", notNull = true)
+    public Date date;
 
-	@Column(name = "mileage", notNull = true)
-	public int mileage;
+    @Column(name = "mileage", notNull = true)
+    public int mileage;
 
-	@Column(name = "volume", notNull = true)
-	public float volume;
+    @Column(name = "volume", notNull = true)
+    public float volume;
 
-	@Column(name = "price", notNull = true)
-	public float price;
+    @Column(name = "price", notNull = true)
+    public float price;
 
-	@Column(name = "partial", notNull = true)
-	public boolean partial;
+    @Column(name = "partial", notNull = true)
+    public boolean partial;
 
-	@Column(name = "note", notNull = true)
-	public String note;
+    @Column(name = "note", notNull = true)
+    public String note;
 
-	@Column(name = "fuel_type", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
-	public FuelType fuelType;
+    @Column(name = "fuel_type", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
+    public FuelType fuelType;
 
-	@Column(name = "car", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
-	public Car car;
+    @Column(name = "car", notNull = true, onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
+    public Car car;
 
-	public boolean guessed = false;
-	
-	public boolean valid = true;
+    public boolean guessed = false;
 
-	public Refueling() {
-		super();
-	}
+    public boolean valid = true;
 
-	public Refueling(Date date, int mileage, float volume, float price,
-			boolean partial, String note, FuelType fuelType, Car car) {
-		super();
-		this.date = date;
-		this.mileage = mileage;
-		this.volume = volume;
-		this.price = price;
-		this.partial = partial;
-		this.note = note;
-		this.fuelType = fuelType;
-		this.car = car;
-	}
+    public Refueling() {
+        super();
+    }
 
-	@Override
-	public int compareTo(Refueling another) {
-		return date.compareTo(another.date);
-	}
+    public Refueling(Date date, int mileage, float volume, float price,
+                     boolean partial, String note, FuelType fuelType, Car car) {
+        super();
+        this.date = date;
+        this.mileage = mileage;
+        this.volume = volume;
+        this.price = price;
+        this.partial = partial;
+        this.note = note;
+        this.fuelType = fuelType;
+        this.car = car;
+    }
 
-	public float getFuelPrice() {
-		return price / volume;
-	}
+    @Override
+    public int compareTo(@NonNull Refueling another) {
+        return date.compareTo(another.date);
+    }
 
-	public static Refueling getPrevious(Car car, Date date) {
-		return new Select().from(Refueling.class)
+    public float getFuelPrice() {
+        return price / volume;
+    }
+
+    public static Refueling getPrevious(Car car, Date date) {
+        return new Select().from(Refueling.class)
                 .where("car = ? AND date < ?", car.id, date.getTime())
                 .orderBy("date DESC")
-				.executeSingle();
-	}
-	
-	public static Refueling getNext(Car car, Date date) {
-		return new Select().from(Refueling.class)
-				.where("car = ? AND date > ?", car.id, date.getTime())
+                .executeSingle();
+    }
+
+    public static Refueling getNext(Car car, Date date) {
+        return new Select().from(Refueling.class)
+                .where("car = ? AND date > ?", car.id, date.getTime())
                 .orderBy("date ASC")
-				.executeSingle();
-	}
+                .executeSingle();
+    }
 }

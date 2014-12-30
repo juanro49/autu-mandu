@@ -61,7 +61,7 @@ public class FuelType extends Model {
                 .orderBy("category ASC").toSql();
         Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
-        List<String> titles = new ArrayList<String>();
+        List<String> titles = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 titles.add(cursor.getString(0));

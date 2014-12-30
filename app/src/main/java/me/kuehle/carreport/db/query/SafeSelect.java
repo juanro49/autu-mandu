@@ -38,7 +38,7 @@ public class SafeSelect {
 		String tableName = tableInfo.getTableName();
 		Collection<Field> fields = tableInfo.getFields();
 
-		List<Select.Column> columns = new ArrayList<Select.Column>();
+		List<Select.Column> columns = new ArrayList<>();
 		for (Field field : fields) {
 			String columnName = tableInfo.getColumnName(field);
 			columns.add(new Column(tableName + "." + columnName, columnName));

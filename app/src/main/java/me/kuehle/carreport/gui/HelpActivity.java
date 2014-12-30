@@ -22,6 +22,7 @@ import android.preference.PreferenceActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,8 @@ import java.util.Locale;
 import me.kuehle.carreport.R;
 
 public class HelpActivity extends PreferenceActivity {
+    private static final String TAG = "HelpActivity";
+
     private Toolbar mActionBar;
 
     @Override
@@ -94,6 +97,7 @@ public class HelpActivity extends PreferenceActivity {
 
                 text.setText(Html.fromHtml(new String(buffer)));
             } catch (IOException e) {
+                Log.e(TAG, "Error reading help html file.", e);
             }
 
             return v;

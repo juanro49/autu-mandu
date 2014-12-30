@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.Menu;
@@ -100,7 +99,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
                 chkSuspend.setChecked(car.isSuspended());
                 edtSuspendDate.setDate(car.isSuspended() ? car.suspendedSince : new Date());
             } else {
-                color = getResources().getColor(R.color.accent );
+                color = getResources().getColor(R.color.accent);
                 edtSuspendDate.setDate(new Date());
             }
         } else {

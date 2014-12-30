@@ -16,6 +16,8 @@
 
 package me.kuehle.carreport.util;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -27,6 +29,8 @@ import java.util.Locale;
 import me.kuehle.carreport.db.serializer.RecurrenceSerializer;
 
 public class CSVWriter {
+    private static final String TAG = "CSVWriter";
+
 	private static final char QUOTE = '"';
 	private static final char ESCAPE = '\\';
 	private static final char SEPARATOR;
@@ -101,6 +105,7 @@ public class CSVWriter {
 			out.write(toString());
 			out.close();
 		} catch (FileNotFoundException e) {
+            Log.e(TAG, "Error while writing to file.", e);
 		}
 	}
 

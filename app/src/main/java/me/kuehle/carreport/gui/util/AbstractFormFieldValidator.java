@@ -50,6 +50,7 @@ public abstract class AbstractFormFieldValidator {
 				} else {
 					error += "\n\n";
 				}
+
 				error += context.getString(getMessage());
 
 				field.setError(error);

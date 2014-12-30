@@ -350,7 +350,7 @@ public class MainActivity extends ActionBarActivity implements
         items[i++] = new DrawerListItem();
         items[i++] = new DrawerListItem(getString(R.string.drawer_settings),
                 new Intent(this, PreferencesActivity.class));
-        items[i++] = new DrawerListItem(getString(R.string.drawer_help),
+        items[i] = new DrawerListItem(getString(R.string.drawer_help),
                 new Intent(this, HelpActivity.class));
 
         return items;

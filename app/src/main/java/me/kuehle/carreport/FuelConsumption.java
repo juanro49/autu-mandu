@@ -66,12 +66,6 @@ public class FuelConsumption {
         return computeFuelConsumption(this.consumptionType, volume, distance);
     }
 
-    public String getUnitLabel(int consumptionTypeId) {
-        Type consumptionType = FuelConsumption
-                .findConsumptionType(consumptionTypeId);
-        return this.getUnitLabel(consumptionType);
-    }
-
     public String getUnitLabel(Type consumptionType) {
         if (consumptionType == Type.DIST_FOR_VOL) {
             return String.format("%s/%s", this.unitDistance, this.unitVolume);

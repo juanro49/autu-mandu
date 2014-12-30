@@ -66,6 +66,7 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
     private TextView mTxtUnit;
     private View mGraphHolder;
     private ChartView mGraph;
+    private View mTableHolder;
     private ListView mTable;
 
     private AbstractCalculation[] mCalculations;
@@ -91,9 +92,10 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
         mTxtUnit = (TextView) v.findViewById(R.id.txt_unit);
         mGraphHolder = v.findViewById(R.id.chart_holder);
         mGraph = (ChartView) v.findViewById(R.id.chart);
+        mTableHolder = v.findViewById(R.id.table_holder);
         mTable = (ListView) v.findViewById(R.id.table);
 
-        ArrayAdapter<String> options = new ArrayAdapter<String>(getActivity(),
+        ArrayAdapter<String> options = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item);
         mSpnOptions.setAdapter(options);
         for (AbstractCalculation calculation : mCalculations) {
@@ -101,14 +103,13 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
         }
 
         if (savedInstanceState != null) {
-            mSpnOptions.setSelection(savedInstanceState.getInt(
-                    STATE_CURRENT_OPTION, 0));
+            mSpnOptions.setSelection(savedInstanceState.getInt(STATE_CURRENT_OPTION, 0));
         }
 
         mSpnOptions.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView,
-                                       View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
                 AbstractCalculation calculation = mCalculations[position];
                 mTxtUnit.setText(calculation.getInputUnit());
 
@@ -150,14 +151,13 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
     }
 
     private void calculate() {
-        AbstractCalculation calculation = mCalculations[mSpnOptions
-                .getSelectedItemPosition()];
-        double input = 1;
+        AbstractCalculation calculation = mCalculations[mSpnOptions.getSelectedItemPosition()];
+        double input;
         try {
             input = Double.parseDouble(mEdtInput.getText().toString());
         } catch (NumberFormatException e) {
             mGraphHolder.setVisibility(View.INVISIBLE);
-            mTable.setVisibility(View.INVISIBLE);
+            mTableHolder.setVisibility(View.INVISIBLE);
             return;
         }
 
@@ -171,8 +171,11 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
             series.add(i, items[i].getValue());
         }
 
+        BarRenderer renderer = new BarRenderer(getActivity());
+        renderer.setSeriesColor(0, getResources().getColor(R.color.accent));
+
         RendererList renderers = new RendererList();
-        renderers.addRenderer(new BarRenderer(getActivity()));
+        renderers.addRenderer(renderer);
 
         Chart chart = new Chart(getActivity(), dataset, renderers);
         chart.getDomainAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
@@ -199,20 +202,19 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
         mGraphHolder.setVisibility(View.VISIBLE);
 
         // Update table
-        List<Map<String, String>> tableData = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> tableData = new ArrayList<>();
         for (CalculationItem item : items) {
-            Map<String, String> row = new HashMap<String, String>();
+            Map<String, String> row = new HashMap<>();
             row.put("label", item.getName());
-            row.put("value",
-                    String.format("%.2f %s", item.getValue(),
-                            calculation.getOutputUnit()));
+            row.put("value", String.format("%.2f %s", item.getValue(),
+                    calculation.getOutputUnit()));
             tableData.add(row);
         }
 
         mTable.setAdapter(new SimpleAdapter(getActivity(), tableData,
-                R.layout.row_report_data, new String[]{"label", "value"},
-                new int[]{android.R.id.text1, android.R.id.text2}));
-        mTable.setVisibility(View.VISIBLE);
+                R.layout.row_report_data, new String[]{ "label", "value" },
+                new int[]{ android.R.id.text1, android.R.id.text2 }));
+        mTableHolder.setVisibility(View.VISIBLE);
     }
 
     private double[] getXValues(Series series) {

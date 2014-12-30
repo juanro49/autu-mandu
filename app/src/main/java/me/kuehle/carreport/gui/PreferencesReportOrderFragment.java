@@ -23,6 +23,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
 import android.app.ListFragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,7 @@ public class PreferencesReportOrderFragment extends ListFragment {
 	private List<Class<? extends AbstractReport>> reportClasses;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.fragment_prefs_report_order,
 				container, false);
@@ -62,8 +63,7 @@ public class PreferencesReportOrderFragment extends ListFragment {
 		DragSortListView lv = (DragSortListView) getListView();
 		lv.setDropListener(new ReportDropListener());
 
-		adapter = new ArrayAdapter<String>(getActivity(),
-				R.layout.list_item_drag, android.R.id.text1);
+		adapter = new ArrayAdapter<>(getActivity(), R.layout.list_item_drag, android.R.id.text1);
 
 		Preferences prefs = new Preferences(getActivity());
 		reportClasses = prefs.getReportOrder();
