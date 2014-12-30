@@ -121,7 +121,6 @@ public class MileageReport extends AbstractReport {
             Long.MAX_VALUE};
 
     private String unit;
-    private boolean showLegend;
 
     public MileageReport(Context context) {
         super(context);
@@ -199,7 +198,7 @@ public class MileageReport extends AbstractReport {
 
         final Chart chart = new Chart(context, dataset, renderers);
         applyDefaultChartStyles(chart);
-        chart.setShowLegend(showLegend);
+        chart.setShowLegend(false);
         if (isShowTrend()) {
             for (int i = 0; i < chartReportData.size() / 2; i++) {
                 chart.getLegend().setSeriesVisible(i, false);
@@ -221,7 +220,6 @@ public class MileageReport extends AbstractReport {
         // Preferences
         Preferences prefs = new Preferences(context);
         unit = prefs.getUnitDistance();
-        showLegend = prefs.isShowLegend();
 
         // Car data
         List<Car> cars = Car.getAll();

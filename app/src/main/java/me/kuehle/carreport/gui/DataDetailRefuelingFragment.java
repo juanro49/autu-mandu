@@ -105,9 +105,11 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
             // By default select most often used fuel type for this car.
             Car selectedCar = cars.get(spnCar.getSelectedItemPosition());
             FuelType mostUsedFuelType = selectedCar.getMostUsedFuelType();
-            for (int pos = 0; pos < fuelTypes.size(); pos++) {
-                if (fuelTypes.get(pos).id.equals(mostUsedFuelType.id)) {
-                    spnFuelType.setSelection(pos);
+            if (mostUsedFuelType != null) {
+                for (int pos = 0; pos < fuelTypes.size(); pos++) {
+                    if (fuelTypes.get(pos).id.equals(mostUsedFuelType.id)) {
+                        spnFuelType.setSelection(pos);
+                    }
                 }
             }
         } else {
@@ -246,6 +248,8 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         }
 
         // Fuel Type
+        FuelType.ensureAtLeastOneFuelType();
+
         fuelTypes = FuelType.getAll();
         ArrayAdapter<String> fuelTypeAdapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item);

@@ -71,4 +71,23 @@ public class FuelType extends Model {
         cursor.close();
         return titles;
     }
+
+    public static int getCount() {
+        String sql = new Select("COUNT(*)").from(FuelType.class).toSql();
+        Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
+
+        int count = 0;
+        if (cursor.moveToFirst() && cursor.getColumnCount() == 1) {
+            count = cursor.getInt(0);
+        }
+
+        cursor.close();
+        return count;
+    }
+
+    public static void ensureAtLeastOneFuelType() {
+        if (getCount() == 0) {
+            new FuelType("Default", "Default").save();
+        }
+    }
 }

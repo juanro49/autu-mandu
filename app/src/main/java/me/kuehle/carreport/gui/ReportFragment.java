@@ -99,8 +99,6 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
 		@Override
 		protected void onProgressUpdate(Object... values) {
-			Preferences prefs = new Preferences(getActivity());
-
 			final AbstractReport report = (AbstractReport) values[0];
 			View card = View.inflate(getActivity(), R.layout.report, null);
 			getNextColumn().addView(card);
@@ -145,12 +143,10 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 					TextView text = (TextView) itemView;
 
 					text.setText(section.getLabel());
-					if (prefs.isColorSections()) {
-						text.setTextColor(section.getColor());
-						GradientDrawable drawableBottom = (GradientDrawable) text
-                                .getCompoundDrawables()[3];
-						drawableBottom.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
-					}
+                    text.setTextColor(section.getColor());
+                    GradientDrawable drawableBottom = (GradientDrawable) text
+                            .getCompoundDrawables()[3];
+                    drawableBottom.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
 				} else {
 					((TextView) itemView.findViewById(android.R.id.text1)).setText(item.getLabel());
 					((TextView) itemView.findViewById(android.R.id.text2))

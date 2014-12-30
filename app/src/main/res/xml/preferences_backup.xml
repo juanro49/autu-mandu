@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-    <PreferenceCategory android:title="@string/pref_title_category_syncronisation" >
+    <PreferenceCategory android:title="@string/pref_title_category_synchronization" >
         <Preference android:key="sync_current_provider" />
         <CheckBoxPreference
             android:defaultValue="true"

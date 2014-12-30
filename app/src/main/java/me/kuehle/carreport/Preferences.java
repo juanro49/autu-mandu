@@ -138,16 +138,8 @@ public class Preferences {
         return prefs.getBoolean("behavior_auto_guess_missing_data", false);
     }
 
-    public boolean isColorSections() {
-        return prefs.getBoolean("appearance_color_sections", true);
-    }
-
     public boolean isShowCarMenu() {
         return prefs.getBoolean("behavior_show_car_menu", true);
-    }
-
-    public boolean isShowLegend() {
-        return prefs.getBoolean("appearance_show_legend", false);
     }
 
     public boolean isSyncOnChange() {

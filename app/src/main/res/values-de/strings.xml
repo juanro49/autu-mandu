@@ -170,17 +170,14 @@
     <string name="pref_title_header_backup">Sichern &amp; Exportieren</string>
     <string name="pref_title_header_report_order">Reihenfolge der Reports</string>
     <string name="pref_title_category_behavior">Verhalten</string>
-    <string name="pref_title_category_appearance">Aussehen</string>
     <string name="pref_title_category_units">Einheiten</string>
-    <string name="pref_title_category_syncronisation">Synchronisation</string>
+    <string name="pref_title_category_synchronization">Synchronisation</string>
     <string name="pref_title_category_backup">Sichern &amp; Wiederherstellen</string>
     <string name="pref_title_category_export">Exportieren &amp; Importieren</string>
     <string name="pref_title_behavior_default_car">Standard-Auto</string>
     <string name="pref_title_behavior_show_car_menu">Zeige Autoauswahlmenü</string>
     <string name="pref_title_behavior_distance_entry_mode">Entfernungseingabe</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Fehlende Tankfüllungen ausgleichen (Beta)</string>
-    <string name="pref_title_appearance_color_sections">Farbige Abschnitte</string>
-    <string name="pref_title_appearance_show_legend">Legende in Graphen anzeigen</string>
     <string name="pref_title_unit_currency">Währung</string>
     <string name="pref_title_unit_volume">Volumen</string>
     <string name="pref_title_unit_distance">Entfernung</string>
@@ -194,8 +191,6 @@
     <string name="pref_title_importcsv">CSV importieren</string>
     <string name="pref_summary_behavior_show_car_menu">Zeige ein Menü zur Autoauswahl, wenn Sie eine Tankfüllung hinzufügen und mehr als ein Auto haben.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Versuche fehlende Tankfüllungen zu erkennen. Dadurch werden die erheblich geringeren Benzinverbräuche, die entstehen, wenn eine Tankfüllung verbessen wird einzutragen, ausgeglichen.</string>
-    <string name="pref_summary_appearance_color_sections">Überschriften der Abschnitte in der Farbe des dazugehörigen Autos anzeigen.</string>
-    <string name="pref_summary_appearance_show_legend">Eine Legende in den Graphen anzeigen, die zeigt, welche Linie zu welchem Auto gehört.</string>
     <string name="pref_summary_sync_setup">Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>
     <string name="pref_summary_sync_current_provider">Verbunden mit %s. Klicke, um die Verbindung zu trennen.</string>
     <string name="pref_summary_sync_on_start">Automatisch synchronisieren, wenn die App startet.</string>

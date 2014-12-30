@@ -94,7 +94,6 @@ public class CostsReport extends AbstractReport {
 
     private SparseArray<ReportGraphData> costsPerMonth = new SparseArray<>();
     private SparseArray<ReportGraphData> costsPerYear = new SparseArray<>();
-    private boolean showLegend;
     private String[] xLabelFormat = new String[2];
     private int visibleBarCount;
 
@@ -176,7 +175,7 @@ public class CostsReport extends AbstractReport {
         // Draw report
         final Chart chart = new Chart(context, dataset, renderers);
         applyDefaultChartStyles(chart);
-        chart.setShowLegend(showLegend);
+        chart.setShowLegend(false);
         if (isShowTrend()) {
             for (int i = 1; i < dataset.size(); i += 2) {
                 chart.getLegend().setSeriesVisible(i, false);
@@ -211,7 +210,6 @@ public class CostsReport extends AbstractReport {
     protected void onUpdate() {
         Preferences prefs = new Preferences(context);
         String unit = prefs.getUnitCurrency();
-        showLegend = prefs.isShowLegend();
 
         // Settings, which are based on the screen size.
         if (context.getResources().getConfiguration().smallestScreenWidthDp > 480) {

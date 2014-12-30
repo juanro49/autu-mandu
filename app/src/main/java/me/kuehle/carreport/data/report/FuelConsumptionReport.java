@@ -105,8 +105,6 @@ public class FuelConsumptionReport extends AbstractReport {
 
     private String unit;
 
-    private boolean showLegend;
-
     public FuelConsumptionReport(Context context) {
         super(context);
     }
@@ -200,7 +198,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
         final Chart chart = new Chart(context, dataset, renderers);
         applyDefaultChartStyles(chart);
-        chart.setShowLegend(showLegend);
+        chart.setShowLegend(false);
         if (isShowTrend()) {
             for (int i = 0; i < reportData.size() / 2; i++) {
                 chart.getLegend().setSeriesVisible(i, false);
@@ -220,10 +218,8 @@ public class FuelConsumptionReport extends AbstractReport {
     @Override
     protected void onUpdate() {
         // Preferences
-        Preferences prefs = new Preferences(context);
         FuelConsumption fuelConsumption = new FuelConsumption(context);
         unit = fuelConsumption.getUnitLabel();
-        showLegend = prefs.isShowLegend();
 
         // Collect report data and add info data which will be displayed
         // next to the graph.

@@ -52,7 +52,6 @@ public class FuelPriceReport extends AbstractReport {
 
 	private ArrayList<ReportGraphData> reportData;
 	private String unit;
-	private boolean showLegend;
 
 	public FuelPriceReport(Context context) {
 		super(context);
@@ -121,7 +120,7 @@ public class FuelPriceReport extends AbstractReport {
 
 		final Chart chart = new Chart(context, dataset, renderers);
 		applyDefaultChartStyles(chart);
-		chart.setShowLegend(showLegend);
+		chart.setShowLegend(false);
 		chart.getDomainAxis().setLabelFormatter(dateLabelFormatter);
 		chart.getRangeAxis()
 				.setLabelFormatter(new DecimalAxisLabelFormatter(3));
@@ -138,7 +137,6 @@ public class FuelPriceReport extends AbstractReport {
 		Preferences prefs = new Preferences(context);
 		unit = String.format("%s/%s", prefs.getUnitCurrency(),
 				prefs.getUnitVolume());
-		showLegend = prefs.isShowLegend();
 
 		List<FuelType> fuelTypes = FuelType.getAll();
 
