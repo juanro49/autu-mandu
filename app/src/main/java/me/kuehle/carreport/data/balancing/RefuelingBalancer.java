@@ -97,8 +97,7 @@ public class RefuelingBalancer {
 				// drive since the last (including partial) refueling.
 				int possibleDistance = avgDistance;
 				for (int pI = lastFullRefueling + 1; pI < i; pI++) {
-					int pDistance = refuelings.get(pI).mileage
-							- refuelings.get(pI - 1).mileage;
+					int pDistance = refuelings.get(pI).mileage - refuelings.get(pI - 1).mileage;
 					if (pDistance <= possibleDistance) {
 						// Distance is possible so we assume nothing is missing
 						// and adjust the possible distance for the next
@@ -106,7 +105,7 @@ public class RefuelingBalancer {
 						possibleDistance -= pDistance;
 						possibleDistance += (int) (refuelings.get(pI).volume / avgConsumption);
 					} else {
-						// It doesn't seem possible that the could drive this
+						// It doesn't seem possible that the car could drive this
 						// far without another refueling so we add one.
 
 						// Always try to refill as much fuel as possible...
@@ -138,18 +137,15 @@ public class RefuelingBalancer {
 						// Try to calculate a date when the refueling happened.
 						long pTimeDiff = refuelings.get(pI).date.getTime()
 								- refuelings.get(pI - 1).date.getTime();
-						Date newDate = new Date(
-								refuelings.get(pI - 1).date.getTime()
-										+ (long) (pTimeDiff / pDistance * (newVolume / avgConsumption)));
+						Date newDate = new Date(refuelings.get(pI - 1).date.getTime()
+                                + (long) (pTimeDiff / pDistance * (newVolume / avgConsumption)));
 
 						// Calculate an average price.
 						float newPrice = newVolume * avgPricePerUnit;
 
-						// Add the refueling to the list and mark it as
-						// "guessed".
-						Refueling guess = new Refueling(newDate, newMileage,
-								newVolume, newPrice, false, "",
-								refueling.fuelType, refueling.car);
+						// Add the refueling to the list and mark it as "guessed".
+						Refueling guess = new Refueling(newDate, newMileage, newVolume, newPrice,
+                                false, "", refueling.fuelType, refueling.car);
 						guess.guessed = true;
 						refuelings.add(pI, guess);
 
@@ -196,21 +192,18 @@ public class RefuelingBalancer {
 					}
 
 					// Try to calculate a date when the refueling happened.
-					int cDistance = refueling.mileage
-							- refuelings.get(i - 1).mileage;
+					int cDistance = refueling.mileage - refuelings.get(i - 1).mileage;
 					long cTimeDiff = refueling.date.getTime()
-							- refuelings.get(i - 1).date.getTime();
-					Date newDate = new Date(
-							refuelings.get(i - 1).date.getTime()
-									+ (long) (cTimeDiff / cDistance * (newVolume / avgConsumption)));
+                            - refuelings.get(i - 1).date.getTime();
+					Date newDate = new Date(refuelings.get(i - 1).date.getTime()
+                            + (long) (cTimeDiff / cDistance * (newVolume / avgConsumption)));
 
 					// Calculate an average price.
 					float newPrice = newVolume * avgPricePerUnit;
 
 					// Add the refueling to the list and mark it as "guessed".
-					Refueling guess = new Refueling(newDate, newMileage,
-							newVolume, newPrice, partial, "",
-							refueling.fuelType, refueling.car);
+					Refueling guess = new Refueling(newDate, newMileage, newVolume, newPrice,
+                            partial, "", refueling.fuelType, refueling.car);
 					guess.guessed = true;
 					refuelings.add(i, guess);
 
@@ -238,8 +231,7 @@ public class RefuelingBalancer {
 	 *            a list of refuelings with the same fuel tank.
 	 * @return the balanced average fuel consumption.
 	 */
-	private static float getBalancedAverageConsumption(
-			List<Refueling> refuelings) {
+	private static float getBalancedAverageConsumption(List<Refueling> refuelings) {
 		Vector<Float> allConsumptions = new Vector<>();
 		Vector<Integer> allDistances = new Vector<>();
 		Vector<Float> allVolumes = new Vector<>();

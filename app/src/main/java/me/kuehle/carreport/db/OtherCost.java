@@ -79,13 +79,14 @@ public class OtherCost extends Model {
 		Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
 		List<String> titles = new ArrayList<>();
-		if (cursor.moveToFirst()) {
-			do {
-				titles.add(cursor.getString(0));
-			} while (cursor.moveToNext());
-		}
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                titles.add(cursor.getString(0));
+            }
 
-		cursor.close();
+            cursor.close();
+        }
+
 		return titles;
 	}
 }

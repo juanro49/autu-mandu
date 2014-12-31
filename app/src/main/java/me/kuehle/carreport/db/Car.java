@@ -97,13 +97,14 @@ public class Car extends Model {
         Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
         List<String> categories = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
                 categories.add(cursor.getString(0));
-            } while (cursor.moveToNext());
+            }
+
+            cursor.close();
         }
 
-        cursor.close();
         return categories;
     }
 
@@ -130,11 +131,14 @@ public class Car extends Model {
         Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
         int count = 0;
-        if (cursor.moveToFirst() && cursor.getColumnCount() == 1) {
-            count = cursor.getInt(0);
+        if (cursor != null) {
+            if (cursor.moveToFirst() && cursor.getColumnCount() == 1) {
+                count = cursor.getInt(0);
+            }
+
+            cursor.close();
         }
 
-        cursor.close();
         return count;
     }
 }

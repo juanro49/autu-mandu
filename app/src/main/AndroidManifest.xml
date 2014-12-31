@@ -38,6 +38,9 @@
             android:name="AA_DB_VERSION"
             android:value="8" />
         <meta-data
+            android:name="AA_MODELS"
+            android:value="me.kuehle.carreport.db.Car,me.kuehle.carreport.db.FuelType,me.kuehle.carreport.db.OtherCost,me.kuehle.carreport.db.Refueling" />
+        <meta-data
             android:name="AA_SERIALIZERS"
             android:value="me.kuehle.carreport.db.serializer.RecurrenceSerializer" />
 

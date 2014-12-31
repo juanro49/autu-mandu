@@ -61,15 +61,16 @@ public class FuelType extends Model {
                 .orderBy("category ASC").toSql();
         Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
-        List<String> titles = new ArrayList<>();
-        if (cursor.moveToFirst()) {
-            do {
-                titles.add(cursor.getString(0));
-            } while (cursor.moveToNext());
+        List<String> categories = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                categories.add(cursor.getString(0));
+            }
+
+            cursor.close();
         }
 
-        cursor.close();
-        return titles;
+        return categories;
     }
 
     public static int getCount() {
@@ -77,11 +78,14 @@ public class FuelType extends Model {
         Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
         int count = 0;
-        if (cursor.moveToFirst() && cursor.getColumnCount() == 1) {
-            count = cursor.getInt(0);
+        if (cursor != null) {
+            if (cursor.moveToFirst() && cursor.getColumnCount() == 1) {
+                count = cursor.getInt(0);
+            }
+
+            cursor.close();
         }
 
-        cursor.close();
         return count;
     }
 
