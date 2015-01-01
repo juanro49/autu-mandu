@@ -17,7 +17,7 @@
 package me.kuehle.carreport.gui;
 
 public interface DataListListener {
-    void unselectItem();
+    void unselectItem(boolean finishActionMode);
 
     void updateData();
 }

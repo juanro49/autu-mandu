@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
@@ -50,7 +50,7 @@ public class DataFragment extends Fragment implements DataListCallback,
                 setNoEntrySelectedTextVisible(true);
                 for (Fragment childFragment : getChildFragmentManager().getFragments()) {
                     if (childFragment instanceof DataListListener) {
-                        ((DataListListener) childFragment).unselectItem();
+                        ((DataListListener) childFragment).unselectItem(false);
                     }
                 }
             } else if (!isPop) {
@@ -72,7 +72,7 @@ public class DataFragment extends Fragment implements DataListCallback,
 
             for (Fragment childFragment : getChildFragmentManager().getFragments()) {
                 if (childFragment instanceof DataListListener) {
-                    ((DataListListener) childFragment).unselectItem();
+                    ((DataListListener) childFragment).unselectItem(true);
                 }
             }
 
@@ -84,14 +84,17 @@ public class DataFragment extends Fragment implements DataListCallback,
         }
     }
 
-    private class DataListPagerAdapter extends FragmentPagerAdapter {
+    private class DataListPagerAdapter extends FragmentStatePagerAdapter {
+        private String[] mTitles;
+
         public DataListPagerAdapter(FragmentManager fm) {
             super(fm);
+            mTitles = getResources().getStringArray(R.array.data_list_page_titles);
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return mTitles.length;
         }
 
         @Override
@@ -106,13 +109,21 @@ public class DataFragment extends Fragment implements DataListCallback,
             Bundle args = new Bundle();
             args.putBoolean(AbstractDataListFragment.EXTRA_ACTIVATE_ON_CLICK, mTwoPane);
             args.putLong(AbstractDataListFragment.EXTRA_CAR_ID, mCar.id);
+            if (position == 1) {
+                args.putInt(DataListOtherFragment.EXTRA_OTHER_TYPE,
+                        DataListOtherFragment.EXTRA_OTHER_TYPE_EXPENDITURE);
+            } else if (position == 2) {
+                args.putInt(DataListOtherFragment.EXTRA_OTHER_TYPE,
+                        DataListOtherFragment.EXTRA_OTHER_TYPE_INCOME);
+            }
+
             fragment.setArguments(args);
             return fragment;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return getResources().getStringArray(R.array.data_list_page_titles)[position];
+            return mTitles[position];
         }
     }
 

@@ -30,7 +30,8 @@
     <string name="drawer_close">Close navigation</string>
 
     <string name="menu_synchronize">Synchronize</string>
-    <string name="menu_add_other">Add other</string>
+    <string name="menu_add_other_expenditure">Add other expenditure</string>
+    <string name="menu_add_other_income">Add other income</string>
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
     <string name="menu_delete">Delete</string>
@@ -81,8 +82,10 @@
     <string name="title_edit_refueling">Edit refueling</string>
     <string name="title_settings">Settings</string>
     <string name="title_help">Help</string>
-    <string name="title_add_other">Add other</string>
-    <string name="title_edit_other">Edit other</string>
+    <string name="title_add_other_expenditure">Add other expenditure</string>
+    <string name="title_add_other_income">Add other income</string>
+    <string name="title_edit_other_expenditure">Edit other expenditure</string>
+    <string name="title_edit_other_income">Edit other income</string>
     <string name="title_add_car">Add car</string>
     <string name="title_edit_car">Edit car</string>
     <string name="title_add_fuel_type">Add fuel type</string>
@@ -92,18 +95,20 @@
     
     <string name="edit_message_no_entry_selected">No entry selected</string>
     <string name="edit_message_no_entries_available">No entries available</string>
-    
+
+    <string name="alert_delete_title">Confirm delete</string>
     <string name="alert_delete_refueling_message">This refueling will be deleted.</string>
-    <string name="alert_delete_other_message">This other cost will be deleted.</string>
+    <string name="alert_delete_refuelings_message">The %d selected refuelings will be deleted.</string>
+    <string name="alert_delete_other_expenditure_message">This expenditure will be deleted.</string>
+    <string name="alert_delete_other_income_message">This income will be deleted.</string>
+    <string name="alert_delete_other_expenditures_message">The %d selected expenditures will be deleted.</string>
+    <string name="alert_delete_other_incomes_message">The %d selected incomes will be deleted.</string>
     <string name="alert_delete_car_message">This car will be deleted.</string>
     <string name="alert_delete_cars_message">The %d selected cars will be deleted.</string>
     <string name="alert_delete_fuel_types_message">The %d selected fuel types will be deleted.</string>
     <string name="alert_cannot_delete_last_car">One car cannot be deleted.</string>
     <string name="alert_cannot_delete_fuel_type">Cannot delete fuel type, because it is used by at least one refueling or fuel tank.</string>
-    <string name="alert_delete_refuelings_message">The %d selected refuelings will be deleted.</string>
     <string name="alert_about_licenses_title">Licenses</string>
-    <string name="alert_delete_title">Confirm delete</string>
-    <string name="alert_delete_others_message">The %d selected other costs will be deleted.</string>
     <string name="alert_change_color_title">Choose color</string>
     <string name="alert_sync_finishing_authentication">Finishing authentication…</string>
     <string name="alert_sync_first_sync_title">First synchronization</string>
@@ -122,8 +127,10 @@
     <string name="toast_synchronization_failed">Synchronization failed</string>
     <string name="toast_refueling_saved">Refueling saved</string>
     <string name="toast_refueling_deleted">Refueling deleted</string>
-    <string name="toast_other_saved">Other cost saved</string>
-    <string name="toast_other_deleted">Other cost deleted</string>
+    <string name="toast_other_expenditure_saved">Other expenditure saved</string>
+    <string name="toast_other_income_saved">Other income saved</string>
+    <string name="toast_other_expenditure_deleted">Other expenditure deleted</string>
+    <string name="toast_other_income_deleted">Other income deleted</string>
     <string name="toast_car_saved">Car saved</string>
     <string name="toast_car_deleted">Car deleted</string>
     <string name="toast_sync_authentication_failed">Authentication failed</string>
@@ -160,7 +167,7 @@
     <string name="report_toast_mileage">Mileage</string>
     <string name="report_toast_price">Price</string>
     <string name="report_toast_date">Date</string>
-    <string name="report_toast_fueltype">Fuel type</string>
+    <string name="report_toast_fuel_type">Fuel type</string>
     <string name="report_toast_none">none</string>
     
     <string name="pref_title_header_about">About Car Report</string>

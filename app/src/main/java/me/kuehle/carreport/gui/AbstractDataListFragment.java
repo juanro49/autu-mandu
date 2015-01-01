@@ -60,21 +60,22 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     private me.kuehle.carreport.gui.DataListCallback mDataListCallback;
     private boolean mActivateOnClick = false;
     private ActionMode mActionMode = null;
-    private boolean dontStartActionMode = false;
+    private boolean mDontStartActionMode = false;
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mListAdapter = new DataListAdapter();
-        if (mCar != null) {
-            updateData();
-        }
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        mListAdapter = new DataListAdapter();
         setEmptyText(getString(R.string.edit_message_no_entries_available));
         setListAdapter(mListAdapter);
 
         getListView().setMultiChoiceModeListener(new DataListMultiChoiceModeListener());
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        if (mCar != null) {
+            updateData();
+        }
 
         if (savedInstanceState != null) {
             setCurrentPosition(savedInstanceState.getInt(STATE_CURRENT_ITEM,
@@ -155,20 +156,25 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
     public void setCurrentPosition(int position) {
         if (mActionMode != null) {
-            mActionMode.finish();
+            return;
         }
 
         getListView().setItemChecked(mCurrentItem, false);
         if (position != ListView.INVALID_POSITION && mActivateOnClick) {
-            dontStartActionMode = true;
+            mDontStartActionMode = true;
             getListView().setItemChecked(position, true);
+            mDontStartActionMode = false;
         }
 
         mCurrentItem = position;
     }
 
     @Override
-    public void unselectItem() {
+    public void unselectItem(boolean finishActionMode) {
+        if (mActionMode != null && finishActionMode) {
+            mActionMode.finish();
+        }
+
         setCurrentPosition(ListView.INVALID_POSITION);
     }
 
@@ -303,9 +309,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.menu_delete:
-                    String message = String.format(
-                            getString(getAlertDeleteManyMessage()), getListView()
-                                    .getCheckedItemCount());
+                    String message = String.format(getString(getAlertDeleteManyMessage()),
+                            getListView().getCheckedItemCount());
                     SupportMessageDialogFragment.newInstance(
                             AbstractDataListFragment.this, REQUEST_DELETE,
                             R.string.alert_delete_title, message,
@@ -319,8 +324,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            if (dontStartActionMode) {
-                dontStartActionMode = false;
+            if (mDontStartActionMode) {
                 return false;
             }
 
@@ -340,8 +344,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
         }
 
         @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                              long id, boolean checked) {
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                                              boolean checked) {
             int count = getListView().getCheckedItemCount();
             mode.setTitle(String.format(getString(R.string.cab_title_selected), count));
         }

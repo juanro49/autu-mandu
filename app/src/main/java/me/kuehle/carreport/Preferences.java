@@ -106,7 +106,7 @@ public class Preferences {
                         reports.add((Class<? extends AbstractReport>) report);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Error loading report order.", e);
+                    Log.w(TAG, String.format("Error loading report order: %s.", reportName), e);
                 }
             }
         }

@@ -30,7 +30,8 @@
     <string name="drawer_close">Navigation schließen</string>
 
     <string name="menu_synchronize">Synchronisieren</string>
-    <string name="menu_add_other">Andere Kosten hinzufügen</string>
+    <string name="menu_add_other_expenditure">Andere Ausgabe hinzufügen</string>
+    <string name="menu_add_other_income">Andere Einnahme hinzufügen</string>
     <string name="menu_save">Fertig</string>
     <string name="menu_cancel">Abbrechen</string>
     <string name="menu_delete">Löschen</string>
@@ -81,8 +82,10 @@
     <string name="title_edit_refueling">Tankfüllung bearbeiten</string>
     <string name="title_settings">Einstellungen</string>
     <string name="title_help">Hilfe</string>
-    <string name="title_add_other">Andere Kosten hinzufügen</string>
-    <string name="title_edit_other">Andere Kosten bearbeiten</string>
+    <string name="title_add_other_expenditure">Andere Ausgaben hinzufügen</string>
+    <string name="title_add_other_income">Andere Einnahmen hinzufügen</string>
+    <string name="title_edit_other_expenditure">Andere Ausgaben bearbeiten</string>
+    <string name="title_edit_other_income">Andere Einnahmen bearbeiten</string>
     <string name="title_add_car">Auto hinzufügen</string>
     <string name="title_edit_car">Auto bearbeiten</string>
     <string name="title_add_fuel_type">Kraftstoff hinzufügen</string>
@@ -92,18 +95,20 @@
 
     <string name="edit_message_no_entry_selected">Kein Eintrag ausgewählt</string>
     <string name="edit_message_no_entries_available">Keine Einträge verfügbar</string>
-    
+
+    <string name="alert_delete_title">Löschen bestätigen</string>
     <string name="alert_delete_refueling_message">Diese Tankfüllung wird gelöscht.</string>
-    <string name="alert_delete_other_message">Diese anderen Kosten werden gelöscht.</string>
+    <string name="alert_delete_refuelings_message">Die %d ausgewählten Tankfüllungen werden gelöscht.</string>
+    <string name="alert_delete_other_expenditure_message">Diese Ausgaben werden gelöscht.</string>
+    <string name="alert_delete_other_income_message">Diese Einnahmen werden gelöscht.</string>
+    <string name="alert_delete_other_expenditures_message">Die %d ausgewählten anderen Kosten werden gelöscht.</string>
+    <string name="alert_delete_other_incomes_message">Die %d ausgewählten anderen Einnahmen werden gelöscht.</string>
     <string name="alert_delete_car_message">Dieses Auto wird gelöscht.</string>
     <string name="alert_delete_cars_message">Die %d ausgewählten Autos werden gelöscht.</string>
     <string name="alert_delete_fuel_types_message">Die %d ausgewählten Kraftstoffe werden gelöscht.</string>
     <string name="alert_cannot_delete_last_car">Das letzte Auto kann nicht gelöscht werden.</string>
     <string name="alert_cannot_delete_fuel_type">Der Kraftstoff kann nicht gelöscht werden, weil er von mindestens einer Tankfüllung oder einem Kraftstofftank verwendet wird.</string>
-    <string name="alert_delete_refuelings_message">Die %d ausgewählten Tankfüllungen werden gelöscht.</string>
     <string name="alert_about_licenses_title">Lizenzen</string>
-    <string name="alert_delete_title">Löschen bestätigen</string>
-    <string name="alert_delete_others_message">Die %d ausgewählten anderen Kosten werden gelöscht.</string>
     <string name="alert_change_color_title">Farbe auswählen</string>
     <string name="alert_sync_finishing_authentication">Authentifizierung wird abgeschlossen…</string>
     <string name="alert_sync_first_sync_title">Erste Synchronisierung</string>
@@ -122,8 +127,10 @@
     <string name="toast_synchronization_failed">Synchronisation fehlgeschlagen</string>
     <string name="toast_refueling_saved">Tankfüllung gespeichert</string>
     <string name="toast_refueling_deleted">Tankfüllung gelöscht</string>
-    <string name="toast_other_saved">Andere Kosten gespeichert</string>
-    <string name="toast_other_deleted">Andere Kosten gelöscht</string>
+    <string name="toast_other_expenditure_saved">Andere Ausgaben gespeichert</string>
+    <string name="toast_other_income_saved">Andere Einnahmen gespeichert</string>
+    <string name="toast_other_expenditure_deleted">Andere Ausgaben gelöscht</string>
+    <string name="toast_other_income_deleted">Andere Einnahmen gelöscht</string>
     <string name="toast_car_saved">Auto gespeichert</string>
     <string name="toast_car_deleted">Auto gelöscht</string>
     <string name="toast_sync_authentication_failed">Authentifizierung fehlgeschlagen</string>
@@ -160,7 +167,7 @@
     <string name="report_toast_mileage">Kilometer</string>
     <string name="report_toast_price">Preis</string>
     <string name="report_toast_date">Datum</string>
-    <string name="report_toast_fueltype">Kraftstoffart</string>
+    <string name="report_toast_fuel_type">Kraftstoffart</string>
     <string name="report_toast_none">keine</string>
 
     <string name="pref_title_header_about">Über Car Report</string>

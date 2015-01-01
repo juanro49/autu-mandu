@@ -52,8 +52,7 @@ public class PreferencesReportOrderFragment extends ListFragment {
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_prefs_report_order,
-				container, false);
+		return inflater.inflate(R.layout.fragment_prefs_report_order, container, false);
 	}
 
 	@Override
@@ -68,8 +67,7 @@ public class PreferencesReportOrderFragment extends ListFragment {
 		Preferences prefs = new Preferences(getActivity());
 		reportClasses = prefs.getReportOrder();
 		for (Class<? extends AbstractReport> reportClass : reportClasses) {
-			AbstractReport report = AbstractReport.newInstance(reportClass,
-					getActivity());
+			AbstractReport report = AbstractReport.newInstance(reportClass, getActivity());
 			adapter.add(report.getTitle());
 		}
 		

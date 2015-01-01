@@ -72,10 +72,15 @@ public class Car extends Model {
     }
 
     public List<OtherCost> getOtherCosts() {
-        return new Select().from(OtherCost.class)
-                .where("car = ?", id)
-                .orderBy("date ASC")
-                .execute();
+        return getOtherCostsFiltered(null);
+    }
+
+    public List<OtherCost> getOtherExpenditures() {
+        return getOtherCostsFiltered("price > 0");
+    }
+
+    public List<OtherCost> getOtherIncomes() {
+        return getOtherCostsFiltered("price < 0");
     }
 
     public FuelType getMostUsedFuelType() {
@@ -106,6 +111,19 @@ public class Car extends Model {
         }
 
         return categories;
+    }
+
+    private List<OtherCost> getOtherCostsFiltered(String additionalWhere) {
+        if (additionalWhere != null && !additionalWhere.isEmpty()) {
+            additionalWhere = " AND " + additionalWhere;
+        } else {
+            additionalWhere = "";
+        }
+
+        return new Select().from(OtherCost.class)
+                .where("car = ?" + additionalWhere, id)
+                .orderBy("date ASC")
+                .execute();
     }
 
     public static List<Car> getAll() {

@@ -18,7 +18,8 @@
 
     <string-array name="data_list_page_titles">
         <item>Refuelings</item>
-        <item>Other Costs</item>
+        <item>Other Expenditures</item>
+        <item>Other Income</item>
     </string-array>
 
     <string-array name="repeat_intervals">

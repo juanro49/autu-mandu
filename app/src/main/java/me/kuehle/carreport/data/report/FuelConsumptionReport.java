@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Vector;
 
 import me.kuehle.carreport.FuelConsumption;
-import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.db.Car;
@@ -187,7 +186,7 @@ public class FuelConsumptionReport extends AbstractReport {
                                 "%s: %s\n%s: %s\n%s: %.2f %s\n%s: %s",
                                 context.getString(R.string.report_toast_car),
                                 car,
-                                context.getString(R.string.report_toast_fueltype),
+                                context.getString(R.string.report_toast_fuel_type),
                                 fuelType,
                                 context.getString(R.string.report_toast_consumption),
                                 s.get(point).y, unit, context

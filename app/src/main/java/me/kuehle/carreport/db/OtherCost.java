@@ -73,9 +73,19 @@ public class OtherCost extends Model {
 		this.car = car;
 	}
 
-	public static List<String> getAllTitles() {
+    public static List<String> getAllExpenditureTitles() {
+        return getAllTitlesFiltered("price > 0");
+    }
+
+    public static List<String> getAllIncomeTitles() {
+        return getAllTitlesFiltered("price < 0");
+    }
+
+	private static List<String> getAllTitlesFiltered(String where) {
 		String sql = new Select("title").distinct().from(OtherCost.class)
-                .orderBy("title ASC").toSql();
+                .where(where)
+                .orderBy("title ASC")
+                .toSql();
 		Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
 		List<String> titles = new ArrayList<>();

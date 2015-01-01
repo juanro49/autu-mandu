@@ -49,10 +49,20 @@ import me.kuehle.carreport.util.RecurrenceInterval;
 public class DataDetailOtherFragment extends AbstractDataDetailFragment
         implements SupportDatePickerDialogFragmentListener,
         SupportTimePickerDialogFragmentListener {
+    public static final String EXTRA_OTHER_TYPE = "other_type";
+    public static final int EXTRA_OTHER_TYPE_EXPENDITURE = 0;
+    public static final int EXTRA_OTHER_TYPE_INCOME = 1;
+
     private static final int PICK_DATE_REQUEST_CODE = 0;
     private static final int PICK_TIME_REQUEST_CODE = 1;
     private static final int PICK_END_DATE_REQUEST_CODE = 2;
 
+    /**
+     * Creates a new fragment to edit an existing other cost entry.
+     * @param id The is of the item to edit.
+     * @param allowCancel True, if the cancel action should be visible.
+     * @return A new edit fragment.
+     */
     public static DataDetailOtherFragment newInstance(long id, boolean allowCancel) {
         DataDetailOtherFragment f = new DataDetailOtherFragment();
 
@@ -123,7 +133,13 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
             if (other.mileage > -1) {
                 edtMileage.setText(String.valueOf(other.mileage));
             }
-            edtPrice.setText(String.valueOf(other.price));
+
+            if (isExpenditure()) {
+                edtPrice.setText(String.valueOf(other.price));
+            } else {
+                edtPrice.setText(String.valueOf(-other.price));
+            }
+
             spnRepeat.setSelection(other.recurrence.getInterval().getValue());
             if (other.recurrence.getInterval() != RecurrenceInterval.ONCE) {
                 chkEndDate.setVisibility(View.VISIBLE);
@@ -154,7 +170,11 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 
     @Override
     protected int getAlertDeleteMessage() {
-        return R.string.alert_delete_other_message;
+        if (isExpenditure()) {
+            return R.string.alert_delete_other_expenditure_message;
+        } else {
+            return R.string.alert_delete_other_income_message;
+        }
     }
 
     @Override
@@ -169,22 +189,38 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 
     @Override
     protected int getTitleForEdit() {
-        return R.string.title_edit_other;
+        if (isExpenditure()) {
+            return R.string.title_edit_other_expenditure;
+        } else {
+            return R.string.title_edit_other_income;
+        }
     }
 
     @Override
     protected int getTitleForNew() {
-        return R.string.title_add_other;
+        if(isExpenditure()) {
+            return R.string.title_add_other_expenditure;
+        } else {
+            return R.string.title_add_other_income;
+        }
     }
 
     @Override
     protected int getToastDeletedMessage() {
-        return R.string.toast_other_deleted;
+        if(isExpenditure()) {
+            return R.string.toast_other_expenditure_deleted;
+        }else {
+            return R.string.toast_other_income_deleted;
+        }
     }
 
     @Override
     protected int getToastSavedMessage() {
-        return R.string.toast_other_saved;
+        if(isExpenditure()) {
+            return R.string.toast_other_expenditure_saved;
+        } else {
+            return R.string.toast_other_income_saved;
+        }
     }
 
     @Override
@@ -210,9 +246,11 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         spnCar = (Spinner) v.findViewById(R.id.spn_car);
 
         // Title
-        ArrayAdapter<String> titleAdapter = new ArrayAdapter<>(
-                getActivity(), android.R.layout.simple_dropdown_item_1line,
-                OtherCost.getAllTitles());
+        ArrayAdapter<String> titleAdapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_dropdown_item_1line,
+                isExpenditure() ?
+                        OtherCost.getAllExpenditureTitles() :
+                        OtherCost.getAllIncomeTitles());
         edtTitle.setAdapter(titleAdapter);
 
         // Date + Time
@@ -230,8 +268,8 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
             private int mLastPosition = 0;
 
             @Override
-            public void onItemSelected(AdapterView<?> parentView,
-                                       View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
                 if (position > 0 && mLastPosition == 0) {
                     chkEndDateAnimator.show();
                 } else if (position == 0 && mLastPosition > 0) {
@@ -249,8 +287,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
 
         chkEndDate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     edtEndDateAnimator.show();
                 } else {
@@ -262,8 +299,9 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         edtEndDate.applyOnClickListener(DataDetailOtherFragment.this, PICK_END_DATE_REQUEST_CODE,
                 getFragmentManager());
 
-        ArrayAdapter<String> carAdapter = new ArrayAdapter<>(
-                getActivity(), android.R.layout.simple_spinner_dropdown_item);
+        // Car
+        ArrayAdapter<String> carAdapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item);
         cars = Car.getAll();
         for (Car car : cars) {
             carAdapter.add(car.name);
@@ -278,6 +316,10 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         Date date = DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate());
         int mileage = getIntegerFromEditText(edtMileage, -1);
         float price = (float) getDoubleFromEditText(edtPrice, 0);
+        if (!isExpenditure()) {
+            price *= -1;
+        }
+
         RecurrenceInterval repInterval = RecurrenceInterval
                 .getByValue(spnRepeat.getSelectedItemPosition());
         Recurrence recurrence = new Recurrence(repInterval);
@@ -285,6 +327,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         if (repInterval != RecurrenceInterval.ONCE && chkEndDate.isChecked()) {
             endDate = edtEndDate.getDate();
         }
+
         String note = edtNote.getText().toString().trim();
         Car car = cars.get(spnCar.getSelectedItemPosition());
 
@@ -309,5 +352,14 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         FormValidator validator = new FormValidator();
         validator.add(new FormFieldGreaterZeroValidator(edtPrice));
         return validator.validate();
+    }
+
+    private boolean isExpenditure() {
+        if (isInEditMode()) {
+            return ((OtherCost) editItem).price > 0;
+        } else {
+            return getArguments().getInt(EXTRA_OTHER_TYPE, EXTRA_OTHER_TYPE_EXPENDITURE) ==
+                    EXTRA_OTHER_TYPE_EXPENDITURE;
+        }
     }
 }

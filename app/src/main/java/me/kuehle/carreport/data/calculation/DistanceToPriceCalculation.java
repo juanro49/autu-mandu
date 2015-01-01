@@ -62,11 +62,10 @@ public class DistanceToPriceCalculation extends AbstractCalculation {
 			for (OtherCost otherCost : otherCosts) {
 				int recurrences;
 				if (otherCost.endDate == null) {
-					recurrences = otherCost.recurrence
-							.getRecurrencesSince(otherCost.date);
+					recurrences = otherCost.recurrence.getRecurrencesSince(otherCost.date);
 				} else {
-					recurrences = otherCost.recurrence.getRecurrencesBetween(
-							otherCost.date, otherCost.endDate);
+					recurrences = otherCost.recurrence.getRecurrencesBetween(otherCost.date,
+                            otherCost.endDate);
 				}
 
 				totalCosts += otherCost.price * recurrences;
@@ -77,13 +76,9 @@ public class DistanceToPriceCalculation extends AbstractCalculation {
 				}
 			}
 
-			if (totalCosts > 0 && startMileage > -1
-					&& endMileage > startMileage) {
-				double avgDistancePrice = totalCosts
-						/ (endMileage - startMileage);
-
-				items.add(new CalculationItem(car.name, input
-						* avgDistancePrice));
+			if (totalCosts > 0 && startMileage > -1 && endMileage > startMileage) {
+				double avgDistancePrice = totalCosts / (endMileage - startMileage);
+				items.add(new CalculationItem(car.name, input * avgDistancePrice));
 			}
 		}
 

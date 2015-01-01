@@ -28,9 +28,17 @@ import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.util.RecurrenceInterval;
 
 public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
+    public static final String EXTRA_OTHER_TYPE = "other_type";
+    public static final int EXTRA_OTHER_TYPE_EXPENDITURE = 0;
+    public static final int EXTRA_OTHER_TYPE_INCOME = 1;
+
     @Override
     protected int getAlertDeleteManyMessage() {
-        return R.string.alert_delete_others_message;
+        if (isExpenditure()) {
+            return R.string.alert_delete_other_expenditures_message;
+        } else {
+            return R.string.alert_delete_other_incomes_message;
+        }
     }
 
     @Override
@@ -52,7 +60,10 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
         if (other.mileage > -1) {
             data.put(R.id.data1, String.format("%d %s", other.mileage, prefs.getUnitDistance()));
         }
-        data.put(R.id.data2, String.format("%.2f %s", other.price, prefs.getUnitCurrency()));
+
+        float price = isExpenditure() ? other.price : -other.price;
+        data.put(R.id.data2, String.format("%.2f %s", price, prefs.getUnitCurrency()));
+
         data.put(R.id.data3, repIntervals[other.recurrence.getInterval().getValue()]);
         if (!other.recurrence.getInterval().equals(RecurrenceInterval.ONCE)) {
             int recurrences;
@@ -72,7 +83,9 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
 
     @Override
     protected List<OtherCost> getItems() {
-        List<OtherCost> otherCosts = mCar.getOtherCosts();
+        List<OtherCost> otherCosts = isExpenditure() ?
+                mCar.getOtherExpenditures() :
+                mCar.getOtherIncomes();
         Collections.reverse(otherCosts);
         return otherCosts;
     }
@@ -85,5 +98,10 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
     @Override
     protected boolean isInvalidData(List<OtherCost> otherCosts, int position) {
         return false;
+    }
+
+    private boolean isExpenditure() {
+        return getArguments().getInt(EXTRA_OTHER_TYPE, EXTRA_OTHER_TYPE_EXPENDITURE) ==
+                EXTRA_OTHER_TYPE_EXPENDITURE;
     }
 }

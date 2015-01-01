@@ -109,7 +109,7 @@ public class FuelPriceReport extends AbstractReport {
 				Toast.makeText(
 						context,
 						String.format("%s: %s\n%s: %.3f %s\n%s: %s", context
-								.getString(R.string.report_toast_fueltype),
+								.getString(R.string.report_toast_fuel_type),
 								fuelType,
 								context.getString(R.string.report_toast_price),
 								p.y, unit, context

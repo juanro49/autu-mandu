@@ -87,6 +87,10 @@ public class MainActivity extends ActionBarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setSupportActionBar((Toolbar) findViewById(R.id.action_bar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
         mTitle = mDrawerTitle = getTitle();
         if (savedInstanceState != null) {
             setTitle(savedInstanceState.getCharSequence(STATE_TITLE, mTitle));
@@ -100,10 +104,6 @@ public class MainActivity extends ActionBarActivity implements
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        setSupportActionBar((Toolbar) findViewById(R.id.action_bar));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open,
                 R.string.drawer_close) {
@@ -212,21 +212,32 @@ public class MainActivity extends ActionBarActivity implements
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		MenuItem item = menu.findItem(R.id.menu_add_other);
-        if (item != null) {
-            Preferences prefs = new Preferences(this);
-            List<Car> cars = Car.getAllActive();
+        Preferences prefs = new Preferences(this);
+        List<Car> cars = Car.getAllActive();
+        MenuItem[] items = {
+                menu.findItem(R.id.menu_add_other_expenditure),
+                menu.findItem(R.id.menu_add_other_income)
+        };
+        int[] otherTypes = {
+                DataDetailOtherFragment.EXTRA_OTHER_TYPE_EXPENDITURE,
+                DataDetailOtherFragment.EXTRA_OTHER_TYPE_INCOME
+        };
 
-            SubMenu subMenu = item.getSubMenu();
+        for (int i = 0; i < items.length; i++) {
+            if (items[i] == null) {
+                continue;
+            }
+
+            SubMenu subMenu = items[i].getSubMenu();
             subMenu.clear();
             if (cars.size() == 1 || !prefs.isShowCarMenu()) {
-                item.setIntent(getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_OTHER,
-                        prefs.getDefaultCar()));
+                items[i].setIntent(getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_OTHER,
+                        prefs.getDefaultCar(), otherTypes[i]));
             } else {
-                item.setIntent(null);
+                items[i].setIntent(null);
                 for (Car car : cars) {
                     subMenu.add(car.name).setIntent(getDetailActivityIntent(
-                            DataDetailActivity.EXTRA_EDIT_OTHER, car.id));
+                            DataDetailActivity.EXTRA_EDIT_OTHER, car.id, otherTypes[i]));
                 }
             }
         }
@@ -377,9 +388,17 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     private Intent getDetailActivityIntent(int edit, long carId) {
+        return getDetailActivityIntent(edit, carId, -1);
+    }
+
+    private Intent getDetailActivityIntent(int edit, long carId, int otherType) {
         Intent intent = new Intent(this, DataDetailActivity.class);
         intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
         intent.putExtra(AbstractDataDetailFragment.EXTRA_CAR_ID, carId);
+        if (otherType >= 0) {
+            intent.putExtra(DataDetailOtherFragment.EXTRA_OTHER_TYPE, otherType);
+        }
+
         return intent;
     }
 

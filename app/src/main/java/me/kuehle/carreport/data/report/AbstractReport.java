@@ -34,8 +34,7 @@ import android.util.TypedValue;
 public abstract class AbstractReport {
     private static final String TAG = "AbstractReport";
 
-	public abstract static class AbstractListItem implements
-			Comparable<AbstractListItem> {
+	public abstract static class AbstractListItem implements Comparable<AbstractListItem> {
 		protected String label;
 
 		public AbstractListItem(String label) {
@@ -96,8 +95,7 @@ public abstract class AbstractReport {
 			} else {
 				Section otherSection = (Section) another;
 				if (order != otherSection.getOrder()) {
-					return Integer.valueOf(order).compareTo(
-							otherSection.getOrder());
+					return Integer.valueOf(order).compareTo(otherSection.getOrder());
 				} else {
 					return label.compareTo(another.getLabel());
 				}
@@ -146,11 +144,11 @@ public abstract class AbstractReport {
 		}
 	}
 
-	public static AbstractReport newInstance(
-			Class<? extends AbstractReport> reportClass, Context context) {
+	public static AbstractReport newInstance(Class<? extends AbstractReport> reportClass,
+                                             Context context) {
 		try {
 			Constructor<? extends AbstractReport> constructor = reportClass
-					.getConstructor(Context.class);
+                    .getConstructor(Context.class);
 			return constructor.newInstance(context);
 		} catch (NoSuchMethodException | IllegalArgumentException | InstantiationException |
                 InvocationTargetException | IllegalAccessException e) {
@@ -171,8 +169,7 @@ public abstract class AbstractReport {
 	protected AxisLabelFormatter dateLabelFormatter = new AxisLabelFormatter() {
 		@Override
 		public String formatLabel(double value) {
-			return DateFormat.getDateFormat(context).format(
-					new Date((long) value));
+			return DateFormat.getDateFormat(context).format(new Date((long) value));
 		}
 	};
 
