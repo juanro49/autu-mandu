@@ -17,9 +17,10 @@
 package me.kuehle.carreport.gui;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -45,7 +46,7 @@ import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessag
 
 public abstract class AbstractDataListFragment<T extends Model> extends
         ListFragment implements SupportMessageDialogFragmentListener,
-        DataListListener {
+        DataListListener, LoaderManager.LoaderCallbacks<List<T>> {
     public static final String EXTRA_ACTIVATE_ON_CLICK = "activate_on_click";
     public static final boolean EXTRA_ACTIVATE_ON_CLICK_DEFAULT = false;
     public static final String EXTRA_CAR_ID = "car_id";
@@ -57,25 +58,25 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
     private DataListAdapter mListAdapter;
     private int mCurrentItem = ListView.INVALID_POSITION;
-    private me.kuehle.carreport.gui.DataListCallback mDataListCallback;
+    private DataListCallback mDataListCallback;
     private boolean mActivateOnClick = false;
     private ActionMode mActionMode = null;
     private boolean mDontStartActionMode = false;
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        setEmptyText(getString(R.string.edit_message_no_entries_available));
 
         mListAdapter = new DataListAdapter();
-        setEmptyText(getString(R.string.edit_message_no_entries_available));
         setListAdapter(mListAdapter);
+        setListShown(false);
 
         getListView().setMultiChoiceModeListener(new DataListMultiChoiceModeListener());
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
-        if (mCar != null) {
-            updateData();
-        }
+        getLoaderManager().initLoader(0, null, this);
 
         if (savedInstanceState != null) {
             setCurrentPosition(savedInstanceState.getInt(STATE_CURRENT_ITEM,
@@ -93,14 +94,15 @@ public abstract class AbstractDataListFragment<T extends Model> extends
                 mDataListCallback = (me.kuehle.carreport.gui.DataListCallback) activity;
             }
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnItemSelectionListener");
+            throw new ClassCastException(activity.toString() +
+                    " must implement OnItemSelectionListener");
         }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Bundle args = getArguments();
         mActivateOnClick = args.getBoolean(EXTRA_ACTIVATE_ON_CLICK,
                 EXTRA_ACTIVATE_ON_CLICK_DEFAULT);
@@ -154,19 +156,20 @@ public abstract class AbstractDataListFragment<T extends Model> extends
         outState.putInt(STATE_CURRENT_ITEM, mCurrentItem);
     }
 
-    public void setCurrentPosition(int position) {
-        if (mActionMode != null) {
-            return;
-        }
+    @Override
+    public void onLoadFinished(Loader<List<T>> loader, List<T> data) {
+        mListAdapter.setItems(data);
 
-        getListView().setItemChecked(mCurrentItem, false);
-        if (position != ListView.INVALID_POSITION && mActivateOnClick) {
-            mDontStartActionMode = true;
-            getListView().setItemChecked(position, true);
-            mDontStartActionMode = false;
+        if (isResumed()) {
+            setListShown(true);
+        } else {
+            setListShownNoAnimation(true);
         }
+    }
 
-        mCurrentItem = position;
+    @Override
+    public void onLoaderReset(Loader<List<T>> loader) {
+        mListAdapter.setItems(null);
     }
 
     @Override
@@ -182,7 +185,22 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     public void updateData() {
         setCurrentPosition(ListView.INVALID_POSITION);
 
-        new DataListUpdateTask().execute();
+        getLoaderManager().restartLoader(0, null, this);
+    }
+
+    private void setCurrentPosition(int position) {
+        if (mActionMode != null) {
+            return;
+        }
+
+        getListView().setItemChecked(mCurrentItem, false);
+        if (position != ListView.INVALID_POSITION && mActivateOnClick) {
+            mDontStartActionMode = true;
+            getListView().setItemChecked(position, true);
+            mDontStartActionMode = false;
+        }
+
+        mCurrentItem = position;
     }
 
     protected abstract int getAlertDeleteManyMessage();
@@ -191,29 +209,9 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
     protected abstract SparseArray<String> getItemData(List<T> items, int position);
 
-    protected abstract List<T> getItems();
-
     protected abstract boolean isMissingData(List<T> items, int position);
 
     protected abstract boolean isInvalidData(List<T> items, int position);
-
-    private class DataListUpdateTask extends AsyncTask<Void, Void, List<T>> {
-        @Override
-        protected void onPreExecute() {
-            setListShown(false);
-        }
-
-        @Override
-        protected List<T> doInBackground(Void... params) {
-            return getItems();
-        }
-
-        @Override
-        protected void onPostExecute(List<T> result) {
-            mListAdapter.update(result);
-            setListShown(true);
-        }
-    }
 
     private class DataListAdapter extends BaseAdapter {
         private final int[] fields = {R.id.title, R.id.subtitle, R.id.date,
@@ -255,8 +253,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
                 SparseArray<String> item = getItemData(mItems, position);
                 TextView textView = (TextView) convertView.findViewById(R.id.title);
-                String value = item.get(R.id.title);
-                textView.setText(value);
+                textView.setText(item.get(R.id.title));
             } else {
                 if (convertView == null) {
                     convertView = getActivity().getLayoutInflater().inflate(
@@ -298,9 +295,14 @@ public abstract class AbstractDataListFragment<T extends Model> extends
             return !isMissingData(mItems, position);
         }
 
-        public void update(List<T> items) {
-            mItems = items;
-            notifyDataSetChanged();
+        public void setItems(List<T> items) {
+            if (items == null) {
+                mItems = new ArrayList<>();
+                notifyDataSetInvalidated();
+            } else {
+                mItems = items;
+                notifyDataSetChanged();
+            }
         }
     }
 
