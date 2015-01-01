@@ -151,7 +151,12 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
     }
 
     private void calculate() {
-        AbstractCalculation calculation = mCalculations[mSpnOptions.getSelectedItemPosition()];
+        int selectedCalculation = mSpnOptions.getSelectedItemPosition();
+        if (selectedCalculation < 0) {
+            return;
+        }
+
+        AbstractCalculation calculation = mCalculations[selectedCalculation];
         double input;
         try {
             input = Double.parseDouble(mEdtInput.getText().toString());

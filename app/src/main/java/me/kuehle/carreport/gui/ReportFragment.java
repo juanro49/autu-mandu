@@ -214,7 +214,13 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 		mCurrentUpdateTask.execute();
 	}
 
-	@Override
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCurrentUpdateTask.cancel(true);
+    }
+
+    @Override
 	public boolean onMenuItemClick(MenuItem item) {
 		if (item.getItemId() == R.id.menu_show_trend) {
 			mCurrentMenuReport.setShowTrend(!item.isChecked());

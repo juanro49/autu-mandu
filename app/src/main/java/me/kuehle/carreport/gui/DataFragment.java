@@ -18,6 +18,7 @@ package me.kuehle.carreport.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
@@ -32,6 +33,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
+
+import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -70,9 +73,12 @@ public class DataFragment extends Fragment implements DataListCallback,
         public void onPageSelected(int position) {
             onItemUnselected();
 
-            for (Fragment childFragment : getChildFragmentManager().getFragments()) {
-                if (childFragment instanceof DataListListener) {
-                    ((DataListListener) childFragment).unselectItem(true);
+            List<Fragment> fragments = getChildFragmentManager().getFragments();
+            if (fragments != null) {
+                for (Fragment childFragment : fragments) {
+                    if (childFragment instanceof DataListListener) {
+                        ((DataListListener) childFragment).unselectItem(true);
+                    }
                 }
             }
 
@@ -124,6 +130,12 @@ public class DataFragment extends Fragment implements DataListCallback,
         @Override
         public CharSequence getPageTitle(int position) {
             return mTitles[position];
+        }
+
+        @Override
+        public void restoreState(Parcelable state, ClassLoader loader) {
+            // Do nothing here! This is a fix for a NullPointerException described here:
+            // http://stackoverflow.com/questions/18642890/
         }
     }
 

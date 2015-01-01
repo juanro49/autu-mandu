@@ -89,9 +89,9 @@ public abstract class AbstractDataListFragment<T extends Model> extends
         super.onAttach(activity);
         try {
             if (getParentFragment() != null) {
-                mDataListCallback = (me.kuehle.carreport.gui.DataListCallback) getParentFragment();
+                mDataListCallback = (DataListCallback) getParentFragment();
             } else {
-                mDataListCallback = (me.kuehle.carreport.gui.DataListCallback) activity;
+                mDataListCallback = (DataListCallback) activity;
             }
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() +
@@ -152,8 +152,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_ITEM, mCurrentItem);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
