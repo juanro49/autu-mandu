@@ -39,6 +39,7 @@ import com.activeandroid.Model;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
@@ -126,6 +127,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
                     mListAdapter.getItem(i).delete();
                 }
             }
+
+            Application.dataChanged();
 
             mActionMode.finish();
             updateData();
@@ -231,7 +234,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
         @Override
         public long getItemId(int position) {
-            return mItems.get(position).id;
+            return getItem(position).id;
         }
 
         @Override

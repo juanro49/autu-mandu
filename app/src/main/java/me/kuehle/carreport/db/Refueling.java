@@ -95,4 +95,11 @@ public class Refueling extends Model implements Comparable<Refueling> {
                 .orderBy("date ASC")
                 .executeSingle();
     }
+
+    public static Refueling getLatest(Car car) {
+        return new Select().from(Refueling.class)
+                .where("car = ?", car.id)
+                .orderBy("date DESC")
+                .executeSingle();
+    }
 }

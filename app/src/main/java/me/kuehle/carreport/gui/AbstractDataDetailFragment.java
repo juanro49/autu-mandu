@@ -145,6 +145,8 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
             Toast.makeText(getActivity(), getToastDeletedMessage(), Toast.LENGTH_SHORT).show();
             onItemActionListener.onItemDeleted();
+
+            Application.dataChanged();
         }
     }
 

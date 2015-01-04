@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015 Jan Kühle
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <!-- Title -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_title"
+            app:floatingLabel="highlight" />
+        <!-- Car -->
+        <TextView
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:id="@+id/txt_label_car"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_title"
+            android:text="@string/label_car" />
+        <Spinner
+            android:id="@+id/spn_car"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/txt_label_car"/>
+        <!-- After Type -->
+        <TextView
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:id="@+id/txt_label_reminder_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/spn_car"
+            android:text="@string/label_reminder_type" />
+        <Spinner
+            android:id="@+id/spn_after_type"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/txt_label_reminder_type"
+            android:entries="@array/reminder_after_types" />
+        <!-- After Distance -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_after_distance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/spn_after_type"
+            android:layout_marginLeft="36dp"
+            android:layout_marginStart="36dp"
+            android:hint="@string/hint_reminder_after_distance"
+            android:inputType="number"
+            app:floatingLabel="highlight" />
+        <!-- After Time -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_after_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_after_distance"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="36dp"
+            android:layout_marginStart="36dp"
+            android:layout_toLeftOf="@+id/spn_after_time_unit"
+            android:layout_toStartOf="@+id/spn_after_time_unit"
+            android:hint="@string/hint_reminder_after_time"
+            android:inputType="number"
+            app:floatingLabel="highlight" />
+        <Spinner
+            android:id="@+id/spn_after_time_unit"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/edt_after_time"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:entries="@array/time_units" />
+        <!-- Section: Advanced -->
+        <TextView
+            style="@style/AppWidget.SectionHeader"
+            android:id="@+id/txt_section_advanced"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_after_time"
+            android:text="@string/section_advanced" />
+        <!-- Start Mileage -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_start_mileage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_section_advanced"
+            android:hint="@string/hint_reminder_start_mileage"
+            android:inputType="number"
+            app:floatingLabel="highlight" />
+        <!-- Start Date -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_start_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_start_mileage"
+            android:hint="@string/hint_reminder_start_date"
+            app:floatingLabel="highlight" />
+        <!-- Snoozed Until -->
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/edt_snoozed_until"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_start_date"
+            android:layout_toLeftOf="@+id/btn_quit_snooze"
+            android:layout_toStartOf="@+id/btn_quit_snooze"
+            android:hint="@string/hint_reminder_snoozed_until"
+            app:floatingLabel="highlight" />
+        <ImageButton
+            android:id="@+id/btn_quit_snooze"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignBottom="@id/edt_snoozed_until"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:src="@drawable/ic_close"
+            android:contentDescription="@string/quit_snooze_desc"/>
+        <!-- Notification Dismissed -->
+        <CheckBox
+            android:id="@+id/chk_dismissed"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/edt_snoozed_until"
+            android:text="@string/label_reminder_dismissed" />
+    </RelativeLayout>
+</ScrollView>

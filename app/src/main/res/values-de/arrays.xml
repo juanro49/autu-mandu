@@ -30,4 +30,16 @@
         <item>Jedes Jahr wiederholen</item>
     </string-array>
 
+    <string-array name="reminder_after_types">
+        <item>Nach Kilometern oder Zeit, je nachdem, was zuerst eintritt</item>
+        <item>Nach Kilometern</item>
+        <item>Nach Zeit</item>
+    </string-array>
+
+    <string-array name="time_units">
+        <item>Tag(e)</item>
+        <item>Monat(e)</item>
+        <item>Jahr(e)</item>
+    </string-array>
+
 </resources>

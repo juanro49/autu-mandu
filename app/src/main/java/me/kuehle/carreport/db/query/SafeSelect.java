@@ -16,35 +16,33 @@
 
 package me.kuehle.carreport.db.query;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import com.activeandroid.Cache;
 import com.activeandroid.Model;
 import com.activeandroid.TableInfo;
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
-import com.activeandroid.query.Select.Column;
+
+import java.lang.reflect.Field;
+import java.util.Collection;
 
 public class SafeSelect {
-	public static From from(Class<? extends Model> table) {
-		return new Select(getColumnList(table)).from(table);
-	}
+    public static From from(Class<? extends Model> table) {
+        return new Select(getColumnList(table)).from(table);
+    }
 
-	private static Select.Column[] getColumnList(Class<? extends Model> table) {
-		TableInfo tableInfo = Cache.getTableInfo(table);
-		String tableName = tableInfo.getTableName();
-		Collection<Field> fields = tableInfo.getFields();
+    private static Select.Column[] getColumnList(Class<? extends Model> table) {
+        TableInfo tableInfo = Cache.getTableInfo(table);
+        String tableName = tableInfo.getTableName();
+        Collection<Field> fields = tableInfo.getFields();
 
-		List<Select.Column> columns = new ArrayList<>();
-		for (Field field : fields) {
-			String columnName = tableInfo.getColumnName(field);
-			columns.add(new Column(tableName + "." + columnName, columnName));
-		}
+        Select.Column[] columns = new Select.Column[fields.size()];
+        int columnIndex = 0;
+        for (Field field : fields) {
+            String columnName = tableInfo.getColumnName(field);
+            columns[columnIndex] = new Select.Column(tableName + "." + columnName, columnName);
+            columnIndex++;
+        }
 
-		return columns.toArray(new Select.Column[columns.size()]);
-
-	}
+        return columns;
+    }
 }

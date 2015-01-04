@@ -17,6 +17,8 @@
 package me.kuehle.carreport;
 
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
+import me.kuehle.carreport.util.reminder.ReminderEnablerReceiver;
+import me.kuehle.carreport.util.reminder.ReminderService;
 
 import com.activeandroid.ActiveAndroid;
 
@@ -32,6 +34,8 @@ public class Application extends android.app.Application {
 					provider.synchronize();
 				}
 			}
+
+            ReminderService.updateNotification(instance);
 		}
 	}
 
@@ -51,6 +55,7 @@ public class Application extends android.app.Application {
 				"org.joda.time.tz.UTCProvider");
 		AbstractSynchronizationProvider.initialize(this);
 		ActiveAndroid.initialize(this);
+        ReminderEnablerReceiver.scheduleAlarms(this);
 
 		if (new Preferences(this).isSyncOnStart()) {
 			AbstractSynchronizationProvider provider = AbstractSynchronizationProvider

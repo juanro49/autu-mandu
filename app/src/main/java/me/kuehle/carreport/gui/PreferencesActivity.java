@@ -73,13 +73,10 @@ public class PreferencesActivity extends PreferenceActivity {
 	protected boolean isValidFragment(String fragmentName) {
 		return PreferencesGeneralFragment.class.getName().equals(fragmentName)
 				|| PreferencesCarsFragment.class.getName().equals(fragmentName)
-				|| PreferencesFuelTypesFragment.class.getName().equals(
-						fragmentName)
-				|| PreferencesReportOrderFragment.class.getName().equals(
-						fragmentName)
-				|| PreferencesBackupFragment.class.getName().equals(
-						fragmentName)
-				|| PreferencesAboutFragment.class.getName()
-						.equals(fragmentName);
+				|| PreferencesFuelTypesFragment.class.getName().equals(fragmentName)
+                || PreferencesRemindersFragment.class.getName().equals(fragmentName)
+				|| PreferencesReportOrderFragment.class.getName().equals(fragmentName)
+				|| PreferencesBackupFragment.class.getName().equals(fragmentName)
+				|| PreferencesAboutFragment.class.getName().equals(fragmentName);
 	}
 }

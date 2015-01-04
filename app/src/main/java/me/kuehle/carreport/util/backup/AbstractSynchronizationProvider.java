@@ -51,10 +51,8 @@ public abstract class AbstractSynchronizationProvider {
     private static class SynchronizationStatusReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int status = intent.getIntExtra(
-                    SynchronizationService.EXTRA_STATUS, -1);
-            boolean result = intent.getBooleanExtra(
-                    SynchronizationService.EXTRA_RESULT, false);
+            int status = intent.getIntExtra(SynchronizationService.EXTRA_STATUS, -1);
+            boolean result = intent.getBooleanExtra(SynchronizationService.EXTRA_RESULT, false);
 
             if (status == SynchronizationService.STATUS_STARTED) {
                 if (mSynchronisationListener != null) {
@@ -79,13 +77,12 @@ public abstract class AbstractSynchronizationProvider {
     private static boolean mSynchronisationInProgress = false;
     private static OnSynchronizeListener mSynchronisationListener;
 
-    public static synchronized AbstractSynchronizationProvider[] getAvailable(
-            Context context) {
+    public static synchronized AbstractSynchronizationProvider[] getAvailable(Context context) {
         if (availableProviders != null) {
             return availableProviders;
         }
 
-        availableProviders = new AbstractSynchronizationProvider[]{
+        availableProviders = new AbstractSynchronizationProvider[] {
                 new DropboxSynchronizationProvider(context),
                 new GoogleDriveSynchronizationProvider(context)
         };
@@ -93,8 +90,7 @@ public abstract class AbstractSynchronizationProvider {
         return availableProviders;
     }
 
-    public static synchronized AbstractSynchronizationProvider getCurrent(
-            Context context) {
+    public static synchronized AbstractSynchronizationProvider getCurrent(Context context) {
         if (currentProvider != null) {
             return currentProvider;
         }
@@ -117,12 +113,10 @@ public abstract class AbstractSynchronizationProvider {
     }
 
     public static void initialize(Context context) {
-        IntentFilter intentFilter = new IntentFilter(
-                SynchronizationService.BROADCAST_ACTION);
+        IntentFilter intentFilter = new IntentFilter(SynchronizationService.BROADCAST_ACTION);
         SynchronizationStatusReceiver receiver = new SynchronizationStatusReceiver();
 
-        LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
-                intentFilter);
+        LocalBroadcastManager.getInstance(context).registerReceiver(receiver, intentFilter);
     }
 
     public static boolean isSynchronisationInProgress() {
@@ -148,28 +142,14 @@ public abstract class AbstractSynchronizationProvider {
     protected boolean mUnlinkingInProgress = false;
 
     public AbstractSynchronizationProvider(Context context) {
-        this.mContext = context;
-
+        mContext = context;
         mTempFile = new File(context.getCacheDir(), getClass().getSimpleName());
-    }
-
-    public void continueAuthentication(int requestCode, int resultCode,
-                                       Intent data) {
-        if (mAuthenticationInProgess) {
-            onContinueAuthentication(requestCode, resultCode, data);
-        }
     }
 
     public abstract String getAccountName();
 
-    /**
-     * @return An icon for the synchronization provider as a drawable resource.
-     */
     public abstract int getIcon();
 
-    /**
-     * @return The name of the synchronization provider.
-     */
     public abstract String getName();
 
     public abstract boolean isAuthenticated();
@@ -180,6 +160,12 @@ public abstract class AbstractSynchronizationProvider {
         mAuthenticationListener = listener;
         mAuthenticationInProgess = true;
         onStartAuthentication();
+    }
+
+    public void continueAuthentication(int requestCode, int resultCode, Intent data) {
+        if (mAuthenticationInProgess) {
+            onContinueAuthentication(requestCode, resultCode, data);
+        }
     }
 
     public void synchronize() {
@@ -257,9 +243,9 @@ public abstract class AbstractSynchronizationProvider {
         }
     }
 
-    protected abstract void onContinueAuthentication(int requestCode, int resultCode, Intent data);
-
     protected abstract void onStartAuthentication();
+
+    protected abstract void onContinueAuthentication(int requestCode, int resultCode, Intent data);
 
     protected abstract boolean onSynchronize(int option);
 

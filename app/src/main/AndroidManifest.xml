@@ -21,6 +21,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name="Application"
@@ -39,10 +40,10 @@
             android:value="8" />
         <meta-data
             android:name="AA_MODELS"
-            android:value="me.kuehle.carreport.db.Car,me.kuehle.carreport.db.FuelType,me.kuehle.carreport.db.OtherCost,me.kuehle.carreport.db.Refueling" />
+            android:value="me.kuehle.carreport.db.Car,me.kuehle.carreport.db.FuelType,me.kuehle.carreport.db.OtherCost,me.kuehle.carreport.db.Refueling,me.kuehle.carreport.db.Reminder" />
         <meta-data
             android:name="AA_SERIALIZERS"
-            android:value="me.kuehle.carreport.db.serializer.RecurrenceSerializer" />
+            android:value="me.kuehle.carreport.db.serializer.RecurrenceSerializer,me.kuehle.carreport.db.serializer.TimeSpanSerializer" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -59,19 +60,25 @@
         </activity>
         <activity
             android:name=".gui.FirstStartActivity"
-            android:label="@string/title_first_start" >
-        </activity>
-        <activity android:name=".gui.DataDetailActivity" >
-        </activity>
+            android:label="@string/title_first_start" />
+        <activity android:name=".gui.DataDetailActivity" />
         <activity
             android:name=".gui.PreferencesActivity"
             android:label="@string/title_settings"
-            android:theme="@style/AppTheme.Preferences" >
+            android:theme="@style/AppTheme.Preferences"
+            android:parentActivityName=".gui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".gui.MainActivity" />
         </activity>
         <activity
             android:name=".gui.HelpActivity"
             android:label="@string/title_help"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".gui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".gui.MainActivity" />
         </activity>
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
@@ -88,7 +95,18 @@
 
         <service
             android:name=".util.backup.SynchronizationService"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":background" />
+        <service
+            android:name=".util.reminder.ReminderService"
+            android:exported="false"
+            android:process=":background" />
+
+        <receiver android:name=".util.reminder.ReminderEnablerReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

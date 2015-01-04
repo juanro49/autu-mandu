@@ -33,6 +33,9 @@ import me.kuehle.carreport.data.report.FuelConsumptionReport;
 import me.kuehle.carreport.data.report.FuelPriceReport;
 import me.kuehle.carreport.data.report.MileageReport;
 import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.serializer.TimeSpanSerializer;
+import me.kuehle.carreport.util.TimeSpan;
+import me.kuehle.carreport.util.TimeSpanUnit;
 
 public class Preferences {
     private static final String TAG = "Preferences";
@@ -116,6 +119,12 @@ public class Preferences {
 
     public String getSynchronizationProvider() {
         return prefs.getString("sync_current_provider", null);
+    }
+
+    public TimeSpan getReminderSnoozeDuration() {
+        String data = prefs.getString("behavior_reminder_snooze_duration", "7 DAY");
+        TimeSpan timeSpan = new TimeSpanSerializer().deserialize(data);
+        return timeSpan == null ? new TimeSpan(TimeSpanUnit.DAY, 7) : timeSpan;
     }
 
     public String getUnitCurrency() {

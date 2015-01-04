@@ -16,15 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import me.kuehle.carreport.DistanceEntryMode;
-import me.kuehle.carreport.FuelConsumption;
-import me.kuehle.carreport.Preferences;
-import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.report.AbstractReport;
-import me.kuehle.carreport.db.Car;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -35,167 +26,194 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.text.TextUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import me.kuehle.carreport.DistanceEntryMode;
+import me.kuehle.carreport.FuelConsumption;
+import me.kuehle.carreport.Preferences;
+import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.report.AbstractReport;
+import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.db.serializer.TimeSpanSerializer;
+import me.kuehle.carreport.util.TimeSpan;
+import me.kuehle.carreport.util.TimeSpanUnit;
+
 public class PreferencesGeneralFragment extends PreferenceFragment {
-	private class PreferenceChangeListener implements
-			OnPreferenceChangeListener {
-		@Override
-		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			FuelConsumption fuelConsumption = new FuelConsumption(getActivity());
-			String prefKey = preference.getKey();
-			if (prefKey.equals("behavior_car")) {
-				Car car = Car.load(Car.class,
-						Long.parseLong(newValue.toString()));
-				preference.setSummary(car.name);
-			} else if (prefKey.equals("behavior_distance_entry_mode")) {
-				DistanceEntryMode mode = DistanceEntryMode.valueOf(newValue
-						.toString());
-				preference.setSummary(getString(mode.nameResourceId));
-			} else if (preference instanceof EditTextPreference) {
-				preference.setSummary(newValue.toString());
+    private class PreferenceChangeListener implements OnPreferenceChangeListener {
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
+            FuelConsumption fuelConsumption = new FuelConsumption(getActivity());
+            String prefKey = preference.getKey();
+            if (prefKey.equals("behavior_car")) {
+                Car car = Car.load(Car.class, Long.parseLong(newValue.toString()));
+                preference.setSummary(car.name);
+            } else if (prefKey.equals("behavior_distance_entry_mode")) {
+                DistanceEntryMode mode = DistanceEntryMode.valueOf(newValue.toString());
+                preference.setSummary(getString(mode.nameResourceId));
+            } else if (prefKey.equals("behavior_reminder_snooze_duration")) {
+                TimeSpan timeSpan = new TimeSpanSerializer().deserialize(newValue);
+                preference.setSummary(timeSpan.toString(getActivity()));
+            } else if (preference instanceof EditTextPreference) {
+                preference.setSummary(newValue.toString());
 
-				// Update fuel consumption label
-				if (prefKey.equals("unit_distance")) {
-					fuelConsumption.setUnitDistance(newValue.toString());
-				} else if (prefKey.equals("unit_volume")) {
-					fuelConsumption.setUnitVolume(newValue.toString());
-				}
+                // Update fuel consumption label
+                if (prefKey.equals("unit_distance")) {
+                    fuelConsumption.setUnitDistance(newValue.toString());
+                } else if (prefKey.equals("unit_volume")) {
+                    fuelConsumption.setUnitVolume(newValue.toString());
+                }
 
-				updateFuelConsumptionField(fuelConsumption);
-			} else if (prefKey.equals("unit_fuel_consumption")) {
-				fuelConsumption.setConsumptionType(Integer.parseInt(newValue
-						.toString()));
-				updateFuelConsumptionField(fuelConsumption,
-						(ListPreference) preference);
-			}
-			
-			return true;
-		}
+                updateFuelConsumptionField(fuelConsumption);
+            } else if (prefKey.equals("unit_fuel_consumption")) {
+                fuelConsumption.setConsumptionType(Integer.parseInt(newValue.toString()));
+                updateFuelConsumptionField(fuelConsumption, (ListPreference) preference);
+            }
 
-		public ListPreference updateFuelConsumptionField(
-				FuelConsumption fuelConsumption) {
-			ListPreference prefFuelConsumption = (ListPreference) findPreference("unit_fuel_consumption");
-			return this.updateFuelConsumptionField(fuelConsumption,
-					prefFuelConsumption);
-		}
+            return true;
+        }
 
-		public ListPreference updateFuelConsumptionField(
-				FuelConsumption fuelConsumption,
-				ListPreference prefFuelConsumption) {
-			String[] entries = fuelConsumption.getUnitsEntries();
-			String[] entryValues = fuelConsumption.getUnitsEntryValues();
-			prefFuelConsumption.setEntries(entries);
-			prefFuelConsumption.setEntryValues(entryValues);
-			prefFuelConsumption.setSummary(fuelConsumption.getUnitLabel());
-			return prefFuelConsumption;
-		}
-	}
+        public ListPreference updateFuelConsumptionField(FuelConsumption fuelConsumption) {
+            ListPreference prefFuelConsumption = (ListPreference) findPreference("unit_fuel_consumption");
+            return updateFuelConsumptionField(fuelConsumption, prefFuelConsumption);
+        }
 
-	private PreferenceChangeListener onPreferenceChangeListener = new PreferenceChangeListener();
+        public ListPreference updateFuelConsumptionField(FuelConsumption fuelConsumption,
+                                                         ListPreference prefFuelConsumption) {
+            String[] entries = fuelConsumption.getUnitsEntries();
+            String[] entryValues = fuelConsumption.getUnitsEntryValues();
+            prefFuelConsumption.setEntries(entries);
+            prefFuelConsumption.setEntryValues(entryValues);
+            prefFuelConsumption.setSummary(fuelConsumption.getUnitLabel());
+            return prefFuelConsumption;
+        }
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    private PreferenceChangeListener onPreferenceChangeListener = new PreferenceChangeListener();
 
-		addPreferencesFromResource(R.xml.preferences_general);
-		PreferenceManager.setDefaultValues(getActivity(),
-				R.xml.preferences_general, false);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		Preferences prefs = new Preferences(getActivity());
-		FuelConsumption fuelConsumption = new FuelConsumption(getActivity());
+        addPreferencesFromResource(R.xml.preferences_general);
+        PreferenceManager.setDefaultValues(getActivity(),
+                R.xml.preferences_general, false);
 
-		// Behavior report order
-		{
-			updateReportOrderSummary();
-		}
+        Preferences prefs = new Preferences(getActivity());
+        FuelConsumption fuelConsumption = new FuelConsumption(getActivity());
 
-		// Behavior default car
-		{
-			List<Car> cars = Car.getAll();
-			String[] defaultEntries = new String[cars.size()];
-			String[] defaultEntryValues = new String[cars.size()];
-			for (int i = 0; i < cars.size(); i++) {
-				defaultEntries[i] = cars.get(i).name;
-				defaultEntryValues[i] = String.valueOf(cars.get(i).id);
-			}
+        // Behavior report order
+        {
+            updateReportOrderSummary();
+        }
 
-			ListPreference defaultCar = (ListPreference) findPreference("behavior_default_car");
-			defaultCar.setEntries(defaultEntries);
-			defaultCar.setEntryValues(defaultEntryValues);
-			defaultCar
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-			Car car = Car.load(Car.class, prefs.getDefaultCar());
-			defaultCar.setSummary(car.name);
-		}
+        // Behavior default car
+        {
+            List<Car> cars = Car.getAll();
+            String[] defaultEntries = new String[cars.size()];
+            String[] defaultEntryValues = new String[cars.size()];
+            for (int i = 0; i < cars.size(); i++) {
+                defaultEntries[i] = cars.get(i).name;
+                defaultEntryValues[i] = String.valueOf(cars.get(i).id);
+            }
 
-		// Behavior distance entry mode
-		{
-			DistanceEntryMode[] modes = DistanceEntryMode.values();
-			String[] entries = new String[modes.length];
-			String[] entryValues = new String[modes.length];
-			for (int i = 0; i < modes.length; i++) {
-				entries[i] = getString(modes[i].nameResourceId);
-				entryValues[i] = modes[i].name();
-			}
+            ListPreference defaultCar = (ListPreference) findPreference("behavior_default_car");
+            defaultCar.setEntries(defaultEntries);
+            defaultCar.setEntryValues(defaultEntryValues);
+            defaultCar.setOnPreferenceChangeListener(onPreferenceChangeListener);
+            Car car = Car.load(Car.class, prefs.getDefaultCar());
+            defaultCar.setSummary(car.name);
+        }
 
-			ListPreference distanceEntryMode = (ListPreference) findPreference("behavior_distance_entry_mode");
-			distanceEntryMode.setEntries(entries);
-			distanceEntryMode.setEntryValues(entryValues);
-			distanceEntryMode
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-			distanceEntryMode
-					.setSummary(getString(prefs.getDistanceEntryMode().nameResourceId));
-		}
+        // Behavior distance entry mode
+        {
+            DistanceEntryMode[] modes = DistanceEntryMode.values();
+            String[] entries = new String[modes.length];
+            String[] entryValues = new String[modes.length];
+            for (int i = 0; i < modes.length; i++) {
+                entries[i] = getString(modes[i].nameResourceId);
+                entryValues[i] = modes[i].name();
+            }
 
-		// Unit Currency
-		{
-			EditTextPreference unitCurrency = (EditTextPreference) findPreference("unit_currency");
-			unitCurrency
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-			unitCurrency.setSummary(prefs.getUnitCurrency());
-		}
+            ListPreference distanceEntryMode = (ListPreference) findPreference("behavior_distance_entry_mode");
+            distanceEntryMode.setEntries(entries);
+            distanceEntryMode.setEntryValues(entryValues);
+            distanceEntryMode.setOnPreferenceChangeListener(onPreferenceChangeListener);
+            distanceEntryMode.setSummary(getString(prefs.getDistanceEntryMode().nameResourceId));
+        }
 
-		// Unit Volume
-		{
-			EditTextPreference unitVolume = (EditTextPreference) findPreference("unit_volume");
-			unitVolume
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-			unitVolume.setSummary(prefs.getUnitVolume());
-		}
+        // Behavior reminder snooze duration
+        {
+            TimeSpan[] availableTimeSpans = {
+                    new TimeSpan(TimeSpanUnit.DAY, 1),
+                    new TimeSpan(TimeSpanUnit.DAY, 2),
+                    new TimeSpan(TimeSpanUnit.DAY, 7),
+                    new TimeSpan(TimeSpanUnit.DAY, 14),
+                    new TimeSpan(TimeSpanUnit.MONTH, 1),
+                    new TimeSpan(TimeSpanUnit.MONTH, 2),
+                    new TimeSpan(TimeSpanUnit.MONTH, 3),
+                    new TimeSpan(TimeSpanUnit.MONTH, 6)
+            };
+            TimeSpanSerializer timeSpanSerializer = new TimeSpanSerializer();
+            String[] entries = new String[availableTimeSpans.length];
+            String[] entryValues = new String[availableTimeSpans.length];
+            for (int i = 0; i < availableTimeSpans.length; i++) {
+                entries[i] = availableTimeSpans[i].toString(getActivity());
+                entryValues[i] = timeSpanSerializer.serialize(availableTimeSpans[i]);
+            }
 
-		// Unit Distance
-		{
-			EditTextPreference unitDistance = (EditTextPreference) findPreference("unit_distance");
-			unitDistance
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-			unitDistance.setSummary(prefs.getUnitDistance());
-		}
+            ListPreference snoozeDuration = (ListPreference) findPreference("behavior_reminder_snooze_duration");
+            snoozeDuration.setEntries(entries);
+            snoozeDuration.setEntryValues(entryValues);
+            snoozeDuration.setOnPreferenceChangeListener(onPreferenceChangeListener);
+            snoozeDuration.setSummary(prefs.getReminderSnoozeDuration().toString(getActivity()));
+        }
 
-		// Unit fuel consumption
-		{
-			ListPreference fieldFuelConsumption = onPreferenceChangeListener
-					.updateFuelConsumptionField(fuelConsumption);
-			fieldFuelConsumption
-					.setOnPreferenceChangeListener(onPreferenceChangeListener);
-		}
-	}
+        // Unit Currency
+        {
+            EditTextPreference unitCurrency = (EditTextPreference) findPreference("unit_currency");
+            unitCurrency.setOnPreferenceChangeListener(onPreferenceChangeListener);
+            unitCurrency.setSummary(prefs.getUnitCurrency());
+        }
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		updateReportOrderSummary();
-	}
+        // Unit Volume
+        {
+            EditTextPreference unitVolume = (EditTextPreference) findPreference("unit_volume");
+            unitVolume.setOnPreferenceChangeListener(onPreferenceChangeListener);
+            unitVolume.setSummary(prefs.getUnitVolume());
+        }
 
-	private void updateReportOrderSummary() {
-		List<Class<? extends AbstractReport>> reportClasses = new Preferences(
-				getActivity()).getReportOrder();
-		List<String> reportTitles = new ArrayList<>();
-		for (Class<? extends AbstractReport> reportClass : reportClasses) {
-			AbstractReport report = AbstractReport.newInstance(reportClass,
-					getActivity());
-			reportTitles.add(report.getTitle());
-		}
+        // Unit Distance
+        {
+            EditTextPreference unitDistance = (EditTextPreference) findPreference("unit_distance");
+            unitDistance.setOnPreferenceChangeListener(onPreferenceChangeListener);
+            unitDistance.setSummary(prefs.getUnitDistance());
+        }
 
-		PreferenceScreen reportOrder = (PreferenceScreen) findPreference("behavior_report_order");
-		reportOrder.setSummary(TextUtils.join(", ", reportTitles));
-	}
+        // Unit fuel consumption
+        {
+            ListPreference fieldFuelConsumption = onPreferenceChangeListener
+                    .updateFuelConsumptionField(fuelConsumption);
+            fieldFuelConsumption.setOnPreferenceChangeListener(onPreferenceChangeListener);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateReportOrderSummary();
+    }
+
+    private void updateReportOrderSummary() {
+        List<Class<? extends AbstractReport>> reportClasses = new Preferences(
+                getActivity()).getReportOrder();
+        List<String> reportTitles = new ArrayList<>();
+        for (Class<? extends AbstractReport> reportClass : reportClasses) {
+            AbstractReport report = AbstractReport.newInstance(reportClass, getActivity());
+            reportTitles.add(report.getTitle());
+        }
+
+        PreferenceScreen reportOrder = (PreferenceScreen) findPreference("behavior_report_order");
+        reportOrder.setSummary(TextUtils.join(", ", reportTitles));
+    }
 }

@@ -76,15 +76,23 @@ public class DateTimeInput {
     }
 
     public Date getDate() {
-        try {
-            return mFormat.parse(mParent.getText().toString());
-        } catch (ParseException e) {
-            return new Date();
+        if (mParent.getText().toString().isEmpty()) {
+            return null;
+        } else {
+            try {
+                return mFormat.parse(mParent.getText().toString());
+            } catch (ParseException e) {
+                return new Date();
+            }
         }
     }
 
     public void setDate(Date date) {
-        mParent.setText(mFormat.format(date));
+        if (date == null) {
+            mParent.setText("");
+        } else {
+            mParent.setText(mFormat.format(date));
+        }
     }
 
     public EditText getEditText() {

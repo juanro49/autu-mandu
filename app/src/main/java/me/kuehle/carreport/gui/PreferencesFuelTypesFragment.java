@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.gui.dialog.EditFuelTypeDialogFragment;
@@ -35,8 +36,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -44,7 +43,7 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
         MessageDialogFragment.MessageDialogFragmentListener,
         EditFuelTypeDialogFragment.EditFuelTypeDialogFragmentListener {
 	private class FuelTypesMultiChoiceModeListener implements MultiChoiceModeListener {
-		private ActionMode mode;
+		private ActionMode mActionMode;
 
 		public void deleteSelectedFuelTypes() {
 			SparseBooleanArray selected = getListView().getCheckedItemPositions();
@@ -53,11 +52,13 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 					mFuelTypes.get(i).delete();
 				}
 			}
-		}
+
+            Application.dataChanged();
+        }
 
 		public void finishActionMode() {
-			if (mode != null) {
-				mode.finish();
+			if (mActionMode != null) {
+				mActionMode.finish();
 			}
 		}
 
@@ -91,7 +92,7 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			this.mode = mode;
+			mActionMode = mode;
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.edit_fuel_types_cab, menu);
 			return true;
@@ -119,23 +120,15 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
     private static final int REQUEST_EDIT = 3;
 
 	private List<FuelType> mFuelTypes;
-
-	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            EditFuelTypeDialogFragment.newInstance(PreferencesFuelTypesFragment.this, REQUEST_EDIT,
-                    mFuelTypes.get(position)).show(getFragmentManager(), null);
-		}
-	};
-
-	private FuelTypesMultiChoiceModeListener multiChoiceModeListener = new FuelTypesMultiChoiceModeListener();
+	private FuelTypesMultiChoiceModeListener mMultiChoiceModeListener;
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		getListView().setOnItemClickListener(onItemClickListener);
-		getListView().setMultiChoiceModeListener(multiChoiceModeListener);
+        mMultiChoiceModeListener = new FuelTypesMultiChoiceModeListener();
+
+		getListView().setMultiChoiceModeListener(mMultiChoiceModeListener);
 		getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
 		fillList();
@@ -164,11 +157,17 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
         }
     }
 
-	@Override
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        EditFuelTypeDialogFragment.newInstance(PreferencesFuelTypesFragment.this, REQUEST_EDIT,
+                mFuelTypes.get(position)).show(getFragmentManager(), null);
+    }
+
+    @Override
 	public void onDialogPositiveClick(int requestCode) {
 		if (requestCode == REQUEST_DELETE) {
-			multiChoiceModeListener.deleteSelectedFuelTypes();
-			multiChoiceModeListener.finishActionMode();
+			mMultiChoiceModeListener.deleteSelectedFuelTypes();
+			mMultiChoiceModeListener.finishActionMode();
 			fillList();
 		} else if (requestCode == REQUEST_ADD || requestCode == REQUEST_EDIT) {
             fillList();
@@ -182,7 +181,7 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 	@Override
 	public void onStop() {
 		super.onStop();
-		multiChoiceModeListener.finishActionMode();
+		mMultiChoiceModeListener.finishActionMode();
 	}
 
 	private void fillList() {

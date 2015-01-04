@@ -20,7 +20,6 @@ import android.app.ListFragment;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,36 +27,40 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
 
+import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
-import me.kuehle.carreport.util.IForEach;
 
 public class PreferencesCarsFragment extends ListFragment implements
         MessageDialogFragmentListener {
     private class CarAdapter extends BaseAdapter {
+        private List<Car> mCars;
+
+        public CarAdapter() {
+            mCars = Car.getAll();
+        }
+
         @Override
         public int getCount() {
-            return cars.size();
+            return mCars.size();
         }
 
         @Override
         public Car getItem(int position) {
-            return cars.get(position);
+            return mCars.get(position);
         }
 
         @Override
         public long getItemId(int position) {
-            return position;
+            return getItem(position).id;
         }
 
         @Override
@@ -80,43 +83,46 @@ public class PreferencesCarsFragment extends ListFragment implements
                         .getTag();
             }
 
-            holder.name.setText(cars.get(position).name);
-            if (cars.get(position).isSuspended()) {
+            holder.name.setText(mCars.get(position).name);
+            if (mCars.get(position).isSuspended()) {
                 holder.suspended.setText(getString(
                         R.string.suspended_since,
                         android.text.format.DateFormat.getDateFormat(
                                 getActivity()).format(
-                                cars.get(position).suspendedSince)));
+                                mCars.get(position).suspendedSince)));
                 holder.suspended.setVisibility(View.VISIBLE);
             } else {
                 holder.suspended.setVisibility(View.GONE);
             }
 
-            holder.color.getBackground().setColorFilter(cars.get(position).color,
+            holder.color.getBackground().setColorFilter(mCars.get(position).color,
                     PorterDuff.Mode.SRC);
             return convertView;
         }
+
+        @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+        public void update() {
+            mCars = Car.getAll();
+            notifyDataSetChanged();
+        }
+    }
+
+    private static class CarViewHolder {
+        public TextView name;
+        public TextView suspended;
+        public View color;
     }
 
     private class CarMultiChoiceModeListener implements MultiChoiceModeListener {
-        private ActionMode mode;
-
-        public void execActionAndFinish(IForEach<Car> forEach) {
-            SparseBooleanArray selected = getListView()
-                    .getCheckedItemPositions();
-            for (int i = 0; i < cars.size(); i++) {
-                if (selected.get(i)) {
-                    forEach.action(cars.get(i));
-                }
-            }
-
-            mode.finish();
-            fillList();
-        }
+        private ActionMode mActionMode;
 
         public void finishActionMode() {
-            if (mode != null) {
-                mode.finish();
+            if (mActionMode != null) {
+                mActionMode.finish();
             }
         }
 
@@ -124,7 +130,7 @@ public class PreferencesCarsFragment extends ListFragment implements
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.menu_delete:
-                    if (getListView().getCheckedItemCount() == cars.size()) {
+                    if (getListView().getCheckedItemCount() == mCarAdapter.getCount()) {
                         MessageDialogFragment.newInstance(null, 0,
                                 R.string.alert_delete_title,
                                 getString(R.string.alert_cannot_delete_last_car),
@@ -147,7 +153,7 @@ public class PreferencesCarsFragment extends ListFragment implements
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            this.mode = mode;
+            mActionMode = mode;
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.edit_cars_cab, menu);
             return true;
@@ -161,8 +167,7 @@ public class PreferencesCarsFragment extends ListFragment implements
         public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
                                               boolean checked) {
             int count = getListView().getCheckedItemCount();
-            mode.setTitle(String.format(getString(R.string.cab_title_selected),
-                    count));
+            mode.setTitle(String.format(getString(R.string.cab_title_selected), count));
         }
 
         @Override
@@ -171,35 +176,22 @@ public class PreferencesCarsFragment extends ListFragment implements
         }
     }
 
-    private static class CarViewHolder {
-        public TextView name;
-        public TextView suspended;
-        public View color;
-    }
-
     private static final int DELETE_REQUEST_CODE = 1;
 
-    private List<Car> cars;
-    private boolean carEditInProgress = false;
-
-    private OnItemClickListener onItemClickListener = new OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            editCar(cars.get(position).id);
-        }
-    };
-
-    private CarMultiChoiceModeListener multiChoiceModeListener = new CarMultiChoiceModeListener();
+    private CarAdapter mCarAdapter;
+    private CarMultiChoiceModeListener mMultiChoiceModeListener;
+    private boolean mCarEditInProgress = false;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getListView().setOnItemClickListener(onItemClickListener);
-        getListView().setMultiChoiceModeListener(multiChoiceModeListener);
-        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        mCarAdapter = new CarAdapter();
+        mMultiChoiceModeListener = new CarMultiChoiceModeListener();
 
-        fillList();
+        getListView().setMultiChoiceModeListener(mMultiChoiceModeListener);
+        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        setListAdapter(mCarAdapter);
     }
 
     @Override
@@ -214,17 +206,26 @@ public class PreferencesCarsFragment extends ListFragment implements
     }
 
     @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        openCarDetailFragment(id);
+    }
+
+    @Override
     public void onDialogNegativeClick(int requestCode) {
     }
 
     @Override
     public void onDialogPositiveClick(int requestCode) {
         if (requestCode == DELETE_REQUEST_CODE) {
-            multiChoiceModeListener.execActionAndFinish(new IForEach<Car>() {
-                public void action(Car car) {
-                    car.delete();
-                }
-            });
+            long[] checkedIds = getListView().getCheckedItemIds();
+            for (long id : checkedIds) {
+                Car.delete(Car.class, id);
+            }
+
+            Application.dataChanged();
+
+            mMultiChoiceModeListener.finishActionMode();
+            mCarAdapter.update();
         }
     }
 
@@ -232,7 +233,7 @@ public class PreferencesCarsFragment extends ListFragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add_car:
-                editCar(AbstractDataDetailFragment.EXTRA_ID_DEFAULT);
+                openCarDetailFragment(AbstractDataDetailFragment.EXTRA_ID_DEFAULT);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -242,29 +243,25 @@ public class PreferencesCarsFragment extends ListFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        if (carEditInProgress) {
-            carEditInProgress = false;
-            fillList();
+        if (mCarEditInProgress) {
+            mCarEditInProgress = false;
+            mCarAdapter.update();
         }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        multiChoiceModeListener.finishActionMode();
+        mMultiChoiceModeListener.finishActionMode();
     }
 
-    private void editCar(long id) {
+    private void openCarDetailFragment(long id) {
         Intent intent = new Intent(getActivity(), DataDetailActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         intent.putExtra(DataDetailActivity.EXTRA_EDIT, DataDetailActivity.EXTRA_EDIT_CAR);
         intent.putExtra(AbstractDataDetailFragment.EXTRA_ID, id);
-        carEditInProgress = true;
         startActivityForResult(intent, 0);
-    }
 
-    private void fillList() {
-        cars = Car.getAll();
-        setListAdapter(new CarAdapter());
+        mCarEditInProgress = true;
     }
 }

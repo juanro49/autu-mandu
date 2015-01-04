@@ -28,6 +28,7 @@ import android.widget.EditText;
 
 import java.util.List;
 
+import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.FuelType;
 import me.kuehle.carreport.gui.util.AbstractFormFieldValidator;
@@ -153,6 +154,8 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
                 mFuelType.category = category;
                 mFuelType.save();
             }
+
+            Application.dataChanged();
 
             return true;
         } else {

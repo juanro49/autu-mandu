@@ -25,6 +25,9 @@
         android:fragment="me.kuehle.carreport.gui.PreferencesFuelTypesFragment"
         android:title="@string/pref_title_header_fuel_types" />
     <header
+        android:fragment="me.kuehle.carreport.gui.PreferencesRemindersFragment"
+        android:title="@string/pref_title_header_reminders" />
+    <header
         android:fragment="me.kuehle.carreport.gui.PreferencesBackupFragment"
         android:title="@string/pref_title_header_backup" />
     <header

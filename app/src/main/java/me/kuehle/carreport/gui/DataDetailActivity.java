@@ -29,6 +29,7 @@ public class DataDetailActivity extends ActionBarActivity implements
     public static final int EXTRA_EDIT_REFUELING = 0;
     public static final int EXTRA_EDIT_OTHER = 1;
     public static final int EXTRA_EDIT_CAR = 2;
+    public static final int EXTRA_EDIT_REMINDER = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +44,10 @@ public class DataDetailActivity extends ActionBarActivity implements
                 fragment = new DataDetailRefuelingFragment();
             } else if (edit == EXTRA_EDIT_OTHER) {
                 fragment = new DataDetailOtherFragment();
-            } else {
+            } else if (edit == EXTRA_EDIT_CAR) {
                 fragment = new DataDetailCarFragment();
+            } else {
+                fragment = new DataDetailReminderFragment();
             }
 
             fragment.setArguments(getIntent().getExtras());

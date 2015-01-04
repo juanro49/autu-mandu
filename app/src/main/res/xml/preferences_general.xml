@@ -38,6 +38,10 @@
             android:key="behavior_auto_guess_missing_data"
             android:summary="@string/pref_summary_behavior_auto_guess_missing_data"
             android:title="@string/pref_title_behavior_auto_guess_missing_data" />
+        <ListPreference
+            android:defaultValue="7 DAY"
+            android:key="behavior_reminder_snooze_duration"
+            android:title="@string/pref_title_behavior_reminder_snooze_duration" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_units" >
         <EditTextPreference

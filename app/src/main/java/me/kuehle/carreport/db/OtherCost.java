@@ -81,6 +81,13 @@ public class OtherCost extends Model {
         return getAllTitlesFiltered("price < 0");
     }
 
+    public static OtherCost getLatest(Car car) {
+        return new Select().from(OtherCost.class)
+                .where("car = ?", car.id)
+                .orderBy("date DESC")
+                .executeSingle();
+    }
+
 	private static List<String> getAllTitlesFiltered(String where) {
 		String sql = new Select("title").distinct().from(OtherCost.class)
                 .where(where)

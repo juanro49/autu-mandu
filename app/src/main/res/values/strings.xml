@@ -37,6 +37,7 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_add_car">Add car</string>
     <string name="menu_add_fuel_type">Add fuel type</string>
+    <string name="menu_add_reminder">Add reminder</string>
     <string name="menu_show_trend">Show trend</string>
     <string name="menu_show_overall_trend">Show overall trend</string>
 
@@ -54,6 +55,11 @@
     <string name="hint_end_date">End date</string>
     <string name="hint_suspend_date">Suspend date</string>
     <string name="hint_category">Category</string>
+    <string name="hint_reminder_after_distance">After distance</string>
+    <string name="hint_reminder_after_time">After time</string>
+    <string name="hint_reminder_start_mileage">Start at mileage</string>
+    <string name="hint_reminder_start_date">Start at date</string>
+    <string name="hint_reminder_snoozed_until">Snoozed until</string>
     
     <string name="label_partial">Partial</string>
     <string name="label_color">Color</string>
@@ -61,9 +67,14 @@
     <string name="label_set_end_date">Set end date</string>
     <string name="label_car">Car</string>
     <string name="label_recurrence">Recurrence</string>
+    <string name="label_reminder_type">Type</string>
+    <string name="label_reminder_dismissed">Notification dismissed</string>
 
     <string name="description_suspend">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports zoom to active cars only in the small view.</string>
     <string name="description_category">Refuelings are grouped by this category for different reports. Examples: Petrol, Diesel, Gas.</string>
+    <string name="description_reminder_status_due">Due</string>
+    <string name="description_reminder_status_due_snoozed">Snoozed until %s</string>
+    <string name="description_reminder_status_due_dismissed">Due, notification dismissed</string>
 
     <string name="validate_error_greater_zero">Has to be greater 0</string>
     <string name="validate_error_not_empty">Must not be empty</string>
@@ -90,6 +101,8 @@
     <string name="title_edit_car">Edit car</string>
     <string name="title_add_fuel_type">Add fuel type</string>
     <string name="title_edit_fuel_type">Edit fuel type</string>
+    <string name="title_add_reminder">Add reminder</string>
+    <string name="title_edit_reminder">Edit reminder</string>
     <string name="cab_title_selected">%d selected</string>
     <string name="edit_title_refueling">Refueling</string>
     
@@ -106,6 +119,8 @@
     <string name="alert_delete_car_message">This car will be deleted.</string>
     <string name="alert_delete_cars_message">The %d selected cars will be deleted.</string>
     <string name="alert_delete_fuel_types_message">The %d selected fuel types will be deleted.</string>
+    <string name="alert_delete_reminder_message">This reminder will be deleted.</string>
+    <string name="alert_delete_reminders_message">The %d selected reminders will be deleted.</string>
     <string name="alert_cannot_delete_last_car">One car cannot be deleted.</string>
     <string name="alert_cannot_delete_fuel_type">Cannot delete fuel type, because it is used by at least one refueling or fuel tank.</string>
     <string name="alert_about_licenses_title">Licenses</string>
@@ -133,6 +148,8 @@
     <string name="toast_other_income_deleted">Other income deleted</string>
     <string name="toast_car_saved">Car saved</string>
     <string name="toast_car_deleted">Car deleted</string>
+    <string name="toast_reminder_saved">Reminder saved</string>
+    <string name="toast_reminder_deleted">Reminder deleted</string>
     <string name="toast_sync_authentication_failed">Authentication failed</string>
     <string name="toast_backup_success">Backup to file %s completed successfully.</string>
     <string name="toast_backup_failed">Backup failed</string>
@@ -174,6 +191,7 @@
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>
     <string name="pref_title_header_fuel_types">Fuel Types</string>
+    <string name="pref_title_header_reminders">Reminders</string>
     <string name="pref_title_header_report_order">Report order</string>
     <string name="pref_title_header_backup">Backup &amp; Export</string>
     <string name="pref_title_category_synchronization">Synchronisation</string>
@@ -185,6 +203,7 @@
     <string name="pref_title_behavior_show_car_menu">Show car menu</string>
     <string name="pref_title_behavior_distance_entry_mode">Distance Entry Mode</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Balance missing refuelings (Beta)</string>
+    <string name="pref_title_behavior_reminder_snooze_duration">Reminder snooze duration</string>
     <string name="pref_title_unit_currency">Currency</string>
     <string name="pref_title_unit_volume">Volume</string>
     <string name="pref_title_unit_distance">Distance</string>
@@ -233,6 +252,12 @@
     <string name="calc_option_distance_to_price">Distance (%1$s) to Price (%2$s)</string>
     <string name="calc_option_price_to_distance">Price (%1$s) to Distance (%2$s)</string>
 
+    <string name="notification_reminder_title_single">Reminder: %s</string>
+    <string name="notification_reminder_title_multiple">Multiple reminders</string>
+    <string name="notification_reminder_action_done">Done</string>
+    <string name="notification_reminder_action_snooze">Snooze</string>
+    <string name="notification_reminder_action_snooze_all">Snooze all</string>
+
     <string name="distance_entry_mode_trip">Trip distance</string>
     <string name="distance_entry_mode_total">Total distance</string>
     <string name="distance_entry_mode_show_selector">Show selector</string>
@@ -242,4 +267,5 @@
     <string name="graph_options_desc">Graph options</string>
     <string name="graph_close_full_screen_desc">Close full screen graph</string>
     <string name="drag_handle_desc">Drag handle</string>
+    <string name="quit_snooze_desc">Quit snooze</string>
 </resources>
