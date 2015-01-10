@@ -38,4 +38,18 @@
         <item name="android:translationY">8dp</item>
     </style>
 
+    <style name="AppWidget.Toolbar" parent="@style/Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="navigationIcon">?attr/homeAsUpIndicator</item>
+    </style>
+
+    <style name="AppWidget.MaterializedHoloActionBar" parent="android:Widget.DeviceDefault.ActionBar">
+        <item name="android:background">@color/primary</item>
+        <item name="android:displayOptions">homeAsUp|showTitle</item>
+
+        <!-- Support library compatibility -->
+        <item name="background">@color/primary</item>
+        <item name="displayOptions">homeAsUp|showTitle</item>
+    </style>
+
 </resources>
