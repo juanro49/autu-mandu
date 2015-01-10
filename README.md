@@ -2,16 +2,19 @@
 
 ## Description
 
-Car Report is an android app, which lets you enter refuelings and other costs of your cars
-and displays nice reports. The following are currently included:
+Car Report is an android app, which lets you enter refuelings and other income and expenses of your
+cars and displays nice reports. The following are currently included:
 
 1. Fuel consumption
 1. Fuel price
 1. Mileage
 1. Costs in general
 
-It provides basic synchronization with Dropbox and Google Drive and has basic backup/restore
-and CSV import/export functionality.
+You can add reminders based on mileage and time for car related recurring actions, e.g. general
+inspection once a year.
+
+It provides synchronization with Dropbox and Google Drive and has basic backup/restore and CSV
+import/export functionality.
 
 ## Get it
 
@@ -19,8 +22,10 @@ and CSV import/export functionality.
 
 ## Used libraries
 
-* [Joda Time](http://joda-time.sourceforge.net)
-* [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
-* [ChartLib](https://bitbucket.org/frigus02/chartlib)
 * [ActiveAndroid](https://github.com/pardom/ActiveAndroid)
 * [DragSortListView](https://github.com/bauerca/drag-sort-listview)
+* [Joda Time](http://joda-time.sourceforge.net)
+* [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
+* [FloatingActionButton](https://github.com/makovkastar/FloatingActionButton)
+* [MaterialEditText](https://github.com/rengwuxian/MaterialEditText)
+* [ChartLib](https://bitbucket.org/frigus02/chartlib)
