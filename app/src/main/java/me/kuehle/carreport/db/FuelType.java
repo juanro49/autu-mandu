@@ -53,12 +53,12 @@ public class FuelType extends Model {
     }
 
     public static List<FuelType> getAll() {
-        return new Select().from(FuelType.class).orderBy("name ASC").execute();
+        return new Select().from(FuelType.class).orderBy("name COLLATE UNICODE ASC").execute();
     }
 
     public static List<String> getAllCategories() {
         String sql = new Select("category").distinct().from(FuelType.class)
-                .orderBy("category ASC").toSql();
+                .orderBy("category COLLATE UNICODE ASC").toSql();
         Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
         List<String> categories = new ArrayList<>();

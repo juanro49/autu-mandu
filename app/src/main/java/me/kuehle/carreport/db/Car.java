@@ -98,7 +98,7 @@ public class Car extends Model {
         String sql = new Select("category").distinct().from(FuelType.class)
                 .join(Refueling.class).on("refuelings.fuel_type = fuel_types.Id")
                 .where("refuelings.car = " + id) // toSql function does not support where arguments
-                .orderBy("category ASC")
+                .orderBy("category COLLATE UNICODE ASC")
                 .toSql();
         Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 
@@ -150,7 +150,7 @@ public class Car extends Model {
 
     public static List<Car> getAll() {
         return new Select().from(Car.class)
-                .orderBy("name ASC")
+                .orderBy("name COLLATE UNICODE ASC")
                 .execute();
     }
 
@@ -162,7 +162,7 @@ public class Car extends Model {
     public static List<Car> getAllActive() {
         return new Select().from(Car.class)
                 .where("suspended_since IS NULL")
-                .orderBy("name ASC")
+                .orderBy("name COLLATE UNICODE ASC")
                 .execute();
     }
 

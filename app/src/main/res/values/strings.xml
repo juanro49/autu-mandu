@@ -73,8 +73,11 @@
     <string name="description_suspend">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports zoom to active cars only in the small view.</string>
     <string name="description_category">Refuelings are grouped by this category for different reports. Examples: Petrol, Diesel, Gas.</string>
     <string name="description_reminder_status_due">Due</string>
-    <string name="description_reminder_status_due_snoozed">Snoozed until %s</string>
+    <string name="description_reminder_status_due_snoozed">Due, snoozed until %s</string>
     <string name="description_reminder_status_due_dismissed">Due, notification dismissed</string>
+    <string name="description_reminder_status_distance_and_time">Due in %1$s or %2$s</string>
+    <string name="description_reminder_status_distance">Due in %s</string>
+    <string name="description_reminder_status_time">Due in %s</string>
 
     <string name="validate_error_greater_zero">Has to be greater 0</string>
     <string name="validate_error_not_empty">Must not be empty</string>

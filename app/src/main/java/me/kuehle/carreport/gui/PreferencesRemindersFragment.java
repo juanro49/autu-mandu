@@ -19,6 +19,7 @@ package me.kuehle.carreport.gui;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.util.TimeUtils;
 import android.text.format.DateFormat;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -38,6 +39,7 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Reminder;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
+import me.kuehle.carreport.util.TimeSpan;
 import me.kuehle.carreport.util.reminder.ReminderService;
 
 public class PreferencesRemindersFragment extends ListFragment implements
@@ -132,18 +134,33 @@ public class PreferencesRemindersFragment extends ListFragment implements
             }
 
             if (reminder.isDue()) {
+                holder.status.setTextColor(getResources().getColor(R.color.accent));
                 if (reminder.notificationDismissed) {
                     holder.status.setText(R.string.description_reminder_status_due_dismissed);
                 } else if (reminder.isSnoozed()) {
-                    holder.status.setText(getString(R.string.description_reminder_status_due_snoozed,
+                    holder.status.setText(getString(
+                            R.string.description_reminder_status_due_snoozed,
                             mDateFormat.format(reminder.snoozedUntil)));
                 } else {
                     holder.status.setText(R.string.description_reminder_status_due);
                 }
-
-                holder.status.setVisibility(View.VISIBLE);
             } else {
-                holder.status.setVisibility(View.GONE);
+                holder.status.setTextColor(getResources().getColor(
+                        R.color.abc_secondary_text_material_dark));
+                if (reminder.afterDistance != null && reminder.afterTime != null) {
+                    holder.status.setText(getString(
+                            R.string.description_reminder_status_distance_and_time,
+                            String.format("%d %s", reminder.getDistanceToDue(), mUnitDistance),
+                            TimeSpan.fromMillis(reminder.getTimeToDue()).toString(getActivity())));
+                } else if (reminder.afterDistance != null) {
+                    holder.status.setText(getString(
+                            R.string.description_reminder_status_distance,
+                            String.format("%d %s", reminder.getDistanceToDue(), mUnitDistance)));
+                } else {
+                    holder.status.setText(getString(
+                            R.string.description_reminder_status_time,
+                            TimeSpan.fromMillis(reminder.getTimeToDue()).toString(getActivity())));
+                }
             }
 
             return convertView;

@@ -91,7 +91,7 @@ public class OtherCost extends Model {
 	private static List<String> getAllTitlesFiltered(String where) {
 		String sql = new Select("title").distinct().from(OtherCost.class)
                 .where(where)
-                .orderBy("title ASC")
+                .orderBy("title COLLATE UNICODE ASC")
                 .toSql();
 		Cursor cursor = Cache.openDatabase().rawQuery(sql, null);
 

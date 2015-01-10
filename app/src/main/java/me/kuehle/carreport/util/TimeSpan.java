@@ -24,6 +24,11 @@ import java.util.Date;
 import me.kuehle.carreport.R;
 
 public class TimeSpan {
+    private static final double MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
+    private static final double MILLIS_PER_MONTH = MILLIS_PER_DAY * 30;
+    private static final double MILLIS_PER_YEAR = MILLIS_PER_DAY * 365;
+    private static final float DEVIATION = 0.9f;
+
     private TimeSpanUnit mUnit;
     private int mCount;
 
@@ -71,5 +76,19 @@ public class TimeSpan {
     public String toString(Context context) {
         String[] timeSpanUnits = context.getResources().getStringArray(R.array.time_units);
         return String.format("%s %s", mCount, timeSpanUnits[mUnit.getValue()]);
+    }
+
+    public static TimeSpan fromMillis(long millis) {
+        millis = Math.abs(millis);
+        if (millis >= (MILLIS_PER_YEAR * DEVIATION)) {
+            int count = (int) Math.round(millis / MILLIS_PER_YEAR);
+            return new TimeSpan(TimeSpanUnit.YEAR, count);
+        } else if (millis >= (MILLIS_PER_MONTH * DEVIATION)) {
+            int count = (int) Math.round(millis / MILLIS_PER_MONTH);
+            return new TimeSpan(TimeSpanUnit.MONTH, count);
+        } else {
+            int count = (int) Math.round(millis / MILLIS_PER_DAY);
+            return new TimeSpan(TimeSpanUnit.DAY, count);
+        }
     }
 }

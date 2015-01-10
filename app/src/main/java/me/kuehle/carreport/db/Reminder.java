@@ -70,17 +70,33 @@ public class Reminder extends Model {
         this.snoozedUntil = null;
     }
 
-    public boolean isDue() {
+    public Integer getDistanceToDue() {
         if (afterDistance != null) {
             int latestMileage = car.getLatestMileage();
-            if (startMileage + afterDistance <= latestMileage) {
+            return startMileage + afterDistance - latestMileage;
+        } else {
+            return null;
+        }
+    }
+
+    public Long getTimeToDue() {
+        if (afterTime != null) {
+            long now = new Date().getTime();
+            return afterTime.addTo(startDate).getTime() - now;
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isDue() {
+        if (afterDistance != null) {
+            if (getDistanceToDue() <= 0) {
                 return true;
             }
         }
 
         if (afterTime != null) {
-            long now = new Date().getTime();
-            if (afterTime.addTo(startDate).getTime() <= now) {
+            if (getTimeToDue() <= 0) {
                 return true;
             }
         }
@@ -95,7 +111,7 @@ public class Reminder extends Model {
 
     public static List<Reminder> getAll() {
         return SafeSelect.from(Reminder.class)
-                .orderBy("title ASC")
+                .orderBy("title COLLATE UNICODE ASC")
                 .execute();
     }
 

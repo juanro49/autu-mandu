@@ -45,5 +45,5 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_margin="10dp"
-        android:background="@drawable/btn_choose_color" />
+        android:background="@drawable/bg_color_indicator" />
 </LinearLayout>
