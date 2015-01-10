@@ -187,7 +187,7 @@
     <string name="report_toast_mileage">Kilometer</string>
     <string name="report_toast_price">Preis</string>
     <string name="report_toast_date">Datum</string>
-    <string name="report_toast_fuel_type">Kraftstoffart</string>
+    <string name="report_toast_fuel_type">Kraftstoff</string>
     <string name="report_toast_none">keine</string>
 
     <string name="pref_title_header_about">Über Car Report</string>
@@ -234,7 +234,7 @@
     <string name="help_section_getting_started">Einstieg</string>
     <string name="help_section_tips">Tipps</string>
     <string name="help_section_calculations">Berechnungen</string>
-    <string name="help_section_fuel_types">Kraftstoffarten</string>
+    <string name="help_section_fuel_types">Kraftstoffe</string>
     <string name="help_section_csv">CSV</string>
 
     <string name="first_start_hi">Hallo!</string>
