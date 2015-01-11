@@ -17,7 +17,6 @@
 package me.kuehle.carreport.db;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.activeandroid.Cache;
 import com.activeandroid.Model;
@@ -117,11 +116,11 @@ public class Car extends Model {
     public int getLatestMileage() {
         Cursor cursor = Cache.openDatabase().rawQuery(
                 "SELECT mileage FROM refuelings WHERE car = ? " +
-                "UNION " +
-                "SELECT mileage FROM other_costs WHERE car = ? " +
-                "ORDER BY mileage DESC " +
-                "LIMIT 1",
-                new String[] { id.toString(), id.toString() });
+                        "UNION " +
+                        "SELECT mileage FROM other_costs WHERE car = ? " +
+                        "ORDER BY mileage DESC " +
+                        "LIMIT 1",
+                new String[]{id.toString(), id.toString()});
 
         int latestMileage = 0;
         if (cursor != null) {

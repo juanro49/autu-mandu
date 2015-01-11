@@ -39,7 +39,6 @@
             android:layout_toLeftOf="@+id/txt_after_distance"
             android:layout_toStartOf="@+id/txt_after_distance"
             android:singleLine="true"
-            android:text="Jährlich sdfsdf Ölstand prüfen"
             android:textAppearance="?android:attr/textAppearanceListItem" />
         <TextView
             android:id="@+id/txt_car"
@@ -51,7 +50,6 @@
             android:layout_toLeftOf="@+id/txt_after_time"
             android:layout_toStartOf="@+id/txt_after_time"
             android:singleLine="true"
-            android:text="Audi A3"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <TextView
             android:id="@+id/txt_after_distance"
@@ -61,7 +59,6 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:singleLine="true"
-            android:text="15000 km"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <TextView
             android:id="@+id/txt_after_time"
@@ -71,7 +68,6 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:singleLine="true"
-            android:text="2 Jahr(e)"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <TextView
             android:id="@+id/txt_status"
@@ -80,7 +76,6 @@
             android:layout_below="@id/txt_car"
             android:layout_marginTop="8dp"
             android:singleLine="true"
-            android:text="Due, snoozed until 20.01.2015"
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </RelativeLayout>
     <ImageButton
@@ -89,12 +84,14 @@
         android:layout_height="48dp"
         android:layout_gravity="center_vertical"
         android:background="?android:attr/selectableItemBackground"
-        android:src="@drawable/ic_check" />
+        android:src="@drawable/ic_check"
+        android:contentDescription="@string/notification_reminder_action_done" />
     <ImageButton
         android:id="@+id/btn_snooze"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="center_vertical"
         android:background="?android:attr/selectableItemBackground"
-        android:src="@drawable/ic_snooze" />
+        android:src="@drawable/ic_snooze"
+        android:contentDescription="@string/notification_reminder_action_snooze" />
 </LinearLayout>

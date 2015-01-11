@@ -33,8 +33,6 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.OtherCost;
-import me.kuehle.carreport.db.Refueling;
 import me.kuehle.carreport.db.Reminder;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment;
 import me.kuehle.carreport.gui.util.DateTimeInput;

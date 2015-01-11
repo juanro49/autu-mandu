@@ -39,10 +39,13 @@ public class SynchronizationService extends IntentService {
 
 		AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
 				.getCurrent(getApplicationContext());
-
-		sendSynchronizationStatus(STATUS_STARTED);
-		boolean result = provider.onSynchronize(option);
-		sendSynchronizationStatus(STATUS_FINISHED, result);
+        if (provider == null) {
+            sendSynchronizationStatus(STATUS_FINISHED, false);
+        } else {
+            sendSynchronizationStatus(STATUS_STARTED);
+            boolean result = provider.onSynchronize(option);
+            sendSynchronizationStatus(STATUS_FINISHED, result);
+        }
 	}
 
 	private void sendSynchronizationStatus(int status) {

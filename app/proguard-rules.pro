@@ -11,6 +11,8 @@
 -keepattributes *Annotation*
 -keep class com.activeandroid.** { *; }
 -keep class me.kuehle.carreport.db.** { *; }
+-keep class me.kuehle.carreport.util.backup.DropboxSynchronizationProvider
+-keep class me.kuehle.carreport.util.backup.GoogleDriveSynchronizationProvider
 
 # Reports
 -keep class me.kuehle.chartlib.ChartView
@@ -21,6 +23,7 @@
 -keep class me.kuehle.carreport.gui.HelpActivity$*
 
 # Dropbox
+-keep public class org.apache.commons.** { *; }
 -dontwarn org.apache.**
 
 # Joda Time

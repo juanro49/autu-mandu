@@ -60,7 +60,6 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
     /**
      * Creates a new fragment to edit an existing other cost entry.
      * @param id The is of the item to edit.
-     * @param allowCancel True, if the cancel action should be visible.
      * @return A new edit fragment.
      */
     public static DataDetailOtherFragment newInstance(long id) {

@@ -95,8 +95,7 @@
 
         <service
             android:name=".util.backup.SynchronizationService"
-            android:exported="false"
-            android:process=":background" />
+            android:exported="false" />
         <service
             android:name=".util.reminder.ReminderService"
             android:exported="false"

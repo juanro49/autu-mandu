@@ -146,6 +146,13 @@ public class MainActivity extends ActionBarActivity implements
         AbstractSynchronizationProvider provider = AbstractSynchronizationProvider.getCurrent(this);
         if (mSyncMenuItem != null) {
             mSyncMenuItem.setVisible(provider != null && provider.isAuthenticated());
+
+            if (AbstractSynchronizationProvider.isSynchronisationInProgress()) {
+                MenuItemCompat.setActionView(mSyncMenuItem,
+                        R.layout.actionbar_indeterminate_progress);
+            } else {
+                MenuItemCompat.setActionView(mSyncMenuItem, null);
+            }
         }
 
         AbstractSynchronizationProvider.setSynchronisationCallback(this);

@@ -19,7 +19,6 @@ package me.kuehle.carreport.gui;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.util.TimeUtils;
 import android.text.format.DateFormat;
 import android.view.ActionMode;
 import android.view.Menu;

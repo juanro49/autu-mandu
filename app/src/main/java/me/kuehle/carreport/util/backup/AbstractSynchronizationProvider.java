@@ -125,9 +125,6 @@ public abstract class AbstractSynchronizationProvider {
 
     public static void setSynchronisationCallback(OnSynchronizeListener callback) {
         mSynchronisationListener = callback;
-        if (mSynchronisationListener != null && mSynchronisationInProgress) {
-            mSynchronisationListener.onSynchronizationStarted();
-        }
     }
 
     protected File mTempFile;
