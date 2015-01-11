@@ -50,12 +50,11 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     private static final int PICK_DATE_REQUEST_CODE = 0;
     private static final int PICK_TIME_REQUEST_CODE = 1;
 
-    public static DataDetailRefuelingFragment newInstance(long id, boolean allowCancel) {
+    public static DataDetailRefuelingFragment newInstance(long id) {
         DataDetailRefuelingFragment f = new DataDetailRefuelingFragment();
 
         Bundle args = new Bundle();
         args.putLong(AbstractDataDetailFragment.EXTRA_ID, id);
-        args.putBoolean(AbstractDataDetailFragment.EXTRA_ALLOW_CANCEL, allowCancel);
         f.setArguments(args);
 
         return f;

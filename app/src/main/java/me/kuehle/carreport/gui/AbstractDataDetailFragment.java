@@ -50,8 +50,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     public static final String EXTRA_ID = "id";
     public static final long EXTRA_ID_DEFAULT = -1;
     public static final String EXTRA_CAR_ID = "car_id";
-    public static final String EXTRA_ALLOW_CANCEL = "allow_cancel";
-    public static final boolean EXTRA_ALLOW_CANCEL_DEFAULT = true;
 
     protected OnItemActionListener onItemActionListener;
     protected Model editItem = null;
@@ -59,13 +57,12 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     private static final int DELETE_REQUEST_CODE = 0;
 
     private CharSequence savedABTitle;
-    private boolean allowCancel;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ActionBar actionBar = MainActivity.getSupportActionBar(this);
-        actionBar.setDisplayHomeAsUpEnabled(allowCancel);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         savedABTitle = actionBar.getTitle();
         if (isInEditMode()) {
@@ -98,9 +95,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
             editItem = getEditItem(id);
         }
 
-        allowCancel = getArguments().getBoolean(EXTRA_ALLOW_CANCEL,
-                EXTRA_ALLOW_CANCEL_DEFAULT);
-
         setHasOptionsMenu(true);
     }
 
@@ -111,10 +105,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
         if (!isInEditMode()) {
             menu.removeItem(R.id.menu_delete);
-        }
-
-        if (!allowCancel) {
-            menu.removeItem(R.id.menu_cancel);
         }
     }
 

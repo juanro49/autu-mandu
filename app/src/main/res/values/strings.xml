@@ -70,7 +70,7 @@
     <string name="label_reminder_type">Type</string>
     <string name="label_reminder_dismissed">Notification dismissed</string>
 
-    <string name="description_suspend">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports zoom to active cars only in the small view.</string>
+    <string name="description_suspend">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports by default zoom to active cars only.</string>
     <string name="description_category">Refuelings are grouped by this category for different reports. Examples: Petrol, Diesel, Gas.</string>
     <string name="description_reminder_status_due">Due</string>
     <string name="description_reminder_status_due_snoozed">Due, snoozed until %s</string>

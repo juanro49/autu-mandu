@@ -18,11 +18,13 @@ package me.kuehle.carreport.gui;
 
 import java.util.List;
 
+import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.util.DrawerListAdapter;
 import me.kuehle.carreport.gui.util.DrawerListItem;
+import me.kuehle.carreport.util.DemoData;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 
 import android.app.Activity;
@@ -207,6 +209,10 @@ public class MainActivity extends ActionBarActivity implements
             }
 		}
 
+        if (BuildConfig.DEBUG) {
+            DemoData.createMenuItem(menu);
+        }
+
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -253,11 +259,6 @@ public class MainActivity extends ActionBarActivity implements
             return true;
         }
 
-        // DemoData.addDemoData();
-        // if (mCurrentFragment instanceof DataChangeListener) {
-        // ((DataChangeListener) mCurrentFragment).onDataChanged();
-        // }
-
         switch (item.getItemId()) {
             case R.id.menu_synchronize:
                 AbstractSynchronizationProvider.getCurrent(this).synchronize();
@@ -265,6 +266,8 @@ public class MainActivity extends ActionBarActivity implements
             default:
                 if (item.getIntent() != null) {
                     startActivityForResult(item.getIntent(), REQUEST_ADD_DATA);
+                    return true;
+                } else if (BuildConfig.DEBUG && DemoData.onOptionsItemSelected(item)) {
                     return true;
                 } else {
                     return super.onOptionsItemSelected(item);

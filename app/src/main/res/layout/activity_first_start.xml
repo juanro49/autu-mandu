@@ -15,16 +15,16 @@
   limitations under the License.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="?attr/detailsElementLayoutWidth"
     android:layout_height="match_parent"
-    android:layout_gravity="center_horizontal"
-    android:padding="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
     android:background="?attr/detailsElementBackground">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".gui.DataDetailActivity" >
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp">
         <TextView
             android:id="@+id/txt_hi"
             android:layout_width="wrap_content"

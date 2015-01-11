@@ -17,6 +17,8 @@
 package me.kuehle.carreport.util;
 
 import android.graphics.Color;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import org.joda.time.DateTime;
 
@@ -26,6 +28,21 @@ import me.kuehle.carreport.db.OtherCost;
 import me.kuehle.carreport.db.Refueling;
 
 public class DemoData {
+    private static final CharSequence MENU_TITLE = "Create demo data";
+
+    public static MenuItem createMenuItem(Menu menu) {
+        return menu.add(MENU_TITLE);
+    }
+
+    public static boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getTitle().equals(MENU_TITLE)) {
+            addDemoData();
+            return true;
+        }
+
+        return false;
+    }
+
     public static void addDemoData() {
         FuelType super95 = createFuelType("Super 95", "Benzin");
         FuelType superE10 = createFuelType("Super E10", "Benzin");

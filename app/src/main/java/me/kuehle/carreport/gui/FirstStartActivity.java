@@ -42,7 +42,6 @@ public class FirstStartActivity extends ActionBarActivity {
     public void onCreateCarClick(View v) {
         Intent intent = new Intent(this, DataDetailActivity.class);
         intent.putExtra(DataDetailActivity.EXTRA_EDIT, DataDetailActivity.EXTRA_EDIT_CAR);
-        intent.putExtra(AbstractDataDetailFragment.EXTRA_ALLOW_CANCEL, false);
 
         startActivityForResult(intent, 0);
     }

@@ -70,7 +70,7 @@
     <string name="label_reminder_type">Typ</string>
     <string name="label_reminder_dismissed">Benachrichtigung entfernt</string>
 
-    <string name="description_suspend">Wenn Sie ein Auto nicht mehr benutzen, können Sie es stilllegen. Dadurch werden sich wiederholenden Kosten zu dem Stilllegezeitpunkt beendet. Außerdem zoomen die Reports in der kleinen Ansicht nur auf aktive Autos.</string>
+    <string name="description_suspend">Wenn Sie ein Auto nicht mehr benutzen, können Sie es stilllegen. Dadurch werden sich wiederholenden Kosten zu dem Stilllegezeitpunkt beendet. Außerdem zoomen die Reports standardmäßig nur auf aktive Autos.</string>
     <string name="description_category">Tankfüllungen werden in verschiedenen Reports nach diesen Kateogrien gruppiert. Beispiele: Benzin, Diesel, Gas.</string>
     <string name="description_reminder_status_due">Fällig</string>
     <string name="description_reminder_status_due_snoozed">Fällig, schlummert bis %s</string>

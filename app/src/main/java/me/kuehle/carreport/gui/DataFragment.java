@@ -217,9 +217,9 @@ public class DataFragment extends Fragment implements DataListCallback,
         if (mTwoPane) {
             AbstractDataDetailFragment fragment;
             if (edit == DataDetailActivity.EXTRA_EDIT_REFUELING) {
-                fragment = DataDetailRefuelingFragment.newInstance(id, true);
+                fragment = DataDetailRefuelingFragment.newInstance(id);
             } else {
-                fragment = DataDetailOtherFragment.newInstance(id, true);
+                fragment = DataDetailOtherFragment.newInstance(id);
             }
 
             mBackStackListener.skipNextIfPop();

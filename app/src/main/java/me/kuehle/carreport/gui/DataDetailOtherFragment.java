@@ -63,12 +63,11 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
      * @param allowCancel True, if the cancel action should be visible.
      * @return A new edit fragment.
      */
-    public static DataDetailOtherFragment newInstance(long id, boolean allowCancel) {
+    public static DataDetailOtherFragment newInstance(long id) {
         DataDetailOtherFragment f = new DataDetailOtherFragment();
 
         Bundle args = new Bundle();
         args.putLong(AbstractDataDetailFragment.EXTRA_ID, id);
-        args.putBoolean(AbstractDataDetailFragment.EXTRA_ALLOW_CANCEL, allowCancel);
         f.setArguments(args);
 
         return f;
