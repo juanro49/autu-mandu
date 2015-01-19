@@ -45,11 +45,21 @@ import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
 import com.google.android.gms.plus.Plus;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.FileContent;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.ParentReference;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 
 import me.kuehle.carreport.Application;
@@ -65,7 +75,10 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
     private static final int REQUEST_RESOLVE_CONNECTION = 1001;
     private static final Scope SCOPE = Drive.SCOPE_APPFOLDER;
 
+    // Google Drive Android API (GDAA)
     private GoogleApiClient mGoogleApiClient;
+    // Google APIs Java Client (REST)
+    private com.google.api.services.drive.Drive mGoogleApiServiceDrive;
 
     public GoogleDriveSynchronizationProvider(Context context) {
         super(context);
@@ -97,7 +110,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
     @Override
     protected void onStartAuthentication() {
         Intent pickerIntent = AccountPicker.newChooseAccountIntent(null, null,
-                new String[] { "com.google" }, false, null, null, null, null);
+                new String[]{"com.google"}, false, null, null, null, null);
         mAuthenticationFragment.startActivityForResult(pickerIntent, REQUEST_PICK_ACCOUNT);
     }
 
@@ -105,7 +118,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
     protected void onContinueAuthentication(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_PICK_ACCOUNT:
-                if(resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK) {
                     String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     Preferences prefs = new Preferences(mContext);
                     prefs.setGoogleDriveAccount(accountName);
@@ -142,20 +155,38 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
                     @Override
                     protected Boolean doInBackground(Void... params) {
                         // Check if remote data is available.
-                        File localFile = new File(Cache.openDatabase().getPath());
+
+                        // Check with GDAA
+                        /*File localFile = new File(Cache.openDatabase().getPath());
                         Query query = new Query.Builder()
                                 .addFilter(Filters.eq(SearchableField.TITLE, localFile.getName()))
                                 .build();
 
-                        DriveApi.MetadataBufferResult metadataBufferResult =  Drive.DriveApi
+                        DriveApi.MetadataBufferResult metadataBufferResult = Drive.DriveApi
                                 .getAppFolder(mGoogleApiClient)
                                 .queryChildren(mGoogleApiClient, query)
                                 .await();
-                        if(!metadataBufferResult.getStatus().isSuccess()) {
+                        if (!metadataBufferResult.getStatus().isSuccess()) {
                             return false;
                         }
 
-                        remoteDataAvailable = metadataBufferResult.getMetadataBuffer().getCount() > 0;
+                        remoteDataAvailable = metadataBufferResult.getMetadataBuffer().getCount() > 0;*/
+
+                        // Check with REST
+                        try {
+                            File localFile = new File(Cache.openDatabase().getPath());
+                            FileList files = mGoogleApiServiceDrive.files()
+                                    .list()
+                                    .setQ(String.format("title = '%s'", localFile.getName()))
+                                    .setFields("items(downloadUrl,id,modifiedDate)")
+                                    .execute();
+
+                            if (files.getItems().size() > 0) {
+                                remoteDataAvailable = true;
+                            }
+                        } catch (Exception e) {
+                            return false;
+                        }
 
                         return true;
                     }
@@ -164,8 +195,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
                     protected void onPostExecute(Boolean result) {
                         mGoogleApiClient.disconnect();
 
-                        mAuthenticationFragmentManager
-                                .executePendingTransactions();
+                        mAuthenticationFragmentManager.executePendingTransactions();
                         ((ProgressDialogFragment) mAuthenticationFragmentManager
                                 .findFragmentByTag("progress")).dismiss();
 
@@ -192,7 +222,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        if(mAuthenticationInProgess) {
+        if (mAuthenticationInProgess) {
             if (connectionResult.hasResolution()) {
                 try {
                     connectionResult.startResolutionForResult(mAuthenticationFragment.getActivity(),
@@ -201,12 +231,10 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
                     authenticationFinished(false, false);
                 }
             } else {
-                GooglePlayServicesUtil
-                        .getErrorDialog(connectionResult.getErrorCode(),
-                                mAuthenticationFragment.getActivity(), 0)
-                        .show();
+                GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(),
+                        mAuthenticationFragment.getActivity(), 0).show();
             }
-        } else if(mUnlinkingInProgress) {
+        } else if (mUnlinkingInProgress) {
             // Nothing to do here.
             unlinkingFinished();
         }
@@ -219,19 +247,105 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
             return false;
         }
 
-        boolean result = doSynchronization(option);
+        boolean result = doSynchronizationREST(option);
 
         mGoogleApiClient.disconnect();
 
         return result;
     }
 
-    /**
-     * Actually performs the synchronization, assuming a connected GoogleApiClient.
-     * @param option
-     * @return
-     */
-    private boolean doSynchronization(int option) {
+    private boolean doSynchronizationREST(int option) {
+        Preferences prefs = new Preferences(mContext);
+        File localFile = new File(Cache.openDatabase().getPath());
+        Date localModifiedDate = prefs.getGoogleDriveLocalModifiedDate();
+
+        // Get id and modification date of the remote file.
+        com.google.api.services.drive.model.File remoteFile = null;
+        Date remoteFileModifiedDate = null;
+        try {
+            FileList files = mGoogleApiServiceDrive.files().list()
+                    .setQ(String.format("title = '%s'", localFile.getName()))
+                    .setFields("items(downloadUrl,id,modifiedDate)").execute();
+            if (files.getItems().size() > 0) {
+                remoteFile = files.getItems().get(0);
+                remoteFileModifiedDate = new Date(remoteFile.getModifiedDate().getValue());
+            }
+        } catch (IOException e) {
+            return false;
+        }
+
+        if (option == SYNC_UPLOAD
+                || remoteFile == null
+                || (option == SYNC_NORMAL && remoteFileModifiedDate.equals(localModifiedDate))) {
+            // --------------------------------------------------
+            // Upload
+            // --------------------------------------------------
+
+            if (!copyFile(localFile, mTempFile)) {
+                return false;
+            }
+
+            com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
+            body.setTitle(localFile.getName());
+            body.setMimeType("application/x-sqlite");
+            body.setParents(Arrays.asList(new ParentReference().setId("appdata")));
+            FileContent mediaContent = new FileContent("application/x-sqlite", localFile);
+            try {
+                com.google.api.services.drive.model.File file;
+                if (remoteFile == null) {
+                    file = mGoogleApiServiceDrive.files().insert(body, mediaContent).execute();
+                } else {
+                    file = mGoogleApiServiceDrive.files()
+                            .update(remoteFile.getId(), body, mediaContent)
+                            .execute();
+                }
+
+                remoteFileModifiedDate = new Date(file.getModifiedDate().getValue());
+                prefs.setGoogleDriveLocalModifiedDate(remoteFileModifiedDate);
+            } catch (IOException e) {
+                return false;
+            } finally {
+                if (!mTempFile.delete()) {
+                    Log.w(TAG, "Could not delete temp file after uploading.");
+                }
+            }
+        } else {
+            // --------------------------------------------------
+            // Download
+            // --------------------------------------------------
+
+            FileOutputStream outputStream = null;
+            try {
+                outputStream = new FileOutputStream(mTempFile);
+                HttpResponse resp = mGoogleApiServiceDrive
+                        .getRequestFactory()
+                        .buildGetRequest(new GenericUrl(remoteFile.getDownloadUrl()))
+                        .execute();
+                resp.download(outputStream);
+                if (copyFile(mTempFile, localFile)) {
+                    prefs.setGoogleDriveLocalModifiedDate(remoteFileModifiedDate);
+                    Application.reinitializeDatabase();
+                }
+            } catch (IOException e) {
+                return false;
+            } finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        Log.w(TAG, "Could not close output stream after downloading.");
+                    }
+                }
+
+                if (!mTempFile.delete()) {
+                    Log.w(TAG, "Could not delete temp file after downloading.");
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean doSynchronizationGDAA(int option) {
         Preferences prefs = new Preferences(mContext);
         File localFile = new File(Cache.openDatabase().getPath());
         Date localModifiedDate = prefs.getGoogleDriveLocalModifiedDate();
@@ -374,6 +488,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
         }
 
         Preferences prefs = new Preferences(mContext);
+
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                 .addApi(Drive.API)
                 .addApi(Plus.API)
@@ -381,6 +496,14 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .setAccountName(prefs.getGoogleDriveAccount())
+                .build();
+
+        mGoogleApiServiceDrive = new com.google.api.services.drive.Drive.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new GsonFactory(),
+                GoogleAccountCredential.usingOAuth2(mContext,
+                        Arrays.asList(DriveScopes.DRIVE_APPDATA))
+                        .setSelectedAccountName(prefs.getGoogleDriveAccount()))
                 .build();
     }
 }
