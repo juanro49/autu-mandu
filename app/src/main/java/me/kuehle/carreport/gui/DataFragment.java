@@ -30,9 +30,11 @@ import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
+import com.melnykov.fab.FloatingActionButton;
 
 import java.util.List;
 
@@ -210,6 +212,13 @@ public class DataFragment extends Fragment implements DataListCallback,
     public void onItemSaved() {
         onItemUnselected();
         onDataChanged();
+    }
+
+    @Override
+    public void onViewCreated(ListView listView) {
+        FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.fab);
+        fab.show();
+        fab.attachToListView(listView);
     }
 
     @Override

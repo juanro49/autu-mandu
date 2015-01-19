@@ -77,6 +77,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
         getListView().setMultiChoiceModeListener(new DataListMultiChoiceModeListener());
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
+        mDataListCallback.onViewCreated(getListView());
+
         getLoaderManager().initLoader(0, null, this);
 
         if (savedInstanceState != null) {

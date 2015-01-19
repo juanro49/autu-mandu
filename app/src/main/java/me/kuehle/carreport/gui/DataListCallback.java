@@ -16,7 +16,11 @@
 
 package me.kuehle.carreport.gui;
 
+import android.widget.ListView;
+
 public interface DataListCallback {
+    void onViewCreated(ListView listView);
+
     void onItemSelected(int edit, long id);
 
     void onItemUnselected();

@@ -19,7 +19,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ScrollView
+    <com.melnykov.fab.ObservableScrollView
+        android:id="@+id/scroll_view"
+        android:overScrollMode="never"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
         <LinearLayout
@@ -42,7 +44,7 @@
                 android:orientation="vertical"
                 tools:ignore="InconsistentLayout" />
         </LinearLayout>
-    </ScrollView>
+    </com.melnykov.fab.ObservableScrollView>
 
     <com.melnykov.fab.FloatingActionButton
         android:id="@+id/fab"
