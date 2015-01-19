@@ -265,8 +265,24 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
         try {
             FileList files = mGoogleApiServiceDrive.files().list()
                     .setQ(String.format("title = '%s'", localFile.getName()))
-                    .setFields("items(downloadUrl,id,modifiedDate)").execute();
-            if (files.getItems().size() > 0) {
+                    .setFields("items(downloadUrl,id,modifiedDate,fileSize)").execute();
+            if (files.getItems().size() > 1) {
+                // Due to a bug in the GDAA it is possible, that there is more than one
+                // database file. In this case we use the largest one (the one with
+                // the most data) and remove the others.
+                for (com.google.api.services.drive.model.File file : files.getItems()) {
+                    if (remoteFile == null) {
+                        remoteFile = file;
+                    } else if (remoteFile.getFileSize() < file.getFileSize()) {
+                        mGoogleApiServiceDrive.files().trash(remoteFile.getId()).execute();
+                        remoteFile = file;
+                    } else {
+                        mGoogleApiServiceDrive.files().trash(file.getId()).execute();
+                    }
+                }
+
+                remoteFileModifiedDate = new Date(remoteFile.getModifiedDate().getValue());
+            } else if (files.getItems().size() == 1) {
                 remoteFile = files.getItems().get(0);
                 remoteFileModifiedDate = new Date(remoteFile.getModifiedDate().getValue());
             }
