@@ -48,3 +48,13 @@
 -keepnames class * implements android.os.Parcelable {
     public static final ** CREATOR;
 }
+
+# Google API Client, Google API Drive Service
+-keep class com.google.** { *;}
+-keep interface com.google.** { *;}
+-dontwarn com.google.**
+-dontwarn sun.misc.Unsafe
+-dontwarn com.google.common.collect.MinMaxPriorityQueue
+-keepattributes *Annotation*,Signature
+-keep class * extends com.google.api.client.json.GenericJson { *; }
+-keep class com.google.api.services.drive.** { *; }
