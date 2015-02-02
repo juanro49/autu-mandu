@@ -84,11 +84,15 @@ public class Preferences {
     }
 
     public Date getGoogleDriveLocalModifiedDate() {
-        long date = prefs.getLong("sync_drive_modified_date", -1);
-        if (date == -1) {
+        try {
+            long date = prefs.getLong("sync_drive_modified_date", -1);
+            if (date == -1) {
+                return null;
+            } else {
+                return new Date(date);
+            }
+        } catch(ClassCastException e) {
             return null;
-        } else {
-            return new Date(date);
         }
     }
 

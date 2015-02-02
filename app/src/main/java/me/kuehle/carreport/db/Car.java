@@ -22,6 +22,7 @@ import com.activeandroid.Cache;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import java.util.ArrayList;
@@ -64,10 +65,16 @@ public class Car extends Model {
     }
 
     public List<Refueling> getRefuelingsByFuelTypeCategory(String category) {
-        return SafeSelect.from(Refueling.class)
-                .join(FuelType.class).on("fuel_types.Id = refuelings.fuel_type")
-                .where("refuelings.car = ? AND fuel_types.category = ?", id, category)
-                .orderBy("refuelings.date ASC")
+        From query = SafeSelect.from(Refueling.class)
+                .join(FuelType.class).on("fuel_types.Id = refuelings.fuel_type");
+
+        if (category == null) {
+            query = query.where("refuelings.car = ? AND fuel_types.category IS NULL", id);
+        } else {
+            query = query.where("refuelings.car = ? AND fuel_types.category = ?", id, category);
+        }
+
+        return query.orderBy("refuelings.date ASC")
                 .execute();
     }
 
