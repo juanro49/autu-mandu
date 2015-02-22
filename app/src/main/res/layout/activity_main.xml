@@ -15,9 +15,11 @@
   limitations under the License.
 -->
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -31,13 +33,22 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>
-    <ListView
-        android:id="@+id/left_drawer"
-        android:layout_width="280dp"
-        android:layout_height="match_parent"
+
+    <me.kuehle.carreport.gui.util.ScrimInsetsFrameLayout
+        android:id="@+id/left_drawer_container"
         android:layout_gravity="start"
-        android:background="@color/background_floating_material_dark"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp" />
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:fitsSystemWindows="true"
+        app:insetForeground="#4000">
+        <ListView
+            android:id="@+id/left_drawer"
+            android:layout_width="280dp"
+            android:layout_height="match_parent"
+            android:background="@color/background_floating_material_dark"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:fitsSystemWindows="true"/>
+    </me.kuehle.carreport.gui.util.ScrimInsetsFrameLayout>
 </android.support.v4.widget.DrawerLayout>

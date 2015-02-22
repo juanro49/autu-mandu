@@ -24,6 +24,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.util.DrawerListAdapter;
 import me.kuehle.carreport.gui.util.DrawerListItem;
+import me.kuehle.carreport.gui.util.ScrimInsetsFrameLayout;
 import me.kuehle.carreport.util.DemoData;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 
@@ -75,6 +76,7 @@ public class MainActivity extends ActionBarActivity implements
 
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
+    private ScrimInsetsFrameLayout mDrawerListContainer;
 	private ListView mDrawerList;
     private DrawerListAdapter mDrawerAdapter;
 	private CharSequence mDrawerTitle;
@@ -100,14 +102,17 @@ public class MainActivity extends ActionBarActivity implements
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerLayout.setStatusBarBackground(R.color.primary_dark);
 
         mDrawerAdapter = new DrawerListAdapter(this, buildDrawerItems());
+
+        mDrawerListContainer = (ScrimInsetsFrameLayout) findViewById(R.id.left_drawer_container);
 
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open,
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, (Toolbar) findViewById(R.id.action_bar), R.string.drawer_open,
                 R.string.drawer_close) {
             public void onDrawerOpened(View drawerView) {
                 mTitle = getSupportActionBar().getTitle();
@@ -428,7 +433,7 @@ public class MainActivity extends ActionBarActivity implements
         mDrawerList.setItemChecked(mCurrentDrawerPosition, true);
         DrawerListItem current = (DrawerListItem) mDrawerAdapter.getItem(mCurrentDrawerPosition);
         setTitle(current.getText());
-        mDrawerLayout.closeDrawer(mDrawerList);
+        mDrawerLayout.closeDrawer(mDrawerListContainer);
     }
 
     public static ActionBar getSupportActionBar(Fragment fragment) {

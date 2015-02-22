@@ -16,7 +16,7 @@
   -->
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat">
+    <style name="AppTheme.Base" parent="Theme.AppCompat">
         <item name="detailsElementLayoutWidth">match_parent</item>
         <item name="detailsElementBackground">@android:color/transparent</item>
 
@@ -28,12 +28,18 @@
         <item name="colorControlHighlight">@color/ripple</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="@style/AppTheme">
+    <style name="AppTheme" parent="AppTheme.Base">
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="toolbarStyle">@style/AppWidget.Toolbar</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.NavigationDrawer" parent="AppTheme.NoActionBar">
     </style>
 
     <style name="AppTheme.Preferences" parent="android:Theme.DeviceDefault">

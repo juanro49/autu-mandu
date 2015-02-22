@@ -16,6 +16,11 @@
   -->
 <resources>
 
+    <style name="AppTheme.NoActionBar.NavigationDrawer" parent="AppTheme.NoActionBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
     <style name="AppTheme.Preferences" parent="android:Theme.DeviceDefault">
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
