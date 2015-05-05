@@ -18,11 +18,11 @@ package me.kuehle.carreport.gui;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import me.kuehle.carreport.R;
 
-public class DataDetailActivity extends ActionBarActivity implements
+public class DataDetailActivity extends AppCompatActivity implements
         AbstractDataDetailFragment.OnItemActionListener {
     public static final String EXTRA_EDIT = "edit";
 

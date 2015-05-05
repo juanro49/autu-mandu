@@ -18,13 +18,13 @@ package me.kuehle.carreport.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.db.Car;
 
-public class FirstStartActivity extends ActionBarActivity {
+public class FirstStartActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

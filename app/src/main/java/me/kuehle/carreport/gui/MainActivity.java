@@ -38,7 +38,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
@@ -51,7 +51,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity implements
+public class MainActivity extends AppCompatActivity implements
 		AbstractSynchronizationProvider.OnSynchronizeListener {
 	public static interface BackPressedListener {
 		public boolean onBackPressed();
@@ -438,8 +438,8 @@ public class MainActivity extends ActionBarActivity implements
 
     public static ActionBar getSupportActionBar(Fragment fragment) {
         Activity activity = fragment.getActivity();
-        if (activity instanceof ActionBarActivity) {
-            return ((ActionBarActivity) activity).getSupportActionBar();
+        if (activity instanceof AppCompatActivity) {
+            return ((AppCompatActivity) activity).getSupportActionBar();
         }
 
         return null;
