@@ -103,6 +103,12 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
         @Override
         protected void onProgressUpdate(Object... values) {
+            // It seems, that sometimes the activity is null, when calling this method. In this
+            // case the best thing we can do is just nothing.
+            if (getActivity() == null) {
+                return;
+            }
+
             final AbstractReport report = (AbstractReport) values[0];
             View card = View.inflate(getActivity(), R.layout.report, null);
             getNextColumn().addView(card);
