@@ -223,7 +223,9 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         if (mAuthenticationInProgess) {
-            if (connectionResult.hasResolution()) {
+            if (mAuthenticationFragment.getActivity() == null) {
+                authenticationFinished(false, false);
+            } else if (connectionResult.hasResolution()) {
                 try {
                     connectionResult.startResolutionForResult(mAuthenticationFragment.getActivity(),
                             REQUEST_RESOLVE_CONNECTION);
