@@ -40,11 +40,11 @@ import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessag
 public abstract class AbstractDataDetailFragment extends Fragment implements
         SupportMessageDialogFragmentListener {
     public interface OnItemActionListener {
-        public void onItemCanceled();
+        void onItemCanceled();
 
-        public void onItemDeleted();
+        void onItemDeleted();
 
-        public void onItemSaved();
+        void onItemSaved();
     }
 
     public static final String EXTRA_ID = "id";

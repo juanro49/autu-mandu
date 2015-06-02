@@ -31,7 +31,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 public class SimpleAnimator {
-	public static enum Property {
+	public enum Property {
 		Height, Weight
 	}
 

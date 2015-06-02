@@ -29,10 +29,10 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 public class ListDialogFragment extends DialogFragment {
-	public static interface ListDialogFragmentListener {
-		public void onDialogNegativeClick(int requestCode);
+	public interface ListDialogFragmentListener {
+		void onDialogNegativeClick(int requestCode);
 
-		public void onDialogPositiveClick(int requestCode, int selectedPosition);
+		void onDialogPositiveClick(int requestCode, int selectedPosition);
 	}
 
 	public static ListDialogFragment newInstance(Fragment parent,

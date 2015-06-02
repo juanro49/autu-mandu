@@ -35,10 +35,10 @@ import com.larswerkman.holocolorpicker.SaturationBar;
 import com.larswerkman.holocolorpicker.ValueBar;
 
 public class SupportColorPickerDialogFragment extends DialogFragment {
-	public static interface SupportColorPickerDialogFragmentListener {
-		public void onDialogNegativeClick(int requestCode);
+	public interface SupportColorPickerDialogFragmentListener {
+		void onDialogNegativeClick(int requestCode);
 
-		public void onDialogPositiveClick(int requestCode, int color);
+		void onDialogPositiveClick(int requestCode, int color);
 	}
 
 	public static SupportColorPickerDialogFragment newInstance(Fragment parent,

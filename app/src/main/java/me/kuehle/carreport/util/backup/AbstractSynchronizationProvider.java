@@ -35,17 +35,17 @@ import me.kuehle.carreport.Preferences;
 
 public abstract class AbstractSynchronizationProvider {
     public interface OnAuthenticationListener {
-        public void onAuthenticationFinished(boolean success, boolean remoteDataAvailable);
+        void onAuthenticationFinished(boolean success, boolean remoteDataAvailable);
     }
 
     public interface OnUnlinkListener {
-        public void onUnlinkingFinished();
+        void onUnlinkingFinished();
     }
 
     public interface OnSynchronizeListener {
-        public void onSynchronizationFinished(boolean result);
+        void onSynchronizationFinished(boolean result);
 
-        public void onSynchronizationStarted();
+        void onSynchronizationStarted();
     }
 
     private static class SynchronizationStatusReceiver extends BroadcastReceiver {

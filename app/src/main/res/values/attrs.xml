@@ -20,8 +20,4 @@
         <enum name="wrap_content" value="-2" />
     </attr>
     <attr name="detailsElementBackground" format="reference" />
-
-    <declare-styleable name="ScrimInsetsView">
-        <attr format="reference|color" name="insetForeground" />
-    </declare-styleable>
 </resources>

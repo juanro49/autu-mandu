@@ -37,8 +37,9 @@ dependencies {
     // Dropbox
     compile fileTree(dir: 'libs/dropbox', include: ['*.jar'])
     // Support, AppCompat
-    compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:design:22.2.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.android.support:cardview-v7:22.1.1'
     // Play Services: for Google Drive
     compile 'com.google.android.gms:play-services-plus:7.5.0'

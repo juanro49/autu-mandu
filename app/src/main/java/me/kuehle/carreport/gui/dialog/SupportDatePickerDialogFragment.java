@@ -29,8 +29,8 @@ import android.widget.DatePicker;
 
 public class SupportDatePickerDialogFragment extends DialogFragment implements
 		DatePickerDialog.OnDateSetListener {
-	public static interface SupportDatePickerDialogFragmentListener {
-		public void onDialogPositiveClick(int requestCode, Date date);
+	public interface SupportDatePickerDialogFragmentListener {
+		void onDialogPositiveClick(int requestCode, Date date);
 	}
 
 	public static SupportDatePickerDialogFragment newInstance(Fragment parent,

@@ -30,8 +30,8 @@ import me.kuehle.carreport.db.Refueling;
 public class DemoData {
     private static final CharSequence MENU_TITLE = "Create demo data";
 
-    public static MenuItem createMenuItem(Menu menu) {
-        return menu.add(MENU_TITLE);
+    public static void createMenuItem(Menu menu) {
+        menu.add(MENU_TITLE);
     }
 
     public static boolean onOptionsItemSelected(MenuItem item) {

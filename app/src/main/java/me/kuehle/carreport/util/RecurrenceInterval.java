@@ -21,7 +21,7 @@ public enum RecurrenceInterval {
 
     private int value;
 
-    private RecurrenceInterval(int i) {
+    RecurrenceInterval(int i) {
         value = i;
     }
 

@@ -171,7 +171,7 @@ public class DataFragment extends Fragment implements DataListCallback,
 
         ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
         mPager.setAdapter(new DataListPagerAdapter(getChildFragmentManager()));
-        mPager.setOnPageChangeListener(new DataListOnPageChangeListener());
+        mPager.addOnPageChangeListener(new DataListOnPageChangeListener());
 
         PagerTabStrip tabs = (PagerTabStrip) v.findViewById(R.id.pager_tab_strip);
         tabs.setBackgroundResource(R.color.primary);
@@ -236,10 +236,10 @@ public class DataFragment extends Fragment implements DataListCallback,
             FragmentManager fm = getChildFragmentManager();
             fm.popBackStack("detail", FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-            FragmentTransaction ft = fm.beginTransaction().replace(R.id.detail, fragment);
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            ft.addToBackStack("detail");
-            ft.commit();
+            fm.beginTransaction().replace(R.id.detail, fragment)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .addToBackStack("detail")
+                    .commit();
         } else {
             Intent intent = new Intent(getActivity(), DataDetailActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);

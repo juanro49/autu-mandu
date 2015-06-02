@@ -36,10 +36,10 @@ import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 
 public class EditFuelTypeDialogFragment extends DialogFragment {
-    public static interface EditFuelTypeDialogFragmentListener {
-        public void onDialogNegativeClick(int requestCode);
+    public interface EditFuelTypeDialogFragmentListener {
+        void onDialogNegativeClick(int requestCode);
 
-        public void onDialogPositiveClick(int requestCode);
+        void onDialogPositiveClick(int requestCode);
     }
 
     public static EditFuelTypeDialogFragment newInstance(Fragment parent, int requestCode,

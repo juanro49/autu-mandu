@@ -43,7 +43,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.ProgressDialogFragment;
 
 public class DropboxSynchronizationProvider extends AbstractSynchronizationProvider {
-    private static final String TAG = "DropboxSynchronizationProvider";
+    private static final String TAG = "DropboxSyncProvider";
 
     private static final String APP_KEY = "a6edub2n9b029if";
     private static final String APP_SECRET = "1cw56rcn1bbnb7f";

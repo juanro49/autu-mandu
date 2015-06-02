@@ -26,10 +26,10 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 
 public class SupportMessageDialogFragment extends DialogFragment {
-	public static interface SupportMessageDialogFragmentListener {
-		public void onDialogNegativeClick(int requestCode);
+	public interface SupportMessageDialogFragmentListener {
+		void onDialogNegativeClick(int requestCode);
 
-		public void onDialogPositiveClick(int requestCode);
+		void onDialogPositiveClick(int requestCode);
 	}
 
 	public static SupportMessageDialogFragment newInstance(Fragment parent,

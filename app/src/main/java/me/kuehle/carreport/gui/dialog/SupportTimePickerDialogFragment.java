@@ -30,8 +30,8 @@ import android.widget.TimePicker;
 
 public class SupportTimePickerDialogFragment extends DialogFragment implements
 		TimePickerDialog.OnTimeSetListener {
-	public static interface SupportTimePickerDialogFragmentListener {
-		public void onDialogPositiveClick(int requestCode, Date time);
+	public interface SupportTimePickerDialogFragmentListener {
+		void onDialogPositiveClick(int requestCode, Date time);
 	}
 
 	public static SupportTimePickerDialogFragment newInstance(Fragment parent,

@@ -60,6 +60,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import me.kuehle.carreport.Application;
@@ -69,7 +70,7 @@ import me.kuehle.carreport.gui.dialog.ProgressDialogFragment;
 
 public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationProvider implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = "GoogleDriveSynchronizationProvider";
+    private static final String TAG = "GoogleDriveSyncProvider";
 
     private static final int REQUEST_PICK_ACCOUNT = 1000;
     private static final int REQUEST_RESOLVE_CONNECTION = 1001;
@@ -306,7 +307,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
             com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
             body.setTitle(localFile.getName());
             body.setMimeType("application/x-sqlite");
-            body.setParents(Arrays.asList(new ParentReference().setId("appdata")));
+            body.setParents(Collections.singletonList(new ParentReference().setId("appdata")));
             FileContent mediaContent = new FileContent("application/x-sqlite", localFile);
             try {
                 com.google.api.services.drive.model.File file;
@@ -520,7 +521,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
                 AndroidHttp.newCompatibleTransport(),
                 new GsonFactory(),
                 GoogleAccountCredential.usingOAuth2(mContext,
-                        Arrays.asList(DriveScopes.DRIVE_APPDATA))
+                        Collections.singletonList(DriveScopes.DRIVE_APPDATA))
                         .setSelectedAccountName(prefs.getGoogleDriveAccount()))
                 .build();
     }

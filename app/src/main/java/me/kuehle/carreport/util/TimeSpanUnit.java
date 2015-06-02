@@ -20,7 +20,7 @@ public enum TimeSpanUnit {
 
     private int value;
 
-    private TimeSpanUnit(int i) {
+    TimeSpanUnit(int i) {
         value = i;
     }
 
