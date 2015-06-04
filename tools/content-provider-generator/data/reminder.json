@@ -1,0 +1,65 @@
+{
+    "documentation": "A reminder for a certain event of a car.",
+
+    "fields": [
+        {
+            "documentation": "Display title of the reminder.",
+            "name": "title",
+            "type": "String",
+            "nullable": false
+        },
+        {
+            "documentation": "Time span after which the reminder should go off. Together with the after_time_span_count this gives a time span like 3 days.",
+            "name": "after_time_span_unit",
+            "type": "enum",
+            "enumName": "TimeSpanUnit",
+            "enumValues": [
+                "DAY",
+                "MONTH",
+                "YEAR"
+            ]
+        },
+        {
+            "documentation": "Time span after which the reminder should go off. Together with the after_time_span_unit this gives a time span like every 3 days.",
+            "name": "after_time_span_count",
+            "type": "Integer"
+        },
+        {
+            "documentation": "Distance after which the reminder should go off.",
+            "name": "after_distance",
+            "type": "Integer"
+        },
+        {
+            "documentation": "Date on which the reminder starts to count.",
+            "name": "start_date",
+            "type": "Date",
+            "nullable": false
+        },
+        {
+            "documentation": "Mileage on which the reminder starts to count.",
+            "name": "start_mileage",
+            "type": "Integer",
+            "nullable": false
+        },
+        {
+            "documentation": "Indicates if the reminder has gone off, but the notification has been dismissed.",
+            "name": "notification_dismissed",
+            "type": "Boolean",
+            "nullable": false
+        },
+        {
+            "documentation": "When the reminder goes off, the user can snooze it. In this case the field contains the date on which the reminder will go off again.",
+            "name": "snoozed_until",
+            "type": "Date"
+        },
+        {
+            "name": "car_id",
+            "type": "Long",
+            "nullable": false,
+            "foreignKey": {
+                "table": "car",
+                "onDelete": "CASCADE"
+            }
+        }
+    ]
+}

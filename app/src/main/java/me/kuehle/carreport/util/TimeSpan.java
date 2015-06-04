@@ -22,6 +22,7 @@ import org.joda.time.DateTime;
 import java.util.Date;
 
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.provider.reminder.TimeSpanUnit;
 
 public class TimeSpan {
     private static final double MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -75,7 +76,7 @@ public class TimeSpan {
 
     public String toString(Context context) {
         String[] timeSpanUnits = context.getResources().getStringArray(R.array.time_units);
-        return String.format("%s %s", mCount, timeSpanUnits[mUnit.getValue()]);
+        return String.format("%s %s", mCount, timeSpanUnits[mUnit.ordinal()]);
     }
 
     public static TimeSpan fromMillis(long millis) {

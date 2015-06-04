@@ -1,0 +1,24 @@
+{
+    "documentation": "A fuel type.",
+
+    "fields": [
+        {
+            "documentation": "Name of the fuel type, e.g. Diesel.",
+            "name": "name",
+            "type": "String",
+            "nullable": false
+        },
+        {
+            "documentation": "An optional category like fuel or gas. Fuel types may be grouped by this category in reports.",
+            "name": "category",
+            "type": "String"
+        }
+    ],
+
+    "constraints": [
+        {
+            "name": "unique_name",
+            "definition": "UNIQUE (fuel_type__name) ON CONFLICT REPLACE"
+        }
+    ]
+}

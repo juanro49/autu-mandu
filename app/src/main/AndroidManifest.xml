@@ -34,19 +34,6 @@
         android:supportsRtl="true">
 
         <meta-data
-            android:name="AA_DB_NAME"
-            android:value="data.db" />
-        <meta-data
-            android:name="AA_DB_VERSION"
-            android:value="8" />
-        <meta-data
-            android:name="AA_MODELS"
-            android:value="me.kuehle.carreport.db.Car,me.kuehle.carreport.db.FuelType,me.kuehle.carreport.db.OtherCost,me.kuehle.carreport.db.Refueling,me.kuehle.carreport.db.Reminder" />
-        <meta-data
-            android:name="AA_SERIALIZERS"
-            android:value="me.kuehle.carreport.db.serializer.RecurrenceSerializer,me.kuehle.carreport.db.serializer.TimeSpanSerializer" />
-
-        <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
@@ -107,6 +94,11 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name="me.kuehle.carreport.provider.DataProvider"
+            android:authorities="me.kuehle.carreport.provider"
+            android:exported="false" />
 
     </application>
 

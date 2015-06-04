@@ -28,8 +28,6 @@ import android.widget.Spinner;
 
 import com.activeandroid.Model;
 
-import org.w3c.dom.Text;
-
 import java.util.Date;
 import java.util.List;
 

@@ -1,0 +1,23 @@
+{
+    "documentation": "A car.",
+
+    "fields": [
+        {
+            "documentation": "Name of the car. Only for display purposes.",
+            "name": "name",
+            "type": "String",
+            "nullable": false
+        },
+        {
+            "documentation": "Color of the car in android color representation.",
+            "name": "color",
+            "type": "Integer",
+            "nullable": false
+        },
+        {
+            "documentation": "When the car has been suspended, this contains the start date.",
+            "name": "suspended_since",
+            "type": "Date"
+        }
+    ]
+}

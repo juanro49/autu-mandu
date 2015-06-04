@@ -1,0 +1,60 @@
+{
+    "documentation": "A refueling for a car.",
+
+    "fields": [
+        {
+            "documentation": "Date on which the refueling occured.",
+            "name": "date",
+            "type": "Date",
+            "nullable": false
+        },
+        {
+            "documentation": "Mileage on which the refueling occured.",
+            "name": "mileage",
+            "type": "Integer",
+            "nullable": false
+        },
+        {
+            "documentation": "The amount of fuel, that was refilled.",
+            "name": "volume",
+            "type": "Float",
+            "nullable": false
+        },
+        {
+            "documentation": "The price of the refueling.",
+            "name": "price",
+            "type": "Float",
+            "nullable": false
+        },
+        {
+            "documentation": "Indicates if the tank was filled completly or only partially.",
+            "name": "partial",
+            "type": "Boolean",
+            "nullable": false
+        },
+        {
+            "documentation": "A note for this cost. Just for display purposes.",
+            "name": "note",
+            "type": "String",
+            "nullable": false
+        },
+        {
+            "name": "fuel_type_id",
+            "type": "Long",
+            "nullable": false,
+            "foreignKey": {
+                "table": "fuel_type",
+                "onDelete": "CASCADE"
+            }
+        },
+        {
+            "name": "car_id",
+            "type": "Long",
+            "nullable": false,
+            "foreignKey": {
+                "table": "car",
+                "onDelete": "CASCADE"
+            }
+        }
+    ]
+}

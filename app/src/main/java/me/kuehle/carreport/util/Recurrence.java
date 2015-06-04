@@ -23,53 +23,52 @@ import org.joda.time.Days;
 import org.joda.time.Months;
 import org.joda.time.Years;
 
+import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
+
 public class Recurrence {
-	private RecurrenceInterval interval;
-	private int multiplier;
+    private RecurrenceInterval interval;
+    private int multiplier;
 
-	public Recurrence(RecurrenceInterval interval) {
-		this(interval, 1);
-	}
+    public Recurrence(RecurrenceInterval interval, int multiplier) {
+        this.interval = interval;
+        this.multiplier = multiplier;
+    }
 
-	public Recurrence(RecurrenceInterval interval, int multiplier) {
-		this.interval = interval;
-		this.multiplier = multiplier;
-	}
+    public RecurrenceInterval getInterval() {
+        return interval;
+    }
 
-	public RecurrenceInterval getInterval() {
-		return interval;
-	}
+    public int getMultiplier() {
+        return multiplier;
+    }
 
-	public int getMultiplier() {
-		return multiplier;
-	}
+    public int getRecurrencesSince(Date start) {
+        return getRecurrencesBetween(start, new Date());
+    }
 
-	public int getRecurrencesSince(Date start) {
-		return getRecurrencesBetween(start, new Date());
-	}
+    public int getRecurrencesBetween(Date start, Date end) {
+        DateTime then = new DateTime(start);
+        DateTime now = new DateTime(end);
 
-	public int getRecurrencesBetween(Date start, Date end) {
-		DateTime then = new DateTime(start);
-		DateTime now = new DateTime(end);
+        int count = 1;
+        switch (interval) {
+            case ONCE:
+                break;
+            case DAY:
+                count += Days.daysBetween(then, now).getDays() / multiplier;
+                break;
+            case MONTH:
+                count += Months.monthsBetween(then, now).getMonths() / multiplier;
+                break;
+            case QUARTER:
+                int quarters = Months.monthsBetween(then, now).getMonths() / 3;
+                count += quarters / multiplier;
+                break;
+            case YEAR:
+                count += Years.yearsBetween(then, now).getYears() / multiplier;
+                break;
+        }
 
-		int count = 1;
-		switch (interval) {
-		case ONCE:
-			break;
-		case DAY:
-			count += Days.daysBetween(then, now).getDays() / multiplier;
-			break;
-		case MONTH:
-			count += Months.monthsBetween(then, now).getMonths() / multiplier;
-			break;
-		case QUARTER:
-			int quarters = Months.monthsBetween(then, now).getMonths() / 3;
-			count += quarters / multiplier;
-			break;
-		case YEAR:
-			count += Years.yearsBetween(then, now).getYears() / multiplier;
-			break;
-		}
-		return count;
-	}
+        return count;
+    }
 }
