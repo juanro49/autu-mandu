@@ -19,12 +19,13 @@ package me.kuehle.carreport.gui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerTabStrip;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
 import android.view.LayoutInflater;
@@ -169,14 +170,14 @@ public class DataFragment extends Fragment implements DataListCallback,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_data, container, false);
 
+        PagerAdapter pagerAdapter = new DataListPagerAdapter(getChildFragmentManager());
+
         ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
-        mPager.setAdapter(new DataListPagerAdapter(getChildFragmentManager()));
+        mPager.setAdapter(pagerAdapter);
         mPager.addOnPageChangeListener(new DataListOnPageChangeListener());
 
-        PagerTabStrip tabs = (PagerTabStrip) v.findViewById(R.id.pager_tab_strip);
-        tabs.setBackgroundResource(R.color.primary);
-        tabs.setTabIndicatorColorResource(R.color.accent);
-        tabs.setDrawFullUnderline(true);
+        TabLayout tabs = (TabLayout) v.findViewById(R.id.tab_layout);
+        tabs.setupWithViewPager(mPager);
 
         mTxtNoEntrySelected = (TextView) v.findViewById(R.id.txt_no_entry_selected);
         if (getChildFragmentManager().findFragmentById(R.id.detail) != null) {
