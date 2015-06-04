@@ -27,5 +27,4 @@ import/export functionality.
 * [Joda Time](http://joda-time.sourceforge.net)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [FloatingActionButton](https://github.com/makovkastar/FloatingActionButton)
-* [MaterialEditText](https://github.com/rengwuxian/MaterialEditText)
 * [ChartLib](https://bitbucket.org/frigus02/chartlib)
