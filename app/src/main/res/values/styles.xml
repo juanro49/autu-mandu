@@ -35,7 +35,8 @@
     <style name="AppWidget.FloatingSpinnerLabel" parent="android:Widget.DeviceDefault.TextView">
         <item name="android:textColor">?android:attr/textColorHint</item>
         <item name="android:textSize">12sp</item>
-        <item name="android:translationY">8dp</item>
+        <item name="android:layout_marginLeft">4dp</item>
+        <item name="android:layout_marginStart">4dp</item>
     </style>
 
     <style name="AppWidget.Toolbar" parent="@style/Widget.AppCompat.Toolbar">

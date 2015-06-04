@@ -18,6 +18,7 @@ package me.kuehle.carreport.gui;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -27,6 +28,8 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
 import com.activeandroid.Model;
+
+import org.w3c.dom.Text;
 
 import java.util.Date;
 import java.util.List;
@@ -63,6 +66,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     private DateTimeInput edtDate;
     private DateTimeInput edtTime;
     private EditText edtMileage;
+    private TextInputLayout edtMileageInputLayout;
     private EditText edtVolume;
     private CheckBox chkPartial;
     private EditText edtPrice;
@@ -186,6 +190,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         edtTime = new DateTimeInput((EditText) v.findViewById(R.id.edt_time),
                 DateTimeInput.Mode.TIME);
         edtMileage = (EditText) v.findViewById(R.id.edt_mileage);
+        edtMileageInputLayout = (TextInputLayout) v.findViewById(R.id.edt_mileage_input_layout);
         edtVolume = (EditText) v.findViewById(R.id.edt_volume);
         chkPartial = (CheckBox) v.findViewById(R.id.chk_partial);
         edtPrice = (EditText) v.findViewById(R.id.edt_price);
@@ -201,8 +206,8 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 getFragmentManager());
 
         // Units
-        addUnitToHint(edtVolume, prefs.getUnitVolume());
-        addUnitToHint(edtPrice, prefs.getUnitCurrency());
+        addUnitToHint(edtVolume, R.string.hint_volume, prefs.getUnitVolume());
+        addUnitToHint(edtPrice, R.string.hint_price, prefs.getUnitCurrency());
 
         // Distance entry mode
         ArrayAdapter<String> distanceEntryModeAdapter = new ArrayAdapter<>(
@@ -216,8 +221,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                     public void onItemSelected(AdapterView<?> parentView,
                                                View selectedItemView, int position, long id) {
                         DistanceEntryMode mode = getDistanceEntryMode();
-                        edtMileage.setHint(mode.nameResourceId);
-                        addUnitToHint(edtMileage, prefs.getUnitDistance());
+                        addUnitToHint(edtMileage, mode.nameResourceId, prefs.getUnitDistance());
                     }
 
                     @Override
@@ -232,13 +236,12 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 spnDistanceEntryMode.setSelection(1);
             }
 
-            edtMileage.setHint(getDistanceEntryMode().nameResourceId);
-            addUnitToHint(edtMileage, prefs.getUnitDistance());
+            addUnitToHint(edtMileage, getDistanceEntryMode().nameResourceId, prefs.getUnitDistance());
 
             // When hiding the distance mode spinner, we also have to adjust the layout params
             // for the mileage edit text, because it depends on the spinner.
             spnDistanceEntryMode.setVisibility(View.GONE);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) edtMileage
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) edtMileageInputLayout
                     .getLayoutParams();
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {

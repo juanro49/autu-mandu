@@ -18,6 +18,7 @@ package me.kuehle.carreport.gui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
@@ -26,11 +27,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.activeandroid.Model;
-import com.rengwuxian.materialedittext.MaterialEditText;
 
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
@@ -193,13 +194,14 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         return editItem != null;
     }
 
-    protected void addUnitToHint(EditText editText, CharSequence unit) {
-        CharSequence hint = editText.getHint();
-        CharSequence newHint = String.format("%s [%s]", hint, unit);
+    protected void addUnitToHint(EditText editText, int hintResource, CharSequence unit) {
+        CharSequence newHint = String.format("%s [%s]", getString(hintResource), unit);
 
-        editText.setHint(newHint);
-        if (editText instanceof MaterialEditText) {
-            ((MaterialEditText)editText).setFloatingLabelText(newHint);
+        ViewParent parent = editText.getParent();
+        if (parent instanceof TextInputLayout) {
+            ((TextInputLayout) parent).setHint(newHint);
+        } else {
+            editText.setHint(newHint);
         }
     }
 

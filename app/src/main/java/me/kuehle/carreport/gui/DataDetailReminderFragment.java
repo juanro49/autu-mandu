@@ -17,6 +17,7 @@
 package me.kuehle.carreport.gui;
 
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,6 +27,8 @@ import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.activeandroid.Model;
+
+import org.w3c.dom.Text;
 
 import java.util.Date;
 import java.util.List;
@@ -52,7 +55,9 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
     private Spinner mSpnCar;
     private Spinner mSpnAfterType;
     private EditText mEdtAfterDistance;
+    private TextInputLayout mEdtAfterDistanceInputLayout;
     private EditText mEdtAfterTime;
+    private TextInputLayout mEdtAfterTimeInputLayout;
     private Spinner mSpnAfterTimeUnit;
     private EditText mEdtStartMileage;
     private DateTimeInput mEdtStartDate;
@@ -118,7 +123,9 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
         mSpnCar = (Spinner) v.findViewById(R.id.spn_car);
         mSpnAfterType = (Spinner) v.findViewById(R.id.spn_after_type);
         mEdtAfterDistance = (EditText) v.findViewById(R.id.edt_after_distance);
+        mEdtAfterDistanceInputLayout = (TextInputLayout) v.findViewById(R.id.edt_after_distance_input_layout);
         mEdtAfterTime = (EditText) v.findViewById(R.id.edt_after_time);
+        mEdtAfterTimeInputLayout = (TextInputLayout) v.findViewById(R.id.edt_after_time_input_layout);
         mSpnAfterTimeUnit = (Spinner) v.findViewById(R.id.spn_after_time_unit);
         mEdtStartMileage = (EditText) v.findViewById(R.id.edt_start_mileage);
         mEdtStartDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_start_date),
@@ -128,16 +135,18 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
         mBtnQuitSnooze = v.findViewById(R.id.btn_quit_snooze);
         mChkDismissed = (CheckBox) v.findViewById(R.id.chk_dismissed);
 
-        mEdtAfterDistanceAnimator = new SimpleAnimator(getActivity(), mEdtAfterDistance,
+        mEdtAfterDistanceAnimator = new SimpleAnimator(getActivity(), mEdtAfterDistanceInputLayout,
                 SimpleAnimator.Property.Height);
-        mEdtAfterTimeAnimator = new SimpleAnimator(getActivity(), mEdtAfterTime,
+        mEdtAfterTimeAnimator = new SimpleAnimator(getActivity(), mEdtAfterTimeInputLayout,
                 SimpleAnimator.Property.Height);
         mSpnAfterTimeUnitAnimator = new SimpleAnimator(getActivity(), mSpnAfterTimeUnit,
                 SimpleAnimator.Property.Height);
 
         // Units
-        addUnitToHint(mEdtAfterDistance, prefs.getUnitDistance());
-        addUnitToHint(mEdtStartMileage, prefs.getUnitDistance());
+        addUnitToHint(mEdtAfterDistance, R.string.hint_reminder_after_distance,
+                prefs.getUnitDistance());
+        addUnitToHint(mEdtStartMileage, R.string.hint_reminder_start_mileage,
+                prefs.getUnitDistance());
 
         // Car
         mCars = Car.getAll();

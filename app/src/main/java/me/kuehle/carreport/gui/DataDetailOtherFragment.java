@@ -17,6 +17,7 @@
 package me.kuehle.carreport.gui;
 
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -82,6 +83,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
     private SimpleAnimator chkEndDateAnimator;
     private SimpleAnimator edtEndDateAnimator;
     private DateTimeInput edtEndDate;
+    private TextInputLayout edtEndDateInputLayout;
     private EditText edtNote;
     private Spinner spnCar;
 
@@ -161,8 +163,8 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
             chkEndDate.setAlpha(0);
         }
         if (!chkEndDate.isChecked()) {
-            edtEndDate.getEditText().getLayoutParams().height = 0;
-            edtEndDate.getEditText().setAlpha(0);
+            edtEndDateInputLayout.getLayoutParams().height = 0;
+            edtEndDateInputLayout.setAlpha(0);
         }
     }
 
@@ -238,7 +240,8 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
                 SimpleAnimator.Property.Height);
         edtEndDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_end_date),
                 DateTimeInput.Mode.DATE);
-        edtEndDateAnimator = new SimpleAnimator(getActivity(), edtEndDate.getEditText(),
+        edtEndDateInputLayout = (TextInputLayout)v.findViewById(R.id.edt_end_date_input_layout);
+        edtEndDateAnimator = new SimpleAnimator(getActivity(), edtEndDateInputLayout,
                 SimpleAnimator.Property.Height);
         edtNote = (EditText) v.findViewById(R.id.edt_note);
         spnCar = (Spinner) v.findViewById(R.id.spn_car);
@@ -258,8 +261,8 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
                 getFragmentManager());
 
         // Units
-        addUnitToHint(edtMileage, prefs.getUnitDistance());
-        addUnitToHint(edtPrice, prefs.getUnitCurrency());
+        addUnitToHint(edtMileage, R.string.hint_mileage_optional, prefs.getUnitDistance());
+        addUnitToHint(edtPrice, R.string.hint_price, prefs.getUnitCurrency());
 
         // Repeat
         spnRepeat.setOnItemSelectedListener(new OnItemSelectedListener() {

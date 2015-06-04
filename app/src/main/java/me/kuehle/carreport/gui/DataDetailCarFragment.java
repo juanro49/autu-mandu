@@ -18,6 +18,7 @@ package me.kuehle.carreport.gui;
 
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -54,6 +55,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     private CheckBox chkSuspend;
     private DateTimeInput edtSuspendDate;
     private SimpleAnimator edtSuspendDateAnimator;
+    private TextInputLayout edtSuspendDateInputLayout;
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -108,8 +110,8 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 
         colorIndicator.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
         if (!chkSuspend.isChecked()) {
-            edtSuspendDate.getEditText().getLayoutParams().height = 0;
-            edtSuspendDate.getEditText().setAlpha(0);
+            edtSuspendDateInputLayout.getLayoutParams().height = 0;
+            edtSuspendDateInputLayout.setAlpha(0);
         }
     }
 
@@ -155,7 +157,8 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         chkSuspend = (CheckBox) v.findViewById(R.id.chk_suspend);
         edtSuspendDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_suspend_date),
                 DateTimeInput.Mode.DATE);
-        edtSuspendDateAnimator = new SimpleAnimator(getActivity(), edtSuspendDate.getEditText(),
+        edtSuspendDateInputLayout = (TextInputLayout) v.findViewById(R.id.edt_suspend_date_input_layout);
+        edtSuspendDateAnimator = new SimpleAnimator(getActivity(), edtSuspendDateInputLayout,
                 SimpleAnimator.Property.Height);
 
         View rowColor = (View) colorIndicator.getParent();

@@ -15,27 +15,30 @@
   ~ limitations under the License.
   -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="16dp">
+    android:layout_height="match_parent">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:padding="16dp">
         <!-- Title -->
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edt_title"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/edt_title_input_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_title"
-            app:floatingLabel="highlight" />
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/edt_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_title" />
+        </android.support.design.widget.TextInputLayout>
         <!-- Car -->
         <TextView
             style="@style/AppWidget.FloatingSpinnerLabel"
             android:id="@+id/txt_label_car"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_title"
+            android:layout_below="@id/edt_title_input_layout"
             android:text="@string/label_car" />
         <Spinner
             android:id="@+id/spn_car"
@@ -57,36 +60,45 @@
             android:layout_below="@id/txt_label_reminder_type"
             android:entries="@array/reminder_after_types" />
         <!-- After Distance -->
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edt_after_distance"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/edt_after_distance_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/spn_after_type"
             android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp"
-            android:hint="@string/hint_reminder_after_distance"
-            android:inputType="number"
-            app:floatingLabel="highlight" />
+            android:layout_marginStart="36dp">
+            <EditText
+                android:id="@+id/edt_after_distance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_reminder_after_distance"
+                android:inputType="number" />
+        </android.support.design.widget.TextInputLayout>
         <!-- After Time -->
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edt_after_time"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/edt_after_time_input_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_after_distance"
+            android:layout_below="@id/edt_after_distance_input_layout"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_marginLeft="36dp"
             android:layout_marginStart="36dp"
             android:layout_toLeftOf="@+id/spn_after_time_unit"
             android:layout_toStartOf="@+id/spn_after_time_unit"
-            android:hint="@string/hint_reminder_after_time"
-            android:inputType="number"
-            app:floatingLabel="highlight" />
+            android:baselineAlignedChildIndex="0">
+            <EditText
+                android:id="@+id/edt_after_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_reminder_after_time"
+                android:inputType="number" />
+        </android.support.design.widget.TextInputLayout>
         <Spinner
             android:id="@+id/spn_after_time_unit"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/edt_after_time"
+            android:layout_alignBaseline="@id/edt_after_time_input_layout"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_marginLeft="16dp"
@@ -98,40 +110,52 @@
             android:id="@+id/txt_section_advanced"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_after_time"
+            android:layout_below="@id/edt_after_time_input_layout"
             android:text="@string/section_advanced" />
         <!-- Start Mileage -->
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edt_start_mileage"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/edt_start_mileage_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txt_section_advanced"
-            android:hint="@string/hint_reminder_start_mileage"
-            android:inputType="number"
-            app:floatingLabel="highlight" />
+            android:layout_below="@id/txt_section_advanced">
+            <EditText
+                android:id="@+id/edt_start_mileage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_reminder_start_mileage"
+                android:inputType="number" />
+        </android.support.design.widget.TextInputLayout>
         <!-- Start Date -->
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edt_start_date"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/edt_start_date_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_start_mileage"
-            android:hint="@string/hint_reminder_start_date"
-            app:floatingLabel="highlight" />
+            android:layout_below="@id/edt_start_mileage_input_layout">
+            <EditText
+                android:id="@+id/edt_start_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_reminder_start_date" />
+        </android.support.design.widget.TextInputLayout>
         <!-- Snoozed Until -->
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edt_snoozed_until"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/edt_snoozed_until_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_start_date"
+            android:layout_below="@id/edt_start_date_input_layout"
             android:layout_toLeftOf="@+id/btn_quit_snooze"
-            android:layout_toStartOf="@+id/btn_quit_snooze"
-            android:hint="@string/hint_reminder_snoozed_until"
-            app:floatingLabel="highlight" />
+            android:layout_toStartOf="@+id/btn_quit_snooze">
+            <EditText
+                android:id="@+id/edt_snoozed_until"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_reminder_snoozed_until" />
+        </android.support.design.widget.TextInputLayout>
         <ImageButton
             android:id="@+id/btn_quit_snooze"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignBottom="@id/edt_snoozed_until"
+            android:layout_alignBottom="@id/edt_snoozed_until_input_layout"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_marginLeft="16dp"
@@ -144,7 +168,7 @@
             android:id="@+id/chk_dismissed"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_below="@id/edt_snoozed_until"
+            android:layout_below="@id/edt_snoozed_until_input_layout"
             android:text="@string/label_reminder_dismissed" />
     </RelativeLayout>
 </ScrollView>
