@@ -22,7 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
+import me.kuehle.carreport.data.query.CarQueries;
 
 public class FirstStartActivity extends AppCompatActivity {
     @Override
@@ -33,7 +33,7 @@ public class FirstStartActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (Car.getCount() > 0) {
+        if (CarQueries.getCount(this) > 0) {
             setResult(RESULT_OK);
             finish();
         }

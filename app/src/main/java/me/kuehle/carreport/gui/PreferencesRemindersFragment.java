@@ -17,7 +17,12 @@
 package me.kuehle.carreport.gui;
 
 import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.ActionMode;
@@ -27,29 +32,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.util.List;
 
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Reminder;
+import me.kuehle.carreport.data.query.ReminderQueries;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
+import me.kuehle.carreport.provider.reminder.ReminderColumns;
+import me.kuehle.carreport.provider.reminder.ReminderCursor;
+import me.kuehle.carreport.provider.reminder.ReminderSelection;
 import me.kuehle.carreport.util.TimeSpan;
 import me.kuehle.carreport.util.reminder.ReminderService;
 
 public class PreferencesRemindersFragment extends ListFragment implements
-        MessageDialogFragment.MessageDialogFragmentListener {
-    private class ReminderAdapter extends BaseAdapter {
-        private List<Reminder> mReminders;
+        MessageDialogFragment.MessageDialogFragmentListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
+    private class ReminderAdapter extends CursorAdapter {
         private java.text.DateFormat mDateFormat;
         private String mUnitDistance;
 
         public ReminderAdapter() {
-            mReminders = Reminder.getAll();
+            super(getActivity(), null, false);
 
             mDateFormat = DateFormat.getDateFormat(getActivity());
 
@@ -58,121 +64,99 @@ public class PreferencesRemindersFragment extends ListFragment implements
         }
 
         @Override
-        public int getCount() {
-            return mReminders.size();
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = getActivity().getLayoutInflater().inflate(R.layout.list_item_reminder,
+                    parent, false);
+
+            ReminderViewHolder holder = new ReminderViewHolder();
+            holder.title = (TextView) view.findViewById(R.id.txt_title);
+            holder.car = (TextView) view.findViewById(R.id.txt_car);
+            holder.afterDistance = (TextView) view.findViewById(R.id.txt_after_distance);
+            holder.afterTime = (TextView) view.findViewById(R.id.txt_after_time);
+            holder.status = (TextView) view.findViewById(R.id.txt_status);
+
+            View btnDone = view.findViewById(R.id.btn_done);
+            View btnSnooze = view.findViewById(R.id.btn_snooze);
+
+            btnDone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getListView().getPositionForView(v);
+                    long id = getItemId(position);
+                    ReminderService.markRemindersDone(getActivity(), id);
+                    notifyDataSetChanged();
+                }
+            });
+
+            btnSnooze.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getListView().getPositionForView(v);
+                    long id = getItemId(position);
+                    ReminderService.snoozeReminders(getActivity(), id);
+                    notifyDataSetChanged();
+                }
+            });
+
+            view.setTag(holder);
+
+            return view;
         }
 
         @Override
-        public Reminder getItem(int position) {
-            return mReminders.get(position);
-        }
+        public void bindView(View view, Context context, Cursor cursor) {
+            ReminderCursor reminder = new ReminderCursor(cursor);
+            ReminderQueries queries = new ReminderQueries(getActivity(), reminder);
+            ReminderViewHolder holder = (ReminderViewHolder) view.getTag();
 
-        @Override
-        public long getItemId(int position) {
-            return getItem(position).id;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ReminderViewHolder holder;
-            if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_reminder,
-                        parent, false);
-
-                holder = new ReminderViewHolder();
-                holder.title = (TextView) convertView.findViewById(R.id.txt_title);
-                holder.car = (TextView) convertView.findViewById(R.id.txt_car);
-                holder.afterDistance = (TextView) convertView.findViewById(R.id.txt_after_distance);
-                holder.afterTime = (TextView) convertView.findViewById(R.id.txt_after_time);
-                holder.status = (TextView) convertView.findViewById(R.id.txt_status);
-
-                View btnDone = convertView.findViewById(R.id.btn_done);
-                View btnSnooze = convertView.findViewById(R.id.btn_snooze);
-
-                btnDone.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int position = getListView().getPositionForView(v);
-                        long id = getItemId(position);
-                        ReminderService.markRemindersDone(getActivity(), id);
-                        notifyDataSetChanged();
-                    }
-                });
-
-                btnSnooze.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int position = getListView().getPositionForView(v);
-                        long id = getItemId(position);
-                        ReminderService.snoozeReminders(getActivity(), id);
-                        notifyDataSetChanged();
-                    }
-                });
-
-                convertView.setTag(holder);
-            } else {
-                holder = (ReminderViewHolder) convertView.getTag();
-            }
-
-            Reminder reminder = getItem(position);
-            holder.title.setText(reminder.title);
-            holder.car.setText(reminder.car.name);
-            if (reminder.afterDistance != null) {
-                holder.afterDistance.setText(String.format("%d %s", reminder.afterDistance,
+            holder.title.setText(reminder.getTitle());
+            holder.car.setText(reminder.getCarName());
+            if (reminder.getAfterDistance() != null) {
+                holder.afterDistance.setText(String.format("%d %s", reminder.getAfterDistance(),
                         mUnitDistance));
                 holder.afterDistance.setVisibility(View.VISIBLE);
             } else {
                 holder.afterDistance.setVisibility(View.INVISIBLE);
             }
 
-            if (reminder.afterTime != null) {
-                holder.afterTime.setText(reminder.afterTime.toString(getActivity()));
+            if (reminder.getAfterTimeSpanUnit() != null) {
+                TimeSpan span = new TimeSpan(reminder.getAfterTimeSpanUnit(),
+                        reminder.getAfterTimeSpanCount() == null ? 1 : reminder.getAfterTimeSpanCount());
+                holder.afterTime.setText(span.toLocalizedString(getActivity()));
                 holder.afterTime.setVisibility(View.VISIBLE);
             } else {
                 holder.afterTime.setVisibility(View.INVISIBLE);
             }
 
-            if (reminder.isDue()) {
+            if (queries.isDue()) {
                 holder.status.setTextColor(getResources().getColor(R.color.accent));
-                if (reminder.notificationDismissed) {
+                if (reminder.getNotificationDismissed()) {
                     holder.status.setText(R.string.description_reminder_status_due_dismissed);
-                } else if (reminder.isSnoozed()) {
+                } else if (queries.isSnoozed()) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_due_snoozed,
-                            mDateFormat.format(reminder.snoozedUntil)));
+                            mDateFormat.format(reminder.getSnoozedUntil())));
                 } else {
                     holder.status.setText(R.string.description_reminder_status_due);
                 }
             } else {
                 holder.status.setTextColor(getResources().getColor(
                         R.color.abc_secondary_text_material_dark));
-                if (reminder.afterDistance != null && reminder.afterTime != null) {
+                if (reminder.getAfterDistance() != null && reminder.getAfterTimeSpanUnit() != null) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_distance_and_time,
-                            String.format("%d %s", reminder.getDistanceToDue(), mUnitDistance),
-                            TimeSpan.fromMillis(reminder.getTimeToDue()).toString(getActivity())));
-                } else if (reminder.afterDistance != null) {
+                            String.format("%d %s", queries.getDistanceToDue(), mUnitDistance),
+                            TimeSpan.fromMillis(queries.getTimeToDue()).toLocalizedString(getActivity())));
+                } else if (reminder.getAfterDistance() != null) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_distance,
-                            String.format("%d %s", reminder.getDistanceToDue(), mUnitDistance)));
+                            String.format("%d %s", queries.getDistanceToDue(), mUnitDistance)));
                 } else {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_time,
-                            TimeSpan.fromMillis(reminder.getTimeToDue()).toString(getActivity())));
+                            TimeSpan.fromMillis(queries.getTimeToDue()).toLocalizedString(getActivity())));
                 }
             }
-
-            return convertView;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
-
-        public void update() {
-            mReminders = Reminder.getAll();
-            notifyDataSetChanged();
         }
     }
 
@@ -252,6 +236,8 @@ public class PreferencesRemindersFragment extends ListFragment implements
         getListView().setMultiChoiceModeListener(mMultiChoiceModeListener);
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         setListAdapter(mReminderAdapter);
+
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -279,13 +265,13 @@ public class PreferencesRemindersFragment extends ListFragment implements
         if (requestCode == REQUEST_DELETE) {
             long[] checkedIds = getListView().getCheckedItemIds();
             for (long id : checkedIds) {
-                Reminder.delete(Reminder.class, id);
+                new ReminderSelection().id(id).delete(getActivity().getContentResolver());
             }
 
             Application.dataChanged();
 
             mMultiChoiceModeListener.finishActionMode();
-            mReminderAdapter.update();
+            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 
@@ -305,7 +291,7 @@ public class PreferencesRemindersFragment extends ListFragment implements
         super.onResume();
         if (mReminderEditInProgress) {
             mReminderEditInProgress = false;
-            mReminderAdapter.update();
+            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 
@@ -313,6 +299,22 @@ public class PreferencesRemindersFragment extends ListFragment implements
     public void onStop() {
         super.onStop();
         mMultiChoiceModeListener.finishActionMode();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        ReminderSelection sel = new ReminderSelection();
+        return new CursorLoader(getActivity(), sel.uri(), null, sel.sel(), sel.args(), ReminderColumns.TITLE + " COLLATE UNICODE");
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mReminderAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mReminderAdapter.swapCursor(null);
     }
 
     private void openReminderDetailFragment(long id) {

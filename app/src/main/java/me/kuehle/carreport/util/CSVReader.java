@@ -29,7 +29,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
-import me.kuehle.carreport.db.serializer.RecurrenceSerializer;
+import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
+import me.kuehle.carreport.provider.reminder.TimeSpanUnit;
 
 public class CSVReader {
     private static final String TAG = "CSVReader";
@@ -68,16 +69,10 @@ public class CSVReader {
     private String[] header;
     private String[][] data;
 
-    private RecurrenceSerializer recurrenceSerializer;
     private DateFormat dateFormat;
     private NumberFormat floatFormat;
 
-    public CSVReader(String data) {
-        this(data, false);
-    }
-
     public CSVReader(String data, boolean hasHeader) {
-        recurrenceSerializer = new RecurrenceSerializer();
         dateFormat = DateFormat.getDateTimeInstance();
         floatFormat = NumberFormat.getInstance();
 
@@ -157,14 +152,6 @@ public class CSVReader {
         return null;
     }
 
-    public Recurrence getRecurrence(int row, int col) {
-        return parseRecurrence(getString(row, col));
-    }
-
-    public Recurrence getRecurrence(int row, String title) {
-        return parseRecurrence(getString(row, title));
-    }
-
     public Date getDate(int row, int col) {
         return parseDate(getString(row, col));
     }
@@ -205,8 +192,20 @@ public class CSVReader {
         return parseBoolean(getString(row, title));
     }
 
-    private Recurrence parseRecurrence(String value) {
-        return recurrenceSerializer.deserialize(value);
+    public RecurrenceInterval getRecurrenceInterval(int row, int col) {
+        return parseRecurrenceInterval(getString(row, col));
+    }
+
+    public RecurrenceInterval getRecurrenceInterval(int row, String title) {
+        return parseRecurrenceInterval(getString(row, title));
+    }
+
+    public TimeSpanUnit getTimeSpanUnit(int row, int col) {
+        return parseTimeSpanUnit(getString(row, col));
+    }
+
+    public TimeSpanUnit getTimeSpanUnit(int row, String title) {
+        return parseTimeSpanUnit(getString(row, title));
     }
 
     private Date parseDate(String value) {
@@ -246,6 +245,24 @@ public class CSVReader {
             return null;
         } else {
             return Boolean.parseBoolean(value);
+        }
+    }
+
+    public RecurrenceInterval parseRecurrenceInterval(String value) {
+        Integer intValue = parseInteger(value);
+        if (intValue != null) {
+            return RecurrenceInterval.values()[intValue];
+        } else {
+            return null;
+        }
+    }
+
+    public TimeSpanUnit parseTimeSpanUnit(String value) {
+        Integer intValue = parseInteger(value);
+        if (intValue != null) {
+            return TimeSpanUnit.values()[intValue];
+        } else {
+            return null;
         }
     }
 }

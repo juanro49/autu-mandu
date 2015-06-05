@@ -16,90 +16,175 @@
 
 package me.kuehle.carreport.util.backup;
 
+import android.content.Context;
 import android.os.Environment;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Cache;
-import com.activeandroid.Model;
-import com.activeandroid.TableInfo;
-import com.activeandroid.query.Select;
-
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 
+import me.kuehle.carreport.provider.car.CarColumns;
+import me.kuehle.carreport.provider.car.CarContentValues;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
+import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
+import me.kuehle.carreport.provider.fueltype.FuelTypeContentValues;
+import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
+import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
+import me.kuehle.carreport.provider.othercost.OtherCostColumns;
+import me.kuehle.carreport.provider.othercost.OtherCostContentValues;
+import me.kuehle.carreport.provider.othercost.OtherCostCursor;
+import me.kuehle.carreport.provider.othercost.OtherCostSelection;
+import me.kuehle.carreport.provider.refueling.RefuelingColumns;
+import me.kuehle.carreport.provider.refueling.RefuelingContentValues;
+import me.kuehle.carreport.provider.refueling.RefuelingCursor;
+import me.kuehle.carreport.provider.refueling.RefuelingSelection;
+import me.kuehle.carreport.provider.reminder.ReminderColumns;
+import me.kuehle.carreport.provider.reminder.ReminderContentValues;
+import me.kuehle.carreport.provider.reminder.ReminderCursor;
+import me.kuehle.carreport.provider.reminder.ReminderSelection;
 import me.kuehle.carreport.util.CSVReader;
 import me.kuehle.carreport.util.CSVWriter;
-import me.kuehle.carreport.util.Recurrence;
 
 public class CSVExportImport {
     public static final String DIRECTORY = "Car Report CSV";
 
-    private File externalStorageDir;
-    private File exportDir;
+    public Context mContext;
 
-    public CSVExportImport() {
-        externalStorageDir = Environment.getExternalStorageDirectory();
-        exportDir = new File(externalStorageDir, DIRECTORY);
+    private File mExternalStorageDir;
+    private File mExportDir;
+
+    private static String[] allTables = {
+            CarColumns.TABLE_NAME,
+            FuelTypeColumns.TABLE_NAME,
+            OtherCostColumns.TABLE_NAME,
+            RefuelingColumns.TABLE_NAME,
+            ReminderColumns.TABLE_NAME
+    };
+
+    public CSVExportImport(Context context) {
+        mContext = context;
+        mExternalStorageDir = Environment.getExternalStorageDirectory();
+        mExportDir = new File(mExternalStorageDir, DIRECTORY);
     }
 
     public boolean export() {
-        if (!exportDir.isDirectory()) {
-            if (!exportDir.mkdir()) {
+        if (!mExportDir.isDirectory()) {
+            if (!mExportDir.mkdir()) {
                 return false;
             }
         }
 
-        Collection<TableInfo> tables = Cache.getTableInfos();
-        for (TableInfo table : tables) {
-            Collection<Field> fields = table.getFields();
-            List<Model> entries = new Select().from(table.getType()).execute();
-
-            List<Object> header = new ArrayList<>();
-            for (Field field : fields) {
-                header.add(table.getColumnName(field));
-            }
-
-            CSVWriter csv = new CSVWriter();
-            csv.writeLine(header.toArray());
-            for (Model entry : entries) {
-                List<Object> line = new ArrayList<>();
-                for (Field field : fields) {
-                    Object value;
-                    try {
-                        value = field.get(entry);
-                    } catch (IllegalArgumentException e) {
-                        return false;
-                    } catch (IllegalAccessException e) {
-                        return false;
-                    }
-
-                    if (value != null && Model.class.isAssignableFrom(field.getType())) {
-                        line.add(((Model) value).id);
-                    } else {
-                        line.add(value);
-                    }
-                }
-
-                csv.writeLine(line.toArray());
-            }
-
-            csv.toFile(new File(exportDir, table.getTableName() + ".csv"));
-        }
+        exportCars();
+        exportFuelTypes();
+        exportOtherCosts();
+        exportRefuelings();
+        exportReminders();
 
         return true;
     }
 
+    private void exportCars() {
+        CSVWriter csv = new CSVWriter();
+        csv.writeLine(CarColumns.ALL_COLUMNS);
+
+        CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        while (car.moveToNext()) {
+            csv.writeLine(
+                    car.getId(),
+                    car.getName(),
+                    car.getColor(),
+                    car.getSuspendedSince()
+            );
+        }
+
+        csv.toFile(new File(mExportDir, CarColumns.TABLE_NAME + ".csv"));
+    }
+
+    private void exportFuelTypes() {
+        CSVWriter csv = new CSVWriter();
+        csv.writeLine(FuelTypeColumns.ALL_COLUMNS);
+
+        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver());
+        while (fuelType.moveToNext()) {
+            csv.writeLine(
+                    fuelType.getId(),
+                    fuelType.getName(),
+                    fuelType.getCategory()
+            );
+        }
+
+        csv.toFile(new File(mExportDir, FuelTypeColumns.TABLE_NAME + ".csv"));
+    }
+
+    private void exportOtherCosts() {
+        CSVWriter csv = new CSVWriter();
+        csv.writeLine(OtherCostColumns.ALL_COLUMNS);
+
+        OtherCostCursor otherCost = new OtherCostSelection().query(mContext.getContentResolver());
+        while (otherCost.moveToNext()) {
+            csv.writeLine(
+                    otherCost.getId(),
+                    otherCost.getTitle(),
+                    otherCost.getDate(),
+                    otherCost.getMileage(),
+                    otherCost.getPrice(),
+                    otherCost.getRecurrenceInterval(),
+                    otherCost.getRecurrenceMultiplier(),
+                    otherCost.getEndDate(),
+                    otherCost.getNote(),
+                    otherCost.getCarId()
+            );
+        }
+
+        csv.toFile(new File(mExportDir, OtherCostColumns.TABLE_NAME + ".csv"));
+    }
+
+    private void exportRefuelings() {
+        CSVWriter csv = new CSVWriter();
+        csv.writeLine(RefuelingColumns.ALL_COLUMNS);
+
+        RefuelingCursor refueling = new RefuelingSelection().query(mContext.getContentResolver());
+        while (refueling.moveToNext()) {
+            csv.writeLine(
+                    refueling.getId(),
+                    refueling.getDate(),
+                    refueling.getMileage(),
+                    refueling.getVolume(),
+                    refueling.getPrice(),
+                    refueling.getPartial(),
+                    refueling.getNote(),
+                    refueling.getFuelTypeId(),
+                    refueling.getCarId()
+            );
+        }
+
+        csv.toFile(new File(mExportDir, RefuelingColumns.TABLE_NAME + ".csv"));
+    }
+
+    private void exportReminders() {
+        CSVWriter csv = new CSVWriter();
+        csv.writeLine(ReminderColumns.ALL_COLUMNS);
+
+        ReminderCursor reminder = new ReminderSelection().query(mContext.getContentResolver());
+        while (reminder.moveToNext()) {
+            csv.writeLine(
+                    reminder.getId(),
+                    reminder.getTitle(),
+                    reminder.getAfterTimeSpanUnit(),
+                    reminder.getAfterTimeSpanCount(),
+                    reminder.getAfterDistance(),
+                    reminder.getStartDate(),
+                    reminder.getStartMileage(),
+                    reminder.getNotificationDismissed(),
+                    reminder.getSnoozedUntil(),
+                    reminder.getCarId()
+            );
+        }
+
+        csv.toFile(new File(mExportDir, ReminderColumns.TABLE_NAME + ".csv"));
+    }
+
     public boolean canExport() {
-        return externalStorageDir.canWrite();
+        return mExternalStorageDir.canWrite();
     }
 
     public boolean canImport() {
@@ -107,9 +192,8 @@ public class CSVExportImport {
     }
 
     public boolean allExportFilesExist() {
-        Collection<TableInfo> tables = Cache.getTableInfos();
-        for (TableInfo table : tables) {
-            File file = new File(exportDir, table.getTableName() + ".csv");
+        for (String table : allTables) {
+            File file = new File(mExportDir, table + ".csv");
             if (!file.isFile()) {
                 return false;
             }
@@ -119,9 +203,8 @@ public class CSVExportImport {
     }
 
     public boolean anyExportFileExist() {
-        Collection<TableInfo> tables = Cache.getTableInfos();
-        for (TableInfo table : tables) {
-            File file = new File(exportDir, table.getTableName() + ".csv");
+        for (String table : allTables) {
+            File file = new File(mExportDir, table + ".csv");
             if (file.isFile()) {
                 return true;
             }
@@ -130,138 +213,183 @@ public class CSVExportImport {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     public boolean import_() {
         if (!allExportFilesExist()) {
             return false;
         }
 
-        Collection<TableInfo> tableCollection = Cache.getTableInfos();
-        TableInfo[] tables = tableCollection.toArray(new TableInfo[tableCollection.size()]);
-        sortByReferences(tables);
-
-        for (TableInfo table : tables) {
-            Collection<Field> fields = table.getFields();
-
-            CSVReader csv = CSVReader.fromFile(
-                    new File(exportDir, table.getTableName() + ".csv"), true);
-
-            ActiveAndroid.beginTransaction();
-            try {
-                for (int i = 0; i < csv.getRowCount(); i++) {
-                    Long id = csv.getLong(i, "Id");
-
-                    Model entry = null;
-                    if (id != null) {
-                        entry = Model.load(table.getType(), id);
-                    }
-
-                    if (entry == null) {
-                        Constructor<?> constructor = table.getType()
-                                .getConstructor();
-                        entry = (Model) constructor.newInstance();
-                    }
-
-                    for (Field field : fields) {
-                        Object value = null;
-
-                        Class<?> fieldType = field.getType();
-                        if (fieldType.equals(Boolean.class)
-                                || fieldType.equals(boolean.class)) {
-                            value = csv.getBoolean(i,
-                                    table.getColumnName(field));
-                        } else if (fieldType.equals(Integer.class)
-                                || fieldType.equals(int.class)) {
-                            value = csv.getInteger(i,
-                                    table.getColumnName(field));
-                        } else if (fieldType.equals(Long.class)
-                                || fieldType.equals(long.class)) {
-                            value = csv.getLong(i, table.getColumnName(field));
-                        } else if (fieldType.equals(Float.class)
-                                || fieldType.equals(float.class)) {
-                            value = csv.getFloat(i, table.getColumnName(field));
-                        } else if (fieldType.equals(Date.class)) {
-                            value = csv.getDate(i, table.getColumnName(field));
-                        } else if (fieldType.equals(Recurrence.class)) {
-                            value = csv.getRecurrence(i,
-                                    table.getColumnName(field));
-                        } else if (fieldType.equals(String.class)) {
-                            value = csv
-                                    .getString(i, table.getColumnName(field));
-                        } else if (Model.class.isAssignableFrom(fieldType)) {
-                            value = Model.load(
-                                    (Class<? extends Model>) fieldType,
-                                    csv.getLong(i, table.getColumnName(field)));
-                        }
-
-                        field.set(entry, value);
-                    }
-
-                    entry.save();
-                }
-
-                ActiveAndroid.setTransactionSuccessful();
-            } catch (NoSuchMethodException | IllegalArgumentException | InstantiationException |
-                    IllegalAccessException | InvocationTargetException e) {
-                return false;
-            } finally {
-                ActiveAndroid.endTransaction();
-            }
-        }
+        importCars();
+        importFuelTypes();
+        importOtherCosts();
+        importRefuelings();
+        importReminders();
 
         return true;
     }
 
-    /**
-     * Get table infos and sort them, so tables with foreign key constraints get
-     * handled after their parent table. Therefore assign every table a number,
-     * which indicates at which position it can be imported. The position will
-     * be max(ref1.pos, ref2.pos, ...) + 1. The tables which do not have any
-     * foreign keys have position 0 and can be imported first.
-     */
-    @SuppressWarnings("SuspiciousMethodCalls")
-    private void sortByReferences(TableInfo[] tables) {
-        // Get position for every table.
-        final HashMap<Class<? extends Model>, Integer> order = new HashMap<>();
-        while (order.size() < tables.length) {
-            for (TableInfo table : tables) {
-                // Do not process tables, which already have a position.
-                if (order.containsKey(table.getType())) {
-                    continue;
+    private void importCars() {
+        CSVReader csv = CSVReader.fromFile(new File(mExportDir, CarColumns.TABLE_NAME + ".csv"), true);
+        for (int i = 0; i < csv.getRowCount(); i++) {
+            Long id = csv.getLong(i, CarColumns._ID);
+
+            CarContentValues values = new CarContentValues();
+            values.putName(csv.getString(i, CarColumns.NAME));
+            values.putColor(csv.getInteger(i, CarColumns.COLOR));
+            values.putSuspendedSince(csv.getDate(i, CarColumns.SUSPENDED_SINCE));
+
+            boolean updated = false;
+            if (id != null) {
+                CarSelection selection = new CarSelection().id(id);
+                CarCursor car = selection.query(mContext.getContentResolver());
+                if (car.getCount() > 0) {
+                    values.update(mContext.getContentResolver(), selection);
+                    updated = true;
+                }
+            }
+
+            if (!updated) {
+                if (id != null) {
+                    values.values().put(CarColumns._ID, id);
                 }
 
-                int position = 0;
-                boolean skip = false;
-
-                // For every foreign key check the position of the referenced
-                // table. If any referenced table does not have a position yet,
-                // skip the current table. It will be handled in one of the next
-                // loops.
-                Collection<Field> fields = table.getFields();
-                for (Field field : fields) {
-                    if (Model.class.isAssignableFrom(field.getType())) {
-                        if (order.containsKey(field.getType())) {
-                            position = Math.max(position, order.get(field.getType()) + 1);
-                        } else {
-                            skip = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!skip) {
-                    order.put(table.getType(), position);
-                }
+                values.insert(mContext.getContentResolver());
             }
         }
+    }
 
-        // Sort the tables by the assigned positions.
-        Arrays.sort(tables, new Comparator<TableInfo>() {
-            @Override
-            public int compare(TableInfo lhs, TableInfo rhs) {
-                return order.get(lhs.getType()).compareTo(
-                        order.get(rhs.getType()));
+    private void importFuelTypes() {
+        CSVReader csv = CSVReader.fromFile(new File(mExportDir, FuelTypeColumns.TABLE_NAME + ".csv"), true);
+        for (int i = 0; i < csv.getRowCount(); i++) {
+            Long id = csv.getLong(i, FuelTypeColumns._ID);
+
+            FuelTypeContentValues values = new FuelTypeContentValues();
+            values.putName(csv.getString(i, FuelTypeColumns.NAME));
+            values.putCategory(csv.getString(i, FuelTypeColumns.CATEGORY));
+
+            boolean updated = false;
+            if (id != null) {
+                FuelTypeSelection selection = new FuelTypeSelection().id(id);
+                FuelTypeCursor fuelType = selection.query(mContext.getContentResolver());
+                if (fuelType.getCount() > 0) {
+                    values.update(mContext.getContentResolver(), selection);
+                    updated = true;
+                }
             }
-        });
+
+            if (!updated) {
+                if (id != null) {
+                    values.values().put(FuelTypeColumns._ID, id);
+                }
+
+                values.insert(mContext.getContentResolver());
+            }
+        }
+    }
+
+    private void importOtherCosts() {
+        CSVReader csv = CSVReader.fromFile(new File(mExportDir, OtherCostColumns.TABLE_NAME + ".csv"), true);
+        for (int i = 0; i < csv.getRowCount(); i++) {
+            Long id = csv.getLong(i, OtherCostColumns._ID);
+
+            OtherCostContentValues values = new OtherCostContentValues();
+            values.putTitle(csv.getString(i, OtherCostColumns.TITLE));
+            values.putDate(csv.getDate(i, OtherCostColumns.DATE));
+            values.putMileage(csv.getInteger(i, OtherCostColumns.MILEAGE));
+            values.putPrice(csv.getFloat(i, OtherCostColumns.PRICE));
+            values.putRecurrenceInterval(csv.getRecurrenceInterval(i, OtherCostColumns.RECURRENCE_INTERVAL));
+            values.putRecurrenceMultiplier(csv.getInteger(i, OtherCostColumns.RECURRENCE_MULTIPLIER));
+            values.putEndDate(csv.getDate(i, OtherCostColumns.END_DATE));
+            values.putNote(csv.getString(i, OtherCostColumns.NOTE));
+            values.putCarId(csv.getLong(i, OtherCostColumns.CAR_ID));
+
+            boolean updated = false;
+            if (id != null) {
+                OtherCostSelection selection = new OtherCostSelection().id(id);
+                OtherCostCursor otherCost = selection.query(mContext.getContentResolver());
+                if (otherCost.getCount() > 0) {
+                    values.update(mContext.getContentResolver(), selection);
+                    updated = true;
+                }
+            }
+
+            if (!updated) {
+                if (id != null) {
+                    values.values().put(OtherCostColumns._ID, id);
+                }
+
+                values.insert(mContext.getContentResolver());
+            }
+        }
+    }
+
+    private void importRefuelings() {
+        CSVReader csv = CSVReader.fromFile(new File(mExportDir, RefuelingColumns.TABLE_NAME + ".csv"), true);
+        for (int i = 0; i < csv.getRowCount(); i++) {
+            Long id = csv.getLong(i, RefuelingColumns._ID);
+
+            RefuelingContentValues values = new RefuelingContentValues();
+            values.putDate(csv.getDate(i, RefuelingColumns.DATE));
+            values.putMileage(csv.getInteger(i, RefuelingColumns.MILEAGE));
+            values.putVolume(csv.getFloat(i, RefuelingColumns.VOLUME));
+            values.putPrice(csv.getFloat(i, RefuelingColumns.PRICE));
+            values.putPartial(csv.getBoolean(i, RefuelingColumns.PARTIAL));
+            values.putNote(csv.getString(i, RefuelingColumns.NOTE));
+            values.putFuelTypeId(csv.getLong(i, RefuelingColumns.FUEL_TYPE_ID));
+            values.putCarId(csv.getLong(i, RefuelingColumns.CAR_ID));
+
+            boolean updated = false;
+            if (id != null) {
+                RefuelingSelection selection = new RefuelingSelection().id(id);
+                RefuelingCursor refueling = selection.query(mContext.getContentResolver());
+                if (refueling.getCount() > 0) {
+                    values.update(mContext.getContentResolver(), selection);
+                    updated = true;
+                }
+            }
+
+            if (!updated) {
+                if (id != null) {
+                    values.values().put(RefuelingColumns._ID, id);
+                }
+
+                values.insert(mContext.getContentResolver());
+            }
+        }
+    }
+
+    private void importReminders() {
+        CSVReader csv = CSVReader.fromFile(new File(mExportDir, ReminderColumns.TABLE_NAME + ".csv"), true);
+        for (int i = 0; i < csv.getRowCount(); i++) {
+            Long id = csv.getLong(i, ReminderColumns._ID);
+
+            ReminderContentValues values = new ReminderContentValues();
+            values.putTitle(csv.getString(i, ReminderColumns.TITLE));
+            values.putAfterTimeSpanUnit(csv.getTimeSpanUnit(i, ReminderColumns.AFTER_TIME_SPAN_UNIT));
+            values.putAfterTimeSpanCount(csv.getInteger(i, ReminderColumns.AFTER_TIME_SPAN_COUNT));
+            values.putAfterDistance(csv.getInteger(i, ReminderColumns.AFTER_DISTANCE));
+            values.putStartDate(csv.getDate(i, ReminderColumns.START_DATE));
+            values.putStartMileage(csv.getInteger(i, ReminderColumns.START_MILEAGE));
+            values.putNotificationDismissed(csv.getBoolean(i, ReminderColumns.NOTIFICATION_DISMISSED));
+            values.putSnoozedUntil(csv.getDate(i, ReminderColumns.SNOOZED_UNTIL));
+            values.putCarId(csv.getLong(i, ReminderColumns.CAR_ID));
+
+            boolean updated = false;
+            if (id != null) {
+                ReminderSelection selection = new ReminderSelection().id(id);
+                ReminderCursor reminder = selection.query(mContext.getContentResolver());
+                if (reminder.getCount() > 0) {
+                    values.update(mContext.getContentResolver(), selection);
+                    updated = true;
+                }
+            }
+
+            if (!updated) {
+                if (id != null) {
+                    values.values().put(ReminderColumns._ID, id);
+                }
+
+                values.insert(mContext.getContentResolver());
+            }
+        }
     }
 }

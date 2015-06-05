@@ -74,7 +74,12 @@ public class TimeSpan {
         return date;
     }
 
-    public String toString(Context context) {
+    @Override
+    public String toString() {
+        return String.format("%d %s", mCount, mUnit.toString());
+    }
+
+    public String toLocalizedString(Context context) {
         String[] timeSpanUnits = context.getResources().getStringArray(R.array.time_units);
         return String.format("%s %s", mCount, timeSpanUnits[mUnit.ordinal()]);
     }
@@ -90,6 +95,21 @@ public class TimeSpan {
         } else {
             int count = (int) Math.round(millis / MILLIS_PER_DAY);
             return new TimeSpan(TimeSpanUnit.DAY, count);
+        }
+    }
+
+    public static TimeSpan fromString(String str, TimeSpan defaultValue) {
+        String[] parts = str.split(" ");
+        if (parts.length != 2) {
+            return defaultValue;
+        }
+
+        try {
+            int count = Integer.parseInt(parts[0]);
+            TimeSpanUnit unit = TimeSpanUnit.valueOf(parts[1]);
+            return new TimeSpan(unit, count);
+        } catch (Exception e) {
+            return defaultValue;
         }
     }
 }

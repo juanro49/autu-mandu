@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.activeandroid.Cache;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.DropboxFileInfo;
 import com.dropbox.client2.DropboxAPI.Entry;
@@ -41,6 +40,7 @@ import me.kuehle.carreport.Application;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.ProgressDialogFragment;
+import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
 
 public class DropboxSynchronizationProvider extends AbstractSynchronizationProvider {
     private static final String TAG = "DropboxSyncProvider";
@@ -131,7 +131,7 @@ public class DropboxSynchronizationProvider extends AbstractSynchronizationProvi
                         }
 
                         // Check if remote data is available.
-                        File localFile = new File(Cache.openDatabase().getPath());
+                        File localFile = new File(DataSQLiteOpenHelper.getInstance(mContext).getReadableDatabase().getPath());
                         try {
                             Entry remoteEntry = mDBApi.metadata("/" + localFile.getName(), 1, null,
                                     false, null);
@@ -174,7 +174,7 @@ public class DropboxSynchronizationProvider extends AbstractSynchronizationProvi
     @Override
     protected boolean onSynchronize(int option) {
         Preferences prefs = new Preferences(mContext);
-        File localFile = new File(Cache.openDatabase().getPath());
+        File localFile = new File(DataSQLiteOpenHelper.getInstance(mContext).getReadableDatabase().getPath());
         String localRev = prefs.getDropboxLocalRev();
 
         String remoteRev = null;

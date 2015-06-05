@@ -107,7 +107,6 @@
     <orderEntry type="library" exported="" name="google-http-client-gson-1.17.0-rc" level="project" />
     <orderEntry type="library" exported="" name="json_simple-1.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.2.0" level="project" />
-    <orderEntry type="library" exported="" name="activeandroid" level="project" />
     <orderEntry type="library" exported="" name="google-api-services-drive-v2-rev105-1.17.0-rc" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="google-http-client-1.17.0-rc" level="project" />

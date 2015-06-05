@@ -16,15 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.util.List;
-
-import me.kuehle.carreport.BuildConfig;
-import me.kuehle.carreport.Preferences;
-import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.util.DemoData;
-import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -36,8 +27,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -48,6 +39,18 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Date;
+
+import me.kuehle.carreport.BuildConfig;
+import me.kuehle.carreport.Preferences;
+import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.provider.car.CarColumns;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
+import me.kuehle.carreport.util.DemoData;
+import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 
 public class MainActivity extends AppCompatActivity implements
         AbstractSynchronizationProvider.OnSynchronizeListener,
@@ -124,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements
         onNavigationItemSelected(mNavigationView.getMenu().getItem(navItemIndex));
 
         // When there is no car, show the first start activity.
-        if (Car.getCount() == 0) {
+        if (CarQueries.getCount(this) == 0) {
             Intent intent = new Intent(this, FirstStartActivity.class);
             startActivityForResult(intent, REQUEST_FIRST_START);
         }
@@ -223,7 +226,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         Preferences prefs = new Preferences(this);
-        List<Car> cars = Car.getAllActive();
+
+        CarCursor car = new CarSelection().suspendedSince((Date) null).query(this.getContentResolver(),
+                CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
         MenuItem[] items = {
                 menu.findItem(R.id.menu_add_other_expenditure),
                 menu.findItem(R.id.menu_add_other_income)
@@ -240,14 +245,14 @@ public class MainActivity extends AppCompatActivity implements
 
             SubMenu subMenu = items[i].getSubMenu();
             subMenu.clear();
-            if (cars.size() == 1 || !prefs.isShowCarMenu()) {
+            if (car.getCount() == 1 || !prefs.isShowCarMenu()) {
                 items[i].setIntent(getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_OTHER,
                         prefs.getDefaultCar(), otherTypes[i]));
             } else {
                 items[i].setIntent(null);
-                for (Car car : cars) {
-                    subMenu.add(car.name).setIntent(getDetailActivityIntent(
-                            DataDetailActivity.EXTRA_EDIT_OTHER, car.id, otherTypes[i]));
+                while (car.moveToNext()) {
+                    subMenu.add(car.getName()).setIntent(getDetailActivityIntent(
+                            DataDetailActivity.EXTRA_EDIT_OTHER, car.getId(), otherTypes[i]));
                 }
             }
         }
@@ -281,9 +286,10 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onFABClicked(View fab) {
         Preferences prefs = new Preferences(this);
-        List<Car> cars = Car.getAllActive();
+        CarCursor car = new CarSelection().suspendedSince((Date) null).query(this.getContentResolver(),
+                CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
 
-        if (cars.size() == 1 || !prefs.isShowCarMenu()) {
+        if (car.getCount() == 1 || !prefs.isShowCarMenu()) {
             Intent intent = getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_REFUELING,
                     prefs.getDefaultCar());
             startActivityForResult(intent, REQUEST_ADD_DATA);
@@ -298,9 +304,9 @@ public class MainActivity extends AppCompatActivity implements
             });
 
             Menu menu = popup.getMenu();
-            for (Car car : cars) {
-                menu.add(car.name).setIntent(getDetailActivityIntent(
-                        DataDetailActivity.EXTRA_EDIT_REFUELING, car.id));
+            while (car.moveToNext()) {
+                menu.add(car.getName()).setIntent(getDetailActivityIntent(
+                        DataDetailActivity.EXTRA_EDIT_REFUELING, car.getId()));
             }
 
             popup.show();
@@ -400,7 +406,8 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         // Data menu items
-        List<Car> cars = Car.getAll();
+        CarCursor car = new CarSelection().query(this.getContentResolver(),
+                CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
 
         Menu menu = mNavigationView.getMenu();
         menu.clear();
@@ -408,11 +415,11 @@ public class MainActivity extends AppCompatActivity implements
         menu.add(1, Menu.NONE, Menu.NONE, R.string.drawer_reports)
                 .setIcon(R.drawable.ic_reports)
                 .setIntent(new Intent().putExtra("fragment", ReportFragment.class.getName()));
-        for (Car car : cars) {
+        while (car.moveToNext()) {
             Bundle args = new Bundle();
-            args.putLong(DataFragment.EXTRA_CAR_ID, car.id);
+            args.putLong(DataFragment.EXTRA_CAR_ID, car.getId());
 
-            menu.add(1, Menu.NONE, Menu.NONE, car.name)
+            menu.add(1, Menu.NONE, Menu.NONE, car.getName())
                     .setIcon(R.drawable.ic_list)
                     .setIntent(new Intent()
                             .putExtra("fragment", DataFragment.class.getName())

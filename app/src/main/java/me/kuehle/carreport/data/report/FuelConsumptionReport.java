@@ -21,14 +21,15 @@ import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Vector;
 
 import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.util.Calculator;
 import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
@@ -42,52 +43,54 @@ public class FuelConsumptionReport extends AbstractReport {
     private class ReportGraphData extends AbstractReportGraphData {
         private double avgConsumption;
 
-        public ReportGraphData(Context context, Car car, String category) {
-            super(context, String.format("%s (%s)", car.name, category), car.color);
+        public ReportGraphData(Context context, CarCursor car, String category) {
+            super(context, String.format("%s (%s)", car.getName(), category), car.getColor());
 
             FuelConsumption fuelConsumption = new FuelConsumption(context);
             RefuelingBalancer balancer = new RefuelingBalancer(context);
-            List<Refueling> refuelings = balancer.getBalancedRefuelings(car, category);
+            BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
 
+            int lastMileage = 0;
             int totalDistance = 0, partialDistance = 0;
             double totalVolume = 0, partialVolume = 0;
-            int lastFullRefueling = -1;
-            for (int i = 0; i < refuelings.size(); i++) {
-                Refueling refueling = refuelings.get(i);
-                if (lastFullRefueling < 0) {
-                    if (!refueling.partial) {
-                        lastFullRefueling = i;
-                    }
+            boolean wasLastFullRefuelingGuessed = false;
+            boolean foundFullRefueling = false;
 
-                    continue;
+            while (refueling.moveToNext()) {
+                if (!foundFullRefueling) {
+                    if (!refueling.getPartial()) {
+                        foundFullRefueling = true;
+                        wasLastFullRefuelingGuessed = refueling.getGuessed();
+                    }
+                } else {
+                    partialDistance += refueling.getMileage() - lastMileage;
+                    partialVolume += refueling.getVolume();
+
+                    if (!refueling.getPartial() && partialDistance > 0) {
+                        totalDistance += partialDistance;
+                        totalVolume += partialVolume;
+
+                        double consumption = fuelConsumption
+                                .computeFuelConsumption(partialVolume,
+                                        partialDistance);
+                        xValues.add(refueling.getDate().getTime());
+                        yValues.add(consumption);
+
+                        if (refueling.getGuessed()) {
+                            markLastPoint();
+                            markLastLine();
+                        } else if (wasLastFullRefuelingGuessed) {
+                            markLastLine();
+                        }
+
+                        partialDistance = 0;
+                        partialVolume = 0;
+
+                        wasLastFullRefuelingGuessed = refueling.getGuessed();
+                    }
                 }
 
-                partialDistance += refueling.mileage
-                        - refuelings.get(i - 1).mileage;
-                partialVolume += refueling.volume;
-
-                if (!refueling.partial && partialDistance > 0) {
-                    totalDistance += partialDistance;
-                    totalVolume += partialVolume;
-
-                    double consumption = fuelConsumption
-                            .computeFuelConsumption(partialVolume,
-                                    partialDistance);
-                    xValues.add(refueling.date.getTime());
-                    yValues.add(consumption);
-
-                    if (refuelings.get(i).guessed) {
-                        markLastPoint();
-                        markLastLine();
-                    } else if (refuelings.get(lastFullRefueling).guessed) {
-                        markLastLine();
-                    }
-
-                    partialDistance = 0;
-                    partialVolume = 0;
-
-                    lastFullRefueling = i;
-                }
+                lastMileage = refueling.getMileage();
             }
 
             avgConsumption = fuelConsumption.computeFuelConsumption(
@@ -115,28 +118,28 @@ public class FuelConsumptionReport extends AbstractReport {
 
     @Override
     public String getTitle() {
-        return context.getString(R.string.report_title_fuel_consumption);
+        return mContext.getString(R.string.report_title_fuel_consumption);
     }
 
-    private Section addDataSection(Car car) {
-        String name = car.name;
+    private Section addDataSection(CarCursor car) {
+        String name = car.getName();
 
-        if (car.isSuspended()) {
+        if (car.getSuspendedSince() != null) {
             return addDataSection(String.format("%s [%s]", name,
-                    context.getString(R.string.suspended)), car.color, 1);
+                    mContext.getString(R.string.suspended)), car.getColor(), 1);
         } else {
-            return addDataSection(name, car.color);
+            return addDataSection(name, car.getColor());
         }
     }
 
-    private Section addDataSection(Car car, String category) {
-        String name = String.format("%s (%s)", car.name, category);
+    private Section addDataSection(CarCursor car, String category) {
+        String name = String.format("%s (%s)", car.getName(), category);
 
-        if (car.isSuspended()) {
+        if (car.getSuspendedSince() != null) {
             return addDataSection(String.format("%s [%s]", name,
-                    context.getString(R.string.suspended)), car.color, 1);
+                    mContext.getString(R.string.suspended)), car.getColor(), 1);
         } else {
-            return addDataSection(name, car.color);
+            return addDataSection(name, car.getColor());
         }
     }
 
@@ -144,7 +147,7 @@ public class FuelConsumptionReport extends AbstractReport {
     protected Chart onGetChart(boolean zoomable, boolean moveable) {
         final Dataset dataset = new Dataset();
         RendererList renderers = new RendererList();
-        LineRenderer renderer = new LineRenderer(context);
+        LineRenderer renderer = new LineRenderer(mContext);
         renderers.addRenderer(renderer);
 
         Vector<AbstractReportGraphData> reportData = new Vector<>();
@@ -177,25 +180,25 @@ public class FuelConsumptionReport extends AbstractReport {
                 String fuelType = s.getTitle().substring(
                         s.getTitle().lastIndexOf('(') + 1,
                         s.getTitle().length() - 1);
-                String date = DateFormat.getDateFormat(context).format(
+                String date = DateFormat.getDateFormat(mContext).format(
                         new Date((long) s.get(point).x));
 
                 Toast.makeText(
-                        context,
+                        mContext,
                         String.format(
                                 "%s: %s\n%s: %s\n%s: %.2f %s\n%s: %s",
-                                context.getString(R.string.report_toast_car),
+                                mContext.getString(R.string.report_toast_car),
                                 car,
-                                context.getString(R.string.report_toast_fuel_type),
+                                mContext.getString(R.string.report_toast_fuel_type),
                                 fuelType,
-                                context.getString(R.string.report_toast_consumption),
-                                s.get(point).y, unit, context
+                                mContext.getString(R.string.report_toast_consumption),
+                                s.get(point).y, unit, mContext
                                         .getString(R.string.report_toast_date),
                                 date), Toast.LENGTH_LONG).show();
             }
         });
 
-        final Chart chart = new Chart(context, dataset, renderers);
+        final Chart chart = new Chart(mContext, dataset, renderers);
         applyDefaultChartStyles(chart);
         chart.setShowLegend(false);
         if (isShowTrend()) {
@@ -203,7 +206,7 @@ public class FuelConsumptionReport extends AbstractReport {
                 chart.getLegend().setSeriesVisible(i, false);
             }
         }
-        chart.getDomainAxis().setLabelFormatter(dateLabelFormatter);
+        chart.getDomainAxis().setLabelFormatter(mDateLabelFormatter);
         chart.getDomainAxis().setDefaultBottomBound(minXValue);
         chart.getRangeAxis().setLabelFormatter(new DecimalAxisLabelFormatter(2));
         chart.getDomainAxis().setZoomable(zoomable);
@@ -217,18 +220,18 @@ public class FuelConsumptionReport extends AbstractReport {
     @Override
     protected void onUpdate() {
         // Preferences
-        FuelConsumption fuelConsumption = new FuelConsumption(context);
+        FuelConsumption fuelConsumption = new FuelConsumption(mContext);
         unit = fuelConsumption.getUnitLabel();
 
         // Collect report data and add info data which will be displayed
         // next to the graph.
-        List<Car> cars = Car.getAll();
-        for (Car car : cars) {
+        CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        while (car.moveToNext()) {
             boolean sectionAdded = false;
 
-            List<String> categories = car.getUsedFuelTypeCategories();
+            String[] categories = CarQueries.getUsedFuelTypeCategories(mContext, car.getId());
             for (String category : categories) {
-                ReportGraphData carData = new ReportGraphData(context, car, category);
+                ReportGraphData carData = new ReportGraphData(mContext, car, category);
                 if (carData.isEmpty()) {
                     continue;
                 }
@@ -237,23 +240,23 @@ public class FuelConsumptionReport extends AbstractReport {
 
                 Section section = addDataSection(car, category);
                 Double[] yValues = carData.yValues.toArray(new Double[carData.yValues.size()]);
-                section.addItem(new Item(context.getString(R.string.report_highest),
+                section.addItem(new Item(mContext.getString(R.string.report_highest),
                         String.format("%.2f %s", Calculator.max(yValues), unit)));
-                section.addItem(new Item(context.getString(R.string.report_lowest),
+                section.addItem(new Item(mContext.getString(R.string.report_lowest),
                         String.format("%.2f %s", Calculator.min(yValues), unit)));
-                section.addItem(new Item(context.getString(R.string.report_average),
+                section.addItem(new Item(mContext.getString(R.string.report_average),
                         String.format("%.2f %s", carData.getAverageConsumption(), unit)));
 
                 sectionAdded = true;
 
-                if (!car.isSuspended()) {
+                if (car.getSuspendedSince() == null) {
                     minXValue = Math.min(minXValue, carData.getSeries().minX());
                 }
             }
 
             if (!sectionAdded) {
                 Section section = addDataSection(car);
-                section.addItem(new Item(context
+                section.addItem(new Item(mContext
                         .getString(R.string.report_not_enough_data), ""));
             }
         }

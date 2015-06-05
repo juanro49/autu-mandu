@@ -26,14 +26,18 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.FuelType;
+import me.kuehle.carreport.data.query.FuelTypeQueries;
 import me.kuehle.carreport.gui.util.AbstractFormFieldValidator;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
+import me.kuehle.carreport.provider.fueltype.FuelTypeContentValues;
+import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
+import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
 
 public class EditFuelTypeDialogFragment extends DialogFragment {
     public interface EditFuelTypeDialogFragmentListener {
@@ -42,20 +46,19 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
         void onDialogPositiveClick(int requestCode);
     }
 
-    public static EditFuelTypeDialogFragment newInstance(Fragment parent, int requestCode,
-                                                         FuelType fuelType) {
+    public static EditFuelTypeDialogFragment newInstance(Fragment parent, int requestCode, long fuelTypeId) {
         EditFuelTypeDialogFragment f = new EditFuelTypeDialogFragment();
         f.setTargetFragment(parent, requestCode);
 
         Bundle args = new Bundle();
-        args.putLong("fuel_type_id", fuelType != null ? fuelType.id : 0);
+        args.putLong("fuel_type_id", fuelTypeId);
         f.setArguments(args);
 
         return f;
     }
 
-    private List<FuelType> mFuelTypes;
-    private FuelType mFuelType;
+    private Set<String> mOtherFuelTypeNames;
+    private FuelTypeCursor mFuelType;
     private EditText mEdtName;
     private AutoCompleteTextView mEdtCategory;
 
@@ -63,10 +66,23 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFuelTypes = FuelType.getAll();
-        long fuelTypeId = getArguments().getLong("fuel_type_id", 0);
-        if (fuelTypeId > 0) {
-            mFuelType = FuelType.load(FuelType.class, fuelTypeId);
+        long currentFuelTypeId = getArguments().getLong("fuel_type_id", 0);
+        int currentFuelTypePos = -1;
+
+        mOtherFuelTypeNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
+        FuelTypeCursor fuelType = new FuelTypeSelection().query(getActivity().getContentResolver());
+        while (fuelType.moveToNext()) {
+            if (currentFuelTypeId == fuelType.getId()) {
+                currentFuelTypePos = fuelType.getPosition();
+            } else {
+                mOtherFuelTypeNames.add(fuelType.getName());
+            }
+        }
+
+        if (currentFuelTypePos > -1) {
+            fuelType.moveToPosition(currentFuelTypePos);
+            mFuelType = fuelType;
         }
     }
 
@@ -80,14 +96,15 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
         mEdtName = (EditText) dialog.findViewById(R.id.edt_name);
         mEdtCategory = (AutoCompleteTextView) dialog.findViewById(R.id.edt_category);
         mEdtCategory.setAdapter(new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_dropdown_item_1line, FuelType.getAllCategories()));
+                android.R.layout.simple_dropdown_item_1line,
+                FuelTypeQueries.getAllCategories(getActivity())));
 
         if (savedInstanceState != null) {
             mEdtName.setText(savedInstanceState.getString("name"));
             mEdtCategory.setText(savedInstanceState.getString("category"));
         } else if (mFuelType != null) {
-            mEdtName.setText(mFuelType.name);
-            mEdtCategory.setText(mFuelType.category);
+            mEdtName.setText(mFuelType.getName());
+            mEdtCategory.setText(mFuelType.getCategory());
         }
 
         dialog.findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
@@ -127,14 +144,7 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
             @Override
             protected boolean isValid() {
                 String name = mEdtName.getText().toString();
-                for (FuelType fuelType : mFuelTypes) {
-                    if (fuelType.name.equals(name) &&
-                            !(mFuelType != null && fuelType.equals(mFuelType))) {
-                        return false;
-                    }
-                }
-
-                return true;
+                return !mOtherFuelTypeNames.contains(name);
             }
 
             @Override
@@ -145,14 +155,15 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
         validator.add(new FormFieldNotEmptyValidator(mEdtCategory));
 
         if (validator.validate()) {
-            String name = mEdtName.getText().toString();
-            String category = mEdtCategory.getText().toString();
+            FuelTypeContentValues values = new FuelTypeContentValues();
+            values.putName(mEdtName.getText().toString());
+            values.putCategory(mEdtCategory.getText().toString());
+
             if (mFuelType == null) {
-                new FuelType(name, category).save();
+                values.insert(getActivity().getContentResolver());
             } else {
-                mFuelType.name = name;
-                mFuelType.category = category;
-                mFuelType.save();
+                FuelTypeSelection where = new FuelTypeSelection().id(mFuelType.getId());
+                values.update(getActivity().getContentResolver(), where);
             }
 
             Application.dataChanged();

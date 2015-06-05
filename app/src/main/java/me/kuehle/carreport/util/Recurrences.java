@@ -25,28 +25,12 @@ import org.joda.time.Years;
 
 import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
 
-public class Recurrence {
-    private RecurrenceInterval interval;
-    private int multiplier;
-
-    public Recurrence(RecurrenceInterval interval, int multiplier) {
-        this.interval = interval;
-        this.multiplier = multiplier;
+public class Recurrences {
+    public static int getRecurrencesSince(RecurrenceInterval interval, int multiplier, Date start) {
+        return getRecurrencesBetween(interval, multiplier, start, new Date());
     }
 
-    public RecurrenceInterval getInterval() {
-        return interval;
-    }
-
-    public int getMultiplier() {
-        return multiplier;
-    }
-
-    public int getRecurrencesSince(Date start) {
-        return getRecurrencesBetween(start, new Date());
-    }
-
-    public int getRecurrencesBetween(Date start, Date end) {
+    public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start, Date end) {
         DateTime then = new DateTime(start);
         DateTime now = new DateTime(end);
 

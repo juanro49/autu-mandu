@@ -31,8 +31,6 @@ import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.activeandroid.Model;
-
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
@@ -52,12 +50,12 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     public static final long EXTRA_ID_DEFAULT = -1;
     public static final String EXTRA_CAR_ID = "car_id";
 
-    protected OnItemActionListener onItemActionListener;
-    protected Model editItem = null;
+    protected OnItemActionListener mOnItemActionListener;
+    protected long mId;
 
     private static final int DELETE_REQUEST_CODE = 0;
 
-    private CharSequence savedABTitle;
+    private CharSequence mSavedABTitle;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -65,7 +63,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         ActionBar actionBar = MainActivity.getSupportActionBar(this);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        savedABTitle = actionBar.getTitle();
+        mSavedABTitle = actionBar.getTitle();
         if (isInEditMode()) {
             actionBar.setTitle(getTitleForEdit());
         } else {
@@ -78,9 +76,9 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         super.onAttach(activity);
         try {
             if (getParentFragment() != null) {
-                onItemActionListener = (OnItemActionListener) getParentFragment();
+                mOnItemActionListener = (OnItemActionListener) getParentFragment();
             } else {
-                onItemActionListener = (OnItemActionListener) activity;
+                mOnItemActionListener = (OnItemActionListener) activity;
             }
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -91,10 +89,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        long id = getArguments().getLong(EXTRA_ID, EXTRA_ID_DEFAULT);
-        if (id != EXTRA_ID_DEFAULT) {
-            editItem = getEditItem(id);
-        }
+        mId = getArguments().getLong(EXTRA_ID, EXTRA_ID_DEFAULT);
 
         setHasOptionsMenu(true);
     }
@@ -122,7 +117,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     public void onDestroyView() {
         super.onDestroyView();
         ActionBar actionBar = MainActivity.getSupportActionBar(this);
-        actionBar.setTitle(savedABTitle);
+        actionBar.setTitle(mSavedABTitle);
     }
 
     @Override
@@ -132,10 +127,10 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     @Override
     public void onDialogPositiveClick(int requestCode) {
         if (requestCode == DELETE_REQUEST_CODE) {
-            editItem.delete();
+            delete();
 
             Toast.makeText(getActivity(), getToastDeletedMessage(), Toast.LENGTH_SHORT).show();
-            onItemActionListener.onItemDeleted();
+            mOnItemActionListener.onItemDeleted();
 
             Application.dataChanged();
         }
@@ -149,14 +144,14 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
                     save();
 
                     Toast.makeText(getActivity(), getToastSavedMessage(), Toast.LENGTH_SHORT).show();
-                    onItemActionListener.onItemSaved();
+                    mOnItemActionListener.onItemSaved();
 
                     Application.dataChanged();
                 }
 
                 return true;
             case R.id.menu_cancel:
-                onItemActionListener.onItemCanceled();
+                mOnItemActionListener.onItemCanceled();
                 return true;
             case R.id.menu_delete:
                 SupportMessageDialogFragment.newInstance(this, DELETE_REQUEST_CODE,
@@ -165,7 +160,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
                         android.R.string.no).show(getFragmentManager(), null);
                 return true;
             case android.R.id.home:
-                onItemActionListener.onItemCanceled();
+                mOnItemActionListener.onItemCanceled();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -191,7 +186,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     }
 
     protected boolean isInEditMode() {
-        return editItem != null;
+        return mId != EXTRA_ID_DEFAULT;
     }
 
     protected void addUnitToHint(EditText editText, int hintResource, CharSequence unit) {
@@ -209,8 +204,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
     protected abstract int getAlertDeleteMessage();
 
-    protected abstract Model getEditItem(long id);
-
     protected abstract int getLayout();
 
     protected abstract int getTitleForEdit();
@@ -224,6 +217,8 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     protected abstract void initFields(Bundle savedInstanceState, View v);
 
     protected abstract void save();
+
+    protected abstract void delete();
 
     protected abstract boolean validate();
 }

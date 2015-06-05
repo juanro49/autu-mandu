@@ -18,31 +18,32 @@ package me.kuehle.carreport.gui;
 
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.activeandroid.Model;
-
 import java.util.Date;
-import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.Reminder;
+import me.kuehle.carreport.data.query.CarQueries;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment;
 import me.kuehle.carreport.gui.util.DateTimeInput;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.gui.util.SimpleAnimator;
-import me.kuehle.carreport.util.TimeSpan;
-import me.kuehle.carreport.util.TimeSpanUnit;
+import me.kuehle.carreport.provider.car.CarColumns;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
+import me.kuehle.carreport.provider.reminder.ReminderContentValues;
+import me.kuehle.carreport.provider.reminder.ReminderCursor;
+import me.kuehle.carreport.provider.reminder.ReminderSelection;
+import me.kuehle.carreport.provider.reminder.TimeSpanUnit;
 
 public class DataDetailReminderFragment extends AbstractDataDetailFragment implements
         SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener {
@@ -53,9 +54,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
     private Spinner mSpnCar;
     private Spinner mSpnAfterType;
     private EditText mEdtAfterDistance;
-    private TextInputLayout mEdtAfterDistanceInputLayout;
     private EditText mEdtAfterTime;
-    private TextInputLayout mEdtAfterTimeInputLayout;
     private Spinner mSpnAfterTimeUnit;
     private EditText mEdtStartMileage;
     private DateTimeInput mEdtStartDate;
@@ -66,8 +65,6 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
     private SimpleAnimator mEdtAfterDistanceAnimator;
     private SimpleAnimator mEdtAfterTimeAnimator;
     private SimpleAnimator mSpnAfterTimeUnitAnimator;
-
-    private List<Car> mCars;
 
     @Override
     public void onDialogPositiveClick(int requestCode, Date date) {
@@ -81,11 +78,6 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
     @Override
     protected int getAlertDeleteMessage() {
         return R.string.alert_delete_reminder_message;
-    }
-
-    @Override
-    protected Model getEditItem(long id) {
-        return Reminder.load(Reminder.class, id);
     }
 
     @Override
@@ -121,9 +113,9 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
         mSpnCar = (Spinner) v.findViewById(R.id.spn_car);
         mSpnAfterType = (Spinner) v.findViewById(R.id.spn_after_type);
         mEdtAfterDistance = (EditText) v.findViewById(R.id.edt_after_distance);
-        mEdtAfterDistanceInputLayout = (TextInputLayout) v.findViewById(R.id.edt_after_distance_input_layout);
+        TextInputLayout mEdtAfterDistanceInputLayout = (TextInputLayout) v.findViewById(R.id.edt_after_distance_input_layout);
         mEdtAfterTime = (EditText) v.findViewById(R.id.edt_after_time);
-        mEdtAfterTimeInputLayout = (TextInputLayout) v.findViewById(R.id.edt_after_time_input_layout);
+        TextInputLayout mEdtAfterTimeInputLayout = (TextInputLayout) v.findViewById(R.id.edt_after_time_input_layout);
         mSpnAfterTimeUnit = (Spinner) v.findViewById(R.id.spn_after_time_unit);
         mEdtStartMileage = (EditText) v.findViewById(R.id.edt_start_mileage);
         mEdtStartDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_start_date),
@@ -147,14 +139,10 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
                 prefs.getUnitDistance());
 
         // Car
-        mCars = Car.getAll();
-        ArrayAdapter<String> carAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_dropdown_item);
-        for (Car car : mCars) {
-            carAdapter.add(car.name);
-        }
-
-        mSpnCar.setAdapter(carAdapter);
+        CarCursor car = new CarSelection().query(getActivity().getContentResolver());
+        mSpnCar.setAdapter(new SimpleCursorAdapter(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item,
+                car, new String[]{CarColumns.NAME}, new int[]{android.R.id.text1}, 0));
 
         mSpnCar.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             private int mLastPosition = ListView.INVALID_POSITION;
@@ -162,8 +150,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!isInEditMode() || mLastPosition != ListView.INVALID_POSITION) {
-                    Car car = mCars.get(position);
-                    mEdtStartMileage.setText(String.valueOf(car.getLatestMileage()));
+                    mEdtStartMileage.setText(String.valueOf(CarQueries.getLatestMileage(getActivity(), id)));
                 }
 
                 mLastPosition = position;
@@ -239,8 +226,9 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
             if (selectCarId == 0) {
                 selectCarId = prefs.getDefaultCar();
             }
-            for (int pos = 0; pos < mCars.size(); pos++) {
-                if (mCars.get(pos).id == selectCarId) {
+
+            for (int pos = 0; pos < mSpnCar.getCount(); pos++) {
+                if (mSpnCar.getItemIdAtPosition(pos) == selectCarId) {
                     mSpnCar.setSelection(pos);
                 }
             }
@@ -251,39 +239,39 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
             mBtnQuitSnooze.setVisibility(View.GONE);
             mChkDismissed.setVisibility(View.GONE);
         } else {
-            Reminder reminder = (Reminder) editItem;
+            ReminderCursor reminder = new ReminderSelection().id(mId).query(getActivity().getContentResolver());
 
-            mEdtTitle.setText(reminder.title);
-            for (int pos = 0; pos < mCars.size(); pos++) {
-                if (mCars.get(pos).id.equals(reminder.car.id)) {
+            mEdtTitle.setText(reminder.getTitle());
+            for (int pos = 0; pos < mSpnCar.getCount(); pos++) {
+                if (mSpnCar.getItemIdAtPosition(pos) == reminder.getCarId()) {
                     mSpnCar.setSelection(pos);
                 }
             }
 
-            if (reminder.afterDistance != null && reminder.afterTime != null) {
+            if (reminder.getAfterDistance() != null && reminder.getAfterTimeSpanUnit() != null) {
                 mSpnAfterType.setSelection(0);
-            } else if (reminder.afterDistance != null) {
+            } else if (reminder.getAfterDistance() != null) {
                 mSpnAfterType.setSelection(1);
             } else {
                 mSpnAfterType.setSelection(2);
             }
 
-            if (reminder.afterDistance != null) {
-                mEdtAfterDistance.setText(reminder.afterDistance.toString());
+            if (reminder.getAfterDistance() != null) {
+                mEdtAfterDistance.setText(reminder.getAfterDistance().toString());
             }
 
-            if (reminder.afterTime != null) {
-                mEdtAfterTime.setText(String.valueOf(reminder.afterTime.getCount()));
-                mSpnAfterTimeUnit.setSelection(reminder.afterTime.getUnit().getValue());
+            if (reminder.getAfterTimeSpanUnit() != null) {
+                mEdtAfterTime.setText(String.valueOf(reminder.getAfterTimeSpanCount()));
+                mSpnAfterTimeUnit.setSelection(reminder.getAfterTimeSpanUnit().ordinal());
             }
 
-            mEdtStartMileage.setText(String.valueOf(reminder.startMileage));
-            mEdtStartDate.setDate(reminder.startDate);
-            if (reminder.snoozedUntil != null) {
-                mEdtSnoozedUntil.setDate(reminder.snoozedUntil);
+            mEdtStartMileage.setText(String.valueOf(reminder.getStartMileage()));
+            mEdtStartDate.setDate(reminder.getStartDate());
+            if (reminder.getSnoozedUntil() != null) {
+                mEdtSnoozedUntil.setDate(reminder.getSnoozedUntil());
             }
 
-            mChkDismissed.setChecked(reminder.notificationDismissed);
+            mChkDismissed.setChecked(reminder.getNotificationDismissed());
         }
     }
 
@@ -308,41 +296,41 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
 
     @Override
     protected void save() {
-        String title = mEdtTitle.getText().toString();
-        Car car = mCars.get(mSpnCar.getSelectedItemPosition());
         Integer afterDistance = null;
-        TimeSpan afterTime = null;
+        Integer afterTimeSpanCount = null;
+        TimeSpanUnit afterTimeSpanUnit = null;
         if (mSpnAfterType.getSelectedItemPosition() == 0) { // Distance and time
             afterDistance = getIntegerFromEditText(mEdtAfterDistance, 0);
-            afterTime = new TimeSpan(
-                    TimeSpanUnit.getByValue(mSpnAfterTimeUnit.getSelectedItemPosition()),
-                    getIntegerFromEditText(mEdtAfterTime, 0));
+            afterTimeSpanCount = getIntegerFromEditText(mEdtAfterTime, 0);
+            afterTimeSpanUnit = TimeSpanUnit.values()[mSpnAfterTimeUnit.getSelectedItemPosition()];
         } else if (mSpnAfterType.getSelectedItemPosition() == 1) { // Distance only
             afterDistance = getIntegerFromEditText(mEdtAfterDistance, 0);
         } else { // Time only
-            afterTime = new TimeSpan(
-                    TimeSpanUnit.getByValue(mSpnAfterTimeUnit.getSelectedItemPosition()),
-                    getIntegerFromEditText(mEdtAfterTime, 0));
+            afterTimeSpanCount = getIntegerFromEditText(mEdtAfterTime, 0);
+            afterTimeSpanUnit = TimeSpanUnit.values()[mSpnAfterTimeUnit.getSelectedItemPosition()];
         }
 
-        int startMileage = getIntegerFromEditText(mEdtStartMileage, 0);
-        Date startDate = mEdtStartDate.getDate();
-        Date snoozedUntil = mEdtSnoozedUntil.getDate();
-        boolean dismissed = mChkDismissed.isChecked();
+        ReminderContentValues values = new ReminderContentValues();
+        values.putTitle(mEdtTitle.getText().toString());
+        values.putAfterDistance(afterDistance);
+        values.putAfterTimeSpanCount(afterTimeSpanCount);
+        values.putAfterTimeSpanUnit(afterTimeSpanUnit);
+        values.putStartMileage(getIntegerFromEditText(mEdtStartMileage, 0));
+        values.putStartDate(mEdtStartDate.getDate());
+        values.putSnoozedUntil(mEdtSnoozedUntil.getDate());
+        values.putNotificationDismissed(mChkDismissed.isChecked());
+        values.putCarId(mSpnCar.getSelectedItemId());
 
-        if (!isInEditMode()) {
-            new Reminder(title, afterTime, afterDistance, startDate, startMileage, car).save();
+        if (isInEditMode()) {
+            ReminderSelection where = new ReminderSelection().id(mId);
+            values.update(getActivity().getContentResolver(), where);
         } else {
-            Reminder reminder = (Reminder) editItem;
-            reminder.title = title;
-            reminder.afterDistance = afterDistance;
-            reminder.afterTime = afterTime;
-            reminder.startMileage = startMileage;
-            reminder.startDate = startDate;
-            reminder.car = car;
-            reminder.snoozedUntil = snoozedUntil;
-            reminder.notificationDismissed = dismissed;
-            reminder.save();
+            values.insert(getActivity().getContentResolver());
         }
+    }
+
+    @Override
+    public void delete() {
+        new ReminderSelection().id(mId).delete(getActivity().getContentResolver());
     }
 }

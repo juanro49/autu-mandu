@@ -32,66 +32,71 @@ import me.kuehle.carreport.data.report.CostsReport;
 import me.kuehle.carreport.data.report.FuelConsumptionReport;
 import me.kuehle.carreport.data.report.FuelPriceReport;
 import me.kuehle.carreport.data.report.MileageReport;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.serializer.TimeSpanSerializer;
+import me.kuehle.carreport.provider.car.CarColumns;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
+import me.kuehle.carreport.provider.reminder.TimeSpanUnit;
 import me.kuehle.carreport.util.TimeSpan;
-import me.kuehle.carreport.util.TimeSpanUnit;
 
 public class Preferences {
     private static final String TAG = "Preferences";
 
-    private SharedPreferences prefs;
+    private Context mContext;
+    private SharedPreferences mPrefs;
 
     public Preferences(Context context) {
-        this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        mContext = context;
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public long getDefaultCar() {
-        int id = Integer.parseInt(prefs.getString("behavior_default_car", "1"));
-        List<Car> cars = Car.getAll();
-        if (cars.size() == 0) {
+        int id = Integer.parseInt(mPrefs.getString("behavior_default_car", "1"));
+
+        CarCursor car = new CarSelection().query(mContext.getContentResolver(), new String[]{CarColumns._ID});
+        if (car.getCount() == 0) {
             return 0;
         }
 
-        for (Car car : cars) {
-            if (car.id == id) {
+        while (car.moveToNext()) {
+            if (car.getId() == id) {
                 return id;
             }
         }
 
-        return cars.get(0).id;
+        car.moveToFirst();
+        return car.getId();
     }
 
     public DistanceEntryMode getDistanceEntryMode() {
-        String mode = prefs.getString("behavior_distance_entry_mode", "TOTAL");
+        String mode = mPrefs.getString("behavior_distance_entry_mode", "TOTAL");
         return DistanceEntryMode.valueOf(mode);
     }
 
     public String getDropboxAccount() {
-        return prefs.getString("sync_dropbox_account", null);
+        return mPrefs.getString("sync_dropbox_account", null);
     }
 
     public String getDropboxAccessToken() {
-        return prefs.getString("sync_dropbox_token", null);
+        return mPrefs.getString("sync_dropbox_token", null);
     }
 
     public String getDropboxLocalRev() {
-        return prefs.getString("sync_dropbox_rev", null);
+        return mPrefs.getString("sync_dropbox_rev", null);
     }
 
     public String getGoogleDriveAccount() {
-        return prefs.getString("sync_drive_account", null);
+        return mPrefs.getString("sync_drive_account", null);
     }
 
     public Date getGoogleDriveLocalModifiedDate() {
         try {
-            long date = prefs.getLong("sync_drive_modified_date", -1);
+            long date = mPrefs.getLong("sync_drive_modified_date", -1);
             if (date == -1) {
                 return null;
             } else {
                 return new Date(date);
             }
-        } catch(ClassCastException e) {
+        } catch (ClassCastException e) {
             return null;
         }
     }
@@ -99,7 +104,7 @@ public class Preferences {
     @SuppressWarnings("unchecked")
     public List<Class<? extends AbstractReport>> getReportOrder() {
         List<Class<? extends AbstractReport>> reports = new ArrayList<>();
-        String reportNames = prefs.getString("behavior_report_order", null);
+        String reportNames = mPrefs.getString("behavior_report_order", null);
         if (reportNames == null) {
             reports.add(FuelConsumptionReport.class);
             reports.add(FuelPriceReport.class);
@@ -122,73 +127,72 @@ public class Preferences {
     }
 
     public String getSynchronizationProvider() {
-        return prefs.getString("sync_current_provider", null);
+        return mPrefs.getString("sync_current_provider", null);
     }
 
     public TimeSpan getReminderSnoozeDuration() {
-        String data = prefs.getString("behavior_reminder_snooze_duration", "7 DAY");
-        TimeSpan timeSpan = new TimeSpanSerializer().deserialize(data);
-        return timeSpan == null ? new TimeSpan(TimeSpanUnit.DAY, 7) : timeSpan;
+        String data = mPrefs.getString("behavior_reminder_snooze_duration", "7 DAY");
+        return TimeSpan.fromString(data, new TimeSpan(TimeSpanUnit.DAY, 7));
     }
 
     public String getUnitCurrency() {
-        return prefs.getString("unit_currency", "EUR");
+        return mPrefs.getString("unit_currency", "EUR");
     }
 
     public String getUnitDistance() {
-        return prefs.getString("unit_distance", "km");
+        return mPrefs.getString("unit_distance", "km");
     }
 
     public String getUnitVolume() {
-        return prefs.getString("unit_volume", "l");
+        return mPrefs.getString("unit_volume", "l");
     }
 
     public int getUnitFuelConsumption() {
-        return Integer.parseInt(prefs.getString("unit_fuel_consumption", "0"));
+        return Integer.parseInt(mPrefs.getString("unit_fuel_consumption", "0"));
     }
 
     public boolean isAutoGuessMissingDataEnabled() {
-        return prefs.getBoolean("behavior_auto_guess_missing_data", false);
+        return mPrefs.getBoolean("behavior_auto_guess_missing_data", false);
     }
 
     public boolean isShowCarMenu() {
-        return prefs.getBoolean("behavior_show_car_menu", true);
+        return mPrefs.getBoolean("behavior_show_car_menu", true);
     }
 
     public boolean isSyncOnChange() {
-        return prefs.getBoolean("sync_on_change", true);
+        return mPrefs.getBoolean("sync_on_change", true);
     }
 
     public boolean isSyncOnStart() {
-        return prefs.getBoolean("sync_on_start", true);
+        return mPrefs.getBoolean("sync_on_start", true);
     }
 
     public void setDropboxAccount(String account) {
-        Editor edit = prefs.edit();
+        Editor edit = mPrefs.edit();
         edit.putString("sync_dropbox_account", account);
         edit.apply();
     }
 
     public void setDropboxAccessToken(String accessToken) {
-        Editor edit = prefs.edit();
+        Editor edit = mPrefs.edit();
         edit.putString("sync_dropbox_token", accessToken);
         edit.apply();
     }
 
     public void setDropboxLocalRev(String rev) {
-        Editor edit = prefs.edit();
+        Editor edit = mPrefs.edit();
         edit.putString("sync_dropbox_rev", rev);
         edit.apply();
     }
 
     public void setGoogleDriveLocalModifiedDate(Date date) {
-        Editor edit = prefs.edit();
+        Editor edit = mPrefs.edit();
         edit.putLong("sync_drive_modified_date", date == null ? -1 : date.getTime());
         edit.apply();
     }
 
     public void setGoogleDriveAccount(String account) {
-        Editor edit = prefs.edit();
+        Editor edit = mPrefs.edit();
         edit.putString("sync_drive_account", account);
         edit.apply();
     }
@@ -199,13 +203,13 @@ public class Preferences {
             reportNames.add(report.getName());
         }
 
-        Editor edit = prefs.edit();
+        Editor edit = mPrefs.edit();
         edit.putString("behavior_report_order", TextUtils.join(",", reportNames));
         edit.apply();
     }
 
     public void setSynchronizationProvider(String provider) {
-        Editor edit = prefs.edit();
+        Editor edit = mPrefs.edit();
         edit.putString("sync_current_provider", provider);
         edit.apply();
     }

@@ -26,111 +26,111 @@ import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import me.kuehle.carreport.db.serializer.RecurrenceSerializer;
-
 public class CSVWriter {
     private static final String TAG = "CSVWriter";
 
-	private static final char QUOTE = '"';
-	private static final char ESCAPE = '\\';
-	private static final char SEPARATOR;
-	private static final char NEW_LINE = '\n';
+    private static final char QUOTE = '"';
+    private static final char ESCAPE = '\\';
+    private static final char SEPARATOR;
+    private static final char NEW_LINE = '\n';
 
-	static {
-		String locale = Locale.getDefault().getLanguage().substring(0, 2)
-				.toLowerCase(Locale.US);
-		if (locale.equals("de")) {
-			SEPARATOR = ';';
-		} else {
-			SEPARATOR = ',';
-		}
-	}
+    static {
+        String locale = Locale.getDefault().getLanguage().substring(0, 2)
+                .toLowerCase(Locale.US);
+        if (locale.equals("de")) {
+            SEPARATOR = ';';
+        } else {
+            SEPARATOR = ',';
+        }
+    }
 
-	private StringBuilder data;
+    private StringBuilder data;
 
-	private RecurrenceSerializer recurrenceSerializer;
-	private DateFormat dateFormat;
-	private NumberFormat floatFormat;
+    private DateFormat dateFormat;
+    private NumberFormat floatFormat;
 
-	public CSVWriter() {
-		data = new StringBuilder();
+    public CSVWriter() {
+        data = new StringBuilder();
 
-		recurrenceSerializer = new RecurrenceSerializer();
-		dateFormat = DateFormat.getDateTimeInstance();
-		floatFormat = NumberFormat.getInstance();
-	}
+        dateFormat = DateFormat.getDateTimeInstance();
+        floatFormat = NumberFormat.getInstance();
+    }
 
-	public void writeLine(Object... columns) {
-		for (int i = 0; i < columns.length; i++) {
-			if (i != 0) {
-				data.append(SEPARATOR);
-			}
+    public void writeLine(Object... columns) {
+        for (int i = 0; i < columns.length; i++) {
+            if (i != 0) {
+                data.append(SEPARATOR);
+            }
 
-			writeColumn(columns[i]);
-		}
+            writeColumn(columns[i]);
+        }
 
-		data.append(NEW_LINE);
-	}
+        data.append(NEW_LINE);
+    }
 
-	private void writeColumn(Object value) {
-		data.append(QUOTE);
-		if (value != null) {
-			String strValue;
-			if (value instanceof Recurrence) {
-				strValue = format((Recurrence) value);
-			} else if (value instanceof Date) {
-				strValue = format((Date) value);
-			} else if (value instanceof Float) {
-				strValue = format((Float) value);
-			} else {
-				strValue = value.toString();
-			}
+    private void writeColumn(Object value) {
+        data.append(QUOTE);
+        if (value != null) {
+            String strValue;
+            if (value instanceof Enum) {
+                strValue = format((Enum) value);
+            } else if (value instanceof Date) {
+                strValue = format((Date) value);
+            } else if (value instanceof Float) {
+                strValue = format((Float) value);
+            } else {
+                strValue = value.toString();
+            }
 
-			for (int j = 0; j < strValue.length(); j++) {
-				char nextChar = strValue.charAt(j);
-				if (nextChar == QUOTE || nextChar == ESCAPE) {
-					data.append(ESCAPE).append(nextChar);
-				} else if (nextChar != NEW_LINE) {
-					data.append(nextChar);
-				}
-			}
-		}
+            for (int j = 0; j < strValue.length(); j++) {
+                char nextChar = strValue.charAt(j);
+                if (nextChar == QUOTE || nextChar == ESCAPE) {
+                    data.append(ESCAPE).append(nextChar);
+                } else if (nextChar != NEW_LINE) {
+                    data.append(nextChar);
+                }
+            }
+        }
 
-		data.append(QUOTE);
-	}
+        data.append(QUOTE);
+    }
 
-	public void toFile(File file) {
-		try {
-			PrintWriter out = new PrintWriter(file);
-			out.write(toString());
-			out.close();
-		} catch (FileNotFoundException e) {
+    public void toFile(File file) {
+        try {
+            PrintWriter out = new PrintWriter(file);
+            out.write(toString());
+            out.close();
+        } catch (FileNotFoundException e) {
             Log.e(TAG, "Error while writing to file.", e);
-		}
-	}
+        }
+    }
 
-	@Override
-	public String toString() {
-		return data.toString();
-	}
+    @Override
+    public String toString() {
+        return data.toString();
+    }
 
-	private String format(Recurrence value) {
-		return recurrenceSerializer.serialize(value);
-	}
+    private String format(Enum value) {
+        try {
+            return String.valueOf(value.ordinal());
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
-	private String format(Date value) {
-		try {
-			return dateFormat.format(value);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+    private String format(Date value) {
+        try {
+            return dateFormat.format(value);
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
-	private String format(Float value) {
-		try {
-			return floatFormat.format(value);
-		} catch (Exception e) {
-			return "";
-		}
-	}
+    private String format(Float value) {
+        try {
+            return floatFormat.format(value);
+        } catch (Exception e) {
+            return "";
+        }
+    }
 }

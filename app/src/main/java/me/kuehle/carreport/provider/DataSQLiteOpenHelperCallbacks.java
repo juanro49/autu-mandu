@@ -22,6 +22,8 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import me.kuehle.carreport.BuildConfig;
 
@@ -66,7 +68,17 @@ public class DataSQLiteOpenHelperCallbacks {
 
     private String[] prepareSqlStatements(String rawSql) {
         rawSql = rawSql.replaceAll("[\r\n]", " ");
-        return rawSql.split(";");
+        String[] rawCommands = rawSql.split(";");
+
+        List<String> commands = new ArrayList<>(rawCommands.length);
+        for (int i = 0; i < rawCommands.length; i++) {
+            rawCommands[i] = rawCommands[i].trim();
+            if (rawCommands[i].length() > 0) {
+                commands.add(rawCommands[i]);
+            }
+        }
+
+        return commands.toArray(new String[commands.size()]);
     }
 
     private String getMigrationFileContent(Context context, int targetVersion) {

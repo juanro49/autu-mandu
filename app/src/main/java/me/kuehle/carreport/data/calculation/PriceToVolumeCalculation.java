@@ -1,55 +1,59 @@
 package me.kuehle.carreport.data.calculation;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.FuelType;
-import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
+import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
+import me.kuehle.carreport.provider.refueling.RefuelingCursor;
+import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 import me.kuehle.carreport.util.Calculator;
-import android.content.Context;
 
 public class PriceToVolumeCalculation extends AbstractCalculation {
-	public PriceToVolumeCalculation(Context context) {
-		super(context);
-	}
+    public PriceToVolumeCalculation(Context context) {
+        super(context);
+    }
 
-	@Override
-	public String getName() {
-		return context.getString(R.string.calc_option_price_to_volume,
-				getInputUnit(), getOutputUnit());
-	}
+    @Override
+    public String getName() {
+        return mContext.getString(R.string.calc_option_price_to_volume,
+                getInputUnit(), getOutputUnit());
+    }
 
-	@Override
-	public String getInputUnit() {
-		Preferences prefs = new Preferences(context);
-		return prefs.getUnitCurrency();
-	}
+    @Override
+    public String getInputUnit() {
+        Preferences prefs = new Preferences(mContext);
+        return prefs.getUnitCurrency();
+    }
 
-	@Override
-	public String getOutputUnit() {
-		Preferences prefs = new Preferences(context);
-		return prefs.getUnitVolume();
-	}
+    @Override
+    public String getOutputUnit() {
+        Preferences prefs = new Preferences(mContext);
+        return prefs.getUnitVolume();
+    }
 
-	@Override
-	public CalculationItem[] calculate(double input) {
-		List<CalculationItem> items = new ArrayList<>();
-		for (FuelType fuelType : FuelType.getAll()) {
-			List<Refueling> refuelings = fuelType.getRefuelings();
-			if (refuelings.size() > 0) {
-				float[] fuelPrices = new float[refuelings.size()];
-				for (int i = 0; i < fuelPrices.length; i++) {
-					fuelPrices[i] = refuelings.get(i).getFuelPrice();
-				}
-				
-				float avgFuelPrice = Calculator.avg(fuelPrices);
-				items.add(new CalculationItem(fuelType.name, input
-						/ avgFuelPrice));
-			}
-		}
+    @Override
+    public CalculationItem[] calculate(double input) {
+        List<CalculationItem> items = new ArrayList<>();
 
-		return items.toArray(new CalculationItem[items.size()]);
-	}
+        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver());
+        while (fuelType.moveToNext()) {
+            RefuelingCursor refueling = new RefuelingSelection().fuelTypeId(fuelType.getId()).query(mContext.getContentResolver());
+            if (refueling.getCount() > 0) {
+                List<Float> fuelPrices = new ArrayList<>(refueling.getCount());
+                while (refueling.moveToNext()) {
+                    fuelPrices.add(refueling.getPrice() / refueling.getVolume());
+                }
+
+                float avgFuelPrice = Calculator.avg(fuelPrices.toArray(new Float[refueling.getCount()]));
+                items.add(new CalculationItem(fuelType.getName(), input / avgFuelPrice));
+            }
+        }
+
+        return items.toArray(new CalculationItem[items.size()]);
+    }
 }

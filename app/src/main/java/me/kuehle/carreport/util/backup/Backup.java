@@ -22,10 +22,10 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 
 import me.kuehle.carreport.Application;
+import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
 
+import android.content.Context;
 import android.os.Environment;
-
-import com.activeandroid.Cache;
 
 public class Backup {
 	public static final String FILE_NAME = "carreport.backup";
@@ -34,9 +34,9 @@ public class Backup {
 	private File dbFile;
 	private File backupFile;
 
-	public Backup() {
+	public Backup(Context context) {
 		dir = Environment.getExternalStorageDirectory();
-		dbFile = new File(Cache.openDatabase().getPath());
+		dbFile = new File(DataSQLiteOpenHelper.getInstance(context).getReadableDatabase().getPath());
 		backupFile = new File(dir, FILE_NAME);
 	}
 

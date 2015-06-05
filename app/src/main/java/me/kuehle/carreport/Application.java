@@ -16,59 +16,56 @@
 
 package me.kuehle.carreport;
 
+import android.content.Context;
+
+import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
 import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
 import me.kuehle.carreport.util.reminder.ReminderEnablerReceiver;
 import me.kuehle.carreport.util.reminder.ReminderService;
 
-import com.activeandroid.ActiveAndroid;
-
 public class Application extends android.app.Application {
-	private static Application instance;
+    private static Application instance;
 
-	public static void dataChanged() {
-		if (instance != null) {
-			if (new Preferences(instance).isSyncOnChange()) {
-				AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
-						.getCurrent(instance);
-				if (provider != null) {
-					provider.synchronize();
-				}
-			}
+    public static void dataChanged() {
+        if (instance != null) {
+            if (new Preferences(instance).isSyncOnChange()) {
+                AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
+                        .getCurrent(instance);
+                if (provider != null) {
+                    provider.synchronize();
+                }
+            }
 
             ReminderService.updateNotification(instance);
-		}
-	}
+        }
+    }
 
-	public static void reinitializeDatabase() {
-		if (instance != null) {
-			ActiveAndroid.dispose();
-			ActiveAndroid.initialize(instance);
-		}
-	}
+    public static Context getContext() {
+        return instance;
+    }
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		instance = this;
+    public static void reinitializeDatabase() {
+        if (instance != null) {
+            DataSQLiteOpenHelper.getInstance(instance).close();
+        }
+    }
 
-		System.setProperty("org.joda.time.DateTimeZone.Provider",
-				"org.joda.time.tz.UTCProvider");
-		AbstractSynchronizationProvider.initialize(this);
-		ActiveAndroid.initialize(this);
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        instance = this;
+
+        System.setProperty("org.joda.time.DateTimeZone.Provider",
+                "org.joda.time.tz.UTCProvider");
+        AbstractSynchronizationProvider.initialize(this);
         ReminderEnablerReceiver.scheduleAlarms(this);
 
-		if (new Preferences(this).isSyncOnStart()) {
-			AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
+        if (new Preferences(this).isSyncOnStart()) {
+            AbstractSynchronizationProvider provider = AbstractSynchronizationProvider
                     .getCurrent(this);
-			if (provider != null) {
-				provider.synchronize();
-			}
-		}
-	}
-
-	@Override
-	public void onTerminate() {
-		super.onTerminate();
-		ActiveAndroid.dispose();
-	}
+            if (provider != null) {
+                provider.synchronize();
+            }
+        }
+    }
 }

@@ -28,12 +28,9 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
-import com.activeandroid.Model;
-
 import java.util.Date;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment.SupportColorPickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
@@ -41,6 +38,9 @@ import me.kuehle.carreport.gui.util.DateTimeInput;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.gui.util.SimpleAnimator;
+import me.kuehle.carreport.provider.car.CarContentValues;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
 
 public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         SupportColorPickerDialogFragmentListener, SupportDatePickerDialogFragmentListener {
@@ -60,7 +60,9 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (Car.getCount() == 1) {
+
+        CarCursor car = new CarSelection().query(getActivity().getContentResolver());
+        if (car.getCount() == 1) {
             menu.removeItem(R.id.menu_delete);
         }
     }
@@ -94,12 +96,13 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     protected void fillFields(Bundle savedInstanceState, View v) {
         if (savedInstanceState == null) {
             if (isInEditMode()) {
-                Car car = (Car) editItem;
+                CarCursor car = new CarSelection().id(mId).query(getActivity().getContentResolver());
+                car.moveToNext();
 
-                edtName.setText(car.name);
-                color = car.color;
-                chkSuspend.setChecked(car.isSuspended());
-                edtSuspendDate.setDate(car.isSuspended() ? car.suspendedSince : new Date());
+                edtName.setText(car.getName());
+                color = car.getColor();
+                chkSuspend.setChecked(car.getSuspendedSince() != null);
+                edtSuspendDate.setDate(car.getSuspendedSince() != null ? car.getSuspendedSince() : new Date());
             } else {
                 color = getResources().getColor(R.color.accent);
                 edtSuspendDate.setDate(new Date());
@@ -118,11 +121,6 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     @Override
     protected int getAlertDeleteMessage() {
         return R.string.alert_delete_car_message;
-    }
-
-    @Override
-    protected Model getEditItem(long id) {
-        return Car.load(Car.class, id);
     }
 
     @Override
@@ -190,18 +188,22 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 
     @Override
     protected void save() {
-        String name = edtName.getText().toString();
-        Date suspended = chkSuspend.isChecked() ? edtSuspendDate.getDate() : null;
+        CarContentValues values = new CarContentValues();
+        values.putName(edtName.getText().toString());
+        values.putColor(color);
+        values.putSuspendedSince(chkSuspend.isChecked() ? edtSuspendDate.getDate() : null);
 
-        if (!isInEditMode()) {
-            new Car(name, color, suspended).save();
+        if (isInEditMode()) {
+            CarSelection where = new CarSelection().id(mId);
+            values.update(getActivity().getContentResolver(), where);
         } else {
-            Car car = (Car) editItem;
-            car.name = name;
-            car.color = color;
-            car.suspendedSince = suspended;
-            car.save();
+            values.insert(getActivity().getContentResolver());
         }
+    }
+
+    @Override
+    protected void delete() {
+        new CarSelection().id(mId).delete(getActivity().getContentResolver());
     }
 
     @Override

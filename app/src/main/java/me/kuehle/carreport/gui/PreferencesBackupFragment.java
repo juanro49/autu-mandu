@@ -186,8 +186,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         addPreferencesFromResource(R.xml.preferences_backup);
         mCurrentSyncProvider = AbstractSynchronizationProvider
                 .getCurrent(getActivity());
-        mBackup = new Backup();
-        mCSVExportImport = new CSVExportImport();
+        mBackup = new Backup(getActivity());
+        mCSVExportImport = new CSVExportImport(getActivity());
 
         // Synchronization
         {

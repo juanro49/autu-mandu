@@ -34,14 +34,12 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.activeandroid.Model;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 
 public class DataFragment extends Fragment implements DataListCallback,
@@ -108,7 +106,7 @@ public class DataFragment extends Fragment implements DataListCallback,
 
         @Override
         public Fragment getItem(int position) {
-            AbstractDataListFragment<? extends Model> fragment;
+            AbstractDataListFragment fragment;
             if (position == 0) {
                 fragment = new DataListRefuelingFragment();
             } else {
@@ -117,7 +115,7 @@ public class DataFragment extends Fragment implements DataListCallback,
 
             Bundle args = new Bundle();
             args.putBoolean(AbstractDataListFragment.EXTRA_ACTIVATE_ON_CLICK, mTwoPane);
-            args.putLong(AbstractDataListFragment.EXTRA_CAR_ID, mCar.id);
+            args.putLong(AbstractDataListFragment.EXTRA_CAR_ID, mCarId);
             if (position == 1) {
                 args.putInt(DataListOtherFragment.EXTRA_OTHER_TYPE,
                         DataListOtherFragment.EXTRA_OTHER_TYPE_EXPENDITURE);
@@ -146,20 +144,18 @@ public class DataFragment extends Fragment implements DataListCallback,
 
     private boolean mTwoPane;
     private TextView mTxtNoEntrySelected;
-    private Car mCar;
+    private long mCarId;
     private DataListBackStackListener mBackStackListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        long carId = getArguments().getLong(EXTRA_CAR_ID, 0);
-        if (carId == 0) {
+        mCarId = getArguments().getLong(EXTRA_CAR_ID, 0);
+        if (mCarId == 0) {
             Preferences prefs = new Preferences(getActivity());
-            carId = prefs.getDefaultCar();
+            mCarId = prefs.getDefaultCar();
         }
-
-        mCar = Car.load(Car.class, carId);
 
         mBackStackListener = new DataListBackStackListener();
         getChildFragmentManager().addOnBackStackChangedListener(mBackStackListener);

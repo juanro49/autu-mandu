@@ -17,7 +17,12 @@
 package me.kuehle.carreport.gui;
 
 import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.ActionMode;
@@ -27,87 +32,57 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.List;
-
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
+import me.kuehle.carreport.provider.car.CarColumns;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
 
 public class PreferencesCarsFragment extends ListFragment implements
-        MessageDialogFragmentListener {
-    private class CarAdapter extends BaseAdapter {
-        private List<Car> mCars;
-
+        MessageDialogFragmentListener, LoaderManager.LoaderCallbacks<Cursor> {
+    private class CarAdapter extends CursorAdapter {
         public CarAdapter() {
-            mCars = Car.getAll();
+            super(getActivity(), null, false);
         }
 
         @Override
-        public int getCount() {
-            return mCars.size();
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = getActivity().getLayoutInflater().inflate(
+                    R.layout.list_item_car, parent, false);
+
+            CarViewHolder holder = new CarViewHolder();
+            holder.name = (TextView) view.findViewById(android.R.id.text1);
+            holder.suspended = (TextView) view.findViewById(android.R.id.text2);
+            holder.color = view.findViewById(android.R.id.custom);
+            view.setTag(holder);
+
+            return view;
         }
 
         @Override
-        public Car getItem(int position) {
-            return mCars.get(position);
-        }
+        public void bindView(View view, Context context, Cursor cursor) {
+            CarCursor car = new CarCursor(cursor);
+            CarViewHolder holder = (CarViewHolder) view.getTag();
 
-        @Override
-        public long getItemId(int position) {
-            return getItem(position).id;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            CarViewHolder holder;
-            if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(
-                        R.layout.list_item_car, parent, false);
-
-                holder = new CarViewHolder();
-                holder.name = (TextView) convertView
-                        .findViewById(android.R.id.text1);
-                holder.suspended = (TextView) convertView
-                        .findViewById(android.R.id.text2);
-                holder.color = convertView.findViewById(android.R.id.custom);
-
-                convertView.setTag(holder);
-            } else {
-                holder = (CarViewHolder) convertView
-                        .getTag();
-            }
-
-            holder.name.setText(mCars.get(position).name);
-            if (mCars.get(position).isSuspended()) {
+            holder.name.setText(car.getName());
+            if (car.getSuspendedSince() != null) {
                 holder.suspended.setText(getString(
                         R.string.suspended_since,
                         android.text.format.DateFormat.getDateFormat(
                                 getActivity()).format(
-                                mCars.get(position).suspendedSince)));
+                                car.getSuspendedSince())));
                 holder.suspended.setVisibility(View.VISIBLE);
             } else {
                 holder.suspended.setVisibility(View.GONE);
             }
 
-            holder.color.getBackground().setColorFilter(mCars.get(position).color,
-                    PorterDuff.Mode.SRC);
-            return convertView;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return true;
-        }
-
-        public void update() {
-            mCars = Car.getAll();
-            notifyDataSetChanged();
+            holder.color.getBackground().setColorFilter(car.getColor(), PorterDuff.Mode.SRC);
         }
     }
 
@@ -192,6 +167,8 @@ public class PreferencesCarsFragment extends ListFragment implements
         getListView().setMultiChoiceModeListener(mMultiChoiceModeListener);
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         setListAdapter(mCarAdapter);
+
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -219,13 +196,13 @@ public class PreferencesCarsFragment extends ListFragment implements
         if (requestCode == DELETE_REQUEST_CODE) {
             long[] checkedIds = getListView().getCheckedItemIds();
             for (long id : checkedIds) {
-                Car.delete(Car.class, id);
+                new CarSelection().id(id).delete(getActivity().getContentResolver());
             }
 
             Application.dataChanged();
 
             mMultiChoiceModeListener.finishActionMode();
-            mCarAdapter.update();
+            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 
@@ -245,7 +222,7 @@ public class PreferencesCarsFragment extends ListFragment implements
         super.onResume();
         if (mCarEditInProgress) {
             mCarEditInProgress = false;
-            mCarAdapter.update();
+            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 
@@ -253,6 +230,23 @@ public class PreferencesCarsFragment extends ListFragment implements
     public void onStop() {
         super.onStop();
         mMultiChoiceModeListener.finishActionMode();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        CarSelection sel = new CarSelection();
+        return new CursorLoader(getActivity(), sel.uri(), CarColumns.ALL_COLUMNS, sel.sel(),
+                sel.args(), CarColumns.NAME + " COLLATE UNICODE");
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mCarAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mCarAdapter.swapCursor(null);
     }
 
     private void openCarDetailFragment(long id) {

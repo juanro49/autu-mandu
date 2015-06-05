@@ -23,9 +23,11 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
 
 public class DistanceToVolumeCalculation extends AbstractCalculation {
     public DistanceToVolumeCalculation(Context context) {
@@ -34,63 +36,63 @@ public class DistanceToVolumeCalculation extends AbstractCalculation {
 
     @Override
     public String getName() {
-        return context.getString(R.string.calc_option_distance_to_volume,
+        return mContext.getString(R.string.calc_option_distance_to_volume,
                 getInputUnit(), getOutputUnit());
     }
 
     @Override
     public String getInputUnit() {
-        Preferences prefs = new Preferences(context);
+        Preferences prefs = new Preferences(mContext);
         return prefs.getUnitDistance();
     }
 
     @Override
     public String getOutputUnit() {
-        Preferences prefs = new Preferences(context);
+        Preferences prefs = new Preferences(mContext);
         return prefs.getUnitVolume();
     }
 
     @Override
     public CalculationItem[] calculate(double input) {
         List<CalculationItem> items = new ArrayList<>();
-        for (Car car : Car.getAll()) {
-            List<String> categories = car.getUsedFuelTypeCategories();
-            for (String category : categories) {
-                RefuelingBalancer balancer = new RefuelingBalancer(context);
-                List<Refueling> refuelings = balancer.getBalancedRefuelings(car, category);
 
+        CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        while (car.moveToNext()) {
+            String[] categories = CarQueries.getUsedFuelTypeCategories(mContext, car.getId());
+            for (String category : categories) {
+                RefuelingBalancer balancer = new RefuelingBalancer(mContext);
+                BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
+
+                int lastMileage = 0;
                 int totalDistance = 0, distance = 0;
                 float totalVolume = 0, volume = 0;
-                int lastFullRefueling = -1;
-                for (int i = 0; i < refuelings.size(); i++) {
-                    Refueling refueling = refuelings.get(i);
-                    if (lastFullRefueling < 0) {
-                        if (!refueling.partial) {
-                            lastFullRefueling = i;
+                boolean foundFullRefueling = false;
+
+                while(refueling.moveToNext()) {
+                    if (!foundFullRefueling) {
+                        if (!refueling.getPartial()) {
+                            foundFullRefueling = true;
                         }
+                    } else {
+                        distance += refueling.getMileage() - lastMileage;
+                        volume += refueling.getVolume();
 
-                        continue;
+                        if (!refueling.getPartial()) {
+                            totalDistance += distance;
+                            totalVolume += volume;
+
+                            distance = 0;
+                            volume = 0;
+                        }
                     }
 
-                    distance += refueling.mileage
-                            - refuelings.get(i - 1).mileage;
-                    volume += refueling.volume;
-
-                    if (!refueling.partial) {
-                        totalDistance += distance;
-                        totalVolume += volume;
-
-                        distance = 0;
-                        volume = 0;
-
-                        lastFullRefueling = i;
-                    }
+                    lastMileage = refueling.getMileage();
                 }
 
                 if (totalDistance > 0 && totalVolume > 0) {
                     double avgConsumption = totalVolume / totalDistance;
-                    items.add(new CalculationItem(String.format("%s (%s)",
-                            car.name, category), input * avgConsumption));
+                    items.add(new CalculationItem(String.format("%s (%s)", car.getName(), category),
+                            input * avgConsumption));
                 }
             }
         }

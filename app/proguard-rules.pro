@@ -9,8 +9,6 @@
 
 # Database
 -keepattributes *Annotation*
--keep class com.activeandroid.** { *; }
--keep class me.kuehle.carreport.db.** { *; }
 -keep class me.kuehle.carreport.util.backup.DropboxSynchronizationProvider
 -keep class me.kuehle.carreport.util.backup.GoogleDriveSynchronizationProvider
 

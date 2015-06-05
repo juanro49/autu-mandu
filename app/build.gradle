@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    // Active Android: for database, ChartLib: for charts
+    // ChartLib: for charts
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // Dropbox
     compile fileTree(dir: 'libs/dropbox', include: ['*.jar'])

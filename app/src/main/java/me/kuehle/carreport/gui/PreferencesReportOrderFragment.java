@@ -16,11 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.util.List;
-
-import me.kuehle.carreport.Preferences;
-import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.report.AbstractReport;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +25,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.mobeta.android.dslv.DragSortListView;
+
+import java.util.List;
+
+import me.kuehle.carreport.Preferences;
+import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.report.AbstractReport;
 
 public class PreferencesReportOrderFragment extends ListFragment {
 	private class ReportDropListener implements DragSortListView.DropListener {

@@ -34,10 +34,11 @@ import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.serializer.TimeSpanSerializer;
+import me.kuehle.carreport.provider.car.CarColumns;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
+import me.kuehle.carreport.provider.reminder.TimeSpanUnit;
 import me.kuehle.carreport.util.TimeSpan;
-import me.kuehle.carreport.util.TimeSpanUnit;
 
 public class PreferencesGeneralFragment extends PreferenceFragment {
     private class PreferenceChangeListener implements OnPreferenceChangeListener {
@@ -46,18 +47,19 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
             FuelConsumption fuelConsumption = new FuelConsumption(getActivity());
             String prefKey = preference.getKey();
             if (prefKey.equals("behavior_car")) {
-                Car car = Car.load(Car.class, Long.parseLong(newValue.toString()));
-                preference.setSummary(car.name);
+                CarCursor car = new CarSelection().id(Long.parseLong(newValue.toString())).query(getActivity().getContentResolver(), CarColumns.ALL_COLUMNS);
+                car.moveToFirst();
+                preference.setSummary(car.getName());
             } else if (prefKey.equals("behavior_distance_entry_mode")) {
                 DistanceEntryMode mode = DistanceEntryMode.valueOf(newValue.toString());
                 preference.setSummary(getString(mode.nameResourceId));
             } else if (prefKey.equals("behavior_reminder_snooze_duration")) {
-                TimeSpan timeSpan = new TimeSpanSerializer().deserialize(newValue);
-                preference.setSummary(timeSpan.toString(getActivity()));
+                TimeSpan timeSpan = TimeSpan.fromString(newValue.toString(), null);
+                preference.setSummary(timeSpan.toLocalizedString(getActivity()));
             } else if (preference instanceof EditTextPreference) {
                 preference.setSummary(newValue.toString());
 
-                // Update fuel consumption label
+                // Update fuel consumption mLabel
                 if (prefKey.equals("unit_distance")) {
                     fuelConsumption.setUnitDistance(newValue.toString());
                 } else if (prefKey.equals("unit_volume")) {
@@ -109,20 +111,25 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
 
         // Behavior default car
         {
-            List<Car> cars = Car.getAll();
-            String[] defaultEntries = new String[cars.size()];
-            String[] defaultEntryValues = new String[cars.size()];
-            for (int i = 0; i < cars.size(); i++) {
-                defaultEntries[i] = cars.get(i).name;
-                defaultEntryValues[i] = String.valueOf(cars.get(i).id);
+            ListPreference defaultCar = (ListPreference) findPreference("behavior_default_car");
+            long defaultCarId = prefs.getDefaultCar();
+
+            CarCursor car = new CarSelection().query(getActivity().getContentResolver(), CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
+            String[] defaultEntries = new String[car.getCount()];
+            String[] defaultEntryValues = new String[car.getCount()];
+            for (int i = 0; i < car.getCount(); i++) {
+                car.moveToPosition(i);
+                defaultEntries[i] = car.getName();
+                defaultEntryValues[i] = String.valueOf(car.getId());
+
+                if (car.getId() == defaultCarId) {
+                    defaultCar.setSummary(car.getName());
+                }
             }
 
-            ListPreference defaultCar = (ListPreference) findPreference("behavior_default_car");
             defaultCar.setEntries(defaultEntries);
             defaultCar.setEntryValues(defaultEntryValues);
             defaultCar.setOnPreferenceChangeListener(onPreferenceChangeListener);
-            Car car = Car.load(Car.class, prefs.getDefaultCar());
-            defaultCar.setSummary(car.name);
         }
 
         // Behavior distance entry mode
@@ -154,19 +161,18 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
                     new TimeSpan(TimeSpanUnit.MONTH, 3),
                     new TimeSpan(TimeSpanUnit.MONTH, 6)
             };
-            TimeSpanSerializer timeSpanSerializer = new TimeSpanSerializer();
             String[] entries = new String[availableTimeSpans.length];
             String[] entryValues = new String[availableTimeSpans.length];
             for (int i = 0; i < availableTimeSpans.length; i++) {
-                entries[i] = availableTimeSpans[i].toString(getActivity());
-                entryValues[i] = timeSpanSerializer.serialize(availableTimeSpans[i]);
+                entries[i] = availableTimeSpans[i].toLocalizedString(getActivity());
+                entryValues[i] = availableTimeSpans[i].toString();
             }
 
             ListPreference snoozeDuration = (ListPreference) findPreference("behavior_reminder_snooze_duration");
             snoozeDuration.setEntries(entries);
             snoozeDuration.setEntryValues(entryValues);
             snoozeDuration.setOnPreferenceChangeListener(onPreferenceChangeListener);
-            snoozeDuration.setSummary(prefs.getReminderSnoozeDuration().toString(getActivity()));
+            snoozeDuration.setSummary(prefs.getReminderSnoozeDuration().toLocalizedString(getActivity()));
         }
 
         // Unit Currency

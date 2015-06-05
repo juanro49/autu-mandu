@@ -17,39 +17,44 @@
 package me.kuehle.carreport.gui;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 
-import java.util.Collections;
-import java.util.List;
-
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.OtherCost;
-import me.kuehle.carreport.util.RecurrenceInterval;
+import me.kuehle.carreport.provider.othercost.OtherCostColumns;
+import me.kuehle.carreport.provider.othercost.OtherCostCursor;
+import me.kuehle.carreport.provider.othercost.OtherCostSelection;
+import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
+import me.kuehle.carreport.util.Recurrences;
 
-public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
-    public static class OtherCostLoader extends AsyncTaskLoader<List<OtherCost>> {
-        private Car mCar;
+public class DataListOtherFragment extends AbstractDataListFragment {
+    public static class OtherCostLoader extends CursorLoader {
+        private Context mContext;
+        private long mCarId;
         private boolean mIsExpenditure;
 
-        public OtherCostLoader(Context context, Car car, boolean isExpenditure) {
+        public OtherCostLoader(Context context, long carId, boolean isExpenditure) {
             super(context);
-            mCar = car;
+            mContext = context;
+            mCarId = carId;
             mIsExpenditure = isExpenditure;
         }
 
         @Override
-        public List<OtherCost> loadInBackground() {
-            List<OtherCost> otherCosts = mIsExpenditure ?
-                    mCar.getOtherExpenditures() :
-                    mCar.getOtherIncomes();
-            Collections.reverse(otherCosts);
-            return otherCosts;
+        public Cursor loadInBackground() {
+            OtherCostSelection where = new OtherCostSelection().carId(mCarId);
+            if (mIsExpenditure) {
+                where.and().priceGt(0);
+            } else {
+                where.and().priceLt(0);
+            }
+
+            return where.query(mContext.getContentResolver(), null, OtherCostColumns.DATE + " DESC");
         }
 
 
@@ -83,8 +88,8 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
     }
 
     @Override
-    public Loader<List<OtherCost>> onCreateLoader(int id, Bundle args) {
-        return new OtherCostLoader(getActivity(), mCar, mIsExpenditure);
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new OtherCostLoader(getActivity(), mCarId, mIsExpenditure);
     }
 
     @Override
@@ -102,29 +107,31 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
     }
 
     @Override
-    protected SparseArray<String> getItemData(List<OtherCost> otherCosts, int position) {
-        OtherCost other = otherCosts.get(position);
+    protected SparseArray<String> getItemData(Cursor cursor) {
+        OtherCostCursor otherCost = (OtherCostCursor) cursor;
 
         SparseArray<String> data = new SparseArray<>(7);
-        data.put(R.id.title, other.title);
-        data.put(R.id.date, mDateFormat.format(other.date));
-        if (other.mileage > -1) {
-            data.put(R.id.data1, String.format("%d %s", other.mileage, mUnitDistance));
+        data.put(R.id.title, otherCost.getTitle());
+        data.put(R.id.date, mDateFormat.format(otherCost.getDate()));
+        if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
+            data.put(R.id.data1, String.format("%d %s", otherCost.getMileage(), mUnitDistance));
         }
 
-        float price = mIsExpenditure ? other.price : -other.price;
+        float price = mIsExpenditure ? otherCost.getPrice() : -otherCost.getPrice();
         data.put(R.id.data2, String.format("%.2f %s", price, mUnitCurrency));
 
-        data.put(R.id.data3, mRepeatIntervals[other.recurrence.getInterval().getValue()]);
-        if (!other.recurrence.getInterval().equals(RecurrenceInterval.ONCE)) {
+        data.put(R.id.data3, mRepeatIntervals[otherCost.getRecurrenceInterval().ordinal()]);
+        if (!otherCost.getRecurrenceInterval().equals(RecurrenceInterval.ONCE)) {
             int recurrences;
-            if (other.endDate == null) {
-                recurrences = other.recurrence.getRecurrencesSince(other.date);
+            if (otherCost.getEndDate() == null) {
+                recurrences = Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(),
+                        otherCost.getRecurrenceMultiplier(), otherCost.getDate());
             } else {
-                recurrences = other.recurrence.getRecurrencesBetween(other.date, other.endDate);
+                recurrences = Recurrences.getRecurrencesBetween(otherCost.getRecurrenceInterval(),
+                        otherCost.getRecurrenceMultiplier(), otherCost.getDate(), otherCost.getEndDate());
             }
 
-            data.put(R.id.data2_calculated, String.format("%.2f %s", other.price * recurrences,
+            data.put(R.id.data2_calculated, String.format("%.2f %s", otherCost.getPrice() * recurrences,
                     mUnitCurrency));
             data.put(R.id.data3_calculated, String.format("x%d", recurrences));
         }
@@ -133,12 +140,17 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
     }
 
     @Override
-    protected boolean isMissingData(List<OtherCost> otherCosts, int position) {
+    protected boolean isMissingData(Cursor cursor) {
         return false;
     }
 
     @Override
-    protected boolean isInvalidData(List<OtherCost> otherCosts, int position) {
+    protected boolean isInvalidData(Cursor cursor) {
         return false;
+    }
+
+    @Override
+    protected void deleteItem(long id) {
+        new OtherCostSelection().id(id).delete(getActivity().getContentResolver());
     }
 }

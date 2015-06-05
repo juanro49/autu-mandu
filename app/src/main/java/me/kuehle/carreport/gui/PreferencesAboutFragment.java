@@ -16,10 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import me.kuehle.carreport.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -35,70 +31,75 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import me.kuehle.carreport.R;
+
 public class PreferencesAboutFragment extends Fragment {
-	public static class LicenseDialogFragment extends DialogFragment {
+    public static class LicenseDialogFragment extends DialogFragment {
         private static final String TAG = "LicenseDialogFragment";
 
-		public static LicenseDialogFragment newInstance() {
-			return new LicenseDialogFragment();
-		}
+        public static LicenseDialogFragment newInstance() {
+            return new LicenseDialogFragment();
+        }
 
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
             ScrollView v = new ScrollView(getActivity());
             v.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
             v.setPadding(16, 16, 16, 16);
 
-			TextView text = new TextView(getActivity());
-			text.setMovementMethod(LinkMovementMethod.getInstance());
-			try {
-				InputStream in = getActivity().getAssets().open("licenses.html");
-				byte[] buffer = new byte[in.available()];
+            TextView text = new TextView(getActivity());
+            text.setMovementMethod(LinkMovementMethod.getInstance());
+            try {
+                InputStream in = getActivity().getAssets().open("licenses.html");
+                byte[] buffer = new byte[in.available()];
                 in.read(buffer);
-				in.close();
-				text.setText(Html.fromHtml(new String(buffer)));
-			} catch (IOException e) {
+                in.close();
+                text.setText(Html.fromHtml(new String(buffer)));
+            } catch (IOException e) {
                 Log.e(TAG, "Error loading license html file.", e);
-			}
+            }
 
             v.addView(text, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
 
-			return new AlertDialog.Builder(getActivity())
-					.setTitle(R.string.alert_about_licenses_title)
-					.setView(v)
-					.setPositiveButton(android.R.string.ok, null)
+            return new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.alert_about_licenses_title)
+                    .setView(v)
+                    .setPositiveButton(android.R.string.ok, null)
                     .create();
-		}
-	}
+        }
+    }
 
-	private View.OnClickListener licensesOnClickListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			LicenseDialogFragment.newInstance().show(getFragmentManager(), null);
-		}
-	};
+    private View.OnClickListener licensesOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            LicenseDialogFragment.newInstance().show(getFragmentManager(), null);
+        }
+    };
 
-	public String getVersion() {
-		try {
-			return getActivity().getPackageManager()
+    public String getVersion() {
+        try {
+            return getActivity().getPackageManager()
                     .getPackageInfo(getActivity().getPackageName(), 0)
                     .versionName;
-		} catch (NameNotFoundException e) {
-			return "";
-		}
-	}
+        } catch (NameNotFoundException e) {
+            return "";
+        }
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View root = inflater.inflate(R.layout.fragment_prefs_about, container, false);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_prefs_about, container, false);
 
-		String strVersion = getString(R.string.about_version, getVersion());
-		((TextView) root.findViewById(R.id.txt_version)).setText(strVersion);
-		root.findViewById(R.id.btn_licenses).setOnClickListener(licensesOnClickListener);
+        String strVersion = getString(R.string.about_version, getVersion());
+        ((TextView) root.findViewById(R.id.txt_version)).setText(strVersion);
+        root.findViewById(R.id.btn_licenses).setOnClickListener(licensesOnClickListener);
 
-		return root;
-	}
+        return root;
+    }
 }

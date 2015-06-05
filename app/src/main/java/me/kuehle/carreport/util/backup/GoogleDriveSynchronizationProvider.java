@@ -25,7 +25,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.activeandroid.Cache;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -59,7 +58,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
@@ -67,6 +65,7 @@ import me.kuehle.carreport.Application;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.ProgressDialogFragment;
+import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
 
 public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationProvider implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -175,7 +174,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
 
                         // Check with REST
                         try {
-                            File localFile = new File(Cache.openDatabase().getPath());
+                            File localFile = new File(DataSQLiteOpenHelper.getInstance(mContext).getReadableDatabase().getPath());
                             FileList files = mGoogleApiServiceDrive.files()
                                     .list()
                                     .setQ(String.format("title = '%s'", localFile.getName()))
@@ -259,7 +258,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
 
     private boolean doSynchronizationREST(int option) {
         Preferences prefs = new Preferences(mContext);
-        File localFile = new File(Cache.openDatabase().getPath());
+        File localFile = new File(DataSQLiteOpenHelper.getInstance(mContext).getReadableDatabase().getPath());
         Date localModifiedDate = prefs.getGoogleDriveLocalModifiedDate();
 
         // Get id and modification date of the remote file.
@@ -366,7 +365,7 @@ public class GoogleDriveSynchronizationProvider extends AbstractSynchronizationP
 
     private boolean doSynchronizationGDAA(int option) {
         Preferences prefs = new Preferences(mContext);
-        File localFile = new File(Cache.openDatabase().getPath());
+        File localFile = new File(DataSQLiteOpenHelper.getInstance(mContext).getReadableDatabase().getPath());
         Date localModifiedDate = prefs.getGoogleDriveLocalModifiedDate();
         DriveFolder remoteFolder = Drive.DriveApi.getAppFolder(mGoogleApiClient);
 

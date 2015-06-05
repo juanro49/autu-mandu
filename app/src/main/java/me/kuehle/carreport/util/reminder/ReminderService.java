@@ -26,15 +26,21 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Reminder;
+import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.data.query.ReminderQueries;
 import me.kuehle.carreport.gui.MainActivity;
 import me.kuehle.carreport.gui.PreferencesActivity;
 import me.kuehle.carreport.gui.PreferencesRemindersFragment;
+import me.kuehle.carreport.provider.reminder.ReminderColumns;
+import me.kuehle.carreport.provider.reminder.ReminderContentValues;
+import me.kuehle.carreport.provider.reminder.ReminderCursor;
+import me.kuehle.carreport.provider.reminder.ReminderSelection;
 
 public class ReminderService extends IntentService {
     public static final String ACTION_UPDATE_NOTIFICATION = "me.kuehle.carreport.util.reminder.ReminderService.UPDATE_NOTIFICATION";
@@ -71,20 +77,7 @@ public class ReminderService extends IntentService {
         }
     }
 
-    public static PendingIntent getPendingIntent(Context context, String action) {
-        return getPendingIntent(context, action, null);
-    }
-
-    public static PendingIntent getPendingIntent(Context context, String action,
-                                                 List<Reminder> reminders) {
-        long[] reminderIds = null;
-        if (reminders != null) {
-            reminderIds = new long[reminders.size()];
-            for (int i = 0; i < reminders.size(); i++) {
-                reminderIds[i] = reminders.get(i).id;
-            }
-        }
-
+    public static PendingIntent getPendingIntent(Context context, String action, long... reminderIds) {
         Intent intent = new Intent(context, ReminderService.class);
         intent.setAction(action);
         intent.putExtra(ReminderService.EXTRA_REMINDER_IDS, reminderIds);
@@ -95,9 +88,32 @@ public class ReminderService extends IntentService {
         NotificationManager notificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
-        List<Reminder> dueReminders = Reminder.getAllDue(false);
-        if (dueReminders.size() > 0) {
-            notificationManager.notify(NOTIFICATION_ID, buildNotification(context, dueReminders));
+        List<Long> dueReminderIds = new ArrayList<>();
+        ReminderCursor reminder = new ReminderSelection().query(context.getContentResolver(), ReminderColumns.ALL_COLUMNS);
+        ReminderQueries queries = new ReminderQueries(context, reminder);
+        while (reminder.moveToNext()) {
+            // Filter dismissed notifications
+            if (reminder.getNotificationDismissed()) {
+                continue;
+            }
+
+            // Filter snoozed notifications
+            if (queries.isSnoozed()) {
+                continue;
+            }
+
+            if (queries.isDue()) {
+                dueReminderIds.add(reminder.getId());
+            }
+        }
+
+        long[] ids = new long[dueReminderIds.size()];
+        for (int i = 0; i < dueReminderIds.size(); i++) {
+            ids[i] = dueReminderIds.get(i);
+        }
+
+        if (dueReminderIds.size() > 0) {
+            notificationManager.notify(NOTIFICATION_ID, buildNotification(context, ids));
         } else {
             notificationManager.cancel(NOTIFICATION_ID);
         }
@@ -106,13 +122,14 @@ public class ReminderService extends IntentService {
     public static void markRemindersDone(Context context, long... reminderIds) {
         Date now = new Date();
 
-        for (long id : reminderIds) {
-            Reminder reminder = Reminder.load(Reminder.class, id);
-            reminder.startDate = now;
-            reminder.startMileage = reminder.car.getLatestMileage();
-            reminder.snoozedUntil = null;
-            reminder.notificationDismissed = false;
-            reminder.save();
+        ReminderCursor reminder = new ReminderSelection().id(reminderIds).query(context.getContentResolver());
+        while (reminder.moveToNext()) {
+            ReminderContentValues values = new ReminderContentValues();
+            values.putStartDate(now);
+            values.putStartMileage(CarQueries.getLatestMileage(context, reminder.getCarId()));
+            values.putSnoozedUntilNull();
+            values.putNotificationDismissed(false);
+            values.update(context.getContentResolver(), new ReminderSelection().id(reminder.getId()));
         }
 
         updateNotification(context);
@@ -120,9 +137,9 @@ public class ReminderService extends IntentService {
 
     public static void dismissReminders(Context context, long... reminderIds) {
         for (long id : reminderIds) {
-            Reminder reminder = Reminder.load(Reminder.class, id);
-            reminder.notificationDismissed = true;
-            reminder.save();
+            ReminderContentValues values = new ReminderContentValues();
+            values.putNotificationDismissed(true);
+            values.update(context.getContentResolver(), new ReminderSelection().id(id));
         }
 
         updateNotification(context);
@@ -135,15 +152,17 @@ public class ReminderService extends IntentService {
         Date snoozedUntil = prefs.getReminderSnoozeDuration().addTo(now);
 
         for (long id : reminderIds) {
-            Reminder reminder = Reminder.load(Reminder.class, id);
-            reminder.snoozedUntil = snoozedUntil;
-            reminder.save();
+            ReminderContentValues values = new ReminderContentValues();
+            values.putSnoozedUntil(snoozedUntil);
+            values.update(context.getContentResolver(), new ReminderSelection().id(id));
         }
 
         updateNotification(context);
     }
 
-    private static Notification buildNotification(Context context, List<Reminder> reminders) {
+    private static Notification buildNotification(Context context, long... reminderIds) {
+        ReminderCursor reminder = new ReminderSelection().id(reminderIds).query(context.getContentResolver());
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
@@ -164,43 +183,43 @@ public class ReminderService extends IntentService {
         builder.setContentIntent(pendingContentIntent);
 
         // Dismiss intent
-        builder.setDeleteIntent(getPendingIntent(context, ACTION_DISMISS_REMINDERS, reminders));
+        builder.setDeleteIntent(getPendingIntent(context, ACTION_DISMISS_REMINDERS, reminderIds));
 
         // Specific layouts for one and many reminders
-        if (reminders.size() == 1) {
-            Reminder reminder = reminders.get(0);
+        if (reminder.getCount() == 1) {
+            reminder.moveToNext();
 
             builder
                     .setContentTitle(context.getString(R.string.notification_reminder_title_single,
-                            reminder.title))
-                    .setContentText(reminder.car.name)
+                            reminder.getTitle()))
+                    .setContentText(reminder.getCarName())
                     .addAction(R.drawable.ic_check,
                             context.getString(R.string.notification_reminder_action_done),
-                            getPendingIntent(context, ACTION_MARK_REMINDERS_DONE, reminders))
+                            getPendingIntent(context, ACTION_MARK_REMINDERS_DONE, reminderIds))
                     .addAction(R.drawable.ic_snooze,
                             context.getString(R.string.notification_reminder_action_snooze),
-                            getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminders));
+                            getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds));
         } else {
             NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
             inboxStyle.setBigContentTitle(context.getString(
                     R.string.notification_reminder_title_multiple));
 
-            String[] reminderTitles = new String[reminders.size()];
-            for (int i = 0; i < reminders.size(); i++) {
-                reminderTitles[i] = reminders.get(i).title;
-                inboxStyle.addLine(String.format("%s (%s)", reminders.get(i).title,
-                        reminders.get(i).car.name));
+            List<String> reminderTitles = new ArrayList<>(reminder.getCount());
+            while (reminder.moveToNext()) {
+                reminderTitles.add(reminder.getTitle());
+                inboxStyle.addLine(String.format("%s (%s)", reminder.getTitle(),
+                        reminder.getCarName()));
             }
 
             builder
                     .setContentTitle(context.getString(
                             R.string.notification_reminder_title_multiple))
                     .setContentText(TextUtils.join(", ", reminderTitles))
-                    .setNumber(reminders.size())
+                    .setNumber(reminder.getCount())
                     .setStyle(inboxStyle)
                     .addAction(R.drawable.ic_snooze,
                             context.getString(R.string.notification_reminder_action_snooze_all),
-                            getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminders));
+                            getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds));
         }
 
         return builder.build();

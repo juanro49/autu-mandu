@@ -17,12 +17,14 @@
 package me.kuehle.carreport.gui;
 
 import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.util.SparseArray;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,24 +32,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.activeandroid.Model;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
 
-public abstract class AbstractDataListFragment<T extends Model> extends
+public abstract class AbstractDataListFragment extends
         ListFragment implements SupportMessageDialogFragmentListener,
-        DataListListener, LoaderManager.LoaderCallbacks<List<T>> {
+        DataListListener, LoaderManager.LoaderCallbacks<Cursor> {
     public static final String EXTRA_ACTIVATE_ON_CLICK = "activate_on_click";
     public static final boolean EXTRA_ACTIVATE_ON_CLICK_DEFAULT = false;
     public static final String EXTRA_CAR_ID = "car_id";
@@ -55,7 +50,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     private static final String STATE_CURRENT_ITEM = "current_item";
     private static final int REQUEST_DELETE = 0;
 
-    protected Car mCar;
+    protected long mCarId;
 
     private DataListAdapter mListAdapter;
     private int mCurrentItem = ListView.INVALID_POSITION;
@@ -70,7 +65,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
         setEmptyText(getString(R.string.edit_message_no_entries_available));
 
-        mListAdapter = new DataListAdapter();
+        mListAdapter = new DataListAdapter(getActivity(), null);
         setListAdapter(mListAdapter);
         setListShown(false);
 
@@ -110,10 +105,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
         mActivateOnClick = args.getBoolean(EXTRA_ACTIVATE_ON_CLICK,
                 EXTRA_ACTIVATE_ON_CLICK_DEFAULT);
 
-        long carId = args.getLong(EXTRA_CAR_ID);
-        if (carId != 0) {
-            mCar = Car.load(Car.class, carId);
-        }
+        mCarId = args.getLong(EXTRA_CAR_ID);
     }
 
     @Override
@@ -123,11 +115,9 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     @Override
     public void onDialogPositiveClick(int requestCode) {
         if (requestCode == REQUEST_DELETE) {
-            SparseBooleanArray selected = getListView().getCheckedItemPositions();
-            for (int i = 0; i < mListAdapter.getCount(); i++) {
-                if (selected.get(i)) {
-                    mListAdapter.getItem(i).delete();
-                }
+            long[] ids = getListView().getCheckedItemIds();
+            for (long id : ids) {
+                deleteItem(id);
             }
 
             Application.dataChanged();
@@ -162,8 +152,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     }
 
     @Override
-    public void onLoadFinished(Loader<List<T>> loader, List<T> data) {
-        mListAdapter.setItems(data);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mListAdapter.swapCursor(cursor);
 
         if (isResumed()) {
             setListShown(true);
@@ -173,8 +163,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     }
 
     @Override
-    public void onLoaderReset(Loader<List<T>> loader) {
-        mListAdapter.setItems(null);
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mListAdapter.swapCursor(null);
     }
 
     @Override
@@ -190,7 +180,7 @@ public abstract class AbstractDataListFragment<T extends Model> extends
     public void updateData() {
         setCurrentPosition(ListView.INVALID_POSITION);
 
-        getLoaderManager().restartLoader(0, null, this);
+        getLoaderManager().getLoader(0).forceLoad();
     }
 
     private void setCurrentPosition(int position) {
@@ -212,62 +202,43 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
     protected abstract int getExtraEdit();
 
-    protected abstract SparseArray<String> getItemData(List<T> items, int position);
+    protected abstract SparseArray<String> getItemData(Cursor cursor);
 
-    protected abstract boolean isMissingData(List<T> items, int position);
+    protected abstract boolean isMissingData(Cursor cursor);
 
-    protected abstract boolean isInvalidData(List<T> items, int position);
+    protected abstract boolean isInvalidData(Cursor cursor);
 
-    private class DataListAdapter extends BaseAdapter {
+    protected abstract void deleteItem(long id);
+
+    private class DataListAdapter extends CursorAdapter {
         private final int[] fields = {R.id.title, R.id.subtitle, R.id.date,
                 R.id.data1, R.id.data1_calculated, R.id.data2,
                 R.id.data2_calculated, R.id.data3, R.id.data3_calculated};
-        private List<T> mItems = new ArrayList<>();
 
-        @Override
-        public int getCount() {
-            return mItems.size();
+        public DataListAdapter(Context context, Cursor c) {
+            super(context, c, false);
         }
 
         @Override
-        public T getItem(int position) {
-            return mItems.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return getItem(position).id;
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            if (isMissingData(mItems, position)) {
-                return 0;
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            if (getItemViewType(cursor) == 0) {
+                return getActivity().getLayoutInflater().inflate(
+                        R.layout.list_item_data_missing, parent, false);
             } else {
-                return 1;
+                return getActivity().getLayoutInflater().inflate(
+                        R.layout.list_item_data, parent, false);
             }
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (getItemViewType(position) == 0) {
-                if (convertView == null) {
-                    convertView = getActivity().getLayoutInflater().inflate(
-                            R.layout.list_item_data_missing, parent, false);
-                }
-
-                SparseArray<String> item = getItemData(mItems, position);
-                TextView textView = (TextView) convertView.findViewById(R.id.title);
+        public void bindView(View view, Context context, Cursor cursor) {
+            SparseArray<String> item = getItemData(cursor);
+            if (getItemViewType(cursor) == 0) {
+                TextView textView = (TextView) view.findViewById(R.id.title);
                 textView.setText(item.get(R.id.title));
             } else {
-                if (convertView == null) {
-                    convertView = getActivity().getLayoutInflater().inflate(
-                            R.layout.list_item_data, parent, false);
-                }
-
-                SparseArray<String> item = getItemData(mItems, position);
                 for (int field : fields) {
-                    TextView textView = (TextView) convertView.findViewById(field);
+                    TextView textView = (TextView) view.findViewById(field);
                     String value = item.get(field);
                     if (value != null) {
                         textView.setText(value);
@@ -279,15 +250,27 @@ public abstract class AbstractDataListFragment<T extends Model> extends
                     }
                 }
 
-                View invalidDataView = convertView.findViewById(R.id.data_invalid);
-                if (isInvalidData(mItems, position)) {
+                View invalidDataView = view.findViewById(R.id.data_invalid);
+                if (isInvalidData(cursor)) {
                     invalidDataView.setVisibility(View.VISIBLE);
                 } else {
                     invalidDataView.setVisibility(View.GONE);
                 }
             }
+        }
 
-            return convertView;
+        @Override
+        public int getItemViewType(int position) {
+            Cursor cursor = (Cursor) getItem(position);
+            return getItemViewType(cursor);
+        }
+
+        public int getItemViewType(Cursor cursor) {
+            if (cursor != null) {
+                return isMissingData(cursor) ? 0 : 1;
+            } else {
+                return 0;
+            }
         }
 
         @Override
@@ -297,17 +280,8 @@ public abstract class AbstractDataListFragment<T extends Model> extends
 
         @Override
         public boolean isEnabled(int position) {
-            return !isMissingData(mItems, position);
-        }
-
-        public void setItems(List<T> items) {
-            if (items == null) {
-                mItems = new ArrayList<>();
-                notifyDataSetInvalidated();
-            } else {
-                mItems = items;
-                notifyDataSetChanged();
-            }
+            Cursor cursor = (Cursor) getItem(position);
+            return cursor == null || !isMissingData(cursor);
         }
     }
 

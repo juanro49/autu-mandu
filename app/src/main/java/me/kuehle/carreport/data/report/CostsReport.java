@@ -26,15 +26,16 @@ import org.joda.time.Seconds;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.OtherCost;
-import me.kuehle.carreport.db.Refueling;
-import me.kuehle.carreport.util.Recurrence;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
+import me.kuehle.carreport.provider.othercost.OtherCostCursor;
+import me.kuehle.carreport.provider.othercost.OtherCostSelection;
+import me.kuehle.carreport.util.Recurrences;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.chart.Chart;
 import me.kuehle.chartlib.data.Dataset;
@@ -45,15 +46,15 @@ import me.kuehle.chartlib.renderer.RendererList;
 
 public class CostsReport extends AbstractReport {
     private class ReportGraphData extends AbstractReportGraphData {
-        private int option;
+        private int mOption;
 
-        public ReportGraphData(Context context, Car car, int option) {
-            super(context, car.name, car.color);
-            this.option = option;
+        public ReportGraphData(Context context, String carName, int carColor, int option) {
+            super(context, carName, carColor);
+            this.mOption = option;
         }
 
         public void add(DateTime date, double costs) {
-            if (option == GRAPH_OPTION_MONTH) {
+            if (mOption == GRAPH_OPTION_MONTH) {
                 date = new DateTime(date.getYear(), date.getMonthOfYear(), 1,
                         0, 0);
             } else {
@@ -94,10 +95,10 @@ public class CostsReport extends AbstractReport {
             1000l * 60l * 60l * 24l * 365l // Year
     };
 
-    private SparseArray<ReportGraphData> costsPerMonth = new SparseArray<>();
-    private SparseArray<ReportGraphData> costsPerYear = new SparseArray<>();
-    private String[] xLabelFormat = new String[2];
-    private int visibleBarCount;
+    private SparseArray<ReportGraphData> mCostsPerMonth = new SparseArray<>();
+    private SparseArray<ReportGraphData> mCostsPerYear = new SparseArray<>();
+    private String[] mXLabelFormat = new String[2];
+    private int mVisibleBarCount;
 
     public CostsReport(Context context) {
         super(context);
@@ -113,7 +114,7 @@ public class CostsReport extends AbstractReport {
 
     @Override
     public String getTitle() {
-        return context.getString(R.string.report_title_costs);
+        return mContext.getString(R.string.report_title_costs);
     }
 
     private double[] getXValues(Dataset dataset) {
@@ -139,16 +140,16 @@ public class CostsReport extends AbstractReport {
     protected Chart onGetChart(boolean zoomable, boolean moveable) {
         final Dataset dataset = new Dataset();
         RendererList renderers = new RendererList();
-        BarRenderer renderer = new BarRenderer(context);
-        LineRenderer trendRenderer = new LineRenderer(context);
+        BarRenderer renderer = new BarRenderer(mContext);
+        LineRenderer trendRenderer = new LineRenderer(mContext);
         renderers.addRenderer(renderer);
         renderers.addRenderer(trendRenderer);
 
         int series = 0;
-        for (Car car : Car.getAll()) {
-            ReportGraphData data = getChartOption() == GRAPH_OPTION_MONTH ? costsPerMonth
-                    .get(car.id.intValue()) : costsPerYear.get(car.id
-                    .intValue());
+        for (int i = 0; i < mCostsPerMonth.size(); i++) {
+            ReportGraphData data = getChartOption() == GRAPH_OPTION_MONTH
+                    ? mCostsPerMonth.get(mCostsPerMonth.keyAt(i))
+                    : mCostsPerYear.get(mCostsPerYear.keyAt(i));
             if (data.isEmpty()) {
                 continue;
             }
@@ -175,7 +176,7 @@ public class CostsReport extends AbstractReport {
         }
 
         // Draw report
-        final Chart chart = new Chart(context, dataset, renderers);
+        final Chart chart = new Chart(mContext, dataset, renderers);
         applyDefaultChartStyles(chart);
         chart.setShowLegend(false);
         if (isShowTrend()) {
@@ -189,14 +190,14 @@ public class CostsReport extends AbstractReport {
             @Override
             public String formatLabel(double value) {
                 DateTime date = new DateTime((long) value);
-                return date.toString(xLabelFormat[getChartOption()]);
+                return date.toString(mXLabelFormat[getChartOption()]);
             }
         });
         double padding = SEC_PER_PERIOD[getChartOption()] / 2;
         double topBound = dataset.maxX();
         double bottomBound = topBound
                 - (SEC_PER_PERIOD[getChartOption()] * Math.min(
-                visibleBarCount - 1, xValues.length - 1));
+                mVisibleBarCount - 1, xValues.length - 1));
         chart.getDomainAxis().setDefaultBottomBound(bottomBound - padding);
         chart.getDomainAxis().setDefaultTopBound(topBound + padding);
         chart.getRangeAxis().setDefaultBottomBound(0);
@@ -210,68 +211,68 @@ public class CostsReport extends AbstractReport {
 
     @Override
     protected void onUpdate() {
-        Preferences prefs = new Preferences(context);
+        Preferences prefs = new Preferences(mContext);
         String unit = prefs.getUnitCurrency();
 
         // Settings, which are based on the screen size.
-        if (context.getResources().getConfiguration().smallestScreenWidthDp > 480) {
-            xLabelFormat[GRAPH_OPTION_MONTH] = "MMMM, yyyy";
-            xLabelFormat[GRAPH_OPTION_YEAR] = "yyyy";
-            visibleBarCount = 4;
+        if (mContext.getResources().getConfiguration().smallestScreenWidthDp > 480) {
+            mXLabelFormat[GRAPH_OPTION_MONTH] = "MMMM, yyyy";
+            mXLabelFormat[GRAPH_OPTION_YEAR] = "yyyy";
+            mVisibleBarCount = 4;
         } else {
-            xLabelFormat[GRAPH_OPTION_MONTH] = "MMM, yyyy";
-            xLabelFormat[GRAPH_OPTION_YEAR] = "yyyy";
-            visibleBarCount = 3;
+            mXLabelFormat[GRAPH_OPTION_MONTH] = "MMM, yyyy";
+            mXLabelFormat[GRAPH_OPTION_YEAR] = "yyyy";
+            mVisibleBarCount = 3;
         }
 
-        List<Car> cars = Car.getAll();
-        for (Car car : cars) {
+        CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        while (car.moveToNext()) {
             Section section;
-            if (car.isSuspended()) {
-                section = addDataSection(String.format("%s [%s]", car.name,
-                        context.getString(R.string.suspended)), car.color, 1);
+            if (car.getSuspendedSince() != null) {
+                section = addDataSection(String.format("%s [%s]", car.getName(),
+                        mContext.getString(R.string.suspended)), car.getColor(), 1);
             } else {
-                section = addDataSection(car.name, car.color);
+                section = addDataSection(car.getName(), car.getColor());
             }
 
-            costsPerMonth.put(car.id.intValue(), new ReportGraphData(context, car,
-                    GRAPH_OPTION_MONTH));
-            costsPerYear.put(car.id.intValue(), new ReportGraphData(context, car,
-                    GRAPH_OPTION_YEAR));
+            mCostsPerMonth.put((int) car.getId(), new ReportGraphData(mContext, car.getName(),
+                    car.getColor(), GRAPH_OPTION_MONTH));
+            mCostsPerYear.put((int) car.getId(), new ReportGraphData(mContext, car.getName(),
+                    car.getColor(), GRAPH_OPTION_YEAR));
 
             int startMileage = Integer.MAX_VALUE;
             int endMileage = Integer.MIN_VALUE;
             DateTime startDate = new DateTime();
             DateTime endDate;
-            if (car.isSuspended()) {
-                endDate = new DateTime(car.suspendedSince);
+            if (car.getSuspendedSince() != null) {
+                endDate = new DateTime(car.getSuspendedSince());
             } else {
                 endDate = new DateTime();
             }
             double costs = 0;
 
-            RefuelingBalancer balancer = new RefuelingBalancer(context);
-            List<Refueling> refuelings = balancer.getBalancedRefuelings(car);
-            List<OtherCost> otherCosts = car.getOtherCosts();
+            RefuelingBalancer balancer = new RefuelingBalancer(mContext);
+            BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId());
+            OtherCostCursor otherCost = new OtherCostSelection().carId(car.getId()).query(mContext.getContentResolver());
 
-            if ((refuelings.size() + otherCosts.size()) < 2) {
-                section.addItem(new Item(context.getString(R.string.report_not_enough_data), ""));
+            if ((refueling.getCount() + otherCost.getCount()) < 2) {
+                section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
                 continue;
             }
 
             boolean first = true;
-            for (Refueling refueling : refuelings) {
+            while (refueling.moveToNext()) {
                 if (!first) {
-                    costs += refueling.price;
+                    costs += refueling.getPrice();
                 }
 
-                DateTime date = new DateTime(refueling.date);
+                DateTime date = new DateTime(refueling.getDate());
 
-                costsPerMonth.get(car.id.intValue()).add(date, refueling.price);
-                costsPerYear.get(car.id.intValue()).add(date, refueling.price);
+                mCostsPerMonth.get((int) car.getId()).add(date, refueling.getPrice());
+                mCostsPerYear.get((int) car.getId()).add(date, refueling.getPrice());
 
-                startMileage = Math.min(startMileage, refueling.mileage);
-                endMileage = Math.max(endMileage, refueling.mileage);
+                startMileage = Math.min(startMileage, refueling.getMileage());
+                endMileage = Math.max(endMileage, refueling.getMileage());
                 if (startDate.isAfter(date)) {
                     startDate = date;
                 }
@@ -280,57 +281,57 @@ public class CostsReport extends AbstractReport {
             }
 
             first = true;
-            for (OtherCost otherCost : otherCosts) {
-                if (!first || (otherCost.mileage > -1 && otherCost.mileage < startMileage)) {
+            while (otherCost.moveToNext()) {
+                if (!first || (otherCost.getMileage() != null && otherCost.getMileage() > -1 && otherCost.getMileage() < startMileage)) {
                     int recurrences;
-                    if (otherCost.endDate == null) {
-                        recurrences = otherCost.recurrence.getRecurrencesSince(otherCost.date);
+                    if (otherCost.getEndDate() == null) {
+                        recurrences = Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(),
+                                otherCost.getRecurrenceMultiplier(), otherCost.getDate());
                     } else {
-                        recurrences = otherCost.recurrence.getRecurrencesBetween(otherCost.date,
-                                otherCost.endDate);
+                        recurrences = Recurrences.getRecurrencesBetween(otherCost.getRecurrenceInterval(),
+                                otherCost.getRecurrenceMultiplier(), otherCost.getDate(), otherCost.getEndDate());
                     }
 
-                    costs += otherCost.price * recurrences;
+                    costs += otherCost.getPrice() * recurrences;
                 }
 
-                Recurrence recurrence = otherCost.recurrence;
-                DateTime date = new DateTime(otherCost.date);
+                DateTime date = new DateTime(otherCost.getDate());
                 DateTime recurrenceEndDate;
-                if (otherCost.endDate != null && endDate.isAfter(otherCost.endDate.getTime())) {
-                    recurrenceEndDate = new DateTime(otherCost.endDate);
+                if (otherCost.getEndDate() != null && endDate.isAfter(otherCost.getEndDate().getTime())) {
+                    recurrenceEndDate = new DateTime(otherCost.getEndDate());
                 } else {
                     recurrenceEndDate = endDate;
                 }
 
                 while (date.isBefore(recurrenceEndDate)) {
-                    costsPerMonth.get(car.id.intValue()).add(date, otherCost.price);
-                    costsPerYear.get(car.id.intValue()).add(date, otherCost.price);
-                    switch (recurrence.getInterval()) {
+                    mCostsPerMonth.get((int) car.getId()).add(date, otherCost.getPrice());
+                    mCostsPerYear.get((int) car.getId()).add(date, otherCost.getPrice());
+                    switch (otherCost.getRecurrenceInterval()) {
                         case ONCE:
                             // Set date after now, so the loop ends.
                             date = DateTime.now().plusYears(1);
                             break;
                         case DAY:
-                            date = date.plusDays(recurrence.getMultiplier());
+                            date = date.plusDays(otherCost.getRecurrenceMultiplier());
                             break;
                         case MONTH:
-                            date = date.plusMonths(recurrence.getMultiplier());
+                            date = date.plusMonths(otherCost.getRecurrenceMultiplier());
                             break;
                         case QUARTER:
-                            date = date.plusDays(recurrence.getMultiplier() * 3);
+                            date = date.plusDays(otherCost.getRecurrenceMultiplier() * 3);
                             break;
                         case YEAR:
-                            date = date.plusYears(recurrence.getMultiplier());
+                            date = date.plusYears(otherCost.getRecurrenceMultiplier());
                             break;
                     }
                 }
 
-                if (otherCost.mileage > -1) {
-                    startMileage = Math.min(startMileage, otherCost.mileage);
-                    endMileage = Math.max(endMileage, otherCost.mileage);
+                if (otherCost.getMileage() > -1) {
+                    startMileage = Math.min(startMileage, otherCost.getMileage());
+                    endMileage = Math.max(endMileage, otherCost.getMileage());
                 }
-                if (startDate.isAfter(otherCost.date.getTime())) {
-                    startDate = new DateTime(otherCost.date);
+                if (startDate.isAfter(otherCost.getDate().getTime())) {
+                    startDate = new DateTime(otherCost.getDate());
                 }
 
                 first = false;
@@ -341,23 +342,23 @@ public class CostsReport extends AbstractReport {
             double costsPerSecond = costs / elapsedSeconds.getSeconds();
             // 60 seconds per minute * 60 minutes per hour * 24 hours per day =
             // 86400 seconds per day
-            section.addItem(new Item("\u00D8 " + context.getString(R.string.report_day),
+            section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_day),
                     String.format("%.2f %s", costsPerSecond * 86400, unit)));
             // 86400 seconds per day * 30,4375 days per month = 2629800 seconds
             // per month
             // (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
-            section.addItem(new Item("\u00D8 " + context.getString(R.string.report_month),
+            section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_month),
                     String.format("%.2f %s", costsPerSecond * 2629800, unit)));
             // 86400 seconds per day * 365,25 days per year = 31557600 seconds
             // per year
-            section.addItem(new Item("\u00D8 " + context.getString(R.string.report_year),
+            section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_year),
                     String.format("%.2f %s", costsPerSecond * 31557600, unit)));
             int mileageDiff = Math.max(1, endMileage - startMileage);
             section.addItem(new Item("\u00D8 " + prefs.getUnitDistance(),
                     String.format("%.2f %s", costs / mileageDiff, unit)));
 
-            section.addItem(new Item(context.getString(R.string.report_since,
-                    DateFormat.getDateFormat(context).format(startDate.toDate())),
+            section.addItem(new Item(mContext.getString(R.string.report_since,
+                    DateFormat.getDateFormat(mContext).format(startDate.toDate())),
                     String.format("%.2f %s", costs, unit)));
         }
     }

@@ -15,15 +15,14 @@
  */
 package me.kuehle.carreport.provider;
 
-import java.util.Arrays;
-
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import java.util.Arrays;
 
 import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.provider.base.BaseContentProvider;
@@ -148,7 +147,48 @@ public class DataProvider extends BaseContentProvider {
         if (DEBUG)
             Log.d(TAG, "query uri=" + uri + " selection=" + selection + " selectionArgs=" + Arrays.toString(selectionArgs) + " sortOrder=" + sortOrder
                     + " groupBy=" + uri.getQueryParameter(QUERY_GROUP_BY) + " having=" + uri.getQueryParameter(QUERY_HAVING) + " limit=" + uri.getQueryParameter(QUERY_LIMIT));
-        return super.query(uri, projection, selection, selectionArgs, sortOrder);
+
+        return super.query(uri, qualifyAmbiguousColumns(uri, projection), selection, selectionArgs, sortOrder);
+    }
+
+    private static String[] qualifyAmbiguousColumns(Uri uri, String[] projection) {
+        if (projection != null) return projection;
+
+        int matchedId = URI_MATCHER.match(uri);
+        switch (matchedId) {
+            case URI_TYPE_CAR:
+            case URI_TYPE_CAR_ID:
+                return CarColumns.ALL_COLUMNS;
+
+            case URI_TYPE_FUEL_TYPE:
+            case URI_TYPE_FUEL_TYPE_ID:
+                return FuelTypeColumns.ALL_COLUMNS;
+
+            case URI_TYPE_OTHER_COST:
+            case URI_TYPE_OTHER_COST_ID:
+                projection = new String[OtherCostColumns.ALL_COLUMNS.length + CarColumns.ALL_COLUMNS.length - 1];
+                System.arraycopy(OtherCostColumns.ALL_COLUMNS, 0, projection, 0, OtherCostColumns.ALL_COLUMNS.length);
+                System.arraycopy(CarColumns.ALL_COLUMNS, 1, projection, OtherCostColumns.ALL_COLUMNS.length, CarColumns.ALL_COLUMNS.length - 1);
+                return projection;
+
+            case URI_TYPE_REFUELING:
+            case URI_TYPE_REFUELING_ID:
+                projection = new String[RefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1 + CarColumns.ALL_COLUMNS.length - 1];
+                System.arraycopy(RefuelingColumns.ALL_COLUMNS, 0, projection, 0, RefuelingColumns.ALL_COLUMNS.length);
+                System.arraycopy(FuelTypeColumns.ALL_COLUMNS, 1, projection, RefuelingColumns.ALL_COLUMNS.length, FuelTypeColumns.ALL_COLUMNS.length - 1);
+                System.arraycopy(CarColumns.ALL_COLUMNS, 1, projection, RefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1, CarColumns.ALL_COLUMNS.length - 1);
+                return projection;
+
+            case URI_TYPE_REMINDER:
+            case URI_TYPE_REMINDER_ID:
+                projection = new String[ReminderColumns.ALL_COLUMNS.length + CarColumns.ALL_COLUMNS.length - 1];
+                System.arraycopy(ReminderColumns.ALL_COLUMNS, 0, projection, 0, ReminderColumns.ALL_COLUMNS.length);
+                System.arraycopy(CarColumns.ALL_COLUMNS, 1, projection, ReminderColumns.ALL_COLUMNS.length, CarColumns.ALL_COLUMNS.length - 1);
+                return projection;
+
+            default:
+                throw new IllegalArgumentException("The uri '" + uri + "' is not supported by this ContentProvider");
+        }
     }
 
     @Override

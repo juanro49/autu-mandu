@@ -25,27 +25,31 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
-import com.activeandroid.Model;
-
-import org.w3c.dom.Text;
-
 import java.util.Date;
-import java.util.List;
 
 import me.kuehle.carreport.DistanceEntryMode;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.db.Car;
-import me.kuehle.carreport.db.FuelType;
-import me.kuehle.carreport.db.Refueling;
+import me.kuehle.carreport.data.query.FuelTypeQueries;
+import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.util.AbstractFormFieldValidator;
 import me.kuehle.carreport.gui.util.DateTimeInput;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
+import me.kuehle.carreport.provider.car.CarColumns;
+import me.kuehle.carreport.provider.car.CarCursor;
+import me.kuehle.carreport.provider.car.CarSelection;
+import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
+import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
+import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
+import me.kuehle.carreport.provider.refueling.RefuelingContentValues;
+import me.kuehle.carreport.provider.refueling.RefuelingCursor;
+import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 
 public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         implements SupportDatePickerDialogFragmentListener,
@@ -66,7 +70,6 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     private DateTimeInput edtDate;
     private DateTimeInput edtTime;
     private EditText edtMileage;
-    private TextInputLayout edtMileageInputLayout;
     private EditText edtVolume;
     private CheckBox chkPartial;
     private EditText edtPrice;
@@ -74,9 +77,6 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     private Spinner spnFuelType;
     private EditText edtNote;
     private Spinner spnCar;
-
-    private List<FuelType> fuelTypes;
-    private List<Car> cars;
 
     @Override
     public void onDialogPositiveClick(int requestCode, Date date) {
@@ -99,49 +99,50 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
             if (selectCarId == 0) {
                 selectCarId = prefs.getDefaultCar();
             }
-            for (int pos = 0; pos < cars.size(); pos++) {
-                if (cars.get(pos).id == selectCarId) {
+
+            for (int pos = 0; pos < spnCar.getCount(); pos++) {
+                if (spnCar.getItemIdAtPosition(pos) == selectCarId) {
                     spnCar.setSelection(pos);
                 }
             }
 
             // By default select most often used fuel type for this car.
-            Car selectedCar = cars.get(spnCar.getSelectedItemPosition());
-            FuelType mostUsedFuelType = selectedCar.getMostUsedFuelType();
-            if (mostUsedFuelType != null) {
-                for (int pos = 0; pos < fuelTypes.size(); pos++) {
-                    if (fuelTypes.get(pos).id.equals(mostUsedFuelType.id)) {
+            long mostUsedFuelTypeId = FuelTypeQueries.getMostUsedId(getActivity(), selectCarId);
+            if (mostUsedFuelTypeId > 0) {
+                for (int pos = 0; pos < spnFuelType.getCount(); pos++) {
+                    if (spnFuelType.getItemIdAtPosition(pos) == mostUsedFuelTypeId) {
                         spnFuelType.setSelection(pos);
                     }
                 }
             }
         } else {
-            Refueling refueling = (Refueling) editItem;
+            RefuelingCursor refueling = new RefuelingSelection().id(mId).query(getActivity().getContentResolver());
+            refueling.moveToNext();
 
-            edtDate.setDate(refueling.date);
-            edtTime.setDate(refueling.date);
-            edtVolume.setText(String.valueOf(refueling.volume));
-            chkPartial.setChecked(refueling.partial);
-            edtPrice.setText(String.valueOf(refueling.price));
-            edtNote.setText(refueling.note);
+            edtDate.setDate(refueling.getDate());
+            edtTime.setDate(refueling.getDate());
+            edtVolume.setText(String.valueOf(refueling.getVolume()));
+            chkPartial.setChecked(refueling.getPartial());
+            edtPrice.setText(String.valueOf(refueling.getPrice()));
+            edtNote.setText(refueling.getNote());
 
-            for (int pos = 0; pos < fuelTypes.size(); pos++) {
-                if (fuelTypes.get(pos).id.equals(refueling.fuelType.id)) {
+            for (int pos = 0; pos < spnFuelType.getCount(); pos++) {
+                if (spnFuelType.getItemIdAtPosition(pos) == refueling.getFuelTypeId()) {
                     spnFuelType.setSelection(pos);
                 }
             }
 
-            for (int pos = 0; pos < cars.size(); pos++) {
-                if (cars.get(pos).id.equals(refueling.car.id)) {
+            for (int pos = 0; pos < spnCar.getCount(); pos++) {
+                if (spnCar.getItemIdAtPosition(pos) == refueling.getCarId()) {
                     spnCar.setSelection(pos);
                 }
             }
 
-            Refueling previousRefueling = getPreviousRefueling();
-            if (getDistanceEntryMode() == DistanceEntryMode.TRIP && previousRefueling != null) {
-                edtMileage.setText(String.valueOf(refueling.mileage - previousRefueling.mileage));
+            RefuelingCursor previousRefueling = getPreviousRefueling();
+            if (getDistanceEntryMode() == DistanceEntryMode.TRIP && previousRefueling.moveToNext()) {
+                edtMileage.setText(String.valueOf(refueling.getMileage() - previousRefueling.getMileage()));
             } else {
-                edtMileage.setText(String.valueOf(refueling.mileage));
+                edtMileage.setText(String.valueOf(refueling.getMileage()));
             }
         }
     }
@@ -149,11 +150,6 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     @Override
     protected int getAlertDeleteMessage() {
         return R.string.alert_delete_refueling_message;
-    }
-
-    @Override
-    protected Model getEditItem(long id) {
-        return Refueling.load(Refueling.class, id);
     }
 
     @Override
@@ -190,7 +186,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         edtTime = new DateTimeInput((EditText) v.findViewById(R.id.edt_time),
                 DateTimeInput.Mode.TIME);
         edtMileage = (EditText) v.findViewById(R.id.edt_mileage);
-        edtMileageInputLayout = (TextInputLayout) v.findViewById(R.id.edt_mileage_input_layout);
+        TextInputLayout edtMileageInputLayout = (TextInputLayout) v.findViewById(R.id.edt_mileage_input_layout);
         edtVolume = (EditText) v.findViewById(R.id.edt_volume);
         chkPartial = (CheckBox) v.findViewById(R.id.chk_partial);
         edtPrice = (EditText) v.findViewById(R.id.edt_price);
@@ -250,26 +246,18 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         }
 
         // Fuel Type
-        FuelType.ensureAtLeastOneFuelType();
+        FuelTypeQueries.ensureAtLeastOne(getActivity());
 
-        fuelTypes = FuelType.getAll();
-        ArrayAdapter<String> fuelTypeAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_dropdown_item);
-        for (FuelType fuelType : fuelTypes) {
-            fuelTypeAdapter.add(String.format("%s (%s)", fuelType.name, fuelType.category));
-        }
-
-        spnFuelType.setAdapter(fuelTypeAdapter);
+        FuelTypeCursor fuelType = new FuelTypeSelection().query(getActivity().getContentResolver());
+        spnFuelType.setAdapter(new SimpleCursorAdapter(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item,
+                fuelType, new String[]{FuelTypeColumns.NAME}, new int[]{android.R.id.text1}, 0));
 
         // Car
-        cars = Car.getAll();
-        ArrayAdapter<String> carAdapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_dropdown_item);
-        for (Car car : cars) {
-            carAdapter.add(car.name);
-        }
-
-        spnCar.setAdapter(carAdapter);
+        CarCursor car = new CarSelection().query(getActivity().getContentResolver());
+        spnCar.setAdapter(new SimpleCursorAdapter(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item,
+                car, new String[]{CarColumns.NAME}, new int[]{android.R.id.text1}, 0));
     }
 
     @Override
@@ -287,11 +275,11 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 @Override
                 protected boolean isValid() {
                     int mileage = getIntegerFromEditText(edtMileage, 0);
-                    Refueling previousRefueling = getPreviousRefueling();
-                    Refueling nextRefueling = getNextRefueling();
+                    RefuelingCursor previousRefueling = getPreviousRefueling();
+                    RefuelingCursor nextRefueling = getNextRefueling();
 
-                    return !((previousRefueling != null && previousRefueling.mileage >= mileage)
-                            || (nextRefueling != null && nextRefueling.mileage <= mileage));
+                    return !((previousRefueling.moveToNext() && previousRefueling.getMileage() >= mileage)
+                            || (nextRefueling.moveToNext() && nextRefueling.getMileage() <= mileage));
                 }
 
                 @Override
@@ -304,11 +292,11 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 @Override
                 protected boolean isValid() {
                     int mileage = getIntegerFromEditText(edtMileage, 0);
-                    Refueling previousRefueling = getPreviousRefueling();
-                    Refueling nextRefueling = getNextRefueling();
+                    RefuelingCursor previousRefueling = getPreviousRefueling();
+                    RefuelingCursor nextRefueling = getNextRefueling();
 
-                    return !(previousRefueling != null && nextRefueling != null
-                            && previousRefueling.mileage + mileage >= nextRefueling.mileage);
+                    return !(previousRefueling.moveToNext() && nextRefueling.moveToNext()
+                            && previousRefueling.getMileage() + mileage >= nextRefueling.getMileage());
                 }
 
                 @Override
@@ -323,34 +311,33 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 
     @Override
     protected void save() {
-        Date date = DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate());
         int mileage = getIntegerFromEditText(edtMileage, 0);
-        float volume = (float) getDoubleFromEditText(edtVolume, 0);
-        boolean partial = chkPartial.isChecked();
-        float price = (float) getDoubleFromEditText(edtPrice, 0);
-        String note = edtNote.getText().toString().trim();
-        FuelType fuelType = fuelTypes.get(spnFuelType.getSelectedItemPosition());
-        Car car = cars.get(spnCar.getSelectedItemPosition());
-
-        Refueling previousRefueling = getPreviousRefueling();
-        if (getDistanceEntryMode() == DistanceEntryMode.TRIP && previousRefueling != null) {
-            mileage += previousRefueling.mileage;
+        RefuelingCursor previousRefueling = getPreviousRefueling();
+        if (getDistanceEntryMode() == DistanceEntryMode.TRIP && previousRefueling.moveToNext()) {
+            mileage += previousRefueling.getMileage();
         }
 
-        if (!isInEditMode()) {
-            new Refueling(date, mileage, volume, price, partial, note, fuelType, car).save();
+        RefuelingContentValues values = new RefuelingContentValues();
+        values.putDate(DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate()));
+        values.putMileage(mileage);
+        values.putVolume((float) getDoubleFromEditText(edtVolume, 0));
+        values.putPartial(chkPartial.isChecked());
+        values.putPrice((float) getDoubleFromEditText(edtPrice, 0));
+        values.putNote(edtNote.getText().toString().trim());
+        values.putFuelTypeId(spnFuelType.getSelectedItemId());
+        values.putCarId(spnCar.getSelectedItemId());
+
+        if (isInEditMode()) {
+            RefuelingSelection where = new RefuelingSelection().id(mId);
+            values.update(getActivity().getContentResolver(), where);
         } else {
-            Refueling refueling = (Refueling) editItem;
-            refueling.date = date;
-            refueling.mileage = mileage;
-            refueling.volume = volume;
-            refueling.price = price;
-            refueling.partial = partial;
-            refueling.note = note;
-            refueling.fuelType = fuelType;
-            refueling.car = car;
-            refueling.save();
+            values.insert(getActivity().getContentResolver());
         }
+    }
+
+    @Override
+    protected void delete() {
+        new RefuelingSelection().id(mId).delete(getActivity().getContentResolver());
     }
 
     private DistanceEntryMode getDistanceEntryMode() {
@@ -361,17 +348,15 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         }
     }
 
-    private Refueling getPreviousRefueling() {
-        Car car = cars.get(spnCar.getSelectedItemPosition());
+    private RefuelingCursor getPreviousRefueling() {
         Date date = DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate());
 
-        return Refueling.getPrevious(car, date);
+        return RefuelingQueries.getPrevious(getActivity(), spnCar.getSelectedItemId(), date);
     }
 
-    private Refueling getNextRefueling() {
-        Car car = cars.get(spnCar.getSelectedItemPosition());
+    private RefuelingCursor getNextRefueling() {
         Date date = DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate());
 
-        return Refueling.getNext(car, date);
+        return RefuelingQueries.getNext(getActivity(), spnCar.getSelectedItemId(), date);
     }
 }
