@@ -22,7 +22,6 @@ import/export functionality.
 
 ## Used libraries
 
-* [ActiveAndroid](https://github.com/pardom/ActiveAndroid)
 * [DragSortListView](https://github.com/bauerca/drag-sort-listview)
 * [Joda Time](http://joda-time.sourceforge.net)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
