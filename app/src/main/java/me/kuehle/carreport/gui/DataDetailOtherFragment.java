@@ -253,7 +253,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         }
 
         OtherCostCursor otherCostTitles = otherCostTitleQuery.query(getActivity().getContentResolver(),
-                new String[]{OtherCostColumns.TITLE},
+                new String[]{OtherCostColumns._ID, OtherCostColumns.TITLE},
                 OtherCostColumns.TITLE + " COLLATE UNICODE ASC");
         edtTitle.setAdapter(new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,

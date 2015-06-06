@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
@@ -33,37 +32,6 @@ import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
 import me.kuehle.carreport.util.Recurrences;
 
 public class DataListOtherFragment extends AbstractDataListFragment {
-    public static class OtherCostLoader extends CursorLoader {
-        private Context mContext;
-        private long mCarId;
-        private boolean mIsExpenditure;
-
-        public OtherCostLoader(Context context, long carId, boolean isExpenditure) {
-            super(context);
-            mContext = context;
-            mCarId = carId;
-            mIsExpenditure = isExpenditure;
-        }
-
-        @Override
-        public Cursor loadInBackground() {
-            OtherCostSelection where = new OtherCostSelection().carId(mCarId);
-            if (mIsExpenditure) {
-                where.and().priceGt(0);
-            } else {
-                where.and().priceLt(0);
-            }
-
-            return where.query(mContext.getContentResolver(), null, OtherCostColumns.DATE + " DESC");
-        }
-
-
-        @Override
-        protected void onStartLoading() {
-            forceLoad();
-        }
-    }
-
     public static final String EXTRA_OTHER_TYPE = "other_type";
     public static final int EXTRA_OTHER_TYPE_EXPENDITURE = 0;
     public static final int EXTRA_OTHER_TYPE_INCOME = 1;
@@ -89,7 +57,15 @@ public class DataListOtherFragment extends AbstractDataListFragment {
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new OtherCostLoader(getActivity(), mCarId, mIsExpenditure);
+        OtherCostSelection where = new OtherCostSelection().carId(mCarId);
+        if (mIsExpenditure) {
+            where.and().priceGt(0);
+        } else {
+            where.and().priceLt(0);
+        }
+
+        return new CursorLoader(getActivity(), where.uri(), null, where.sel(), where.args(),
+                OtherCostColumns.DATE + " DESC");
     }
 
     @Override
@@ -108,7 +84,7 @@ public class DataListOtherFragment extends AbstractDataListFragment {
 
     @Override
     protected SparseArray<String> getItemData(Cursor cursor) {
-        OtherCostCursor otherCost = (OtherCostCursor) cursor;
+        OtherCostCursor otherCost = new OtherCostCursor(cursor);
 
         SparseArray<String> data = new SparseArray<>(7);
         data.put(R.id.title, otherCost.getTitle());

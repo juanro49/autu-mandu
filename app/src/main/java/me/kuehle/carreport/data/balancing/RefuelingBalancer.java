@@ -120,10 +120,9 @@ public class RefuelingBalancer {
     }
 
     public BalancedRefuelingCursor getBalancedRefuelings(long carId, boolean orderDescending) {
-        RefuelingCursor refueling = new RefuelingSelection()
-                .carId(carId)
-                .query(mContext.getContentResolver(), null, RefuelingColumns.DATE);
-        return getBalancedRefuelings(refueling, orderDescending);
+        RefuelingSelection refuelingSelection = new RefuelingSelection()
+                .carId(carId);
+        return getBalancedRefuelings(refuelingSelection, orderDescending);
     }
 
     public BalancedRefuelingCursor getBalancedRefuelings(long carId, String fuelTypeCategory) {
@@ -131,15 +130,16 @@ public class RefuelingBalancer {
     }
 
     public BalancedRefuelingCursor getBalancedRefuelings(long carId, String fuelTypeCategory, boolean orderDescending) {
-        RefuelingCursor refueling = new RefuelingSelection()
+        RefuelingSelection refuelingSelection = new RefuelingSelection()
                 .carId(carId)
                 .and()
-                .fuelTypeCategory(fuelTypeCategory)
-                .query(mContext.getContentResolver(), null, RefuelingColumns.DATE);
-        return getBalancedRefuelings(refueling, orderDescending);
+                .fuelTypeCategory(fuelTypeCategory);
+        return getBalancedRefuelings(refuelingSelection, orderDescending);
     }
 
-    private BalancedRefuelingCursor getBalancedRefuelings(RefuelingCursor refueling, boolean orderDescending) {
+    private BalancedRefuelingCursor getBalancedRefuelings(RefuelingSelection refuelingSelection, boolean orderDescending) {
+        RefuelingCursor refueling = refuelingSelection.query(mContext.getContentResolver(), null, RefuelingColumns.DATE);
+
         ArrayList<BalancedRefueling> list = new ArrayList<>(refueling.getCount());
         while (refueling.moveToNext()) {
             list.add(new BalancedRefueling(refueling));
@@ -156,6 +156,7 @@ public class RefuelingBalancer {
         System.arraycopy(CarColumns.ALL_COLUMNS, 1, columns, BalancedRefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1, CarColumns.ALL_COLUMNS.length - 1);
 
         MatrixCursor balancedRefuelingCursor = new MatrixCursor(columns, balancedRefuelingList.size());
+        balancedRefuelingCursor.setNotificationUri(mContext.getContentResolver(), refuelingSelection.uri());
         for (BalancedRefueling balancedRefueling : balancedRefuelingList) {
             balancedRefuelingCursor.addRow(balancedRefueling.values());
         }

@@ -241,12 +241,12 @@ public class PreferencesCarsFragment extends ListFragment implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCarAdapter.swapCursor(data);
+        mCarAdapter.changeCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mCarAdapter.swapCursor(null);
+        mCarAdapter.changeCursor(null);
     }
 
     private void openCarDetailFragment(long id) {

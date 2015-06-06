@@ -309,12 +309,12 @@ public class PreferencesRemindersFragment extends ListFragment implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mReminderAdapter.swapCursor(data);
+        mReminderAdapter.changeCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mReminderAdapter.swapCursor(null);
+        mReminderAdapter.changeCursor(null);
     }
 
     private void openReminderDetailFragment(long id) {

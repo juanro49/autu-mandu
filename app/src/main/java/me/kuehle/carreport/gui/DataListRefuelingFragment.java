@@ -33,22 +33,25 @@ import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 
 public class DataListRefuelingFragment extends AbstractDataListFragment {
     public static class RefuelingLoader extends CursorLoader {
-        private long mCarId;
+        private final ForceLoadContentObserver mObserver;
+        private final long mCarId;
 
         public RefuelingLoader(Context context, long carId) {
             super(context);
+            mObserver = new ForceLoadContentObserver();
             mCarId = carId;
         }
 
         @Override
         public Cursor loadInBackground() {
             RefuelingBalancer balancer = new RefuelingBalancer(getContext());
-            return balancer.getBalancedRefuelings(mCarId, true);
-        }
-
-        @Override
-        protected void onStartLoading() {
-            forceLoad();
+            Cursor cursor = balancer.getBalancedRefuelings(mCarId, true);
+            if (cursor != null) {
+                cursor.getCount();
+                cursor.registerContentObserver(mObserver);
+            }
+            
+            return cursor;
         }
     }
 

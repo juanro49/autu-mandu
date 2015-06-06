@@ -40,10 +40,9 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 
 public class DataFragment extends Fragment implements DataListCallback,
-        AbstractDataDetailFragment.OnItemActionListener, DataChangeListener {
+        AbstractDataDetailFragment.OnItemActionListener {
     private class DataListBackStackListener implements OnBackStackChangedListener {
         private boolean mSkipNextIfPop = false;
 
@@ -186,15 +185,6 @@ public class DataFragment extends Fragment implements DataListCallback,
     }
 
     @Override
-    public void onDataChanged() {
-        for (Fragment fragment : getChildFragmentManager().getFragments()) {
-            if (fragment instanceof DataListListener) {
-                ((DataListListener) fragment).updateData();
-            }
-        }
-    }
-
-    @Override
     public void onItemCanceled() {
         onItemUnselected();
     }
@@ -202,13 +192,11 @@ public class DataFragment extends Fragment implements DataListCallback,
     @Override
     public void onItemDeleted() {
         onItemUnselected();
-        onDataChanged();
     }
 
     @Override
     public void onItemSaved() {
         onItemUnselected();
-        onDataChanged();
     }
 
     @Override

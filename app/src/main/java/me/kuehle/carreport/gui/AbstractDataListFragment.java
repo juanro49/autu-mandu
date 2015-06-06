@@ -67,7 +67,6 @@ public abstract class AbstractDataListFragment extends
 
         mListAdapter = new DataListAdapter(getActivity(), null);
         setListAdapter(mListAdapter);
-        setListShown(false);
 
         getListView().setMultiChoiceModeListener(new DataListMultiChoiceModeListener());
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -123,7 +122,6 @@ public abstract class AbstractDataListFragment extends
             Application.dataChanged();
 
             mActionMode.finish();
-            updateData();
         }
     }
 
@@ -153,18 +151,13 @@ public abstract class AbstractDataListFragment extends
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        mListAdapter.swapCursor(cursor);
-
-        if (isResumed()) {
-            setListShown(true);
-        } else {
-            setListShownNoAnimation(true);
-        }
+        setCurrentPosition(ListView.INVALID_POSITION);
+        mListAdapter.changeCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mListAdapter.swapCursor(null);
+        mListAdapter.changeCursor(null);
     }
 
     @Override
@@ -174,13 +167,6 @@ public abstract class AbstractDataListFragment extends
         }
 
         setCurrentPosition(ListView.INVALID_POSITION);
-    }
-
-    @Override
-    public void updateData() {
-        setCurrentPosition(ListView.INVALID_POSITION);
-
-        getLoaderManager().getLoader(0).forceLoad();
     }
 
     private void setCurrentPosition(int position) {
@@ -216,7 +202,7 @@ public abstract class AbstractDataListFragment extends
                 R.id.data2_calculated, R.id.data3, R.id.data3_calculated};
 
         public DataListAdapter(Context context, Cursor c) {
-            super(context, c, false);
+            super(context, c, 0);
         }
 
         @Override

@@ -197,11 +197,11 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mListAdapter.swapCursor(data);
+        mListAdapter.changeCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mListAdapter.swapCursor(null);
+        mListAdapter.changeCursor(null);
     }
 }
