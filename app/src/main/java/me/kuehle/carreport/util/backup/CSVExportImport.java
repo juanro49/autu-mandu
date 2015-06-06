@@ -16,11 +16,16 @@
 
 package me.kuehle.carreport.util.backup;
 
+import android.content.ContentProviderOperation;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.os.Environment;
+import android.os.RemoteException;
 
 import java.io.File;
+import java.util.ArrayList;
 
+import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarContentValues;
 import me.kuehle.carreport.provider.car.CarCursor;
@@ -218,16 +223,23 @@ public class CSVExportImport {
             return false;
         }
 
-        importCars();
-        importFuelTypes();
-        importOtherCosts();
-        importRefuelings();
-        importReminders();
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+        operations.addAll(importCars());
+        operations.addAll(importFuelTypes());
+        operations.addAll(importOtherCosts());
+        operations.addAll(importRefuelings());
+        operations.addAll(importReminders());
 
-        return true;
+        try {
+            mContext.getContentResolver().applyBatch(DataProvider.AUTHORITY, operations);
+            return true;
+        } catch (RemoteException | OperationApplicationException e) {
+            return false;
+        }
     }
 
-    private void importCars() {
+    private ArrayList<ContentProviderOperation> importCars() {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
         CSVReader csv = CSVReader.fromFile(new File(mExportDir, CarColumns.TABLE_NAME + ".csv"), true);
         for (int i = 0; i < csv.getRowCount(); i++) {
             Long id = csv.getLong(i, CarColumns._ID);
@@ -242,7 +254,10 @@ public class CSVExportImport {
                 CarSelection selection = new CarSelection().id(id);
                 CarCursor car = selection.query(mContext.getContentResolver());
                 if (car.getCount() > 0) {
-                    values.update(mContext.getContentResolver(), selection);
+                    operations.add(ContentProviderOperation.newUpdate(values.uri())
+                            .withSelection(selection.sel(), selection.args())
+                            .withValues(values.values())
+                            .build());
                     updated = true;
                 }
             }
@@ -252,12 +267,17 @@ public class CSVExportImport {
                     values.values().put(CarColumns._ID, id);
                 }
 
-                values.insert(mContext.getContentResolver());
+                operations.add(ContentProviderOperation.newInsert(values.uri())
+                        .withValues(values.values())
+                        .build());
             }
         }
+
+        return operations;
     }
 
-    private void importFuelTypes() {
+    private ArrayList<ContentProviderOperation> importFuelTypes() {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
         CSVReader csv = CSVReader.fromFile(new File(mExportDir, FuelTypeColumns.TABLE_NAME + ".csv"), true);
         for (int i = 0; i < csv.getRowCount(); i++) {
             Long id = csv.getLong(i, FuelTypeColumns._ID);
@@ -271,7 +291,10 @@ public class CSVExportImport {
                 FuelTypeSelection selection = new FuelTypeSelection().id(id);
                 FuelTypeCursor fuelType = selection.query(mContext.getContentResolver());
                 if (fuelType.getCount() > 0) {
-                    values.update(mContext.getContentResolver(), selection);
+                    operations.add(ContentProviderOperation.newUpdate(values.uri())
+                            .withSelection(selection.sel(), selection.args())
+                            .withValues(values.values())
+                            .build());
                     updated = true;
                 }
             }
@@ -281,12 +304,17 @@ public class CSVExportImport {
                     values.values().put(FuelTypeColumns._ID, id);
                 }
 
-                values.insert(mContext.getContentResolver());
+                operations.add(ContentProviderOperation.newInsert(values.uri())
+                        .withValues(values.values())
+                        .build());
             }
         }
+
+        return operations;
     }
 
-    private void importOtherCosts() {
+    private ArrayList<ContentProviderOperation> importOtherCosts() {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
         CSVReader csv = CSVReader.fromFile(new File(mExportDir, OtherCostColumns.TABLE_NAME + ".csv"), true);
         for (int i = 0; i < csv.getRowCount(); i++) {
             Long id = csv.getLong(i, OtherCostColumns._ID);
@@ -307,7 +335,10 @@ public class CSVExportImport {
                 OtherCostSelection selection = new OtherCostSelection().id(id);
                 OtherCostCursor otherCost = selection.query(mContext.getContentResolver());
                 if (otherCost.getCount() > 0) {
-                    values.update(mContext.getContentResolver(), selection);
+                    operations.add(ContentProviderOperation.newUpdate(values.uri())
+                            .withSelection(selection.sel(), selection.args())
+                            .withValues(values.values())
+                            .build());
                     updated = true;
                 }
             }
@@ -317,12 +348,17 @@ public class CSVExportImport {
                     values.values().put(OtherCostColumns._ID, id);
                 }
 
-                values.insert(mContext.getContentResolver());
+                operations.add(ContentProviderOperation.newInsert(values.uri())
+                        .withValues(values.values())
+                        .build());
             }
         }
+
+        return operations;
     }
 
-    private void importRefuelings() {
+    private ArrayList<ContentProviderOperation> importRefuelings() {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
         CSVReader csv = CSVReader.fromFile(new File(mExportDir, RefuelingColumns.TABLE_NAME + ".csv"), true);
         for (int i = 0; i < csv.getRowCount(); i++) {
             Long id = csv.getLong(i, RefuelingColumns._ID);
@@ -342,7 +378,10 @@ public class CSVExportImport {
                 RefuelingSelection selection = new RefuelingSelection().id(id);
                 RefuelingCursor refueling = selection.query(mContext.getContentResolver());
                 if (refueling.getCount() > 0) {
-                    values.update(mContext.getContentResolver(), selection);
+                    operations.add(ContentProviderOperation.newUpdate(values.uri())
+                            .withSelection(selection.sel(), selection.args())
+                            .withValues(values.values())
+                            .build());
                     updated = true;
                 }
             }
@@ -352,12 +391,17 @@ public class CSVExportImport {
                     values.values().put(RefuelingColumns._ID, id);
                 }
 
-                values.insert(mContext.getContentResolver());
+                operations.add(ContentProviderOperation.newInsert(values.uri())
+                        .withValues(values.values())
+                        .build());
             }
         }
+
+        return operations;
     }
 
-    private void importReminders() {
+    private ArrayList<ContentProviderOperation> importReminders() {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
         CSVReader csv = CSVReader.fromFile(new File(mExportDir, ReminderColumns.TABLE_NAME + ".csv"), true);
         for (int i = 0; i < csv.getRowCount(); i++) {
             Long id = csv.getLong(i, ReminderColumns._ID);
@@ -378,7 +422,10 @@ public class CSVExportImport {
                 ReminderSelection selection = new ReminderSelection().id(id);
                 ReminderCursor reminder = selection.query(mContext.getContentResolver());
                 if (reminder.getCount() > 0) {
-                    values.update(mContext.getContentResolver(), selection);
+                    operations.add(ContentProviderOperation.newUpdate(values.uri())
+                            .withSelection(selection.sel(), selection.args())
+                            .withValues(values.values())
+                            .build());
                     updated = true;
                 }
             }
@@ -388,8 +435,12 @@ public class CSVExportImport {
                     values.values().put(ReminderColumns._ID, id);
                 }
 
-                values.insert(mContext.getContentResolver());
+                operations.add(ContentProviderOperation.newInsert(values.uri())
+                        .withValues(values.values())
+                        .build());
             }
         }
+
+        return operations;
     }
 }
