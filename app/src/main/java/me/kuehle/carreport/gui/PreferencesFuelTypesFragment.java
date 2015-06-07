@@ -172,9 +172,6 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
         if (requestCode == REQUEST_DELETE) {
             mMultiChoiceModeListener.deleteSelectedFuelTypes();
             mMultiChoiceModeListener.finishActionMode();
-            getLoaderManager().getLoader(0).forceLoad();
-        } else if (requestCode == REQUEST_ADD || requestCode == REQUEST_EDIT) {
-            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 

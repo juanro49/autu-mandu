@@ -55,7 +55,7 @@ public class PreferencesRemindersFragment extends ListFragment implements
         private String mUnitDistance;
 
         public ReminderAdapter() {
-            super(getActivity(), null, false);
+            super(getActivity(), null, 0);
 
             mDateFormat = DateFormat.getDateFormat(getActivity());
 
@@ -271,7 +271,6 @@ public class PreferencesRemindersFragment extends ListFragment implements
             Application.dataChanged();
 
             mMultiChoiceModeListener.finishActionMode();
-            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 
@@ -291,7 +290,6 @@ public class PreferencesRemindersFragment extends ListFragment implements
         super.onResume();
         if (mReminderEditInProgress) {
             mReminderEditInProgress = false;
-            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 

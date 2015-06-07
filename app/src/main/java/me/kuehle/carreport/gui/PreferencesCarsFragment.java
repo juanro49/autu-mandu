@@ -48,7 +48,7 @@ public class PreferencesCarsFragment extends ListFragment implements
         MessageDialogFragmentListener, LoaderManager.LoaderCallbacks<Cursor> {
     private class CarAdapter extends CursorAdapter {
         public CarAdapter() {
-            super(getActivity(), null, false);
+            super(getActivity(), null, 0);
         }
 
         @Override
@@ -202,7 +202,6 @@ public class PreferencesCarsFragment extends ListFragment implements
             Application.dataChanged();
 
             mMultiChoiceModeListener.finishActionMode();
-            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 
@@ -222,7 +221,6 @@ public class PreferencesCarsFragment extends ListFragment implements
         super.onResume();
         if (mCarEditInProgress) {
             mCarEditInProgress = false;
-            getLoaderManager().getLoader(0).forceLoad();
         }
     }
 
