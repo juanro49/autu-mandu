@@ -25,13 +25,19 @@ import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,7 +49,6 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 
 import com.melnykov.fab.FloatingActionButton;
-import com.melnykov.fab.ObservableScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,71 +56,56 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
-import me.kuehle.carreport.data.report.AbstractReport.AbstractListItem;
-import me.kuehle.carreport.data.report.AbstractReport.Item;
-import me.kuehle.carreport.data.report.AbstractReport.Section;
 import me.kuehle.carreport.gui.MainActivity.BackPressedListener;
 import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 import me.kuehle.chartlib.ChartView;
-import me.kuehle.chartlib.chart.Chart;
 
 public class ReportFragment extends Fragment implements OnMenuItemClickListener, DataChangeListener,
-        BackPressedListener {
-    private class ReportUpdateTask extends AsyncTask<Void, Object, Void> {
-        private final int[] columnIDs = {R.id.list1, R.id.list2};
-        private List<ViewGroup> columns;
-        private int currentColumn;
+        BackPressedListener, LoaderManager.LoaderCallbacks<List<AbstractReport>> {
+    public static class ReportLoader extends AsyncTaskLoader<List<AbstractReport>> {
+        private Preferences mPrefs;
 
-        private ViewGroup getNextColumn() {
-            if (++currentColumn >= columns.size()) {
-                currentColumn = 0;
-            }
-
-            return columns.get(currentColumn);
+        public ReportLoader(Context context) {
+            super(context);
+            mPrefs = new Preferences(context);
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            List<Class<? extends AbstractReport>> reportClasses = new Preferences(
-                    getActivity()).getReportOrder();
+        public List<AbstractReport> loadInBackground() {
+            List<AbstractReport> reports = new ArrayList<>();
+
+            List<Class<? extends AbstractReport>> reportClasses = mPrefs.getReportOrder();
             for (Class<? extends AbstractReport> reportClass : reportClasses) {
-                AbstractReport report = AbstractReport.newInstance(reportClass, getActivity());
-                loadGraphSettings(report);
-                report.update();
-                publishProgress(report, report.getChart(false, false));
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            currentColumn = -1;
-            columns = new ArrayList<>();
-            for (int columnId : columnIDs) {
-                ViewGroup column = (ViewGroup) getView().findViewById(columnId);
-                if (column != null) {
-                    column.removeAllViews();
-                    columns.add(column);
+                AbstractReport report = AbstractReport.newInstance(reportClass, getContext());
+                if (report != null) {
+                    ReportFragment.loadGraphSettings(getContext(), report);
+                    report.update();
+                    reports.add(report);
                 }
             }
+
+            return reports;
         }
 
         @Override
-        protected void onProgressUpdate(Object... values) {
-            // It seems, that sometimes the activity is null, when calling this method. In this
-            // case the best thing we can do is just nothing.
-            if (getActivity() == null) {
-                return;
-            }
+        protected void onStartLoading() {
+            forceLoad();
+        }
+    }
 
-            final AbstractReport report = (AbstractReport) values[0];
-            View card = View.inflate(getActivity(), R.layout.report, null);
-            getNextColumn().addView(card);
+    private class ReportHolder extends RecyclerView.ViewHolder {
+        private TextView mTxtTitle;
+        private ChartView mChart;
+        private ViewGroup mDetails;
 
-            ((TextView) card.findViewById(R.id.txt_title)).setText(report.getTitle());
+        private AbstractReport mReport;
 
-            View btnReportDetails = card.findViewById(R.id.btn_report_details);
+        public ReportHolder(View itemView) {
+            super(itemView);
+
+            mTxtTitle = (TextView) itemView.findViewById(R.id.txt_title);
+
+            View btnReportDetails = itemView.findViewById(R.id.btn_report_details);
             btnReportDetails.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -123,33 +113,42 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
                 }
             });
 
-            View btnReportOptions = card.findViewById(R.id.btn_report_options);
+            View btnReportOptions = itemView.findViewById(R.id.btn_report_options);
             btnReportOptions.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showReportOptions(report, v);
+                    showReportOptions(mReport, v);
                 }
             });
 
-            ChartView chart = (ChartView) card.findViewById(R.id.chart);
-            chart.setNotEnoughDataView(View.inflate(getActivity(), R.layout.chart_not_enough_data,
-                    null));
-            chart.setChart((Chart) values[1]);
-            chart.setOnClickListener(new View.OnClickListener() {
+            mChart = (ChartView) itemView.findViewById(R.id.chart);
+            mChart.setNotEnoughDataView(View.inflate(itemView.getContext(),
+                    R.layout.chart_not_enough_data, null));
+            mChart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showFullScreenChart(report, v);
+                    showFullScreenChart(mReport, v);
                 }
             });
 
-            ViewGroup details = (ViewGroup) card.findViewById(R.id.details);
-            for (AbstractListItem item : report.getData(true)) {
-                View itemView = View.inflate(getActivity(),
-                        item instanceof Section ? R.layout.row_section
-                                : R.layout.row_report_data, null);
+            mDetails = (ViewGroup) itemView.findViewById(R.id.details);
+        }
 
-                if (item instanceof Section) {
-                    Section section = (Section) item;
+        public void bind(AbstractReport report) {
+            mReport = report;
+
+            mTxtTitle.setText(report.getTitle());
+            mChart.setChart(report.getChart(false, false));
+
+            mDetails.removeAllViews();
+            for (AbstractReport.AbstractListItem item : report.getData(true)) {
+                View itemView = View.inflate(mDetails.getContext(),
+                        item instanceof AbstractReport.Section
+                                ? R.layout.report_row_section
+                                : R.layout.report_row_data, null);
+
+                if (item instanceof AbstractReport.Section) {
+                    AbstractReport.Section section = (AbstractReport.Section) item;
                     TextView text = (TextView) itemView;
 
                     text.setText(section.getLabel());
@@ -160,24 +159,81 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
                 } else {
                     ((TextView) itemView.findViewById(android.R.id.text1)).setText(item.getLabel());
                     ((TextView) itemView.findViewById(android.R.id.text2))
-                            .setText(((Item) item).getValue());
+                            .setText(((AbstractReport.Item) item).getValue());
                 }
 
-                details.addView(itemView);
+                mDetails.addView(itemView);
             }
-
-            ObjectAnimator
-                    .ofFloat(chart, View.ALPHA, 0f, 1f)
-                    .setDuration(getResources().getInteger(android.R.integer.config_longAnimTime))
-                    .start();
         }
     }
 
-    private ReportUpdateTask mCurrentUpdateTask;
+    private class ReportAdapter extends RecyclerView.Adapter<ReportHolder> {
+        private List<AbstractReport> mReports;
+
+        public ReportAdapter() {
+            mReports = null;
+        }
+
+        @Override
+        public ReportHolder onCreateViewHolder(ViewGroup parent, int position) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.report,
+                    parent, false);
+            return new ReportHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(ReportHolder reportHolder, int position) {
+            AbstractReport report = mReports.get(position);
+            reportHolder.bind(report);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mReports == null ? 0 : mReports.size();
+        }
+
+        public void setItems(List<AbstractReport> items) {
+            mReports = items;
+            notifyDataSetChanged();
+        }
+    }
+
+    private class ReportItemDecoration extends RecyclerView.ItemDecoration {
+        private int mSpacing;
+
+        public ReportItemDecoration() {
+            mSpacing = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15.0f,
+                    getActivity().getResources().getDisplayMetrics());
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) parent.getLayoutManager();
+            int columns = layoutManager.getSpanCount();
+            int position = parent.getChildLayoutPosition(view);
+
+            outRect.right = mSpacing;
+            outRect.bottom = mSpacing;
+
+            // Add top spacing for items in first row.
+            if (position < columns) {
+                outRect.top = mSpacing;
+            }
+
+            // Add left spacing for items in the first column.
+            if (position % columns == 0) {
+                outRect.left = mSpacing;
+            }
+        }
+    }
+
+    private ReportAdapter mReportAdapter;
 
     private AbstractReport mCurrentMenuReport;
     private ViewGroup mCurrentMenuReportView;
 
+    private ChartView mFullScreenChart;
+    private View mFullScreenChartHolder;
     private Animator mFullScreenChartAnimator;
     private ChartView mCurrentFullScreenChart;
     private Rect mCurrentFullScreenStartBounds;
@@ -195,20 +251,24 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mCurrentUpdateTask = new ReportUpdateTask();
-        mCurrentUpdateTask.execute();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_report, container, false);
 
-        ObservableScrollView scrollView = (ObservableScrollView) v.findViewById(R.id.scroll_view);
+        RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.list);
+        int orientation = getResources().getConfiguration().orientation;
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
+                orientation == Configuration.ORIENTATION_LANDSCAPE ? 2 : 1,
+                StaggeredGridLayoutManager.VERTICAL));
+        mReportAdapter = new ReportAdapter();
+        recyclerView.setAdapter(mReportAdapter);
+        recyclerView.addItemDecoration(new ReportItemDecoration());
+
         FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
-        fab.attachToScrollView(scrollView);
+        fab.attachToRecyclerView(recyclerView);
+
+        mFullScreenChart = (ChartView) v.findViewById(R.id.full_screen_chart);
+        mFullScreenChartHolder = v.findViewById(R.id.full_screen_chart_holder);
 
         View btnCloseFullScreen = v.findViewById(R.id.btn_close_full_screen);
         btnCloseFullScreen.setOnClickListener(new View.OnClickListener() {
@@ -218,39 +278,33 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
             }
         });
 
+        getLoaderManager().initLoader(0, null, this);
+
         return v;
     }
 
     @Override
     public void onDataChanged() {
-        mCurrentUpdateTask.cancel(true);
-        mCurrentUpdateTask = new ReportUpdateTask();
-        mCurrentUpdateTask.execute();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mCurrentUpdateTask.cancel(true);
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.menu_show_trend) {
             mCurrentMenuReport.setShowTrend(!item.isChecked());
-            saveGraphSettings(mCurrentMenuReport);
+            ReportFragment.saveGraphSettings(getActivity(), mCurrentMenuReport);
             ((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
                     .setChart(mCurrentMenuReport.getChart(false, false));
             return true;
         } else if (item.getItemId() == R.id.menu_show_overall_trend) {
             mCurrentMenuReport.setShowOverallTrend(!item.isChecked());
-            saveGraphSettings(mCurrentMenuReport);
+            ReportFragment.saveGraphSettings(getActivity(), mCurrentMenuReport);
             ((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
                     .setChart(mCurrentMenuReport.getChart(false, false));
             return true;
         } else if (item.getGroupId() == R.id.group_graph) {
             mCurrentMenuReport.setChartOption(item.getOrder());
-            saveGraphSettings(mCurrentMenuReport);
+            ReportFragment.saveGraphSettings(getActivity(), mCurrentMenuReport);
             ((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
                     .setChart(mCurrentMenuReport.getChart(false, false));
             return true;
@@ -259,24 +313,37 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         }
     }
 
+    @Override
+    public Loader<List<AbstractReport>> onCreateLoader(int id, Bundle args) {
+        return new ReportLoader(getActivity());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<AbstractReport>> loader, List<AbstractReport> data) {
+        mReportAdapter.setItems(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<AbstractReport>> loader) {
+        mReportAdapter.setItems(null);
+    }
+
     private void hideFullScreenChart() {
         if (mFullScreenChartAnimator != null) {
             mFullScreenChartAnimator.cancel();
         }
 
-        final View chartHolder = getView().findViewById(R.id.full_screen_chart_holder);
-
         // Animate the four positioning/sizing properties in parallel, back to
         // their original values.
         AnimatorSet set = new AnimatorSet();
         set.play(
-                ObjectAnimator.ofFloat(chartHolder, View.X,
+                ObjectAnimator.ofFloat(mFullScreenChartHolder, View.X,
                         mCurrentFullScreenStartBounds.left))
-                .with(ObjectAnimator.ofFloat(chartHolder, View.Y,
+                .with(ObjectAnimator.ofFloat(mFullScreenChartHolder, View.Y,
                         mCurrentFullScreenStartBounds.top))
-                .with(ObjectAnimator.ofFloat(chartHolder, View.SCALE_X,
+                .with(ObjectAnimator.ofFloat(mFullScreenChartHolder, View.SCALE_X,
                         mCurrentFullScreenStartScaleX))
-                .with(ObjectAnimator.ofFloat(chartHolder, View.SCALE_Y,
+                .with(ObjectAnimator.ofFloat(mFullScreenChartHolder, View.SCALE_Y,
                         mCurrentFullScreenStartScaleY));
         set.setDuration(getResources().getInteger(
                 android.R.integer.config_longAnimTime));
@@ -286,31 +353,12 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
             public void onAnimationEnd(Animator animation) {
                 mCurrentFullScreenChart.setVisibility(View.VISIBLE);
                 mCurrentFullScreenChart = null;
-                chartHolder.setVisibility(View.GONE);
+                mFullScreenChartHolder.setVisibility(View.GONE);
                 mFullScreenChartAnimator = null;
             }
         });
         set.start();
         mFullScreenChartAnimator = set;
-    }
-
-    private void loadGraphSettings(AbstractReport report) {
-        SharedPreferences prefs = getActivity().getSharedPreferences(getClass().getName(),
-                Context.MODE_PRIVATE);
-        String reportName = report.getClass().getSimpleName();
-        report.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
-        report.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
-        report.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
-    }
-
-    private void saveGraphSettings(AbstractReport report) {
-        SharedPreferences.Editor prefsEdit = getActivity().getSharedPreferences(
-                getClass().getName(), Context.MODE_PRIVATE).edit();
-        String reportName = report.getClass().getSimpleName();
-        prefsEdit.putBoolean(reportName + "_show_trend", report.isShowTrend());
-        prefsEdit.putBoolean(reportName + "_show_overall_trend", report.isShowOverallTrend());
-        prefsEdit.putInt(reportName + "_current_chart_option", report.getChartOption());
-        prefsEdit.apply();
     }
 
     private void showFullScreenChart(AbstractReport report, View v) {
@@ -319,17 +367,14 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         }
 
         mCurrentFullScreenChart = (ChartView) v;
-        View chartHolder = getView().findViewById(R.id.full_screen_chart_holder);
-        ((ChartView) getView().findViewById(R.id.full_screen_chart))
-                .setChart(report.getChart(true, true));
+        mFullScreenChart.setChart(report.getChart(true, true));
 
         // Calculate translation start and end point and scales.
         mCurrentFullScreenStartBounds = new Rect();
         final Rect finalBounds = new Rect();
         final Point globalOffset = new Point();
 
-        mCurrentFullScreenChart
-                .getGlobalVisibleRect(mCurrentFullScreenStartBounds);
+        mCurrentFullScreenChart.getGlobalVisibleRect(mCurrentFullScreenStartBounds);
         getView().getGlobalVisibleRect(finalBounds, globalOffset);
         mCurrentFullScreenStartBounds.offset(-globalOffset.x, -globalOffset.y);
         finalBounds.offset(-globalOffset.x, -globalOffset.y);
@@ -343,25 +388,25 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         // begins, it will position the zoomed-in view in the place of the small
         // chart.
         mCurrentFullScreenChart.setVisibility(View.INVISIBLE);
-        chartHolder.setVisibility(View.VISIBLE);
+        mFullScreenChartHolder.setVisibility(View.VISIBLE);
 
         // Set the pivot point for SCALE_X and SCALE_Y transformations to the
         // top-left corner of the zoomed-in view (the default is the center of
         // the view).
-        chartHolder.setPivotX(0f);
-        chartHolder.setPivotY(0f);
+        mFullScreenChartHolder.setPivotX(0f);
+        mFullScreenChartHolder.setPivotY(0f);
 
         // Construct and run the parallel animation of the four translation and
         // scale properties (X, Y, SCALE_X, and SCALE_Y).
         AnimatorSet set = new AnimatorSet();
         set.play(
-                ObjectAnimator.ofFloat(chartHolder, View.X,
+                ObjectAnimator.ofFloat(mFullScreenChartHolder, View.X,
                         mCurrentFullScreenStartBounds.left, finalBounds.left))
-                .with(ObjectAnimator.ofFloat(chartHolder, View.Y,
+                .with(ObjectAnimator.ofFloat(mFullScreenChartHolder, View.Y,
                         mCurrentFullScreenStartBounds.top, finalBounds.top))
-                .with(ObjectAnimator.ofFloat(chartHolder, View.SCALE_X,
+                .with(ObjectAnimator.ofFloat(mFullScreenChartHolder, View.SCALE_X,
                         mCurrentFullScreenStartScaleX, 1f))
-                .with(ObjectAnimator.ofFloat(chartHolder, View.SCALE_Y,
+                .with(ObjectAnimator.ofFloat(mFullScreenChartHolder, View.SCALE_Y,
                         mCurrentFullScreenStartScaleY, 1f));
         set.setDuration(getResources().getInteger(
                 android.R.integer.config_longAnimTime));
@@ -427,5 +472,24 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         }
 
         popup.show();
+    }
+
+    private static void loadGraphSettings(Context context, AbstractReport report) {
+        SharedPreferences prefs = context.getSharedPreferences(ReportFragment.class.getName(),
+                Context.MODE_PRIVATE);
+        String reportName = report.getClass().getSimpleName();
+        report.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
+        report.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
+        report.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
+    }
+
+    private static void saveGraphSettings(Context context, AbstractReport report) {
+        SharedPreferences.Editor prefsEdit = context.getSharedPreferences(
+                ReportFragment.class.getName(), Context.MODE_PRIVATE).edit();
+        String reportName = report.getClass().getSimpleName();
+        prefsEdit.putBoolean(reportName + "_show_trend", report.isShowTrend());
+        prefsEdit.putBoolean(reportName + "_show_overall_trend", report.isShowOverallTrend());
+        prefsEdit.putInt(reportName + "_current_chart_option", report.getChartOption());
+        prefsEdit.apply();
     }
 }

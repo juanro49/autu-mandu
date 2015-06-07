@@ -263,7 +263,7 @@ public class MileageReport extends AbstractReport {
                     section = addDataSection(String.format("%s (%s) [%s]", car.getName(), category,
                             mContext.getString(R.string.suspended)), car.getColor(), 1);
                 } else {
-                    section = addDataSection(String.format("%s (%s)", car.getColor(), category),
+                    section = addDataSection(String.format("%s (%s)", car.getName(), category),
                             car.getColor());
                 }
 

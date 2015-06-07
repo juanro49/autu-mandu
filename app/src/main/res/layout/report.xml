@@ -16,13 +16,13 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         card_view:cardBackgroundColor="#000">
         <FrameLayout
             android:layout_width="match_parent"
@@ -52,7 +52,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:singleLine="true"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        tools:text="John Doe"/>
                     <ImageButton
                         android:id="@+id/btn_report_details"
                         android:layout_width="32dp"

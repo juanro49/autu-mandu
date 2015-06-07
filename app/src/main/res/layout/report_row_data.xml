@@ -15,10 +15,11 @@
   limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="4dp" >
+    android:padding="4dp">
     <TextView
         android:id="@android:id/text1"
         android:layout_width="wrap_content"
@@ -26,7 +27,8 @@
         android:layout_weight="1"
         android:gravity="start"
         android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="Average"/>
     <TextView
         android:id="@android:id/text2"
         android:layout_width="wrap_content"
@@ -34,5 +36,6 @@
         android:layout_weight="0"
         android:gravity="end"
         android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="7,23 l/100km"/>
 </LinearLayout>

@@ -217,7 +217,7 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
         }
 
         mTable.setAdapter(new SimpleAdapter(getActivity(), tableData,
-                R.layout.row_report_data, new String[]{ "label", "value" },
+                R.layout.report_row_data, new String[]{ "label", "value" },
                 new int[]{ android.R.id.text1, android.R.id.text2 }));
         mTableHolder.setVisibility(View.VISIBLE);
     }
