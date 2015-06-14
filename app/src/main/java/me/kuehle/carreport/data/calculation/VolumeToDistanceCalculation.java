@@ -23,13 +23,8 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
-import me.kuehle.carreport.data.balancing.RefuelingBalancer;
-import me.kuehle.carreport.data.query.CarQueries;
-import me.kuehle.carreport.provider.car.CarCursor;
-import me.kuehle.carreport.provider.car.CarSelection;
 
-public class VolumeToDistanceCalculation extends AbstractCalculation {
+public class VolumeToDistanceCalculation extends AbstractVolumeDistanceCalculation {
     public VolumeToDistanceCalculation(Context context) {
         super(context);
     }
@@ -53,48 +48,14 @@ public class VolumeToDistanceCalculation extends AbstractCalculation {
     }
 
     @Override
-    public CalculationItem[] calculate(double input) {
+    protected CalculationItem[] onCalculate(double input) {
         List<CalculationItem> items = new ArrayList<>();
 
-        CarCursor car = new CarSelection().query(mContext.getContentResolver());
-        while (car.moveToNext()) {
-            String[] categories = CarQueries.getUsedFuelTypeCategories(mContext, car.getId());
-            for (String category : categories) {
-                RefuelingBalancer balancer = new RefuelingBalancer(mContext);
-                BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
+        for (int i = 0; i < mNames.size(); i++) {
+            String name = mNames.get(i);
+            double avgConsumption = mAvgConsumptions.get(i);
 
-                int lastMileage = 0;
-                int totalDistance = 0, distance = 0;
-                float totalVolume = 0, volume = 0;
-                boolean foundFullRefueling = false;
-
-                while(refueling.moveToNext()) {
-                    if (!foundFullRefueling) {
-                        if (!refueling.getPartial()) {
-                            foundFullRefueling = true;
-                        }
-                    } else {
-                        distance += refueling.getMileage() - lastMileage;
-                        volume += refueling.getVolume();
-
-                        if (!refueling.getPartial()) {
-                            totalDistance += distance;
-                            totalVolume += volume;
-
-                            distance = 0;
-                            volume = 0;
-                        }
-                    }
-
-                    lastMileage = refueling.getMileage();
-                }
-
-                if (totalDistance > 0 && totalVolume > 0) {
-                    double avgConsumption = totalVolume / totalDistance;
-                    items.add(new CalculationItem(String.format("%s (%s)",
-                            car.getName(), category), input / avgConsumption));
-                }
-            }
+            items.add(new CalculationItem(name, input / avgConsumption));
         }
 
         return items.toArray(new CalculationItem[items.size()]);

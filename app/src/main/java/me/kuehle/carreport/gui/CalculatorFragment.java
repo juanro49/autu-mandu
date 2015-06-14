@@ -17,7 +17,9 @@
 package me.kuehle.carreport.gui;
 
 import android.app.Activity;
+import android.database.ContentObserver;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -48,7 +50,6 @@ import me.kuehle.carreport.data.calculation.PriceToDistanceCalculation;
 import me.kuehle.carreport.data.calculation.PriceToVolumeCalculation;
 import me.kuehle.carreport.data.calculation.VolumeToDistanceCalculation;
 import me.kuehle.carreport.data.calculation.VolumeToPriceCalculation;
-import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 import me.kuehle.chartlib.ChartView;
 import me.kuehle.chartlib.axis.AxisLabelFormatter;
 import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
@@ -58,7 +59,23 @@ import me.kuehle.chartlib.data.Series;
 import me.kuehle.chartlib.renderer.BarRenderer;
 import me.kuehle.chartlib.renderer.RendererList;
 
-public class CalculatorFragment extends Fragment implements DataChangeListener {
+public class CalculatorFragment extends Fragment {
+    public final class ForceLoadContentObserver extends ContentObserver {
+        public ForceLoadContentObserver() {
+            super(new Handler());
+        }
+
+        @Override
+        public boolean deliverSelfNotifications() {
+            return true;
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            calculate();
+        }
+    }
+
     private static final String STATE_CURRENT_OPTION = "current_option";
 
     private Spinner mSpnOptions;
@@ -69,7 +86,10 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
     private View mTableHolder;
     private ListView mTable;
 
+    private ForceLoadContentObserver mObserver;
+
     private AbstractCalculation[] mCalculations;
+    private AbstractCalculation mSelectedCalculation;
 
     @Override
     public void onAttach(Activity activity) {
@@ -81,6 +101,8 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
                 new PriceToVolumeCalculation(activity),
                 new DistanceToPriceCalculation(activity),
                 new PriceToDistanceCalculation(activity)};
+
+        mObserver = new ForceLoadContentObserver();
     }
 
     @Override
@@ -110,14 +132,25 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
                                        int position, long id) {
-                AbstractCalculation calculation = mCalculations[position];
-                mTxtUnit.setText(calculation.getInputUnit());
+                if (mSelectedCalculation != null) {
+                    mSelectedCalculation.unregisterContentObserver(mObserver);
+                }
+
+                mSelectedCalculation = mCalculations[position];
+                mSelectedCalculation.registerContentObserver(mObserver);
+
+                mTxtUnit.setText(mSelectedCalculation.getInputUnit());
 
                 calculate();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
+                if (mSelectedCalculation != null) {
+                    mSelectedCalculation.unregisterContentObserver(mObserver);
+                }
+
+                mSelectedCalculation = null;
             }
         });
 
@@ -140,23 +173,16 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
     }
 
     @Override
-    public void onDataChanged() {
-        calculate();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_OPTION, mSpnOptions.getSelectedItemPosition());
     }
 
     private void calculate() {
-        int selectedCalculation = mSpnOptions.getSelectedItemPosition();
-        if (selectedCalculation < 0) {
+        if (mSelectedCalculation == null) {
             return;
         }
 
-        AbstractCalculation calculation = mCalculations[selectedCalculation];
         double input;
         try {
             input = Double.parseDouble(mEdtInput.getText().toString());
@@ -166,11 +192,11 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
             return;
         }
 
-        final CalculationItem[] items = calculation.calculate(input);
+        final CalculationItem[] items = mSelectedCalculation.calculate(input);
 
         // Update graph
         Dataset dataset = new Dataset();
-        Series series = new Series(calculation.getOutputUnit());
+        Series series = new Series(mSelectedCalculation.getOutputUnit());
         dataset.add(series);
         for (int i = 0; i < items.length; i++) {
             series.add(i, items[i].getValue());
@@ -212,7 +238,7 @@ public class CalculatorFragment extends Fragment implements DataChangeListener {
             Map<String, String> row = new HashMap<>();
             row.put("label", item.getName());
             row.put("value", String.format("%.2f %s", item.getValue(),
-                    calculation.getOutputUnit()));
+                    mSelectedCalculation.getOutputUnit()));
             tableData.add(row);
         }
 

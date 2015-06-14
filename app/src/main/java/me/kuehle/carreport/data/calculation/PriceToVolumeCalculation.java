@@ -7,13 +7,8 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
-import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
-import me.kuehle.carreport.provider.refueling.RefuelingCursor;
-import me.kuehle.carreport.provider.refueling.RefuelingSelection;
-import me.kuehle.carreport.util.Calculator;
 
-public class PriceToVolumeCalculation extends AbstractCalculation {
+public class PriceToVolumeCalculation extends AbstractPriceVolumeCalculation {
     public PriceToVolumeCalculation(Context context) {
         super(context);
     }
@@ -37,21 +32,14 @@ public class PriceToVolumeCalculation extends AbstractCalculation {
     }
 
     @Override
-    public CalculationItem[] calculate(double input) {
+    protected CalculationItem[] onCalculate(double input) {
         List<CalculationItem> items = new ArrayList<>();
 
-        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver());
-        while (fuelType.moveToNext()) {
-            RefuelingCursor refueling = new RefuelingSelection().fuelTypeId(fuelType.getId()).query(mContext.getContentResolver());
-            if (refueling.getCount() > 0) {
-                List<Float> fuelPrices = new ArrayList<>(refueling.getCount());
-                while (refueling.moveToNext()) {
-                    fuelPrices.add(refueling.getPrice() / refueling.getVolume());
-                }
+        for (int i = 0; i < mNames.size(); i++) {
+            String name = mNames.get(i);
+            double avgFuelPrice = mAvgFuelPrices.get(i);
 
-                float avgFuelPrice = Calculator.avg(fuelPrices.toArray(new Float[refueling.getCount()]));
-                items.add(new CalculationItem(fuelType.getName(), input / avgFuelPrice));
-            }
+            items.add(new CalculationItem(name, input / avgFuelPrice));
         }
 
         return items.toArray(new CalculationItem[items.size()]);

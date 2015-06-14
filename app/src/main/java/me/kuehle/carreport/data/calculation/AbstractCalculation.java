@@ -17,12 +17,47 @@
 package me.kuehle.carreport.data.calculation;
 
 import android.content.Context;
+import android.database.ContentObserver;
+import android.os.Handler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractCalculation {
+    public final class ForceLoadContentObserver extends ContentObserver {
+        public ForceLoadContentObserver() {
+            super(new Handler());
+        }
+
+        @Override
+        public boolean deliverSelfNotifications() {
+            return true;
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            contentChanged();
+        }
+    }
+
     protected Context mContext;
+    private ForceLoadContentObserver mInternalObserver;
+    private List<ContentObserver> mPublicObservers;
+    private boolean mDataChanged;
 
     public AbstractCalculation(Context context) {
         mContext = context;
+        mInternalObserver = new ForceLoadContentObserver();
+        mPublicObservers = new ArrayList<>();
+        mDataChanged = true;
+    }
+
+    public void registerContentObserver(ContentObserver observer) {
+        mPublicObservers.add(observer);
+    }
+
+    public void unregisterContentObserver(ContentObserver observer) {
+        mPublicObservers.remove(observer);
     }
 
     public abstract String getName();
@@ -31,5 +66,23 @@ public abstract class AbstractCalculation {
 
     public abstract String getOutputUnit();
 
-    public abstract CalculationItem[] calculate(double input);
+    public CalculationItem[] calculate(double input) {
+        if (mDataChanged) {
+            onLoadData(mInternalObserver);
+        }
+
+        return onCalculate(input);
+    }
+
+    protected abstract void onLoadData(ContentObserver observer);
+
+    protected abstract CalculationItem[] onCalculate(double input);
+
+    private void contentChanged() {
+        mDataChanged = true;
+
+        for (ContentObserver observer : mPublicObservers) {
+            observer.dispatchChange(false);
+        }
+    }
 }
