@@ -17,6 +17,7 @@
 package me.kuehle.carreport.data.report;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 
@@ -117,25 +118,6 @@ public class CostsReport extends AbstractReport {
         return mContext.getString(R.string.report_title_costs);
     }
 
-    private double[] getXValues(Dataset dataset) {
-        HashSet<Double> values = new HashSet<>();
-        for (int s = 0; s < dataset.size(); s++) {
-            Series series = dataset.get(s);
-            for (int p = 0; p < series.size(); p++) {
-                values.add(series.get(p).x);
-            }
-        }
-        ArrayList<Double> list = new ArrayList<>(values);
-        Collections.sort(list);
-
-        double[] arrValues = new double[list.size()];
-        for (int i = 0; i < arrValues.length; i++) {
-            arrValues[i] = list.get(i);
-        }
-
-        return arrValues;
-    }
-
     @Override
     protected Chart onGetChart(boolean zoomable, boolean moveable) {
         final Dataset dataset = new Dataset();
@@ -210,7 +192,7 @@ public class CostsReport extends AbstractReport {
     }
 
     @Override
-    protected void onUpdate() {
+    protected Cursor[] onUpdate() {
         Preferences prefs = new Preferences(mContext);
         String unit = prefs.getUnitCurrency();
 
@@ -225,7 +207,11 @@ public class CostsReport extends AbstractReport {
             mVisibleBarCount = 3;
         }
 
+        ArrayList<Cursor> cursors = new ArrayList<>();
+
+        RefuelingBalancer balancer = new RefuelingBalancer(mContext);
         CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        cursors.add(car);
         while (car.moveToNext()) {
             Section section;
             if (car.getSuspendedSince() != null) {
@@ -251,9 +237,10 @@ public class CostsReport extends AbstractReport {
             }
             double costs = 0;
 
-            RefuelingBalancer balancer = new RefuelingBalancer(mContext);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId());
+            cursors.add(refueling);
             OtherCostCursor otherCost = new OtherCostSelection().carId(car.getId()).query(mContext.getContentResolver());
+            cursors.add(otherCost);
 
             if ((refueling.getCount() + otherCost.getCount()) < 2) {
                 section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
@@ -282,7 +269,9 @@ public class CostsReport extends AbstractReport {
 
             first = true;
             while (otherCost.moveToNext()) {
-                if (!first || (otherCost.getMileage() != null && otherCost.getMileage() > -1 && otherCost.getMileage() < startMileage)) {
+                if (!first || (otherCost.getMileage() != null &&
+                        otherCost.getMileage() > -1 &&
+                        otherCost.getMileage() < startMileage)) {
                     int recurrences;
                     if (otherCost.getEndDate() == null) {
                         recurrences = Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(),
@@ -361,5 +350,26 @@ public class CostsReport extends AbstractReport {
                     DateFormat.getDateFormat(mContext).format(startDate.toDate())),
                     String.format("%.2f %s", costs, unit)));
         }
+
+        return cursors.toArray(new Cursor[cursors.size()]);
+    }
+
+    private double[] getXValues(Dataset dataset) {
+        HashSet<Double> values = new HashSet<>();
+        for (int s = 0; s < dataset.size(); s++) {
+            Series series = dataset.get(s);
+            for (int p = 0; p < series.size(); p++) {
+                values.add(series.get(p).x);
+            }
+        }
+        ArrayList<Double> list = new ArrayList<>(values);
+        Collections.sort(list);
+
+        double[] arrValues = new double[list.size()];
+        for (int i = 0; i < arrValues.length; i++) {
+            arrValues[i] = list.get(i);
+        }
+
+        return arrValues;
     }
 }

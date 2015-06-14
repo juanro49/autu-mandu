@@ -57,16 +57,17 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.gui.MainActivity.BackPressedListener;
-import me.kuehle.carreport.gui.MainActivity.DataChangeListener;
 import me.kuehle.chartlib.ChartView;
 
-public class ReportFragment extends Fragment implements OnMenuItemClickListener, DataChangeListener,
+public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         BackPressedListener, LoaderManager.LoaderCallbacks<List<AbstractReport>> {
     public static class ReportLoader extends AsyncTaskLoader<List<AbstractReport>> {
+        private final ForceLoadContentObserver mObserver;
         private Preferences mPrefs;
 
         public ReportLoader(Context context) {
             super(context);
+            mObserver = new ForceLoadContentObserver();
             mPrefs = new Preferences(context);
         }
 
@@ -80,6 +81,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
                 if (report != null) {
                     ReportFragment.loadGraphSettings(getContext(), report);
                     report.update();
+                    report.registerContentObserver(mObserver);
                     reports.add(report);
                 }
             }
@@ -281,11 +283,6 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         getLoaderManager().initLoader(0, null, this);
 
         return v;
-    }
-
-    @Override
-    public void onDataChanged() {
-        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override

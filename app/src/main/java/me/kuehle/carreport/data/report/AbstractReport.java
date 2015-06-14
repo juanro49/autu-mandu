@@ -17,6 +17,8 @@
 package me.kuehle.carreport.data.report;
 
 import android.content.Context;
+import android.database.ContentObserver;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -164,6 +166,7 @@ public abstract class AbstractReport {
     private boolean mShowTrend = false;
     private boolean mShowOverallTrend = false;
     private int mChartOption = 0;
+    private Cursor[] mUsedCursors;
 
     private boolean mInitialized = false;
 
@@ -175,10 +178,12 @@ public abstract class AbstractReport {
     };
 
     public AbstractReport(Context context) {
-        this.mContext = context;
+        mContext = context;
     }
 
     public abstract int[] getAvailableChartOptions();
+
+    public abstract String getTitle();
 
     public Chart getChart(boolean zoomable, boolean moveable) {
         if (mInitialized) {
@@ -214,8 +219,6 @@ public abstract class AbstractReport {
         }
     }
 
-    public abstract String getTitle();
-
     public boolean isShowTrend() {
         return mShowTrend;
     }
@@ -224,31 +227,33 @@ public abstract class AbstractReport {
         return mShowOverallTrend;
     }
 
+    public void registerContentObserver(ContentObserver observer) {
+        for (Cursor c : mUsedCursors) {
+            c.registerContentObserver(observer);
+        }
+    }
+
     public void setChartOption(int chartOption) {
         if (chartOption < getAvailableChartOptions().length) {
-            this.mChartOption = chartOption;
+            mChartOption = chartOption;
         } else {
-            this.mChartOption = 0;
+            mChartOption = 0;
         }
     }
 
     public void setShowTrend(boolean showTrend) {
-        this.mShowTrend = showTrend;
+        mShowTrend = showTrend;
     }
 
     public void setShowOverallTrend(boolean showOverallTrend) {
-        this.mShowOverallTrend = showOverallTrend;
+        mShowOverallTrend = showOverallTrend;
     }
 
     public void update() {
         mInitialized = false;
         mData.clear();
-        onUpdate();
+        mUsedCursors = onUpdate();
         mInitialized = true;
-    }
-
-    protected void addData(String label, String value) {
-        mData.add(new Item(label, value));
     }
 
     protected Section addDataSection(String label, int color) {
@@ -270,5 +275,12 @@ public abstract class AbstractReport {
 
     protected abstract Chart onGetChart(boolean zoomable, boolean moveable);
 
-    protected abstract void onUpdate();
+    /**
+     * Is called as a result of {@link #update()} and should perform all operations to
+     * update the report with the newest data.
+     *
+     * @return The cursors used in the process. These will be used to register a content
+     * observer on them, so the caller can get noticed of any changes.
+     */
+    protected abstract Cursor[] onUpdate();
 }

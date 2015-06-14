@@ -17,11 +17,14 @@
 package me.kuehle.carreport.data.report;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 
@@ -42,13 +45,16 @@ import me.kuehle.chartlib.renderer.RendererList;
 
 public class MileageReport extends AbstractReport {
     private class ReportGraphDataAccumulated extends AbstractReportGraphData {
+        private Cursor mCursor;
+
         public ReportGraphDataAccumulated(Context context, CarCursor car) {
             super(context, car.getName(), car.getColor());
 
             RefuelingBalancer balancer = new RefuelingBalancer(context);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId());
-            boolean wasLastRefuelingGuessed = false;
+            mCursor = refueling;
 
+            boolean wasLastRefuelingGuessed = false;
             while(refueling.moveToNext()) {
                 xValues.add(refueling.getDate().getTime());
                 yValues.add((double) refueling.getMileage());
@@ -63,17 +69,24 @@ public class MileageReport extends AbstractReport {
                 wasLastRefuelingGuessed = refueling.getGuessed();
             }
         }
+
+        public Cursor[] getUsedCursors() {
+            return new Cursor[] { mCursor };
+        }
     }
 
     private class ReportGraphDataPerRefueling extends AbstractReportGraphData {
+        private Cursor mCursor;
+
         public ReportGraphDataPerRefueling(Context context, CarCursor car, String category) {
             super(context, String.format("%s (%s)", car.getName(), category), car.getColor());
 
             RefuelingBalancer balancer = new RefuelingBalancer(context);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
+            mCursor = refueling;
+
             boolean wasLastRefuelingGuessed = false;
             int lastRefuelingMileage = -1;
-
             while(refueling.moveToNext()) {
                 if (lastRefuelingMileage > -1) {
                     xValues.add(refueling.getDate().getTime());
@@ -91,16 +104,23 @@ public class MileageReport extends AbstractReport {
                 lastRefuelingMileage = refueling.getMileage();
             }
         }
+
+        public Cursor[] getUsedCursors() {
+            return new Cursor[] { mCursor };
+        }
     }
 
     private class ReportGraphDataPerMonth extends AbstractReportGraphData {
+        private Cursor mCursor;
+
         public ReportGraphDataPerMonth(Context context, CarCursor car) {
             super(context, car.getName(), car.getColor());
 
             RefuelingBalancer balancer = new RefuelingBalancer(context);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId());
-            int lastRefuelingMileage = -1;
+            mCursor = refueling;
 
+            int lastRefuelingMileage = -1;
             while(refueling.moveToNext()) {
                 if (lastRefuelingMileage > -1) {
                     long x = getMonthTime(refueling.getDate().getTime());
@@ -117,6 +137,10 @@ public class MileageReport extends AbstractReport {
 
                 lastRefuelingMileage = refueling.getMileage();
             }
+        }
+
+        public Cursor[] getUsedCursors() {
+            return new Cursor[] { mCursor };
         }
 
         private long getMonthTime(long time) {
@@ -233,17 +257,21 @@ public class MileageReport extends AbstractReport {
     }
 
     @Override
-    protected void onUpdate() {
+    protected Cursor[] onUpdate() {
         // Preferences
         Preferences prefs = new Preferences(mContext);
         unit = prefs.getUnitDistance();
 
+        ArrayList<Cursor> cursors = new ArrayList<>();
+
         // Car data
         CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        cursors.add(car);
         while (car.moveToNext()) {
             // Accumulated data
             ReportGraphDataAccumulated carDataAccumulated = new ReportGraphDataAccumulated(
                     mContext, car);
+            cursors.addAll(Arrays.asList(carDataAccumulated.getUsedCursors()));
             if (carDataAccumulated.size() > 0) {
                 reportDataAccumulated.add(carDataAccumulated);
                 minXValue[GRAPH_OPTION_ACCUMULATED] = Math.min(
@@ -256,6 +284,7 @@ public class MileageReport extends AbstractReport {
             for (String category : categories) {
                 ReportGraphDataPerRefueling carDataPerRefueling = new ReportGraphDataPerRefueling(
                         mContext, car, category);
+                cursors.addAll(Arrays.asList(carDataPerRefueling.getUsedCursors()));
 
                 // Add section for car
                 Section section;
@@ -289,11 +318,14 @@ public class MileageReport extends AbstractReport {
 
             // Per month data
             ReportGraphDataPerMonth carDataPerMonth = new ReportGraphDataPerMonth(mContext, car);
+            cursors.addAll(Arrays.asList(carDataPerMonth.getUsedCursors()));
             if (carDataPerMonth.size() > 0) {
                 reportDataPerMonth.add(carDataPerMonth);
                 minXValue[GRAPH_OPTION_PER_MONTH] = Math.min(minXValue[GRAPH_OPTION_PER_MONTH],
                         carDataPerMonth.getSeries().minX());
             }
         }
+
+        return cursors.toArray(new Cursor[cursors.size()]);
     }
 }

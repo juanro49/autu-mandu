@@ -59,10 +59,6 @@ public class MainActivity extends AppCompatActivity implements
         boolean onBackPressed();
     }
 
-    public interface DataChangeListener {
-        void onDataChanged();
-    }
-
     private static final int REQUEST_FIRST_START = 0;
     private static final int REQUEST_ADD_DATA = 1;
     private static final int REQUEST_FROM_DRAWER = 2;
@@ -168,7 +164,8 @@ public class MainActivity extends AppCompatActivity implements
                 invalidateOptionsMenu();
             }
 
-            dataChanged();
+            // Cars could have been changed, so the drawer has to be updated.
+            updateNavigationViewMenu();
         }
     }
 
@@ -327,7 +324,8 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         if (result) {
-            dataChanged();
+            // Cars could have been changed, so the drawer has to be updated.
+            updateNavigationViewMenu();
         } else {
             Toast.makeText(MainActivity.this, R.string.toast_synchronization_failed,
                     Toast.LENGTH_SHORT).show();
@@ -433,15 +431,6 @@ public class MainActivity extends AppCompatActivity implements
         menu.add(R.string.drawer_help).setIntent(new Intent(this, HelpActivity.class));
 
         menu.setGroupCheckable(1, true, true);
-    }
-
-    private void dataChanged() {
-        if (mCurrentFragment instanceof DataChangeListener) {
-            ((DataChangeListener) mCurrentFragment).onDataChanged();
-        }
-
-        // Cars could have been changed, so the drawer has to be updated.
-        updateNavigationViewMenu();
     }
 
     private Intent getDetailActivityIntent(int edit, long carId) {

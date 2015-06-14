@@ -17,11 +17,13 @@
 package me.kuehle.carreport.data.report;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
@@ -42,15 +44,22 @@ import me.kuehle.chartlib.renderer.RendererList;
 
 public class FuelPriceReport extends AbstractReport {
     private class ReportGraphData extends AbstractReportGraphData {
+        private Cursor mCursor;
+
         public ReportGraphData(Context context, FuelTypeCursor fuelType, int color) {
             super(context, fuelType.getName(), color);
 
             RefuelingCursor refueling = new RefuelingSelection().fuelTypeId(fuelType.getId())
                     .query(mContext.getContentResolver(), RefuelingColumns.ALL_COLUMNS);
+            mCursor = refueling;
             while (refueling.moveToNext()) {
                 xValues.add(refueling.getDate().getTime());
                 yValues.add((double) (refueling.getPrice() / refueling.getVolume()));
             }
+        }
+
+        public Cursor[] getUsedCursors() {
+            return new Cursor[] { mCursor };
         }
     }
 
@@ -137,12 +146,15 @@ public class FuelPriceReport extends AbstractReport {
     }
 
     @Override
-    protected void onUpdate() {
+    protected Cursor[] onUpdate() {
         Preferences prefs = new Preferences(mContext);
         unit = String.format("%s/%s", prefs.getUnitCurrency(),
                 prefs.getUnitVolume());
 
+        ArrayList<Cursor> cursors = new ArrayList<>();
+
         FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver());
+        cursors.add(fuelType);
 
         float[] hsvColor = new float[3];
         Color.colorToHSV(
@@ -155,6 +167,7 @@ public class FuelPriceReport extends AbstractReport {
         while (fuelType.moveToNext()) {
             int color = Color.HSVToColor(hsvColor);
             ReportGraphData data = new ReportGraphData(mContext, fuelType, color);
+            cursors.addAll(Arrays.asList(data.getUsedCursors()));
             if (!data.isEmpty()) {
                 reportData.add(data);
 
@@ -182,5 +195,7 @@ public class FuelPriceReport extends AbstractReport {
                 }
             }
         }
+
+        return cursors.toArray(new Cursor[cursors.size()]);
     }
 }

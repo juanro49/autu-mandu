@@ -17,9 +17,12 @@
 package me.kuehle.carreport.data.report;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.text.format.DateFormat;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 
@@ -41,6 +44,7 @@ import me.kuehle.chartlib.renderer.RendererList;
 
 public class FuelConsumptionReport extends AbstractReport {
     private class ReportGraphData extends AbstractReportGraphData {
+        private Cursor mCursor;
         private double avgConsumption;
 
         public ReportGraphData(Context context, CarCursor car, String category) {
@@ -49,6 +53,7 @@ public class FuelConsumptionReport extends AbstractReport {
             FuelConsumption fuelConsumption = new FuelConsumption(context);
             RefuelingBalancer balancer = new RefuelingBalancer(context);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
+            mCursor = refueling;
 
             int lastMileage = 0;
             int totalDistance = 0, partialDistance = 0;
@@ -70,9 +75,8 @@ public class FuelConsumptionReport extends AbstractReport {
                         totalDistance += partialDistance;
                         totalVolume += partialVolume;
 
-                        double consumption = fuelConsumption
-                                .computeFuelConsumption(partialVolume,
-                                        partialDistance);
+                        double consumption = fuelConsumption.computeFuelConsumption(partialVolume,
+                                partialDistance);
                         xValues.add(refueling.getDate().getTime());
                         yValues.add(consumption);
 
@@ -93,12 +97,15 @@ public class FuelConsumptionReport extends AbstractReport {
                 lastMileage = refueling.getMileage();
             }
 
-            avgConsumption = fuelConsumption.computeFuelConsumption(
-                    totalVolume, totalDistance);
+            avgConsumption = fuelConsumption.computeFuelConsumption(totalVolume, totalDistance);
         }
 
         public double getAverageConsumption() {
             return avgConsumption;
+        }
+
+        public Cursor[] getUsedCursors() {
+            return new Cursor[] { mCursor };
         }
     }
 
@@ -119,28 +126,6 @@ public class FuelConsumptionReport extends AbstractReport {
     @Override
     public String getTitle() {
         return mContext.getString(R.string.report_title_fuel_consumption);
-    }
-
-    private Section addDataSection(CarCursor car) {
-        String name = car.getName();
-
-        if (car.getSuspendedSince() != null) {
-            return addDataSection(String.format("%s [%s]", name,
-                    mContext.getString(R.string.suspended)), car.getColor(), 1);
-        } else {
-            return addDataSection(name, car.getColor());
-        }
-    }
-
-    private Section addDataSection(CarCursor car, String category) {
-        String name = String.format("%s (%s)", car.getName(), category);
-
-        if (car.getSuspendedSince() != null) {
-            return addDataSection(String.format("%s [%s]", name,
-                    mContext.getString(R.string.suspended)), car.getColor(), 1);
-        } else {
-            return addDataSection(name, car.getColor());
-        }
     }
 
     @Override
@@ -218,14 +203,17 @@ public class FuelConsumptionReport extends AbstractReport {
     }
 
     @Override
-    protected void onUpdate() {
+    protected Cursor[] onUpdate() {
         // Preferences
         FuelConsumption fuelConsumption = new FuelConsumption(mContext);
         unit = fuelConsumption.getUnitLabel();
 
+        ArrayList<Cursor> cursors = new ArrayList<>();
+
         // Collect report data and add info data which will be displayed
         // next to the graph.
         CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        cursors.add(car);
         while (car.moveToNext()) {
             boolean sectionAdded = false;
 
@@ -237,6 +225,7 @@ public class FuelConsumptionReport extends AbstractReport {
                 }
 
                 reportData.add(carData);
+                cursors.addAll(Arrays.asList(carData.getUsedCursors()));
 
                 Section section = addDataSection(car, category);
                 Double[] yValues = carData.yValues.toArray(new Double[carData.yValues.size()]);
@@ -259,6 +248,30 @@ public class FuelConsumptionReport extends AbstractReport {
                 section.addItem(new Item(mContext
                         .getString(R.string.report_not_enough_data), ""));
             }
+        }
+
+        return cursors.toArray(new Cursor[cursors.size()]);
+    }
+
+    private Section addDataSection(CarCursor car) {
+        String name = car.getName();
+
+        if (car.getSuspendedSince() != null) {
+            return addDataSection(String.format("%s [%s]", name,
+                    mContext.getString(R.string.suspended)), car.getColor(), 1);
+        } else {
+            return addDataSection(name, car.getColor());
+        }
+    }
+
+    private Section addDataSection(CarCursor car, String category) {
+        String name = String.format("%s (%s)", car.getName(), category);
+
+        if (car.getSuspendedSince() != null) {
+            return addDataSection(String.format("%s [%s]", name,
+                    mContext.getString(R.string.suspended)), car.getColor(), 1);
+        } else {
+            return addDataSection(name, car.getColor());
         }
     }
 }
