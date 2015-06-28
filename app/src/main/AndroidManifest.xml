@@ -18,10 +18,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="me.kuehle.carreport">
 
+    <!-- Purpose: backup/restore, CSV export/import, sync -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Purpose: sync -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <!-- Purpose: setup reminder service, so reminders work after reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
@@ -69,6 +79,11 @@
                 android:value=".gui.MainActivity" />
         </activity>
         <activity
+            android:name=".gui.AuthenticatorAddAccountActivity"
+            android:label="@string/title_first_start"
+            android:theme="@style/Base.Theme.AppCompat.Dialog"
+            android:excludeFromRecents="true"/>
+        <activity
             android:name="com.dropbox.client2.android.AuthActivity"
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask"
@@ -82,12 +97,30 @@
         </activity>
 
         <service
-            android:name=".util.backup.SynchronizationService"
-            android:exported="false" />
+            android:name=".util.sync.AuthenticatorService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+        <service
+            android:name=".util.sync.SyncService"
+            android:process=":sync"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_adapter" />
+        </service>
         <service
             android:name=".util.reminder.ReminderService"
             android:exported="false"
-            android:process=":background" />
+            android:process=":reminder" />
 
         <receiver android:name=".util.reminder.ReminderEnablerReceiver">
             <intent-filter>

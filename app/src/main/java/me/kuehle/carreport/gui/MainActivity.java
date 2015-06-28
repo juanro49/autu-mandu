@@ -16,8 +16,13 @@
 
 package me.kuehle.carreport.gui;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SyncInfo;
+import android.content.SyncStatusObserver;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -38,7 +43,6 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Date;
 
@@ -46,14 +50,15 @@ import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.util.DemoData;
-import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
+import me.kuehle.carreport.util.sync.AbstractSyncProvider;
+import me.kuehle.carreport.util.sync.Authenticator;
 
 public class MainActivity extends AppCompatActivity implements
-        AbstractSynchronizationProvider.OnSynchronizeListener,
         NavigationView.OnNavigationItemSelectedListener {
     public interface BackPressedListener {
         boolean onBackPressed();
@@ -72,9 +77,11 @@ public class MainActivity extends AppCompatActivity implements
     private View mNavigationViewTop;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-
     private Fragment mCurrentFragment;
     private int mCurrentNavItemIndex;
+
+    private SyncStatusObserver mSyncStatusObserver;
+    private Object mSyncHandle;
     private MenuItem mSyncMenuItem;
 
     @Override
@@ -115,6 +122,18 @@ public class MainActivity extends AppCompatActivity implements
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+        mSyncStatusObserver = new SyncStatusObserver() {
+            @Override
+            public void onStatusChanged(int which) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateSyncMenuItem();
+                    }
+                });
+            }
+        };
+
         int navItemIndex = 0;
         if (savedInstanceState != null) {
             navItemIndex = savedInstanceState.getInt(STATE_NAV_ITEM_INDEX, 0);
@@ -139,19 +158,14 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
 
-        AbstractSynchronizationProvider provider = AbstractSynchronizationProvider.getCurrent(this);
-        if (mSyncMenuItem != null) {
-            mSyncMenuItem.setVisible(provider != null && provider.isAuthenticated());
+        // Refresh synchronization status
+        mSyncStatusObserver.onStatusChanged(0);
 
-            if (AbstractSynchronizationProvider.isSynchronisationInProgress()) {
-                MenuItemCompat.setActionView(mSyncMenuItem,
-                        R.layout.actionbar_indeterminate_progress);
-            } else {
-                MenuItemCompat.setActionView(mSyncMenuItem, null);
-            }
-        }
-
-        AbstractSynchronizationProvider.setSynchronisationCallback(this);
+        // Watch for synchronization status changes
+        mSyncHandle = ContentResolver.addStatusChangeListener(
+                ContentResolver.SYNC_OBSERVER_TYPE_PENDING |
+                        ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE,
+                mSyncStatusObserver);
     }
 
     @Override
@@ -200,17 +214,11 @@ public class MainActivity extends AppCompatActivity implements
         inflater.inflate(R.menu.main, menu);
         mSyncMenuItem = menu.findItem(R.id.menu_synchronize);
 
-        AbstractSynchronizationProvider provider = AbstractSynchronizationProvider.getCurrent(this);
-        if (provider == null) {
+        Account account = getCurrentSyncAccount();
+        if (account == null) {
             mSyncMenuItem.setVisible(false);
         } else {
-            mSyncMenuItem.setVisible(provider.isAuthenticated());
-            if (AbstractSynchronizationProvider.isSynchronisationInProgress()) {
-                MenuItemCompat.setActionView(mSyncMenuItem,
-                        R.layout.actionbar_indeterminate_progress);
-            } else {
-                MenuItemCompat.setActionView(mSyncMenuItem, null);
-            }
+            mSyncMenuItem.setVisible(true);
         }
 
         if (BuildConfig.DEBUG) {
@@ -267,7 +275,11 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (item.getItemId()) {
             case R.id.menu_synchronize:
-                AbstractSynchronizationProvider.getCurrent(this).synchronize();
+                Account account = getCurrentSyncAccount();
+                Bundle settingsBundle = new Bundle();
+                settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                ContentResolver.requestSync(account, DataProvider.AUTHORITY, settingsBundle);
                 return true;
             default:
                 if (item.getIntent() != null) {
@@ -311,28 +323,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSynchronizationStarted() {
-        if (mSyncMenuItem != null) {
-            MenuItemCompat.setActionView(mSyncMenuItem, R.layout.actionbar_indeterminate_progress);
-        }
-    }
-
-    @Override
-    public void onSynchronizationFinished(boolean result) {
-        if (mSyncMenuItem != null) {
-            MenuItemCompat.setActionView(mSyncMenuItem, null);
-        }
-
-        if (result) {
-            // Cars could have been changed, so the drawer has to be updated.
-            updateNavigationViewMenu();
-        } else {
-            Toast.makeText(MainActivity.this, R.string.toast_synchronization_failed,
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
         getSupportActionBar().setTitle(mTitle);
@@ -341,7 +331,11 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        AbstractSynchronizationProvider.setSynchronisationCallback(null);
+
+        if (mSyncHandle != null) {
+            ContentResolver.removeStatusChangeListener(mSyncHandle);
+            mSyncHandle = null;
+        }
     }
 
     @Override
@@ -391,16 +385,16 @@ public class MainActivity extends AppCompatActivity implements
         // Profile section on top of drawer
         ImageView topImage = (ImageView) mNavigationViewTop.findViewById(android.R.id.icon1);
         TextView topText = (TextView) mNavigationViewTop.findViewById(android.R.id.text1);
-        AbstractSynchronizationProvider syncProvider = AbstractSynchronizationProvider
-                .getCurrent(this);
-        if (syncProvider == null) {
+        Account account = getCurrentSyncAccount();
+        if (account == null) {
             topImage.setVisibility(View.GONE);
             topText.setVisibility(View.GONE);
         } else {
+            AbstractSyncProvider syncProvider = Authenticator.getSyncProviderByAccount(account);
             topImage.setVisibility(View.VISIBLE);
             topImage.setImageResource(syncProvider.getIcon());
             topText.setVisibility(View.VISIBLE);
-            topText.setText(syncProvider.getAccountName());
+            topText.setText(account.name);
         }
 
         // Data menu items
@@ -446,6 +440,42 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return intent;
+    }
+
+    private void updateSyncMenuItem() {
+        Account account = getCurrentSyncAccount();
+
+        boolean isSyncInProgress = false;
+        for (SyncInfo syncInfo : ContentResolver.getCurrentSyncs()) {
+            if (syncInfo.account.equals(account) &&
+                    syncInfo.authority.equals(DataProvider.AUTHORITY)) {
+                isSyncInProgress = true;
+            }
+        }
+
+        if (isSyncInProgress) {
+            if (mSyncMenuItem != null) {
+                MenuItemCompat.setActionView(mSyncMenuItem,
+                        R.layout.actionbar_indeterminate_progress);
+            }
+        } else {
+            if (mSyncMenuItem != null) {
+                MenuItemCompat.setActionView(mSyncMenuItem, null);
+            }
+
+            // Cars could have changed, so we need to update navigation drawer.
+            updateNavigationViewMenu();
+        }
+    }
+
+    private Account getCurrentSyncAccount() {
+        AccountManager accountManager = AccountManager.get(this);
+        Account[] accounts = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        if (accounts.length > 0) {
+            return accounts[0];
+        } else {
+            return null;
+        }
     }
 
     public static ActionBar getSupportActionBar(Fragment fragment) {

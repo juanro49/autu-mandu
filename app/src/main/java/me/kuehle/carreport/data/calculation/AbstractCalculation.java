@@ -18,6 +18,7 @@ package me.kuehle.carreport.data.calculation;
 
 import android.content.Context;
 import android.database.ContentObserver;
+import android.os.Build;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -82,7 +83,11 @@ public abstract class AbstractCalculation {
         mDataChanged = true;
 
         for (ContentObserver observer : mPublicObservers) {
-            observer.dispatchChange(false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                observer.dispatchChange(false, null);
+            }else {
+                observer.dispatchChange(false);
+            }
         }
     }
 }

@@ -216,7 +216,9 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
         List<String> reportTitles = new ArrayList<>();
         for (Class<? extends AbstractReport> reportClass : reportClasses) {
             AbstractReport report = AbstractReport.newInstance(reportClass, getActivity());
-            reportTitles.add(report.getTitle());
+            if (report != null) {
+                reportTitles.add(report.getTitle());
+            }
         }
 
         PreferenceScreen reportOrder = (PreferenceScreen) findPreference("behavior_report_order");

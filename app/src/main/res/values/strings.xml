@@ -129,10 +129,11 @@
     <string name="alert_about_licenses_title">Licenses</string>
     <string name="alert_change_color_title">Choose color</string>
     <string name="alert_sync_finishing_authentication">Finishing authentication…</string>
-    <string name="alert_sync_first_sync_title">First synchronization</string>
+    <string name="alert_sync_performing_first_sync">Performing first sync…</string>
     <string name="alert_sync_first_sync_message">There is remote data available. Please choose which data you want to use on your first synchronization.</string>
     <string name="alert_sync_first_sync_download">Online data</string>
     <string name="alert_sync_first_sync_upload">Local data</string>
+    <string name="alert_sync_first_sync_error">There was an error while performing the first sync. Please ensure you have a working network connection and try again.</string>
     <string name="alert_backup_overwrite_title">Backup</string>
     <string name="alert_backup_overwrite_message">A previous backup file does already exist on SD card.</string>
     <string name="alert_restore_title">Restore</string>
@@ -142,7 +143,6 @@
     <string name="alert_import_csv_title">Import CSV</string>
     <string name="alert_import_csv_message">Import will update existing entries and add new ones, but it will not delete entries.</string>
 
-    <string name="toast_synchronization_failed">Synchronization failed</string>
     <string name="toast_refueling_saved">Refueling saved</string>
     <string name="toast_refueling_deleted">Refueling deleted</string>
     <string name="toast_other_expenditure_saved">Other expenditure saved</string>
@@ -153,7 +153,6 @@
     <string name="toast_car_deleted">Car deleted</string>
     <string name="toast_reminder_saved">Reminder saved</string>
     <string name="toast_reminder_deleted">Reminder deleted</string>
-    <string name="toast_sync_authentication_failed">Authentication failed</string>
     <string name="toast_backup_success">Backup to file %s completed successfully.</string>
     <string name="toast_backup_failed">Backup failed</string>
     <string name="toast_restore_success">Restore completed successfully</string>
@@ -212,8 +211,6 @@
     <string name="pref_title_unit_distance">Distance</string>
     <string name="pref_title_unit_fuel_consumption">Fuel Consumption</string>
     <string name="pref_title_sync_setup">Set up synchronization</string>
-    <string name="pref_title_sync_on_start">On start</string>
-    <string name="pref_title_sync_on_change">On data change</string>
     <string name="pref_title_backup">Backup</string>
     <string name="pref_title_restore">Restore</string>
     <string name="pref_title_exportcsv">Export CSV</string>
@@ -222,8 +219,6 @@
     <string name="pref_summary_behavior_auto_guess_missing_data">Try to recognize missing refuelings. This will balance the significantly lower fuel consumptions, that occure when you forget to insert a refueling.</string>
     <string name="pref_summary_sync_setup">This is a very basic synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>
     <string name="pref_summary_sync_current_provider">Linked to %s. Click to unlink.</string>
-    <string name="pref_summary_sync_on_start">Automatically synchronize when the app starts.</string>
-    <string name="pref_summary_sync_on_change">Automatically synchronize when data is changed.</string>
     <string name="pref_summary_backup">Backup the current data to SD card.</string>
     <string name="pref_summary_restore">Restore data from file %s on SD card.</string>
     <string name="pref_summary_restore_no_data">File %s does not exist on SD card.</string>

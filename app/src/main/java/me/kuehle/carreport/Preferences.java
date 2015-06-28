@@ -72,33 +72,14 @@ public class Preferences {
         return DistanceEntryMode.valueOf(mode);
     }
 
-    public String getDropboxAccount() {
-        return mPrefs.getString("sync_dropbox_account", null);
+    public String getSyncLocalFileRev() {
+        return mPrefs.getString("sync_local_file_rev", null);
     }
 
-    public String getDropboxAccessToken() {
-        return mPrefs.getString("sync_dropbox_token", null);
-    }
-
-    public String getDropboxLocalRev() {
-        return mPrefs.getString("sync_dropbox_rev", null);
-    }
-
-    public String getGoogleDriveAccount() {
-        return mPrefs.getString("sync_drive_account", null);
-    }
-
-    public Date getGoogleDriveLocalModifiedDate() {
-        try {
-            long date = mPrefs.getLong("sync_drive_modified_date", -1);
-            if (date == -1) {
-                return null;
-            } else {
-                return new Date(date);
-            }
-        } catch (ClassCastException e) {
-            return null;
-        }
+    public void setSyncLocalFileRev(String rev) {
+        Editor edit = mPrefs.edit();
+        edit.putString("sync_local_file_rev", rev);
+        edit.apply();
     }
 
     @SuppressWarnings("unchecked")
@@ -124,10 +105,6 @@ public class Preferences {
         }
 
         return reports;
-    }
-
-    public String getSynchronizationProvider() {
-        return mPrefs.getString("sync_current_provider", null);
     }
 
     public TimeSpan getReminderSnoozeDuration() {
@@ -159,44 +136,6 @@ public class Preferences {
         return mPrefs.getBoolean("behavior_show_car_menu", true);
     }
 
-    public boolean isSyncOnChange() {
-        return mPrefs.getBoolean("sync_on_change", true);
-    }
-
-    public boolean isSyncOnStart() {
-        return mPrefs.getBoolean("sync_on_start", true);
-    }
-
-    public void setDropboxAccount(String account) {
-        Editor edit = mPrefs.edit();
-        edit.putString("sync_dropbox_account", account);
-        edit.apply();
-    }
-
-    public void setDropboxAccessToken(String accessToken) {
-        Editor edit = mPrefs.edit();
-        edit.putString("sync_dropbox_token", accessToken);
-        edit.apply();
-    }
-
-    public void setDropboxLocalRev(String rev) {
-        Editor edit = mPrefs.edit();
-        edit.putString("sync_dropbox_rev", rev);
-        edit.apply();
-    }
-
-    public void setGoogleDriveLocalModifiedDate(Date date) {
-        Editor edit = mPrefs.edit();
-        edit.putLong("sync_drive_modified_date", date == null ? -1 : date.getTime());
-        edit.apply();
-    }
-
-    public void setGoogleDriveAccount(String account) {
-        Editor edit = mPrefs.edit();
-        edit.putString("sync_drive_account", account);
-        edit.apply();
-    }
-
     public void setReportOrder(List<Class<? extends AbstractReport>> reports) {
         List<String> reportNames = new ArrayList<>();
         for (Class<? extends AbstractReport> report : reports) {
@@ -208,9 +147,51 @@ public class Preferences {
         edit.apply();
     }
 
-    public void setSynchronizationProvider(String provider) {
+    // Deprecated Dropbox and Google Drive sync settings
+
+    public String getDeprecatedSynchronizationProvider() {
+        return mPrefs.getString("sync_current_provider", null);
+    }
+
+    public String getDeprecatedDropboxAccount() {
+        return mPrefs.getString("sync_dropbox_account", null);
+    }
+
+    public String getDeprecatedDropboxAccessToken() {
+        return mPrefs.getString("sync_dropbox_token", null);
+    }
+
+    public String getDeprecatedDropboxLocalRev() {
+        return mPrefs.getString("sync_dropbox_rev", null);
+    }
+
+    public String getDeprecatedGoogleDriveAccount() {
+        return mPrefs.getString("sync_drive_account", null);
+    }
+
+    public Date getDeprecatedGoogleDriveLocalModifiedDate() {
+        try {
+            long date = mPrefs.getLong("sync_drive_modified_date", -1);
+            if (date == -1) {
+                return null;
+            } else {
+                return new Date(date);
+            }
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
+
+    public void removeDeprecatedSyncSettings() {
         Editor edit = mPrefs.edit();
-        edit.putString("sync_current_provider", provider);
+        edit.remove("sync_dropbox_account");
+        edit.remove("sync_dropbox_token");
+        edit.remove("sync_dropbox_rev");
+        edit.remove("sync_drive_modified_date");
+        edit.remove("sync_drive_account");
+        edit.remove("sync_current_provider");
+        edit.remove("sync_on_change");
+        edit.remove("sync_on_start");
         edit.apply();
     }
 }

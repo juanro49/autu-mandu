@@ -16,55 +16,57 @@
 
 package me.kuehle.carreport.gui;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
+import android.util.Log;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.gui.dialog.ListDialogFragment;
-import me.kuehle.carreport.gui.dialog.ListDialogFragment.ListDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
-import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider;
-import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider.OnAuthenticationListener;
-import me.kuehle.carreport.util.backup.AbstractSynchronizationProvider.OnUnlinkListener;
 import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.backup.CSVExportImport;
-import me.kuehle.carreport.util.backup.DropboxSynchronizationProvider;
+import me.kuehle.carreport.util.sync.AbstractSyncProvider;
+import me.kuehle.carreport.util.sync.Authenticator;
 
 public class PreferencesBackupFragment extends PreferenceFragment implements
-        MessageDialogFragmentListener, ListDialogFragmentListener,
-        OnAuthenticationListener, OnUnlinkListener {
-    private static final int REQUEST_CHOOSE_SYNC_PROVIDER = 10;
-    private static final int REQUEST_FIRST_SYNC = 11;
+        MessageDialogFragmentListener {
+    private static final String TAG = "PreferencesBackupFragme";
+
     private static final int REQUEST_BACKUP_OVERWRITE = 12;
     private static final int REQUEST_RESTORE = 13;
     private static final int REQUEST_EXPORT_CSV_OVERWRITE = 14;
     private static final int REQUEST_IMPORT_CSV = 15;
 
-    private AbstractSynchronizationProvider mCurrentSyncProvider;
+    private AccountManager mAccountManager;
     private Backup mBackup;
     private CSVExportImport mCSVExportImport;
 
     private OnPreferenceClickListener mSetupSync = new OnPreferenceClickListener() {
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            AbstractSynchronizationProvider[] providers = AbstractSynchronizationProvider
-                    .getAvailable(getActivity());
-            String[] items = new String[providers.length];
-            int[] icons = new int[providers.length];
-            for (int i = 0; i < providers.length; i++) {
-                items[i] = providers[i].getName();
-                icons[i] = providers[i].getIcon();
-            }
-
-            ListDialogFragment.newInstance(PreferencesBackupFragment.this,
-                    REQUEST_CHOOSE_SYNC_PROVIDER, null, items, icons,
-                    android.R.string.cancel).show(getFragmentManager(), null);
+            mAccountManager.addAccount(Authenticator.ACCOUNT_TYPE, null, null, null, getActivity(), new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(AccountManagerFuture<Bundle> future) {
+                    try {
+                        future.getResult();
+                        setupSynchronizationPreference();
+                    } catch (OperationCanceledException | IOException | AuthenticatorException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, null);
 
             return true;
         }
@@ -73,9 +75,20 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     private OnPreferenceClickListener mUnlinkSync = new OnPreferenceClickListener() {
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            mCurrentSyncProvider.unlink(PreferencesBackupFragment.this);
-            mCurrentSyncProvider = null;
-            setupSynchronizationPreference();
+            Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+            mAccountManager.removeAccount(accounts[0], new AccountManagerCallback<Boolean>() {
+                @Override
+                public void run(AccountManagerFuture<Boolean> future) {
+                    try {
+                        if (future.getResult()) {
+                            setupSynchronizationPreference();
+                        }
+                    } catch (OperationCanceledException | IOException | AuthenticatorException e) {
+                        Log.e(TAG, "Error removing sync account.", e);
+                    }
+                }
+            }, null);
+
             return true;
         }
     };
@@ -144,39 +157,13 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     };
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (mCurrentSyncProvider != null) {
-            mCurrentSyncProvider.continueAuthentication(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         if (activity instanceof PreferencesActivity) {
             activity.onAttachFragment(this);
         } else {
-            throw new ClassCastException(
-                    "This fragment can only be attached to the PreferencesActivity!");
+            throw new ClassCastException("This fragment can only be attached to the PreferencesActivity!");
         }
-    }
-
-    @Override
-    public void onAuthenticationFinished(boolean success,
-                                         boolean remoteDataAvailable) {
-        if (success) {
-            setupSynchronizationPreference();
-            startFirstSynchronisation(remoteDataAvailable);
-        } else {
-            Toast.makeText(getActivity(),
-                    R.string.toast_sync_authentication_failed,
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onUnlinkingFinished() {
-
     }
 
     @Override
@@ -184,8 +171,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences_backup);
-        mCurrentSyncProvider = AbstractSynchronizationProvider
-                .getCurrent(getActivity());
+        mAccountManager = AccountManager.get(getActivity());
         mBackup = new Backup(getActivity());
         mCSVExportImport = new CSVExportImport(getActivity());
 
@@ -226,17 +212,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     }
 
     @Override
-    public void onDialogNegativeClick(int requestCode) {
-        if (requestCode == REQUEST_FIRST_SYNC) {
-            mCurrentSyncProvider.synchronize(DropboxSynchronizationProvider.SYNC_UPLOAD);
-        }
-    }
-
-    @Override
     public void onDialogPositiveClick(int requestCode) {
-        if (requestCode == REQUEST_FIRST_SYNC) {
-            mCurrentSyncProvider.synchronize(DropboxSynchronizationProvider.SYNC_DOWNLOAD);
-        } else if (requestCode == REQUEST_BACKUP_OVERWRITE) {
+        if (requestCode == REQUEST_BACKUP_OVERWRITE) {
             doBackup();
         } else if (requestCode == REQUEST_RESTORE) {
             doRestore();
@@ -248,22 +225,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     }
 
     @Override
-    public void onDialogPositiveClick(int requestCode, int selectedPosition) {
-        if (requestCode == REQUEST_CHOOSE_SYNC_PROVIDER) {
-            mCurrentSyncProvider = AbstractSynchronizationProvider
-                    .getAvailable(getActivity())[selectedPosition];
-            mCurrentSyncProvider.startAuthentication(
-                    PreferencesBackupFragment.this,
-                    PreferencesBackupFragment.this);
-        }
-    }
+    public void onDialogNegativeClick(int requestCode) {
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mCurrentSyncProvider != null) {
-            mCurrentSyncProvider.continueAuthentication(0, 0, null);
-        }
     }
 
     private void doBackup() {
@@ -340,45 +303,21 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     }
 
     private void setupSynchronizationPreference() {
-        Preference sync = findPreference("sync_current_provider");
-        Preference syncOnStart = findPreference("sync_on_start");
-        Preference syncOnChange = findPreference("sync_on_change");
-
-        if (mCurrentSyncProvider != null
-                && mCurrentSyncProvider.isAuthenticated()) {
-            String name = mCurrentSyncProvider.getAccountName();
-            if (name == null) {
-                name = mCurrentSyncProvider.getName();
-            }
-
-            sync.setTitle(mCurrentSyncProvider.getName());
-            sync.setIcon(mCurrentSyncProvider.getIcon());
+        Preference sync = findPreference("sync");
+        Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        if (accounts.length > 0) {
+            AbstractSyncProvider syncProvider = Authenticator.getSyncProviderByAccount(accounts[0]);
+            sync.setTitle(syncProvider.getName());
+            sync.setIcon(syncProvider.getIcon());
             sync.setSummary(getString(
                     R.string.pref_summary_sync_current_provider,
-                    name));
+                    accounts[0].name));
             sync.setOnPreferenceClickListener(mUnlinkSync);
-            syncOnStart.setEnabled(true);
-            syncOnChange.setEnabled(true);
         } else {
             sync.setTitle(R.string.pref_title_sync_setup);
             sync.setIcon(R.drawable.ic_null);
             sync.setSummary(R.string.pref_summary_sync_setup);
             sync.setOnPreferenceClickListener(mSetupSync);
-            syncOnStart.setEnabled(false);
-            syncOnChange.setEnabled(false);
-        }
-    }
-
-    private void startFirstSynchronisation(boolean remoteDataAvailable) {
-        if (remoteDataAvailable) {
-            MessageDialogFragment.newInstance(this, REQUEST_FIRST_SYNC,
-                    R.string.alert_sync_first_sync_title,
-                    getString(R.string.alert_sync_first_sync_message),
-                    R.string.alert_sync_first_sync_download,
-                    R.string.alert_sync_first_sync_upload).show(
-                    getFragmentManager(), null);
-        } else {
-            mCurrentSyncProvider.synchronize(DropboxSynchronizationProvider.SYNC_UPLOAD);
         }
     }
 }

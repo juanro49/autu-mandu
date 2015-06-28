@@ -129,10 +129,11 @@
     <string name="alert_about_licenses_title">Lizenzen</string>
     <string name="alert_change_color_title">Farbe auswählen</string>
     <string name="alert_sync_finishing_authentication">Authentifizierung wird abgeschlossen…</string>
-    <string name="alert_sync_first_sync_title">Erste Synchronisierung</string>
+    <string name="alert_sync_performing_first_sync">Erster Sync wird durchgeführt…</string>
     <string name="alert_sync_first_sync_message">Es sind Online-Daten vorhanden. Welche Daten möchten Sie bei der ersten Synchronisation behalten.</string>
     <string name="alert_sync_first_sync_download">Online-Daten</string>
     <string name="alert_sync_first_sync_upload">Lokale Daten</string>
+    <string name="alert_sync_first_sync_error">Bei der ersten Synchronisation ist ein Fehler aufgetreten. Bitte stellen Sie sicher, dass Sie eine Internetverbinding haben und versuchen Sie es erneut.</string>
     <string name="alert_backup_overwrite_title">Sichern</string>
     <string name="alert_backup_overwrite_message">Es gibt bereits eine Sicherungsdatei auf der SD-Karte.</string>
     <string name="alert_restore_title">Wiederherstellen</string>
@@ -142,7 +143,6 @@
     <string name="alert_import_csv_title">CSV importieren</string>
     <string name="alert_import_csv_message">Der Import aktualisiert bestehende Einträge und fügt neue hinzu, löscht aber keine Einträge.</string>
 
-    <string name="toast_synchronization_failed">Synchronisation fehlgeschlagen</string>
     <string name="toast_refueling_saved">Tankfüllung gespeichert</string>
     <string name="toast_refueling_deleted">Tankfüllung gelöscht</string>
     <string name="toast_other_expenditure_saved">Andere Ausgaben gespeichert</string>
@@ -153,7 +153,6 @@
     <string name="toast_car_deleted">Auto gelöscht</string>
     <string name="toast_reminder_saved">Erinnerung gespeichert</string>
     <string name="toast_reminder_deleted">Erinnerung gelöscht</string>
-    <string name="toast_sync_authentication_failed">Authentifizierung fehlgeschlagen</string>
     <string name="toast_backup_success">Sichern der Daten zur Datei %s war erfolgreich.</string>
     <string name="toast_backup_failed">Sichern fehlgeschlagen</string>
     <string name="toast_restore_success">Wiederherstellen der Daten war erfolgreich</string>
@@ -212,8 +211,6 @@
     <string name="pref_title_unit_distance">Entfernung</string>
     <string name="pref_title_unit_fuel_consumption">Benzinverbrauch</string>
     <string name="pref_title_sync_setup">Synchronisation einrichten</string>
-    <string name="pref_title_sync_on_start">Beim App-Start</string>
-    <string name="pref_title_sync_on_change">Bei Datenänderung</string>
     <string name="pref_title_backup">Sichern</string>
     <string name="pref_title_restore">Wiederherstellen</string>
     <string name="pref_title_exportcsv">CSV exportieren</string>
@@ -222,8 +219,6 @@
     <string name="pref_summary_behavior_auto_guess_missing_data">Versuche fehlende Tankfüllungen zu erkennen. Dadurch werden die erheblich geringeren Benzinverbräuche, die entstehen, wenn eine Tankfüllung verbessen wird einzutragen, ausgeglichen.</string>
     <string name="pref_summary_sync_setup">Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>
     <string name="pref_summary_sync_current_provider">Verbunden mit %s. Klicke, um die Verbindung zu trennen.</string>
-    <string name="pref_summary_sync_on_start">Automatisch synchronisieren, wenn die App startet.</string>
-    <string name="pref_summary_sync_on_change">Automatisch synchronisieren, wenn Daten geändert werden.</string>
     <string name="pref_summary_backup">Daten auf der SD-Karte sichern.</string>
     <string name="pref_summary_restore">Daten aus der Datei %s von der SD-Karte wiederherstellen.</string>
     <string name="pref_summary_restore_no_data">Die Datei %s wurde nicht auf der SD-Karte gefunden.</string>
