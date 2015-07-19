@@ -98,8 +98,8 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
 
                     @Override
                     protected void onPostExecute(String result) {
-                        activity.onAuthenticationResult(result,
-                                mDBApi.getSession().getOAuth2AccessToken(), null, null);
+                        activity.onAuthenticationResult(result, null,
+                                mDBApi.getSession().getOAuth2AccessToken(), null);
                     }
                 }.execute();
             } catch (IllegalStateException e) {
