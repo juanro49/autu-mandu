@@ -89,7 +89,7 @@ public class CSVExportImport {
 
     private void exportCars() {
         CSVWriter csv = new CSVWriter();
-        csv.writeLine(CarColumns.ALL_COLUMNS);
+        csv.writeLine((Object[]) CarColumns.ALL_COLUMNS);
 
         CarCursor car = new CarSelection().query(mContext.getContentResolver());
         while (car.moveToNext()) {
@@ -97,8 +97,7 @@ public class CSVExportImport {
                     car.getId(),
                     car.getName(),
                     car.getColor(),
-                    car.getSuspendedSince()
-            );
+                    car.getSuspendedSince());
         }
 
         csv.toFile(new File(mExportDir, CarColumns.TABLE_NAME + ".csv"));
@@ -106,15 +105,14 @@ public class CSVExportImport {
 
     private void exportFuelTypes() {
         CSVWriter csv = new CSVWriter();
-        csv.writeLine(FuelTypeColumns.ALL_COLUMNS);
+        csv.writeLine((Object[]) FuelTypeColumns.ALL_COLUMNS);
 
         FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver());
         while (fuelType.moveToNext()) {
             csv.writeLine(
                     fuelType.getId(),
                     fuelType.getName(),
-                    fuelType.getCategory()
-            );
+                    fuelType.getCategory());
         }
 
         csv.toFile(new File(mExportDir, FuelTypeColumns.TABLE_NAME + ".csv"));
@@ -122,7 +120,7 @@ public class CSVExportImport {
 
     private void exportOtherCosts() {
         CSVWriter csv = new CSVWriter();
-        csv.writeLine(OtherCostColumns.ALL_COLUMNS);
+        csv.writeLine((Object[]) OtherCostColumns.ALL_COLUMNS);
 
         OtherCostCursor otherCost = new OtherCostSelection().query(mContext.getContentResolver());
         while (otherCost.moveToNext()) {
@@ -136,8 +134,7 @@ public class CSVExportImport {
                     otherCost.getRecurrenceMultiplier(),
                     otherCost.getEndDate(),
                     otherCost.getNote(),
-                    otherCost.getCarId()
-            );
+                    otherCost.getCarId());
         }
 
         csv.toFile(new File(mExportDir, OtherCostColumns.TABLE_NAME + ".csv"));
@@ -145,7 +142,7 @@ public class CSVExportImport {
 
     private void exportRefuelings() {
         CSVWriter csv = new CSVWriter();
-        csv.writeLine(RefuelingColumns.ALL_COLUMNS);
+        csv.writeLine((Object[]) RefuelingColumns.ALL_COLUMNS);
 
         RefuelingCursor refueling = new RefuelingSelection().query(mContext.getContentResolver());
         while (refueling.moveToNext()) {
@@ -158,8 +155,7 @@ public class CSVExportImport {
                     refueling.getPartial(),
                     refueling.getNote(),
                     refueling.getFuelTypeId(),
-                    refueling.getCarId()
-            );
+                    refueling.getCarId());
         }
 
         csv.toFile(new File(mExportDir, RefuelingColumns.TABLE_NAME + ".csv"));
@@ -167,7 +163,7 @@ public class CSVExportImport {
 
     private void exportReminders() {
         CSVWriter csv = new CSVWriter();
-        csv.writeLine(ReminderColumns.ALL_COLUMNS);
+        csv.writeLine((Object[]) ReminderColumns.ALL_COLUMNS);
 
         ReminderCursor reminder = new ReminderSelection().query(mContext.getContentResolver());
         while (reminder.moveToNext()) {
@@ -181,8 +177,7 @@ public class CSVExportImport {
                     reminder.getStartMileage(),
                     reminder.getNotificationDismissed(),
                     reminder.getSnoozedUntil(),
-                    reminder.getCarId()
-            );
+                    reminder.getCarId());
         }
 
         csv.toFile(new File(mExportDir, ReminderColumns.TABLE_NAME + ".csv"));

@@ -75,14 +75,17 @@ public class Application extends android.app.Application {
 
         String syncProvider = prefs.getDeprecatedSynchronizationProvider();
         if (syncProvider != null) {
+            long syncProviderId = 0;
             Account account = null;
             String authToken = null;
             if (syncProvider.equals("me.kuehle.carreport.util.backup.DropboxSynchronizationProvider")) {
+                syncProviderId = 1;
                 account = new Account(prefs.getDeprecatedDropboxAccount(), Authenticator.ACCOUNT_TYPE);
                 authToken = prefs.getDeprecatedDropboxAccessToken();
 
                 prefs.setSyncLocalFileRev(prefs.getDeprecatedDropboxLocalRev());
             } else if (syncProvider.equals("me.kuehle.carreport.util.backup.GoogleDriveSynchronizationProvider")) {
+                syncProviderId = 2;
                 account = new Account(prefs.getDeprecatedGoogleDriveAccount(), Authenticator.ACCOUNT_TYPE);
                 authToken = null;
 
@@ -96,7 +99,7 @@ public class Application extends android.app.Application {
                 accountManager.addAccountExplicitly(account, null, null);
                 accountManager.setAuthToken(account, Authenticator.AUTH_TOKEN_TYPE, authToken);
                 accountManager.setUserData(account, Authenticator.KEY_SYNC_PROVIDER,
-                        String.valueOf(Authenticator.getSyncProviderByAccount(account).getId()));
+                        String.valueOf(syncProviderId));
             }
 
             prefs.removeDeprecatedSyncSettings();

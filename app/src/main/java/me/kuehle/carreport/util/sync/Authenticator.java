@@ -66,7 +66,7 @@ public class Authenticator extends AbstractAccountAuthenticator {
         String settings = accountManager.getUserData(account, KEY_SYNC_PROVIDER_SETTINGS);
         try {
             return new JSONObject(settings);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             return null;
         }
     }

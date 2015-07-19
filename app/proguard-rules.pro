@@ -9,8 +9,6 @@
 
 # Database
 -keepattributes *Annotation*
--keep class me.kuehle.carreport.util.backup.DropboxSynchronizationProvider
--keep class me.kuehle.carreport.util.backup.GoogleDriveSynchronizationProvider
 
 # Reports
 -keep class me.kuehle.chartlib.ChartView
@@ -31,6 +29,7 @@
 
 # Misc
 -dontwarn org.bouncycastle.**
+-dontwarn org.slf4j.*
 
 # Google Play Services
 -keep class * extends java.util.ListResourceBundle {

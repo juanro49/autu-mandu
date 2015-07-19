@@ -240,6 +240,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
             mChkDismissed.setVisibility(View.GONE);
         } else {
             ReminderCursor reminder = new ReminderSelection().id(mId).query(getActivity().getContentResolver());
+            reminder.moveToNext();
 
             mEdtTitle.setText(reminder.getTitle());
             for (int pos = 0; pos < mSpnCar.getCount(); pos++) {
