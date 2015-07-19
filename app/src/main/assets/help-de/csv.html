@@ -5,45 +5,47 @@ Id Spalte der cars Tabelle.</p>
 
 <h1>Spalten</h1>
 <big>cars</big>
-<p>Id: [int]<br>
-name: [string]<br>
+<p>_id: [int]<br>
+car__name: [string]<br>
 suspended_since: [date]<br>
 color: [int] In <a href="http://developer.android.com/reference/android/graphics/Color.html">der Android Dokumentation für Color</a> finden Sie detaillierte Informationen darüber, wie der Farbwert berechnet wird.</p>
 
 <big>fuel_types</big>
-<p>Id: [int]<br>
-name: [string]<br>
+<p>_id: [int]<br>
+fuel_type__name: [string]<br>
 category: [string]</p>
 
 <big>other_costs</big>
-<p>Id: [int]<br>
-car: [int] die Id des Autos.<br>
+<p>_id: [int]<br>
+car_id: [int] die Id des Autos.<br>
 mileage: [int] der Gesamtkilometerstand.<br>
 price: [float]<br>
-recurrence: "ONCE|DAY|MONTH|QUARTER|YEAR [int]" Beispiel: DAY 5 bedeutet jeden fünften Tag.<br>
+recurrence_interval: [int] 0 = einmalig, 1 = täglich, 2 = monatlich, 3 = jedes Quartal, 4 = jährlich<br>
+recurrence_multiplier: [int] Gibt zusammen mit recurrence_interval den Wiederholungszyklus an. Beispiel: interval = 2 und multiplier = 5 bedeutet jeden 5. Monat.<br>
 title: [string]<br>
 date: [date]<br>
 note: [string]<br>
 end_date: [date] Beende die Wiederholungen an diesem Datum.</p>
 
 <big>refuelings</big>
-<p>Id: [int]<br>
-partial: "true|false"<br>
+<p>_id: [int]<br>
+partial: [bool] (1 oder 0)<br>
 date: [date]<br>
 note: [string]<br>
 volume: [float]<br>
 fuel_type: [int] die Id der Spritart.<br>
 price: [float]<br>
 mileage: [int] der Gesamtkilometerstand.<br>
-car: [int] die Id des Autos.</p>
+car_id: [int] die Id des Autos.</p>
 
 <big>reminders</big>
-<p>Id: [int]<br>
+<p>_id: [int]<br>
 title: [string]<br>
-after_time: "DAY|MONTH|YEAR [int]" Beispiel: MONTH 3 bedeutet nach drei Monaten.<br>
+after_time_span_unit: [int] 0 = Tage, 1 = Monate, 2 = Jahre<br>
+after_time_span_count: [int] Gibt zusammen mit after_time_span_unit eine Zeitspanne an. Beispiel: unit = 1 und count = 5 bedeutet nach 5 Monaten.<br>
 after_distance: [int]<br>
 start_date: [date]<br>
 start_mileage: [int]<br>
-car: [int] die Id des Autos.<br>
-notification_dismissed: "true|false"<br>
+car_id: [int] die Id des Autos.<br>
+notification_dismissed: [bool] (1 oder 0)<br>
 snoozed_until: [date]</p>

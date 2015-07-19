@@ -5,45 +5,47 @@ table.</p>
 
 <h1>Columns</h1>
 <big>cars</big>
-<p>Id: [int]<br>
-name: [string]<br>
+<p>_id: [int]<br>
+car__name: [string]<br>
 suspended_since: [date]<br>
 color: [int] Have a look at <a href="http://developer.android.com/reference/android/graphics/Color.html">the android color documentation</a> for a more detailed explanation how the value is calculated.</p>
 
 <big>fuel_types</big>
-<p>Id: [int]<br>
-name: [string]<br>
+<p>_id: [int]<br>
+fuel_type__name: [string]<br>
 category: [string]</p>
 
 <big>other_costs</big>
-<p>Id: [int]<br>
-car: [int] the Id of the car.<br>
+<p>_id: [int]<br>
+car_id: [int] the Id of the car.<br>
 mileage: [int] Total distance (odometer).<br>
 price: [float]<br>
-recurrence: "ONCE|DAY|MONTH|QUARTER|YEAR [int]" Example: DAY 5 means every five days.<br>
+recurrence_interval: [int] 0 = once, 1 = daily, 2 = monthly, 3 = every quarter, 4 = every year<br>
+recurrence_multiplier: [int] Specifies the recurrence cycle together with recurrence_interval. Example: interval = 2 and multiplier = 5 means every 5 months.<br>
 title: [string]<br>
 date: [date]<br>
 note: [string]<br>
 end_date: [date] End recurrence on this date.</p>
 
 <big>refuelings</big>
-<p>Id: [int]<br>
-partial: "true|false"<br>
+<p>_id: [int]<br>
+partial: [bool] (1 or 0)<br>
 date: [date]<br>
 note: [string]<br>
 volume: [float]<br>
 fuel_type: [int] the Id of the fuel type.<br>
 price: [float]<br>
 mileage: [int] Total distance (odometer).<br>
-car: [int] the Id of the car.</p>
+car_id: [int] the Id of the car.</p>
 
 <big>reminders</big>
-<p>Id: [int]<br>
+<p>_id: [int]<br>
 title: [string]<br>
-after_time: "DAY|MONTH|YEAR [int]" Example: MONTH 3 means after three months.<br>
+after_time_span_unit: [int] 0 = days, 1 = months, 2 = years<br>
+after_time_span_count: [int] Specifies a time span together with after_time_span_unit. Example: unit = 1 and count = 5 means after 5 months.<br>
 after_distance: [int]<br>
 start_date: [date]<br>
 start_mileage: [int]<br>
-car: [int] the Id of the car.<br>
-notification_dismissed: "true|false"<br>
+car_id: [int] the Id of the car.<br>
+notification_dismissed: [bool] (1 or 0)<br>
 snoozed_until: [date]</p>
