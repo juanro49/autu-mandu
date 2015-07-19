@@ -25,6 +25,7 @@ import android.content.SyncInfo;
 import android.content.SyncStatusObserver;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -134,12 +135,19 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
-        int navItemIndex = 0;
+        final int navItemIndex;
         if (savedInstanceState != null) {
             navItemIndex = savedInstanceState.getInt(STATE_NAV_ITEM_INDEX, 0);
+        } else {
+            navItemIndex = 0;
         }
 
-        onNavigationItemSelected(mNavigationView.getMenu().getItem(navItemIndex));
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                onNavigationItemSelected(mNavigationView.getMenu().getItem(navItemIndex));
+            }
+        });
 
         // When there is no car, show the first start activity.
         if (CarQueries.getCount(this) == 0) {

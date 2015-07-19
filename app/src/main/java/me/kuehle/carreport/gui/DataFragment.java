@@ -18,6 +18,7 @@ package me.kuehle.carreport.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -167,12 +168,17 @@ public class DataFragment extends Fragment implements DataListCallback,
 
         PagerAdapter pagerAdapter = new DataListPagerAdapter(getChildFragmentManager());
 
-        ViewPager mPager = (ViewPager) v.findViewById(R.id.pager);
-        mPager.setAdapter(pagerAdapter);
-        mPager.addOnPageChangeListener(new DataListOnPageChangeListener());
+        final ViewPager pager = (ViewPager) v.findViewById(R.id.pager);
+        pager.setAdapter(pagerAdapter);
+        pager.addOnPageChangeListener(new DataListOnPageChangeListener());
 
-        TabLayout tabs = (TabLayout) v.findViewById(R.id.tab_layout);
-        tabs.setupWithViewPager(mPager);
+        final TabLayout tabs = (TabLayout) v.findViewById(R.id.tab_layout);
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                tabs.setupWithViewPager(pager);
+            }
+        });
 
         mTxtNoEntrySelected = (TextView) v.findViewById(R.id.txt_no_entry_selected);
         if (getChildFragmentManager().findFragmentById(R.id.detail) != null) {
