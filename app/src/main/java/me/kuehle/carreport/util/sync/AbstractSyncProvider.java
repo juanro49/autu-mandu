@@ -19,10 +19,13 @@ package me.kuehle.carreport.util.sync;
 import android.accounts.Account;
 import android.accounts.NetworkErrorException;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 
 import com.google.api.services.drive.model.App;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +47,7 @@ public abstract class AbstractSyncProvider {
 
     public abstract String getName();
 
-    public abstract void setup(@Nullable Account account, @Nullable String authToken);
+    public abstract void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings);
 
     public abstract void startAuthentication(AuthenticatorAddAccountActivity activity);
 
@@ -68,36 +71,5 @@ public abstract class AbstractSyncProvider {
 
     protected File getLocalFile() {
         return new File(DataSQLiteOpenHelper.getInstance(Application.getContext()).getReadableDatabase().getPath());
-    }
-
-    protected boolean copyFile(File from, File to) {
-        try {
-            FileInputStream inStream = new FileInputStream(from);
-            FileOutputStream outStream = new FileOutputStream(to);
-            FileChannel src = inStream.getChannel();
-            FileChannel dst = outStream.getChannel();
-            dst.transferFrom(src, 0, src.size());
-            src.close();
-            dst.close();
-            outStream.close();
-            inStream.close();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    protected boolean copyFile(InputStream from, OutputStream to) {
-        try {
-            byte[] buffer = new byte[4096];
-            int len;
-            while ((len = from.read(buffer)) > 0) {
-                to.write(buffer, 0, len);
-            }
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

@@ -55,6 +55,9 @@
     <string name="hint_end_date">Enddatum</string>
     <string name="hint_suspend_date">Silllegedatum</string>
     <string name="hint_category">Kategorie</string>
+    <string name="hint_url">URL</string>
+    <string name="hint_user_name">Benutzername</string>
+    <string name="hint_password">Passwort</string>
     <string name="hint_reminder_after_distance">Nach Kilometern</string>
     <string name="hint_reminder_after_time">Nach Zeit</string>
     <string name="hint_reminder_start_mileage">Starte bei Kilometerstand</string>
@@ -78,12 +81,14 @@
     <string name="description_reminder_status_distance_and_time">Fällig in %1$s oder %2$s</string>
     <string name="description_reminder_status_distance">Fällig in %s</string>
     <string name="description_reminder_status_time">Fällig in %s</string>
+    <string name="description_webdav_url">Bitte geben Sie hier die URL zu einem speziellen Ordner für Car Report auf Ihrem WebDAV-Server ein. Car Report wird seine Dateien in diesem Ordner speichern, alles außerhalb des Ordners wird nicht angeführt.</string>
 
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
     <string name="validate_error_mileage_out_of_range_total">Der Kilometerstand muss bei Eingabe der Gesamtkilometer zwischen dem der letzten und der nächsten Tankfüllung liegen. Wenn Sie Tageskilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_mileage_out_of_range_trip">Der kumulierte Kilometerstand darf bei Eingabe der Tageskilometer den Kilometerstand der nächsten Tankfüllung nicht übersteigen. Wenn Sie Gesamtkilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_fuel_type_exists">Diese Kaftstoffart existiert bereits.</string>
+    <string name="validate_error_webdav_login">Login am WebDAV-Server fehlgeschlagen. Bitte prüfen Sie die URL, Benutzername und Password.</string>
 
     <string name="suspended">Stillgelegt</string>
     <string name="suspended_since">Stillgelegt seit %s</string>

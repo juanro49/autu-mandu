@@ -30,6 +30,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
@@ -46,7 +48,9 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
 
     private AbstractSyncProvider mSelectedSyncProvider;
     private Account mAuthenticatedAccount;
+    private String mAuthenticatedAccountPassword;
     private String mAuthenticatedAccountAuthToken;
+    private JSONObject mAuthenticatedAccountSettings;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,27 +95,31 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         mSelectedSyncProvider = mSyncProviderAdapter.getItem(position);
-        mSelectedSyncProvider.setup(null, null);
+        mSelectedSyncProvider.setup(null, null, null, null);
         mSelectedSyncProvider.startAuthentication(this);
 
         mListView.setVisibility(View.GONE);
         mProgressView.setVisibility(View.VISIBLE);
     }
 
-    public void onAuthenticationResult(String accountName, String authToken) {
+    public void onAuthenticationResult(String accountName, String password, String authToken, JSONObject settings) {
         if (accountName != null) {
             Intent data = new Intent();
             data.putExtra(AccountManager.KEY_ACCOUNT_NAME, accountName);
             data.putExtra(AccountManager.KEY_ACCOUNT_TYPE, Authenticator.ACCOUNT_TYPE);
+            data.putExtra(AccountManager.KEY_PASSWORD, password);
             data.putExtra(AccountManager.KEY_AUTHTOKEN, authToken);
 
             mAuthenticatedAccount = new Account(accountName, Authenticator.ACCOUNT_TYPE);
+            mAuthenticatedAccountPassword = password;
             mAuthenticatedAccountAuthToken = authToken;
+            mAuthenticatedAccountSettings = settings;
             AccountManager accountManager = AccountManager.get(this);
-            accountManager.addAccountExplicitly(mAuthenticatedAccount, null, null);
+            accountManager.addAccountExplicitly(mAuthenticatedAccount, password, null);
             accountManager.setAuthToken(mAuthenticatedAccount, Authenticator.AUTH_TOKEN_TYPE, authToken);
             accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER,
                     String.valueOf(mSelectedSyncProvider.getId()));
+            Authenticator.setSyncProviderSettings(mAuthenticatedAccount, settings);
 
             setAccountAuthenticatorResult(data.getExtras());
             setResult(Activity.RESULT_OK, data);
@@ -144,7 +152,9 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             protected Boolean doInBackground(Void... params) {
                 try {
                     mSelectedSyncProvider.setup(mAuthenticatedAccount,
-                            mAuthenticatedAccountAuthToken);
+                            mAuthenticatedAccountPassword,
+                            mAuthenticatedAccountAuthToken,
+                            mAuthenticatedAccountSettings);
                     String remoteRev = mSelectedSyncProvider.getRemoteFileRev();
                     return remoteRev != null;
                 } catch (Exception e) {

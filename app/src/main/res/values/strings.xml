@@ -55,6 +55,9 @@
     <string name="hint_end_date">End date</string>
     <string name="hint_suspend_date">Suspend date</string>
     <string name="hint_category">Category</string>
+    <string name="hint_url">URL</string>
+    <string name="hint_user_name">User name</string>
+    <string name="hint_password">Password</string>
     <string name="hint_reminder_after_distance">After distance</string>
     <string name="hint_reminder_after_time">After time</string>
     <string name="hint_reminder_start_mileage">Start at mileage</string>
@@ -78,12 +81,14 @@
     <string name="description_reminder_status_distance_and_time">Due in %1$s or %2$s</string>
     <string name="description_reminder_status_distance">Due in %s</string>
     <string name="description_reminder_status_time">Due in %s</string>
+    <string name="description_webdav_url">Please enter the URL to a special folder for Car Report on your WebDAV server. Car Report will store its data inside this folder, it won\'t touch anything outside of it.</string>
 
     <string name="validate_error_greater_zero">Has to be greater 0</string>
     <string name="validate_error_not_empty">Must not be empty</string>
     <string name="validate_error_mileage_out_of_range_total">Mileage needs to be between the mileage of the previous and next refueling in total distance entry mode. If you meant to insert trip distance, you can change entry mode in the settings.</string>
     <string name="validate_error_mileage_out_of_range_trip">The cumulated mileage cannot be higher than the mileage of the next refueling in trip distance entry mode. If you meant to insert total distance, you can change entry mode in the settings.</string>
     <string name="validate_error_fuel_type_exists">This fuel type does already exist.</string>
+    <string name="validate_error_webdav_login">Could not login to WebDAV server. Please check URL and credentials.</string>
     
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>

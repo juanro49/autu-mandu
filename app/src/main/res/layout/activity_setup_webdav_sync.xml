@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2014 Jan Kühle
+  ~ Copyright 2015 Jan Kühle
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,34 +15,44 @@
   ~ limitations under the License.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-    <!-- Name -->
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+    <!-- URL -->
     <EditText
-        android:id="@+id/edt_name"
+        android:id="@+id/edt_url"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:hint="@string/hint_name" />
-    <!-- Category -->
-    <AutoCompleteTextView
-        android:id="@+id/edt_category"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:hint="@string/hint_category" />
+        android:hint="@string/hint_url"
+        android:inputType="textUri"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:text="@string/description_category"
+        android:text="@string/description_webdav_url"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+    <!-- UserName -->
+    <EditText
+        android:id="@+id/edt_user_name"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:hint="@string/hint_user_name"/>
+    <!-- Password -->
+    <EditText
+        android:id="@+id/edt_password"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:hint="@string/hint_password"
+        android:inputType="textPassword"/>
     <!-- Buttons -->
     <LinearLayout
         android:layout_width="match_parent"

@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.common.AccountPicker;
@@ -40,6 +41,8 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.ParentReference;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -48,6 +51,7 @@ import java.util.Collections;
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
+import me.kuehle.carreport.util.FileCopyUtil;
 
 public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -81,7 +85,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
     }
 
     @Override
-    public void setup(Account account, String authToken) {
+    public void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -115,12 +119,12 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
     }
 
     @Override
-    public void continueAuthentication(AuthenticatorAddAccountActivity activity, int requestCode, int resultCode, Intent data) {
+    public void continueAuthentication(AuthenticatorAddAccountActivity activity, int requestCode, int resultCode, @Nullable Intent data) {
         switch (requestCode) {
             case REQUEST_PICK_ACCOUNT:
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK && data != null) {
                     String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                    setup(new Account(accountName, Authenticator.ACCOUNT_TYPE), null);
+                    setup(new Account(accountName, Authenticator.ACCOUNT_TYPE), null, null, null);
 
                     mIsAuthenticationInProgress = true;
                     mCurrentAuthenticationAccountName = accountName;
@@ -128,7 +132,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
 
                     mGoogleApiClient.connect();
                 } else {
-                    activity.onAuthenticationResult(null, null);
+                    activity.onAuthenticationResult(null, null, null, null);
                 }
 
                 break;
@@ -139,7 +143,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
 
                     mGoogleApiClient.connect();
                 } else {
-                    activity.onAuthenticationResult(null, null);
+                    activity.onAuthenticationResult(null, null, null, null);
                 }
 
                 break;
@@ -175,7 +179,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
         try {
-            if (!copyFile(localFile, tempFile)) {
+            if (!FileCopyUtil.copyFile(localFile, tempFile)) {
                 throw new Exception();
             }
 
@@ -219,7 +223,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
         FileOutputStream outputStream = null;
         try {
-            if (!copyFile(localFile, tempFile)) {
+            if (!FileCopyUtil.copyFile(localFile, tempFile)) {
                 throw new Exception();
             }
 
@@ -234,7 +238,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
                     .buildGetRequest(new GenericUrl(remoteFile.getDownloadUrl()))
                     .execute();
             resp.download(outputStream);
-            if (!copyFile(tempFile, localFile)) {
+            if (!FileCopyUtil.copyFile(tempFile, localFile)) {
                 throw new Exception();
             }
         } catch (IOException e) {
@@ -260,7 +264,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
     public void onConnected(Bundle bundle) {
         if (mIsAuthenticationInProgress) {
             mIsAuthenticationInProgress = false;
-            mAuthenticatorAddAccountActivity.onAuthenticationResult(mCurrentAuthenticationAccountName, null);
+            mAuthenticatorAddAccountActivity.onAuthenticationResult(mCurrentAuthenticationAccountName, null, null, null);
         }
     }
 
@@ -277,7 +281,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
                     connectionResult.startResolutionForResult(mAuthenticatorAddAccountActivity,
                             REQUEST_RESOLVE_CONNECTION);
                 } catch (IntentSender.SendIntentException e) {
-                    mAuthenticatorAddAccountActivity.onAuthenticationResult(null, null);
+                    mAuthenticatorAddAccountActivity.onAuthenticationResult(null, null, null, null);
                 }
             } else {
                 GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(),

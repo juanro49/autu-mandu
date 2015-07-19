@@ -25,6 +25,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 
@@ -32,10 +35,12 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public static final String ACCOUNT_TYPE = "me.kuehle.carreport.sync";
     public static final String AUTH_TOKEN_TYPE = "Default";
     public static final String KEY_SYNC_PROVIDER = ACCOUNT_TYPE + ".provider";
+    public static final String KEY_SYNC_PROVIDER_SETTINGS = ACCOUNT_TYPE + ".provider.settings";
 
     public static AbstractSyncProvider[] SYNC_PROVIDERS = {
             new DropboxSyncProvider(),
-            new GoogleDriveSyncProvider()
+            new GoogleDriveSyncProvider(),
+            new WebDavSyncProvider()
     };
 
     public static AbstractSyncProvider getSyncProviderByAccount(Account account) {
@@ -54,6 +59,25 @@ public class Authenticator extends AbstractAccountAuthenticator {
         }
 
         return null;
+    }
+
+    public static JSONObject getSyncProviderSettings(Account account) {
+        AccountManager accountManager = AccountManager.get(Application.getContext());
+        String settings = accountManager.getUserData(account, KEY_SYNC_PROVIDER_SETTINGS);
+        try {
+            return new JSONObject(settings);
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    public static void setSyncProviderSettings(Account account, JSONObject settings) {
+        AccountManager accountManager = AccountManager.get(Application.getContext());
+        if (settings != null) {
+            accountManager.setUserData(account, KEY_SYNC_PROVIDER_SETTINGS, settings.toString());
+        } else {
+            accountManager.setUserData(account, KEY_SYNC_PROVIDER_SETTINGS, null);
+        }
     }
 
     private Context mContext;

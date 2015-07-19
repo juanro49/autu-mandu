@@ -20,6 +20,7 @@ import android.accounts.Account;
 import android.accounts.NetworkErrorException;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.dropbox.client2.DropboxAPI;
@@ -28,6 +29,8 @@ import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.exception.DropboxServerException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
 import com.dropbox.client2.session.AppKeyPair;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +41,7 @@ import java.io.IOException;
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
+import me.kuehle.carreport.util.FileCopyUtil;
 
 public class DropboxSyncProvider extends AbstractSyncProvider {
     private static final String TAG = "DropboxSyncProvider";
@@ -63,7 +67,7 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     }
 
     @Override
-    public void setup(Account account, String authToken) {
+    public void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) {
         AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
         AndroidAuthSession session = new AndroidAuthSession(appKeys, authToken);
         mDBApi = new DropboxAPI<>(session);
@@ -77,7 +81,7 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     @Override
     public void continueAuthentication(final AuthenticatorAddAccountActivity activity,
                                        final int requestCode, final int resultCode,
-                                       final Intent data) {
+                                       final @Nullable Intent data) {
         if (mDBApi.getSession().authenticationSuccessful()) {
             try {
                 mDBApi.getSession().finishAuthentication();
@@ -95,14 +99,14 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
                     @Override
                     protected void onPostExecute(String result) {
                         activity.onAuthenticationResult(result,
-                                mDBApi.getSession().getOAuth2AccessToken());
+                                mDBApi.getSession().getOAuth2AccessToken(), null, null);
                     }
                 }.execute();
             } catch (IllegalStateException e) {
-                activity.onAuthenticationResult(null, null);
+                activity.onAuthenticationResult(null, null, null, null);
             }
         } else {
-            activity.onAuthenticationResult(null, null);
+            activity.onAuthenticationResult(null, null, null, null);
         }
     }
 
@@ -131,7 +135,7 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     public String uploadFile() throws Exception {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
-        if (!copyFile(localFile, tempFile)) {
+        if (!FileCopyUtil.copyFile(localFile, tempFile)) {
             throw new Exception();
         }
 
@@ -171,7 +175,7 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
         try {
             outputStream = new FileOutputStream(tempFile);
             mDBApi.getFile("/" + localFile.getName(), null, outputStream, null);
-            if (!copyFile(tempFile, localFile)) {
+            if (!FileCopyUtil.copyFile(tempFile, localFile)) {
                 throw new Exception();
             }
         } catch (DropboxServerException e) {

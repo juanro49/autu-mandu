@@ -80,7 +80,6 @@
         </activity>
         <activity
             android:name=".gui.AuthenticatorAddAccountActivity"
-            android:label="@string/title_first_start"
             android:theme="@style/Base.Theme.AppCompat.Dialog"
             android:excludeFromRecents="true"/>
         <activity
@@ -95,6 +94,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".gui.dialog.SetupWebDavSyncDialogActivity"
+            android:theme="@style/Base.Theme.AppCompat.Dialog"
+            android:excludeFromRecents="true"/>
 
         <service
             android:name=".util.sync.AuthenticatorService"

@@ -19,7 +19,6 @@ package me.kuehle.carreport.util.sync;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
-import android.accounts.NetworkErrorException;
 import android.accounts.OperationCanceledException;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
@@ -27,6 +26,8 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -47,6 +48,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         AccountManager accountManager = AccountManager.get(getContext());
 
+        String password = accountManager.getPassword(account);
+        JSONObject settings = Authenticator.getSyncProviderSettings(account);
+
         String authToken;
         try {
             authToken = accountManager.blockingGetAuthToken(account, Authenticator.AUTH_TOKEN_TYPE, true);
@@ -57,7 +61,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
         AbstractSyncProvider syncProvider = Authenticator.getSyncProviderByAccount(account);
-        syncProvider.setup(account, authToken);
+        syncProvider.setup(account, password, authToken, settings);
 
         try {
             String localRev = syncProvider.getLocalFileRev();
