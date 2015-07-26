@@ -39,8 +39,12 @@ CREATE TABLE other_cost (
 );
 
 INSERT INTO other_cost (_id, title, date, mileage, price, recurrence_interval, recurrence_multiplier, end_date, note, car_id)
-SELECT Id, title, date, mileage, price, CASE WHEN substr(recurrence, 1, r_pos-1) = 'ONCE' THEN 0 WHEN substr(recurrence, 1, r_pos-1) = 'DAY' THEN 1 WHEN substr(recurrence, 1, r_pos-1) = 'MONTH' THEN 2 WHEN substr(recurrence, 1, r_pos-1) = 'QUARTER' THEN 3 WHEN substr(recurrence, 1, r_pos-1) = 'YEAR' THEN 4 END, substr(recurrence, r_pos+1), end_date, note, car
-FROM (SELECT *, instr(recurrence,' ') AS r_pos FROM other_costs);
+SELECT Id, title, date, mileage, price, recurrence_interval, recurrence_multiplier, end_date, note, car FROM (
+    SELECT *, 0 AS recurrence_interval, substr(recurrence, 6) AS recurrence_multiplier FROM other_costs WHERE recurrence LIKE 'ONCE%' UNION
+    SELECT *, 1 AS recurrence_interval, substr(recurrence, 5) AS recurrence_multiplier FROM other_costs WHERE recurrence LIKE 'DAY%' UNION
+    SELECT *, 2 AS recurrence_interval, substr(recurrence, 7) AS recurrence_multiplier FROM other_costs WHERE recurrence LIKE 'MONTH%' UNION
+    SELECT *, 3 AS recurrence_interval, substr(recurrence, 9) AS recurrence_multiplier FROM other_costs WHERE recurrence LIKE 'QUARTER%' UNION
+    SELECT *, 4 AS recurrence_interval, substr(recurrence, 6) AS recurrence_multiplier FROM other_costs WHERE recurrence LIKE 'YEAR%');
 
 
 
@@ -79,8 +83,10 @@ CREATE TABLE reminder (
 );
 
 INSERT INTO reminder (_id, title, after_time_span_unit, after_time_span_count, after_distance, start_date, start_mileage, notification_dismissed, snoozed_until, car_id)
-SELECT Id, title, CASE WHEN substr(after_time, 1, at_pos-1) = 'DAY' THEN 0 WHEN substr(after_time, 1, at_pos-1) = 'MONTH' THEN 1 WHEN substr(after_time, 1, at_pos-1) = 'YEAR' THEN 2 END, substr(after_time, at_pos+1), after_distance, start_date, start_mileage, notification_dismissed, snoozed_until, car
-FROM (SELECT *, instr(after_time,' ') AS at_pos FROM reminders);
+SELECT Id, title, after_time_span_unit, after_time_span_count, after_distance, start_date, start_mileage, notification_dismissed, snoozed_until, car FROM (
+    SELECT *, 0 AS after_time_span_unit, substr(after_time, 5) AS after_time_span_count FROM reminders WHERE after_time LIKE 'DAY%' UNION
+    SELECT *, 1 AS after_time_span_unit, substr(after_time, 7) AS after_time_span_count FROM reminders WHERE after_time LIKE 'MONTH%' UNION
+    SELECT *, 2 AS after_time_span_unit, substr(after_time, 6) AS after_time_span_count FROM reminders WHERE after_time LIKE 'YEAR%');
 
 
 

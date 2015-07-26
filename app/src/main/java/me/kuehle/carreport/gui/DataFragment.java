@@ -176,17 +176,12 @@ public class DataFragment extends Fragment implements DataListCallback,
         final TabLayout tabs = (TabLayout) v.findViewById(R.id.tab_layout);
 
         // Workaround for https://code.google.com/p/android/issues/detail?id=180462&thanks=180462&ts=1437178613
-        if (ViewCompat.isLaidOut(tabs)) {
-            tabs.setupWithViewPager(pager);
-        } else {
-            tabs.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    tabs.setupWithViewPager(pager);
-                    tabs.removeOnLayoutChangeListener(this);
-                }
-            });
-        }
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                tabs.setupWithViewPager(pager);
+            }
+        });
 
         mTxtNoEntrySelected = (TextView) v.findViewById(R.id.txt_no_entry_selected);
         if (getChildFragmentManager().findFragmentById(R.id.detail) != null) {
