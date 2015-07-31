@@ -139,7 +139,8 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
                 prefs.getUnitDistance());
 
         // Car
-        CarCursor car = new CarSelection().query(getActivity().getContentResolver());
+        CarCursor car = new CarSelection().query(getActivity().getContentResolver(), null,
+                CarColumns.NAME + " COLLATE UNICODE");
         mSpnCar.setAdapter(new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 car, new String[]{CarColumns.NAME}, new int[]{android.R.id.text1}, 0));

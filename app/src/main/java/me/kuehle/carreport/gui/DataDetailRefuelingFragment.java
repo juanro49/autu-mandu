@@ -248,13 +248,15 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         // Fuel Type
         FuelTypeQueries.ensureAtLeastOne(getActivity());
 
-        FuelTypeCursor fuelType = new FuelTypeSelection().query(getActivity().getContentResolver());
+        FuelTypeCursor fuelType = new FuelTypeSelection().query(getActivity().getContentResolver(),
+                null, FuelTypeColumns.NAME + " COLLATE UNICODE");
         spnFuelType.setAdapter(new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 fuelType, new String[]{FuelTypeColumns.NAME}, new int[]{android.R.id.text1}, 0));
 
         // Car
-        CarCursor car = new CarSelection().query(getActivity().getContentResolver());
+        CarCursor car = new CarSelection().query(getActivity().getContentResolver(), null,
+                CarColumns.NAME + " COLLATE UNICODE");
         spnCar.setAdapter(new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 car, new String[]{CarColumns.NAME}, new int[]{android.R.id.text1}, 0));

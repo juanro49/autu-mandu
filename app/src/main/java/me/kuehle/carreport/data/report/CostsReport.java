@@ -32,6 +32,7 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
+import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.provider.othercost.OtherCostCursor;
@@ -210,7 +211,7 @@ public class CostsReport extends AbstractReport {
         ArrayList<Cursor> cursors = new ArrayList<>();
 
         RefuelingBalancer balancer = new RefuelingBalancer(mContext);
-        CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        CarCursor car = new CarSelection().query(mContext.getContentResolver(), null, CarColumns.NAME + " COLLATE UNICODE");
         cursors.add(car);
         while (car.moveToNext()) {
             Section section;

@@ -28,6 +28,7 @@ import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
 import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
 import me.kuehle.carreport.provider.refueling.RefuelingColumns;
@@ -49,8 +50,9 @@ public class FuelPriceReport extends AbstractReport {
         public ReportGraphData(Context context, FuelTypeCursor fuelType, int color) {
             super(context, fuelType.getName(), color);
 
-            RefuelingCursor refueling = new RefuelingSelection().fuelTypeId(fuelType.getId())
-                    .query(mContext.getContentResolver(), RefuelingColumns.ALL_COLUMNS);
+            RefuelingCursor refueling = new RefuelingSelection()
+                    .fuelTypeId(fuelType.getId())
+                    .query(mContext.getContentResolver(), RefuelingColumns.ALL_COLUMNS, RefuelingColumns.DATE);
             mCursor = refueling;
             while (refueling.moveToNext()) {
                 xValues.add(refueling.getDate().getTime());
@@ -153,7 +155,8 @@ public class FuelPriceReport extends AbstractReport {
 
         ArrayList<Cursor> cursors = new ArrayList<>();
 
-        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver());
+        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver(), null,
+                FuelTypeColumns.NAME + " COLLATE UNICODE");
         cursors.add(fuelType);
 
         float[] hsvColor = new float[3];

@@ -31,6 +31,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.util.Calculator;
@@ -212,7 +213,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
         // Collect report data and add info data which will be displayed
         // next to the graph.
-        CarCursor car = new CarSelection().query(mContext.getContentResolver());
+        CarCursor car = new CarSelection().query(mContext.getContentResolver(), null, CarColumns.NAME + " COLLATE UNICODE");
         cursors.add(car);
         while (car.moveToNext()) {
             boolean sectionAdded = false;

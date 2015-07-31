@@ -25,6 +25,7 @@ import android.os.RemoteException;
 import java.io.File;
 import java.util.ArrayList;
 
+import me.kuehle.carreport.data.query.CarQueries;
 import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarContentValues;
@@ -247,8 +248,7 @@ public class CSVExportImport {
             boolean updated = false;
             if (id != null) {
                 CarSelection selection = new CarSelection().id(id);
-                CarCursor car = selection.query(mContext.getContentResolver());
-                if (car.getCount() > 0) {
+                if (CarQueries.getCount(mContext) > 0) {
                     operations.add(ContentProviderOperation.newUpdate(values.uri())
                             .withSelection(selection.sel(), selection.args())
                             .withValues(values.values())

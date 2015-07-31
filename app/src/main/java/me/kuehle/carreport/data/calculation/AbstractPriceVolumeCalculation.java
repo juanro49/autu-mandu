@@ -23,6 +23,7 @@ import android.database.Cursor;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
 import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
 import me.kuehle.carreport.provider.refueling.RefuelingCursor;
@@ -46,7 +47,8 @@ public abstract class AbstractPriceVolumeCalculation extends AbstractCalculation
         mNames = new ArrayList<>();
         mAvgFuelPrices = new ArrayList<>();
 
-        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver());
+        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver(), null,
+                FuelTypeColumns.NAME + " COLLATE UNICODE");
         fuelType.registerContentObserver(observer);
         mCursorStore.add(fuelType);
         while (fuelType.moveToNext()) {

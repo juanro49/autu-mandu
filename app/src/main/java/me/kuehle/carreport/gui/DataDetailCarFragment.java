@@ -31,6 +31,7 @@ import android.widget.EditText;
 import java.util.Date;
 
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.query.CarQueries;
 import me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment.SupportColorPickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
@@ -61,8 +62,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        CarCursor car = new CarSelection().query(getActivity().getContentResolver());
-        if (car.getCount() == 1) {
+        if (CarQueries.getCount(getActivity()) == 1) {
             menu.removeItem(R.id.menu_delete);
         }
     }

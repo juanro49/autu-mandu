@@ -75,33 +75,33 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         return f;
     }
 
-    private AutoCompleteTextView edtTitle;
-    private DateTimeInput edtDate;
-    private DateTimeInput edtTime;
-    private EditText edtMileage;
-    private EditText edtPrice;
-    private Spinner spnRepeat;
-    private CheckBox chkEndDate;
-    private SimpleAnimator chkEndDateAnimator;
-    private SimpleAnimator edtEndDateAnimator;
-    private DateTimeInput edtEndDate;
-    private TextInputLayout edtEndDateInputLayout;
-    private EditText edtNote;
-    private Spinner spnCar;
+    private AutoCompleteTextView mEdtTitle;
+    private DateTimeInput mEdtDate;
+    private DateTimeInput mEdtTime;
+    private EditText mEdtMileage;
+    private EditText mEdtPrice;
+    private Spinner mSpnRepeat;
+    private CheckBox mChkEndDate;
+    private SimpleAnimator mChkEndDateAnimator;
+    private SimpleAnimator mEdtEndDateAnimator;
+    private DateTimeInput mEdtEndDate;
+    private TextInputLayout mEdtEndDateInputLayout;
+    private EditText mEdtNote;
+    private Spinner mSpnCar;
 
-    private Boolean isExpenditureCached = null;
+    private Boolean mCachedIsExpenditure = null;
 
     @Override
     public void onDialogPositiveClick(int requestCode, Date date) {
         switch (requestCode) {
             case PICK_DATE_REQUEST_CODE:
-                edtDate.setDate(date);
+                mEdtDate.setDate(date);
                 break;
             case PICK_TIME_REQUEST_CODE:
-                edtTime.setDate(date);
+                mEdtTime.setDate(date);
                 break;
             case PICK_END_DATE_REQUEST_CODE:
-                edtEndDate.setDate(date);
+                mEdtEndDate.setDate(date);
                 break;
         }
     }
@@ -111,63 +111,63 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         if (!isInEditMode()) {
             Preferences prefs = new Preferences(getActivity());
 
-            edtDate.setDate(new Date());
-            edtTime.setDate(new Date());
+            mEdtDate.setDate(new Date());
+            mEdtTime.setDate(new Date());
 
-            edtEndDate.setDate(new Date());
+            mEdtEndDate.setDate(new Date());
 
             long selectCarId = getArguments().getLong(EXTRA_CAR_ID);
             if (selectCarId == 0) {
                 selectCarId = prefs.getDefaultCar();
             }
 
-            for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                if (spnCar.getItemIdAtPosition(pos) == selectCarId) {
-                    spnCar.setSelection(pos);
+            for (int pos = 0; pos < mSpnCar.getCount(); pos++) {
+                if (mSpnCar.getItemIdAtPosition(pos) == selectCarId) {
+                    mSpnCar.setSelection(pos);
                 }
             }
         } else {
             OtherCostCursor otherCost = new OtherCostSelection().id(mId).query(getActivity().getContentResolver());
             otherCost.moveToNext();
 
-            edtDate.setDate(otherCost.getDate());
-            edtTime.setDate(otherCost.getDate());
-            edtTitle.setText(String.valueOf(otherCost.getTitle()));
+            mEdtDate.setDate(otherCost.getDate());
+            mEdtTime.setDate(otherCost.getDate());
+            mEdtTitle.setText(String.valueOf(otherCost.getTitle()));
             if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                edtMileage.setText(String.valueOf(otherCost.getMileage()));
+                mEdtMileage.setText(String.valueOf(otherCost.getMileage()));
             }
 
             if (isExpenditure()) {
-                edtPrice.setText(String.valueOf(otherCost.getPrice()));
+                mEdtPrice.setText(String.valueOf(otherCost.getPrice()));
             } else {
-                edtPrice.setText(String.valueOf(-otherCost.getPrice()));
+                mEdtPrice.setText(String.valueOf(-otherCost.getPrice()));
             }
 
-            spnRepeat.setSelection(otherCost.getRecurrenceInterval().ordinal());
+            mSpnRepeat.setSelection(otherCost.getRecurrenceInterval().ordinal());
             if (otherCost.getRecurrenceInterval() != RecurrenceInterval.ONCE) {
-                chkEndDate.setVisibility(View.VISIBLE);
+                mChkEndDate.setVisibility(View.VISIBLE);
                 if (otherCost.getEndDate() != null) {
-                    chkEndDate.setChecked(true);
+                    mChkEndDate.setChecked(true);
                 }
             }
 
-            edtEndDate.setDate(otherCost.getEndDate() == null ? new Date() : otherCost.getEndDate());
-            edtNote.setText(otherCost.getNote());
+            mEdtEndDate.setDate(otherCost.getEndDate() == null ? new Date() : otherCost.getEndDate());
+            mEdtNote.setText(otherCost.getNote());
 
-            for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                if (spnCar.getItemIdAtPosition(pos) == otherCost.getCarId()) {
-                    spnCar.setSelection(pos);
+            for (int pos = 0; pos < mSpnCar.getCount(); pos++) {
+                if (mSpnCar.getItemIdAtPosition(pos) == otherCost.getCarId()) {
+                    mSpnCar.setSelection(pos);
                 }
             }
         }
 
-        if (spnRepeat.getSelectedItemPosition() == 0) {
-            chkEndDate.getLayoutParams().height = 0;
-            chkEndDate.setAlpha(0);
+        if (mSpnRepeat.getSelectedItemPosition() == 0) {
+            mChkEndDate.getLayoutParams().height = 0;
+            mChkEndDate.setAlpha(0);
         }
-        if (!chkEndDate.isChecked()) {
-            edtEndDateInputLayout.getLayoutParams().height = 0;
-            edtEndDateInputLayout.setAlpha(0);
+        if (!mChkEndDate.isChecked()) {
+            mEdtEndDateInputLayout.getLayoutParams().height = 0;
+            mEdtEndDateInputLayout.setAlpha(0);
         }
     }
 
@@ -225,24 +225,24 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
     protected void initFields(Bundle savedInstanceState, View v) {
         Preferences prefs = new Preferences(getActivity());
 
-        edtTitle = (AutoCompleteTextView) v.findViewById(R.id.edt_title);
-        edtDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_date),
+        mEdtTitle = (AutoCompleteTextView) v.findViewById(R.id.edt_title);
+        mEdtDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_date),
                 DateTimeInput.Mode.DATE);
-        edtTime = new DateTimeInput((EditText) v.findViewById(R.id.edt_time),
+        mEdtTime = new DateTimeInput((EditText) v.findViewById(R.id.edt_time),
                 DateTimeInput.Mode.TIME);
-        edtMileage = (EditText) v.findViewById(R.id.edt_mileage);
-        edtPrice = (EditText) v.findViewById(R.id.edt_price);
-        spnRepeat = (Spinner) v.findViewById(R.id.spn_repeat);
-        chkEndDate = (CheckBox) v.findViewById(R.id.chk_end_date);
-        chkEndDateAnimator = new SimpleAnimator(getActivity(), chkEndDate,
+        mEdtMileage = (EditText) v.findViewById(R.id.edt_mileage);
+        mEdtPrice = (EditText) v.findViewById(R.id.edt_price);
+        mSpnRepeat = (Spinner) v.findViewById(R.id.spn_repeat);
+        mChkEndDate = (CheckBox) v.findViewById(R.id.chk_end_date);
+        mChkEndDateAnimator = new SimpleAnimator(getActivity(), mChkEndDate,
                 SimpleAnimator.Property.Height);
-        edtEndDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_end_date),
+        mEdtEndDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_end_date),
                 DateTimeInput.Mode.DATE);
-        edtEndDateInputLayout = (TextInputLayout) v.findViewById(R.id.edt_end_date_input_layout);
-        edtEndDateAnimator = new SimpleAnimator(getActivity(), edtEndDateInputLayout,
+        mEdtEndDateInputLayout = (TextInputLayout) v.findViewById(R.id.edt_end_date_input_layout);
+        mEdtEndDateAnimator = new SimpleAnimator(getActivity(), mEdtEndDateInputLayout,
                 SimpleAnimator.Property.Height);
-        edtNote = (EditText) v.findViewById(R.id.edt_note);
-        spnCar = (Spinner) v.findViewById(R.id.spn_car);
+        mEdtNote = (EditText) v.findViewById(R.id.edt_note);
+        mSpnCar = (Spinner) v.findViewById(R.id.spn_car);
 
         // Title
         OtherCostSelection otherCostTitleQuery = new OtherCostSelection();
@@ -255,32 +255,32 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         OtherCostCursor otherCostTitles = otherCostTitleQuery.query(getActivity().getContentResolver(),
                 new String[]{OtherCostColumns._ID, OtherCostColumns.TITLE},
                 OtherCostColumns.TITLE + " COLLATE UNICODE ASC");
-        edtTitle.setAdapter(new SimpleCursorAdapter(getActivity(),
+        mEdtTitle.setAdapter(new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 otherCostTitles, new String[]{OtherCostColumns.TITLE}, new int[]{android.R.id.text1}, 0));
 
         // Date + Time
-        edtDate.applyOnClickListener(DataDetailOtherFragment.this, PICK_DATE_REQUEST_CODE,
+        mEdtDate.applyOnClickListener(DataDetailOtherFragment.this, PICK_DATE_REQUEST_CODE,
                 getFragmentManager());
-        edtTime.applyOnClickListener(DataDetailOtherFragment.this, PICK_TIME_REQUEST_CODE,
+        mEdtTime.applyOnClickListener(DataDetailOtherFragment.this, PICK_TIME_REQUEST_CODE,
                 getFragmentManager());
 
         // Units
-        addUnitToHint(edtMileage, R.string.hint_mileage_optional, prefs.getUnitDistance());
-        addUnitToHint(edtPrice, R.string.hint_price, prefs.getUnitCurrency());
+        addUnitToHint(mEdtMileage, R.string.hint_mileage_optional, prefs.getUnitDistance());
+        addUnitToHint(mEdtPrice, R.string.hint_price, prefs.getUnitCurrency());
 
         // Repeat
-        spnRepeat.setOnItemSelectedListener(new OnItemSelectedListener() {
+        mSpnRepeat.setOnItemSelectedListener(new OnItemSelectedListener() {
             private int mLastPosition = 0;
 
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
                                        int position, long id) {
                 if (position > 0 && mLastPosition == 0) {
-                    chkEndDateAnimator.show();
+                    mChkEndDateAnimator.show();
                 } else if (position == 0 && mLastPosition > 0) {
-                    chkEndDate.setChecked(false);
-                    chkEndDateAnimator.hide();
+                    mChkEndDate.setChecked(false);
+                    mChkEndDateAnimator.hide();
                 }
 
                 mLastPosition = position;
@@ -291,50 +291,51 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
             }
         });
 
-        chkEndDate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        mChkEndDate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    edtEndDateAnimator.show();
+                    mEdtEndDateAnimator.show();
                 } else {
-                    edtEndDateAnimator.hide();
+                    mEdtEndDateAnimator.hide();
                 }
             }
         });
 
-        edtEndDate.applyOnClickListener(DataDetailOtherFragment.this, PICK_END_DATE_REQUEST_CODE,
+        mEdtEndDate.applyOnClickListener(DataDetailOtherFragment.this, PICK_END_DATE_REQUEST_CODE,
                 getFragmentManager());
 
         // Car
-        CarCursor car = new CarSelection().query(getActivity().getContentResolver());
-        spnCar.setAdapter(new SimpleCursorAdapter(getActivity(),
+        CarCursor car = new CarSelection().query(getActivity().getContentResolver(), null,
+                CarColumns.NAME + " COLLATE UNICODE");
+        mSpnCar.setAdapter(new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
                 car, new String[]{CarColumns.NAME}, new int[]{android.R.id.text1}, 0));
     }
 
     @Override
     protected void save() {
-        float price = (float) getDoubleFromEditText(edtPrice, 0);
+        float price = (float) getDoubleFromEditText(mEdtPrice, 0);
         if (!isExpenditure()) {
             price *= -1;
         }
 
-        RecurrenceInterval recurrenceInterval = RecurrenceInterval.values()[spnRepeat.getSelectedItemPosition()];
+        RecurrenceInterval recurrenceInterval = RecurrenceInterval.values()[mSpnRepeat.getSelectedItemPosition()];
         Date endDate = null;
-        if (recurrenceInterval != RecurrenceInterval.ONCE && chkEndDate.isChecked()) {
-            endDate = edtEndDate.getDate();
+        if (recurrenceInterval != RecurrenceInterval.ONCE && mChkEndDate.isChecked()) {
+            endDate = mEdtEndDate.getDate();
         }
 
         OtherCostContentValues values = new OtherCostContentValues();
-        values.putTitle(edtTitle.getText().toString().trim());
-        values.putDate(DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate()));
-        values.putMileage(getIntegerFromEditText(edtMileage, -1));
+        values.putTitle(mEdtTitle.getText().toString().trim());
+        values.putDate(DateTimeInput.getDateTime(mEdtDate.getDate(), mEdtTime.getDate()));
+        values.putMileage(getIntegerFromEditText(mEdtMileage, -1));
         values.putPrice(price);
         values.putRecurrenceInterval(recurrenceInterval);
         values.putRecurrenceMultiplier(1);
         values.putEndDate(endDate);
-        values.putNote(edtNote.getText().toString().trim());
-        values.putCarId(spnCar.getSelectedItemId());
+        values.putNote(mEdtNote.getText().toString().trim());
+        values.putCarId(mSpnCar.getSelectedItemId());
 
         if (isInEditMode()) {
             OtherCostSelection where = new OtherCostSelection().id(mId);
@@ -352,24 +353,24 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
     @Override
     protected boolean validate() {
         FormValidator validator = new FormValidator();
-        validator.add(new FormFieldGreaterZeroValidator(edtPrice));
+        validator.add(new FormFieldGreaterZeroValidator(mEdtPrice));
         return validator.validate();
     }
 
     private boolean isExpenditure() {
-        if (isExpenditureCached == null) {
+        if (mCachedIsExpenditure == null) {
             if (isInEditMode()) {
 
                 OtherCostCursor otherCost = new OtherCostSelection().id(mId).query(getActivity().getContentResolver());
                 otherCost.moveToNext();
 
-                isExpenditureCached = otherCost.getPrice() > 0;
+                mCachedIsExpenditure = otherCost.getPrice() > 0;
             } else {
-                isExpenditureCached = getArguments().getInt(EXTRA_OTHER_TYPE, EXTRA_OTHER_TYPE_EXPENDITURE) ==
+                mCachedIsExpenditure = getArguments().getInt(EXTRA_OTHER_TYPE, EXTRA_OTHER_TYPE_EXPENDITURE) ==
                         EXTRA_OTHER_TYPE_EXPENDITURE;
             }
         }
 
-        return isExpenditureCached;
+        return mCachedIsExpenditure;
     }
 }

@@ -151,6 +151,10 @@ public class DataProvider extends BaseContentProvider {
         return super.query(uri, qualifyAmbiguousColumns(uri, projection), selection, selectionArgs, sortOrder);
     }
 
+    /**
+     * If projection is null (which means all columns should be returned), remove the _id
+     * column from all joined tables, so only the _id column of the main table is included.
+     */
     private static String[] qualifyAmbiguousColumns(Uri uri, String[] projection) {
         if (projection != null) return projection;
 
