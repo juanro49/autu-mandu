@@ -31,7 +31,6 @@ import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
@@ -131,8 +130,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
             Toast.makeText(getActivity(), getToastDeletedMessage(), Toast.LENGTH_SHORT).show();
             mOnItemActionListener.onItemDeleted();
-
-            Application.dataChanged();
         }
     }
 
@@ -145,8 +142,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
                     Toast.makeText(getActivity(), getToastSavedMessage(), Toast.LENGTH_SHORT).show();
                     mOnItemActionListener.onItemSaved();
-
-                    Application.dataChanged();
                 }
 
                 return true;

@@ -35,7 +35,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
@@ -118,8 +117,6 @@ public abstract class AbstractDataListFragment extends
             for (long id : ids) {
                 deleteItem(id);
             }
-
-            Application.dataChanged();
 
             mActionMode.finish();
         }

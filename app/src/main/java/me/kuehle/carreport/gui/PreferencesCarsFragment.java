@@ -36,7 +36,6 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
@@ -198,8 +197,6 @@ public class PreferencesCarsFragment extends ListFragment implements
             for (long id : checkedIds) {
                 new CarSelection().id(id).delete(getActivity().getContentResolver());
             }
-
-            Application.dataChanged();
 
             mMultiChoiceModeListener.finishActionMode();
         }

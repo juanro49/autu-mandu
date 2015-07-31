@@ -27,7 +27,9 @@
         android:layout_marginTop="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:hint="@string/hint_name" />
+        android:hint="@string/hint_name"
+        android:inputType="text"
+        android:singleLine="true"/>
     <!-- Category -->
     <AutoCompleteTextView
         android:id="@+id/edt_category"
@@ -35,7 +37,9 @@
         android:layout_height="48dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:hint="@string/hint_category" />
+        android:hint="@string/hint_category"
+        android:inputType="text"
+        android:singleLine="true"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

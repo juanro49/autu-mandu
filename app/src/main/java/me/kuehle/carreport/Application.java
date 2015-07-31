@@ -24,6 +24,7 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import java.util.Date;
 
@@ -34,13 +35,8 @@ import me.kuehle.carreport.util.reminder.ReminderService;
 import me.kuehle.carreport.util.sync.Authenticator;
 
 public class Application extends android.app.Application {
+    private static final String TAG = "Application";
     private static Application instance;
-
-    public static void dataChanged() {
-        if (instance != null) {
-            ReminderService.updateNotification(instance);
-        }
-    }
 
     public static Context getContext() {
         return instance;
@@ -67,7 +63,7 @@ public class Application extends android.app.Application {
         ReminderEnablerReceiver.scheduleAlarms(this);
 
         upgradeOldSyncServiceToNewSyncAdapterWithAccounts();
-        setupSyncOnAnyDataChange();
+        setupDataChangeObserver();
     }
 
     private void upgradeOldSyncServiceToNewSyncAdapterWithAccounts() {
@@ -95,10 +91,9 @@ public class Application extends android.app.Application {
             }
 
             if (account != null) {
-                AccountManager accountManager = AccountManager.get(this);
-                accountManager.addAccountExplicitly(account, null, null);
-                accountManager.setAuthToken(account, Authenticator.AUTH_TOKEN_TYPE, authToken);
-                accountManager.setUserData(account, Authenticator.KEY_SYNC_PROVIDER,
+                mAccountManager.addAccountExplicitly(account, null, null);
+                mAccountManager.setAuthToken(account, Authenticator.AUTH_TOKEN_TYPE, authToken);
+                mAccountManager.setUserData(account, Authenticator.KEY_SYNC_PROVIDER,
                         String.valueOf(syncProviderId));
             }
 
@@ -106,7 +101,7 @@ public class Application extends android.app.Application {
         }
     }
 
-    private void setupSyncOnAnyDataChange() {
+    private void setupDataChangeObserver() {
         ContentObserver contentObserver = new ContentObserver(new Handler()) {
             @Override
             public boolean deliverSelfNotifications() {
@@ -115,15 +110,33 @@ public class Application extends android.app.Application {
 
             @Override
             public void onChange(boolean selfChange) {
-                Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
-                if (accounts.length > 0) {
-                    ContentResolver.requestSync(accounts[0], DataProvider.AUTHORITY, new Bundle());
-                }
+                updateReminders();
+                requestSync();
+            }
+
+            @Override
+            public void onChange(boolean selfChange, Uri uri) {
+                onChange(selfChange);
             }
         };
 
         ContentResolver contentResolver = getContentResolver();
         contentResolver.registerContentObserver(Uri.parse(DataProvider.CONTENT_URI_BASE), true,
                 contentObserver);
+    }
+
+    private void updateReminders() {
+        if (BuildConfig.DEBUG) Log.d(TAG, "updateReminders");
+
+        ReminderService.updateNotification(instance);
+    }
+
+    private void requestSync() {
+        if (BuildConfig.DEBUG) Log.d(TAG, "requestSync");
+
+        Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        if (accounts.length > 0) {
+            ContentResolver.requestSync(accounts[0], DataProvider.AUTHORITY, new Bundle());
+        }
     }
 }

@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import me.kuehle.carreport.Application;
+import me.kuehle.carreport.BuildConfig;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = "SyncAdapter";
@@ -46,6 +47,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        if (BuildConfig.DEBUG) Log.d(TAG, "onPerformSync");
+
         AccountManager accountManager = AccountManager.get(getContext());
 
         String password = accountManager.getPassword(account);

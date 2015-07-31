@@ -15,8 +15,9 @@
   limitations under the License.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,11 +27,14 @@
             android:id="@+id/edt_name_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <EditText
                 android:id="@+id/edt_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_name" />
+                android:hint="@string/hint_name"
+                android:inputType="text"
+                android:singleLine="true"/>
         </android.support.design.widget.TextInputLayout>
         <!-- Color -->
         <LinearLayout
@@ -39,7 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/edt_name_input_layout"
             android:background="?android:attr/selectableItemBackground"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -48,22 +53,24 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:text="@string/label_color"
-                android:textSize="16sp" />
+                android:textSize="16sp"/>
+
             <View
                 android:id="@+id/btn_color"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_margin="4dp"
-                android:background="@drawable/bg_color_indicator" />
+                android:background="@drawable/bg_color_indicator"/>
         </LinearLayout>
         <!-- Suspend -->
         <TextView
-            style="@style/AppWidget.SectionHeader"
             android:id="@+id/txt_section_suspend"
+            style="@style/AppWidget.SectionHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/layout_color"
-            android:text="@string/section_suspend" />
+            android:text="@string/section_suspend"/>
+
         <TextView
             android:id="@+id/txt_description_suspend"
             android:layout_width="match_parent"
@@ -71,13 +78,15 @@
             android:layout_below="@id/txt_section_suspend"
             android:layout_marginTop="8dp"
             android:text="@string/description_suspend"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
         <CheckBox
             android:id="@+id/chk_suspend"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_below="@id/txt_description_suspend"
-            android:text="@string/label_suspend" />
+            android:text="@string/label_suspend"/>
+
         <android.support.design.widget.TextInputLayout
             android:id="@+id/edt_suspend_date_input_layout"
             android:layout_width="match_parent"
@@ -85,11 +94,12 @@
             android:layout_below="@id/chk_suspend"
             android:layout_marginLeft="36dp"
             android:layout_marginStart="36dp">
+
             <EditText
                 android:id="@+id/edt_suspend_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_suspend_date" />
+                android:hint="@string/hint_suspend_date"/>
         </android.support.design.widget.TextInputLayout>
     </RelativeLayout>
 </ScrollView>

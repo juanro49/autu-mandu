@@ -36,7 +36,6 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import me.kuehle.carreport.Application;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.query.ReminderQueries;
@@ -267,8 +266,6 @@ public class PreferencesRemindersFragment extends ListFragment implements
             for (long id : checkedIds) {
                 new ReminderSelection().id(id).delete(getActivity().getContentResolver());
             }
-
-            Application.dataChanged();
 
             mMultiChoiceModeListener.finishActionMode();
         }

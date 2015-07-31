@@ -31,7 +31,6 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.query.FuelTypeQueries;
 import me.kuehle.carreport.gui.dialog.EditFuelTypeDialogFragment;
@@ -51,8 +50,6 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
             for (long id : ids) {
                 new FuelTypeSelection().id(id).delete(getActivity().getContentResolver());
             }
-
-            Application.dataChanged();
         }
 
         public void finishActionMode() {
