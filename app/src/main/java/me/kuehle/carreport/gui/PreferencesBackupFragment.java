@@ -39,6 +39,7 @@ import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.backup.CSVExportImport;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 import me.kuehle.carreport.util.sync.Authenticator;
+import me.kuehle.carreport.util.sync.SyncProviders;
 
 public class PreferencesBackupFragment extends PreferenceFragment implements
         MessageDialogFragmentListener {
@@ -306,7 +307,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         Preference sync = findPreference("sync");
         Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
         if (accounts.length > 0) {
-            AbstractSyncProvider syncProvider = Authenticator.getSyncProviderByAccount(accounts[0]);
+            AbstractSyncProvider syncProvider = SyncProviders.getSyncProviderByAccount(
+                    getActivity(), accounts[0]);
             sync.setTitle(syncProvider.getName());
             sync.setIcon(syncProvider.getIcon());
             sync.setSummary(getString(

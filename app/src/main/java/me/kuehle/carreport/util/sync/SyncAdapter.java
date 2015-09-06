@@ -52,18 +52,20 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         AccountManager accountManager = AccountManager.get(getContext());
 
         String password = accountManager.getPassword(account);
-        JSONObject settings = Authenticator.getSyncProviderSettings(account);
+        JSONObject settings = SyncProviders.getSyncProviderSettings(account);
 
         String authToken;
         try {
-            authToken = accountManager.blockingGetAuthToken(account, Authenticator.AUTH_TOKEN_TYPE, true);
+            authToken = accountManager.blockingGetAuthToken(account, Authenticator.AUTH_TOKEN_TYPE,
+                    true);
         } catch (OperationCanceledException | IOException | AuthenticatorException e) {
             Log.e(TAG, "Error getting auth token.", e);
             syncResult.stats.numAuthExceptions++;
             return;
         }
 
-        AbstractSyncProvider syncProvider = Authenticator.getSyncProviderByAccount(account);
+        AbstractSyncProvider syncProvider = SyncProviders.getSyncProviderByAccount(getContext(),
+                account);
         syncProvider.setup(account, password, authToken, settings);
 
         try {

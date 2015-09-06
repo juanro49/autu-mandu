@@ -36,6 +36,7 @@ import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 import me.kuehle.carreport.util.sync.Authenticator;
+import me.kuehle.carreport.util.sync.SyncProviders;
 
 public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivity implements
         AdapterView.OnItemClickListener {
@@ -119,7 +120,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             accountManager.setAuthToken(mAuthenticatedAccount, Authenticator.AUTH_TOKEN_TYPE, authToken);
             accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER,
                     String.valueOf(mSelectedSyncProvider.getId()));
-            Authenticator.setSyncProviderSettings(mAuthenticatedAccount, settings);
+            SyncProviders.setSyncProviderSettings(mAuthenticatedAccount, settings);
 
             setAccountAuthenticatorResult(data.getExtras());
             setResult(Activity.RESULT_OK, data);
@@ -225,17 +226,17 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
     private class SyncProviderAdapter extends BaseAdapter {
         @Override
         public int getCount() {
-            return Authenticator.SYNC_PROVIDERS.length;
+            return SyncProviders.getSyncProviders(AuthenticatorAddAccountActivity.this).length;
         }
 
         @Override
         public AbstractSyncProvider getItem(int position) {
-            return Authenticator.SYNC_PROVIDERS[position];
+            return SyncProviders.getSyncProviders(AuthenticatorAddAccountActivity.this)[position];
         }
 
         @Override
         public long getItemId(int position) {
-            return Authenticator.SYNC_PROVIDERS[position].getId();
+            return getItem(position).getId();
         }
 
         @Override

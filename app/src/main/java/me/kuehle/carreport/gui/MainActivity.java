@@ -58,6 +58,7 @@ import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.util.DemoData;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 import me.kuehle.carreport.util.sync.Authenticator;
+import me.kuehle.carreport.util.sync.SyncProviders;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener {
@@ -398,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements
             topImage.setVisibility(View.GONE);
             topText.setVisibility(View.GONE);
         } else {
-            AbstractSyncProvider syncProvider = Authenticator.getSyncProviderByAccount(account);
+            AbstractSyncProvider syncProvider = SyncProviders.getSyncProviderByAccount(this, account);
             topImage.setVisibility(View.VISIBLE);
             topImage.setImageResource(syncProvider.getIcon());
             topText.setVisibility(View.VISIBLE);
