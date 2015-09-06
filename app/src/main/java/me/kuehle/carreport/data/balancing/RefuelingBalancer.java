@@ -18,8 +18,10 @@ package me.kuehle.carreport.data.balancing;
 
 import android.content.Context;
 import android.database.MatrixCursor;
+import android.util.SparseIntArray;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -355,9 +357,10 @@ public class RefuelingBalancer {
      * @return the balanced average fuel consumption.
      */
     private static float getBalancedAverageConsumption(List<BalancedRefueling> refuelings) {
-        Vector<Float> allConsumptions = new Vector<>();
-        Vector<Integer> allDistances = new Vector<>();
-        Vector<Float> allVolumes = new Vector<>();
+        int iAll = 0;
+        float[] allConsumptions = new float[refuelings.size()];
+        int[] allDistances = new int[refuelings.size()];
+        float[] allVolumes = new float[refuelings.size()];
 
         // Calculate consumptions for all refuelings in the specified list.
         // There is not need to use the fuel consumption class here because
@@ -382,9 +385,10 @@ public class RefuelingBalancer {
                 totalDistance += distance;
                 totalVolume += volume;
 
-                allConsumptions.add(volume / distance);
-                allDistances.add(distance);
-                allVolumes.add(volume);
+                allConsumptions[iAll] = volume / distance;
+                allDistances[iAll] = distance;
+                allVolumes[iAll] = volume;
+                iAll++;
 
                 distance = 0;
                 volume = 0;
@@ -397,18 +401,17 @@ public class RefuelingBalancer {
 
         // Remove outstanding values from the average.
         boolean updated;
+        boolean[] removedValues = new boolean[iAll];
         do {
             updated = false;
-            for (int i = allConsumptions.size() - 1; i >= 0; i--) {
-                if (allConsumptions.get(i) / avgConsumption < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
-                    totalDistance -= allDistances.get(i);
-                    totalVolume -= allVolumes.get(i);
+            for (int i = iAll - 1; i >= 0; i--) {
+                if (allConsumptions[i] / avgConsumption < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
+                        && !removedValues[i]) {
+                    totalDistance -= allDistances[i];
+                    totalVolume -= allVolumes[i];
                     avgConsumption = totalVolume / totalDistance;
 
-                    allConsumptions.remove(i);
-                    allDistances.remove(i);
-                    allVolumes.remove(i);
-
+                    removedValues[i] = true;
                     updated = true;
                 }
             }
@@ -425,37 +428,39 @@ public class RefuelingBalancer {
      * @return the average distance for full refuelings.
      */
     private static int getBalancedAverageDistanceOfFullRefuelings(List<BalancedRefueling> refuelings) {
-        Vector<Integer> allDistances = new Vector<>();
+        int iAll = 0;
+        int[] allDistances = new int[refuelings.size()];
 
         for (int i = 1; i < refuelings.size(); i++) {
             if (!refuelings.get(i).partial) {
-                allDistances.add(refuelings.get(i).mileage
-                        - refuelings.get(i - 1).mileage);
+                allDistances[iAll] = refuelings.get(i).mileage - refuelings.get(i - 1).mileage;
+                iAll++;
             }
         }
 
         // Remove the top 20% to get rid of the very high distances.
-        Collections.sort(allDistances);
-        int size = allDistances.size();
-        for (int i = size - 1; i >= size * 0.8; i--) {
-            allDistances.remove(i);
-        }
+        Arrays.sort(allDistances);
+        iAll *= 0.8;
 
-        int avgDistance = Calculator.avg(allDistances
-                .toArray(new Integer[allDistances.size()]));
+        int totalDistance = Calculator.sum(0, iAll, allDistances);
+        int avgDistance = totalDistance / iAll;
 
         // Remove outstanding values from the average.
         boolean updated;
+        boolean[] removedValues = new boolean[iAll];
+        int removedValuesCount = 0;
         do {
             updated = false;
-            for (int i = allDistances.size() - 1; i >= 0; i--) {
-                float relativeDistance = (float) allDistances.get(i)
-                        / (float) avgDistance;
-                if (relativeDistance < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
-                        || relativeDistance > (1 + MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
-                    allDistances.remove(i);
-                    avgDistance = Calculator.avg(allDistances
-                            .toArray(new Integer[allDistances.size()]));
+            for (int i = iAll - 1; i >= 0; i--) {
+                float relativeDistance = (float) allDistances[i] / (float) avgDistance;
+                if ((relativeDistance < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
+                        || relativeDistance > (1 + MAX_RELATIVE_CONSUMPTION_DEVIATION))
+                        && !removedValues[i]) {
+                    removedValues[i] = true;
+                    removedValuesCount++;
+
+                    totalDistance -= allDistances[i];
+                    avgDistance = totalDistance / (iAll - removedValuesCount);
 
                     updated = true;
                 }

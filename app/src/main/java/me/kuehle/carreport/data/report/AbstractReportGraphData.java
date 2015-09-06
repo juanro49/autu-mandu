@@ -22,15 +22,12 @@ import android.graphics.DashPathEffect;
 import android.util.TypedValue;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.util.Calculator;
 import me.kuehle.chartlib.data.PointD;
 import me.kuehle.chartlib.data.Series;
 import me.kuehle.chartlib.renderer.AbstractRenderer;
@@ -48,37 +45,38 @@ public abstract class AbstractReportGraphData {
 
             // It doesn't make sense to display a trend line with just 2 points
             // or less because it would be the same as the original line.
-            if (data.xValues.size() <= 2 || data.yValues.size() <= 2) {
+            if (data.size() <= 2) {
                 return;
             }
 
-            long avgX = Calculator.avg(data.xValues
-                    .toArray(new Long[data.xValues.size()]));
-            double avgY = Calculator.avg(data.yValues
-                    .toArray(new Double[data.yValues.size()]));
-
-            BigInteger sum1 = BigInteger.ZERO; // (x_i - avg(X)) ^ 2
-            BigDecimal sum2 = BigDecimal.ZERO; // (x_i - avg(X)) * (y_i -
-            // avg(Y))
+            double sumX = 0;
+            double sumY = 0;
             for (int i = 0; i < data.size(); i++) {
-                BigInteger xMinusAvgX = BigInteger.valueOf(data.xValues.get(i)
-                        - avgX);
-                BigDecimal yMinusAvgY = BigDecimal.valueOf(data.yValues.get(i)
-                        - avgY);
-                sum1 = sum1.add(xMinusAvgX.multiply(xMinusAvgX));
-                sum2 = sum2
-                        .add(yMinusAvgY.multiply(new BigDecimal(xMinusAvgX)));
+                sumX += data.points.get(i).x;
+                sumY += data.points.get(i).y;
             }
 
-            if (!sum1.equals(BigInteger.ZERO)) {
-                double beta1 = sum2.divide(new BigDecimal(sum1),
-                        MathContext.DECIMAL128).doubleValue();
+            double avgX = sumX / data.size();
+            double avgY = sumY / data.size();
+
+            BigDecimal sum1 = BigDecimal.ZERO; // (x_i - avg(X)) ^ 2
+            BigDecimal sum2 = BigDecimal.ZERO; // (x_i - avg(X)) * (y_i - avg(Y))
+            for (int i = 0; i < data.size(); i++) {
+                BigDecimal xMinusAvgX = BigDecimal.valueOf(data.points.get(i).x - avgX);
+                BigDecimal yMinusAvgY = BigDecimal.valueOf(data.points.get(i).y - avgY);
+                sum1 = sum1.add(xMinusAvgX.multiply(xMinusAvgX));
+                sum2 = sum2.add(yMinusAvgY.multiply(xMinusAvgX));
+            }
+
+            if (!sum1.equals(BigDecimal.ZERO)) {
+                double beta1 = sum2.divide(sum1, MathContext.DECIMAL128).doubleValue();
                 double beta0 = avgY - (beta1 * avgX);
 
-                xValues.add(data.xValues.firstElement());
-                yValues.add(beta0 + (beta1 * data.xValues.firstElement()));
-                xValues.add(data.xValues.lastElement());
-                yValues.add(beta0 + (beta1 * data.xValues.lastElement()));
+                PointD firstPoint = data.points.get(0);
+                addPoint(firstPoint.x, beta0 + (beta1 * firstPoint.x));
+
+                PointD lastPoint = data.points.get(data.points.size() - 1);
+                addPoint(lastPoint.x, beta0 + (beta1 * lastPoint.x));
             }
         }
 
@@ -101,15 +99,14 @@ public abstract class AbstractReportGraphData {
     private class TrendReportData extends AbstractReportGraphData {
         public TrendReportData(AbstractReportGraphData data) {
             super(data.context, data.context.getString(
-                    R.string.report_trend_label, data.name), data
-                    .getTrendColor());
+                    R.string.report_trend_label, data.name), data.getTrendColor());
 
             // Use higher order when more entries are available to calculate a
             // more accurate trend.
             int order;
-            if (data.xValues.size() > 7) {
+            if (data.points.size() > 7) {
                 order = 5;
-            } else if (data.xValues.size() > 3) {
+            } else if (data.points.size() > 3) {
                 order = 3;
             } else {
                 // It doesn't make sense to display a trend line with order 1
@@ -119,20 +116,18 @@ public abstract class AbstractReportGraphData {
 
             int k = (order - 1) / 2;
 
-            for (int t = k; t < data.xValues.size() - k; t++) {
-                long x = data.xValues.get(t);
+            for (int t = k; t < data.points.size() - k; t++) {
+                double x = data.points.get(t).x;
 
-                // y_t = (y_t-k + y_t-k+1 + ... + y_t + ... + y_t+k-1 + y_t+k) /
-                // order
+                // y_t = (y_t-k + y_t-k+1 + ... + y_t + ... + y_t+k-1 + y_t+k) / order
                 double y = 0;
                 for (int i = t - k; i <= t + k; i++) {
-                    y += data.yValues.get(i);
+                    y += data.points.get(i).y;
                 }
 
                 y /= order;
 
-                xValues.add(x);
-                yValues.add(y);
+                addPoint(x, y);
             }
         }
 
@@ -152,8 +147,7 @@ public abstract class AbstractReportGraphData {
     protected String name;
     protected int color;
 
-    protected Vector<Long> xValues = new Vector<>();
-    protected Vector<Double> yValues = new Vector<>();
+    private List<PointD> points = new ArrayList<>();
 
     private List<List<PointD>> markLines = new ArrayList<>();
     private List<PointD> markPoints = new ArrayList<>();
@@ -203,32 +197,27 @@ public abstract class AbstractReportGraphData {
     public Series getSeries() {
         Series series = new Series(name);
         for (int i = 0; i < size(); i++) {
-            series.add(xValues.get(i), yValues.get(i));
+            PointD point = points.get(i);
+            series.add(point.x, point.y);
         }
+
         return series;
     }
 
+    public void addPoint(double x, double y) {
+        points.add(new PointD(x, y));
+    }
+
     public boolean isEmpty() {
-        return xValues.size() == 0 || yValues.size() == 0;
+        return points.size() == 0;
     }
 
     public int size() {
-        return xValues.size();
+        return points.size();
     }
 
     public void sort() {
-        ArrayList<PointD> points = new ArrayList<>();
-        for (int i = 0; i < xValues.size(); i++) {
-            points.add(new PointD(xValues.get(i), yValues.get(i)));
-        }
-
         Collections.sort(points);
-        xValues.clear();
-        yValues.clear();
-        for (PointD point : points) {
-            xValues.add((long) point.x);
-            yValues.add(point.y);
-        }
     }
 
     /**
@@ -251,19 +240,17 @@ public abstract class AbstractReportGraphData {
     }
 
     protected void markLastLine() {
-        if (xValues.size() < 2 || yValues.size() < 2) {
+        if (points.size() < 2) {
             return;
         }
 
         List<PointD> line = new ArrayList<>();
-        line.add(new PointD(xValues.get(xValues.size() - 2), yValues
-                .get(yValues.size() - 2)));
-        line.add(new PointD(xValues.lastElement(), yValues.lastElement()));
+        line.add(points.get(points.size() - 2));
+        line.add(points.get(points.size() - 1));
         markLines.add(line);
     }
 
     protected void markLastPoint() {
-        markPoints
-                .add(new PointD(xValues.lastElement(), yValues.lastElement()));
+        markPoints.add(points.get(points.size() - 1));
     }
 }

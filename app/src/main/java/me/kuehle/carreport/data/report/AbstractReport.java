@@ -98,7 +98,7 @@ public abstract class AbstractReport {
             } else {
                 Section otherSection = (Section) another;
                 if (mOrder != otherSection.getOrder()) {
-                    return Integer.valueOf(mOrder).compareTo(otherSection.getOrder());
+                    return mOrder - otherSection.getOrder();
                 } else {
                     return mLabel.compareTo(another.getLabel());
                 }

@@ -18,8 +18,9 @@ package me.kuehle.carreport.data.report;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.util.LongSparseArray;
 import android.text.format.DateFormat;
+import android.util.LongSparseArray;
+import android.util.MutableLong;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
@@ -49,16 +50,17 @@ import me.kuehle.chartlib.renderer.RendererList;
 public class CostsReport extends AbstractReport {
     private class ReportGraphData extends AbstractReportGraphData {
         private int mOption;
+        private LongSparseArray<MutableLong> mCachedPoints;
 
         public ReportGraphData(Context context, String carName, int carColor, int option) {
             super(context, carName, carColor);
-            this.mOption = option;
+            mOption = option;
+            mCachedPoints = new LongSparseArray<>();
         }
 
         public void add(DateTime date, double costs) {
             if (mOption == GRAPH_OPTION_MONTH) {
-                date = new DateTime(date.getYear(), date.getMonthOfYear(), 1,
-                        0, 0);
+                date = new DateTime(date.getYear(), date.getMonthOfYear(), 1, 0, 0);
             } else {
                 date = new DateTime(date.getYear(), 1, 1, 0, 0);
             }
@@ -70,22 +72,6 @@ public class CostsReport extends AbstractReport {
             } else {
                 yValues.set(index, yValues.get(index) + costs);
             }
-        }
-
-        @Override
-        public AbstractReportGraphData createOverallTrendData() {
-            if (size() == 0) {
-                return super.createOverallTrendData();
-            }
-
-            long lastX = xValues.lastElement();
-            xValues.remove(xValues.size() - 1);
-            double lastY = yValues.lastElement();
-            yValues.remove(yValues.size() - 1);
-            AbstractReportGraphData data = super.createOverallTrendData();
-            xValues.add(lastX);
-            yValues.add(lastY);
-            return data;
         }
     }
 
