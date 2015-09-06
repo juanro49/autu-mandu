@@ -17,23 +17,13 @@
 package me.kuehle.carreport.util.sync;
 
 import android.accounts.Account;
-import android.accounts.NetworkErrorException;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
-
-import com.google.api.services.drive.model.App;
 
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
-import java.util.Date;
 
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.Preferences;
