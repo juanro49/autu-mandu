@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CarReport.iml" filepath="$PROJECT_DIR$/CarReport.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dropbox-android-sdk/dropbox-android-sdk.iml" filepath="$PROJECT_DIR$/dropbox-android-sdk/dropbox-android-sdk.iml" />
     </modules>
   </component>
 </project>
-

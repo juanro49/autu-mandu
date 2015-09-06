@@ -38,10 +38,10 @@ repositories {
 
 dependencies {
     // ChartLib
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
 
     // Dropbox
-    compile fileTree(dir: 'libs/dropbox', include: ['*.jar'], exclude: 'commons-logging-1.1.1.jar')
+    compile project(':dropbox-android-sdk')
 
     // Support, AppCompat
     compile 'com.android.support:support-v4:22.2.1'

@@ -116,27 +116,25 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="jackrabbit-webdav-2.10.1" level="project" />
-    <orderEntry type="library" exported="" name="httpcore-4.0.1" level="project" />
+    <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="floatingactionbutton-1.1.0" level="project" />
-    <orderEntry type="library" exported="" name="bcprov-jdk16-146" level="project" />
-    <orderEntry type="library" exported="" name="httpmime-4.0.3" level="project" />
-    <orderEntry type="library" exported="" name="dropbox-android-sdk-1.6.2" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.2" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.2.1" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-22.2.1" level="project" />
-    <orderEntry type="library" exported="" name="json_simple-1.1" level="project" />
+    <orderEntry type="library" exported="" name="json-simple-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.2.1" level="project" />
     <orderEntry type="library" exported="" name="HoloColorPicker-1.4" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.2.1" level="project" />
     <orderEntry type="library" exported="" name="jcl-over-slf4j-1.7.4" level="project" />
     <orderEntry type="library" exported="" name="joda-time-2.6" level="project" />
+    <orderEntry type="library" exported="" name="hamcrest-core-1.1" level="project" />
     <orderEntry type="library" exported="" name="chartlib" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.4" level="project" />
+    <orderEntry type="library" exported="" name="junit-4.10" level="project" />
     <orderEntry type="library" exported="" name="commons-httpclient-3.1" level="project" />
     <orderEntry type="library" exported="" name="design-22.2.1" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-22.2.1" level="project" />
-    <orderEntry type="library" exported="" name="httpclient-4.0.3" level="project" />
+    <orderEntry type="module" module-name="dropbox-android-sdk" exported="" />
   </component>
 </module>
