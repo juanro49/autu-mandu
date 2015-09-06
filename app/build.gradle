@@ -18,7 +18,7 @@ android {
     }
     productFlavors {
         foss {}
-        proprietary {}
+        full {}
     }
     packagingOptions {
         // These files are included in at least two of the following libraries:
@@ -51,16 +51,16 @@ dependencies {
     compile 'com.android.support:design:22.2.1'
 
     // Play Services: for Google Drive
-    proprietaryCompile 'com.google.android.gms:play-services-plus:7.5.0'
-    proprietaryCompile 'com.google.android.gms:play-services-drive:7.5.0'
+    fullCompile 'com.google.android.gms:play-services-plus:7.5.0'
+    fullCompile 'com.google.android.gms:play-services-drive:7.5.0'
 
     // The new Android Drive API, which is included in the play services, has caching bugs and does
     // not provide all functionality. Until this is fixed we have to use the old Google API.
-    proprietaryCompile 'com.google.apis:google-api-services-drive:v2-rev105-1.17.0-rc'
-    proprietaryCompile('com.google.api-client:google-api-client-android:1.17.0-rc') {
+    fullCompile 'com.google.apis:google-api-services-drive:v2-rev105-1.17.0-rc'
+    fullCompile('com.google.api-client:google-api-client-android:1.17.0-rc') {
         exclude group: 'com.google.android.google-play-services'
     }
-    proprietaryCompile('com.google.http-client:google-http-client-gson:1.17.0-rc') {
+    fullCompile('com.google.http-client:google-http-client-gson:1.17.0-rc') {
         exclude module: 'httpclient'
     }
 

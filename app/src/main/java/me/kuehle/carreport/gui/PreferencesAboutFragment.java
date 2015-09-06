@@ -20,7 +20,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -34,6 +33,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 
+import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.R;
 
 public class PreferencesAboutFragment extends Fragment {
@@ -81,22 +81,12 @@ public class PreferencesAboutFragment extends Fragment {
         }
     };
 
-    public String getVersion() {
-        try {
-            return getActivity().getPackageManager()
-                    .getPackageInfo(getActivity().getPackageName(), 0)
-                    .versionName;
-        } catch (NameNotFoundException e) {
-            return "";
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_prefs_about, container, false);
 
-        String strVersion = getString(R.string.about_version, getVersion());
+        String strVersion = getString(R.string.about_version, BuildConfig.VERSION_NAME);
         ((TextView) root.findViewById(R.id.txt_version)).setText(strVersion);
         root.findViewById(R.id.btn_licenses).setOnClickListener(licensesOnClickListener);
 
