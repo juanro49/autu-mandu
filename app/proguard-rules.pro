@@ -55,3 +55,8 @@
 -keepattributes *Annotation*,Signature
 -keep class * extends com.google.api.client.json.GenericJson { *; }
 -keep class com.google.api.services.drive.** { *; }
+
+# Supported Libraries
+-dontwarn android.support.v7.**
+-keep class android.support.v7.** { *; }
+-keep interface android.support.v7.** { *; }
