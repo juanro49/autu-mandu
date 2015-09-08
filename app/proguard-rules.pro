@@ -21,6 +21,7 @@
 # Dropbox
 -keep public class org.apache.commons.** { *; }
 -dontwarn org.apache.**
+-dontwarn android.test.**
 
 # Joda Time
 -keep class org.joda.time.DateTimeZone.Provider
@@ -55,8 +56,3 @@
 -keepattributes *Annotation*,Signature
 -keep class * extends com.google.api.client.json.GenericJson { *; }
 -keep class com.google.api.services.drive.** { *; }
-
-# Supported Libraries
--dontwarn android.support.v7.**
--keep class android.support.v7.** { *; }
--keep interface android.support.v7.** { *; }
