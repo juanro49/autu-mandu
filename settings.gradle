@@ -1,1 +1,1 @@
-include ':app', ':dropbox-android-sdk'
+include ':app', ':dropbox-android-sdk', ':chartlib'

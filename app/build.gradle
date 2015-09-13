@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     // ChartLib
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(':chartlib')
 
     // Dropbox
     compile project(':dropbox-android-sdk')
