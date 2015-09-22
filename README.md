@@ -19,10 +19,28 @@ import/export functionality.
 ## Get it
 
 [Car Report on Play Store](https://play.google.com/store/apps/details?id=me.kuehle.carreport)
+*(This is the full version.)*
+
+[Car Report on F-Droid](https://f-droid.org/repository/browse/?fdid=me.kuehle.carreport)
+*(This is a special FOSS version without Google Drive sync.)*
+
+## Build it
+
+The app uses gradle, so to build it just open a command line, switch to the app directory and
+execute one of the following commands.
+
+```
+# Full version
+gradle assembleFullRelease
+
+# FOSS version
+gradle assembleFossRelease
+```
+
 
 ## Used libraries
 
 * [Joda Time](http://joda-time.sourceforge.net)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [FloatingActionButton](https://github.com/makovkastar/FloatingActionButton)
-* [ChartLib](https://bitbucket.org/frigus02/chartlib)
+* [Jackrabbit WebDAV](http://jackrabbit.apache.org)
