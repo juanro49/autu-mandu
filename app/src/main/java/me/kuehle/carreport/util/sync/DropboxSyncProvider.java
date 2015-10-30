@@ -17,18 +17,16 @@
 package me.kuehle.carreport.util.sync;
 
 import android.accounts.Account;
-import android.accounts.NetworkErrorException;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.exception.DropboxException;
-import com.dropbox.client2.exception.DropboxServerException;
-import com.dropbox.client2.exception.DropboxUnlinkedException;
-import com.dropbox.client2.session.AppKeyPair;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.android.Auth;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.Files;
 
 import org.json.JSONObject;
 
@@ -37,8 +35,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 import me.kuehle.carreport.Application;
+import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 import me.kuehle.carreport.util.FileCopyUtil;
@@ -47,9 +47,8 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     private static final String TAG = "DropboxSyncProvider";
 
     private static final String APP_KEY = "a6edub2n9b029if";
-    private static final String APP_SECRET = "1cw56rcn1bbnb7f";
 
-    private DropboxAPI<AndroidAuthSession> mDBApi;
+    private DbxClientV2 mDbxClient;
 
     @Override
     public long getId() {
@@ -68,38 +67,42 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
 
     @Override
     public void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) {
-        AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
-        AndroidAuthSession session = new AndroidAuthSession(appKeys, authToken);
-        mDBApi = new DropboxAPI<>(session);
+        if (authToken == null) {
+            mDbxClient = null;
+        } else {
+            String userLocale = Locale.getDefault().toString();
+            DbxRequestConfig requestConfig = new DbxRequestConfig(BuildConfig.APPLICATION_ID, userLocale);
+            mDbxClient = new DbxClientV2(requestConfig, authToken);
+        }
     }
 
     @Override
     public void startAuthentication(AuthenticatorAddAccountActivity activity) {
-        mDBApi.getSession().startOAuth2Authentication(activity);
+        Auth.startOAuth2Authentication(activity, APP_KEY);
     }
 
     @Override
     public void continueAuthentication(final AuthenticatorAddAccountActivity activity,
                                        final int requestCode, final int resultCode,
                                        final @Nullable Intent data) {
-        if (mDBApi.getSession().authenticationSuccessful()) {
+        final String accessToken = Auth.getOAuth2Token();
+        if (accessToken != null) {
             try {
-                mDBApi.getSession().finishAuthentication();
+                setup(null, null, accessToken, null);
 
                 new AsyncTask<Void, Void, String>() {
                     @Override
                     protected String doInBackground(Void... params) {
                         try {
-                            return mDBApi.accountInfo().displayName;
-                        } catch (DropboxException e) {
+                            return mDbxClient.users.getCurrentAccount().name.displayName;
+                        } catch (DbxException e) {
                             return null;
                         }
                     }
 
                     @Override
                     protected void onPostExecute(String result) {
-                        activity.onAuthenticationResult(result, null,
-                                mDBApi.getSession().getOAuth2AccessToken(), null);
+                        activity.onAuthenticationResult(result, null, accessToken, null);
                     }
                 }.execute();
             } catch (IllegalStateException e) {
@@ -114,17 +117,12 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     public String getRemoteFileRev() throws Exception {
         try {
             File localFile = getLocalFile();
-            DropboxAPI.Entry remoteEntry = mDBApi.metadata("/" + localFile.getName(), 1, null, false, null);
-            if (!remoteEntry.isDeleted) {
-                return remoteEntry.rev;
+            Files.Metadata remoteMetadata = mDbxClient.files.getMetadata("/" + localFile.getName());
+
+            if (remoteMetadata instanceof Files.FileMetadata) {
+                return ((Files.FileMetadata)remoteMetadata).rev;
             }
-        } catch (DropboxServerException e) {
-            if (e.error != 404) {
-                throw new NetworkErrorException(e);
-            }
-        } catch (DropboxUnlinkedException e) {
-            throw new AccountUnlinkedException(e);
-        } catch (DropboxException e) {
+        } catch (DbxException e) {
             throw new Exception(e);
         }
 
@@ -142,14 +140,12 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
         FileInputStream inputStream = null;
         try {
             inputStream = new FileInputStream(tempFile);
-            DropboxAPI.Entry remoteEntry = mDBApi.putFile("/" + localFile.getName(), inputStream,
-                    tempFile.length(), getRemoteFileRev(), null);
-            return remoteEntry.rev;
-        } catch (DropboxServerException e) {
-            throw new NetworkErrorException(e);
-        } catch (DropboxUnlinkedException e) {
-            throw new AccountUnlinkedException(e);
-        } catch (DropboxException | FileNotFoundException e) {
+            Files.FileMetadata remoteMetadata = mDbxClient.files
+                    .uploadBuilder("/" + localFile.getName())
+                    .mode(Files.WriteMode.overwrite)
+                    .run(inputStream);
+            return remoteMetadata.rev;
+        } catch (DbxException | FileNotFoundException e) {
             throw new Exception(e);
         } finally {
             if (inputStream != null) {
@@ -174,15 +170,13 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
         FileOutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(tempFile);
-            mDBApi.getFile("/" + localFile.getName(), null, outputStream, null);
+            mDbxClient.files
+                    .downloadBuilder("/" + localFile.getName())
+                    .run(outputStream);
             if (!FileCopyUtil.copyFile(tempFile, localFile)) {
                 throw new Exception();
             }
-        } catch (DropboxServerException e) {
-            throw new NetworkErrorException(e);
-        } catch (DropboxUnlinkedException e) {
-            throw new AccountUnlinkedException(e);
-        } catch (DropboxException | FileNotFoundException e) {
+        } catch (DbxException | FileNotFoundException e) {
             throw new Exception(e);
         } finally {
             if (outputStream != null) {

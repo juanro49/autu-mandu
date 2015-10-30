@@ -41,7 +41,7 @@ dependencies {
     compile project(':chartlib')
 
     // Dropbox
-    compile project(':dropbox-android-sdk')
+    compile 'com.dropbox.core:dropbox-core-sdk:2.0-beta-1'
 
     // Support, AppCompat
     compile 'com.android.support:support-v4:22.2.1'

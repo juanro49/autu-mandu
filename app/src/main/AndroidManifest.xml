@@ -79,10 +79,9 @@
             android:theme="@style/Base.Theme.AppCompat.Dialog"
             android:excludeFromRecents="true"/>
         <activity
-            android:name="com.dropbox.client2.android.AuthActivity"
+            android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
-            android:launchMode="singleTask"
-            tools:ignore="ExportedActivity" >
+            android:launchMode="singleTask" >
             <intent-filter>
                 <data android:scheme="db-a6edub2n9b029if" />
                 <action android:name="android.intent.action.VIEW" />
