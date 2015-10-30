@@ -23,6 +23,8 @@ import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 
+import org.joda.time.DateTime;
+
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.provider.othercost.OtherCostColumns;
@@ -99,7 +101,7 @@ public class DataListOtherFragment extends AbstractDataListFragment {
         data.put(R.id.data3, mRepeatIntervals[otherCost.getRecurrenceInterval().ordinal()]);
         if (!otherCost.getRecurrenceInterval().equals(RecurrenceInterval.ONCE)) {
             int recurrences;
-            if (otherCost.getEndDate() == null) {
+            if (otherCost.getEndDate() == null || new DateTime(otherCost.getEndDate()).isAfterNow()) {
                 recurrences = Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(),
                         otherCost.getRecurrenceMultiplier(), otherCost.getDate());
             } else {
