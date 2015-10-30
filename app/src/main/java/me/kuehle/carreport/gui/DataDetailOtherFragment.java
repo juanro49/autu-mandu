@@ -22,6 +22,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -33,6 +34,7 @@ import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.query.OtherCostQueries;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.util.DateTimeInput;
@@ -245,19 +247,9 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         mSpnCar = (Spinner) v.findViewById(R.id.spn_car);
 
         // Title
-        OtherCostSelection otherCostTitleQuery = new OtherCostSelection();
-        if (isExpenditure()) {
-            otherCostTitleQuery.priceGt(0);
-        } else {
-            otherCostTitleQuery.priceLt(0);
-        }
-
-        OtherCostCursor otherCostTitles = otherCostTitleQuery.query(getActivity().getContentResolver(),
-                new String[]{OtherCostColumns._ID, OtherCostColumns.TITLE},
-                OtherCostColumns.TITLE + " COLLATE UNICODE ASC");
-        mEdtTitle.setAdapter(new SimpleCursorAdapter(getActivity(),
-                android.R.layout.simple_spinner_dropdown_item,
-                otherCostTitles, new String[]{OtherCostColumns.TITLE}, new int[]{android.R.id.text1}, 0));
+        mEdtTitle.setAdapter(new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_spinner_dropdown_item, android.R.id.text1,
+                OtherCostQueries.getTitles(getActivity(), isExpenditure())));
 
         // Date + Time
         mEdtDate.applyOnClickListener(DataDetailOtherFragment.this, PICK_DATE_REQUEST_CODE,
