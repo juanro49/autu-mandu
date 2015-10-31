@@ -24,29 +24,15 @@
         <!-- Mileage -->
         <android.support.design.widget.TextInputLayout
             android:id="@+id/edt_mileage_input_layout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/spn_distance_entry_mode"
-            android:layout_toStartOf="@+id/spn_distance_entry_mode"
-            android:baselineAlignedChildIndex="0">
+            android:layout_alignParentTop="true">
             <EditText
                 android:id="@+id/edt_mileage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number" />
         </android.support.design.widget.TextInputLayout>
-        <Spinner
-            android:id="@+id/spn_distance_entry_mode"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/edt_mileage_input_layout"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"/>
         <!-- Volume -->
         <android.support.design.widget.TextInputLayout
             android:id="@+id/edt_volume_input_layout"

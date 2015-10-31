@@ -69,7 +69,20 @@ public class Preferences {
 
     public DistanceEntryMode getDistanceEntryMode() {
         String mode = mPrefs.getString("behavior_distance_entry_mode", "TOTAL");
-        return DistanceEntryMode.valueOf(mode);
+        try {
+            return DistanceEntryMode.valueOf(mode);
+        } catch (IllegalArgumentException e) {
+            return DistanceEntryMode.TOTAL;
+        }
+    }
+
+    public PriceEntryMode getPriceEntryMode() {
+        String mode = mPrefs.getString("behavior_price_entry_mode", "TOTAL_AND_VOLUME");
+        try {
+            return PriceEntryMode.valueOf(mode);
+        } catch (IllegalArgumentException e) {
+            return PriceEntryMode.TOTAL_AND_VOLUME;
+        }
     }
 
     public String getSyncLocalFileRev() {

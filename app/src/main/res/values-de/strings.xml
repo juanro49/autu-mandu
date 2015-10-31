@@ -47,6 +47,8 @@
     <string name="hint_mileage_optional">Gesamtkilometer (optional)</string>
     <string name="hint_volume">Volumen</string>
     <string name="hint_price">Preis</string>
+    <string name="hint_price_total">Gesamtpreis</string>
+    <string name="hint_price_per_unit">Preis pro Einheit</string>
     <string name="hint_note_optional">Notiz (optional)</string>
     <string name="hint_title">Titel</string>
     <string name="hint_name">Name</string>
@@ -210,6 +212,7 @@
     <string name="pref_title_behavior_default_car">Standard-Auto</string>
     <string name="pref_title_behavior_show_car_menu">Zeige Autoauswahlmenü</string>
     <string name="pref_title_behavior_distance_entry_mode">Entfernungseingabe</string>
+    <string name="pref_title_behavior_price_entry_mode">Preiseingabe</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Fehlende Tankfüllungen ausgleichen (Beta)</string>
     <string name="pref_title_behavior_reminder_snooze_duration">Schlummerdauer für Erinnerungen</string>
     <string name="pref_title_unit_currency">Währung</string>
@@ -264,7 +267,9 @@
 
     <string name="distance_entry_mode_trip">Tageskilometer</string>
     <string name="distance_entry_mode_total">Gesamtkilometer</string>
-    <string name="distance_entry_mode_show_selector">Auswahl anzeigen</string>
+    <string name="price_entry_mode_per_unit_and_volume">Preis pro Einheit &amp; Volumen</string>
+    <string name="price_entry_mode_per_unit_and_total">Preis pro Einheit &amp; Gesamtpreis</string>
+    <string name="price_entry_mode_total_and_volume">Gesamtpreis &amp; Volumen</string>
     <string name="missing_refueling">Fehlende Tankfüllung</string>
     <string name="invalid_data">Dieser Eintrag ist fehlerhaft. Bearbeiten und speichern Sie ihn um detaillierte Meldungen zu erhalten.</string>
     <string name="graph_details_desc">Graph-Details</string>

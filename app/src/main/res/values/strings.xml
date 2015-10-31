@@ -47,6 +47,8 @@
     <string name="hint_mileage_optional">Total distance (optional)</string>
     <string name="hint_volume">Volume</string>
     <string name="hint_price">Price</string>
+    <string name="hint_price_total">Total price</string>
+    <string name="hint_price_per_unit">Price per unit</string>
     <string name="hint_note_optional">Note (optional)</string>
     <string name="hint_title">Title</string>
     <string name="hint_name">Name</string>
@@ -210,6 +212,7 @@
     <string name="pref_title_behavior_default_car">Default car</string>
     <string name="pref_title_behavior_show_car_menu">Show car menu</string>
     <string name="pref_title_behavior_distance_entry_mode">Distance Entry Mode</string>
+    <string name="pref_title_behavior_price_entry_mode">Price Entry Mode</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Balance missing refuelings (Beta)</string>
     <string name="pref_title_behavior_reminder_snooze_duration">Reminder snooze duration</string>
     <string name="pref_title_unit_currency">Currency</string>
@@ -264,7 +267,9 @@
 
     <string name="distance_entry_mode_trip">Trip distance</string>
     <string name="distance_entry_mode_total">Total distance</string>
-    <string name="distance_entry_mode_show_selector">Show selector</string>
+    <string name="price_entry_mode_per_unit_and_volume">Price per unit &amp; volume</string>
+    <string name="price_entry_mode_per_unit_and_total">Price per unit &amp; total price</string>
+    <string name="price_entry_mode_total_and_volume">Total price &amp; volume</string>
     <string name="missing_refueling">Missing refueling</string>
     <string name="invalid_data">This entry contains invalid data. Edit and save it to see detailed errors.</string>
     <string name="graph_details_desc">Graph details</string>

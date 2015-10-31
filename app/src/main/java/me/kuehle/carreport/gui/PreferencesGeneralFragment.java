@@ -32,6 +32,7 @@ import java.util.List;
 import me.kuehle.carreport.DistanceEntryMode;
 import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.Preferences;
+import me.kuehle.carreport.PriceEntryMode;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.provider.car.CarColumns;
@@ -52,6 +53,9 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
                 preference.setSummary(car.getName());
             } else if (prefKey.equals("behavior_distance_entry_mode")) {
                 DistanceEntryMode mode = DistanceEntryMode.valueOf(newValue.toString());
+                preference.setSummary(getString(mode.nameResourceId));
+            } else if (prefKey.equals("behavior_price_entry_mode")) {
+                PriceEntryMode mode = PriceEntryMode.valueOf(newValue.toString());
                 preference.setSummary(getString(mode.nameResourceId));
             } else if (prefKey.equals("behavior_reminder_snooze_duration")) {
                 TimeSpan timeSpan = TimeSpan.fromString(newValue.toString(), null);
@@ -147,6 +151,23 @@ public class PreferencesGeneralFragment extends PreferenceFragment {
             distanceEntryMode.setEntryValues(entryValues);
             distanceEntryMode.setOnPreferenceChangeListener(onPreferenceChangeListener);
             distanceEntryMode.setSummary(getString(prefs.getDistanceEntryMode().nameResourceId));
+        }
+
+        // Behavior price entry mode
+        {
+            PriceEntryMode[] modes = PriceEntryMode.values();
+            String[] entries = new String[modes.length];
+            String[] entryValues = new String[modes.length];
+            for (int i = 0; i < modes.length; i++) {
+                entries[i] = getString(modes[i].nameResourceId);
+                entryValues[i] = modes[i].name();
+            }
+
+            ListPreference priceEntryMode = (ListPreference) findPreference("behavior_price_entry_mode");
+            priceEntryMode.setEntries(entries);
+            priceEntryMode.setEntryValues(entryValues);
+            priceEntryMode.setOnPreferenceChangeListener(onPreferenceChangeListener);
+            priceEntryMode.setSummary(getString(prefs.getPriceEntryMode().nameResourceId));
         }
 
         // Behavior reminder snooze duration

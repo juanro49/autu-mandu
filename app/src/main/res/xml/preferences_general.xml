@@ -33,6 +33,10 @@
             android:defaultValue="TOTAL"
             android:key="behavior_distance_entry_mode"
             android:title="@string/pref_title_behavior_distance_entry_mode" />
+        <ListPreference
+            android:defaultValue="TOTAL_AND_VOLUME"
+            android:key="behavior_price_entry_mode"
+            android:title="@string/pref_title_behavior_price_entry_mode" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="behavior_auto_guess_missing_data"
