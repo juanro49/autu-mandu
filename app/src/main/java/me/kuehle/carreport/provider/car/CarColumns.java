@@ -48,6 +48,11 @@ public class CarColumns implements BaseColumns {
     public static final String COLOR = "color";
 
     /**
+     * Initial mileage of the car, when it starts to be used in the app.
+     */
+    public static final String INITIAL_MILEAGE = "initial_mileage";
+
+    /**
      * When the car has been suspended, this contains the start date.
      */
     public static final String SUSPENDED_SINCE = "suspended_since";
@@ -60,6 +65,7 @@ public class CarColumns implements BaseColumns {
             _ID,
             NAME,
             COLOR,
+            INITIAL_MILEAGE,
             SUSPENDED_SINCE
     };
     // @formatter:on
@@ -69,6 +75,7 @@ public class CarColumns implements BaseColumns {
         for (String c : projection) {
             if (c.equals(NAME) || c.contains("." + NAME)) return true;
             if (c.equals(COLOR) || c.contains("." + COLOR)) return true;
+            if (c.equals(INITIAL_MILEAGE) || c.contains("." + INITIAL_MILEAGE)) return true;
             if (c.equals(SUSPENDED_SINCE) || c.contains("." + SUSPENDED_SINCE)) return true;
         }
         return false;

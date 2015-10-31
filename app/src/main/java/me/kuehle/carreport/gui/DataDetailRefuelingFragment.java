@@ -138,9 +138,13 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 }
             }
 
-            RefuelingCursor previousRefueling = getPreviousRefueling();
-            if (getDistanceEntryMode() == DistanceEntryMode.TRIP && previousRefueling.moveToNext()) {
-                edtMileage.setText(String.valueOf(refueling.getMileage() - previousRefueling.getMileage()));
+            if (getDistanceEntryMode() == DistanceEntryMode.TRIP) {
+                RefuelingCursor previousRefueling = getPreviousRefueling();
+                if (previousRefueling.moveToNext()) {
+                    edtMileage.setText(String.valueOf(refueling.getMileage() - previousRefueling.getMileage()));
+                } else {
+                    edtMileage.setText(String.valueOf(refueling.getMileage() - refueling.getCarInitialMileage()));
+                }
             } else {
                 edtMileage.setText(String.valueOf(refueling.getMileage()));
             }

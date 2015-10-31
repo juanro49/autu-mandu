@@ -62,13 +62,27 @@
                 android:layout_margin="4dp"
                 android:background="@drawable/bg_color_indicator"/>
         </LinearLayout>
+        <!-- Initial Mileage -->
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/edt_initial_mileage_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layout_color">
+
+            <EditText
+                android:id="@+id/edt_initial_mileage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_initial_mileage"
+                android:inputType="number"/>
+        </android.support.design.widget.TextInputLayout>
         <!-- Suspend -->
         <TextView
             android:id="@+id/txt_section_suspend"
             style="@style/AppWidget.SectionHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/layout_color"
+            android:layout_below="@id/edt_initial_mileage_input_layout"
             android:text="@string/section_suspend"/>
 
         <TextView

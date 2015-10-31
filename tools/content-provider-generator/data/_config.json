@@ -7,7 +7,7 @@
     "sqliteOpenHelperClassName": "DataSQLiteOpenHelper",
     "sqliteOpenHelperCallbacksClassName": "DataSQLiteOpenHelperCallbacks",
     "databaseFileName": "data.db",
-    "databaseVersion": 9,
+    "databaseVersion": 10,
     "enableForeignKeys": true,
     "useAnnotations": true
 }

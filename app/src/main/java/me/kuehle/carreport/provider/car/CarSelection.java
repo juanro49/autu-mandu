@@ -127,6 +127,36 @@ public class CarSelection extends AbstractSelection<CarSelection> {
         return this;
     }
 
+    public CarSelection initialMileage(int... value) {
+        addEquals(CarColumns.INITIAL_MILEAGE, toObjectArray(value));
+        return this;
+    }
+
+    public CarSelection initialMileageNot(int... value) {
+        addNotEquals(CarColumns.INITIAL_MILEAGE, toObjectArray(value));
+        return this;
+    }
+
+    public CarSelection initialMileageGt(int value) {
+        addGreaterThan(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public CarSelection initialMileageGtEq(int value) {
+        addGreaterThanOrEquals(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public CarSelection initialMileageLt(int value) {
+        addLessThan(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public CarSelection initialMileageLtEq(int value) {
+        addLessThanOrEquals(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
     public CarSelection suspendedSince(Date... value) {
         addEquals(CarColumns.SUSPENDED_SINCE, value);
         return this;

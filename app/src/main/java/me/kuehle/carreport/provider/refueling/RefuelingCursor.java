@@ -172,6 +172,16 @@ public class RefuelingCursor extends AbstractCursor implements RefuelingModel {
     }
 
     /**
+     * Initial mileage of the car, when it starts to be used in the app.
+     */
+    public int getCarInitialMileage() {
+        Integer res = getIntegerOrNull(CarColumns.INITIAL_MILEAGE);
+        if (res == null)
+            throw new NullPointerException("The value of 'initial_mileage' in the database was null, which is not allowed according to the model definition");
+        return res;
+    }
+
+    /**
      * When the car has been suspended, this contains the start date.
      * Can be {@code null}.
      */

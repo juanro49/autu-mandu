@@ -364,6 +364,36 @@ public class ReminderSelection extends AbstractSelection<ReminderSelection> {
         return this;
     }
 
+    public ReminderSelection carInitialMileage(int... value) {
+        addEquals(CarColumns.INITIAL_MILEAGE, toObjectArray(value));
+        return this;
+    }
+
+    public ReminderSelection carInitialMileageNot(int... value) {
+        addNotEquals(CarColumns.INITIAL_MILEAGE, toObjectArray(value));
+        return this;
+    }
+
+    public ReminderSelection carInitialMileageGt(int value) {
+        addGreaterThan(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public ReminderSelection carInitialMileageGtEq(int value) {
+        addGreaterThanOrEquals(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public ReminderSelection carInitialMileageLt(int value) {
+        addLessThan(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public ReminderSelection carInitialMileageLtEq(int value) {
+        addLessThanOrEquals(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
     public ReminderSelection carSuspendedSince(Date... value) {
         addEquals(CarColumns.SUSPENDED_SINCE, value);
         return this;

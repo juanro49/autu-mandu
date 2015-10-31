@@ -109,11 +109,12 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
 
         data.put(R.id.data1, String.format("%d %s", mileage, mUnitDistance));
 
+        int mileageDifference = mileage - refueling.getCarInitialMileage();
         if (moveToNextNotGuessedRefueling(refueling)) {
-            data.put(R.id.data1_calculated, String.format("+ %d %s",
-                    mileage - refueling.getMileage(), mUnitDistance));
+            mileageDifference = mileage - refueling.getMileage();
         }
         refueling.moveToPosition(position);
+        data.put(R.id.data1_calculated, String.format("+ %d %s", mileageDifference, mUnitDistance));
 
         data.put(R.id.data2, String.format("%.2f %s", refueling.getPrice(), mUnitCurrency));
         data.put(R.id.data2_calculated, String.format("%.3f %s/%s",

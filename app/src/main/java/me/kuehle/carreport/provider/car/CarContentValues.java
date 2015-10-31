@@ -63,6 +63,15 @@ public class CarContentValues extends AbstractContentValues {
 
 
     /**
+     * Initial mileage of the car, when it starts to be used in the app.
+     */
+    public CarContentValues putInitialMileage(int value) {
+        mContentValues.put(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+
+    /**
      * When the car has been suspended, this contains the start date.
      */
     public CarContentValues putSuspendedSince(@Nullable Date value) {

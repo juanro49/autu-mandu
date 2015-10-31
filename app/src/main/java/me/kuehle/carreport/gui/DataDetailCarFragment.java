@@ -53,6 +53,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     private EditText edtName;
     private View colorIndicator;
     private int color;
+    private EditText edtInitialMileage;
     private CheckBox chkSuspend;
     private DateTimeInput edtSuspendDate;
     private SimpleAnimator edtSuspendDateAnimator;
@@ -101,10 +102,12 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
 
                 edtName.setText(car.getName());
                 color = car.getColor();
+                edtInitialMileage.setText(String.valueOf(car.getInitialMileage()));
                 chkSuspend.setChecked(car.getSuspendedSince() != null);
                 edtSuspendDate.setDate(car.getSuspendedSince() != null ? car.getSuspendedSince() : new Date());
             } else {
                 color = getResources().getColor(R.color.accent);
+                edtInitialMileage.setText("0");
                 edtSuspendDate.setDate(new Date());
             }
         } else {
@@ -152,6 +155,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     protected void initFields(Bundle savedInstanceState, View v) {
         edtName = (EditText) v.findViewById(R.id.edt_name);
         colorIndicator = v.findViewById(R.id.btn_color);
+        edtInitialMileage = (EditText) v.findViewById(R.id.edt_initial_mileage);
         chkSuspend = (CheckBox) v.findViewById(R.id.chk_suspend);
         edtSuspendDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_suspend_date),
                 DateTimeInput.Mode.DATE);
@@ -191,6 +195,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         CarContentValues values = new CarContentValues();
         values.putName(edtName.getText().toString());
         values.putColor(color);
+        values.putInitialMileage(getIntegerFromEditText(edtInitialMileage, 0));
         values.putSuspendedSince(chkSuspend.isChecked() ? edtSuspendDate.getDate() : null);
 
         if (isInEditMode()) {

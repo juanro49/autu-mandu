@@ -35,7 +35,7 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = DataSQLiteOpenHelper.class.getSimpleName();
 
     public static final String DATABASE_FILE_NAME = "data.db";
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
     private static DataSQLiteOpenHelper sInstance;
     private final Context mContext;
     private final DataSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
@@ -46,6 +46,7 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
             + CarColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CarColumns.NAME + " TEXT NOT NULL, "
             + CarColumns.COLOR + " INTEGER NOT NULL, "
+            + CarColumns.INITIAL_MILEAGE + " INTEGER NOT NULL DEFAULT 0, "
             + CarColumns.SUSPENDED_SINCE + " INTEGER "
             + " );";
 
@@ -105,8 +106,8 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
     // @formatter:on
 
     public static DataSQLiteOpenHelper getInstance(Context context) {
-        // Use the application mContext, which will ensure that you
-        // don't accidentally leak an Activity's mContext.
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
         // See this article for more information: http://bit.ly/6LRzfx
         if (sInstance == null) {
             sInstance = newInstance(context.getApplicationContext());

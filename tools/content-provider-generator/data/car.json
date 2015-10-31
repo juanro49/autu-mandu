@@ -15,6 +15,13 @@
             "nullable": false
         },
         {
+            "documentation": "Initial mileage of the car, when it starts to be used in the app.",
+            "name": "initial_mileage",
+            "type": "Integer",
+            "nullable": false,
+            "defaultValue": 0
+        },
+        {
             "documentation": "When the car has been suspended, this contains the start date.",
             "name": "suspended_since",
             "type": "Date"

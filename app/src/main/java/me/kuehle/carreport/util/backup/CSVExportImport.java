@@ -98,6 +98,7 @@ public class CSVExportImport {
                     car.getId(),
                     car.getName(),
                     car.getColor(),
+                    car.getInitialMileage(),
                     car.getSuspendedSince());
         }
 
@@ -243,6 +244,7 @@ public class CSVExportImport {
             CarContentValues values = new CarContentValues();
             values.putName(csv.getString(i, CarColumns.NAME));
             values.putColor(csv.getInteger(i, CarColumns.COLOR));
+            values.putInitialMileage(csv.getInteger(i, CarColumns.INITIAL_MILEAGE));
             values.putSuspendedSince(csv.getDate(i, CarColumns.SUSPENDED_SINCE));
 
             boolean updated = false;

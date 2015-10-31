@@ -54,6 +54,9 @@ public class CarQueries {
         int latestRefuelingMileage = 0;
         int latestOtherCostMileage = 0;
 
+        CarCursor car = new CarSelection().id(carId).query(context.getContentResolver());
+        car.moveToNext();
+
         RefuelingCursor refueling = new RefuelingSelection().carId(carId).limit(1).query(context.getContentResolver(), new String[]{RefuelingColumns.MILEAGE}, RefuelingColumns.MILEAGE + " DESC");
         if (refueling.moveToNext()) {
             latestRefuelingMileage = refueling.getMileage();
@@ -64,6 +67,6 @@ public class CarQueries {
             latestOtherCostMileage = otherCost.getMileage();
         }
 
-        return Math.max(latestOtherCostMileage, latestRefuelingMileage);
+        return Math.max(car.getInitialMileage(), Math.max(latestOtherCostMileage, latestRefuelingMileage));
     }
 }

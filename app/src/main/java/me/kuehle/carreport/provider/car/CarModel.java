@@ -40,6 +40,11 @@ public interface CarModel extends BaseModel {
     int getColor();
 
     /**
+     * Initial mileage of the car, when it starts to be used in the app.
+     */
+    int getInitialMileage();
+
+    /**
      * When the car has been suspended, this contains the start date.
      * Can be {@code null}.
      */

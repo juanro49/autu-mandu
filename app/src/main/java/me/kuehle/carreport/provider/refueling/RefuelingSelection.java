@@ -409,6 +409,36 @@ public class RefuelingSelection extends AbstractSelection<RefuelingSelection> {
         return this;
     }
 
+    public RefuelingSelection carInitialMileage(int... value) {
+        addEquals(CarColumns.INITIAL_MILEAGE, toObjectArray(value));
+        return this;
+    }
+
+    public RefuelingSelection carInitialMileageNot(int... value) {
+        addNotEquals(CarColumns.INITIAL_MILEAGE, toObjectArray(value));
+        return this;
+    }
+
+    public RefuelingSelection carInitialMileageGt(int value) {
+        addGreaterThan(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public RefuelingSelection carInitialMileageGtEq(int value) {
+        addGreaterThanOrEquals(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public RefuelingSelection carInitialMileageLt(int value) {
+        addLessThan(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
+    public RefuelingSelection carInitialMileageLtEq(int value) {
+        addLessThanOrEquals(CarColumns.INITIAL_MILEAGE, value);
+        return this;
+    }
+
     public RefuelingSelection carSuspendedSince(Date... value) {
         addEquals(CarColumns.SUSPENDED_SINCE, value);
         return this;

@@ -58,6 +58,7 @@
     <string name="hint_url">URL</string>
     <string name="hint_user_name">User name</string>
     <string name="hint_password">Password</string>
+    <string name="hint_initial_mileage">Initial mileage</string>
     <string name="hint_reminder_after_distance">After distance</string>
     <string name="hint_reminder_after_time">After time</string>
     <string name="hint_reminder_start_mileage">Start at mileage</string>
