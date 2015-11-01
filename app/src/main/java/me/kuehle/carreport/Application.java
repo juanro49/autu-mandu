@@ -110,13 +110,12 @@ public class Application extends android.app.Application {
 
             @Override
             public void onChange(boolean selfChange) {
-                updateReminders();
-                requestSync();
+                onChange(selfChange, null);
             }
 
             @Override
             public void onChange(boolean selfChange, Uri uri) {
-                onChange(selfChange);
+                updateReminders();
             }
         };
 
@@ -129,14 +128,5 @@ public class Application extends android.app.Application {
         if (BuildConfig.DEBUG) Log.d(TAG, "updateReminders");
 
         ReminderService.updateNotification(instance);
-    }
-
-    private void requestSync() {
-        if (BuildConfig.DEBUG) Log.d(TAG, "requestSync");
-
-        Account[] accounts = mAccountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
-        if (accounts.length > 0) {
-            ContentResolver.requestSync(accounts[0], DataProvider.AUTHORITY, new Bundle());
-        }
     }
 }

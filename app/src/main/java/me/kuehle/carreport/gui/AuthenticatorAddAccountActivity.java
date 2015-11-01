@@ -20,6 +20,7 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import org.json.JSONObject;
 
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 import me.kuehle.carreport.util.sync.Authenticator;
 import me.kuehle.carreport.util.sync.SyncProviders;
@@ -121,6 +123,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER,
                     String.valueOf(mSelectedSyncProvider.getId()));
             SyncProviders.setSyncProviderSettings(mAuthenticatedAccount, settings);
+            ContentResolver.setSyncAutomatically(mAuthenticatedAccount, DataProvider.AUTHORITY, true);
 
             setAccountAuthenticatorResult(data.getExtras());
             setResult(Activity.RESULT_OK, data);

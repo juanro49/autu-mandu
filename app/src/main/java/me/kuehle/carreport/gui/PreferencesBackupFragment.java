@@ -227,7 +227,6 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 
     @Override
     public void onDialogNegativeClick(int requestCode) {
-
     }
 
     private void doBackup() {
