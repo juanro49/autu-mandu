@@ -16,6 +16,7 @@
 
 package me.kuehle.carreport.gui;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -23,10 +24,14 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -49,6 +54,10 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     private static final int REQUEST_RESTORE = 13;
     private static final int REQUEST_EXPORT_CSV_OVERWRITE = 14;
     private static final int REQUEST_IMPORT_CSV = 15;
+    private static final int REQUEST_BACKUP_PERMISSIONS = 16;
+    private static final int REQUEST_RESTORE_PERMISSIONS = 17;
+    private static final int REQUEST_EXPORT_CSV_PERMISSIONS = 18;
+    private static final int REQUEST_IMPORT_CSV_PERMISSIONS = 19;
 
     private AccountManager mAccountManager;
     private Backup mBackup;
@@ -94,69 +103,6 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         }
     };
 
-    private OnPreferenceClickListener mBackupClick = new OnPreferenceClickListener() {
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            if (mBackup.backupFileExists()) {
-                MessageDialogFragment.newInstance(
-                        PreferencesBackupFragment.this,
-                        REQUEST_BACKUP_OVERWRITE,
-                        R.string.alert_backup_overwrite_title,
-                        getString(R.string.alert_backup_overwrite_message),
-                        R.string.overwrite, android.R.string.cancel).show(
-                        getFragmentManager(), null);
-            } else {
-                doBackup();
-            }
-
-            return true;
-        }
-
-    };
-
-    private OnPreferenceClickListener mRestoreClick = new OnPreferenceClickListener() {
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            MessageDialogFragment.newInstance(PreferencesBackupFragment.this,
-                    REQUEST_RESTORE, R.string.alert_restore_title,
-                    getString(R.string.alert_restore_message),
-                    R.string.restore, android.R.string.cancel).show(
-                    getFragmentManager(), null);
-            return true;
-        }
-    };
-
-    private OnPreferenceClickListener mExportCSVClick = new OnPreferenceClickListener() {
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            if (mCSVExportImport.anyExportFileExist()) {
-                MessageDialogFragment.newInstance(
-                        PreferencesBackupFragment.this,
-                        REQUEST_EXPORT_CSV_OVERWRITE,
-                        R.string.alert_export_csv_overwrite_title,
-                        getString(R.string.alert_export_csv_overwrite_message),
-                        R.string.overwrite, android.R.string.cancel).show(
-                        getFragmentManager(), null);
-            } else {
-                doExportCSV();
-            }
-
-            return true;
-        }
-    };
-
-    private OnPreferenceClickListener mImportCSVClick = new OnPreferenceClickListener() {
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            MessageDialogFragment.newInstance(PreferencesBackupFragment.this,
-                    REQUEST_IMPORT_CSV, R.string.alert_import_csv_title,
-                    getString(R.string.alert_import_csv_message),
-                    R.string.import_, android.R.string.cancel).show(
-                    getFragmentManager(), null);
-            return true;
-        }
-    };
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -184,8 +130,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         // Backup
         {
             Preference backup = findPreference("backup");
-            backup.setEnabled(this.mBackup.canBackup());
-            backup.setOnPreferenceClickListener(mBackupClick);
+            backup.setOnPreferenceClickListener(
+                    createOnClickListenerToAskForStorageAccess(REQUEST_BACKUP_PERMISSIONS));
         }
 
         // Restore
@@ -196,8 +142,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         // Export CSV
         {
             Preference export = findPreference("exportcsv");
-            export.setEnabled(mCSVExportImport.canExport());
-            export.setOnPreferenceClickListener(mExportCSVClick);
+            export.setOnPreferenceClickListener(
+                    createOnClickListenerToAskForStorageAccess(REQUEST_EXPORT_CSV_PERMISSIONS));
         }
 
         // Import CSV
@@ -215,13 +161,13 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     @Override
     public void onDialogPositiveClick(int requestCode) {
         if (requestCode == REQUEST_BACKUP_OVERWRITE) {
-            doBackup();
+            doBackup(true);
         } else if (requestCode == REQUEST_RESTORE) {
-            doRestore();
+            doRestore(true);
         } else if (requestCode == REQUEST_EXPORT_CSV_OVERWRITE) {
-            doExportCSV();
+            doExportCSV(true);
         } else if (requestCode == REQUEST_IMPORT_CSV) {
-            doImportCSV();
+            doImportCSV(true);
         }
     }
 
@@ -229,8 +175,39 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     public void onDialogNegativeClick(int requestCode) {
     }
 
-    private void doBackup() {
-        if (mBackup.backup()) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_BACKUP_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                doBackup(false);
+            }
+        } else if (requestCode == REQUEST_RESTORE_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                doRestore(false);
+            }
+        } else if (requestCode == REQUEST_EXPORT_CSV_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                doExportCSV(false);
+            }
+        } else if (requestCode == REQUEST_IMPORT_CSV_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                doImportCSV(false);
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    private void doBackup(boolean userWasAskedForOverwrite) {
+        if (mBackup.backupFileExists() && !userWasAskedForOverwrite) {
+            MessageDialogFragment.newInstance(
+                    PreferencesBackupFragment.this,
+                    REQUEST_BACKUP_OVERWRITE,
+                    R.string.alert_backup_overwrite_title,
+                    getString(R.string.alert_backup_overwrite_message),
+                    R.string.overwrite, android.R.string.cancel)
+                    .show(getFragmentManager(), null);
+        } else if (mBackup.backup()) {
             Toast.makeText(getActivity(),
                     getString(R.string.toast_backup_success, Backup.FILE_NAME),
                     Toast.LENGTH_SHORT).show();
@@ -241,8 +218,16 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         }
     }
 
-    private void doExportCSV() {
-        if (mCSVExportImport.export()) {
+    private void doExportCSV(boolean userWasAskedForOverwrite) {
+        if (mCSVExportImport.anyExportFileExist() && !userWasAskedForOverwrite) {
+            MessageDialogFragment.newInstance(
+                    PreferencesBackupFragment.this,
+                    REQUEST_EXPORT_CSV_OVERWRITE,
+                    R.string.alert_export_csv_overwrite_title,
+                    getString(R.string.alert_export_csv_overwrite_message),
+                    R.string.overwrite, android.R.string.cancel).show(
+                    getFragmentManager(), null);
+        } else if (mCSVExportImport.export()) {
             Toast.makeText(getActivity(), R.string.toast_export_csv_succeeded,
                     Toast.LENGTH_SHORT).show();
             setupImportCSVPreference();
@@ -252,8 +237,14 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         }
     }
 
-    private void doImportCSV() {
-        if (mCSVExportImport.import_()) {
+    private void doImportCSV(boolean userWasAsked) {
+        if (!userWasAsked) {
+            MessageDialogFragment.newInstance(PreferencesBackupFragment.this,
+                    REQUEST_IMPORT_CSV, R.string.alert_import_csv_title,
+                    getString(R.string.alert_import_csv_message),
+                    R.string.import_, android.R.string.cancel).show(
+                    getFragmentManager(), null);
+        } else if (mCSVExportImport.import_()) {
             Toast.makeText(getActivity(), R.string.toast_import_csv_success,
                     Toast.LENGTH_SHORT).show();
         } else {
@@ -262,8 +253,14 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         }
     }
 
-    private void doRestore() {
-        if (mBackup.restore()) {
+    private void doRestore(boolean userWasAsked) {
+        if (!userWasAsked) {
+            MessageDialogFragment.newInstance(PreferencesBackupFragment.this,
+                    REQUEST_RESTORE, R.string.alert_restore_title,
+                    getString(R.string.alert_restore_message),
+                    R.string.restore, android.R.string.cancel)
+                    .show(getFragmentManager(), null);
+        } else if (mBackup.restore()) {
             Toast.makeText(getActivity(), R.string.toast_restore_success,
                     Toast.LENGTH_SHORT).show();
         } else {
@@ -274,7 +271,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 
     private void setupImportCSVPreference() {
         Preference import_ = findPreference("importcsv");
-        if (mCSVExportImport.canImport()) {
+        if (mCSVExportImport.allExportFilesExist()) {
             import_.setSummary(getString(R.string.pref_summary_import_csv,
                     Backup.FILE_NAME));
             import_.setEnabled(true);
@@ -285,12 +282,13 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             import_.setEnabled(false);
         }
 
-        import_.setOnPreferenceClickListener(mImportCSVClick);
+        import_.setOnPreferenceClickListener(
+                createOnClickListenerToAskForStorageAccess(REQUEST_IMPORT_CSV_PERMISSIONS));
     }
 
     private void setupRestorePreference() {
         Preference restore = findPreference("restore");
-        if (mBackup.canRestore()) {
+        if (mBackup.backupFileExists()) {
             restore.setSummary(getString(R.string.pref_summary_restore,
                     Backup.FILE_NAME));
             restore.setEnabled(true);
@@ -299,7 +297,9 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     Backup.FILE_NAME));
             restore.setEnabled(false);
         }
-        restore.setOnPreferenceClickListener(mRestoreClick);
+
+        restore.setOnPreferenceClickListener(
+                createOnClickListenerToAskForStorageAccess(REQUEST_RESTORE_PERMISSIONS));
     }
 
     private void setupSynchronizationPreference() {
@@ -320,5 +320,31 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             sync.setSummary(R.string.pref_summary_sync_setup);
             sync.setOnPreferenceClickListener(mSetupSync);
         }
+    }
+
+    private OnPreferenceClickListener createOnClickListenerToAskForStorageAccess(final int requestCode) {
+        final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        return new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                        PackageManager.PERMISSION_GRANTED) {
+                    onRequestPermissionsResult(requestCode, permissions,
+                            new int[]{PackageManager.PERMISSION_GRANTED});
+                } else {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        Toast.makeText(getActivity(), R.string.toast_need_storage_permission,
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    ActivityCompat.requestPermissions(getActivity(), permissions, requestCode);
+                }
+
+                return true;
+            }
+        };
     }
 }

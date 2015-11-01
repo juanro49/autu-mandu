@@ -55,7 +55,6 @@ public class CSVExportImport {
 
     public Context mContext;
 
-    private File mExternalStorageDir;
     private File mExportDir;
 
     private static String[] allTables = {
@@ -68,7 +67,7 @@ public class CSVExportImport {
 
     public CSVExportImport(Context context) {
         mContext = context;
-        mExternalStorageDir = Environment.getExternalStorageDirectory();
+        File mExternalStorageDir = Environment.getExternalStorageDirectory();
         mExportDir = new File(mExternalStorageDir, DIRECTORY);
     }
 
@@ -183,14 +182,6 @@ public class CSVExportImport {
         }
 
         csv.toFile(new File(mExportDir, ReminderColumns.TABLE_NAME + ".csv"));
-    }
-
-    public boolean canExport() {
-        return mExternalStorageDir.canWrite();
-    }
-
-    public boolean canImport() {
-        return allExportFilesExist();
     }
 
     public boolean allExportFilesExist() {

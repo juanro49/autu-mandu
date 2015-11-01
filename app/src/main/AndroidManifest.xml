@@ -14,85 +14,87 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="me.kuehle.carreport">
+<manifest package="me.kuehle.carreport"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Purpose: backup/restore, CSV export/import, sync -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Purpose: backup/restore, CSV export/import -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <!-- Purpose: sync -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="22"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" android:maxSdkVersion="22"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" android:maxSdkVersion="22"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" android:maxSdkVersion="22"/>
 
     <!-- Purpose: setup reminder service, so reminders work after reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name="Application"
+        android:allowBackup="true"
+        android:description="@string/app_description"
+        android:fullBackupContent="@xml/backup_scheme"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:description="@string/app_description"
-        android:theme="@style/AppTheme"
-        android:allowBackup="true"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
 
         <activity
             android:name=".gui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar.NavigationDrawer">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".gui.FirstStartActivity"
-            android:label="@string/title_first_start" />
-        <activity android:name=".gui.DataDetailActivity" />
+            android:label="@string/title_first_start"/>
+        <activity android:name=".gui.DataDetailActivity"/>
         <activity
             android:name=".gui.PreferencesActivity"
             android:label="@string/title_settings"
-            android:theme="@style/AppTheme.Preferences"
-            android:parentActivityName=".gui.MainActivity">
+            android:parentActivityName=".gui.MainActivity"
+            android:theme="@style/AppTheme.Preferences">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".gui.MainActivity" />
+                android:value=".gui.MainActivity"/>
         </activity>
         <activity
             android:name=".gui.HelpActivity"
             android:label="@string/title_help"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".gui.MainActivity">
+            android:parentActivityName=".gui.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".gui.MainActivity" />
+                android:value=".gui.MainActivity"/>
         </activity>
         <activity
             android:name=".gui.AuthenticatorAddAccountActivity"
-            android:theme="@style/Base.Theme.AppCompat.Dialog"
-            android:excludeFromRecents="true"/>
+            android:excludeFromRecents="true"
+            android:theme="@style/Base.Theme.AppCompat.Dialog"/>
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask">
             <intent-filter>
-                <data android:scheme="db-a6edub2n9b029if" />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="db-a6edub2n9b029if"/>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".gui.dialog.SetupWebDavSyncDialogActivity"
-            android:theme="@style/Base.Theme.AppCompat.Dialog"
-            android:excludeFromRecents="true"/>
+            android:excludeFromRecents="true"
+            android:theme="@style/Base.Theme.AppCompat.Dialog"/>
 
         <service
             android:name=".util.sync.AuthenticatorService"
@@ -102,7 +104,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
+                android:resource="@xml/authenticator"/>
         </service>
         <service
             android:name=".util.sync.SyncService"
@@ -113,12 +115,12 @@
             </intent-filter>
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_adapter" />
+                android:resource="@xml/sync_adapter"/>
         </service>
         <service
             android:name=".util.reminder.ReminderService"
             android:exported="false"
-            android:process=":reminder" />
+            android:process=":reminder"/>
 
         <receiver android:name=".util.reminder.ReminderEnablerReceiver">
             <intent-filter>
@@ -129,7 +131,7 @@
         <provider
             android:name="me.kuehle.carreport.provider.DataProvider"
             android:authorities="me.kuehle.carreport.provider"
-            android:exported="false" />
+            android:exported="false"/>
 
     </application>
 

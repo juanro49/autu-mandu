@@ -16,68 +16,41 @@
 
 package me.kuehle.carreport.util.backup;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
-
-import me.kuehle.carreport.Application;
-import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
-
 import android.content.Context;
 import android.os.Environment;
 
+import java.io.File;
+
+import me.kuehle.carreport.Application;
+import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
+import me.kuehle.carreport.util.FileCopyUtil;
+
 public class Backup {
-	public static final String FILE_NAME = "carreport.backup";
+    public static final String FILE_NAME = "carreport.backup";
 
-	private File dir;
-	private File dbFile;
-	private File backupFile;
+    private File dbFile;
+    private File backupFile;
 
-	public Backup(Context context) {
-		dir = Environment.getExternalStorageDirectory();
-		dbFile = new File(DataSQLiteOpenHelper.getInstance(context).getReadableDatabase().getPath());
-		backupFile = new File(dir, FILE_NAME);
-	}
+    public Backup(Context context) {
+        File dir = Environment.getExternalStorageDirectory();
+        dbFile = new File(DataSQLiteOpenHelper.getInstance(context).getReadableDatabase().getPath());
+        backupFile = new File(dir, FILE_NAME);
+    }
 
-	public boolean backup() {
-		return copyFile(dbFile, backupFile);
-	}
+    public boolean backup() {
+        return FileCopyUtil.copyFile(dbFile, backupFile);
+    }
 
-	public boolean backupFileExists() {
-		return backupFile.isFile();
-	}
+    public boolean backupFileExists() {
+        return backupFile.isFile();
+    }
 
-	public boolean canBackup() {
-		return dir.canWrite();
-	}
+    public boolean restore() {
+        boolean result = FileCopyUtil.copyFile(backupFile, dbFile);
+        if (result) {
+            Application.reinitializeDatabase();
+        }
 
-	public boolean canRestore() {
-		return backupFile.isFile();
-	}
-
-	public boolean restore() {
-		boolean result = copyFile(backupFile, dbFile);
-		if (result) {
-			Application.reinitializeDatabase();
-		}
-		return result;
-	}
-
-	private boolean copyFile(File from, File to) {
-		try {
-			FileInputStream inStream = new FileInputStream(from);
-			FileOutputStream outStream = new FileOutputStream(to);
-			FileChannel src = inStream.getChannel();
-			FileChannel dst = outStream.getChannel();
-			dst.transferFrom(src, 0, src.size());
-			src.close();
-			dst.close();
-			inStream.close();
-			outStream.close();
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
+        return result;
+    }
 }
