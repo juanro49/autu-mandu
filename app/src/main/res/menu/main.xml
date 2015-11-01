@@ -24,18 +24,4 @@
         android:title="@string/menu_synchronize"
         tools:ignore="AlwaysShowAction">
     </item>
-    <item
-        android:id="@+id/menu_add_other_expenditure"
-        android:icon="@drawable/ic_add"
-        app:showAsAction="never"
-        android:title="@string/menu_add_other_expenditure">
-        <menu/>
-    </item>
-    <item
-        android:id="@+id/menu_add_other_income"
-        android:icon="@drawable/ic_add"
-        app:showAsAction="never"
-        android:title="@string/menu_add_other_income">
-        <menu/>
-    </item>
 </menu>

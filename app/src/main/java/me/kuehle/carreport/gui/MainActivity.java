@@ -20,6 +20,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SyncInfo;
 import android.content.SyncStatusObserver;
@@ -34,16 +35,17 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.Date;
 
@@ -194,6 +196,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
+        if (closeFABMenu()) {
+            return;
+        }
+
         if (mCurrentFragment != null && mCurrentFragment instanceof BackPressedListener) {
             if (((BackPressedListener) mCurrentFragment).onBackPressed()) {
                 return;
@@ -238,43 +244,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        Preferences prefs = new Preferences(this);
-
-        CarCursor car = new CarSelection().suspendedSince((Date) null).query(this.getContentResolver(),
-                CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
-        MenuItem[] items = {
-                menu.findItem(R.id.menu_add_other_expenditure),
-                menu.findItem(R.id.menu_add_other_income)
-        };
-        int[] otherTypes = {
-                DataDetailOtherFragment.EXTRA_OTHER_TYPE_EXPENDITURE,
-                DataDetailOtherFragment.EXTRA_OTHER_TYPE_INCOME
-        };
-
-        for (int i = 0; i < items.length; i++) {
-            if (items[i] == null) {
-                continue;
-            }
-
-            SubMenu subMenu = items[i].getSubMenu();
-            subMenu.clear();
-            if (car.getCount() == 1 || !prefs.isShowCarMenu()) {
-                items[i].setIntent(getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_OTHER,
-                        prefs.getDefaultCar(), otherTypes[i]));
-            } else {
-                items[i].setIntent(null);
-                while (car.moveToNext()) {
-                    subMenu.add(car.getName()).setIntent(getDetailActivityIntent(
-                            DataDetailActivity.EXTRA_EDIT_OTHER, car.getId(), otherTypes[i]));
-                }
-            }
-        }
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event.
@@ -302,33 +271,18 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void onFABClicked(View fab) {
-        Preferences prefs = new Preferences(this);
-        CarCursor car = new CarSelection().suspendedSince((Date) null).query(this.getContentResolver(),
-                CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
+    public void onFABAddRefuelingClicked(View fab) {
+        handleFABClick(DataDetailActivity.EXTRA_EDIT_REFUELING, -1);
+    }
 
-        if (car.getCount() == 1 || !prefs.isShowCarMenu()) {
-            Intent intent = getDetailActivityIntent(DataDetailActivity.EXTRA_EDIT_REFUELING,
-                    prefs.getDefaultCar());
-            startActivityForResult(intent, REQUEST_ADD_DATA);
-        } else {
-            PopupMenu popup = new PopupMenu(this, fab);
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    startActivityForResult(menuItem.getIntent(), REQUEST_ADD_DATA);
-                    return true;
-                }
-            });
+    public void onFABAddOtherExpenditureClicked(View fab) {
+        handleFABClick(DataDetailActivity.EXTRA_EDIT_OTHER,
+                DataDetailOtherFragment.EXTRA_OTHER_TYPE_EXPENDITURE);
+    }
 
-            Menu menu = popup.getMenu();
-            while (car.moveToNext()) {
-                menu.add(car.getName()).setIntent(getDetailActivityIntent(
-                        DataDetailActivity.EXTRA_EDIT_REFUELING, car.getId()));
-            }
-
-            popup.show();
-        }
+    public void onFABAddOtherIncomeClicked(View fab) {
+        handleFABClick(DataDetailActivity.EXTRA_EDIT_OTHER,
+                DataDetailOtherFragment.EXTRA_OTHER_TYPE_INCOME);
     }
 
     @Override
@@ -436,10 +390,6 @@ public class MainActivity extends AppCompatActivity implements
         menu.setGroupCheckable(1, true, true);
     }
 
-    private Intent getDetailActivityIntent(int edit, long carId) {
-        return getDetailActivityIntent(edit, carId, -1);
-    }
-
     private Intent getDetailActivityIntent(int edit, long carId, int otherType) {
         Intent intent = new Intent(this, DataDetailActivity.class);
         intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
@@ -484,6 +434,47 @@ public class MainActivity extends AppCompatActivity implements
             return accounts[0];
         } else {
             return null;
+        }
+    }
+
+    private boolean closeFABMenu() {
+        FloatingActionMenu floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fab);
+        if (floatingActionMenu != null && floatingActionMenu.isOpened()) {
+            floatingActionMenu.close(true);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void handleFABClick(final int edit, final int otherType) {
+        closeFABMenu();
+
+        Preferences prefs = new Preferences(this);
+        CarCursor car = new CarSelection().suspendedSince((Date) null).query(getContentResolver(),
+                CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
+
+        if (car.getCount() == 1 || !prefs.isShowCarMenu()) {
+            Intent intent = getDetailActivityIntent(edit, prefs.getDefaultCar(), otherType);
+            startActivityForResult(intent, REQUEST_ADD_DATA);
+        } else {
+            final long[] carIds = new long[car.getCount()];
+            final String[] carNames = new String[car.getCount()];
+            while (car.moveToNext()) {
+                carIds[car.getPosition()] = car.getId();
+                carNames[car.getPosition()] = car.getName();
+            }
+
+            new AlertDialog.Builder(this)
+                    .setItems(carNames, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = getDetailActivityIntent(edit, carIds[which], otherType);
+                            startActivityForResult(intent, REQUEST_ADD_DATA);
+                        }
+                    })
+                    .create()
+                    .show();
         }
     }
 

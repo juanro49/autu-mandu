@@ -30,8 +30,6 @@
     <string name="drawer_close">Close navigation</string>
 
     <string name="menu_synchronize">Synchronize</string>
-    <string name="menu_add_other_expenditure">Add other expenditure</string>
-    <string name="menu_add_other_income">Add other income</string>
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
     <string name="menu_delete">Delete</string>
@@ -40,6 +38,9 @@
     <string name="menu_add_reminder">Add reminder</string>
     <string name="menu_show_trend">Show trend</string>
     <string name="menu_show_overall_trend">Show overall trend</string>
+    <string name="menu_add_refueling">Add refueling</string>
+    <string name="menu_add_other_expenditure">Add other expenditure</string>
+    <string name="menu_add_other_income">Add other income</string>
 
     <string name="section_suspend">Suspend</string>
     <string name="section_advanced">Advanced options</string>

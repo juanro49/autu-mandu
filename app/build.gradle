@@ -69,7 +69,7 @@ dependencies {
 
     // UI Helper Libraries
     compile 'com.larswerkman:HoloColorPicker:1.4'
-    compile 'com.melnykov:floatingactionbutton:1.1.0'
+    compile 'com.github.clans:fab:1.6.1'
 
     // Misc
     compile 'joda-time:joda-time:2.6'

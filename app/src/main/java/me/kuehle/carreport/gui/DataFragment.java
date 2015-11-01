@@ -27,7 +27,6 @@ import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
 import android.view.LayoutInflater;
@@ -36,12 +35,13 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.gui.util.FloatingActionButtonRevealer;
 
 public class DataFragment extends Fragment implements DataListCallback,
         AbstractDataDetailFragment.OnItemActionListener {
@@ -210,9 +210,8 @@ public class DataFragment extends Fragment implements DataListCallback,
 
     @Override
     public void onViewCreated(ListView listView) {
-        FloatingActionButton fab = (FloatingActionButton) getView().findViewById(R.id.fab);
-        fab.show();
-        fab.attachToListView(listView);
+        FloatingActionMenu fab = (FloatingActionMenu) getView().findViewById(R.id.fab);
+        FloatingActionButtonRevealer.setup(fab, listView);
     }
 
     @Override

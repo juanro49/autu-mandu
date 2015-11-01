@@ -48,7 +48,7 @@ import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
 
-import com.melnykov.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +57,7 @@ import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
 import me.kuehle.carreport.gui.MainActivity.BackPressedListener;
+import me.kuehle.carreport.gui.util.FloatingActionButtonRevealer;
 import me.kuehle.chartlib.ChartView;
 
 public class ReportFragment extends Fragment implements OnMenuItemClickListener,
@@ -266,8 +267,8 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         recyclerView.setAdapter(mReportAdapter);
         recyclerView.addItemDecoration(new ReportItemDecoration());
 
-        FloatingActionButton fab = (FloatingActionButton) v.findViewById(R.id.fab);
-        fab.attachToRecyclerView(recyclerView);
+        FloatingActionMenu fab = (FloatingActionMenu) v.findViewById(R.id.fab);
+        FloatingActionButtonRevealer.setup(fab, recyclerView);
 
         mFullScreenChart = (ChartView) v.findViewById(R.id.full_screen_chart);
         mFullScreenChartHolder = v.findViewById(R.id.full_screen_chart_holder);
