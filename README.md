@@ -48,5 +48,5 @@ for more information.
 
 * [Joda Time](http://joda-time.sourceforge.net)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
-* [FloatingActionButton](https://github.com/makovkastar/FloatingActionButton)
-* [Jackrabbit WebDAV](http://jackrabbit.apache.org)
+* [FloatingActionButton](https://github.com/Clans/FloatingActionButton)
+* [Apache Jackrabbit WebDAV](http://jackrabbit.apache.org)
