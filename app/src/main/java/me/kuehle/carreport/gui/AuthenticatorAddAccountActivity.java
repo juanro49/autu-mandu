@@ -123,10 +123,10 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER,
                     String.valueOf(mSelectedSyncProvider.getId()));
             SyncProviders.setSyncProviderSettings(mAuthenticatedAccount, settings);
-            ContentResolver.setSyncAutomatically(mAuthenticatedAccount, DataProvider.AUTHORITY, true);
 
             setAccountAuthenticatorResult(data.getExtras());
             setResult(Activity.RESULT_OK, data);
+
             startFirstSync();
         } else {
             setResult(Activity.RESULT_CANCELED);
@@ -208,6 +208,8 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             @Override
             protected void onPostExecute(Boolean result) {
                 if (result) {
+                    // Now we can start to synchronize on every change.
+                    ContentResolver.setSyncAutomatically(mAuthenticatedAccount, DataProvider.AUTHORITY, true);
                     finish();
                 } else {
                     handleFirstSyncError();

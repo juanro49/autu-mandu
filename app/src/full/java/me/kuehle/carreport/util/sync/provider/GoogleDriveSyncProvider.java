@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.kuehle.carreport.util.sync;
+package me.kuehle.carreport.util.sync.provider;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -52,6 +52,8 @@ import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 import me.kuehle.carreport.util.FileCopyUtil;
+import me.kuehle.carreport.util.sync.AbstractSyncProvider;
+import me.kuehle.carreport.util.sync.Authenticator;
 
 public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {

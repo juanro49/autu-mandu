@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 <sync-providers>
-    <sync-provider class="me.kuehle.carreport.util.sync.DropboxSyncProvider"/>
-    <sync-provider class="me.kuehle.carreport.util.sync.GoogleDriveSyncProvider"/>
-    <sync-provider class="me.kuehle.carreport.util.sync.WebDavSyncProvider"/>
+    <sync-provider class="me.kuehle.carreport.util.sync.provider.DropboxSyncProvider"/>
+    <sync-provider class="me.kuehle.carreport.util.sync.provider.GoogleDriveSyncProvider"/>
+    <sync-provider class="me.kuehle.carreport.util.sync.provider.WebDavSyncProvider"/>
 </sync-providers>

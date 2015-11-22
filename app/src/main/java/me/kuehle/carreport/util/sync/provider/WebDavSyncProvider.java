@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.kuehle.carreport.util.sync;
+package me.kuehle.carreport.util.sync.provider;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -36,6 +36,7 @@ import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 import me.kuehle.carreport.gui.dialog.SetupWebDavSyncDialogActivity;
 import me.kuehle.carreport.util.FileCopyUtil;
 import me.kuehle.carreport.util.WebDavClient;
+import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 
 public class WebDavSyncProvider extends AbstractSyncProvider {
     public static final String KEY_WEB_DAV_URL = "webDavUrl";

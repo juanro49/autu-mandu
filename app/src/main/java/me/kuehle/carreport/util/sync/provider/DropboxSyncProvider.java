@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.kuehle.carreport.util.sync;
+package me.kuehle.carreport.util.sync.provider;
 
 import android.accounts.Account;
 import android.content.Intent;
@@ -42,6 +42,7 @@ import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 import me.kuehle.carreport.util.FileCopyUtil;
+import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 
 public class DropboxSyncProvider extends AbstractSyncProvider {
     private static final String TAG = "DropboxSyncProvider";

@@ -25,11 +25,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.gui.util.AbstractFormFieldValidator;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.util.WebDavClient;
-import me.kuehle.carreport.util.sync.WebDavSyncProvider;
+import me.kuehle.carreport.util.sync.provider.WebDavSyncProvider;
 
 public class SetupWebDavSyncDialogActivity extends Activity {
     private EditText mEdtUrl;

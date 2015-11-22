@@ -7,8 +7,10 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# Database
--keepattributes *Annotation*
+
+#####################################
+# Car Report
+#####################################
 
 # Reports
 -keep class me.kuehle.chartlib.ChartView
@@ -18,30 +20,22 @@
 -keep class me.kuehle.carreport.gui.Preferences*
 -keep class me.kuehle.carreport.gui.HelpActivity$*
 
-# Dropbox
--keep public class org.apache.commons.** { *; }
--dontwarn org.apache.**
--dontwarn android.test.**
+# Sync Providers
+-keep class me.kuehle.carreport.util.sync.provider.*
 
+#####################################
+# Libraries
+#####################################
+
+# Dropbox
+-dontwarn com.dropbox.core.**
+-keepnames class com.fasterxml.jackson.** { *; }
+
+# Jackrabbit
+-dontwarn org.apache.**
 
 # Misc
--dontwarn org.bouncycastle.**
 -dontwarn org.slf4j.*
-
-# Google Play Services
--keep class * extends java.util.ListResourceBundle {
-    protected Object[][] getContents();
-}
--keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
-    public static final *** NULL;
-}
--keepnames @com.google.android.gms.common.annotation.KeepName class *
--keepclassmembernames class * {
-    @com.google.android.gms.common.annotation.KeepName *;
-}
--keepnames class * implements android.os.Parcelable {
-    public static final ** CREATOR;
-}
 
 # Google API Client, Google API Drive Service
 -keep class com.google.** { *;}
