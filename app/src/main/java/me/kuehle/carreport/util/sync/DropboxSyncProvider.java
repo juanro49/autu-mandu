@@ -25,8 +25,8 @@ import android.util.Log;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.android.Auth;
+import com.dropbox.core.v2.DbxFiles;
 import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.Files;
 
 import org.json.JSONObject;
 
@@ -117,10 +117,10 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     public String getRemoteFileRev() throws Exception {
         try {
             File localFile = getLocalFile();
-            Files.Metadata remoteMetadata = mDbxClient.files.getMetadata("/" + localFile.getName());
+            DbxFiles.Metadata remoteMetadata = mDbxClient.files.getMetadata("/" + localFile.getName());
 
-            if (remoteMetadata instanceof Files.FileMetadata) {
-                return ((Files.FileMetadata)remoteMetadata).rev;
+            if (remoteMetadata instanceof DbxFiles.FileMetadata) {
+                return ((DbxFiles.FileMetadata)remoteMetadata).rev;
             }
         } catch (DbxException e) {
             throw new Exception(e);
@@ -140,9 +140,9 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
         FileInputStream inputStream = null;
         try {
             inputStream = new FileInputStream(tempFile);
-            Files.FileMetadata remoteMetadata = mDbxClient.files
+            DbxFiles.FileMetadata remoteMetadata = mDbxClient.files
                     .uploadBuilder("/" + localFile.getName())
-                    .mode(Files.WriteMode.overwrite)
+                    .mode(DbxFiles.WriteMode.overwrite)
                     .run(inputStream);
             return remoteMetadata.rev;
         } catch (DbxException | FileNotFoundException e) {
