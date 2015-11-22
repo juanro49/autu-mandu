@@ -28,8 +28,11 @@
 #####################################
 
 # Dropbox
--dontwarn com.dropbox.core.**
+-dontwarn com.dropbox.core.http.OkHttpRequestor
+-dontwarn com.dropbox.core.http.OkHttpRequestor$*
+-dontwarn com.dropbox.core.DbxStandardSessionStore
 -keepnames class com.fasterxml.jackson.** { *; }
+-keeppackagenames com.dropbox.core.http
 
 # Jackrabbit
 -dontwarn org.apache.**
