@@ -67,10 +67,10 @@ dependencies {
     // WebDAV
     compile 'org.apache.jackrabbit:jackrabbit-webdav:2.10.1'
 
-    // UI Helper Libraries
+    // UI Helpers
     compile 'com.larswerkman:HoloColorPicker:1.4'
     compile 'com.github.clans:fab:1.6.1'
 
-    // Misc
-    compile 'joda-time:joda-time:2.6'
+    // Joda-Time for Android
+    compile 'net.danlew:android.joda:2.9.0'
 }

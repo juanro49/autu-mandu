@@ -46,7 +46,7 @@ for more information.
 
 ## Used libraries
 
-* [Joda Time](http://joda-time.sourceforge.net)
+* [joda-time-android](https://github.com/dlew/joda-time-android)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [FloatingActionButton](https://github.com/Clans/FloatingActionButton)
 * [Apache Jackrabbit WebDAV](http://jackrabbit.apache.org)

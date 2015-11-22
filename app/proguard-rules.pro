@@ -23,10 +23,6 @@
 -dontwarn org.apache.**
 -dontwarn android.test.**
 
-# Joda Time
--keep class org.joda.time.DateTimeZone.Provider
--keep class org.joda.time.tz.UTCProvider
--dontwarn org.joda.convert.**
 
 # Misc
 -dontwarn org.bouncycastle.**

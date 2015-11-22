@@ -22,9 +22,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+
+import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.util.Date;
 
@@ -57,8 +58,7 @@ public class Application extends android.app.Application {
 
         mAccountManager = AccountManager.get(this);
 
-        System.setProperty("org.joda.time.DateTimeZone.Provider",
-                "org.joda.time.tz.UTCProvider");
+        JodaTimeAndroid.init(this);
 
         ReminderEnablerReceiver.scheduleAlarms(this);
 
