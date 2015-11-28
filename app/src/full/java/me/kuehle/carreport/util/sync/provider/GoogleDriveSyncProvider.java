@@ -78,7 +78,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
 
     @Override
     public int getIcon() {
-        return R.drawable.ic_sync_drive;
+        return R.drawable.ic_c_sync_drive_64dp;
     }
 
     @Override

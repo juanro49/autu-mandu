@@ -58,7 +58,7 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
 
     @Override
     public int getIcon() {
-        return R.drawable.ic_sync_dropbox;
+        return R.drawable.ic_c_sync_dropbox_64dp;
     }
 
     @Override

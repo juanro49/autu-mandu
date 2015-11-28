@@ -161,7 +161,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:background="?android:attr/selectableItemBackground"
-            android:src="@drawable/ic_close"
+            android:src="@drawable/ic_close_24dp"
             android:contentDescription="@string/quit_snooze_desc"/>
         <!-- Notification Dismissed -->
         <CheckBox

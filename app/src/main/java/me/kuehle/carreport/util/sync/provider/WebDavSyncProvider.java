@@ -53,7 +53,7 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
 
     @Override
     public int getIcon() {
-        return R.drawable.ic_sync_webdav;
+        return R.drawable.ic_c_sync_webdav_64dp;
     }
 
     @Override

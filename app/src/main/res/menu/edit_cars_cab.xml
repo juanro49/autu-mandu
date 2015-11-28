@@ -18,7 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/menu_delete"
-        android:icon="@drawable/ic_delete"
+        android:icon="@drawable/ic_delete_24dp"
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_delete"
         tools:ignore="AppCompatResource">

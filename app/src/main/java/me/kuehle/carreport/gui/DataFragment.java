@@ -85,8 +85,8 @@ public class DataFragment extends Fragment implements DataListCallback,
             }
 
             if (mTxtNoEntrySelected != null) {
-                int id = position == 0 ? R.drawable.ic_data_detail_refueling
-                        : R.drawable.ic_data_detail_other;
+                int id = position == 0 ? R.drawable.ic_c_refueling_128dp
+                        : R.drawable.ic_c_other_128dp;
                 mTxtNoEntrySelected.setCompoundDrawablesWithIntrinsicBounds(0, id, 0, 0);
             }
         }

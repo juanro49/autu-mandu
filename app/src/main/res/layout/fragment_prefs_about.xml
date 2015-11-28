@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_about" />
+            android:src="@drawable/ic_c_launcher_80dp" />
 
         <TextView
             android:id="@+id/txt_version"

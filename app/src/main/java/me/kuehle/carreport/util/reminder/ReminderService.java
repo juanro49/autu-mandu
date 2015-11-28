@@ -164,7 +164,7 @@ public class ReminderService extends IntentService {
         ReminderCursor reminder = new ReminderSelection().id(reminderIds).query(context.getContentResolver());
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_c_notification_24dp)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
 
@@ -193,10 +193,10 @@ public class ReminderService extends IntentService {
                     .setContentTitle(context.getString(R.string.notification_reminder_title_single,
                             reminder.getTitle()))
                     .setContentText(reminder.getCarName())
-                    .addAction(R.drawable.ic_check,
+                    .addAction(R.drawable.ic_check_24dp,
                             context.getString(R.string.notification_reminder_action_done),
                             getPendingIntent(context, ACTION_MARK_REMINDERS_DONE, reminderIds))
-                    .addAction(R.drawable.ic_snooze,
+                    .addAction(R.drawable.ic_snooze_24dp,
                             context.getString(R.string.notification_reminder_action_snooze),
                             getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds));
         } else {
@@ -217,7 +217,7 @@ public class ReminderService extends IntentService {
                     .setContentText(TextUtils.join(", ", reminderTitles))
                     .setNumber(reminder.getCount())
                     .setStyle(inboxStyle)
-                    .addAction(R.drawable.ic_snooze,
+                    .addAction(R.drawable.ic_snooze_24dp,
                             context.getString(R.string.notification_reminder_action_snooze_all),
                             getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds));
         }

@@ -18,7 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/menu_add_reminder"
-        android:icon="@drawable/ic_add"
+        android:icon="@drawable/ic_add_24dp"
         android:showAsAction="ifRoom|withText"
         android:title="@string/menu_add_reminder"
         tools:ignore="AppCompatResource">

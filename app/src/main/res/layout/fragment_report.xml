@@ -46,6 +46,6 @@
             android:layout_margin="16dp"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/graph_close_full_screen_desc"
-            android:src="@drawable/ic_fullscreen_exit" />
+            android:src="@drawable/ic_fullscreen_exit_24dp" />
     </FrameLayout>
 </FrameLayout>

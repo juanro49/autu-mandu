@@ -60,14 +60,14 @@
                         android:layout_height="32dp"
                         android:background="?android:attr/selectableItemBackground"
                         android:contentDescription="@string/graph_details_desc"
-                        android:src="@drawable/ic_info" />
+                        android:src="@drawable/ic_info_24dp" />
                     <ImageButton
                         android:id="@+id/btn_report_options"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:background="?android:attr/selectableItemBackground"
                         android:contentDescription="@string/graph_options_desc"
-                        android:src="@drawable/ic_more_vert" />
+                        android:src="@drawable/ic_more_vert_24dp" />
                 </LinearLayout>
                 <me.kuehle.chartlib.ChartView
                     android:id="@+id/chart"

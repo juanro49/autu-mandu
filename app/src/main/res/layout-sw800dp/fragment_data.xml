@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:drawableTop="@drawable/ic_data_detail_refueling"
+            android:drawableTop="@drawable/ic_c_refueling_128dp"
             android:text="@string/edit_message_no_entry_selected"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
     </FrameLayout>

@@ -368,21 +368,21 @@ public class MainActivity extends AppCompatActivity implements
         menu.clear();
 
         menu.add(1, Menu.NONE, Menu.NONE, R.string.drawer_reports)
-                .setIcon(R.drawable.ic_reports)
+                .setIcon(R.drawable.ic_c_report_24dp)
                 .setIntent(new Intent().putExtra("fragment", ReportFragment.class.getName()));
         while (car.moveToNext()) {
             Bundle args = new Bundle();
             args.putLong(DataFragment.EXTRA_CAR_ID, car.getId());
 
             menu.add(1, Menu.NONE, Menu.NONE, car.getName())
-                    .setIcon(R.drawable.ic_list)
+                    .setIcon(R.drawable.ic_list_24dp)
                     .setIntent(new Intent()
                             .putExtra("fragment", DataFragment.class.getName())
                             .putExtra("arguments", args));
         }
 
         menu.add(1, Menu.NONE, Menu.NONE, R.string.drawer_calculator)
-                .setIcon(R.drawable.ic_functions)
+                .setIcon(R.drawable.ic_functions_24dp)
                 .setIntent(new Intent().putExtra("fragment", CalculatorFragment.class.getName()));
         menu.add(R.string.drawer_settings).setIntent(new Intent(this, PreferencesActivity.class));
         menu.add(R.string.drawer_help).setIntent(new Intent(this, HelpActivity.class));

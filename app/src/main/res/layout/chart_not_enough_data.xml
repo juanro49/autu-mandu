@@ -22,7 +22,7 @@
         style="@android:style/TextAppearance.DeviceDefault.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableTop="@drawable/ic_not_enough_data"
+        android:drawableTop="@drawable/ic_c_report_128dp"
         android:text="@string/report_not_enough_data" >
     </TextView>
 </LinearLayout>

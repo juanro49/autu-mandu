@@ -52,7 +52,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@string/first_start_step1_img_desc"
-            android:src="@drawable/ic_first_start_step1" />
+            android:src="@drawable/ic_c_first_start_step1_32dp" />
         <TextView
             android:id="@+id/txt_step1_text"
             android:layout_width="wrap_content"
@@ -72,7 +72,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@string/first_start_step2_img_desc"
-            android:src="@drawable/ic_first_start_step2" />
+            android:src="@drawable/ic_c_first_start_step2_32dp" />
         <TextView
             android:id="@+id/txt_step2_text"
             android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@string/first_start_step3_img_desc"
-            android:src="@drawable/ic_first_start_step3" />
+            android:src="@drawable/ic_c_first_start_step3_32dp" />
         <TextView
             android:id="@+id/txt_step3_text"
             android:layout_width="wrap_content"
