@@ -52,7 +52,7 @@
             android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:text="@string/app_description" />
+            android:text="@string/about_description" />
 
         <Button
             android:id="@+id/btn_licenses"

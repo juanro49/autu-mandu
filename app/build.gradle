@@ -13,6 +13,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources false // Currently this changes the size of resources from 1932KB to 1943KB, making it useless.
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

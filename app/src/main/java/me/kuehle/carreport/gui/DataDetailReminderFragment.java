@@ -259,7 +259,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
             }
 
             if (reminder.getAfterDistance() != null) {
-                mEdtAfterDistance.setText(reminder.getAfterDistance().toString());
+                mEdtAfterDistance.setText(String.valueOf(reminder.getAfterDistance()));
             }
 
             if (reminder.getAfterTimeSpanUnit() != null) {

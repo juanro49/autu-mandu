@@ -139,8 +139,7 @@ public class PreferencesRemindersFragment extends ListFragment implements
                     holder.status.setText(R.string.description_reminder_status_due);
                 }
             } else {
-                holder.status.setTextColor(getResources().getColor(
-                        R.color.abc_secondary_text_material_dark));
+                holder.status.setTextColor(getResources().getColor(R.color.secondary_text));
                 if (reminder.getAfterDistance() != null && reminder.getAfterTimeSpanUnit() != null) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_distance_and_time,

@@ -68,12 +68,19 @@ public class SetupWebDavSyncDialogActivity extends Activity {
 
         if (validator.validate()) {
             new AsyncTask<Void, Void, Boolean>() {
+                private String url;
+                private String userName;
+                private String password;
+
+                @Override
+                protected void onPreExecute() {
+                    url = mEdtUrl.getText().toString();
+                    userName = mEdtUserName.getText().toString();
+                    password = mEdtPassword.getText().toString();
+                }
+
                 @Override
                 protected Boolean doInBackground(Void... params) {
-                    String url = mEdtUrl.getText().toString();
-                    String userName = mEdtUserName.getText().toString();
-                    String password = mEdtPassword.getText().toString();
-
                     WebDavClient client = new WebDavClient(url, userName, password);
                     return client.testLogin();
                 }
