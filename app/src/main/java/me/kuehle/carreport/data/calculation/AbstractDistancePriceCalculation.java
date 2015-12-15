@@ -62,8 +62,6 @@ public abstract class AbstractDistancePriceCalculation extends AbstractCalculati
             int startMileage = -1;
             int endMileage = -1;
 
-            mNames.add(car.getName());
-
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId());
             refueling.registerContentObserver(observer);
             mCursorStore.add(refueling);
@@ -104,6 +102,8 @@ public abstract class AbstractDistancePriceCalculation extends AbstractCalculati
 
             if (totalCosts > 0 && startMileage > -1 && endMileage > startMileage) {
                 double avgDistancePrice = totalCosts / (endMileage - startMileage);
+
+                mNames.add(car.getName());
                 mAvgDistancePrices.add(avgDistancePrice);
             }
         }
