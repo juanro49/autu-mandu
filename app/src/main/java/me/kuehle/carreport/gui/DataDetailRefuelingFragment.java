@@ -46,6 +46,7 @@ import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
 import me.kuehle.carreport.provider.refueling.RefuelingContentValues;
 import me.kuehle.carreport.provider.refueling.RefuelingCursor;
 import me.kuehle.carreport.provider.refueling.RefuelingSelection;
+import me.kuehle.carreport.util.Calculator;
 
 public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         implements SupportDatePickerDialogFragmentListener,
@@ -149,11 +150,11 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 edtVolume.setText(String.valueOf(refueling.getVolume()));
                 edtPrice.setText(String.valueOf(refueling.getPrice()));
             } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
-                edtVolume.setText(String.format("%.3f", refueling.getPrice() / refueling.getVolume()));
+                edtVolume.setText(String.valueOf(refueling.getPrice() / refueling.getVolume()));
                 edtPrice.setText(String.valueOf(refueling.getPrice()));
             } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
                 edtVolume.setText(String.valueOf(refueling.getVolume()));
-                edtPrice.setText(String.format("%.3f", refueling.getPrice() / refueling.getVolume()));
+                edtPrice.setText(String.valueOf(refueling.getPrice() / refueling.getVolume()));
             }
         }
     }
