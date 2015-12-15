@@ -37,7 +37,7 @@
         app:fab_colorNormal="@color/button_accent"
         app:fab_colorPressed="@color/button_accent_pressed"
         app:fab_colorRipple="@color/ripple"
-        app:fab_label="@string/menu_add_other_income"
+        app:fab_label="@string/fab_add_other_income"
         app:fab_size="mini"/>
 
     <com.github.clans.fab.FloatingActionButton
@@ -48,7 +48,7 @@
         app:fab_colorNormal="@color/button_accent"
         app:fab_colorPressed="@color/button_accent_pressed"
         app:fab_colorRipple="@color/ripple"
-        app:fab_label="@string/menu_add_other_expenditure"
+        app:fab_label="@string/fab_add_other_expenditure"
         app:fab_size="mini"/>
 
     <com.github.clans.fab.FloatingActionButton
@@ -59,7 +59,7 @@
         app:fab_colorNormal="@color/button_accent"
         app:fab_colorPressed="@color/button_accent_pressed"
         app:fab_colorRipple="@color/ripple"
-        app:fab_label="@string/menu_add_refueling"
+        app:fab_label="@string/fab_add_refueling"
         app:fab_size="mini"/>
 
 </com.github.clans.fab.FloatingActionMenu>

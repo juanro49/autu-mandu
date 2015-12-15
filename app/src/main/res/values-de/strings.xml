@@ -36,9 +36,10 @@
     <string name="menu_add_reminder">Erinnerung hinzufügen</string>
     <string name="menu_show_trend">Trend anzeigen</string>
     <string name="menu_show_overall_trend">Gesamttrend anzeigen</string>
-    <string name="menu_add_refueling">Neue Tankfüllung</string>
-    <string name="menu_add_other_expenditure">Neue andere Ausgabe</string>
-    <string name="menu_add_other_income">Neue andere Einnahme</string>
+
+    <string name="fab_add_refueling">Tankfüllung</string>
+    <string name="fab_add_other_expenditure">Andere Ausgabe</string>
+    <string name="fab_add_other_income">Andere Einnahme</string>
 
     <string name="section_suspend">Stilllegen</string>
     <string name="section_advanced">Erweiterte Optionen</string>

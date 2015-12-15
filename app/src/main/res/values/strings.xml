@@ -36,9 +36,10 @@
     <string name="menu_add_reminder">Add reminder</string>
     <string name="menu_show_trend">Show trend</string>
     <string name="menu_show_overall_trend">Show overall trend</string>
-    <string name="menu_add_refueling">Add refueling</string>
-    <string name="menu_add_other_expenditure">Add other expenditure</string>
-    <string name="menu_add_other_income">Add other income</string>
+
+    <string name="fab_add_refueling">Refueling</string>
+    <string name="fab_add_other_expenditure">Other expenditure</string>
+    <string name="fab_add_other_income">Other income</string>
 
     <string name="section_suspend">Suspend</string>
     <string name="section_advanced">Advanced options</string>
