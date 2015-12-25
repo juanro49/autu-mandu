@@ -25,8 +25,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -38,72 +37,70 @@ import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.provider.othercost.OtherCostCursor;
 import me.kuehle.carreport.provider.othercost.OtherCostSelection;
 import me.kuehle.carreport.util.Recurrences;
-import me.kuehle.chartlib.axis.AxisLabelFormatter;
-import me.kuehle.chartlib.chart.Chart;
-import me.kuehle.chartlib.data.Dataset;
-import me.kuehle.chartlib.data.Series;
-import me.kuehle.chartlib.renderer.BarRenderer;
-import me.kuehle.chartlib.renderer.LineRenderer;
-import me.kuehle.chartlib.renderer.RendererList;
 
 public class CostsReport extends AbstractReport {
-    private class ReportGraphData extends AbstractReportGraphData {
+    private class ReportChartData extends AbstractReportChartColumnData {
         private int mOption;
 
-        public ReportGraphData(Context context, String carName, int carColor, int option) {
+        public ReportChartData(Context context, String carName, int carColor, int option) {
             super(context, carName, carColor);
-            this.mOption = option;
+            mOption = option;
         }
 
-        public void add(DateTime date, double costs) {
+        public void add(DateTime date, float costs) {
+            float dateValue;
             if (mOption == GRAPH_OPTION_MONTH) {
-                date = new DateTime(date.getYear(), date.getMonthOfYear(), 1,
-                        0, 0);
+                dateValue = date.getYear() * 100 + date.getMonthOfYear();
             } else {
-                date = new DateTime(date.getYear(), 1, 1, 0, 0);
+                dateValue = date.getYear() * 100 + 1;
             }
 
-            int index = xValues.indexOf(date.getMillis());
+            int index = indexOf(dateValue);
             if (index == -1) {
-                xValues.add(date.getMillis());
-                yValues.add(costs);
+                add(dateValue, costs, makeTooltip(costs, dateValue));
             } else {
-                yValues.set(index, yValues.get(index) + costs);
+                costs += getYValues().get(index);
+                set(index, dateValue, costs, makeTooltip(costs, dateValue));
             }
         }
 
-        @Override
-        public AbstractReportGraphData createOverallTrendData() {
-            if (size() == 0) {
-                return super.createOverallTrendData();
-            }
-
-            long lastX = xValues.lastElement();
-            xValues.remove(xValues.size() - 1);
-            double lastY = yValues.lastElement();
-            yValues.remove(yValues.size() - 1);
-            AbstractReportGraphData data = super.createOverallTrendData();
-            xValues.add(lastX);
-            yValues.add(lastY);
-            return data;
+        private String makeTooltip(double costs, float dateValue) {
+            return String.format(
+                    "%s: %s\n%s: %.0f %s\n%s: %s",
+                    mContext.getString(R.string.report_toast_car),
+                    getName(),
+                    mContext.getString(R.string.report_toast_costs),
+                    costs,
+                    mUnit,
+                    mContext.getString(R.string.report_toast_date),
+                    formatXValue(dateValue, mOption));
         }
     }
 
     public static final int GRAPH_OPTION_MONTH = 0;
     public static final int GRAPH_OPTION_YEAR = 1;
 
-    private static final long[] SEC_PER_PERIOD = {
-            1000l * 60l * 60l * 24l * 30l, // Month
-            1000l * 60l * 60l * 24l * 365l // Year
-    };
-
-    private LongSparseArray<ReportGraphData> mCostsPerMonth = new LongSparseArray<>();
-    private LongSparseArray<ReportGraphData> mCostsPerYear = new LongSparseArray<>();
+    private LongSparseArray<ReportChartData> mCostsPerMonth = new LongSparseArray<>();
+    private LongSparseArray<ReportChartData> mCostsPerYear = new LongSparseArray<>();
+    private String mUnit;
     private String[] mXLabelFormat = new String[2];
-    private int mVisibleBarCount;
 
     public CostsReport(Context context) {
         super(context);
+    }
+
+    @Override
+    protected String formatXValue(float value, int chartOption) {
+        int dateValue = (int) value;
+        int year = dateValue / 100;
+        int month = dateValue % 100;
+        DateTime date = new DateTime(year, month, 1, 0, 0);
+        return date.toString(mXLabelFormat[chartOption]);
+    }
+
+    @Override
+    protected String formatYValue(float value, int chartOption) {
+        return String.format("%.0f", value);
     }
 
     @Override
@@ -120,92 +117,32 @@ public class CostsReport extends AbstractReport {
     }
 
     @Override
-    protected Chart onGetChart(boolean zoomable, boolean moveable) {
-        final Dataset dataset = new Dataset();
-        RendererList renderers = new RendererList();
-        BarRenderer renderer = new BarRenderer(mContext);
-        LineRenderer trendRenderer = new LineRenderer(mContext);
-        renderers.addRenderer(renderer);
-        renderers.addRenderer(trendRenderer);
-
-        int series = 0;
+    protected List<AbstractReportChartData> getRawChartData(int chartOption) {
+        List<AbstractReportChartData> data = new ArrayList<>(mCostsPerMonth.size());
         for (int i = 0; i < mCostsPerMonth.size(); i++) {
-            ReportGraphData data = getChartOption() == GRAPH_OPTION_MONTH
+            ReportChartData carData = chartOption == GRAPH_OPTION_MONTH
                     ? mCostsPerMonth.get(mCostsPerMonth.keyAt(i))
                     : mCostsPerYear.get(mCostsPerYear.keyAt(i));
-            if (data.isEmpty()) {
-                continue;
-            }
-
-            dataset.add(data.getSeries());
-            data.applySeriesStyle(series, renderer);
-            series++;
-
-            if (isShowTrend()) {
-                AbstractReportGraphData trendData = data.createTrendData();
-                dataset.add(trendData.getSeries());
-                trendData.applySeriesStyle(series, trendRenderer);
-                renderers.mapSeriesToRenderer(series, trendRenderer);
-                series++;
-            }
-
-            if (isShowOverallTrend()) {
-                AbstractReportGraphData trendData = data.createOverallTrendData();
-                dataset.add(trendData.getSeries());
-                trendData.applySeriesStyle(series, trendRenderer);
-                renderers.mapSeriesToRenderer(series, trendRenderer);
-                series++;
+            if (!carData.isEmpty()) {
+                data.add(carData);
             }
         }
 
-        // Draw report
-        final Chart chart = new Chart(mContext, dataset, renderers);
-        applyDefaultChartStyles(chart);
-        chart.setShowLegend(false);
-        if (isShowTrend()) {
-            for (int i = 1; i < dataset.size(); i += 2) {
-                chart.getLegend().setSeriesVisible(i, false);
-            }
-        }
-        double[] xValues = getXValues(dataset);
-        chart.getDomainAxis().setLabels(xValues);
-        chart.getDomainAxis().setLabelFormatter(new AxisLabelFormatter() {
-            @Override
-            public String formatLabel(double value) {
-                DateTime date = new DateTime((long) value);
-                return date.toString(mXLabelFormat[getChartOption()]);
-            }
-        });
-        double padding = SEC_PER_PERIOD[getChartOption()] / 2;
-        double topBound = dataset.maxX();
-        double bottomBound = topBound
-                - (SEC_PER_PERIOD[getChartOption()] * Math.min(
-                mVisibleBarCount - 1, xValues.length - 1));
-        chart.getDomainAxis().setDefaultBottomBound(bottomBound - padding);
-        chart.getDomainAxis().setDefaultTopBound(topBound + padding);
-        chart.getRangeAxis().setDefaultBottomBound(0);
-        chart.getDomainAxis().setZoomable(zoomable);
-        chart.getDomainAxis().setMovable(moveable);
-        chart.getRangeAxis().setZoomable(zoomable);
-        chart.getRangeAxis().setMovable(moveable);
-
-        return chart;
+        return data;
     }
 
     @Override
     protected Cursor[] onUpdate() {
         Preferences prefs = new Preferences(mContext);
-        String unit = prefs.getUnitCurrency();
+        mUnit = prefs.getUnitCurrency();
 
         // Settings, which are based on the screen size.
         if (mContext.getResources().getConfiguration().smallestScreenWidthDp > 480) {
-            mXLabelFormat[GRAPH_OPTION_MONTH] = "MMMM, yyyy";
+            mXLabelFormat[GRAPH_OPTION_MONTH] = "MMMM yyyy";
             mXLabelFormat[GRAPH_OPTION_YEAR] = "yyyy";
-            mVisibleBarCount = 4;
         } else {
-            mXLabelFormat[GRAPH_OPTION_MONTH] = "MMM, yyyy";
+            mXLabelFormat[GRAPH_OPTION_MONTH] = "MMM yyyy";
             mXLabelFormat[GRAPH_OPTION_YEAR] = "yyyy";
-            mVisibleBarCount = 3;
         }
 
         ArrayList<Cursor> cursors = new ArrayList<>();
@@ -222,9 +159,9 @@ public class CostsReport extends AbstractReport {
                 section = addDataSection(car.getName(), car.getColor());
             }
 
-            mCostsPerMonth.put(car.getId(), new ReportGraphData(mContext, car.getName(),
+            mCostsPerMonth.put(car.getId(), new ReportChartData(mContext, car.getName(),
                     car.getColor(), GRAPH_OPTION_MONTH));
-            mCostsPerYear.put(car.getId(), new ReportGraphData(mContext, car.getName(),
+            mCostsPerYear.put(car.getId(), new ReportChartData(mContext, car.getName(),
                     car.getColor(), GRAPH_OPTION_YEAR));
 
             int startMileage = Integer.MAX_VALUE;
@@ -330,51 +267,32 @@ public class CostsReport extends AbstractReport {
             // 60 seconds per minute * 60 minutes per hour * 24 hours per day =
             // 86400 seconds per day
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_day),
-                    String.format("%.2f %s", costsPerSecond * 86400, unit)));
+                    String.format("%.2f %s", costsPerSecond * 86400, mUnit)));
 
             // Average costs per month
             // 86400 seconds per day * 30,4375 days per month = 2629800 seconds
             // per month
             // (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_month),
-                    String.format("%.2f %s", costsPerSecond * 2629800, unit)));
+                    String.format("%.2f %s", costsPerSecond * 2629800, mUnit)));
 
             // Average costs per year
             // 86400 seconds per day * 365,25 days per year = 31557600 seconds
             // per year
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_year),
-                    String.format("%.2f %s", costsPerSecond * 31557600, unit)));
+                    String.format("%.2f %s", costsPerSecond * 31557600, mUnit)));
 
             // Average costs per [distance unit]
             int mileageDiff = Math.max(1, endMileage - startMileage);
             section.addItem(new Item("\u00D8 " + prefs.getUnitDistance(),
-                    String.format("%.2f %s", totalCosts / mileageDiff, unit)));
+                    String.format("%.2f %s", totalCosts / mileageDiff, mUnit)));
 
             // Total costs
             section.addItem(new Item(mContext.getString(R.string.report_since,
                     DateFormat.getDateFormat(mContext).format(startDate.toDate())),
-                    String.format("%.2f %s", totalCosts, unit)));
+                    String.format("%.2f %s", totalCosts, mUnit)));
         }
 
         return cursors.toArray(new Cursor[cursors.size()]);
-    }
-
-    private double[] getXValues(Dataset dataset) {
-        HashSet<Double> values = new HashSet<>();
-        for (int s = 0; s < dataset.size(); s++) {
-            Series series = dataset.get(s);
-            for (int p = 0; p < series.size(); p++) {
-                values.add(series.get(p).x);
-            }
-        }
-        ArrayList<Double> list = new ArrayList<>(values);
-        Collections.sort(list);
-
-        double[] arrValues = new double[list.size()];
-        for (int i = 0; i < arrValues.length; i++) {
-            arrValues[i] = list.get(i);
-        }
-
-        return arrValues;
     }
 }

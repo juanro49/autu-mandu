@@ -18,15 +18,14 @@ package me.kuehle.carreport.data.report;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.format.DateFormat;
-import android.widget.Toast;
 
 import org.joda.time.DateTime;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -37,84 +36,65 @@ import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.util.Calculator;
-import me.kuehle.chartlib.chart.Chart;
-import me.kuehle.chartlib.data.Dataset;
-import me.kuehle.chartlib.data.Series;
-import me.kuehle.chartlib.renderer.LineRenderer;
-import me.kuehle.chartlib.renderer.OnClickListener;
-import me.kuehle.chartlib.renderer.RendererList;
 
 public class MileageReport extends AbstractReport {
-    private class ReportGraphDataAccumulated extends AbstractReportGraphData {
+    private class ReportChartDataAccumulated extends AbstractReportChartLineData {
         private Cursor mCursor;
 
-        public ReportGraphDataAccumulated(Context context, CarCursor car) {
+        public ReportChartDataAccumulated(Context context, CarCursor car) {
             super(context, car.getName(), car.getColor());
 
             RefuelingBalancer balancer = new RefuelingBalancer(context);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId());
             mCursor = refueling;
 
-            boolean wasLastRefuelingGuessed = false;
-            while(refueling.moveToNext()) {
-                xValues.add(refueling.getDate().getTime());
-                yValues.add((double) refueling.getMileage());
-
-                if (refueling.getGuessed()) {
-                    markLastPoint();
-                    markLastLine();
-                } else if (wasLastRefuelingGuessed) {
-                    markLastLine();
-                }
-
-                wasLastRefuelingGuessed = refueling.getGuessed();
+            while (refueling.moveToNext()) {
+                add((float) refueling.getDate().getTime(),
+                        (float) refueling.getMileage(),
+                        makeToolip(refueling.getCarName(), refueling.getMileage(),
+                                refueling.getDate().getTime(), GRAPH_OPTION_ACCUMULATED),
+                        refueling.getGuessed());
             }
         }
 
         public Cursor[] getUsedCursors() {
-            return new Cursor[] { mCursor };
+            return new Cursor[]{mCursor};
         }
     }
 
-    private class ReportGraphDataPerRefueling extends AbstractReportGraphData {
+    private class ReportChartDataPerRefueling extends AbstractReportChartLineData {
         private Cursor mCursor;
 
-        public ReportGraphDataPerRefueling(Context context, CarCursor car, String category) {
+        public ReportChartDataPerRefueling(Context context, CarCursor car, String category) {
             super(context, String.format("%s (%s)", car.getName(), category), car.getColor());
 
             RefuelingBalancer balancer = new RefuelingBalancer(context);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
             mCursor = refueling;
 
-            boolean wasLastRefuelingGuessed = false;
             int lastRefuelingMileage = -1;
-            while(refueling.moveToNext()) {
+            while (refueling.moveToNext()) {
                 if (lastRefuelingMileage > -1) {
-                    xValues.add(refueling.getDate().getTime());
-                    yValues.add((double) (refueling.getMileage() - lastRefuelingMileage));
-
-                    if (refueling.getGuessed()) {
-                        markLastPoint();
-                        markLastLine();
-                    } else if (wasLastRefuelingGuessed) {
-                        markLastLine();
-                    }
+                    add((float) refueling.getDate().getTime(),
+                            (float) (refueling.getMileage() - lastRefuelingMileage),
+                            makeToolip(refueling.getCarName(), refueling.getMileage(),
+                                    refueling.getDate().getTime(), GRAPH_OPTION_PER_REFUELING),
+                            refueling.getGuessed());
                 }
 
-                wasLastRefuelingGuessed = refueling.getGuessed();
                 lastRefuelingMileage = refueling.getMileage();
             }
         }
 
         public Cursor[] getUsedCursors() {
-            return new Cursor[] { mCursor };
+            return new Cursor[]{mCursor};
         }
     }
 
-    private class ReportGraphDataPerMonth extends AbstractReportGraphData {
+    private class ReportChartDataPerMonth extends AbstractReportChartColumnData {
         private Cursor mCursor;
 
-        public ReportGraphDataPerMonth(Context context, CarCursor car) {
+        public ReportChartDataPerMonth(Context context, CarCursor car) {
             super(context, car.getName(), car.getColor());
 
             RefuelingBalancer balancer = new RefuelingBalancer(context);
@@ -122,17 +102,19 @@ public class MileageReport extends AbstractReport {
             mCursor = refueling;
 
             int lastRefuelingMileage = -1;
-            while(refueling.moveToNext()) {
+            while (refueling.moveToNext()) {
                 if (lastRefuelingMileage > -1) {
-                    long x = getMonthTime(refueling.getDate().getTime());
-                    double y = (double) (refueling.getMileage() - lastRefuelingMileage);
+                    DateTime date = new DateTime(refueling.getDate());
+                    float x = date.getYear() * 100 + date.getMonthOfYear();
+                    float y = refueling.getMileage() - lastRefuelingMileage;
 
-                    int xIndex = xValues.indexOf(x);
+                    int xIndex = indexOf(x);
                     if (xIndex == -1) {
-                        xValues.add(x);
-                        yValues.add(y);
+                        add(x, y, makeToolip(refueling.getCarName(), y, x, GRAPH_OPTION_PER_MONTH));
                     } else {
-                        yValues.set(xIndex, yValues.get(xIndex) + y);
+                        y += getYValues().get(xIndex);
+                        set(xIndex, x, y, makeToolip(refueling.getCarName(), y, x,
+                                GRAPH_OPTION_PER_MONTH));
                     }
                 }
 
@@ -141,14 +123,7 @@ public class MileageReport extends AbstractReport {
         }
 
         public Cursor[] getUsedCursors() {
-            return new Cursor[] { mCursor };
-        }
-
-        private long getMonthTime(long time) {
-            DateTime date = new DateTime(time);
-            date = new DateTime(date.getYear(), date.getMonthOfYear(), 1, 0, 0);
-
-            return date.getMillis();
+            return new Cursor[]{mCursor};
         }
     }
 
@@ -156,16 +131,39 @@ public class MileageReport extends AbstractReport {
     public static final int GRAPH_OPTION_PER_REFUELING = 1;
     public static final int GRAPH_OPTION_PER_MONTH = 2;
 
-    private Vector<AbstractReportGraphData> reportDataAccumulated = new Vector<>();
-    private Vector<AbstractReportGraphData> reportDataPerRefueling = new Vector<>();
-    private Vector<AbstractReportGraphData> reportDataPerMonth = new Vector<>();
-    private double[] minXValue = {Long.MAX_VALUE, Long.MAX_VALUE,
-            Long.MAX_VALUE};
+    private List<AbstractReportChartData> reportDataAccumulated = new ArrayList<>();
+    private List<AbstractReportChartData> reportDataPerRefueling = new ArrayList<>();
+    private List<AbstractReportChartData> reportDataPerMonth = new ArrayList<>();
 
-    private String unit;
+    private String mUnit;
+    private DateFormat mDateFormat;
+    private String mMonthLabelFormat;
 
     public MileageReport(Context context) {
         super(context);
+    }
+
+    @Override
+    protected String formatXValue(float value, int chartOption) {
+        if (chartOption == GRAPH_OPTION_PER_MONTH) {
+            int dateValue = (int) value;
+            int year = dateValue / 100;
+            int month = dateValue % 100;
+            DateTime date = new DateTime(year, month, 1, 0, 0);
+            return date.toString(mMonthLabelFormat);
+        } else {
+            return mDateFormat.format(new Date((long) value));
+        }
+    }
+
+    @Override
+    protected String formatYValue(float value, int chartOption) {
+        int rounded = (int) (value + .5);
+        if (rounded > 1000) {
+            return String.format("%dk", rounded / 1000);
+        } else {
+            return String.valueOf(rounded);
+        }
     }
 
     @Override
@@ -183,85 +181,27 @@ public class MileageReport extends AbstractReport {
     }
 
     @Override
-    protected Chart onGetChart(boolean zoomable, boolean moveable) {
-        final Dataset dataset = new Dataset();
-        RendererList renderers = new RendererList();
-        LineRenderer renderer = new LineRenderer(mContext);
-        renderers.addRenderer(renderer);
-
-        Vector<AbstractReportGraphData> reportData;
-        if (getChartOption() == GRAPH_OPTION_ACCUMULATED) {
-            reportData = reportDataAccumulated;
-        } else if (getChartOption() == GRAPH_OPTION_PER_REFUELING) {
-            reportData = reportDataPerRefueling;
+    protected List<AbstractReportChartData> getRawChartData(int chartOption) {
+        if (chartOption == GRAPH_OPTION_ACCUMULATED) {
+            return reportDataAccumulated;
+        } else if (chartOption == GRAPH_OPTION_PER_REFUELING) {
+            return reportDataPerRefueling;
         } else {
-            reportData = reportDataPerMonth;
+            return reportDataPerMonth;
         }
-        Vector<AbstractReportGraphData> chartReportData = new Vector<>();
-
-        if (isShowTrend()) {
-            for (AbstractReportGraphData data : reportData) {
-                chartReportData.add(data.createTrendData());
-            }
-        }
-
-        if (isShowOverallTrend()) {
-            for (AbstractReportGraphData data : reportData) {
-                chartReportData.add(data.createOverallTrendData());
-            }
-        }
-
-        chartReportData.addAll(reportData);
-
-        for (int i = 0; i < chartReportData.size(); i++) {
-            dataset.add(chartReportData.get(i).getSeries());
-            chartReportData.get(i).applySeriesStyle(i, renderer);
-        }
-
-        renderer.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onSeriesClick(int series, int point, boolean marked) {
-                Series s = dataset.get(series);
-                String car = s.getTitle();
-                String date = DateFormat.getDateFormat(mContext).format(
-                        new Date((long) s.get(point).x));
-                Toast.makeText(
-                        mContext,
-                        String.format(
-                                "%s: %s\n%s: %.0f %s\n%s: %s",
-                                mContext.getString(R.string.report_toast_car),
-                                car,
-                                mContext.getString(R.string.report_toast_mileage),
-                                s.get(point).y, unit, mContext
-                                        .getString(R.string.report_toast_date),
-                                date), Toast.LENGTH_LONG).show();
-            }
-        });
-
-        final Chart chart = new Chart(mContext, dataset, renderers);
-        applyDefaultChartStyles(chart);
-        chart.setShowLegend(false);
-        if (isShowTrend()) {
-            for (int i = 0; i < chartReportData.size() / 2; i++) {
-                chart.getLegend().setSeriesVisible(i, false);
-            }
-        }
-        chart.getDomainAxis().setLabelFormatter(mDateLabelFormatter);
-        chart.getDomainAxis()
-                .setDefaultBottomBound(minXValue[getChartOption()]);
-        chart.getDomainAxis().setZoomable(zoomable);
-        chart.getDomainAxis().setMovable(moveable);
-        chart.getRangeAxis().setZoomable(zoomable);
-        chart.getRangeAxis().setMovable(moveable);
-
-        return chart;
     }
 
     @Override
     protected Cursor[] onUpdate() {
         // Preferences
         Preferences prefs = new Preferences(mContext);
-        unit = prefs.getUnitDistance();
+        mUnit = prefs.getUnitDistance();
+        mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
+        if (mContext.getResources().getConfiguration().smallestScreenWidthDp > 480) {
+            mMonthLabelFormat = "MMMM yyyy";
+        } else {
+            mMonthLabelFormat = "MMM yyyy";
+        }
 
         ArrayList<Cursor> cursors = new ArrayList<>();
 
@@ -270,20 +210,17 @@ public class MileageReport extends AbstractReport {
         cursors.add(car);
         while (car.moveToNext()) {
             // Accumulated data
-            ReportGraphDataAccumulated carDataAccumulated = new ReportGraphDataAccumulated(
+            ReportChartDataAccumulated carDataAccumulated = new ReportChartDataAccumulated(
                     mContext, car);
             cursors.addAll(Arrays.asList(carDataAccumulated.getUsedCursors()));
             if (carDataAccumulated.size() > 0) {
                 reportDataAccumulated.add(carDataAccumulated);
-                minXValue[GRAPH_OPTION_ACCUMULATED] = Math.min(
-                        minXValue[GRAPH_OPTION_ACCUMULATED], carDataAccumulated
-                                .getSeries().minX());
             }
 
             // Per refueling data
             String[] categories = CarQueries.getUsedFuelTypeCategories(mContext, car.getId());
             for (String category : categories) {
-                ReportGraphDataPerRefueling carDataPerRefueling = new ReportGraphDataPerRefueling(
+                ReportChartDataPerRefueling carDataPerRefueling = new ReportChartDataPerRefueling(
                         mContext, car, category);
                 cursors.addAll(Arrays.asList(carDataPerRefueling.getUsedCursors()));
 
@@ -302,31 +239,38 @@ public class MileageReport extends AbstractReport {
                             .getString(R.string.report_not_enough_data), ""));
                 } else {
                     reportDataPerRefueling.add(carDataPerRefueling);
-                    minXValue[GRAPH_OPTION_PER_REFUELING] = Math.min(
-                            minXValue[GRAPH_OPTION_PER_REFUELING],
-                            carDataPerRefueling.getSeries().minX());
 
-                    Double[] carYValues = carDataPerRefueling.yValues.toArray(
-                            new Double[carDataPerRefueling.yValues.size()]);
+                    Float[] carYValues = carDataPerRefueling.getYValues().toArray(
+                            new Float[carDataPerRefueling.size()]);
                     section.addItem(new Item(mContext.getString(R.string.report_highest),
-                            String.format("%d %s", Calculator.max(carYValues).intValue(), unit)));
+                            String.format("%d %s", Calculator.max(carYValues).intValue(), mUnit)));
                     section.addItem(new Item(mContext.getString(R.string.report_lowest),
-                            String.format("%d %s", Calculator.min(carYValues).intValue(), unit)));
+                            String.format("%d %s", Calculator.min(carYValues).intValue(), mUnit)));
                     section.addItem(new Item(mContext.getString(R.string.report_average),
-                            String.format("%d %s", Calculator.avg(carYValues).intValue(), unit)));
+                            String.format("%d %s", Calculator.avg(carYValues).intValue(), mUnit)));
                 }
             }
 
             // Per month data
-            ReportGraphDataPerMonth carDataPerMonth = new ReportGraphDataPerMonth(mContext, car);
+            ReportChartDataPerMonth carDataPerMonth = new ReportChartDataPerMonth(mContext, car);
             cursors.addAll(Arrays.asList(carDataPerMonth.getUsedCursors()));
             if (carDataPerMonth.size() > 0) {
                 reportDataPerMonth.add(carDataPerMonth);
-                minXValue[GRAPH_OPTION_PER_MONTH] = Math.min(minXValue[GRAPH_OPTION_PER_MONTH],
-                        carDataPerMonth.getSeries().minX());
             }
         }
 
         return cursors.toArray(new Cursor[cursors.size()]);
+    }
+
+    private String makeToolip(String car, float value, float dateValue, int chartOption) {
+        return String.format(
+                "%s: %s\n%s: %.0f %s\n%s: %s",
+                mContext.getString(R.string.report_toast_car),
+                car,
+                mContext.getString(R.string.report_toast_mileage),
+                value,
+                mUnit,
+                mContext.getString(R.string.report_toast_date),
+                formatXValue(dateValue, chartOption));
     }
 }

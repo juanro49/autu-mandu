@@ -34,7 +34,7 @@
         android:paddingLeft="8dp"
         android:visibility="gone"
         tools:ignore="RtlHardcoded,RtlSymmetry">
-        <me.kuehle.chartlib.ChartView
+        <lecho.lib.hellocharts.view.ComboLineColumnChartView
             android:id="@+id/full_screen_chart"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

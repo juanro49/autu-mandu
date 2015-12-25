@@ -67,20 +67,6 @@
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
-            android:id="@+id/table_holder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            card_view:cardBackgroundColor="#000"
-            card_view:contentPadding="8dp">
-
-            <ListView
-                android:id="@+id/table"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
             android:id="@+id/chart_holder"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -89,7 +75,7 @@
             card_view:cardBackgroundColor="#000"
             card_view:contentPadding="16dp">
 
-            <me.kuehle.chartlib.ChartView
+            <lecho.lib.hellocharts.view.ColumnChartView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>

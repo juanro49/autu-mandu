@@ -13,7 +13,6 @@
 #####################################
 
 # Reports
--keep class me.kuehle.chartlib.ChartView
 -keep class me.kuehle.carreport.data.report.* { *; }
 
 # Preferences

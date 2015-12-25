@@ -18,13 +18,12 @@ package me.kuehle.carreport.data.report;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.format.DateFormat;
-import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.R;
@@ -35,20 +34,13 @@ import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.util.Calculator;
-import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
-import me.kuehle.chartlib.chart.Chart;
-import me.kuehle.chartlib.data.Dataset;
-import me.kuehle.chartlib.data.Series;
-import me.kuehle.chartlib.renderer.LineRenderer;
-import me.kuehle.chartlib.renderer.OnClickListener;
-import me.kuehle.chartlib.renderer.RendererList;
 
 public class FuelConsumptionReport extends AbstractReport {
-    private class ReportGraphData extends AbstractReportGraphData {
+    private class ReportChartData extends AbstractReportChartLineData {
         private Cursor mCursor;
-        private double avgConsumption;
+        private double mAvgConsumption;
 
-        public ReportGraphData(Context context, CarCursor car, String category) {
+        public ReportChartData(Context context, CarCursor car, String category) {
             super(context, String.format("%s (%s)", car.getName(), category), car.getColor());
 
             FuelConsumption fuelConsumption = new FuelConsumption(context);
@@ -58,15 +50,13 @@ public class FuelConsumptionReport extends AbstractReport {
 
             int lastMileage = 0;
             int totalDistance = 0, partialDistance = 0;
-            double totalVolume = 0, partialVolume = 0;
-            boolean wasLastFullRefuelingGuessed = false;
+            float totalVolume = 0, partialVolume = 0;
             boolean foundFullRefueling = false;
 
             while (refueling.moveToNext()) {
                 if (!foundFullRefueling) {
                     if (!refueling.getPartial()) {
                         foundFullRefueling = true;
-                        wasLastFullRefuelingGuessed = refueling.getGuessed();
                     }
                 } else {
                     partialDistance += refueling.getMileage() - lastMileage;
@@ -76,47 +66,59 @@ public class FuelConsumptionReport extends AbstractReport {
                         totalDistance += partialDistance;
                         totalVolume += partialVolume;
 
-                        double consumption = fuelConsumption.computeFuelConsumption(partialVolume,
+                        float consumption = fuelConsumption.computeFuelConsumption(partialVolume,
                                 partialDistance);
-                        xValues.add(refueling.getDate().getTime());
-                        yValues.add(consumption);
-
-                        if (refueling.getGuessed()) {
-                            markLastPoint();
-                            markLastLine();
-                        } else if (wasLastFullRefuelingGuessed) {
-                            markLastLine();
-                        }
+                        add((float) refueling.getDate().getTime(),
+                                consumption,
+                                String.format(
+                                        "%s: %s\n%s: %s\n%s: %.2f %s\n%s: %s",
+                                        mContext.getString(R.string.report_toast_car),
+                                        car.getName(),
+                                        mContext.getString(R.string.report_toast_fuel_type),
+                                        refueling.getFuelTypeName(),
+                                        mContext.getString(R.string.report_toast_consumption),
+                                        consumption,
+                                        mUnit,
+                                        mContext.getString(R.string.report_toast_date),
+                                        mDateFormat.format(refueling.getDate())),
+                                refueling.getGuessed());
 
                         partialDistance = 0;
                         partialVolume = 0;
-
-                        wasLastFullRefuelingGuessed = refueling.getGuessed();
                     }
                 }
 
                 lastMileage = refueling.getMileage();
             }
 
-            avgConsumption = fuelConsumption.computeFuelConsumption(totalVolume, totalDistance);
+            mAvgConsumption = fuelConsumption.computeFuelConsumption(totalVolume, totalDistance);
         }
 
         public double getAverageConsumption() {
-            return avgConsumption;
+            return mAvgConsumption;
         }
 
         public Cursor[] getUsedCursors() {
-            return new Cursor[] { mCursor };
+            return new Cursor[]{mCursor};
         }
     }
 
-    private Vector<AbstractReportGraphData> reportData = new Vector<>();
-    private double minXValue = Long.MAX_VALUE;
-
-    private String unit;
+    private List<AbstractReportChartData> reportData = new ArrayList<>();
+    private String mUnit;
+    private DateFormat mDateFormat;
 
     public FuelConsumptionReport(Context context) {
         super(context);
+    }
+
+    @Override
+    protected String formatXValue(float value, int chartOption) {
+        return mDateFormat.format(new Date((long) value));
+    }
+
+    @Override
+    protected String formatYValue(float value, int chartOption) {
+        return String.format("%.2f", value);
     }
 
     @Override
@@ -130,84 +132,16 @@ public class FuelConsumptionReport extends AbstractReport {
     }
 
     @Override
-    protected Chart onGetChart(boolean zoomable, boolean moveable) {
-        final Dataset dataset = new Dataset();
-        RendererList renderers = new RendererList();
-        LineRenderer renderer = new LineRenderer(mContext);
-        renderers.addRenderer(renderer);
-
-        Vector<AbstractReportGraphData> reportData = new Vector<>();
-
-        if (isShowTrend()) {
-            for (AbstractReportGraphData data : this.reportData) {
-                reportData.add(data.createTrendData());
-            }
-        }
-
-        if (isShowOverallTrend()) {
-            for (AbstractReportGraphData data : this.reportData) {
-                reportData.add(data.createOverallTrendData());
-            }
-        }
-
-        reportData.addAll(this.reportData);
-
-        for (int i = 0; i < reportData.size(); i++) {
-            dataset.add(reportData.get(i).getSeries());
-            reportData.get(i).applySeriesStyle(i, renderer);
-        }
-
-        renderer.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onSeriesClick(int series, int point, boolean marked) {
-                Series s = dataset.get(series);
-                String car = s.getTitle().substring(0,
-                        s.getTitle().lastIndexOf('(') - 1);
-                String fuelType = s.getTitle().substring(
-                        s.getTitle().lastIndexOf('(') + 1,
-                        s.getTitle().length() - 1);
-                String date = DateFormat.getDateFormat(mContext).format(
-                        new Date((long) s.get(point).x));
-
-                Toast.makeText(
-                        mContext,
-                        String.format(
-                                "%s: %s\n%s: %s\n%s: %.2f %s\n%s: %s",
-                                mContext.getString(R.string.report_toast_car),
-                                car,
-                                mContext.getString(R.string.report_toast_fuel_type),
-                                fuelType,
-                                mContext.getString(R.string.report_toast_consumption),
-                                s.get(point).y, unit, mContext
-                                        .getString(R.string.report_toast_date),
-                                date), Toast.LENGTH_LONG).show();
-            }
-        });
-
-        final Chart chart = new Chart(mContext, dataset, renderers);
-        applyDefaultChartStyles(chart);
-        chart.setShowLegend(false);
-        if (isShowTrend()) {
-            for (int i = 0; i < reportData.size() / 2; i++) {
-                chart.getLegend().setSeriesVisible(i, false);
-            }
-        }
-        chart.getDomainAxis().setLabelFormatter(mDateLabelFormatter);
-        chart.getDomainAxis().setDefaultBottomBound(minXValue);
-        chart.getRangeAxis().setLabelFormatter(new DecimalAxisLabelFormatter(2));
-        chart.getDomainAxis().setZoomable(zoomable);
-        chart.getDomainAxis().setMovable(moveable);
-        chart.getRangeAxis().setZoomable(zoomable);
-        chart.getRangeAxis().setMovable(moveable);
-
-        return chart;
+    protected List<AbstractReportChartData> getRawChartData(int chartOption) {
+        return reportData;
     }
 
     @Override
     protected Cursor[] onUpdate() {
         // Preferences
         FuelConsumption fuelConsumption = new FuelConsumption(mContext);
-        unit = fuelConsumption.getUnitLabel();
+        mUnit = fuelConsumption.getUnitLabel();
+        mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
 
         ArrayList<Cursor> cursors = new ArrayList<>();
 
@@ -220,7 +154,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
             String[] categories = CarQueries.getUsedFuelTypeCategories(mContext, car.getId());
             for (String category : categories) {
-                ReportGraphData carData = new ReportGraphData(mContext, car, category);
+                ReportChartData carData = new ReportChartData(mContext, car, category);
                 if (carData.isEmpty()) {
                     continue;
                 }
@@ -229,19 +163,15 @@ public class FuelConsumptionReport extends AbstractReport {
                 cursors.addAll(Arrays.asList(carData.getUsedCursors()));
 
                 Section section = addDataSection(car, category);
-                Double[] yValues = carData.yValues.toArray(new Double[carData.yValues.size()]);
+                Float[] yValues = carData.getYValues().toArray(new Float[carData.size()]);
                 section.addItem(new Item(mContext.getString(R.string.report_highest),
-                        String.format("%.2f %s", Calculator.max(yValues), unit)));
+                        String.format("%.2f %s", Calculator.max(yValues), mUnit)));
                 section.addItem(new Item(mContext.getString(R.string.report_lowest),
-                        String.format("%.2f %s", Calculator.min(yValues), unit)));
+                        String.format("%.2f %s", Calculator.min(yValues), mUnit)));
                 section.addItem(new Item(mContext.getString(R.string.report_average),
-                        String.format("%.2f %s", carData.getAverageConsumption(), unit)));
+                        String.format("%.2f %s", carData.getAverageConsumption(), mUnit)));
 
                 sectionAdded = true;
-
-                if (car.getSuspendedSince() == null) {
-                    minXValue = Math.min(minXValue, carData.getSeries().minX());
-                }
             }
 
             if (!sectionAdded) {

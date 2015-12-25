@@ -20,19 +20,31 @@ import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.text.format.DateFormat;
 import android.util.Log;
-import android.util.TypedValue;
+
+import org.joda.time.DateTime;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import me.kuehle.chartlib.axis.AxisLabelFormatter;
-import me.kuehle.chartlib.chart.Chart;
+import lecho.lib.hellocharts.formatter.AxisValueFormatter;
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.Column;
+import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.ComboLineColumnChartData;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+import me.kuehle.carreport.R;
 
 public abstract class AbstractReport {
     private static final String TAG = "AbstractReport";
@@ -163,19 +175,9 @@ public abstract class AbstractReport {
 
     protected Context mContext;
     private ArrayList<AbstractListItem> mData = new ArrayList<>();
-    private boolean mShowTrend = false;
-    private boolean mShowOverallTrend = false;
-    private int mChartOption = 0;
     private Cursor[] mUsedCursors;
 
     private boolean mInitialized = false;
-
-    protected AxisLabelFormatter mDateLabelFormatter = new AxisLabelFormatter() {
-        @Override
-        public String formatLabel(double value) {
-            return DateFormat.getDateFormat(mContext).format(new Date((long) value));
-        }
-    };
 
     public AbstractReport(Context context) {
         mContext = context;
@@ -185,16 +187,113 @@ public abstract class AbstractReport {
 
     public abstract String getTitle();
 
-    public Chart getChart(boolean zoomable, boolean moveable) {
-        if (mInitialized) {
-            return onGetChart(zoomable, moveable);
-        } else {
+    public ComboLineColumnChartData getChartData(final ReportChartOptions options) {
+        if (!mInitialized) {
             return null;
         }
-    }
 
-    public int getChartOption() {
-        return mChartOption;
+        List<AbstractReportChartData> rawData = getRawChartData(options.getChartOption());
+        List<AbstractReportChartColumnData> rawColumnData = new ArrayList<>();
+        AxisValueFormatter xAxisFormatter = new ReportAxisValueFormatter() {
+            @Override
+            public String format(float value) {
+                return formatXValue(value, options.getChartOption());
+            }
+        };
+        AxisValueFormatter yAxisFormatter = new ReportAxisValueFormatter() {
+            @Override
+            public String format(float value) {
+                return formatYValue(value, options.getChartOption());
+            }
+        };
+
+        List<Column> columns = new ArrayList<>();
+        List<Line> lines = new ArrayList<>();
+
+        for (AbstractReportChartData data : rawData) {
+            data.sort();
+        }
+
+        if (options.isShowTrend()) {
+            for (AbstractReportChartData data : rawData) {
+                lines.add(data.createTrendData().getLine());
+            }
+        }
+
+        if (options.isShowOverallTrend()) {
+            for (AbstractReportChartData data : rawData) {
+                lines.add(data.createOverallTrendData().getLine());
+            }
+        }
+
+        for (AbstractReportChartData data : rawData) {
+            if (data instanceof AbstractReportChartColumnData) {
+                rawColumnData.add((AbstractReportChartColumnData) data);
+            } else if (data instanceof AbstractReportChartLineData) {
+                lines.add(((AbstractReportChartLineData) data).getLine());
+            }
+        }
+
+        if (!rawColumnData.isEmpty()) {
+            // Collect X values.
+            SortedSet<Float> xValues = new TreeSet<>();
+            for (AbstractReportChartData data : rawData) {
+                xValues.addAll(data.getXValues());
+            }
+
+            Map<Float, Integer> xValueMap = new HashMap<>(xValues.size());
+            int xValueIndex = 0;
+            for (Float x : xValues) {
+                // Build a map of X values to their indexes on the axis.
+                xValueMap.put(x, xValueIndex);
+                xValueIndex++;
+
+                // Create column values.
+                List<SubcolumnValue> subcolumnValues = new ArrayList<>();
+                for (AbstractReportChartColumnData data : rawColumnData) {
+                    SubcolumnValue subcolumnValue = data.getSubcolumnValue(x);
+                    if (subcolumnValue != null) {
+                        subcolumnValues.add(subcolumnValue);
+                    }
+                }
+
+                columns.add(new Column(subcolumnValues));
+            }
+
+            // Convert X values of lines to indexes, so they match the columns.
+            for (Line line : lines) {
+                List<PointValue> points = line.getValues();
+                for (PointValue point : points) {
+                    point.set(xValueMap.get(point.getX()), point.getY());
+                }
+            }
+
+            // Change X axis value formatter to first convert index back to real value.
+            final Float[] xValueReverseMap = xValues.toArray(new Float[xValues.size()]);
+            xAxisFormatter = new ReportAxisValueFormatter() {
+                @Override
+                public String format(float value) {
+                    return formatXValue(xValueReverseMap[(int) value], options.getChartOption());
+                }
+            };
+        }
+
+        ColumnChartData columnChartData = new ColumnChartData(columns);
+        LineChartData lineChartData = new LineChartData(lines);
+
+        ComboLineColumnChartData data = new ComboLineColumnChartData(columnChartData, lineChartData);
+        data.setAxisXBottom(new Axis()
+                .setTextColor(mContext.getResources().getColor(R.color.secondary_text))
+                .setFormatter(xAxisFormatter)
+                .setMaxLabelChars(8));
+        data.setAxisYLeft(new Axis()
+                .setLineColor(mContext.getResources().getColor(R.color.divider))
+                .setTextColor(mContext.getResources().getColor(R.color.secondary_text))
+                .setHasLines(true)
+                .setFormatter(yAxisFormatter)
+                .setMaxLabelChars(4));
+
+        return data;
     }
 
     public List<AbstractListItem> getData() {
@@ -219,34 +318,10 @@ public abstract class AbstractReport {
         }
     }
 
-    public boolean isShowTrend() {
-        return mShowTrend;
-    }
-
-    public boolean isShowOverallTrend() {
-        return mShowOverallTrend;
-    }
-
     public void registerContentObserver(ContentObserver observer) {
         for (Cursor c : mUsedCursors) {
             c.registerContentObserver(observer);
         }
-    }
-
-    public void setChartOption(int chartOption) {
-        if (chartOption < getAvailableChartOptions().length) {
-            mChartOption = chartOption;
-        } else {
-            mChartOption = 0;
-        }
-    }
-
-    public void setShowTrend(boolean showTrend) {
-        mShowTrend = showTrend;
-    }
-
-    public void setShowOverallTrend(boolean showOverallTrend) {
-        mShowOverallTrend = showOverallTrend;
     }
 
     public void update() {
@@ -266,14 +341,11 @@ public abstract class AbstractReport {
         return section;
     }
 
-    protected void applyDefaultChartStyles(Chart chart) {
-        chart.getDomainAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
-        chart.getDomainAxis().setShowGrid(false);
-        chart.getRangeAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
-        chart.getLegend().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
-    }
+    protected abstract String formatXValue(float value, int chartOption);
 
-    protected abstract Chart onGetChart(boolean zoomable, boolean moveable);
+    protected abstract String formatYValue(float value, int chartOption);
+
+    protected abstract List<AbstractReportChartData> getRawChartData(int chartOption);
 
     /**
      * Is called as a result of {@link #update()} and should perform all operations to

@@ -23,6 +23,7 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -47,18 +48,28 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import lecho.lib.hellocharts.listener.ComboLineColumnChartOnValueSelectListener;
+import lecho.lib.hellocharts.model.ComboLineColumnChartData;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+import lecho.lib.hellocharts.model.Viewport;
+import lecho.lib.hellocharts.view.ComboLineColumnChartView;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.report.AbstractReport;
+import me.kuehle.carreport.data.report.AbstractReportChartColumnData;
+import me.kuehle.carreport.data.report.AbstractReportChartLineData;
+import me.kuehle.carreport.data.report.ReportChartOptions;
 import me.kuehle.carreport.gui.MainActivity.BackPressedListener;
 import me.kuehle.carreport.gui.util.FloatingActionButtonRevealer;
-import me.kuehle.chartlib.ChartView;
 
 public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         BackPressedListener, LoaderManager.LoaderCallbacks<List<AbstractReport>> {
@@ -80,7 +91,6 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
             for (Class<? extends AbstractReport> reportClass : reportClasses) {
                 AbstractReport report = AbstractReport.newInstance(reportClass, getContext());
                 if (report != null) {
-                    ReportFragment.loadGraphSettings(getContext(), report);
                     report.update();
                     report.registerContentObserver(mObserver);
                     reports.add(report);
@@ -98,7 +108,8 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
     private class ReportHolder extends RecyclerView.ViewHolder {
         private TextView mTxtTitle;
-        private ChartView mChart;
+        private ComboLineColumnChartView mChart;
+        private View mChartNotEnoughData;
         private ViewGroup mDetails;
 
         private AbstractReport mReport;
@@ -124,15 +135,18 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
                 }
             });
 
-            mChart = (ChartView) itemView.findViewById(R.id.chart);
-            mChart.setNotEnoughDataView(View.inflate(itemView.getContext(),
-                    R.layout.chart_not_enough_data, null));
+            mChart = (ComboLineColumnChartView) itemView.findViewById(R.id.chart);
+            mChart.setZoomEnabled(false);
+            mChart.setScrollEnabled(false);
+            mChart.setValueTouchEnabled(false);
             mChart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     showFullScreenChart(mReport, v);
                 }
             });
+
+            mChartNotEnoughData = itemView.findViewById(R.id.chart_not_enough_data);
 
             mDetails = (ViewGroup) itemView.findViewById(R.id.details);
         }
@@ -141,7 +155,16 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
             mReport = report;
 
             mTxtTitle.setText(report.getTitle());
-            mChart.setChart(report.getChart(false, false));
+
+            ReportChartOptions options = loadReportChartOptions(getContext(), report);
+            ComboLineColumnChartData data = report.getChartData(options);
+            mChart.setComboLineColumnChartData(data);
+            applyViewport(mChart, true);
+
+            boolean enoughData = data.getLineChartData().getLines().size() > 1 ||
+                    data.getColumnChartData().getColumns().size() > 0;
+            mChart.setVisibility(enoughData ? View.VISIBLE : View.GONE);
+            mChartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
 
             mDetails.removeAllViews();
             for (AbstractReport.AbstractListItem item : report.getData(true)) {
@@ -205,8 +228,8 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         private int mSpacing;
 
         public ReportItemDecoration() {
-            mSpacing = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15.0f,
-                    getActivity().getResources().getDisplayMetrics());
+            mSpacing = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16,
+                    getResources().getDisplayMetrics());
         }
 
         @Override
@@ -235,10 +258,10 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
     private AbstractReport mCurrentMenuReport;
     private ViewGroup mCurrentMenuReportView;
 
-    private ChartView mFullScreenChart;
+    private ComboLineColumnChartView mFullScreenChart;
     private View mFullScreenChartHolder;
     private Animator mFullScreenChartAnimator;
-    private ChartView mCurrentFullScreenChart;
+    private ComboLineColumnChartView mCurrentFullScreenChart;
     private Rect mCurrentFullScreenStartBounds;
     private float mCurrentFullScreenStartScaleX;
     private float mCurrentFullScreenStartScaleY;
@@ -254,8 +277,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_report, container, false);
 
         RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.list);
@@ -270,7 +292,32 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         FloatingActionMenu fab = (FloatingActionMenu) v.findViewById(R.id.fab);
         FloatingActionButtonRevealer.setup(fab, recyclerView);
 
-        mFullScreenChart = (ChartView) v.findViewById(R.id.full_screen_chart);
+        mFullScreenChart = (ComboLineColumnChartView) v.findViewById(R.id.full_screen_chart);
+        mFullScreenChart.setOnValueTouchListener(new ComboLineColumnChartOnValueSelectListener() {
+            @SuppressLint("ShowToast")
+            private Toast mToast = Toast.makeText(getContext(), "", Toast.LENGTH_LONG);
+
+            @Override
+            public void onColumnValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
+                if (value instanceof AbstractReportChartColumnData.SubcolumnValueWithTooltip) {
+                    mToast.setText(((AbstractReportChartColumnData.SubcolumnValueWithTooltip) value).getTooltip());
+                    mToast.show();
+                }
+            }
+
+            @Override
+            public void onPointValueSelected(int lineIndex, int pointIndex, PointValue value) {
+                if (value instanceof AbstractReportChartLineData.PointValueWithTooltip) {
+                    mToast.setText(((AbstractReportChartLineData.PointValueWithTooltip) value).getTooltip());
+                    mToast.show();
+                }
+            }
+
+            @Override
+            public void onValueDeselected() {
+            }
+        });
+
         mFullScreenChartHolder = v.findViewById(R.id.full_screen_chart_holder);
 
         View btnCloseFullScreen = v.findViewById(R.id.btn_close_full_screen);
@@ -288,27 +335,22 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
+        ReportChartOptions options = loadReportChartOptions(getContext(), mCurrentMenuReport);
         if (item.getItemId() == R.id.menu_show_trend) {
-            mCurrentMenuReport.setShowTrend(!item.isChecked());
-            ReportFragment.saveGraphSettings(getActivity(), mCurrentMenuReport);
-            ((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
-                    .setChart(mCurrentMenuReport.getChart(false, false));
-            return true;
+            options.setShowTrend(!item.isChecked());
         } else if (item.getItemId() == R.id.menu_show_overall_trend) {
-            mCurrentMenuReport.setShowOverallTrend(!item.isChecked());
-            ReportFragment.saveGraphSettings(getActivity(), mCurrentMenuReport);
-            ((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
-                    .setChart(mCurrentMenuReport.getChart(false, false));
-            return true;
+            options.setShowOverallTrend(!item.isChecked());
         } else if (item.getGroupId() == R.id.group_graph) {
-            mCurrentMenuReport.setChartOption(item.getOrder());
-            ReportFragment.saveGraphSettings(getActivity(), mCurrentMenuReport);
-            ((ChartView) mCurrentMenuReportView.findViewById(R.id.chart))
-                    .setChart(mCurrentMenuReport.getChart(false, false));
-            return true;
-        } else {
-            return false;
+            options.setChartOption(item.getOrder());
         }
+
+        saveReportChartOptions(getContext(), mCurrentMenuReport, options);
+        ComboLineColumnChartView chart = (ComboLineColumnChartView) mCurrentMenuReportView
+                .findViewById(R.id.chart);
+        chart.setComboLineColumnChartData(mCurrentMenuReport.getChartData(options));
+        applyViewport(chart, true);
+
+        return true;
     }
 
     @Override
@@ -364,8 +406,11 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
             mFullScreenChartAnimator.cancel();
         }
 
-        mCurrentFullScreenChart = (ChartView) v;
-        mFullScreenChart.setChart(report.getChart(true, true));
+        mCurrentFullScreenChart = (ComboLineColumnChartView) v;
+
+        ReportChartOptions options = loadReportChartOptions(getContext(), report);
+        mFullScreenChart.setComboLineColumnChartData(report.getChartData(options));
+        applyViewport(mFullScreenChart, false);
 
         // Calculate translation start and end point and scales.
         mCurrentFullScreenStartBounds = new Rect();
@@ -449,21 +494,22 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
     private void showReportOptions(AbstractReport report, View v) {
         mCurrentMenuReport = report;
         mCurrentMenuReportView = (ViewGroup) v.getParent().getParent().getParent();
+        ReportChartOptions options = loadReportChartOptions(getContext(), report);
 
         PopupMenu popup = new PopupMenu(getActivity(), v);
         popup.inflate(R.menu.report_options);
         popup.setOnMenuItemClickListener(this);
 
         Menu menu = popup.getMenu();
-        menu.findItem(R.id.menu_show_trend).setChecked(report.isShowTrend());
-        menu.findItem(R.id.menu_show_overall_trend).setChecked(report.isShowOverallTrend());
+        menu.findItem(R.id.menu_show_trend).setChecked(options.isShowTrend());
+        menu.findItem(R.id.menu_show_overall_trend).setChecked(options.isShowOverallTrend());
 
         int[] graphOptions = report.getAvailableChartOptions();
         if (graphOptions.length >= 2) {
             for (int i = 0; i < graphOptions.length; i++) {
                 MenuItem item = menu.add(R.id.group_graph, Menu.NONE, i,
                         graphOptions[i]);
-                item.setChecked(i == report.getChartOption());
+                item.setChecked(i == options.getChartOption());
             }
 
             menu.setGroupCheckable(R.id.group_graph, true, true);
@@ -472,22 +518,52 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         popup.show();
     }
 
-    private static void loadGraphSettings(Context context, AbstractReport report) {
+    private static ReportChartOptions loadReportChartOptions(Context context, AbstractReport report) {
         SharedPreferences prefs = context.getSharedPreferences(ReportFragment.class.getName(),
                 Context.MODE_PRIVATE);
         String reportName = report.getClass().getSimpleName();
-        report.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
-        report.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
-        report.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
+
+        ReportChartOptions options = new ReportChartOptions();
+        options.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
+        options.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
+        options.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
+
+        return options;
     }
 
-    private static void saveGraphSettings(Context context, AbstractReport report) {
+    private static void saveReportChartOptions(Context context, AbstractReport report, ReportChartOptions options) {
         SharedPreferences.Editor prefsEdit = context.getSharedPreferences(
                 ReportFragment.class.getName(), Context.MODE_PRIVATE).edit();
         String reportName = report.getClass().getSimpleName();
-        prefsEdit.putBoolean(reportName + "_show_trend", report.isShowTrend());
-        prefsEdit.putBoolean(reportName + "_show_overall_trend", report.isShowOverallTrend());
-        prefsEdit.putInt(reportName + "_current_chart_option", report.getChartOption());
+
+        prefsEdit.putBoolean(reportName + "_show_trend", options.isShowTrend());
+        prefsEdit.putBoolean(reportName + "_show_overall_trend", options.isShowOverallTrend());
+        prefsEdit.putInt(reportName + "_current_chart_option", options.getChartOption());
         prefsEdit.apply();
+    }
+
+    /**
+     * Apply viewport to see only the last 3 columns / last 10 points
+     *
+     * @param chart The chart view.
+     * @param fix   Should the user be able to change the viewport.
+     */
+    private static void applyViewport(ComboLineColumnChartView chart, boolean fix) {
+        ComboLineColumnChartData data = (ComboLineColumnChartData) chart.getChartData();
+
+        float leftValue = Math.max(0, data.getColumnChartData().getColumns().size() - 3 - .5f);
+        for (Line line : data.getLineChartData().getLines()) {
+            if (!line.getValues().isEmpty()) {
+                int i = Math.max(0, line.getValues().size() - 10);
+                leftValue = Math.max(leftValue, line.getValues().get(i).getX());
+            }
+        }
+
+        Viewport tempViewport = new Viewport(chart.getMaximumViewport());
+        tempViewport.left = leftValue;
+        chart.setCurrentViewport(tempViewport);
+        if (fix) {
+            chart.setMaximumViewport(tempViewport);
+        }
     }
 }

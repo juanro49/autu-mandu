@@ -70,14 +70,14 @@ public class DemoData {
         for (int i = 0; i < puntoCount; i++) {
             puntoDate = puntoDate.plusDays(randInt(12, 18));
             puntoMileage += randInt(570, 620);
-            float volume = randFloat(43, 51);
+            float volume = randFloat(43, 48);
             boolean partial = false;
             if (randInt(0, 5) == 5) {
                 volume -= randFloat(20, 40);
                 partial = true;
             }
 
-            float price = volume * randFloat(140, 170) / 100;
+            float price = volume * randFloat(140, 160) / 100;
             long fuelType = super95;
             if (randInt(0, 3) == 3) {
                 fuelType = superE10;
@@ -105,14 +105,14 @@ public class DemoData {
         for (int i = 0; i < astraCount; i++) {
             astraDate = astraDate.plusDays(randInt(8, 13));
             astraMileage += randInt(570, 620);
-            float volume = randFloat(49, 60);
+            float volume = randFloat(55, 60);
             boolean partial = false;
             if (randInt(0, 5) == 5) {
                 volume -= randFloat(20, 40);
                 partial = true;
             }
 
-            float price = volume * randFloat(140, 170) / 100;
+            float price = volume * randFloat(140, 160) / 100;
             long fuelType = super95;
             if (randInt(0, 1) == 1) {
                 fuelType = lpg;
@@ -142,6 +142,11 @@ public class DemoData {
     private static long createRefueling(Context context, DateTime date, int mileage, float volume,
                                         float price, boolean partial, String note, long fuelTypeId,
                                         long carId) {
+        // Has a chance of 10% to fail. This emulates, that the user forgot to enter the refueling.
+        if (Math.random() > 0.95) {
+            return -1;
+        }
+
         return getIdFromUri(new RefuelingContentValues()
                 .putDate(date.toDate())
                 .putMileage(mileage)

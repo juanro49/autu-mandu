@@ -196,6 +196,7 @@
     <string name="report_toast_price">Preis</string>
     <string name="report_toast_date">Datum</string>
     <string name="report_toast_fuel_type">Kraftstoff</string>
+    <string name="report_toast_costs">Kosten</string>
     <string name="report_toast_none">keine</string>
 
     <string name="pref_title_header_about">Über Car Report</string>

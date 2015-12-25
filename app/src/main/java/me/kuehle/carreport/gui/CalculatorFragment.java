@@ -16,14 +16,14 @@
 
 package me.kuehle.carreport.gui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,16 +31,19 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
+import lecho.lib.hellocharts.model.Column;
+import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+import lecho.lib.hellocharts.util.ChartUtils;
+import lecho.lib.hellocharts.view.ColumnChartView;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.calculation.AbstractCalculation;
 import me.kuehle.carreport.data.calculation.CalculationItem;
@@ -50,14 +53,6 @@ import me.kuehle.carreport.data.calculation.PriceToDistanceCalculation;
 import me.kuehle.carreport.data.calculation.PriceToVolumeCalculation;
 import me.kuehle.carreport.data.calculation.VolumeToDistanceCalculation;
 import me.kuehle.carreport.data.calculation.VolumeToPriceCalculation;
-import me.kuehle.chartlib.ChartView;
-import me.kuehle.chartlib.axis.AxisLabelFormatter;
-import me.kuehle.chartlib.axis.DecimalAxisLabelFormatter;
-import me.kuehle.chartlib.chart.Chart;
-import me.kuehle.chartlib.data.Dataset;
-import me.kuehle.chartlib.data.Series;
-import me.kuehle.chartlib.renderer.BarRenderer;
-import me.kuehle.chartlib.renderer.RendererList;
 
 public class CalculatorFragment extends Fragment {
     public final class ForceLoadContentObserver extends ContentObserver {
@@ -81,10 +76,8 @@ public class CalculatorFragment extends Fragment {
     private Spinner mSpnOptions;
     private EditText mEdtInput;
     private TextView mTxtUnit;
-    private View mGraphHolder;
-    private ChartView mGraph;
-    private View mTableHolder;
-    private ListView mTable;
+    private View mChartHolder;
+    private ColumnChartView mChart;
 
     private ForceLoadContentObserver mObserver;
 
@@ -92,15 +85,15 @@ public class CalculatorFragment extends Fragment {
     private AbstractCalculation mSelectedCalculation;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(@Nullable Context context) {
+        super.onAttach(context);
         mCalculations = new AbstractCalculation[]{
-                new VolumeToDistanceCalculation(activity),
-                new DistanceToVolumeCalculation(activity),
-                new VolumeToPriceCalculation(activity),
-                new PriceToVolumeCalculation(activity),
-                new DistanceToPriceCalculation(activity),
-                new PriceToDistanceCalculation(activity)};
+                new VolumeToDistanceCalculation(context),
+                new DistanceToVolumeCalculation(context),
+                new VolumeToPriceCalculation(context),
+                new PriceToVolumeCalculation(context),
+                new DistanceToPriceCalculation(context),
+                new PriceToDistanceCalculation(context)};
 
         mObserver = new ForceLoadContentObserver();
     }
@@ -112,10 +105,8 @@ public class CalculatorFragment extends Fragment {
         mSpnOptions = (Spinner) v.findViewById(R.id.spn_options);
         mEdtInput = (EditText) v.findViewById(R.id.edt_input);
         mTxtUnit = (TextView) v.findViewById(R.id.txt_unit);
-        mGraphHolder = v.findViewById(R.id.chart_holder);
-        mGraph = (ChartView) v.findViewById(R.id.chart);
-        mTableHolder = v.findViewById(R.id.table_holder);
-        mTable = (ListView) v.findViewById(R.id.table);
+        mChartHolder = v.findViewById(R.id.chart_holder);
+        mChart = (ColumnChartView) v.findViewById(R.id.chart);
 
         ArrayAdapter<String> options = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item);
@@ -169,6 +160,8 @@ public class CalculatorFragment extends Fragment {
             }
         });
 
+        mChart.setInteractive(false);
+
         return v;
     }
 
@@ -186,74 +179,43 @@ public class CalculatorFragment extends Fragment {
         double input;
         try {
             input = Double.parseDouble(mEdtInput.getText().toString());
+
+            mChartHolder.setVisibility(View.VISIBLE);
         } catch (NumberFormatException e) {
-            mGraphHolder.setVisibility(View.INVISIBLE);
-            mTableHolder.setVisibility(View.INVISIBLE);
+            mChartHolder.setVisibility(View.INVISIBLE);
             return;
         }
 
         final CalculationItem[] items = mSelectedCalculation.calculate(input);
 
-        // Update graph
-        Dataset dataset = new Dataset();
-        Series series = new Series(mSelectedCalculation.getOutputUnit());
-        dataset.add(series);
+        List<Column> columns = new ArrayList<>(items.length);
+        List<AxisValue> axisValues = new ArrayList<>(items.length);
+        int[] colors = ChartUtils.COLORS;
+        int colorIndex = -1;
         for (int i = 0; i < items.length; i++) {
-            series.add(i, items[i].getValue());
+            float value = (float) items[i].getValue();
+            int color = mSelectedCalculation.hasColors()
+                    ? items[i].getColor()
+                    : colors[++colorIndex % colors.length];
+            String label = String.format("%.2f %s", value, mSelectedCalculation.getOutputUnit());
+
+            List<SubcolumnValue> subcolumnValues = new ArrayList<>(1);
+            subcolumnValues.add(new SubcolumnValue(value, color).setLabel(label));
+            columns.add(new Column(subcolumnValues).setHasLabels(true));
+
+            axisValues.add(new AxisValue(i).setLabel(items[i].getName()));
         }
 
-        BarRenderer renderer = new BarRenderer(getActivity());
-        renderer.setSeriesColor(0, getResources().getColor(R.color.accent));
+        ColumnChartData data = new ColumnChartData(columns);
+        data.setAxisXBottom(new Axis()
+                .setTextColor(getResources().getColor(R.color.secondary_text))
+                .setValues(axisValues));
+        data.setAxisYLeft(new Axis()
+                .setLineColor(getResources().getColor(R.color.divider))
+                .setTextColor(getResources().getColor(R.color.secondary_text))
+                .setHasLines(true)
+                .setMaxLabelChars(4));
 
-        RendererList renderers = new RendererList();
-        renderers.addRenderer(renderer);
-
-        Chart chart = new Chart(getActivity(), dataset, renderers);
-        chart.getDomainAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
-        chart.getDomainAxis().setShowGrid(false);
-        chart.getDomainAxis().setZoomable(false);
-        chart.getDomainAxis().setMovable(false);
-        chart.getDomainAxis().setLabels(getXValues(series));
-        chart.getDomainAxis().setLabelFormatter(new AxisLabelFormatter() {
-            @Override
-            public String formatLabel(double value) {
-                return items[(int) value].getName();
-            }
-        });
-        chart.getDomainAxis().setDefaultBottomBound(dataset.minX() - 0.5);
-        chart.getDomainAxis().setDefaultTopBound(dataset.maxX() + 0.5);
-        chart.getRangeAxis().setFontSize(14, TypedValue.COMPLEX_UNIT_SP);
-        chart.getRangeAxis().setZoomable(false);
-        chart.getRangeAxis().setMovable(false);
-        chart.getRangeAxis().setLabelFormatter(new DecimalAxisLabelFormatter(2));
-        chart.getRangeAxis().setDefaultBottomBound(0);
-        chart.setShowLegend(false);
-
-        mGraph.setChart(chart);
-        mGraphHolder.setVisibility(View.VISIBLE);
-
-        // Update table
-        List<Map<String, String>> tableData = new ArrayList<>();
-        for (CalculationItem item : items) {
-            Map<String, String> row = new HashMap<>();
-            row.put("label", item.getName());
-            row.put("value", String.format("%.2f %s", item.getValue(),
-                    mSelectedCalculation.getOutputUnit()));
-            tableData.add(row);
-        }
-
-        mTable.setAdapter(new SimpleAdapter(getActivity(), tableData,
-                R.layout.report_row_data, new String[]{ "label", "value" },
-                new int[]{ android.R.id.text1, android.R.id.text2 }));
-        mTableHolder.setVisibility(View.VISIBLE);
-    }
-
-    private double[] getXValues(Series series) {
-        double[] xValues = new double[series.size()];
-        for (int i = 0; i < series.size(); i++) {
-            xValues[i] = series.get(i).x;
-        }
-
-        return xValues;
+        mChart.setColumnChartData(data);
     }
 }

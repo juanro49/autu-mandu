@@ -1,1 +1,1 @@
-include ':app', ':chartlib'
+include ':app'

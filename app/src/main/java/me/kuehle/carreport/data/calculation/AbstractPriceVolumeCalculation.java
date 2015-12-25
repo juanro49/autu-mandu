@@ -42,6 +42,11 @@ public abstract class AbstractPriceVolumeCalculation extends AbstractCalculation
     }
 
     @Override
+    public boolean hasColors() {
+        return false;
+    }
+
+    @Override
     protected void onLoadData(ContentObserver observer) {
         mCursorStore = new ArrayList<>();
         mNames = new ArrayList<>();

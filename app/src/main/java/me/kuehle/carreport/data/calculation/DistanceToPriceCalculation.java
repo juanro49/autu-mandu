@@ -54,8 +54,9 @@ public class DistanceToPriceCalculation extends AbstractDistancePriceCalculation
         for (int i = 0; i < mNames.size(); i++) {
             String name = mNames.get(i);
             double avgDistancePrice = mAvgDistancePrices.get(i);
+            int color = mColors.get(i);
 
-            items.add(new CalculationItem(name, input * avgDistancePrice));
+            items.add(new CalculationItem(name, input * avgDistancePrice, color));
         }
 
         return items.toArray(new CalculationItem[items.size()]);

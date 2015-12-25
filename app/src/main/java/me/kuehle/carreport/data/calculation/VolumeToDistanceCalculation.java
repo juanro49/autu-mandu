@@ -54,8 +54,9 @@ public class VolumeToDistanceCalculation extends AbstractVolumeDistanceCalculati
         for (int i = 0; i < mNames.size(); i++) {
             String name = mNames.get(i);
             double avgConsumption = mAvgConsumptions.get(i);
+            int color = mColors.get(i);
 
-            items.add(new CalculationItem(name, input / avgConsumption));
+            items.add(new CalculationItem(name, input / avgConsumption, color));
         }
 
         return items.toArray(new CalculationItem[items.size()]);

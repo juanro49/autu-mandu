@@ -196,6 +196,7 @@
     <string name="report_toast_price">Price</string>
     <string name="report_toast_date">Date</string>
     <string name="report_toast_fuel_type">Fuel type</string>
+    <string name="report_toast_costs">Costs</string>
     <string name="report_toast_none">none</string>
     
     <string name="pref_title_header_about">About Car Report</string>

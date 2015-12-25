@@ -67,6 +67,8 @@ public abstract class AbstractCalculation {
 
     public abstract String getOutputUnit();
 
+    public abstract boolean hasColors();
+
     public CalculationItem[] calculate(double input) {
         if (mDataChanged) {
             onLoadData(mInternalObserver);

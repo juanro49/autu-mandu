@@ -36,16 +36,24 @@ public abstract class AbstractVolumeDistanceCalculation extends AbstractCalculat
 
     protected List<String> mNames;
     protected List<Double> mAvgConsumptions;
+    protected List<Integer> mColors;
 
     public AbstractVolumeDistanceCalculation(Context context) {
         super(context);
     }
 
     @Override
+    public boolean hasColors() {
+        return true;
+    }
+
+    @Override
     protected void onLoadData(ContentObserver observer) {
         mCursorStore = new ArrayList<>();
+
         mNames = new ArrayList<>();
         mAvgConsumptions = new ArrayList<>();
+        mColors = new ArrayList<>();
 
         RefuelingBalancer balancer = new RefuelingBalancer(mContext);
 
@@ -90,6 +98,7 @@ public abstract class AbstractVolumeDistanceCalculation extends AbstractCalculat
 
                     mNames.add(String.format("%s (%s)", car.getName(), category));
                     mAvgConsumptions.add(avgConsumption);
+                    mColors.add(car.getColor());
                 }
             }
         }

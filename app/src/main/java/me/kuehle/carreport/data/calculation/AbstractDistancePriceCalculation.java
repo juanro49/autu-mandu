@@ -39,9 +39,15 @@ public abstract class AbstractDistancePriceCalculation extends AbstractCalculati
 
     protected List<String> mNames;
     protected List<Double> mAvgDistancePrices;
+    protected List<Integer> mColors;
 
     public AbstractDistancePriceCalculation(Context context) {
         super(context);
+    }
+
+    @Override
+    public boolean hasColors() {
+        return true;
     }
 
     @Override
@@ -56,6 +62,7 @@ public abstract class AbstractDistancePriceCalculation extends AbstractCalculati
 
         mNames = new ArrayList<>(car.getCount());
         mAvgDistancePrices = new ArrayList<>(car.getCount());
+        mColors = new ArrayList<>(car.getCount());
 
         while (car.moveToNext()) {
             double totalCosts = 0;
@@ -105,6 +112,7 @@ public abstract class AbstractDistancePriceCalculation extends AbstractCalculati
 
                 mNames.add(car.getName());
                 mAvgDistancePrices.add(avgDistancePrice);
+                mColors.add(car.getColor());
             }
         }
     }
