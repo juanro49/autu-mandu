@@ -23,7 +23,7 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -104,10 +104,10 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     };
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (activity instanceof PreferencesActivity) {
-            activity.onAttachFragment(this);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof PreferencesActivity) {
+            ((PreferencesActivity) context).onAttachFragment(this);
         } else {
             throw new ClassCastException("This fragment can only be attached to the PreferencesActivity!");
         }

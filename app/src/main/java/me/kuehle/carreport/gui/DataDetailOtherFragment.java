@@ -44,7 +44,6 @@ import me.kuehle.carreport.gui.util.SimpleAnimator;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
-import me.kuehle.carreport.provider.othercost.OtherCostColumns;
 import me.kuehle.carreport.provider.othercost.OtherCostContentValues;
 import me.kuehle.carreport.provider.othercost.OtherCostCursor;
 import me.kuehle.carreport.provider.othercost.OtherCostSelection;
@@ -202,24 +201,6 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
             return R.string.title_add_other_expenditure;
         } else {
             return R.string.title_add_other_income;
-        }
-    }
-
-    @Override
-    protected int getToastDeletedMessage() {
-        if (isExpenditure()) {
-            return R.string.toast_other_expenditure_deleted;
-        } else {
-            return R.string.toast_other_income_deleted;
-        }
-    }
-
-    @Override
-    protected int getToastSavedMessage() {
-        if (isExpenditure()) {
-            return R.string.toast_other_expenditure_saved;
-        } else {
-            return R.string.toast_other_income_saved;
         }
     }
 

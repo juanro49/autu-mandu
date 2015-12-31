@@ -16,7 +16,6 @@
 
 package me.kuehle.carreport.gui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -81,17 +80,17 @@ public abstract class AbstractDataListFragment extends
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
             if (getParentFragment() != null) {
                 mDataListCallback = (DataListCallback) getParentFragment();
             } else {
-                mDataListCallback = (DataListCallback) activity;
+                mDataListCallback = (DataListCallback) context;
             }
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() +
-                    " must implement OnItemSelectionListener");
+            throw new ClassCastException(context.toString() +
+                    " or parent fragment must implement OnItemSelectionListener");
         }
     }
 

@@ -3,13 +3,13 @@
 
     "fields": [
         {
-            "documentation": "Date on which the refueling occured.",
+            "documentation": "Date on which the refueling occurred.",
             "name": "date",
             "type": "Date",
             "nullable": false
         },
         {
-            "documentation": "Mileage on which the refueling occured.",
+            "documentation": "Mileage on which the refueling occurred.",
             "name": "mileage",
             "type": "Integer",
             "nullable": false
@@ -27,13 +27,13 @@
             "nullable": false
         },
         {
-            "documentation": "Indicates if the tank was filled completly or only partially.",
+            "documentation": "Indicates if the tank was filled completely or only partially.",
             "name": "partial",
             "type": "Boolean",
             "nullable": false
         },
         {
-            "documentation": "A note for this cost. Just for display purposes.",
+            "documentation": "A note for this refueling. Just for display purposes.",
             "name": "note",
             "type": "String",
             "nullable": false

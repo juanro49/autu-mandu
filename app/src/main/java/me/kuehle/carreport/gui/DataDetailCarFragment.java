@@ -142,16 +142,6 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     }
 
     @Override
-    protected int getToastDeletedMessage() {
-        return R.string.toast_car_deleted;
-    }
-
-    @Override
-    protected int getToastSavedMessage() {
-        return R.string.toast_car_saved;
-    }
-
-    @Override
     protected void initFields(Bundle savedInstanceState, View v) {
         edtName = (EditText) v.findViewById(R.id.edt_name);
         colorIndicator = v.findViewById(R.id.btn_color);

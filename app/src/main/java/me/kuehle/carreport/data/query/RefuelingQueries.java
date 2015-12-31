@@ -29,7 +29,6 @@ public class RefuelingQueries {
                 .carId(carId)
                 .and()
                 .dateBefore(date)
-                .limit(1)
                 .query(context.getContentResolver(),
                         RefuelingColumns.ALL_COLUMNS,
                         RefuelingColumns.DATE + " DESC");
@@ -40,7 +39,6 @@ public class RefuelingQueries {
                 .carId(carId)
                 .and()
                 .dateAfter(date)
-                .limit(1)
                 .query(context.getContentResolver(),
                         RefuelingColumns.ALL_COLUMNS,
                         RefuelingColumns.DATE);

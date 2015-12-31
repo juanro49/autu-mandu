@@ -15,6 +15,9 @@
   limitations under the License.
 -->
 <resources>
+    <string name="app_name" translatable="false">Car Report</string>
+    <string name="app_description" translatable="false">Enter the costs of your car and receive nice reports and statistics.</string>
+
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
     <string name="about_description">Enter the costs of your car and receive nice reports and statistics.</string>
@@ -151,16 +154,6 @@
     <string name="alert_import_csv_title">Import CSV</string>
     <string name="alert_import_csv_message">Import will update existing entries and add new ones, but it will not delete entries.</string>
 
-    <string name="toast_refueling_saved">Refueling saved</string>
-    <string name="toast_refueling_deleted">Refueling deleted</string>
-    <string name="toast_other_expenditure_saved">Other expenditure saved</string>
-    <string name="toast_other_income_saved">Other income saved</string>
-    <string name="toast_other_expenditure_deleted">Other expenditure deleted</string>
-    <string name="toast_other_income_deleted">Other income deleted</string>
-    <string name="toast_car_saved">Car saved</string>
-    <string name="toast_car_deleted">Car deleted</string>
-    <string name="toast_reminder_saved">Reminder saved</string>
-    <string name="toast_reminder_deleted">Reminder deleted</string>
     <string name="toast_backup_success">Backup to file %s completed successfully.</string>
     <string name="toast_backup_failed">Backup failed</string>
     <string name="toast_restore_success">Restore completed successfully</string>
@@ -197,8 +190,7 @@
     <string name="report_toast_date">Date</string>
     <string name="report_toast_fuel_type">Fuel type</string>
     <string name="report_toast_costs">Costs</string>
-    <string name="report_toast_none">none</string>
-    
+
     <string name="pref_title_header_about">About Car Report</string>
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>

@@ -16,7 +16,7 @@
 
 package me.kuehle.carreport.gui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
@@ -60,28 +59,30 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ActionBar actionBar = MainActivity.getSupportActionBar(this);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mSavedABTitle = actionBar.getTitle();
-        if (isInEditMode()) {
-            actionBar.setTitle(getTitleForEdit());
-        } else {
-            actionBar.setTitle(getTitleForNew());
+            mSavedABTitle = actionBar.getTitle();
+            if (isInEditMode()) {
+                actionBar.setTitle(getTitleForEdit());
+            } else {
+                actionBar.setTitle(getTitleForNew());
+            }
         }
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
             if (getParentFragment() != null) {
                 mOnItemActionListener = (OnItemActionListener) getParentFragment();
             } else {
-                mOnItemActionListener = (OnItemActionListener) activity;
+                mOnItemActionListener = (OnItemActionListener) context;
             }
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnItemActionListener");
+            throw new ClassCastException(context.toString()
+                    + " or parent fragment must implement OnItemActionListener");
         }
     }
 
@@ -116,7 +117,9 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     public void onDestroyView() {
         super.onDestroyView();
         ActionBar actionBar = MainActivity.getSupportActionBar(this);
-        actionBar.setTitle(mSavedABTitle);
+        if (actionBar != null) {
+            actionBar.setTitle(mSavedABTitle);
+        }
     }
 
     @Override
@@ -128,7 +131,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         if (requestCode == DELETE_REQUEST_CODE) {
             delete();
 
-            Toast.makeText(getActivity(), getToastDeletedMessage(), Toast.LENGTH_SHORT).show();
             mOnItemActionListener.onItemDeleted();
         }
     }
@@ -140,7 +142,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
                 if (validate()) {
                     save();
 
-                    Toast.makeText(getActivity(), getToastSavedMessage(), Toast.LENGTH_SHORT).show();
                     mOnItemActionListener.onItemSaved();
                 }
 
@@ -204,10 +205,6 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     protected abstract int getTitleForEdit();
 
     protected abstract int getTitleForNew();
-
-    protected abstract int getToastDeletedMessage();
-
-    protected abstract int getToastSavedMessage();
 
     protected abstract void initFields(Bundle savedInstanceState, View v);
 

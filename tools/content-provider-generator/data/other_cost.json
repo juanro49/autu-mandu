@@ -9,13 +9,13 @@
             "nullable": false
         },
         {
-            "documentation": "Date on which the cost occured.",
+            "documentation": "Date on which the cost occurred.",
             "name": "date",
             "type": "Date",
             "nullable": false
         },
         {
-            "documentation": "Mileage on which the cost occured.",
+            "documentation": "Mileage on which the cost occurred.",
             "name": "mileage",
             "type": "Integer"
         },

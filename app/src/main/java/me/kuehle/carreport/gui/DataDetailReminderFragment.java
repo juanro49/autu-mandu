@@ -96,16 +96,6 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
     }
 
     @Override
-    protected int getToastDeletedMessage() {
-        return R.string.toast_reminder_deleted;
-    }
-
-    @Override
-    protected int getToastSavedMessage() {
-        return R.string.toast_reminder_saved;
-    }
-
-    @Override
     protected void initFields(Bundle savedInstanceState, View v) {
         Preferences prefs = new Preferences(getActivity());
 

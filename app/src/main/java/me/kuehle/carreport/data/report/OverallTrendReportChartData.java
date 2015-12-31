@@ -19,7 +19,6 @@ import android.content.Context;
 import android.graphics.DashPathEffect;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.MathContext;
 
 import lecho.lib.hellocharts.model.Line;

@@ -22,13 +22,10 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import org.joda.time.DateTime;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

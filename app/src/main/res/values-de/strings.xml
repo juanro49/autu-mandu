@@ -151,16 +151,6 @@
     <string name="alert_import_csv_title">CSV importieren</string>
     <string name="alert_import_csv_message">Der Import aktualisiert bestehende Einträge und fügt neue hinzu, löscht aber keine Einträge.</string>
 
-    <string name="toast_refueling_saved">Tankfüllung gespeichert</string>
-    <string name="toast_refueling_deleted">Tankfüllung gelöscht</string>
-    <string name="toast_other_expenditure_saved">Andere Ausgaben gespeichert</string>
-    <string name="toast_other_income_saved">Andere Einnahmen gespeichert</string>
-    <string name="toast_other_expenditure_deleted">Andere Ausgaben gelöscht</string>
-    <string name="toast_other_income_deleted">Andere Einnahmen gelöscht</string>
-    <string name="toast_car_saved">Auto gespeichert</string>
-    <string name="toast_car_deleted">Auto gelöscht</string>
-    <string name="toast_reminder_saved">Erinnerung gespeichert</string>
-    <string name="toast_reminder_deleted">Erinnerung gelöscht</string>
     <string name="toast_backup_success">Sichern der Daten zur Datei %s war erfolgreich.</string>
     <string name="toast_backup_failed">Sichern fehlgeschlagen</string>
     <string name="toast_restore_success">Wiederherstellen der Daten war erfolgreich</string>
@@ -197,7 +187,6 @@
     <string name="report_toast_date">Datum</string>
     <string name="report_toast_fuel_type">Kraftstoff</string>
     <string name="report_toast_costs">Kosten</string>
-    <string name="report_toast_none">keine</string>
 
     <string name="pref_title_header_about">Über Car Report</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>
