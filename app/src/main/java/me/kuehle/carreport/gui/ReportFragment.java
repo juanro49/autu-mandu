@@ -32,6 +32,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -142,7 +143,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
             mChart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showFullScreenChart(mReport, v);
+                    showFullScreenChart(mReport, mChart);
                 }
             });
 
@@ -255,6 +256,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
     private ReportAdapter mReportAdapter;
 
+    private AppBarLayout mAppBarLayout;
     private AbstractReport mCurrentMenuReport;
     private ViewGroup mCurrentMenuReportView;
 
@@ -279,6 +281,8 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_report, container, false);
+
+        mAppBarLayout = (AppBarLayout) v.findViewById(R.id.app_bar_layout);
 
         RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.list);
         int orientation = getResources().getConfiguration().orientation;
@@ -331,6 +335,12 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         getLoaderManager().initLoader(0, null, this);
 
         return v;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        MainActivity.setSupportActionBar(this);
     }
 
     @Override
@@ -390,6 +400,11 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         set.setInterpolator(new DecelerateInterpolator());
         set.addListener(new AnimatorListenerAdapter() {
             @Override
+            public void onAnimationStart(Animator animation) {
+                mAppBarLayout.setVisibility(View.VISIBLE);
+            }
+
+            @Override
             public void onAnimationEnd(Animator animation) {
                 mCurrentFullScreenChart.setVisibility(View.VISIBLE);
                 mCurrentFullScreenChart = null;
@@ -401,12 +416,16 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
         mFullScreenChartAnimator = set;
     }
 
-    private void showFullScreenChart(AbstractReport report, View v) {
+    private void showFullScreenChart(AbstractReport report, ComboLineColumnChartView v) {
+        if (getView() == null) {
+            return;
+        }
+
         if (mFullScreenChartAnimator != null) {
             mFullScreenChartAnimator.cancel();
         }
 
-        mCurrentFullScreenChart = (ComboLineColumnChartView) v;
+        mCurrentFullScreenChart = v;
 
         ReportChartOptions options = loadReportChartOptions(getContext(), report);
         mFullScreenChart.setComboLineColumnChartData(report.getChartData(options));
@@ -457,6 +476,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
             @Override
             public void onAnimationEnd(Animator animation) {
                 mFullScreenChartAnimator = null;
+                mAppBarLayout.setVisibility(View.INVISIBLE);
             }
         });
         set.start();

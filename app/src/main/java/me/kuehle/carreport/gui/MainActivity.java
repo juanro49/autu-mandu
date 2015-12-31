@@ -27,6 +27,7 @@ import android.content.SyncStatusObserver;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -93,10 +94,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.action_bar));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
         mTitle = mDrawerTitle = getTitle();
         if (savedInstanceState != null) {
             setTitle(savedInstanceState.getCharSequence(STATE_TITLE, mTitle));
@@ -110,21 +107,7 @@ public class MainActivity extends AppCompatActivity implements
         mNavigationViewTop = mNavigationView.inflateHeaderView(R.layout.navigation_view_main_top);
         mNavigationView.setNavigationItemSelectedListener(this);
         updateNavigationViewMenu();
-
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, (Toolbar) findViewById(R.id.action_bar), R.string.drawer_open,
-                R.string.drawer_close) {
-            public void onDrawerOpened(View drawerView) {
-                mTitle = getSupportActionBar().getTitle();
-                getSupportActionBar().setTitle(mDrawerTitle);
-                invalidateOptionsMenu();
-            }
-
-            public void onDrawerClosed(View view) {
-                getSupportActionBar().setTitle(mTitle);
-                invalidateOptionsMenu();
-            }
-        };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        setSupportActionBar((Toolbar) null);
 
         mSyncStatusObserver = new SyncStatusObserver() {
             @Override
@@ -263,10 +246,9 @@ public class MainActivity extends AppCompatActivity implements
                 if (item.getIntent() != null) {
                     startActivityForResult(item.getIntent(), REQUEST_ADD_DATA);
                     return true;
-                } else if (BuildConfig.DEBUG && DemoData.onOptionsItemSelected(item)) {
-                    return true;
                 } else {
-                    return super.onOptionsItemSelected(item);
+                    return (BuildConfig.DEBUG && DemoData.onOptionsItemSelected(item))
+                            || super.onOptionsItemSelected(item);
                 }
         }
     }
@@ -288,7 +270,53 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
-        getSupportActionBar().setTitle(mTitle);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(mTitle);
+        }
+    }
+
+    @Override
+    public void setSupportActionBar(@Nullable Toolbar toolbar) {
+        // All child fragments need to have a toolbar in their layout because of this bug:
+        // https://code.google.com/p/android/issues/detail?id=78496
+        // https://code.google.com/p/android/issues/detail?id=185736
+        if (toolbar != null) {
+            super.setSupportActionBar(toolbar);
+        }
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(mTitle);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar,
+                R.string.drawer_open, R.string.drawer_close) {
+            public void onDrawerOpened(View drawerView) {
+                ActionBar actionBar = getSupportActionBar();
+                if (actionBar != null) {
+                    mTitle = actionBar.getTitle();
+                    actionBar.setTitle(mDrawerTitle);
+                }
+
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerClosed(View view) {
+                ActionBar actionBar = getSupportActionBar();
+                if (actionBar != null) {
+                    actionBar.setTitle(mTitle);
+                }
+
+                invalidateOptionsMenu();
+            }
+        };
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
     }
 
     @Override
@@ -476,6 +504,16 @@ public class MainActivity extends AppCompatActivity implements
                     .create()
                     .show();
         }
+    }
+
+    public static void setSupportActionBar(Fragment fragment) {
+        Activity activity = fragment.getActivity();
+        if (!(activity instanceof AppCompatActivity) || fragment.getView() == null) {
+            return;
+        }
+
+        Toolbar toolbar = (Toolbar) fragment.getView().findViewById(R.id.toolbar);
+        ((AppCompatActivity) activity).setSupportActionBar(toolbar);
     }
 
     public static ActionBar getSupportActionBar(Fragment fragment) {

@@ -50,7 +50,7 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
                 cursor.getCount();
                 cursor.registerContentObserver(mObserver);
             }
-            
+
             return cursor;
         }
     }
@@ -140,6 +140,8 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
         }
         refueling.moveToPosition(position);
 
+        data.put(R.id.data_invalid, refueling.getValid() ? "false" : "true");
+
         return data;
     }
 
@@ -148,13 +150,6 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
         BalancedRefuelingCursor refueling = (BalancedRefuelingCursor) cursor;
 
         return refueling.getGuessed();
-    }
-
-    @Override
-    protected boolean isInvalidData(Cursor cursor) {
-        BalancedRefuelingCursor refueling = (BalancedRefuelingCursor) cursor;
-
-        return !refueling.getValid();
     }
 
     @Override

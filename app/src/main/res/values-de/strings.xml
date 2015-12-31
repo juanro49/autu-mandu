@@ -118,7 +118,6 @@
     <string name="edit_title_refueling">Tankfüllung</string>
 
     <string name="edit_message_no_entry_selected">Kein Eintrag ausgewählt</string>
-    <string name="edit_message_no_entries_available">Keine Einträge verfügbar</string>
 
     <string name="alert_delete_title">Löschen bestätigen</string>
     <string name="alert_delete_refueling_message">Diese Tankfüllung wird gelöscht.</string>

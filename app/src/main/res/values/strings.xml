@@ -121,7 +121,6 @@
     <string name="edit_title_refueling">Refueling</string>
     
     <string name="edit_message_no_entry_selected">No entry selected</string>
-    <string name="edit_message_no_entries_available">No entries available</string>
 
     <string name="alert_delete_title">Confirm delete</string>
     <string name="alert_delete_refueling_message">This refueling will be deleted.</string>

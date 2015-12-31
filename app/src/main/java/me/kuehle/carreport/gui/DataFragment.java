@@ -29,6 +29,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.util.FloatingActionButtonRevealer;
+import me.kuehle.carreport.gui.util.FragmentUtils;
 
 public class DataFragment extends Fragment implements DataListCallback,
         AbstractDataDetailFragment.OnItemActionListener {
@@ -194,6 +196,12 @@ public class DataFragment extends Fragment implements DataListCallback,
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        MainActivity.setSupportActionBar(this);
+    }
+
+    @Override
     public void onItemCanceled() {
         onItemUnselected();
     }
@@ -209,9 +217,9 @@ public class DataFragment extends Fragment implements DataListCallback,
     }
 
     @Override
-    public void onViewCreated(ListView listView) {
+    public void onViewCreated(RecyclerView recyclerView) {
         FloatingActionMenu fab = (FloatingActionMenu) getView().findViewById(R.id.fab);
-        FloatingActionButtonRevealer.setup(fab, listView);
+        FloatingActionButtonRevealer.setup(fab, recyclerView);
     }
 
     @Override
@@ -227,9 +235,17 @@ public class DataFragment extends Fragment implements DataListCallback,
             mBackStackListener.skipNextIfPop();
 
             FragmentManager fm = getChildFragmentManager();
+
+            // Disable the fragment animations, when we are just replacing an existing detail
+            // fragment.
+            if (fm.getBackStackEntryCount() > 0) {
+                FragmentUtils.DISABLE_FRAGMENT_ANIMATIONS = 2;
+            }
+
             fm.popBackStack("detail", FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-            fm.beginTransaction().replace(R.id.detail, fragment)
+            fm.beginTransaction()
+                    .replace(R.id.detail, fragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .addToBackStack("detail")
                     .commit();

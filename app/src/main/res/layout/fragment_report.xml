@@ -14,14 +14,30 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways"/>
+    </android.support.design.widget.AppBarLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <include layout="@layout/include_fab"/>
 
@@ -34,10 +50,12 @@
         android:paddingLeft="8dp"
         android:visibility="gone"
         tools:ignore="RtlHardcoded,RtlSymmetry">
+
         <lecho.lib.hellocharts.view.ComboLineColumnChartView
             android:id="@+id/full_screen_chart"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
+
         <ImageButton
             android:id="@+id/btn_close_full_screen"
             android:layout_width="32dp"
@@ -46,6 +64,6 @@
             android:layout_margin="16dp"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@string/graph_close_full_screen_desc"
-            android:src="@drawable/ic_fullscreen_exit_24dp" />
+            android:src="@drawable/ic_fullscreen_exit_24dp"/>
     </FrameLayout>
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

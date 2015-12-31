@@ -74,6 +74,7 @@ dependencies {
     // UI Helpers
     compile 'com.larswerkman:HoloColorPicker:1.4'
     compile 'com.github.clans:fab:1.6.1'
+    compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
 
     // Joda-Time for Android
     compile 'net.danlew:android.joda:2.9.0'

@@ -28,11 +28,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.animation.Animation;
 import android.widget.EditText;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
+import me.kuehle.carreport.gui.util.FragmentUtils;
 
 public abstract class AbstractDataDetailFragment extends Fragment implements
         SupportMessageDialogFragmentListener {
@@ -54,6 +56,19 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     private static final int DELETE_REQUEST_CODE = 0;
 
     private CharSequence mSavedABTitle;
+
+    @Override
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+        if (FragmentUtils.DISABLE_FRAGMENT_ANIMATIONS > 0) {
+            FragmentUtils.DISABLE_FRAGMENT_ANIMATIONS--;
+
+            Animation a = new Animation() {};
+            a.setDuration(0);
+            return a;
+        }
+
+        return super.onCreateAnimation(transit, enter, nextAnim);
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

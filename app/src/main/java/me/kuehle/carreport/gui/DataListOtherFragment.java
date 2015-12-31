@@ -123,11 +123,6 @@ public class DataListOtherFragment extends AbstractDataListFragment {
     }
 
     @Override
-    protected boolean isInvalidData(Cursor cursor) {
-        return false;
-    }
-
-    @Override
     protected void deleteItem(long id) {
         new OtherCostSelection().id(id).delete(getActivity().getContentResolver());
     }

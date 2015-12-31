@@ -17,8 +17,6 @@ package me.kuehle.carreport.gui.util;
 
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
-import android.widget.AbsListView;
-import android.widget.ListView;
 
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -38,27 +36,6 @@ public class FloatingActionButtonRevealer {
                         fab.showMenuButton(true);
                     }
                 }
-            }
-        });
-    }
-
-    public static void setup(final FloatingActionMenu fab, final ListView list) {
-        showDelayed(fab);
-        list.setOnScrollListener(new AbsListView.OnScrollListener() {
-            private int mPreviousVisibleItem;
-
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem > mPreviousVisibleItem) {
-                    fab.hideMenuButton(true);
-                } else if (firstVisibleItem < mPreviousVisibleItem) {
-                    fab.showMenuButton(true);
-                }
-                mPreviousVisibleItem = firstVisibleItem;
             }
         });
     }

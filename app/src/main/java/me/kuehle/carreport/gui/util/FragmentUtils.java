@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Jan Kühle
+ * Copyright 2015 Jan Kühle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package me.kuehle.carreport.gui.util;
 
-package me.kuehle.carreport.gui;
-
-import android.support.v7.widget.RecyclerView;
-
-public interface DataListCallback {
-    void onViewCreated(RecyclerView recyclerView);
-
-    void onItemSelected(int edit, long id);
-
-    void onItemUnselected();
+public class FragmentUtils {
+    public static int DISABLE_FRAGMENT_ANIMATIONS = 0;
 }
