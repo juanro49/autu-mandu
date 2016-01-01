@@ -49,10 +49,18 @@ public class MileageReport extends AbstractReport {
             mCursor = refueling;
 
             while (refueling.moveToNext()) {
+                String tooltip = mContext.getString(R.string.report_toast_mileage,
+                        car.getName(),
+                        refueling.getMileage(),
+                        mUnit,
+                        formatXValue(refueling.getDate().getTime(), GRAPH_OPTION_ACCUMULATED));
+                if (refueling.getGuessed()) {
+                    tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
+                }
+
                 add((float) refueling.getDate().getTime(),
                         (float) refueling.getMileage(),
-                        makeToolip(refueling.getCarName(), refueling.getMileage(),
-                                refueling.getDate().getTime(), GRAPH_OPTION_ACCUMULATED),
+                        tooltip,
                         refueling.getGuessed());
             }
         }
@@ -75,10 +83,19 @@ public class MileageReport extends AbstractReport {
             int lastRefuelingMileage = -1;
             while (refueling.moveToNext()) {
                 if (lastRefuelingMileage > -1) {
+                    int mileageDiff = refueling.getMileage() - lastRefuelingMileage;
+                    String tooltip = mContext.getString(R.string.report_toast_mileage,
+                            car.getName(),
+                            mileageDiff,
+                            mUnit,
+                            formatXValue(refueling.getDate().getTime(), GRAPH_OPTION_PER_REFUELING));
+                    if (refueling.getGuessed()) {
+                        tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
+                    }
+
                     add((float) refueling.getDate().getTime(),
-                            (float) (refueling.getMileage() - lastRefuelingMileage),
-                            makeToolip(refueling.getCarName(), refueling.getMileage(),
-                                    refueling.getDate().getTime(), GRAPH_OPTION_PER_REFUELING),
+                            (float) mileageDiff,
+                            tooltip,
                             refueling.getGuessed());
                 }
 
@@ -110,11 +127,12 @@ public class MileageReport extends AbstractReport {
 
                     int xIndex = indexOf(x);
                     if (xIndex == -1) {
-                        add(x, y, makeToolip(refueling.getCarName(), y, x, GRAPH_OPTION_PER_MONTH));
+                        add(x, y, mContext.getString(R.string.report_toast_mileage_month,
+                                car.getName(), y, mUnit, formatXValue(x, GRAPH_OPTION_PER_MONTH)));
                     } else {
                         y += getYValues().get(xIndex);
-                        set(xIndex, x, y, makeToolip(refueling.getCarName(), y, x,
-                                GRAPH_OPTION_PER_MONTH));
+                        set(xIndex, x, y, mContext.getString(R.string.report_toast_mileage_month,
+                                car.getName(), y, mUnit, formatXValue(x, GRAPH_OPTION_PER_MONTH)));
                     }
                 }
 
@@ -260,17 +278,5 @@ public class MileageReport extends AbstractReport {
         }
 
         return cursors.toArray(new Cursor[cursors.size()]);
-    }
-
-    private String makeToolip(String car, float value, float dateValue, int chartOption) {
-        return String.format(
-                "%s: %s\n%s: %.0f %s\n%s: %s",
-                mContext.getString(R.string.report_toast_car),
-                car,
-                mContext.getString(R.string.report_toast_mileage),
-                value,
-                mUnit,
-                mContext.getString(R.string.report_toast_date),
-                formatXValue(dateValue, chartOption));
     }
 }

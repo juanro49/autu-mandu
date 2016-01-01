@@ -68,19 +68,19 @@ public class FuelConsumptionReport extends AbstractReport {
 
                         float consumption = fuelConsumption.computeFuelConsumption(partialVolume,
                                 partialDistance);
+                        String tooltip = mContext.getString(R.string.report_toast_fuel_consumption,
+                                car.getName(),
+                                consumption,
+                                mUnit,
+                                refueling.getFuelTypeName(),
+                                mDateFormat.format(refueling.getDate()));
+                        if (refueling.getGuessed()) {
+                            tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
+                        }
+
                         add((float) refueling.getDate().getTime(),
                                 consumption,
-                                String.format(
-                                        "%s: %s\n%s: %s\n%s: %.2f %s\n%s: %s",
-                                        mContext.getString(R.string.report_toast_car),
-                                        car.getName(),
-                                        mContext.getString(R.string.report_toast_fuel_type),
-                                        refueling.getFuelTypeName(),
-                                        mContext.getString(R.string.report_toast_consumption),
-                                        consumption,
-                                        mUnit,
-                                        mContext.getString(R.string.report_toast_date),
-                                        mDateFormat.format(refueling.getDate())),
+                                tooltip,
                                 refueling.getGuessed());
 
                         partialDistance = 0;

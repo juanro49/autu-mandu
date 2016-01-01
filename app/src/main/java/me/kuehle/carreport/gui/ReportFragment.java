@@ -23,7 +23,6 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -33,6 +32,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -49,7 +49,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.PopupMenu;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -280,7 +279,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_report, container, false);
+        final View v = inflater.inflate(R.layout.fragment_report, container, false);
 
         mAppBarLayout = (AppBarLayout) v.findViewById(R.id.app_bar_layout);
 
@@ -298,22 +297,19 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
 
         mFullScreenChart = (ComboLineColumnChartView) v.findViewById(R.id.full_screen_chart);
         mFullScreenChart.setOnValueTouchListener(new ComboLineColumnChartOnValueSelectListener() {
-            @SuppressLint("ShowToast")
-            private Toast mToast = Toast.makeText(getContext(), "", Toast.LENGTH_LONG);
-
             @Override
             public void onColumnValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
                 if (value instanceof AbstractReportChartColumnData.SubcolumnValueWithTooltip) {
-                    mToast.setText(((AbstractReportChartColumnData.SubcolumnValueWithTooltip) value).getTooltip());
-                    mToast.show();
+                    String tooltip = ((AbstractReportChartColumnData.SubcolumnValueWithTooltip) value).getTooltip();
+                    Snackbar.make(v, tooltip, Snackbar.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onPointValueSelected(int lineIndex, int pointIndex, PointValue value) {
                 if (value instanceof AbstractReportChartLineData.PointValueWithTooltip) {
-                    mToast.setText(((AbstractReportChartLineData.PointValueWithTooltip) value).getTooltip());
-                    mToast.show();
+                    String tooltip = ((AbstractReportChartLineData.PointValueWithTooltip) value).getTooltip();
+                    Snackbar.make(v, tooltip, Snackbar.LENGTH_LONG).show();
                 }
             }
 

@@ -65,14 +65,10 @@ public class CostsReport extends AbstractReport {
         }
 
         private String makeTooltip(double costs, float dateValue) {
-            return String.format(
-                    "%s: %s\n%s: %.0f %s\n%s: %s",
-                    mContext.getString(R.string.report_toast_car),
+            return mContext.getString(R.string.report_toast_costs,
                     getName(),
-                    mContext.getString(R.string.report_toast_costs),
                     costs,
                     mUnit,
-                    mContext.getString(R.string.report_toast_date),
                     formatXValue(dateValue, mOption));
         }
     }

@@ -182,13 +182,12 @@
     <string name="report_day">Day</string>
     <string name="report_month">Month</string>
     <string name="report_year">Year</string>
-    <string name="report_toast_car">Car</string>
-    <string name="report_toast_consumption">Consumption</string>
-    <string name="report_toast_mileage">Mileage</string>
-    <string name="report_toast_price">Price</string>
-    <string name="report_toast_date">Date</string>
-    <string name="report_toast_fuel_type">Fuel type</string>
-    <string name="report_toast_costs">Costs</string>
+    <string name="report_toast_fuel_consumption">%1$s: %2$.2f %3$s of %4$s on %5$s</string>
+    <string name="report_toast_fuel_price">%1$.3f %2$s for %3$s on %4$s</string>
+    <string name="report_toast_mileage">"%1$s: %2$d %3$s on %4$s"</string>
+    <string name="report_toast_mileage_month">"%1$s: %2$.0f %3$s in %4$s"</string>
+    <string name="report_toast_costs">%1$s: %2$.0f %3$s in %4$s</string>
+    <string name="report_toast_guessed">Guessed to balance missing refuelings.</string>
 
     <string name="pref_title_header_about">About Car Report</string>
     <string name="pref_title_header_general">General settings</string>

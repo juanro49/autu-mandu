@@ -179,13 +179,12 @@
     <string name="report_day">Tag</string>
     <string name="report_month">Monat</string>
     <string name="report_year">Jahr</string>
-    <string name="report_toast_car">Auto</string>
-    <string name="report_toast_consumption">Verbrauch</string>
-    <string name="report_toast_mileage">Kilometer</string>
-    <string name="report_toast_price">Preis</string>
-    <string name="report_toast_date">Datum</string>
-    <string name="report_toast_fuel_type">Kraftstoff</string>
-    <string name="report_toast_costs">Kosten</string>
+    <string name="report_toast_fuel_consumption">%1$s: %2$.2f %3$s von %4$s am %5$s</string>
+    <string name="report_toast_fuel_price">%1$.3f %2$s für %3$s am %4$s</string>
+    <string name="report_toast_mileage">"%1$s: %2$d %3$s am %4$s"</string>
+    <string name="report_toast_mileage_month">"%1$s: %2$.0f %3$s im %4$s"</string>
+    <string name="report_toast_costs">%1$s: %2$.0f %3$s im %4$s</string>
+    <string name="report_toast_guessed">Geschätzt um fehlende Tankfüllungen auszugleichen.</string>
 
     <string name="pref_title_header_about">Über Car Report</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>

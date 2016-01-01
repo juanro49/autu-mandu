@@ -58,14 +58,10 @@ public class FuelPriceReport extends AbstractReport {
 
                 add((float) refueling.getDate().getTime(),
                         fuelPrice,
-                        String.format(
-                                "%s: %s\n%s: %.3f %s\n%s: %s",
-                                mContext.getString(R.string.report_toast_fuel_type),
-                                fuelType.getName(),
-                                mContext.getString(R.string.report_toast_price),
+                        mContext.getString(R.string.report_toast_fuel_price,
                                 fuelPrice,
                                 mUnit,
-                                mContext.getString(R.string.report_toast_date),
+                                fuelType.getName(),
                                 mDateFormat.format(refueling.getDate())),
                         false);
             }
