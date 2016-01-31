@@ -16,6 +16,8 @@
 
 package me.kuehle.carreport.gui;
 
+import android.content.ContentUris;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -287,7 +289,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
     }
 
     @Override
-    protected void save() {
+    protected long save() {
         Integer afterDistance = null;
         Integer afterTimeSpanCount = null;
         TimeSpanUnit afterTimeSpanUnit = null;
@@ -316,8 +318,10 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
         if (isInEditMode()) {
             ReminderSelection where = new ReminderSelection().id(mId);
             values.update(getActivity().getContentResolver(), where);
+            return mId;
         } else {
-            values.insert(getActivity().getContentResolver());
+            Uri uri = values.insert(getActivity().getContentResolver());
+            return ContentUris.parseId(uri);
         }
     }
 

@@ -16,6 +16,7 @@
 
 package me.kuehle.carreport.gui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import me.kuehle.carreport.R;
 public class DataDetailActivity extends AppCompatActivity implements
         AbstractDataDetailFragment.OnItemActionListener {
     public static final String EXTRA_EDIT = "edit";
+    public static final String EXTRA_NEW_ID = "new_id";
 
     public static final int EXTRA_EDIT_REFUELING = 0;
     public static final int EXTRA_EDIT_OTHER = 1;
@@ -57,8 +59,11 @@ public class DataDetailActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onItemSaved() {
-        setResult(RESULT_OK);
+    public void onItemSaved(long newId) {
+        Intent data = new Intent();
+        data.putExtra(EXTRA_NEW_ID, newId);
+
+        setResult(RESULT_OK, data);
         finish();
     }
 

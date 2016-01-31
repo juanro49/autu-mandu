@@ -43,7 +43,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
         void onItemDeleted();
 
-        void onItemSaved();
+        void onItemSaved(long newId);
     }
 
     public static final String EXTRA_ID = "id";
@@ -155,9 +155,9 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         switch (item.getItemId()) {
             case R.id.menu_save:
                 if (validate()) {
-                    save();
+                    long newId = save();
 
-                    mOnItemActionListener.onItemSaved();
+                    mOnItemActionListener.onItemSaved(newId);
                 }
 
                 return true;
@@ -223,7 +223,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
 
     protected abstract void initFields(Bundle savedInstanceState, View v);
 
-    protected abstract void save();
+    protected abstract long save();
 
     protected abstract void delete();
 

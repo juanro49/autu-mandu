@@ -54,6 +54,7 @@ import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.gui.util.NewRefuelingSnackbar;
 import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
@@ -69,9 +70,9 @@ public class MainActivity extends AppCompatActivity implements
         boolean onBackPressed();
     }
 
-    private static final int REQUEST_FIRST_START = 0;
-    private static final int REQUEST_ADD_DATA = 1;
-    private static final int REQUEST_FROM_DRAWER = 2;
+    private static final int REQUEST_FIRST_START = 10;
+    private static final int REQUEST_FROM_DRAWER = 20;
+    private static final int REQUEST_ADD_DATA = 30;
 
     private static final String STATE_TITLE = "title";
     private static final String STATE_NAV_ITEM_INDEX = "nav_item_index";
@@ -174,6 +175,14 @@ public class MainActivity extends AppCompatActivity implements
 
             // Cars could have been changed, so the drawer has to be updated.
             updateNavigationViewMenu();
+
+            // If a new refueling has been added, show Snackbar with details.
+            if (requestCode % REQUEST_ADD_DATA == DataDetailActivity.EXTRA_EDIT_REFUELING) {
+                long newId = data.getLongExtra(DataDetailActivity.EXTRA_NEW_ID, 0);
+                if (newId > 0 && mCurrentFragment.getView() != null) {
+                    NewRefuelingSnackbar.show(mCurrentFragment.getView(), newId);
+                }
+            }
         }
     }
 
@@ -484,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements
 
         if (car.getCount() == 1 || !prefs.isShowCarMenu()) {
             Intent intent = getDetailActivityIntent(edit, prefs.getDefaultCar(), otherType);
-            startActivityForResult(intent, REQUEST_ADD_DATA);
+            startActivityForResult(intent, REQUEST_ADD_DATA + edit);
         } else {
             final long[] carIds = new long[car.getCount()];
             final String[] carNames = new String[car.getCount()];
@@ -498,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent intent = getDetailActivityIntent(edit, carIds[which], otherType);
-                            startActivityForResult(intent, REQUEST_ADD_DATA);
+                            startActivityForResult(intent, REQUEST_ADD_DATA + edit);
                         }
                     })
                     .create()

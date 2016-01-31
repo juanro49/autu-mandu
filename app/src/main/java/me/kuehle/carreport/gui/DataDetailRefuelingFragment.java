@@ -16,25 +16,18 @@
 
 package me.kuehle.carreport.gui;
 
+import android.content.ContentUris;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.text.TextUtilsCompat;
-import android.support.v4.text.TextUtilsCompatJellybeanMr1;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import me.kuehle.carreport.DistanceEntryMode;
-import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.PriceEntryMode;
 import me.kuehle.carreport.R;
@@ -294,21 +287,13 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     }
 
     @Override
-    protected void save() {
-        Preferences prefs = new Preferences(getContext());
+    protected long save() {
         RefuelingCursor previousRefueling = getPreviousRefueling();
         boolean hasPrevious = previousRefueling.moveToFirst();
-        List<String> toast = new ArrayList<>(3);
 
         int mileage = getIntegerFromEditText(edtMileage, 0);
-        if (hasPrevious) {
-            if (mDistanceEntryMode == DistanceEntryMode.TRIP) {
-                mileage += previousRefueling.getMileage();
-            } else {
-                // User entered the total mileage: show trip value in toast.
-                toast.add(String.format("+ %d %s", mileage - previousRefueling.getMileage(),
-                        prefs.getUnitDistance()));
-            }
+        if (hasPrevious && mDistanceEntryMode == DistanceEntryMode.TRIP) {
+            mileage += previousRefueling.getMileage();
         }
 
         RefuelingContentValues values = new RefuelingContentValues();
@@ -324,56 +309,22 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         if (mPriceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME) {
             values.putVolume(volume);
             values.putPrice(price);
-
-            // User entered the total price and volume: show price per unit in toast.
-            toast.add(String.format("%.3f %s/%s", price / volume, prefs.getUnitCurrency(),
-                    prefs.getUnitVolume()));
         } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
             values.putVolume(price / volume);
             values.putPrice(price);
-
-            // User entered the price per unit and total price: show volume in toast.
-            toast.add(String.format("%.2f %s", price / volume, prefs.getUnitVolume()));
         } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
             values.putVolume(volume);
             values.putPrice(volume * price);
-
-            // User entered the price per unit and volume: show total price in toast.
-            toast.add(String.format("%.2f %s", volume * price, prefs.getUnitCurrency()));
-        }
-
-        // Full refueling: show fuel consumption compared to previous in toast.
-        if (hasPrevious && !chkPartial.isChecked()) {
-            FuelConsumption consumptionCalc = new FuelConsumption(getContext());
-
-            float consumption = getFuelConsumptionToPreviousRefueling(volume, mileage, previousRefueling);
-            if (consumption > 0) {
-                String consumptionChange = "";
-                if (!previousRefueling.isAfterLast()) {
-                    float prevVolume = previousRefueling.getVolume();
-                    int prevMileage = previousRefueling.getMileage();
-                    previousRefueling.moveToNext();
-
-                    float prevConsumption = getFuelConsumptionToPreviousRefueling(prevVolume, prevMileage, previousRefueling);
-                    if (prevConsumption > 0) {
-                        consumptionChange = prevConsumption > consumption ? "v" : "^";
-                    }
-                }
-
-                toast.add(String.format("%.2f %s %s", consumption, consumptionCalc.getUnitLabel(), consumptionChange));
-            }
-
-            previousRefueling.moveToFirst();
         }
 
         if (isInEditMode()) {
             RefuelingSelection where = new RefuelingSelection().id(mId);
             values.update(getActivity().getContentResolver(), where);
+            return mId;
         } else {
-            values.insert(getActivity().getContentResolver());
+            Uri uri = values.insert(getActivity().getContentResolver());
+            return ContentUris.parseId(uri);
         }
-
-        Toast.makeText(getContext(), TextUtils.join("\n", toast), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -391,40 +342,5 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         Date date = DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate());
 
         return RefuelingQueries.getNext(getActivity(), spnCar.getSelectedItemId(), date);
-    }
-
-    /**
-     * Calculates the fuel consumption for the specified volume and mileage relative to the
-     * specified previous refueling. This modifies the previousRefueling cursor. It will have
-     * one of the following results:
-     *
-     *      Calculation was successfull:
-     *          Returns fuel consumption.
-     *          Cursor previousRefueling points to the previous full refueling.
-     *      Calculation failed:
-     *          Returns -1.
-     *          Cursor previousRefueling points after the last entry.
-     * @param thisVolume The volume of the current refueling.
-     * @param thisMileage The mileage of the current refueling.
-     * @param previousRefueling A cursor of all previous refuelings sorted by date descending and
-     *                          currently pointing to the next refueling relative to the current.
-     * @return The fuel consumption or -1.
-     */
-    private float getFuelConsumptionToPreviousRefueling(float thisVolume, int thisMileage, RefuelingCursor previousRefueling) {
-        float volumeSinceFullRefueling = thisVolume;
-        while (previousRefueling.getPartial() && !previousRefueling.isAfterLast()) {
-            volumeSinceFullRefueling += previousRefueling.getVolume();
-            previousRefueling.moveToNext();
-        }
-
-        if (!previousRefueling.isAfterLast()) {
-            int mileageOfLastFullRefueling = previousRefueling.getMileage();
-
-            return new FuelConsumption(getContext()).computeFuelConsumption(
-                    volumeSinceFullRefueling,
-                    thisMileage - mileageOfLastFullRefueling);
-        } else {
-            return -1;
-        }
     }
 }

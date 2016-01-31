@@ -212,7 +212,7 @@ public class DataFragment extends Fragment implements DataListCallback,
     }
 
     @Override
-    public void onItemSaved() {
+    public void onItemSaved(long newId) {
         onItemUnselected();
     }
 

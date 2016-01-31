@@ -16,7 +16,9 @@
 
 package me.kuehle.carreport.gui;
 
+import android.content.ContentUris;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.view.Menu;
@@ -181,7 +183,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     }
 
     @Override
-    protected void save() {
+    protected long save() {
         CarContentValues values = new CarContentValues();
         values.putName(edtName.getText().toString());
         values.putColor(color);
@@ -191,8 +193,10 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         if (isInEditMode()) {
             CarSelection where = new CarSelection().id(mId);
             values.update(getActivity().getContentResolver(), where);
+            return mId;
         } else {
-            values.insert(getActivity().getContentResolver());
+            Uri uri = values.insert(getActivity().getContentResolver());
+            return ContentUris.parseId(uri);
         }
     }
 

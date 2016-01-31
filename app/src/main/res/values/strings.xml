@@ -153,6 +153,7 @@
     <string name="alert_import_csv_title">Import CSV</string>
     <string name="alert_import_csv_message">Import will update existing entries and add new ones, but it will not delete entries.</string>
 
+    <string name="toast_new_refueling">Fuel consumption: %1$.2f %2$s %3$s</string>
     <string name="toast_backup_success">Backup to file %s completed successfully.</string>
     <string name="toast_backup_failed">Backup failed</string>
     <string name="toast_restore_success">Restore completed successfully</string>

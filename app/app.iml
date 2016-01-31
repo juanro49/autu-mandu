@@ -136,7 +136,7 @@
     <orderEntry type="library" exported="" name="jackrabbit-webdav-2.10.1" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-multiselect-0.2" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.3" level="project" />
-    <orderEntry type="library" exported="" name="jackson-core-2.6.4" level="project" />
+    <orderEntry type="library" exported="" name="jackson-core-2.6.5" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-23.1.1" level="project" />
     <orderEntry type="library" exported="" name="google-oauth-client-1.17.0-rc" level="project" />
     <orderEntry type="library" exported="" name="HoloColorPicker-1.4" level="project" />

@@ -16,6 +16,8 @@
 
 package me.kuehle.carreport.gui;
 
+import android.content.ContentUris;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -287,7 +289,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
     }
 
     @Override
-    protected void save() {
+    protected long save() {
         float price = (float) getDoubleFromEditText(mEdtPrice, 0);
         if (!isExpenditure()) {
             price *= -1;
@@ -313,8 +315,10 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         if (isInEditMode()) {
             OtherCostSelection where = new OtherCostSelection().id(mId);
             values.update(getActivity().getContentResolver(), where);
+            return mId;
         } else {
-            values.insert(getActivity().getContentResolver());
+            Uri uri = values.insert(getActivity().getContentResolver());
+            return ContentUris.parseId(uri);
         }
     }
 
