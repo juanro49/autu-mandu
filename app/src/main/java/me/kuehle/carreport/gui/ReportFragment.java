@@ -161,7 +161,7 @@ public class ReportFragment extends Fragment implements OnMenuItemClickListener,
             mChart.setComboLineColumnChartData(data);
             applyViewport(mChart, true);
 
-            boolean enoughData = data.getLineChartData().getLines().size() > 1 ||
+            boolean enoughData = data.getLineChartData().getLines().size() > 0 ||
                     data.getColumnChartData().getColumns().size() > 0;
             mChart.setVisibility(enoughData ? View.VISIBLE : View.GONE);
             mChartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
