@@ -84,7 +84,7 @@ public class NewRefuelingSnackbar {
      */
     private static float getFuelConsumptionToPreviousRefueling(@NonNull FuelConsumption fuelConsumption, float thisVolume, int thisMileage, @NonNull RefuelingCursor previousRefueling) {
         float volumeSinceFullRefueling = thisVolume;
-        while (previousRefueling.getPartial() && !previousRefueling.isAfterLast()) {
+        while (!previousRefueling.isAfterLast() && previousRefueling.getPartial()) {
             volumeSinceFullRefueling += previousRefueling.getVolume();
             previousRefueling.moveToNext();
         }

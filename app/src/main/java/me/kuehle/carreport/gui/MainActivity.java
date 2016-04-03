@@ -177,10 +177,14 @@ public class MainActivity extends AppCompatActivity implements
             updateNavigationViewMenu();
 
             // If a new refueling has been added, show Snackbar with details.
-            if (requestCode % REQUEST_ADD_DATA == DataDetailActivity.EXTRA_EDIT_REFUELING) {
+            if (requestCode % REQUEST_ADD_DATA == DataDetailActivity.EXTRA_EDIT_REFUELING
+                    && resultCode == RESULT_OK
+                    && data != null
+                    && mCurrentFragment != null) {
                 long newId = data.getLongExtra(DataDetailActivity.EXTRA_NEW_ID, 0);
-                if (newId > 0 && mCurrentFragment.getView() != null) {
-                    NewRefuelingSnackbar.show(mCurrentFragment.getView(), newId);
+                View view = mCurrentFragment.getView();
+                if (newId > 0 && view != null) {
+                    NewRefuelingSnackbar.show(view, newId);
                 }
             }
         }
