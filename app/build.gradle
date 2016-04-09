@@ -69,7 +69,7 @@ dependencies {
     }
 
     // WebDAV
-    compile 'org.apache.jackrabbit:jackrabbit-webdav:2.10.1'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
 
     // UI Helpers
     compile 'com.larswerkman:HoloColorPicker:1.4'

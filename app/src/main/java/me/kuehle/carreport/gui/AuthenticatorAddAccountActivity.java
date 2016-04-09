@@ -98,11 +98,15 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         mSelectedSyncProvider = mSyncProviderAdapter.getItem(position);
-        mSelectedSyncProvider.setup(null, null, null, null);
-        mSelectedSyncProvider.startAuthentication(this);
+        try {
+            mSelectedSyncProvider.setup(null, null, null, null);
+            mSelectedSyncProvider.startAuthentication(this);
 
-        mListView.setVisibility(View.GONE);
-        mProgressView.setVisibility(View.VISIBLE);
+            mListView.setVisibility(View.GONE);
+            mProgressView.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            handleFirstSyncError();
+        }
     }
 
     public void onAuthenticationResult(String accountName, String password, String authToken, JSONObject settings) {
@@ -220,7 +224,10 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
 
     private void handleFirstSyncError() {
         AccountManager accountManager = AccountManager.get(this);
-        accountManager.removeAccountExplicitly(mAuthenticatedAccount);
+        if (mAuthenticatedAccount != null) {
+            accountManager.removeAccountExplicitly(mAuthenticatedAccount);
+        }
+
         setAccountAuthenticatorResult(null);
         setResult(Activity.RESULT_CANCELED, null);
 

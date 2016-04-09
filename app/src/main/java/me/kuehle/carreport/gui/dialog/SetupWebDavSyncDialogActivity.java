@@ -22,18 +22,38 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import java.security.cert.X509Certificate;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
-import me.kuehle.carreport.util.WebDavClient;
+import me.kuehle.carreport.util.webdav.WebDavClient;
 import me.kuehle.carreport.util.sync.provider.WebDavSyncProvider;
+import me.kuehle.carreport.util.webdav.CertificateHelper;
+import me.kuehle.carreport.util.webdav.InvalidCertificateException;
+import me.kuehle.carreport.util.webdav.UntrustedCertificateException;
 
 public class SetupWebDavSyncDialogActivity extends Activity {
+    enum TestLoginStatus {
+        OK,
+        UNTRUSTED_CERTIFICATE,
+        INVALID_CERTIFICATE,
+        FAILED
+    }
+
     private EditText mEdtUrl;
     private EditText mEdtUserName;
     private EditText mEdtPassword;
+    private TextView mTxtTrustCertificateDescription;
+    private TextView mTxtTrustCertificate;
+    private CheckBox mChkTrustCertificate;
+    private X509Certificate mTrustCertificate;
+    private Button mBtnOk;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,8 +64,16 @@ public class SetupWebDavSyncDialogActivity extends Activity {
         mEdtUrl = (EditText) findViewById(R.id.edt_url);
         mEdtUserName = (EditText) findViewById(R.id.edt_user_name);
         mEdtPassword = (EditText) findViewById(R.id.edt_password);
+        mTxtTrustCertificateDescription = (TextView) findViewById(R.id.txt_trust_certificate_description);
+        mTxtTrustCertificate = (TextView) findViewById(R.id.txt_trust_certificate);
+        mChkTrustCertificate = (CheckBox) findViewById(R.id.chk_trust_certificate);
 
-        findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
+        mTxtTrustCertificateDescription.setVisibility(View.GONE);
+        mTxtTrustCertificate.setVisibility(View.GONE);
+        mChkTrustCertificate.setVisibility(View.GONE);
+
+        mBtnOk = (Button) findViewById(R.id.btn_ok);
+        mBtnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onOkClick();
@@ -63,40 +91,63 @@ public class SetupWebDavSyncDialogActivity extends Activity {
     private void onOkClick() {
         FormValidator validator = new FormValidator();
         validator.add(new FormFieldNotEmptyValidator(mEdtUrl));
-        validator.add(new FormFieldNotEmptyValidator(mEdtUserName));
-        validator.add(new FormFieldNotEmptyValidator(mEdtPassword));
 
         if (validator.validate()) {
-            new AsyncTask<Void, Void, Boolean>() {
+            new AsyncTask<Void, Void, TestLoginStatus>() {
                 private String url;
                 private String userName;
                 private String password;
+                private X509Certificate trustedCertificate;
 
                 @Override
                 protected void onPreExecute() {
                     url = mEdtUrl.getText().toString();
                     userName = mEdtUserName.getText().toString();
                     password = mEdtPassword.getText().toString();
+                    trustedCertificate = mChkTrustCertificate.isChecked() ? mTrustCertificate : null;
+
+                    mBtnOk.setEnabled(false);
                 }
 
                 @Override
-                protected Boolean doInBackground(Void... params) {
-                    WebDavClient client = new WebDavClient(url, userName, password);
-                    return client.testLogin();
+                protected TestLoginStatus doInBackground(Void... params) {
+                    try {
+                        WebDavClient client = new WebDavClient(url, userName, password, trustedCertificate);
+                        return client.testLogin() ? TestLoginStatus.OK : TestLoginStatus.FAILED;
+                    } catch (UntrustedCertificateException e) {
+                        mTrustCertificate = e.getCertificate();
+                        return TestLoginStatus.UNTRUSTED_CERTIFICATE;
+                    } catch (InvalidCertificateException e) {
+                        return TestLoginStatus.INVALID_CERTIFICATE;
+                    }
                 }
 
                 @Override
-                protected void onPostExecute(Boolean dataIsValid) {
-                    if (dataIsValid) {
+                protected void onPostExecute(TestLoginStatus status) {
+                    if (status == TestLoginStatus.OK) {
                         Intent data = new Intent();
                         data.putExtra(AccountManager.KEY_ACCOUNT_NAME, mEdtUserName.getText().toString());
                         data.putExtra(AccountManager.KEY_PASSWORD, mEdtPassword.getText().toString());
                         data.putExtra(WebDavSyncProvider.KEY_WEB_DAV_URL, mEdtUrl.getText().toString());
+                        if (mTrustCertificate != null && mChkTrustCertificate.isChecked()) {
+                            data.putExtra(WebDavSyncProvider.KEY_WEB_DAV_CERTIFICATE, mTrustCertificate);
+                        }
+
                         setResult(Activity.RESULT_OK, data);
                         finish();
+                    } else if (status == TestLoginStatus.UNTRUSTED_CERTIFICATE) {
+                        mTxtTrustCertificateDescription.setVisibility(View.VISIBLE);
+                        mTxtTrustCertificate.setText(CertificateHelper.getShortDescription(mTrustCertificate, SetupWebDavSyncDialogActivity.this));
+                        mTxtTrustCertificate.setVisibility(View.VISIBLE);
+                        mChkTrustCertificate.setChecked(false);
+                        mChkTrustCertificate.setVisibility(View.VISIBLE);
+                    } else if (status == TestLoginStatus.INVALID_CERTIFICATE) {
+                        mChkTrustCertificate.setError(getString(R.string.validate_error_webdav_invalid_certificate));
                     } else {
-                        mEdtUrl.setError(getString(R.string.validate_error_webdav_login));
+                        mEdtUrl.setError(getString(R.string.validate_error_webdav_login_failed));
                     }
+
+                    mBtnOk.setEnabled(true);
                 }
             }.execute();
         }

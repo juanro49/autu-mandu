@@ -75,6 +75,7 @@
     <string name="label_recurrence">Wiederholung</string>
     <string name="label_reminder_type">Typ</string>
     <string name="label_reminder_dismissed">Benachrichtigung entfernt</string>
+    <string name="label_trust_certificate">Diesem Zertifikat vertrauen</string>
 
     <string name="description_suspend">Wenn Sie ein Auto nicht mehr benutzen, können Sie es stilllegen. Dadurch werden sich wiederholenden Kosten zu dem Stilllegezeitpunkt beendet. Außerdem zoomen die Reports standardmäßig nur auf aktive Autos.</string>
     <string name="description_category">Tankfüllungen werden in verschiedenen Reports nach diesen Kateogrien gruppiert. Beispiele: Benzin, Diesel, Gas.</string>
@@ -85,13 +86,15 @@
     <string name="description_reminder_status_distance">Fällig in %s</string>
     <string name="description_reminder_status_time">Fällig in %s</string>
     <string name="description_webdav_url">Bitte geben Sie hier die URL zu einem speziellen Ordner für Car Report auf Ihrem WebDAV-Server ein. Car Report wird seine Dateien in diesem Ordner speichern, alles außerhalb des Ordners wird nicht angeführt.</string>
+    <string name="description_webdav_trust_certificate">Die Webseite verwendet ein Zertifikat, dem Android nicht vertraut.</string>
 
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
     <string name="validate_error_mileage_out_of_range_total">Der Kilometerstand muss bei Eingabe der Gesamtkilometer zwischen dem der letzten und der nächsten Tankfüllung liegen. Wenn Sie Tageskilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_mileage_out_of_range_trip">Der kumulierte Kilometerstand darf bei Eingabe der Tageskilometer den Kilometerstand der nächsten Tankfüllung nicht übersteigen. Wenn Sie Gesamtkilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_fuel_type_exists">Diese Kaftstoffart existiert bereits.</string>
-    <string name="validate_error_webdav_login">Login am WebDAV-Server fehlgeschlagen. Bitte prüfen Sie die URL, Benutzername und Password.</string>
+    <string name="validate_error_webdav_login_failed">Login am WebDAV-Server fehlgeschlagen. Bitte prüfen Sie die URL, Benutzername und Password.</string>
+    <string name="validate_error_webdav_invalid_certificate">Dem Zertifikat konnte nicht vertraut werden. Es ist möglicherweise beschädigt.</string>
 
     <string name="suspended">Stillgelegt</string>
     <string name="suspended_since">Stillgelegt seit %s</string>

@@ -23,11 +23,11 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 
 import me.kuehle.carreport.Application;
@@ -35,11 +35,13 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 import me.kuehle.carreport.gui.dialog.SetupWebDavSyncDialogActivity;
 import me.kuehle.carreport.util.FileCopyUtil;
-import me.kuehle.carreport.util.WebDavClient;
+import me.kuehle.carreport.util.webdav.WebDavClient;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
+import me.kuehle.carreport.util.webdav.CertificateHelper;
 
 public class WebDavSyncProvider extends AbstractSyncProvider {
     public static final String KEY_WEB_DAV_URL = "webDavUrl";
+    public static final String KEY_WEB_DAV_CERTIFICATE = "webDavCertificate";
 
     private static final String TAG = "WebDavSyncProvider";
     private static final int REQUEST_SETUP = 1000;
@@ -62,10 +64,15 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
     }
 
     @Override
-    public void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) {
+    public void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) throws Exception {
         if (account != null && password != null && settings != null) {
             String url = settings.optString(KEY_WEB_DAV_URL);
-            mWebDavClient = new WebDavClient(url, account.name, password);
+            X509Certificate certificate = null;
+            if (settings.has(KEY_WEB_DAV_CERTIFICATE)) {
+                certificate = CertificateHelper.fromString(settings.optString(KEY_WEB_DAV_CERTIFICATE));
+            }
+
+            mWebDavClient = new WebDavClient(url, account.name, password, certificate);
         } else {
             mWebDavClient = null;
         }
@@ -84,12 +91,16 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
                 String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                 String password = data.getStringExtra(AccountManager.KEY_PASSWORD);
                 String url = data.getStringExtra(KEY_WEB_DAV_URL);
+                X509Certificate certificate = (X509Certificate) data.getSerializableExtra(KEY_WEB_DAV_CERTIFICATE);
 
                 JSONObject settings = new JSONObject();
                 try {
                     settings.put(KEY_WEB_DAV_URL, url);
-                } catch (JSONException e) {
-                    Log.e(TAG, "Could not store url in settings JSONObject", e);
+                    if (certificate != null) {
+                        settings.put(KEY_WEB_DAV_CERTIFICATE, CertificateHelper.toString(certificate));
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Could not store url and certificate in settings JSONObject", e);
                 }
 
                 activity.onAuthenticationResult(accountName, password, null, settings);

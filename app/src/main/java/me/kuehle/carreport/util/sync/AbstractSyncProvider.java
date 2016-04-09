@@ -37,7 +37,7 @@ public abstract class AbstractSyncProvider {
 
     public abstract String getName();
 
-    public abstract void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings);
+    public abstract void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) throws Exception;
 
     public abstract void startAuthentication(AuthenticatorAddAccountActivity activity);
 

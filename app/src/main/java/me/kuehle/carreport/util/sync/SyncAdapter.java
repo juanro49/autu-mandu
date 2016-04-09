@@ -66,9 +66,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         AbstractSyncProvider syncProvider = SyncProviders.getSyncProviderByAccount(getContext(),
                 account);
-        syncProvider.setup(account, password, authToken, settings);
 
         try {
+            syncProvider.setup(account, password, authToken, settings);
+
             String localRev = syncProvider.getLocalFileRev();
             String remoteRev = syncProvider.getRemoteFileRev();
             if (localRev == null || localRev.equals(remoteRev)) {
