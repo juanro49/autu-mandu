@@ -42,11 +42,3 @@ although they are not used for compiling. If you don't have these libraries avai
 to temporary remove all lines prefixed with ```fullCompile``` from the *build.gradle* file in the
 app folder. See [this comment](https://bitbucket.org/frigus02/car-report/issues/53/dependence-on-proprietary-components#comment-21959839)
 for more information.
-
-
-## Used libraries
-
-* [joda-time-android](https://github.com/dlew/joda-time-android)
-* [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
-* [FloatingActionButton](https://github.com/Clans/FloatingActionButton)
-* [Apache Jackrabbit WebDAV](http://jackrabbit.apache.org)
