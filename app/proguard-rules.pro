@@ -33,18 +33,23 @@
 -keepnames class com.fasterxml.jackson.** { *; }
 -keeppackagenames com.dropbox.core.http
 
-# Jackrabbit
--dontwarn org.apache.**
-
 # Misc
 -dontwarn org.slf4j.*
 
+# OkHttp
+-keepattributes Signature,*Annotation*
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.*
+
 # Google API Client, Google API Drive Service
--keep class com.google.** { *;}
--keep interface com.google.** { *;}
--dontwarn com.google.**
--dontwarn sun.misc.Unsafe
--dontwarn com.google.common.collect.MinMaxPriorityQueue
--keepattributes *Annotation*,Signature
--keep class * extends com.google.api.client.json.GenericJson { *; }
+-keepattributes Signature,RuntimeVisibleAnnotations,AnnotationDefault
+-keepclassmembers class * {
+  @com.google.api.client.util.Key <fields>;
+}
+-keep class com.google.api.client.** { *;}
+-keep interface com.google.api.client.** { *;}
 -keep class com.google.api.services.drive.** { *; }
+-keep class * extends com.google.api.client.json.GenericJson { *; }
+-dontwarn com.google.**

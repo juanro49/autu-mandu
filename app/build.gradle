@@ -55,17 +55,25 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
 
     // Play Services: for Google Drive
-    fullCompile 'com.google.android.gms:play-services-plus:8.3.0'
-    fullCompile 'com.google.android.gms:play-services-drive:8.3.0'
+    fullCompile 'com.google.android.gms:play-services-drive:8.4.0'
 
     // The new Android Drive API, which is included in the play services, has caching bugs and does
     // not provide all functionality. Until this is fixed we have to use the old Google API.
-    fullCompile 'com.google.apis:google-api-services-drive:v2-rev105-1.17.0-rc'
-    fullCompile('com.google.api-client:google-api-client-android:1.17.0-rc') {
-        exclude group: 'com.google.android.google-play-services'
+    fullCompile('com.google.oauth-client:google-oauth-client:1.21.0') {
+        exclude group: 'org.apache.httpcomponents'
     }
-    fullCompile('com.google.http-client:google-http-client-gson:1.17.0-rc') {
-        exclude module: 'httpclient'
+    fullCompile files('libs/google-api-client-1.21.0-self-build.jar')
+    fullCompile('com.google.apis:google-api-services-drive:v3-rev18-1.21.0') {
+        exclude group: 'org.apache.httpcomponents'
+        exclude module: 'google-api-client'
+    }
+    fullCompile('com.google.api-client:google-api-client-android:1.21.0') {
+        exclude group: 'org.apache.httpcomponents'
+        exclude module: 'google-api-client'
+    }
+    fullCompile('com.google.http-client:google-http-client-android:1.21.0') {
+        exclude group: 'org.apache.httpcomponents'
+        exclude module: 'google-api-client'
     }
 
     // WebDAV

@@ -8,12 +8,14 @@
  * <p/>
  * Contributors:
  * Jay Rosenthal - initial API and implementation
+ * Jan Kühle - changes to better fit in Car Report app
  *******************************************************************************/
 
 package me.kuehle.carreport.util.webdav;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -30,22 +32,19 @@ import javax.security.auth.x500.X500Principal;
  * is to return the most significant (first) attribute found.
  */
 public class X500PrincipalHelper {
-    public static int LEASTSIGNIFICANT = 0;
-    public static int MOSTSIGNIFICANT = 1;
+    public final static String attrCN = "CN";
+    public final static String attrOU = "OU";
+    public final static String attrO = "O";
+    public final static String attrC = "C";
+    public final static String attrL = "L";
+    public final static String attrST = "ST";
+    public final static String attrSTREET = "STREET";
+    public final static String attrEMAIL = "EMAILADDRESS";
+    public final static String attrUID = "UID";
 
-    public final static String attrCN = "CN"; //$NON-NLS-1$
-    public final static String attrOU = "OU"; //$NON-NLS-1$
-    public final static String attrO = "O"; //$NON-NLS-1$
-    public final static String attrC = "C"; //$NON-NLS-1$
-    public final static String attrL = "L"; //$NON-NLS-1$
-    public final static String attrST = "ST"; //$NON-NLS-1$
-    public final static String attrSTREET = "STREET";//$NON-NLS-1$
-    public final static String attrEMAIL = "EMAILADDRESS"; //$NON-NLS-1$
-    public final static String attrUID = "UID"; //$NON-NLS-1$
+    ArrayList<ArrayList<String>> rdnNameArray = new ArrayList<>();
 
-    ArrayList rdnNameArray = new ArrayList();
-
-    private final static String attrTerminator = "="; //$NON-NLS-1$
+    private final static String attrTerminator = "=";
 
     public X500PrincipalHelper(X500Principal principal) {
         parseDN(principal.getName(X500Principal.RFC2253));
@@ -158,10 +157,10 @@ public class X500PrincipalHelper {
      * @param dn the distinguished name in canonical form.
      * @throws IllegalArgumentException if a formatting error is found.
      */
-    private void parseDN(String dn) throws IllegalArgumentException {
+    private void parseDN(@NonNull String dn) throws IllegalArgumentException {
         int startIndex = 0;
         char c = '\0';
-        ArrayList nameValues = new ArrayList();
+        ArrayList<String> nameValues = new ArrayList<>();
 
         // Clear the existing array, in case this instance is being re-used
         rdnNameArray.clear();
@@ -178,42 +177,43 @@ public class X500PrincipalHelper {
             }
 
             if (endIndex > dn.length())
-                throw new IllegalArgumentException("unterminated escape " + dn); //$NON-NLS-1$
+                throw new IllegalArgumentException("unterminated escape " + dn);
 
+            //noinspection ConstantConditions
             nameValues.add(dn.substring(startIndex, endIndex));
 
             if (c != '+') {
                 rdnNameArray.add(nameValues);
                 if (endIndex != dn.length())
-                    nameValues = new ArrayList();
+                    nameValues = new ArrayList<>();
                 else
                     nameValues = null;
             }
+
             startIndex = endIndex + 1;
         }
 
         if (nameValues != null) {
-            throw new IllegalArgumentException("improperly terminated DN " + dn); //$NON-NLS-1$
+            throw new IllegalArgumentException("improperly terminated DN " + dn);
         }
     }
 
     private String findPart(String attributeID) {
-        return findSignificantPart(attributeID, MOSTSIGNIFICANT);
+        return findSignificantPart(attributeID, true);
     }
 
-    private String findSignificantPart(String attributeID, int significance) {
+    private String findSignificantPart(String attributeID, boolean mostSignificant) {
         String retNamePart = null;
         String searchPart = attributeID + attrTerminator;
 
-        for (Iterator iter = rdnNameArray.iterator(); iter.hasNext(); ) {
-            ArrayList nameList = (ArrayList) iter.next();
-            String namePart = (String) nameList.get(0);
+        for (ArrayList<String> nameList : rdnNameArray) {
+            String namePart = nameList.get(0);
 
             if (namePart.startsWith(searchPart)) {
                 // Return the string starting after the ID string and the = sign that follows it.
-                retNamePart = namePart.toString().substring(searchPart.length());
+                retNamePart = namePart.substring(searchPart.length());
                 //  By definition the first one is most significant
-                if (significance == MOSTSIGNIFICANT)
+                if (mostSignificant)
                     break;
             }
         }

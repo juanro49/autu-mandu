@@ -272,8 +272,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     private void setupImportCSVPreference() {
         Preference import_ = findPreference("importcsv");
         if (mCSVExportImport.allExportFilesExist()) {
-            import_.setSummary(getString(R.string.pref_summary_import_csv,
-                    Backup.FILE_NAME));
+            import_.setSummary(R.string.pref_summary_import_csv);
             import_.setEnabled(true);
         } else {
             import_.setSummary(getString(
@@ -337,7 +336,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
                             Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                         Toast.makeText(getActivity(), R.string.toast_need_storage_permission,
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_LONG).show();
                     }
 
                     ActivityCompat.requestPermissions(getActivity(), permissions, requestCode);

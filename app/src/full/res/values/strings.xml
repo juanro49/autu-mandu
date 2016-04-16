@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2015 Jan Kühle
+  ~ Copyright 2016 Jan Kühle
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,18 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- Needed for Google Api Client -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" tools:remove="maxSdkVersion" />
-
-    <application>
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
-
-    </application>
-
-</manifest>
+<resources>
+    <string name="toast_need_accounts_permission">To perform this action Car Report needs to be able to read your configured Google accounts.</string>
+</resources>

@@ -22,8 +22,11 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -41,7 +44,7 @@ import me.kuehle.carreport.util.sync.Authenticator;
 import me.kuehle.carreport.util.sync.SyncProviders;
 
 public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivity implements
-        AdapterView.OnItemClickListener {
+        AdapterView.OnItemClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
     private ListView mListView;
     private SyncProviderAdapter mSyncProviderAdapter;
     private View mProgressView;
@@ -150,6 +153,20 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (mSelectedSyncProvider != null) {
             mSelectedSyncProvider.continueAuthentication(this, requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (mSelectedSyncProvider != null) {
+            int resultCode = Activity.RESULT_OK;
+            for (int grantResult : grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    resultCode = Activity.RESULT_CANCELED;
+                }
+            }
+
+            mSelectedSyncProvider.continueAuthentication(this, requestCode, resultCode, null);
         }
     }
 
