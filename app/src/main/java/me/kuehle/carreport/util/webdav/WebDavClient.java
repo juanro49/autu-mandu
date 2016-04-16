@@ -44,12 +44,17 @@ public class WebDavClient {
     private Uri mBaseUri;
 
     public WebDavClient(String baseUrl, String userName, String password, X509Certificate trustedCertificate) throws InvalidCertificateException {
+        // Base URL needs to point to a directory.
+        if (!baseUrl.endsWith("/")) {
+            baseUrl += "/";
+        }
+
         mBaseUri = Uri.parse(baseUrl);
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
         if (userName != null && password != null) {
-            builder.authenticator(new BasicAuthenticator(userName, password));
+            builder.authenticator(new BasicDigestAuthenticator(mBaseUri.getHost(), userName, password));
         }
 
         if (trustedCertificate != null) {
@@ -125,17 +130,25 @@ public class WebDavClient {
             Response response = mClient.newCall(request).execute();
             return response.isSuccessful();
         } catch (SSLHandshakeException e) {
-            try {
-                if (e.getCause().getCause() instanceof CertPathValidatorException) {
-                    X509Certificate cert = (X509Certificate) ((CertPathValidatorException) e.getCause().getCause())
+            Throwable innerEx = e;
+            while (innerEx != null && !(innerEx instanceof CertPathValidatorException)) {
+                innerEx = innerEx.getCause();
+            }
+
+            if (innerEx != null) {
+                X509Certificate cert = null;
+                try {
+                    cert = (X509Certificate) ((CertPathValidatorException) innerEx)
                             .getCertPath()
                             .getCertificates()
                             .get(0);
+                } catch (Exception e2) {
+                    Log.e(TAG, "Error extracting certificate..", e2);
+                }
 
+                if (cert != null) {
                     throw new UntrustedCertificateException(cert);
                 }
-            } catch (Exception e2) {
-                Log.e(TAG, "Error extracting certificate..", e2);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error testing login.", e);
