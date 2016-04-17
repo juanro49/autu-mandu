@@ -45,7 +45,7 @@ dependencies {
     compile 'com.github.lecho:hellocharts-library:1.5.9@aar'
 
     // Dropbox
-    compile 'com.dropbox.core:dropbox-core-sdk:2.0-beta-2'
+    compile 'com.dropbox.core:dropbox-core-sdk:2.0.1'
 
     // Support, AppCompat
     compile 'com.android.support:support-v4:23.3.0'
