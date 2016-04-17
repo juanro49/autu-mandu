@@ -32,13 +32,11 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -71,6 +69,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
     // Google Drive Android API (GDAA)
     private GoogleApiClient mGoogleApiClient;
     // Google APIs Java Client (REST)
+    private GoogleAccountCredential mGoogleAccountCredential;
     private com.google.api.services.drive.Drive mGoogleApiServiceDrive;
 
     private boolean mIsAuthenticationInProgress = false;
@@ -103,19 +102,19 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
                 .addScope(Drive.SCOPE_APPFOLDER)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this);
-        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(Application.getContext(),
+        mGoogleAccountCredential = GoogleAccountCredential.usingOAuth2(Application.getContext(),
                 Collections.singletonList(DriveScopes.DRIVE_APPDATA));
 
         if (account != null) {
             builder.setAccountName(account.name);
-            credential.setSelectedAccountName(account.name);
+            mGoogleAccountCredential.setSelectedAccountName(account.name);
         }
 
         mGoogleApiClient = builder.build();
         mGoogleApiServiceDrive = new com.google.api.services.drive.Drive.Builder(
                 new NetHttpTransport(),
                 new AndroidJsonFactory(),
-                credential)
+                mGoogleAccountCredential)
                 .setApplicationName(Application.getContext().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME)
                 .build();
     }
@@ -142,8 +141,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         switch (requestCode) {
             case REQUEST_PERMISSIONS:
                 if (resultCode == Activity.RESULT_OK) {
-                    Intent pickerIntent = AccountPicker.newChooseAccountIntent(null, null,
-                            new String[]{"com.google"}, false, null, null, null, null);
+                    Intent pickerIntent = mGoogleAccountCredential.newChooseAccountIntent();
                     activity.startActivityForResult(pickerIntent, REQUEST_PICK_ACCOUNT);
                 } else {
                     activity.onAuthenticationResult(null, null, null, null);

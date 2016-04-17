@@ -18,7 +18,6 @@ package me.kuehle.carreport.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -33,7 +32,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -149,6 +147,7 @@ public class DataFragment extends Fragment implements DataListCallback,
     private TextView mTxtNoEntrySelected;
     private long mCarId;
     private DataListBackStackListener mBackStackListener;
+    private FloatingActionMenu mFab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -171,19 +170,12 @@ public class DataFragment extends Fragment implements DataListCallback,
 
         PagerAdapter pagerAdapter = new DataListPagerAdapter(getChildFragmentManager());
 
-        final ViewPager pager = (ViewPager) v.findViewById(R.id.pager);
+        ViewPager pager = (ViewPager) v.findViewById(R.id.pager);
         pager.setAdapter(pagerAdapter);
         pager.addOnPageChangeListener(new DataListOnPageChangeListener());
 
-        final TabLayout tabs = (TabLayout) v.findViewById(R.id.tab_layout);
-
-        // Workaround for https://code.google.com/p/android/issues/detail?id=180462&thanks=180462&ts=1437178613
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                tabs.setupWithViewPager(pager);
-            }
-        });
+        TabLayout tabs = (TabLayout) v.findViewById(R.id.tab_layout);
+        tabs.setupWithViewPager(pager);
 
         mTxtNoEntrySelected = (TextView) v.findViewById(R.id.txt_no_entry_selected);
         if (getChildFragmentManager().findFragmentById(R.id.detail) != null) {
@@ -191,6 +183,8 @@ public class DataFragment extends Fragment implements DataListCallback,
         }
 
         mTwoPane = v.findViewById(R.id.detail) != null;
+
+        mFab = (FloatingActionMenu) v.findViewById(R.id.fab);
 
         return v;
     }
@@ -218,8 +212,7 @@ public class DataFragment extends Fragment implements DataListCallback,
 
     @Override
     public void onViewCreated(RecyclerView recyclerView) {
-        FloatingActionMenu fab = (FloatingActionMenu) getView().findViewById(R.id.fab);
-        FloatingActionButtonRevealer.setup(fab, recyclerView);
+        FloatingActionButtonRevealer.setup(mFab, recyclerView);
     }
 
     @Override

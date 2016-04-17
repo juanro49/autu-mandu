@@ -17,11 +17,8 @@
 package me.kuehle.carreport.gui;
 
 import android.app.ActionBar;
-import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.view.MenuItem;
 
@@ -31,14 +28,6 @@ import me.kuehle.carreport.R;
 
 public class PreferencesActivity extends PreferenceActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
-    private Fragment mCurrentPreferencesFragment;
-
-    public void onAttachFragment(Fragment fragment) {
-        if (fragment != null && isValidFragment(fragment.getClass().getName())) {
-            mCurrentPreferencesFragment = fragment;
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,20 +51,6 @@ public class PreferencesActivity extends PreferenceActivity implements
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (mCurrentPreferencesFragment != null) {
-            mCurrentPreferencesFragment.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @SuppressWarnings("RedundantCast")
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (mCurrentPreferencesFragment != null && mCurrentPreferencesFragment instanceof PreferencesBackupFragment) {
-            ((PreferencesBackupFragment) mCurrentPreferencesFragment).onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

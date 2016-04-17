@@ -122,19 +122,14 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
-        final int navItemIndex;
+        // Initialize the first page of the navigation drawer.
+        int navItemIndex = 0;
         if (savedInstanceState != null) {
             navItemIndex = savedInstanceState.getInt(STATE_NAV_ITEM_INDEX, 0);
-        } else {
-            navItemIndex = 0;
         }
 
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                onNavigationItemSelected(mNavigationView.getMenu().getItem(navItemIndex));
-            }
-        });
+        MenuItem item = mNavigationView.getMenu().getItem(navItemIndex);
+        mNavigationView.getMenu().performIdentifierAction(item.getItemId(), 0);
 
         // When there is no car, show the first start activity.
         if (CarQueries.getCount(this) == 0) {
@@ -351,6 +346,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
+        mDrawerLayout.closeDrawer(mNavigationView);
+
         Intent intent = menuItem.getIntent();
         String fragment = intent.getStringExtra("fragment");
         Bundle arguments = intent.getBundleExtra("arguments");
@@ -374,15 +371,11 @@ public class MainActivity extends AppCompatActivity implements
             fm.popBackStack();
             fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
 
-            menuItem.setChecked(true);
             setTitle(menuItem.getTitle());
-        } else if (menuItem.getIntent() != null) {
-            startActivityForResult(menuItem.getIntent(), REQUEST_FROM_DRAWER);
+            return true;
+        } else {
+            return false;
         }
-
-        mDrawerLayout.closeDrawer(mNavigationView);
-
-        return true;
     }
 
     private void updateNavigationViewMenu() {
@@ -408,27 +401,31 @@ public class MainActivity extends AppCompatActivity implements
         Menu menu = mNavigationView.getMenu();
         menu.clear();
 
-        menu.add(1, Menu.NONE, Menu.NONE, R.string.drawer_reports)
+        int groupId = Menu.FIRST;
+        int itemId = Menu.FIRST;
+
+        menu.add(groupId, itemId++, Menu.NONE, R.string.drawer_reports)
                 .setIcon(R.drawable.ic_c_report_24dp)
                 .setIntent(new Intent().putExtra("fragment", ReportFragment.class.getName()));
         while (car.moveToNext()) {
             Bundle args = new Bundle();
             args.putLong(DataFragment.EXTRA_CAR_ID, car.getId());
 
-            menu.add(1, Menu.NONE, Menu.NONE, car.getName())
+            menu.add(groupId, itemId++, Menu.NONE, car.getName())
                     .setIcon(R.drawable.ic_list_24dp)
                     .setIntent(new Intent()
                             .putExtra("fragment", DataFragment.class.getName())
                             .putExtra("arguments", args));
         }
 
-        menu.add(1, Menu.NONE, Menu.NONE, R.string.drawer_calculator)
+        menu.add(groupId, itemId, Menu.NONE, R.string.drawer_calculator)
                 .setIcon(R.drawable.ic_functions_24dp)
                 .setIntent(new Intent().putExtra("fragment", CalculatorFragment.class.getName()));
+
         menu.add(R.string.drawer_settings).setIntent(new Intent(this, PreferencesActivity.class));
         menu.add(R.string.drawer_help).setIntent(new Intent(this, HelpActivity.class));
 
-        menu.setGroupCheckable(1, true, true);
+        menu.setGroupCheckable(groupId, true, true);
     }
 
     private Intent getDetailActivityIntent(int edit, long carId, int otherType) {
