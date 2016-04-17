@@ -273,4 +273,30 @@
     <string name="graph_close_full_screen_desc">Close full screen graph</string>
     <string name="drag_handle_desc">Drag handle</string>
     <string name="quit_snooze_desc">Quit snooze</string>
+
+    <string name="about_licenses_styles" translatable="false">
+        body {
+            color: #fff;
+            background-color: #424242;
+            font-family: sans-serif;
+            overflow-wrap: break-word;
+        }
+
+        pre {
+            color: #fff;
+            background-color: #303030;
+            padding: 1em;
+            white-space: pre-wrap;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        a {
+            color: #607d8b;
+        }
+    </string>
 </resources>

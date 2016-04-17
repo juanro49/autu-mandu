@@ -80,10 +80,11 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
 
     // UI Helpers
-    compile 'com.larswerkman:HoloColorPicker:1.4'
-    compile 'com.github.clans:fab:1.6.1'
+    compile 'com.larswerkman:HoloColorPicker:1.5'
+    compile 'com.github.clans:fab:1.6.3'
     compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
+    compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
 
     // Joda-Time for Android
-    compile 'net.danlew:android.joda:2.9.0'
+    compile 'net.danlew:android.joda:2.9.3'
 }

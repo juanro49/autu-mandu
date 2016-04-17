@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2016 Jan Kühle
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<notices>
+    <notice>
+        <name>HelloCharts for Android</name>
+        <url>https://github.com/lecho/hellocharts-android</url>
+        <copyright>Copyright 2014 Leszek Wach</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Dropbox Core SDK for Java 6+</name>
+        <url>https://github.com/dropbox/dropbox-sdk-java</url>
+        <copyright>Copyright (c) 2015 Dropbox Inc., http://www.dropbox.com/</copyright>
+        <license>MIT License</license>
+    </notice>
+    <notice>
+        <name>OkHttp</name>
+        <url>http://square.github.io/okhttp/</url>
+        <copyright>Copyright 2016 Square, Inc.</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Android Holo ColorPicker</name>
+        <url>https://github.com/LarsWerkman/HoloColorPicker</url>
+        <copyright>Copyright 2012 Lars Werkman</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>FloatingActionButton</name>
+        <url>https://github.com/Clans/FloatingActionButton</url>
+        <copyright>Copyright 2015 Dmytro Tarianyk</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>RecyclerView MultiSelect</name>
+        <url>https://github.com/bignerdranch/recyclerview-multiselect</url>
+        <copyright>Copyright (c) 2014 Big Nerd Ranch</copyright>
+        <license>MIT License</license>
+    </notice>
+    <notice>
+        <name>joda-time-android</name>
+        <url>https://github.com/dlew/joda-time-android</url>
+        <copyright>Copyright 2001-2010 Stephen Colebourne</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+</notices>
