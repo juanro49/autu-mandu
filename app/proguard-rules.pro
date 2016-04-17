@@ -33,6 +33,7 @@
 -dontwarn com.dropbox.core.http.OkHttpRequestor
 -dontwarn com.dropbox.core.http.OkHttpRequestor$*
 -dontwarn javax.servlet.**
+-keeppackagenames com.dropbox.core.http
 
 # Misc
 -dontwarn org.slf4j.*
