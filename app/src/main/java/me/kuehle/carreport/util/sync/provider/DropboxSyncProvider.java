@@ -24,9 +24,11 @@ import android.util.Log;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.NetworkIOException;
 import com.dropbox.core.android.Auth;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.GetMetadataErrorException;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.files.WriteMode;
 
@@ -34,7 +36,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
@@ -45,6 +46,8 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 import me.kuehle.carreport.util.FileCopyUtil;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
+import me.kuehle.carreport.util.sync.SyncIoException;
+import me.kuehle.carreport.util.sync.SyncParseException;
 
 public class DropboxSyncProvider extends AbstractSyncProvider {
     private static final String TAG = "DropboxSyncProvider";
@@ -117,27 +120,37 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     }
 
     @Override
-    public String getRemoteFileRev() throws Exception {
+    public String getRemoteFileRev() throws SyncIoException, SyncParseException {
         try {
             File localFile = getLocalFile();
             Metadata remoteMetadata = mDbxClient.files().getMetadata("/" + localFile.getName());
 
             if (remoteMetadata instanceof FileMetadata) {
                 return ((FileMetadata) remoteMetadata).getRev();
+            } else {
+                return null;
+            }
+        } catch (NetworkIOException e) {
+            throw new SyncIoException(e);
+        } catch (GetMetadataErrorException e) {
+            if (e.errorValue != null &&
+                    e.errorValue.getPathValue() != null &&
+                    e.errorValue.getPathValue().isNotFound()) {
+                return null;
+            } else {
+                throw new SyncParseException(e);
             }
         } catch (DbxException e) {
-            throw new Exception(e);
+            throw new SyncParseException(e);
         }
-
-        return null;
     }
 
     @Override
-    public String uploadFile() throws Exception {
+    public String uploadFile() throws SyncIoException, SyncParseException {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
         if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-            throw new Exception();
+            throw new SyncParseException();
         }
 
         FileInputStream inputStream = null;
@@ -149,8 +162,10 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
                     .start()
                     .uploadAndFinish(inputStream);
             return remoteMetadata.getRev();
-        } catch (DbxException | FileNotFoundException e) {
-            throw new Exception(e);
+        } catch (NetworkIOException e) {
+            throw new SyncIoException(e);
+        } catch (DbxException | IOException e) {
+            throw new SyncParseException(e);
         } finally {
             if (inputStream != null) {
                 try {
@@ -167,7 +182,7 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     }
 
     @Override
-    public void downloadFile() throws Exception {
+    public void downloadFile() throws SyncIoException, SyncParseException {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
 
@@ -178,10 +193,12 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
                     .download("/" + localFile.getName())
                     .download(outputStream);
             if (!FileCopyUtil.copyFile(tempFile, localFile)) {
-                throw new Exception();
+                throw new IOException();
             }
-        } catch (DbxException | FileNotFoundException e) {
-            throw new Exception(e);
+        } catch (NetworkIOException e) {
+            throw new SyncIoException(e);
+        } catch (DbxException | IOException e) {
+            throw new SyncParseException(e);
         } finally {
             if (outputStream != null) {
                 try {

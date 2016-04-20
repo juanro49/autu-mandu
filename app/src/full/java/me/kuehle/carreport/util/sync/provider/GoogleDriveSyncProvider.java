@@ -19,7 +19,6 @@ package me.kuehle.carreport.util.sync.provider;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -57,6 +56,9 @@ import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 import me.kuehle.carreport.util.FileCopyUtil;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 import me.kuehle.carreport.util.sync.Authenticator;
+import me.kuehle.carreport.util.sync.SyncAuthException;
+import me.kuehle.carreport.util.sync.SyncIoException;
+import me.kuehle.carreport.util.sync.SyncParseException;
 
 public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -178,11 +180,8 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
     }
 
     @Override
-    public String getRemoteFileRev() throws Exception {
-        ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
-        if (!connectionResult.isSuccess()) {
-            throw new Exception();
-        }
+    public String getRemoteFileRev() throws SyncAuthException, SyncIoException, SyncParseException {
+        ensureSuccessfulConnect();
 
         try {
             com.google.api.services.drive.model.File remoteFile = getRemoteFile();
@@ -197,17 +196,14 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
     }
 
     @Override
-    public String uploadFile() throws Exception {
-        ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
-        if (!connectionResult.isSuccess()) {
-            throw new Exception();
-        }
+    public String uploadFile() throws SyncAuthException, SyncIoException, SyncParseException {
+        ensureSuccessfulConnect();
 
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
         try {
             if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-                throw new Exception();
+                throw new SyncParseException();
             }
 
             com.google.api.services.drive.model.File remoteFile = getRemoteFile();
@@ -232,7 +228,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
 
             return String.valueOf(newFile.getModifiedTime().getValue());
         } catch (IOException e) {
-            throw new NetworkErrorException(e);
+            throw new SyncIoException(e);
         } finally {
             if (!tempFile.delete()) {
                 Log.w(TAG, "Could not delete temp file after uploading.");
@@ -243,23 +239,20 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
     }
 
     @Override
-    public void downloadFile() throws Exception {
-        ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
-        if (!connectionResult.isSuccess()) {
-            throw new Exception();
-        }
+    public void downloadFile() throws SyncAuthException, SyncIoException, SyncParseException {
+        ensureSuccessfulConnect();
 
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
         FileOutputStream outputStream = null;
         try {
             if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-                throw new Exception();
+                throw new SyncParseException();
             }
 
             com.google.api.services.drive.model.File remoteFile = getRemoteFile();
             if (remoteFile == null) {
-                throw new Exception();
+                throw new SyncParseException();
             }
 
 
@@ -269,10 +262,10 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
                     .get(remoteFile.getId())
                     .executeMediaAndDownloadTo(outputStream);
             if (!FileCopyUtil.copyFile(tempFile, localFile)) {
-                throw new Exception();
+                throw new SyncParseException();
             }
         } catch (IOException e) {
-            throw new NetworkErrorException(e);
+            throw new SyncIoException(e);
         } finally {
             if (outputStream != null) {
                 try {
@@ -320,7 +313,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         }
     }
 
-    private com.google.api.services.drive.model.File getRemoteFile() throws Exception {
+    private com.google.api.services.drive.model.File getRemoteFile() throws SyncIoException {
         File localFile = getLocalFile();
         com.google.api.services.drive.model.File remoteFile = null;
         try {
@@ -350,7 +343,32 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
                 return null;
             }
         } catch (IOException e) {
-            throw new NetworkErrorException(e);
+            throw new SyncIoException(e);
+        }
+    }
+
+    private void ensureSuccessfulConnect() throws SyncAuthException, SyncIoException, SyncParseException {
+        ConnectionResult connectionResult = mGoogleApiClient.blockingConnect();
+        if (!connectionResult.isSuccess()) {
+            switch (connectionResult.getErrorCode()) {
+                case ConnectionResult.SIGN_IN_REQUIRED:
+                case ConnectionResult.INVALID_ACCOUNT:
+                case ConnectionResult.RESOLUTION_REQUIRED:
+                case ConnectionResult.SIGN_IN_FAILED:
+                case ConnectionResult.SERVICE_MISSING_PERMISSION:
+                    throw new SyncAuthException();
+                case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
+                case ConnectionResult.NETWORK_ERROR:
+                case ConnectionResult.INTERNAL_ERROR:
+                case ConnectionResult.CANCELED:
+                case ConnectionResult.TIMEOUT:
+                case ConnectionResult.INTERRUPTED:
+                case ConnectionResult.API_UNAVAILABLE:
+                case ConnectionResult.SERVICE_UPDATING:
+                    throw new SyncIoException(connectionResult.getErrorMessage());
+                default:
+                    throw new SyncParseException(connectionResult.getErrorMessage());
+            }
         }
     }
 }

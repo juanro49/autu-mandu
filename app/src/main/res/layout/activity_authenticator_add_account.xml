@@ -110,6 +110,18 @@
             android:padding="16dp"
             android:text="@string/alert_sync_first_sync_error"/>
 
+        <TextView
+            android:id="@+id/first_sync_error_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:paddingBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            tools:text="404 Not found"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -17,7 +17,6 @@ package me.kuehle.carreport.util.sync.provider;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.Nullable;
@@ -27,6 +26,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
@@ -35,9 +35,14 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.AuthenticatorAddAccountActivity;
 import me.kuehle.carreport.gui.dialog.SetupWebDavSyncDialogActivity;
 import me.kuehle.carreport.util.FileCopyUtil;
-import me.kuehle.carreport.util.webdav.WebDavClient;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
+import me.kuehle.carreport.util.sync.SyncAuthException;
+import me.kuehle.carreport.util.sync.SyncIoException;
+import me.kuehle.carreport.util.sync.SyncParseException;
 import me.kuehle.carreport.util.webdav.CertificateHelper;
+import me.kuehle.carreport.util.webdav.HttpException;
+import me.kuehle.carreport.util.webdav.InvalidCertificateException;
+import me.kuehle.carreport.util.webdav.WebDavClient;
 
 public class WebDavSyncProvider extends AbstractSyncProvider {
     public static final String KEY_WEB_DAV_URL = "webDavUrl";
@@ -64,15 +69,23 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
     }
 
     @Override
-    public void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) throws Exception {
+    public void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) throws SyncParseException {
         if (account != null && password != null && settings != null) {
             String url = settings.optString(KEY_WEB_DAV_URL);
             X509Certificate certificate = null;
             if (settings.has(KEY_WEB_DAV_CERTIFICATE)) {
-                certificate = CertificateHelper.fromString(settings.optString(KEY_WEB_DAV_CERTIFICATE));
+                try {
+                    certificate = CertificateHelper.fromString(settings.optString(KEY_WEB_DAV_CERTIFICATE));
+                } catch (CertificateException e) {
+                    throw new SyncParseException(e);
+                }
             }
 
-            mWebDavClient = new WebDavClient(url, account.name, password, certificate);
+            try {
+                mWebDavClient = new WebDavClient(url, account.name, password, certificate);
+            } catch (InvalidCertificateException e) {
+                throw new SyncParseException(e);
+            }
         } else {
             mWebDavClient = null;
         }
@@ -110,28 +123,43 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
     }
 
     @Override
-    public String getRemoteFileRev() throws Exception {
+    public String getRemoteFileRev() throws SyncAuthException, SyncIoException, SyncParseException {
         File localFile = getLocalFile();
-        Date lastModified = mWebDavClient.getLastModified(localFile.getName());
-        return lastModified == null ? null : String.valueOf(lastModified.getTime());
+        try {
+            Date lastModified = mWebDavClient.getLastModified(localFile.getName());
+            return lastModified == null ? null : String.valueOf(lastModified.getTime());
+        } catch (HttpException e) {
+            if (e.isNotFound()) {
+                return null;
+            } else if (e.isNetworkIssue()) {
+                throw new SyncIoException(e);
+            } else if (e.isUnauthorized()) {
+                throw new SyncAuthException();
+            } else {
+                throw new SyncParseException(e);
+            }
+        }
     }
 
     @Override
-    public String uploadFile() throws Exception {
+    public String uploadFile() throws SyncAuthException, SyncIoException, SyncParseException {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
         if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-            throw new Exception();
+            throw new SyncParseException();
         }
 
         try {
-            if (!mWebDavClient.upload(tempFile, localFile.getName(), "application/x-sqlite")) {
-                throw new NetworkErrorException("File upload failed.");
-            }
-
+            mWebDavClient.upload(tempFile, localFile.getName(), "application/x-sqlite");
             return getRemoteFileRev();
-        } catch (IOException e) {
-            throw new NetworkErrorException(e);
+        } catch (HttpException e) {
+            if (e.isNetworkIssue()) {
+                throw new SyncIoException(e);
+            } else if (e.isUnauthorized()) {
+                throw new SyncAuthException();
+            } else {
+                throw new SyncParseException(e);
+            }
         } finally {
             if (!tempFile.delete()) {
                 Log.w(TAG, "Could not delete temp file after uploading.");
@@ -140,17 +168,25 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
     }
 
     @Override
-    public void downloadFile() throws Exception {
+    public void downloadFile() throws SyncAuthException, SyncIoException, SyncParseException {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
 
         try {
             mWebDavClient.download(localFile.getName(), tempFile);
             if (!FileCopyUtil.copyFile(tempFile, localFile)) {
-                throw new Exception();
+                throw new SyncParseException();
+            }
+        } catch (HttpException e) {
+            if (e.isNetworkIssue()) {
+                throw new SyncIoException(e);
+            } else if (e.isUnauthorized()) {
+                throw new SyncAuthException();
+            } else {
+                throw new SyncParseException(e);
             }
         } catch (IOException e) {
-            throw new NetworkErrorException(e);
+            throw new SyncParseException(e);
         } finally {
             if (!tempFile.delete()) {
                 Log.w(TAG, "Could not delete temp file after downloading.");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jan Kühle
+ * Copyright 2016 Jan Kühle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,19 @@
  */
 package me.kuehle.carreport.util.sync;
 
-public class AccountUnlinkedException extends Exception {
-    public AccountUnlinkedException() {
-        super();
+public class SyncIoException extends Exception {
+    private static final String MESSAGE = "Network error.";
+    private static final String MESSAGE_FORMAT = "Network error: %s";
+
+    public SyncIoException() {
+        super(MESSAGE);
     }
 
-    public AccountUnlinkedException(Throwable cause) {
-        super(cause);
+    public SyncIoException(Throwable cause) {
+        super(String.format(MESSAGE_FORMAT, cause.getMessage()), cause);
+    }
+
+    public SyncIoException(String message) {
+        super(String.format(MESSAGE_FORMAT, message));
     }
 }

@@ -19,6 +19,10 @@ package me.kuehle.carreport.gui;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -36,6 +40,8 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.provider.DataProvider;
@@ -51,6 +57,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
     private TextView mProgressMessage;
     private View mFirstSyncView;
     private View mFirstSyncErrorView;
+    private TextView mFirstSyncErrorMessage;
 
     private AbstractSyncProvider mSelectedSyncProvider;
     private Account mAuthenticatedAccount;
@@ -90,6 +97,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
 
         mFirstSyncErrorView = findViewById(R.id.first_sync_error);
         mFirstSyncErrorView.setVisibility(View.GONE);
+        mFirstSyncErrorMessage = (TextView) findViewById(R.id.first_sync_error_message);
         findViewById(R.id.first_sync_error_btn_ok).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,7 +116,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             mListView.setVisibility(View.GONE);
             mProgressView.setVisibility(View.VISIBLE);
         } catch (Exception e) {
-            handleFirstSyncError();
+            handleFirstSyncError(e);
         }
     }
 
@@ -173,6 +181,8 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
     private void startFirstSync() {
         mProgressMessage.setText(R.string.alert_sync_performing_first_sync);
         new AsyncTask<Void, Void, Boolean>() {
+            private Exception mException;
+
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
@@ -183,6 +193,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
                     String remoteRev = mSelectedSyncProvider.getRemoteFileRev();
                     return remoteRev != null;
                 } catch (Exception e) {
+                    mException = e;
                     return null;
                 }
             }
@@ -190,7 +201,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             @Override
             protected void onPostExecute(Boolean remoteDataAvailable) {
                 if (remoteDataAvailable == null) {
-                    handleFirstSyncError();
+                    handleFirstSyncError(mException);
                 } else if (remoteDataAvailable) {
                     mProgressView.setVisibility(View.GONE);
                     mFirstSyncView.setVisibility(View.VISIBLE);
@@ -207,6 +218,8 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
         mProgressView.setVisibility(View.VISIBLE);
 
         new AsyncTask<Void, Void, Boolean>() {
+            private Exception mException;
+
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
@@ -222,6 +235,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
                     mSelectedSyncProvider.setLocalFileRev(remoteRev);
                     return true;
                 } catch (Exception e) {
+                    mException = e;
                     return false;
                 }
             }
@@ -233,16 +247,24 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
                     ContentResolver.setSyncAutomatically(mAuthenticatedAccount, DataProvider.AUTHORITY, true);
                     finish();
                 } else {
-                    handleFirstSyncError();
+                    handleFirstSyncError(mException);
                 }
             }
         }.execute();
     }
 
-    private void handleFirstSyncError() {
-        AccountManager accountManager = AccountManager.get(this);
+    private void handleFirstSyncError(Exception e) {
         if (mAuthenticatedAccount != null) {
-            accountManager.removeAccountExplicitly(mAuthenticatedAccount);
+            AccountManager accountManager = AccountManager.get(this);
+            accountManager.removeAccount(mAuthenticatedAccount, new AccountManagerCallback<Boolean>() {
+                @Override
+                public void run(AccountManagerFuture<Boolean> future) {
+                    try {
+                        future.getResult();
+                    } catch (OperationCanceledException | IOException | AuthenticatorException ignored) {
+                    }
+                }
+            }, null);
         }
 
         setAccountAuthenticatorResult(null);
@@ -250,6 +272,7 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
 
         mProgressView.setVisibility(View.GONE);
         mFirstSyncErrorView.setVisibility(View.VISIBLE);
+        mFirstSyncErrorMessage.setText(e.getMessage());
     }
 
     private class SyncProviderAdapter extends BaseAdapter {

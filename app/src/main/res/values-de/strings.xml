@@ -93,7 +93,6 @@
     <string name="validate_error_mileage_out_of_range_total">Der Kilometerstand muss bei Eingabe der Gesamtkilometer zwischen dem der letzten und der nächsten Tankfüllung liegen. Wenn Sie Tageskilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_mileage_out_of_range_trip">Der kumulierte Kilometerstand darf bei Eingabe der Tageskilometer den Kilometerstand der nächsten Tankfüllung nicht übersteigen. Wenn Sie Gesamtkilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_fuel_type_exists">Diese Kaftstoffart existiert bereits.</string>
-    <string name="validate_error_webdav_login_failed">Login am WebDAV-Server fehlgeschlagen. Bitte prüfen Sie die URL, Benutzername und Password.</string>
     <string name="validate_error_webdav_invalid_certificate">Dem Zertifikat konnte nicht vertraut werden. Es ist möglicherweise beschädigt.</string>
 
     <string name="suspended">Stillgelegt</string>

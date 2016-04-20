@@ -15,17 +15,18 @@
  */
 package me.kuehle.carreport.util.webdav;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.util.Log;
-import android.util.Xml;
-
-import org.xmlpull.v1.XmlPullParser;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -39,6 +40,9 @@ import okhttp3.Response;
 
 public class WebDavClient {
     private static final String TAG = "WebDavClient";
+
+    @SuppressLint("SimpleDateFormat")
+    public static final DateFormat MODIFICATION_DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
 
     private OkHttpClient mClient;
     private Uri mBaseUri;
@@ -64,71 +68,80 @@ public class WebDavClient {
         mClient = builder.build();
     }
 
-    public boolean download(String remoteFilepath, File targetFile) throws IOException {
+    public void download(String remoteFilepath, File targetFile) throws HttpException, IOException {
         Request request = new Request.Builder()
                 .url(mBaseUri.buildUpon().appendPath(remoteFilepath).toString())
                 .build();
-        Response response = mClient.newCall(request).execute();
-        if (!response.isSuccessful()) {
-            return false;
+
+        Response response;
+        try {
+            response = mClient.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                throw new HttpException(response);
+            }
+        } catch (IOException e) {
+            throw new HttpException(request, e);
         }
 
         FileOutputStream fos = new FileOutputStream(targetFile);
         FileCopyUtil.copyFile(response.body().byteStream(), fos);
         fos.close();
-        return true;
     }
 
-    public boolean upload(File localFile, String remoteFilepath, String contentType) throws IOException {
+    public void upload(File localFile, String remoteFilepath, String contentType) throws HttpException {
         RequestBody body = RequestBody.create(MediaType.parse(contentType), localFile);
         Request request = new Request.Builder()
                 .url(mBaseUri.buildUpon().appendPath(remoteFilepath).toString())
                 .put(body)
                 .build();
-        Response response = mClient.newCall(request).execute();
-        return response.isSuccessful();
+
+        try {
+            Response response = mClient.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                throw new HttpException(response);
+            }
+        } catch (IOException e) {
+            throw new HttpException(request, e);
+        }
     }
 
-    public Date getLastModified(String remoteFilepath) throws Exception {
-        String bodyText = "<?xml version=\"1.0\"?>\n" +
-                "<a:propfind xmlns:a=\"DAV:\">\n" +
-                "    <a:prop>\n" +
-                "        <a:getlastmodified/>\n" +
-                "    </a:prop>\n" +
-                "</a:propfind>";
-        RequestBody body = RequestBody.create(MediaType.parse("text/xml"), bodyText);
+    @SuppressWarnings("TryWithIdenticalCatches")
+    public Date getLastModified(String remoteFilepath) throws HttpException {
         Request request = new Request.Builder()
                 .url(mBaseUri.buildUpon().appendPath(remoteFilepath).toString())
-                .method("PROPFIND", body)
-                .addHeader("Depth", "0")
+                .head()
                 .build();
-        Response response = mClient.newCall(request).execute();
-        if (response.code() == 207) {
-            XmlPullParser parser = Xml.newPullParser();
-            parser.setInput(response.body().charStream());
-            parser.nextTag();
 
-            DavMultiStatus multiStatus = DavMultiStatus.read(parser);
-            if (multiStatus.getResponses().length != 1 ||
-                    multiStatus.getResponses()[0].getPropertySets().length != 1 ||
-                    multiStatus.getResponses()[0].getPropertySets()[0].getStatus() != 200) {
-                throw new Exception("Multi status response does not contain exactly one response.");
+        try {
+            Response response = mClient.newCall(request).execute();
+            if (response.isSuccessful()) {
+                String lastModified = response.header("Last-Modified");
+                if (lastModified != null) {
+                    return MODIFICATION_DATE_FORMAT.parse(lastModified);
+                } else {
+                    throw new ParseException("Server did not return a Last-Modified header.", 0);
+                }
+            } else {
+                throw new HttpException(response);
             }
-
-            return multiStatus.getResponses()[0].getPropertySets()[0].getLastModified();
+        } catch (IOException e) {
+            throw new HttpException(request, e);
+        } catch (ParseException e) {
+            throw new HttpException(request, e);
         }
-
-        return null;
     }
 
-    public boolean testLogin() throws UntrustedCertificateException {
+    public void testLogin() throws HttpException, UntrustedCertificateException {
+        Request request = new Request.Builder()
+                .url(mBaseUri.toString())
+                .head()
+                .build();
+
         try {
-            Request request = new Request.Builder()
-                    .url(mBaseUri.toString())
-                    .head()
-                    .build();
             Response response = mClient.newCall(request).execute();
-            return response.isSuccessful();
+            if (!response.isSuccessful()) {
+                throw new HttpException(response);
+            }
         } catch (SSLHandshakeException e) {
             Throwable innerEx = e;
             while (innerEx != null && !(innerEx instanceof CertPathValidatorException)) {
@@ -150,10 +163,8 @@ public class WebDavClient {
                     throw new UntrustedCertificateException(cert);
                 }
             }
-        } catch (Exception e) {
-            Log.e(TAG, "Error testing login.", e);
+        } catch (IOException e) {
+            throw new HttpException(request, e);
         }
-
-        return false;
     }
 }

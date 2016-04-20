@@ -80,12 +80,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 syncProvider.setLocalFileRev(remoteRev);
                 Application.reinitializeDatabase();
             }
-        } catch (AccountUnlinkedException e) {
+        } catch (SyncAuthException e) {
             Log.e(TAG, "Error syncing.", e);
             syncResult.stats.numAuthExceptions++;
-        } catch (Exception e) {
+        } catch (SyncIoException e) {
             Log.e(TAG, "Error syncing.", e);
             syncResult.stats.numIoExceptions++;
+        } catch (SyncParseException e) {
+            Log.e(TAG, "Error syncing.", e);
+            syncResult.stats.numParseExceptions++;
         }
     }
 }

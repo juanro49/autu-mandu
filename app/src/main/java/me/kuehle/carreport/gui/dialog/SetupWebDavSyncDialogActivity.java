@@ -32,11 +32,12 @@ import java.security.cert.X509Certificate;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
-import me.kuehle.carreport.util.webdav.WebDavClient;
 import me.kuehle.carreport.util.sync.provider.WebDavSyncProvider;
 import me.kuehle.carreport.util.webdav.CertificateHelper;
+import me.kuehle.carreport.util.webdav.HttpException;
 import me.kuehle.carreport.util.webdav.InvalidCertificateException;
 import me.kuehle.carreport.util.webdav.UntrustedCertificateException;
+import me.kuehle.carreport.util.webdav.WebDavClient;
 
 public class SetupWebDavSyncDialogActivity extends Activity {
     enum TestLoginStatus {
@@ -91,6 +92,8 @@ public class SetupWebDavSyncDialogActivity extends Activity {
     private void onOkClick() {
         FormValidator validator = new FormValidator();
         validator.add(new FormFieldNotEmptyValidator(mEdtUrl));
+        validator.add(new FormFieldNotEmptyValidator(mEdtUserName));
+        validator.add(new FormFieldNotEmptyValidator(mEdtPassword));
 
         if (validator.validate()) {
             new AsyncTask<Void, Void, TestLoginStatus>() {
@@ -98,6 +101,7 @@ public class SetupWebDavSyncDialogActivity extends Activity {
                 private String userName;
                 private String password;
                 private X509Certificate trustedCertificate;
+                private HttpException exception;
 
                 @Override
                 protected void onPreExecute() {
@@ -105,6 +109,7 @@ public class SetupWebDavSyncDialogActivity extends Activity {
                     userName = mEdtUserName.getText().toString();
                     password = mEdtPassword.getText().toString();
                     trustedCertificate = mChkTrustCertificate.isChecked() ? mTrustCertificate : null;
+                    exception = null;
 
                     mBtnOk.setEnabled(false);
                 }
@@ -113,12 +118,16 @@ public class SetupWebDavSyncDialogActivity extends Activity {
                 protected TestLoginStatus doInBackground(Void... params) {
                     try {
                         WebDavClient client = new WebDavClient(url, userName, password, trustedCertificate);
-                        return client.testLogin() ? TestLoginStatus.OK : TestLoginStatus.FAILED;
+                        client.testLogin();
+                        return TestLoginStatus.OK;
                     } catch (UntrustedCertificateException e) {
                         mTrustCertificate = e.getCertificate();
                         return TestLoginStatus.UNTRUSTED_CERTIFICATE;
                     } catch (InvalidCertificateException e) {
                         return TestLoginStatus.INVALID_CERTIFICATE;
+                    } catch (HttpException e) {
+                        exception = e;
+                        return TestLoginStatus.FAILED;
                     }
                 }
 
@@ -144,7 +153,7 @@ public class SetupWebDavSyncDialogActivity extends Activity {
                     } else if (status == TestLoginStatus.INVALID_CERTIFICATE) {
                         mChkTrustCertificate.setError(getString(R.string.validate_error_webdav_invalid_certificate));
                     } else {
-                        mEdtUrl.setError(getString(R.string.validate_error_webdav_login_failed));
+                        mEdtUrl.setError(exception.getMessage());
                     }
 
                     mBtnOk.setEnabled(true);

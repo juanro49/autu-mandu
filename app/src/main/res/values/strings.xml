@@ -96,9 +96,8 @@
     <string name="validate_error_mileage_out_of_range_total">Mileage needs to be between the mileage of the previous and next refueling in total distance entry mode. If you meant to insert trip distance, you can change entry mode in the settings.</string>
     <string name="validate_error_mileage_out_of_range_trip">The cumulated mileage cannot be higher than the mileage of the next refueling in trip distance entry mode. If you meant to insert total distance, you can change entry mode in the settings.</string>
     <string name="validate_error_fuel_type_exists">This fuel type does already exist.</string>
-    <string name="validate_error_webdav_login_failed">Could not login to WebDAV server. Please check URL and credentials.</string>
     <string name="validate_error_webdav_invalid_certificate">The certificate could not be trusted. It seems invalid.</string>
-    
+
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>
     <string name="overwrite">Overwrite</string>

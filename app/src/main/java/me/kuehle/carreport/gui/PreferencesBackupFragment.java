@@ -73,7 +73,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                         future.getResult();
                         setupSynchronizationPreference();
                     } catch (OperationCanceledException | IOException | AuthenticatorException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "Error adding sync account.", e);
                     }
                 }
             }, null);
@@ -90,9 +90,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                 @Override
                 public void run(AccountManagerFuture<Boolean> future) {
                     try {
-                        if (future.getResult()) {
-                            setupSynchronizationPreference();
-                        }
+                        future.getResult();
+                        setupSynchronizationPreference();
                     } catch (OperationCanceledException | IOException | AuthenticatorException e) {
                         Log.e(TAG, "Error removing sync account.", e);
                     }

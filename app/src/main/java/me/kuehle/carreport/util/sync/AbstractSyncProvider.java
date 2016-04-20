@@ -33,11 +33,12 @@ import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
 public abstract class AbstractSyncProvider {
     public abstract long getId();
 
-    public abstract @DrawableRes int getIcon();
+    @DrawableRes
+    public abstract int getIcon();
 
     public abstract String getName();
 
-    public abstract void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) throws Exception;
+    public abstract void setup(@Nullable Account account, @Nullable String password, @Nullable String authToken, @Nullable JSONObject settings) throws SyncAuthException, SyncIoException, SyncParseException;
 
     public abstract void startAuthentication(AuthenticatorAddAccountActivity activity);
 
@@ -53,11 +54,11 @@ public abstract class AbstractSyncProvider {
         prefs.setSyncLocalFileRev(rev);
     }
 
-    public abstract String getRemoteFileRev() throws Exception;
+    public abstract String getRemoteFileRev() throws SyncAuthException, SyncIoException, SyncParseException;
 
-    public abstract String uploadFile() throws Exception;
+    public abstract String uploadFile() throws SyncAuthException, SyncIoException, SyncParseException;
 
-    public abstract void downloadFile() throws Exception;
+    public abstract void downloadFile() throws SyncAuthException, SyncIoException, SyncParseException;
 
     protected File getLocalFile() {
         return new File(DataSQLiteOpenHelper.getInstance(Application.getContext()).getReadableDatabase().getPath());
