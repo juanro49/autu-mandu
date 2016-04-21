@@ -15,7 +15,6 @@
  */
 package me.kuehle.carreport.util.webdav;
 
-import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.util.Log;
 
@@ -30,7 +29,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLSession;
 
 import me.kuehle.carreport.util.FileCopyUtil;
 import okhttp3.MediaType;
@@ -47,7 +49,7 @@ public class WebDavClient {
     private OkHttpClient mClient;
     private Uri mBaseUri;
 
-    public WebDavClient(String baseUrl, String userName, String password, X509Certificate trustedCertificate) throws InvalidCertificateException {
+    public WebDavClient(String baseUrl, String userName, String password, final X509Certificate trustedCertificate) throws InvalidCertificateException {
         // Base URL needs to point to a directory.
         if (!baseUrl.endsWith("/")) {
             baseUrl += "/";
@@ -63,6 +65,18 @@ public class WebDavClient {
 
         if (trustedCertificate != null) {
             builder.sslSocketFactory(CertificateHelper.createSocketFactory(trustedCertificate));
+
+            builder.hostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    try {
+                        X509Certificate certificate = (X509Certificate) session.getPeerCertificates()[0];
+                        return certificate.equals(trustedCertificate);
+                    } catch (SSLException e) {
+                        return false;
+                    }
+                }
+            });
         }
 
         mClient = builder.build();

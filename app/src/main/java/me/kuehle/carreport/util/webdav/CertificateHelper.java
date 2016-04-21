@@ -16,6 +16,8 @@
 package me.kuehle.carreport.util.webdav;
 
 import android.content.Context;
+import android.support.v4.text.TextUtilsCompat;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Base64;
 
@@ -29,10 +31,15 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+
+import okhttp3.internal.tls.OkHostnameVerifier;
 
 public class CertificateHelper {
     public static String getShortDescription(X509Certificate certificate, Context context) {
@@ -40,6 +47,9 @@ public class CertificateHelper {
 
         X500PrincipalHelper sujectHelper = new X500PrincipalHelper(certificate.getSubjectX500Principal());
         String subject = sujectHelper.getCN();
+
+        SortedSet<String> subjectAltNames = new TreeSet<>();
+        subjectAltNames.addAll(OkHostnameVerifier.allSubjectAltNames(certificate));
 
         X500PrincipalHelper issuerHelper = new X500PrincipalHelper(certificate.getIssuerX500Principal());
         String issuer = issuerHelper.getCN();
@@ -50,10 +60,11 @@ public class CertificateHelper {
 
         return String.format("" +
                         "Subject: %s\n" +
+                        "Alt. names: %s\n" +
                         "Serialnumber: %s\n" +
                         "Issuer: %s\n" +
                         "Valid: %s - %s\n",
-                subject, serialNumber, issuer, validFrom, validUntil);
+                subject, TextUtils.join(", ", subjectAltNames), serialNumber, issuer, validFrom, validUntil);
     }
 
     public static String toString(X509Certificate certificate) throws CertificateEncodingException {

@@ -20,6 +20,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -63,6 +65,23 @@ public class SetupWebDavSyncDialogActivity extends Activity {
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         mEdtUrl = (EditText) findViewById(R.id.edt_url);
+        mEdtUrl.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mTxtTrustCertificateDescription.setVisibility(View.GONE);
+                mTxtTrustCertificate.setVisibility(View.GONE);
+                mChkTrustCertificate.setChecked(false);
+                mChkTrustCertificate.setVisibility(View.GONE);
+            }
+        });
         mEdtUserName = (EditText) findViewById(R.id.edt_user_name);
         mEdtPassword = (EditText) findViewById(R.id.edt_password);
         mTxtTrustCertificateDescription = (TextView) findViewById(R.id.txt_trust_certificate_description);
@@ -148,7 +167,6 @@ public class SetupWebDavSyncDialogActivity extends Activity {
                         mTxtTrustCertificateDescription.setVisibility(View.VISIBLE);
                         mTxtTrustCertificate.setText(CertificateHelper.getShortDescription(mTrustCertificate, SetupWebDavSyncDialogActivity.this));
                         mTxtTrustCertificate.setVisibility(View.VISIBLE);
-                        mChkTrustCertificate.setChecked(false);
                         mChkTrustCertificate.setVisibility(View.VISIBLE);
                     } else if (status == TestLoginStatus.INVALID_CERTIFICATE) {
                         mChkTrustCertificate.setError(getString(R.string.validate_error_webdav_invalid_certificate));
