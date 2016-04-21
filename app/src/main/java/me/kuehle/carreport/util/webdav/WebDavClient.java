@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.net.ssl.SSLHandshakeException;
 
@@ -41,8 +42,7 @@ import okhttp3.Response;
 public class WebDavClient {
     private static final String TAG = "WebDavClient";
 
-    @SuppressLint("SimpleDateFormat")
-    public static final DateFormat MODIFICATION_DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
+    public static final DateFormat MODIFICATION_DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
 
     private OkHttpClient mClient;
     private Uri mBaseUri;
