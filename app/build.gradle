@@ -33,16 +33,13 @@ android {
 }
 
 repositories {
-    // Required for com.google.api-client
-    mavenCentral()
-
     // Required for HelloCharts for Android
-    maven { url "http://dl.bintray.com/gudatcomputers/maven" }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
     // Charts
-    compile 'com.github.lecho:hellocharts-library:1.5.9@aar'
+    compile 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
 
     // Dropbox
     compile 'com.dropbox.core:dropbox-core-sdk:2.0.1'
