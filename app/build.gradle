@@ -21,6 +21,9 @@ android {
         foss
         full
     }
+    lintOptions {
+        checkReleaseBuilds false
+    }
     packagingOptions {
         // These files are included in at least two of the following libraries:
         // joda-time-2.6.jar, httpmime-4.0.3.jar, httpcore-4.0.1.jar, commons-logging-1.1.1.jar
