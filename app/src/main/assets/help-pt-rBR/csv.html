@@ -1,0 +1,53 @@
+<h1>Geral</h1>
+<p>O banco de dados completo é exportado, um arquivo para cada tabela. Isso significa que os dados de um abastecimento
+é separado em vários arquivos. Você pode encontrar o carro procurando o valor da coluna 'car' na coluna Id da tabela 
+'cars'.</p>
+
+<h1>Colunas</h1>
+<big>cars</big>
+<p>_id: [int]<br>
+car__name: [string]<br>
+color: [int] Procure na <a href="http://developer.android.com/reference/android/graphics/Color.html">documentação
+de cores do Android</a> para uma explicação mais detalhada de como o valor é calculado.<br>
+initial_mileage: [int] Quilometragem inicial do carro, quando iniciar o uso do aplicativo.<br>
+suspended_since: [date]</p>
+
+<big>fuel_types</big>
+<p>_id: [int]<br>
+fuel_type__name: [string]<br>
+category: [string]</p>
+
+<big>other_costs</big>
+<p>_id: [int]<br>
+car_id: [int] o Id do carro.<br>
+mileage: [int] Distância total (odômetro).<br>
+price: [float]<br>
+recurrence_interval: [int] 0 = uma vez, 1 = diário, 2 = mensal, 3 = trimestral, 4 = anual<br>
+recurrence_multiplier: [int] Indica o ciclo de recorrência em conjunto com o recurrence_interval. Exemplo: intervalo = 2 e multiplicador = 5 significa a cada 5 meses.<br>
+title: [string]<br>
+date: [date]<br>
+note: [string]<br>
+end_date: [date] Fim da recorrência nesta data.</p>
+
+<big>refuelings</big>
+<p>_id: [int]<br>
+partial: [bool] (1 ou 0)<br>
+date: [date]<br>
+note: [string]<br>
+volume: [float]<br>
+fuel_type: [int] o Id do tipo de combustível.<br>
+price: [float]<br>
+mileage: [int] Distância total (odômetro).<br>
+car_id: [int] o Id do carro.</p>
+
+<big>reminders</big>
+<p>_id: [int]<br>
+title: [string]<br>
+after_time_span_unit: [int] 0 = dias, 1 = meses, 2 = anos<br>
+after_time_span_count: [int] Indica um intervalo de tempo em conjunto com o after_time_span_unit. Exemplo: unit = 1 e count = 5 significa após 5 meses.<br>
+after_distance: [int]<br>
+start_date: [date]<br>
+start_mileage: [int]<br>
+car_id: [int] o Id do carro.<br>
+notification_dismissed: [bool] (1 ou 0)<br>
+snoozed_until: [date]</p>
