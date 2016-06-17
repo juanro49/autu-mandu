@@ -289,7 +289,7 @@ public class Calculator {
 	}
 
 	public static Long sum(Long... numbers) {
-		Long sum = 0l;
+		Long sum = 0L;
 		for (Long number : numbers) {
 			sum += number;
 		}
