@@ -7,14 +7,23 @@ android {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 47
-        versionName "3.9.3"
+        versionCode 48
+        versionName "3.10.0"
+    }
+    signingConfigs {
+        release {
+            keyAlias carReportSignKeyAlias
+            keyPassword carReportSignKeyPassword
+            storeFile file(carReportSignStoreFile)
+            storePassword carReportSignStorePassword
+        }
     }
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources false // Currently this changes the size of resources from 1932KB to 1943KB, making it useless.
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     productFlavors {
