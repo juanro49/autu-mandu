@@ -148,22 +148,23 @@
     <string name="alert_sync_first_sync_error">There was an error while performing the first sync. Please ensure you have a working network connection and try again.</string>
     <string name="alert_backup_overwrite_title">Backup</string>
     <string name="alert_backup_overwrite_message">A previous backup file does already exist on SD card.</string>
+    <string name="alert_backup_failed">Backup failed</string>
     <string name="alert_restore_title">Restore</string>
     <string name="alert_restore_message">When restoring from file, all current data will be overwritten. Also make sure the backup is from an app with equal or lower version than the one installed.</string>
+    <string name="alert_restore_failed">Restore failed</string>
     <string name="alert_export_csv_overwrite_title">Export CSV</string>
     <string name="alert_export_csv_overwrite_message">Export files from a previous export do already exist on SD card.</string>
+    <string name="alert_export_csv_failed">Export failed.</string>
     <string name="alert_import_csv_title">Import CSV</string>
     <string name="alert_import_csv_message">Import will update existing entries and add new ones, but it will not delete entries.</string>
+    <string name="alert_import_csv_failed">Import failed. No data was changed.\n\nReason: %s</string>
+    <string name="alert_error_title">Error</string>
 
     <string name="toast_new_refueling">Fuel consumption: %1$.2f %2$s %3$s</string>
-    <string name="toast_backup_success">Backup to file %s completed successfully.</string>
-    <string name="toast_backup_failed">Backup failed</string>
-    <string name="toast_restore_success">Restore completed successfully</string>
-    <string name="toast_restore_failed">Restore failed</string>
+    <string name="toast_backup_succeeded">Backup to file %s completed successfully.</string>
+    <string name="toast_restore_succeeded">Restore completed successfully</string>
     <string name="toast_export_csv_succeeded">Export to SD card completed successfully.</string>
-    <string name="toast_export_csv_failed">Export failed.</string>
-    <string name="toast_import_csv_success">Import completed successfully.</string>
-    <string name="toast_import_csv_failed">Import failed. No data was changed.\n\nPossible reasons:\n - Import data is not in the correct format.</string>
+    <string name="toast_import_csv_succeeded">Import completed successfully.</string>
     <string name="toast_need_storage_permission">To perform this action Car Report needs to have access to your files.</string>
     
     <string name="report_title_fuel_consumption">Fuel consumption</string>

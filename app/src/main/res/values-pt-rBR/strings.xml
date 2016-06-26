@@ -145,22 +145,23 @@
     <string name="alert_sync_first_sync_error">Ocorreu um erro durante a primeira sincronização. Verifique se a conexão com a rede está funcionando e tente novamente.</string>
     <string name="alert_backup_overwrite_title">Backup</string>
     <string name="alert_backup_overwrite_message">Já existe um arquivo de backup no cartão SD.</string>
+    <string name="alert_backup_failed">O backup falhou</string>
     <string name="alert_restore_title">Restaurar</string>
     <string name="alert_restore_message">Ao restaurar a partir de um arquivo, todos os dados serão sobrescritos. Certifique-se de que o backup foi feito a partir de uma versão igual ou menor do aplicativo instalado.</string>
+    <string name="alert_restore_failed">A restauração falhou</string>
     <string name="alert_export_csv_overwrite_title">Exportar CSV</string>
     <string name="alert_export_csv_overwrite_message">Exporta arquivos a partir de uma exportação anterior no cartão SD.</string>
+    <string name="alert_export_csv_failed">A exportação falhou.</string>
     <string name="alert_import_csv_title">Importar CSV</string>
     <string name="alert_import_csv_message">A importação irá atualizar e adicionar novos dados, mas não excluirá os existentes.</string>
+    <string name="alert_import_csv_failed">A importação falhou. Nenhum dado foi alterado.\n\nMotivo: %s</string>
+    <string name="alert_error_title">Erro</string>
 
     <string name="toast_new_refueling">Consmo de combustível: %1$.2f %2$s %3$s</string>
-    <string name="toast_backup_success">O backup para o arquivo %s foi concluído com sucesso.</string>
-    <string name="toast_backup_failed">O backup falhou</string>
-    <string name="toast_restore_success">Restauração concluída com sucesso</string>
-    <string name="toast_restore_failed">A restauração falhou</string>
+    <string name="toast_backup_succeeded">O backup para o arquivo %s foi concluído com sucesso.</string>
+    <string name="toast_restore_succeeded">Restauração concluída com sucesso</string>
     <string name="toast_export_csv_succeeded">Exportação para cartão SD concluída com sucesso.</string>
-    <string name="toast_export_csv_failed">A exportação falhou.</string>
-    <string name="toast_import_csv_success">Importação concluída com sucesso.</string>
-    <string name="toast_import_csv_failed">A importação falhou. Nenhum dado foi alterado.\n\nMotivos possíveis:\n - O formato dos dados importados está incorreto.</string>
+    <string name="toast_import_csv_succeeded">Importação concluída com sucesso.</string>
     <string name="toast_need_storage_permission">Para efetuar esta operação, o Car Report precisa ter acesso aos seus arquivos.</string>
     
     <string name="report_title_fuel_consumption">Consumo de combustível</string>

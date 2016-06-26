@@ -42,6 +42,7 @@ import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
 import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.backup.CSVExportImport;
+import me.kuehle.carreport.util.backup.CSVImportException;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 import me.kuehle.carreport.util.sync.Authenticator;
 import me.kuehle.carreport.util.sync.SyncProviders;
@@ -208,12 +209,11 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     .show(getFragmentManager(), null);
         } else if (mBackup.backup()) {
             Toast.makeText(getActivity(),
-                    getString(R.string.toast_backup_success, Backup.FILE_NAME),
+                    getString(R.string.toast_backup_succeeded, Backup.FILE_NAME),
                     Toast.LENGTH_SHORT).show();
             setupRestorePreference();
         } else {
-            Toast.makeText(getActivity(), R.string.toast_backup_failed,
-                    Toast.LENGTH_LONG).show();
+            showError(getString(R.string.alert_backup_failed));
         }
     }
 
@@ -231,8 +231,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     Toast.LENGTH_SHORT).show();
             setupImportCSVPreference();
         } else {
-            Toast.makeText(getActivity(), R.string.toast_export_csv_failed,
-                    Toast.LENGTH_LONG).show();
+            showError(getString(R.string.alert_export_csv_failed));
         }
     }
 
@@ -243,12 +242,14 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     getString(R.string.alert_import_csv_message),
                     R.string.import_, android.R.string.cancel).show(
                     getFragmentManager(), null);
-        } else if (mCSVExportImport.import_()) {
-            Toast.makeText(getActivity(), R.string.toast_import_csv_success,
-                    Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getActivity(), R.string.toast_import_csv_failed,
-                    Toast.LENGTH_LONG).show();
+            try {
+                mCSVExportImport.import_();
+                Toast.makeText(getActivity(), R.string.toast_import_csv_succeeded,
+                        Toast.LENGTH_SHORT).show();
+            } catch (CSVImportException e) {
+                showError(getString(R.string.alert_import_csv_failed, e.getMessage()));
+            }
         }
     }
 
@@ -260,11 +261,10 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     R.string.restore, android.R.string.cancel)
                     .show(getFragmentManager(), null);
         } else if (mBackup.restore()) {
-            Toast.makeText(getActivity(), R.string.toast_restore_success,
+            Toast.makeText(getActivity(), R.string.toast_restore_succeeded,
                     Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getActivity(), R.string.toast_restore_failed,
-                    Toast.LENGTH_LONG).show();
+            showError(getString(R.string.alert_restore_failed));
         }
     }
 
@@ -344,5 +344,11 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                 return true;
             }
         };
+    }
+
+    private void showError(String message) {
+        MessageDialogFragment.newInstance(this, 0, R.string.alert_error_title,
+                message, android.R.string.ok, null)
+                .show(getFragmentManager(), null);
     }
 }

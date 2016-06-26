@@ -19,6 +19,7 @@ package me.kuehle.carreport.util.backup;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.Environment;
 import android.os.RemoteException;
 
@@ -206,9 +207,9 @@ public class CSVExportImport {
         return false;
     }
 
-    public boolean import_() {
+    public void import_() throws CSVImportException {
         if (!allExportFilesExist()) {
-            return false;
+            throw new CSVImportException("Some import files are missing.");
         }
 
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
@@ -220,9 +221,8 @@ public class CSVExportImport {
 
         try {
             mContext.getContentResolver().applyBatch(DataProvider.AUTHORITY, operations);
-            return true;
-        } catch (RemoteException | OperationApplicationException e) {
-            return false;
+        } catch (RemoteException | OperationApplicationException | SQLiteConstraintException e) {
+            throw new CSVImportException(e);
         }
     }
 
