@@ -251,6 +251,8 @@
     <string name="calc_option_price_to_volume">Preis (%1$s) nach Volumen (%2$s)</string>
     <string name="calc_option_distance_to_price">Strecke (%1$s) nach Preis (%2$s)</string>
     <string name="calc_option_price_to_distance">Preis (%1$s) nach Strecke (%2$s)</string>
+    <string name="calc_option_distance_to_fuel_price">Strecke (%1$s) nach Benzinpreis (%2$s)</string>
+    <string name="calc_option_fuel_price_to_distance">Benzinpreis (%1$s) nach Strecke (%2$s)</string>
 
     <string name="notification_reminder_title_single">Erinnerung: %s</string>
     <string name="notification_reminder_title_multiple">Mehrere Erinnerungen</string>

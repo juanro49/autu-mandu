@@ -1,11 +1,11 @@
 /*
- * Copyright 2015 Jan Kühle
+ * Copyright 2016 Jan Kühle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,14 +24,14 @@ import java.util.List;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 
-public class DistanceToPriceCalculation extends AbstractDistancePriceCalculation {
-    public DistanceToPriceCalculation(Context context) {
-        super(context, true);
+public class DistanceToFuelPriceCalculation extends AbstractDistancePriceCalculation {
+    public DistanceToFuelPriceCalculation(Context context) {
+        super(context, false);
     }
 
     @Override
     public String getName() {
-        return mContext.getString(R.string.calc_option_distance_to_price,
+        return mContext.getString(R.string.calc_option_distance_to_fuel_price,
                 getInputUnit(), getOutputUnit());
     }
 

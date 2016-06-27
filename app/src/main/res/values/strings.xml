@@ -254,6 +254,8 @@
     <string name="calc_option_price_to_volume">Price (%1$s) to Volume (%2$s)</string>
     <string name="calc_option_distance_to_price">Distance (%1$s) to Price (%2$s)</string>
     <string name="calc_option_price_to_distance">Price (%1$s) to Distance (%2$s)</string>
+    <string name="calc_option_distance_to_fuel_price">Distance (%1$s) to Fuel Price (%2$s)</string>
+    <string name="calc_option_fuel_price_to_distance">Fuel Price (%1$s) to Distance (%2$s)</string>
 
     <string name="notification_reminder_title_single">Reminder: %s</string>
     <string name="notification_reminder_title_multiple">Multiple reminders</string>

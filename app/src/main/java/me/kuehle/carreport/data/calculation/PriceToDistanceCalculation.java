@@ -26,7 +26,7 @@ import me.kuehle.carreport.R;
 
 public class PriceToDistanceCalculation extends AbstractDistancePriceCalculation {
     public PriceToDistanceCalculation(Context context) {
-        super(context);
+        super(context, true);
     }
 
     @Override
