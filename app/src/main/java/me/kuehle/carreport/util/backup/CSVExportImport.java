@@ -18,15 +18,11 @@ package me.kuehle.carreport.util.backup;
 
 import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.content.OperationApplicationException;
-import android.database.sqlite.SQLiteConstraintException;
 import android.os.Environment;
-import android.os.RemoteException;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import me.kuehle.carreport.data.query.CarQueries;
 import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarContentValues;
@@ -212,16 +208,16 @@ public class CSVExportImport {
             throw new CSVImportException("Some import files are missing.");
         }
 
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-        operations.addAll(importCars());
-        operations.addAll(importFuelTypes());
-        operations.addAll(importOtherCosts());
-        operations.addAll(importRefuelings());
-        operations.addAll(importReminders());
-
         try {
+            ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+            operations.addAll(importCars());
+            operations.addAll(importFuelTypes());
+            operations.addAll(importOtherCosts());
+            operations.addAll(importRefuelings());
+            operations.addAll(importReminders());
+
             mContext.getContentResolver().applyBatch(DataProvider.AUTHORITY, operations);
-        } catch (RemoteException | OperationApplicationException | SQLiteConstraintException e) {
+        } catch (Exception e) {
             throw new CSVImportException(e);
         }
     }
@@ -241,7 +237,8 @@ public class CSVExportImport {
             boolean updated = false;
             if (id != null) {
                 CarSelection selection = new CarSelection().id(id);
-                if (CarQueries.getCount(mContext) > 0) {
+                CarCursor car = selection.query(mContext.getContentResolver());
+                if (car.getCount() > 0) {
                     operations.add(ContentProviderOperation.newUpdate(values.uri())
                             .withSelection(selection.sel(), selection.args())
                             .withValues(values.values())
