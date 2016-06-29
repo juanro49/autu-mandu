@@ -36,13 +36,16 @@ import me.kuehle.carreport.util.Recurrences;
 public abstract class AbstractDistancePriceCalculation extends AbstractCalculation {
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "FieldCanBeLocal"})
     private List<Cursor> mCursorStore;
+    private boolean mIncludeOtherCosts;
 
     protected List<String> mNames;
     protected List<Double> mAvgDistancePrices;
     protected List<Integer> mColors;
 
-    public AbstractDistancePriceCalculation(Context context) {
+    public AbstractDistancePriceCalculation(Context context, boolean includeOtherCosts) {
         super(context);
+
+        mIncludeOtherCosts = includeOtherCosts;
     }
 
     @Override
@@ -85,25 +88,27 @@ public abstract class AbstractDistancePriceCalculation extends AbstractCalculati
                 endMileage = refueling.getMileage();
             }
 
-            OtherCostCursor otherCost = new OtherCostSelection().carId(car.getId())
-                    .query(mContext.getContentResolver(), OtherCostColumns.ALL_COLUMNS);
-            otherCost.registerContentObserver(observer);
-            mCursorStore.add(otherCost);
-            while (otherCost.moveToNext()) {
-                int recurrences;
-                if (otherCost.getEndDate() == null) {
-                    recurrences = Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(),
-                            otherCost.getRecurrenceMultiplier(), otherCost.getDate());
-                } else {
-                    recurrences = Recurrences.getRecurrencesBetween(otherCost.getRecurrenceInterval(),
-                            otherCost.getRecurrenceMultiplier(), otherCost.getDate(), otherCost.getEndDate());
-                }
+            if (mIncludeOtherCosts) {
+                OtherCostCursor otherCost = new OtherCostSelection().carId(car.getId())
+                        .query(mContext.getContentResolver(), OtherCostColumns.ALL_COLUMNS);
+                otherCost.registerContentObserver(observer);
+                mCursorStore.add(otherCost);
+                while (otherCost.moveToNext()) {
+                    int recurrences;
+                    if (otherCost.getEndDate() == null) {
+                        recurrences = Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(),
+                                otherCost.getRecurrenceMultiplier(), otherCost.getDate());
+                    } else {
+                        recurrences = Recurrences.getRecurrencesBetween(otherCost.getRecurrenceInterval(),
+                                otherCost.getRecurrenceMultiplier(), otherCost.getDate(), otherCost.getEndDate());
+                    }
 
-                totalCosts += otherCost.getPrice() * recurrences;
+                    totalCosts += otherCost.getPrice() * recurrences;
 
-                if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                    startMileage = Math.min(startMileage, otherCost.getMileage());
-                    endMileage = Math.max(endMileage, otherCost.getMileage());
+                    if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
+                        startMileage = Math.min(startMileage, otherCost.getMileage());
+                        endMileage = Math.max(endMileage, otherCost.getMileage());
+                    }
                 }
             }
 

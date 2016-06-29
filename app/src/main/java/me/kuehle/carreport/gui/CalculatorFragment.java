@@ -47,8 +47,10 @@ import lecho.lib.hellocharts.view.ColumnChartView;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.calculation.AbstractCalculation;
 import me.kuehle.carreport.data.calculation.CalculationItem;
+import me.kuehle.carreport.data.calculation.DistanceToFuelPriceCalculation;
 import me.kuehle.carreport.data.calculation.DistanceToPriceCalculation;
 import me.kuehle.carreport.data.calculation.DistanceToVolumeCalculation;
+import me.kuehle.carreport.data.calculation.FuelPriceToDistanceCalculation;
 import me.kuehle.carreport.data.calculation.PriceToDistanceCalculation;
 import me.kuehle.carreport.data.calculation.PriceToVolumeCalculation;
 import me.kuehle.carreport.data.calculation.VolumeToDistanceCalculation;
@@ -93,7 +95,9 @@ public class CalculatorFragment extends Fragment {
                 new VolumeToPriceCalculation(context),
                 new PriceToVolumeCalculation(context),
                 new DistanceToPriceCalculation(context),
-                new PriceToDistanceCalculation(context)};
+                new PriceToDistanceCalculation(context),
+                new DistanceToFuelPriceCalculation(context),
+                new FuelPriceToDistanceCalculation(context)};
 
         mObserver = new ForceLoadContentObserver();
     }

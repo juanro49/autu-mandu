@@ -145,22 +145,23 @@
     <string name="alert_sync_first_sync_error">Bei der ersten Synchronisation ist ein Fehler aufgetreten. Bitte stellen Sie sicher, dass Sie eine Internetverbinding haben und versuchen Sie es erneut.</string>
     <string name="alert_backup_overwrite_title">Sichern</string>
     <string name="alert_backup_overwrite_message">Es gibt bereits eine Sicherungsdatei auf der SD-Karte.</string>
+    <string name="alert_backup_failed">Sichern fehlgeschlagen</string>
     <string name="alert_restore_title">Wiederherstellen</string>
     <string name="alert_restore_message">Beim Wiederherstellen werden alle aktuellen Daten überschrieben. Versichern Sie sich außerdem, dass die Sicherung von einer App mit gleicher oder niedrigerer Version als der installierten stammt.</string>
+    <string name="alert_restore_failed">Wiederherstellen fehlgeschlagen</string>
     <string name="alert_export_csv_overwrite_title">CSV exportieren</string>
     <string name="alert_export_csv_overwrite_message">Es existieren bereits Exportdaten von einem vorigen Export auf der SD-Karte.</string>
+    <string name="alert_export_csv_failed">Export fehlgeschlagen</string>
     <string name="alert_import_csv_title">CSV importieren</string>
     <string name="alert_import_csv_message">Der Import aktualisiert bestehende Einträge und fügt neue hinzu, löscht aber keine Einträge.</string>
+    <string name="alert_import_csv_failed">Import fehlgeschlagen. Es wurden keine Daten verändert.\n\nFehlerursache: %s</string>
+    <string name="alert_error_title">Fehler</string>
 
     <string name="toast_new_refueling">Benzinverbrauch: %1$.2f %2$s %3$s</string>
-    <string name="toast_backup_success">Sichern der Daten zur Datei %s war erfolgreich.</string>
-    <string name="toast_backup_failed">Sichern fehlgeschlagen</string>
-    <string name="toast_restore_success">Wiederherstellen der Daten war erfolgreich</string>
-    <string name="toast_restore_failed">Wiederherstellen fehlgeschlagen</string>
+    <string name="toast_backup_succeeded">Sichern der Daten zur Datei %s war erfolgreich.</string>
+    <string name="toast_restore_succeeded">Wiederherstellen der Daten war erfolgreich</string>
     <string name="toast_export_csv_succeeded">Export auf die SD-Karte war erfolgreich</string>
-    <string name="toast_export_csv_failed">Export fehlgeschlagen</string>
-    <string name="toast_import_csv_success">Importieren der Daten war erfolgreich</string>
-    <string name="toast_import_csv_failed">Import fehlgeschlagen. Es wurden keine Daten verändert.\n\nMögliche Fehlerursachen:\n - Die Importdaten sind nicht im CSV-Format.</string>
+    <string name="toast_import_csv_succeeded">Importieren der Daten war erfolgreich</string>
     <string name="toast_need_storage_permission">Um diese Aktion durchzuführen, braucht Car Report Zugriff auf Ihre Dateien.</string>
     
     <string name="report_title_fuel_consumption">Benzinverbrauch</string>
@@ -250,6 +251,8 @@
     <string name="calc_option_price_to_volume">Preis (%1$s) nach Volumen (%2$s)</string>
     <string name="calc_option_distance_to_price">Strecke (%1$s) nach Preis (%2$s)</string>
     <string name="calc_option_price_to_distance">Preis (%1$s) nach Strecke (%2$s)</string>
+    <string name="calc_option_distance_to_fuel_price">Strecke (%1$s) nach Benzinpreis (%2$s)</string>
+    <string name="calc_option_fuel_price_to_distance">Benzinpreis (%1$s) nach Strecke (%2$s)</string>
 
     <string name="notification_reminder_title_single">Erinnerung: %s</string>
     <string name="notification_reminder_title_multiple">Mehrere Erinnerungen</string>
