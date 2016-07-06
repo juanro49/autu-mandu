@@ -24,6 +24,8 @@ import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 
+import java.util.Locale;
+
 import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -107,21 +109,22 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
         data.put(R.id.subtitle, refueling.getFuelTypeName());
         data.put(R.id.date, mDateFormat.format(refueling.getDate()));
 
-        data.put(R.id.data1, String.format("%d %s", mileage, mUnitDistance));
+        data.put(R.id.data1, String.format(Locale.getDefault(), "%d %s", mileage, mUnitDistance));
 
         int mileageDifference = mileage - refueling.getCarInitialMileage();
         if (moveToNextNotGuessedRefueling(refueling)) {
             mileageDifference = mileage - refueling.getMileage();
         }
         refueling.moveToPosition(position);
-        data.put(R.id.data1_calculated, String.format("+ %d %s", mileageDifference, mUnitDistance));
+        data.put(R.id.data1_calculated, String.format(Locale.getDefault(), "+ %d %s",
+                mileageDifference, mUnitDistance));
 
-        data.put(R.id.data2, String.format("%.2f %s", refueling.getPrice(), mUnitCurrency));
-        data.put(R.id.data2_calculated, String.format("%.3f %s/%s",
-                refueling.getPrice() / volume, mUnitCurrency,
-                mUnitVolume));
+        data.put(R.id.data2, String.format(Locale.getDefault(), "%.2f %s", refueling.getPrice(),
+                mUnitCurrency));
+        data.put(R.id.data2_calculated, String.format(Locale.getDefault(), "%.3f %s/%s",
+                refueling.getPrice() / volume, mUnitCurrency, mUnitVolume));
 
-        data.put(R.id.data3, String.format("%.2f %s", volume, mUnitVolume));
+        data.put(R.id.data3, String.format(Locale.getDefault(), "%.2f %s", volume, mUnitVolume));
         if (refueling.getPartial()) {
             data.put(R.id.data3_calculated, getString(R.string.label_partial));
         } else if (moveToNextNotGuessedRefuelingOfSameFuelTypeCategory(refueling)) {
@@ -131,7 +134,7 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
                     diffVolume += refueling.getVolume();
                 } else {
                     int diffMileage = mileage - refueling.getMileage();
-                    data.put(R.id.data3_calculated, String.format("%.2f %s",
+                    data.put(R.id.data3_calculated, String.format(Locale.getDefault(), "%.2f %s",
                             mFuelConsumption.computeFuelConsumption(diffVolume, diffMileage),
                             mFuelConsumption.getUnitLabel()));
                     break;

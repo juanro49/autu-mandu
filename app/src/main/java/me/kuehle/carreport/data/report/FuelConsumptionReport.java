@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.R;
@@ -118,7 +119,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
     @Override
     protected String formatYValue(float value, int chartOption) {
-        return String.format("%.2f", value);
+        return String.format(Locale.getDefault(), "%.2f", value);
     }
 
     @Override
@@ -145,9 +146,9 @@ public class FuelConsumptionReport extends AbstractReport {
 
         ArrayList<Cursor> cursors = new ArrayList<>();
 
-        // Collect report data and add info data which will be displayed
-        // next to the graph.
-        CarCursor car = new CarSelection().query(mContext.getContentResolver(), null, CarColumns.NAME + " COLLATE UNICODE");
+        // Collect report data and add info data which will be displayed next to the graph.
+        CarCursor car = new CarSelection().query(mContext.getContentResolver(), null,
+                CarColumns.NAME + " COLLATE UNICODE");
         cursors.add(car);
         while (car.moveToNext()) {
             boolean sectionAdded = false;
@@ -164,12 +165,12 @@ public class FuelConsumptionReport extends AbstractReport {
 
                 Section section = addDataSection(car, category);
                 Float[] yValues = carData.getYValues().toArray(new Float[carData.size()]);
-                section.addItem(new Item(mContext.getString(R.string.report_highest),
-                        String.format("%.2f %s", Calculator.max(yValues), mUnit)));
-                section.addItem(new Item(mContext.getString(R.string.report_lowest),
-                        String.format("%.2f %s", Calculator.min(yValues), mUnit)));
-                section.addItem(new Item(mContext.getString(R.string.report_average),
-                        String.format("%.2f %s", carData.getAverageConsumption(), mUnit)));
+                section.addItem(new Item(mContext.getString(R.string.report_highest), String.format(Locale.getDefault(),
+                        "%.2f %s", Calculator.max(yValues), mUnit)));
+                section.addItem(new Item(mContext.getString(R.string.report_lowest), String.format(Locale.getDefault(),
+                        "%.2f %s", Calculator.min(yValues), mUnit)));
+                section.addItem(new Item(mContext.getString(R.string.report_average), String.format(Locale.getDefault(),
+                        "%.2f %s", carData.getAverageConsumption(), mUnit)));
 
                 sectionAdded = true;
             }

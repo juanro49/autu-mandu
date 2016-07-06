@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import lecho.lib.hellocharts.util.ChartUtils;
 import me.kuehle.carreport.Preferences;
@@ -144,13 +145,13 @@ public class FuelPriceReport extends AbstractReport {
 
                 Section section = addDataSection(fuelType.getName(), color);
                 section.addItem(new Item(mContext
-                        .getString(R.string.report_highest), String.format(
+                        .getString(R.string.report_highest), String.format(Locale.getDefault(),
                         "%.3f %s", data.getMax(), mUnit)));
                 section.addItem(new Item(mContext
-                        .getString(R.string.report_lowest), String.format(
+                        .getString(R.string.report_lowest), String.format(Locale.getDefault(),
                         "%.3f %s", data.getMin(), mUnit)));
                 section.addItem(new Item(mContext
-                        .getString(R.string.report_average), String.format(
+                        .getString(R.string.report_average), String.format(Locale.getDefault(),
                         "%.3f %s", data.getAverage(), mUnit)));
 
                 currentColor++;
