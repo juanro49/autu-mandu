@@ -38,7 +38,7 @@ public class NewRefuelingSnackbar {
         }
 
         RefuelingCursor previousRefueling = RefuelingQueries.getPrevious(context,
-                refueling.getCarId(), refueling.getDate());
+                refueling.getCarId(), refueling.getDate(), refueling.getFuelTypeCategory());
         if (previousRefueling.moveToFirst() && !refueling.getPartial()) {
             float consumption = getFuelConsumptionToPreviousRefueling(fuelConsumption,
                     refueling.getVolume(), refueling.getMileage(), previousRefueling);

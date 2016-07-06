@@ -124,7 +124,7 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
         data.put(R.id.data3, String.format("%.2f %s", volume, mUnitVolume));
         if (refueling.getPartial()) {
             data.put(R.id.data3_calculated, getString(R.string.label_partial));
-        } else if (moveToNextNotGuessedRefueling(refueling)) {
+        } else if (moveToNextNotGuessedRefuelingOfSameFuelTypeCategory(refueling)) {
             float diffVolume = volume;
             do {
                 if (refueling.getPartial()) {
@@ -136,7 +136,7 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
                             mFuelConsumption.getUnitLabel()));
                     break;
                 }
-            } while (moveToNextNotGuessedRefueling(refueling));
+            } while (moveToNextNotGuessedRefuelingOfSameFuelTypeCategory(refueling));
         }
         refueling.moveToPosition(position);
 
@@ -160,6 +160,20 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
     private boolean moveToNextNotGuessedRefueling(BalancedRefuelingCursor refueling) {
         while (refueling.moveToNext()) {
             if (!refueling.getGuessed()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean moveToNextNotGuessedRefuelingOfSameFuelTypeCategory(BalancedRefuelingCursor refueling) {
+        String fuelTypeCategory = refueling.getFuelTypeCategory();
+        while (moveToNextNotGuessedRefueling(refueling)) {
+            if ((fuelTypeCategory == null &&
+                    refueling.getFuelTypeCategory() == null) ||
+                    (fuelTypeCategory != null &&
+                            fuelTypeCategory.equals(refueling.getFuelTypeCategory()))) {
                 return true;
             }
         }
