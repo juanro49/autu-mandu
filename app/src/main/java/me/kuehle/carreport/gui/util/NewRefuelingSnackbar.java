@@ -68,7 +68,7 @@ public class NewRefuelingSnackbar {
      * specified previous refueling. This modifies the previousRefueling cursor. It will have
      * one of the following results:
      * <p/>
-     * Calculation was successfull:
+     * Calculation was successful:
      * Returns fuel consumption.
      * Cursor previousRefueling points to the previous full refueling.
      * Calculation failed:

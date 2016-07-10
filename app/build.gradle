@@ -54,17 +54,17 @@ dependencies {
     compile 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
 
     // Dropbox
-    compile 'com.dropbox.core:dropbox-core-sdk:2.0.3'
+    compile 'com.dropbox.core:dropbox-core-sdk:2.0.6'
 
     // Support, AppCompat
-    compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:cardview-v7:23.3.0'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
+    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:cardview-v7:23.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.android.support:design:23.4.0'
 
     // Play Services: for Google Drive
-    fullCompile 'com.google.android.gms:play-services-drive:8.4.0'
+    fullCompile 'com.google.android.gms:play-services-drive:9.2.0'
 
     // The new Android Drive API, which is included in the play services, has caching bugs and does
     // not provide all functionality. Until this is fixed we have to use the old Google API.
@@ -86,14 +86,14 @@ dependencies {
     }
 
     // WebDAV
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.okhttp3:okhttp:3.4.0'
 
     // UI Helpers
     compile 'com.larswerkman:HoloColorPicker:1.5'
-    compile 'com.github.clans:fab:1.6.3'
+    compile 'com.github.clans:fab:1.6.4'
     compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
-    compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
+    compile 'de.psdev.licensesdialog:licensesdialog:1.8.1'
 
     // Joda-Time for Android
-    compile 'net.danlew:android.joda:2.9.3'
+    compile 'net.danlew:android.joda:2.9.4.1'
 }

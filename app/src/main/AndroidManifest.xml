@@ -78,7 +78,7 @@
         <activity
             android:name=".gui.AuthenticatorAddAccountActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/Base.Theme.AppCompat.Dialog"/>
+            android:theme="@style/AppTheme.Dialog"/>
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
             android:configChanges="orientation|keyboard"
@@ -94,7 +94,7 @@
         <activity
             android:name=".gui.dialog.SetupWebDavSyncDialogActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/Base.Theme.AppCompat.Dialog"/>
+            android:theme="@style/AppTheme.Dialog"/>
 
         <service
             android:name=".util.sync.AuthenticatorService"
