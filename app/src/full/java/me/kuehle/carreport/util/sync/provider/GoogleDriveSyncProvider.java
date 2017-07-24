@@ -255,7 +255,6 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
                 throw new SyncParseException();
             }
 
-
             outputStream = new FileOutputStream(tempFile);
             mGoogleApiServiceDrive
                     .files()

@@ -142,6 +142,7 @@
     <orderEntry type="library" exported="" name="google-http-client-android-1.21.0" level="project" />
     <orderEntry type="library" exported="" name="hellocharts-android-ba603174d302931c0985afb4e54d597fba28146b" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-11.0.2" level="project" />
+    <orderEntry type="library" exported="" name="play-services-auth-11.0.2" level="project" />
     <orderEntry type="library" exported="" name="jsr305-3.0.1" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-1.21.0-self-build" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-android-1.21.0" level="project" />
@@ -166,6 +167,7 @@
     <orderEntry type="library" exported="" name="support-v4-25.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.4.0" level="project" />
     <orderEntry type="library" exported="" name="google-http-client-1.21.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-auth-base-11.0.2" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-25.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-tasks-11.0.2" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.4.0" level="project" />

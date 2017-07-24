@@ -64,6 +64,7 @@ dependencies {
     compile 'com.android.support:design:25.4.0'
 
     // Play Services: for Google Drive
+    fullCompile 'com.google.android.gms:play-services-auth:11.0.2'
     fullCompile 'com.google.android.gms:play-services-drive:11.0.2'
 
     // The new Android Drive API, which is included in the play services, has caching bugs and does
