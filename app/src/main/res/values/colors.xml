@@ -39,4 +39,6 @@
     <color name="button_accent_pressed">#ffff7e56</color>
     <color name="button_accent_focused">#ffff6c3e</color>
 
+    <color name="background">#ff424242</color>
+
 </resources>
