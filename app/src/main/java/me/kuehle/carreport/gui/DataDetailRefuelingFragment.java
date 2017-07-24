@@ -19,11 +19,13 @@ package me.kuehle.carreport.gui;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.Date;
 
@@ -35,7 +37,6 @@ import me.kuehle.carreport.data.query.FuelTypeQueries;
 import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
-import me.kuehle.carreport.gui.util.AbstractFormFieldValidator;
 import me.kuehle.carreport.gui.util.DateTimeInput;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
@@ -68,6 +69,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     private DateTimeInput edtDate;
     private DateTimeInput edtTime;
     private EditText edtMileage;
+    private TextView txtMileageWarning;
     private EditText edtVolume;
     private CheckBox chkPartial;
     private EditText edtPrice;
@@ -157,6 +159,8 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 edtVolume.setText(String.valueOf(refueling.getVolume()));
                 edtPrice.setText(String.valueOf(refueling.getPrice() / refueling.getVolume()));
             }
+
+            updateMileageInputWarningVisibility();
         }
     }
 
@@ -189,6 +193,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         edtTime = new DateTimeInput((EditText) v.findViewById(R.id.edt_time),
                 DateTimeInput.Mode.TIME);
         edtMileage = (EditText) v.findViewById(R.id.edt_mileage);
+        txtMileageWarning = (TextView) v.findViewById(R.id.txt_mileage_input_warning);
         edtVolume = (EditText) v.findViewById(R.id.edt_volume);
         chkPartial = (CheckBox) v.findViewById(R.id.chk_partial);
         edtPrice = (EditText) v.findViewById(R.id.edt_price);
@@ -205,6 +210,18 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         // Distance entry mode
         mDistanceEntryMode = prefs.getDistanceEntryMode();
         addUnitToHint(edtMileage, mDistanceEntryMode.nameResourceId, prefs.getUnitDistance());
+
+        // Mileage warning
+        txtMileageWarning.setVisibility(View.GONE);
+        txtMileageWarning.setText(mDistanceEntryMode == DistanceEntryMode.TOTAL
+                ? R.string.validate_error_mileage_out_of_range_total
+                : R.string.validate_error_mileage_out_of_range_trip);
+        edtMileage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                updateMileageInputWarningVisibility();
+            }
+        });
 
         // Price entry mode
         mPriceEntryMode = prefs.getPriceEntryMode();
@@ -244,44 +261,6 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         validator.add(new FormFieldGreaterZeroValidator(edtMileage));
         validator.add(new FormFieldGreaterZeroValidator(edtVolume));
         validator.add(new FormFieldGreaterZeroValidator(edtPrice));
-
-        // Check if entered mileage is between the mileage of the
-        // previous and next refueling.
-        if (mDistanceEntryMode == DistanceEntryMode.TOTAL) {
-            validator.add(new AbstractFormFieldValidator(edtMileage) {
-                @Override
-                protected boolean isValid() {
-                    int mileage = getIntegerFromEditText(edtMileage, 0);
-                    RefuelingCursor previousRefueling = getPreviousRefueling();
-                    RefuelingCursor nextRefueling = getNextRefueling();
-
-                    return !((previousRefueling.moveToNext() && previousRefueling.getMileage() >= mileage)
-                            || (nextRefueling.moveToNext() && nextRefueling.getMileage() <= mileage));
-                }
-
-                @Override
-                protected int getMessage() {
-                    return R.string.validate_error_mileage_out_of_range_total;
-                }
-            });
-        } else {
-            validator.add(new AbstractFormFieldValidator(edtMileage) {
-                @Override
-                protected boolean isValid() {
-                    int mileage = getIntegerFromEditText(edtMileage, 0);
-                    RefuelingCursor previousRefueling = getPreviousRefueling();
-                    RefuelingCursor nextRefueling = getNextRefueling();
-
-                    return !(previousRefueling.moveToNext() && nextRefueling.moveToNext()
-                            && previousRefueling.getMileage() + mileage >= nextRefueling.getMileage());
-                }
-
-                @Override
-                protected int getMessage() {
-                    return R.string.validate_error_mileage_out_of_range_trip;
-                }
-            });
-        }
 
         return validator.validate();
     }
@@ -342,5 +321,27 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         Date date = DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate());
 
         return RefuelingQueries.getNext(getActivity(), spnCar.getSelectedItemId(), date);
+    }
+
+    private void updateMileageInputWarningVisibility() {
+        boolean showWarning;
+        if (TextUtils.isEmpty(edtMileage.getText())) {
+            showWarning = false;
+        } else {
+            int mileage = getIntegerFromEditText(edtMileage, 0);
+            RefuelingCursor previousRefueling = getPreviousRefueling();
+            RefuelingCursor nextRefueling = getNextRefueling();
+
+            if (mDistanceEntryMode == DistanceEntryMode.TOTAL) {
+                showWarning = (previousRefueling.moveToNext() && previousRefueling.getMileage() >= mileage) ||
+                        (nextRefueling.moveToNext() && nextRefueling.getMileage() <= mileage);
+            } else {
+                showWarning = previousRefueling.moveToNext() &&
+                        nextRefueling.moveToNext() &&
+                        previousRefueling.getMileage() + mileage >= nextRefueling.getMileage();
+            }
+        }
+
+        txtMileageWarning.setVisibility(showWarning ? View.VISIBLE : View.GONE);
     }
 }

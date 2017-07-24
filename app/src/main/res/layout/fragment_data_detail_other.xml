@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/edt_title_input_layout">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_mileage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/edt_mileage_input_layout">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,7 +76,7 @@
             android:layout_alignParentStart="true"
             android:layout_toLeftOf="@+id/edt_time_input_layout"
             android:layout_toStartOf="@+id/edt_time_input_layout">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_time"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
@@ -126,7 +126,7 @@
             android:layout_below="@id/chk_end_date"
             android:layout_marginLeft="36dp"
             android:layout_marginStart="36dp">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_end_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/edt_end_date_input_layout">
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

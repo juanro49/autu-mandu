@@ -67,7 +67,7 @@ public abstract class AbstractFormFieldValidator {
     protected abstract boolean isValid();
 
     private static void setError(TextView field, String error) {
-        ViewParent parent = field.getParent();
+        ViewParent parent = field.getParent().getParent();
         if (parent instanceof TextInputLayout) {
             ((TextInputLayout) parent).setError(error);
         } else {
