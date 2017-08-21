@@ -191,7 +191,7 @@
     <string name="pref_title_unit_distance">Distance</string>
     <string name="pref_title_unit_fuel_consumption">Consommation de carburant</string>
     <string name="pref_title_sync_setup">Paramètre de synchronisation</string>
-    <string name="pref_title_backup">Restauration</string>
+    <string name="pref_title_backup">Sauvegarde</string>
     <string name="pref_title_restore">Restauration</string>
     <string name="pref_title_exportcsv">Exportation CSV</string>
     <string name="pref_title_importcsv">Importation CSV</string>
