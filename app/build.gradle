@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "26.0.0"
+    buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 54
-        versionName "3.13.0"
+        versionCode 55
+        versionName "3.13.1"
     }
     signingConfigs {
         release {
