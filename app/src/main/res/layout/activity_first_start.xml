@@ -15,115 +15,201 @@
   limitations under the License.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="?attr/detailsElementLayoutWidth"
-    android:layout_height="match_parent"
-    android:layout_gravity="center_horizontal"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp"
-    android:background="?attr/detailsElementBackground">
-    <RelativeLayout
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="?attr/detailsElementLayoutWidth"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:background="?attr/detailsElementBackground">
+
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/txt_hi"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
             android:text="@string/first_start_hi"
-            android:textSize="30sp" />
+            android:textSize="30sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintTop_creator="1"/>
+
         <TextView
             android:id="@+id/txt_intro"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_hi"
-            android:layout_marginTop="24dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
             android:text="@string/first_start_intro"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_hi"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintTop_creator="1"/>
+
         <ImageView
             android:id="@+id/img_step1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_intro"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@string/first_start_step1_img_desc"
-            android:src="@drawable/ic_c_first_start_step1_32dp" />
+            android:src="@drawable/ic_c_first_start_step1_32dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_intro"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_conversion_absoluteHeight="32dp"
+            tools:layout_conversion_absoluteWidth="32dp"
+            tools:layout_conversion_absoluteX="24dp"
+            tools:layout_conversion_absoluteY="185dp"/>
+
         <TextView
             android:id="@+id/txt_step1_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/img_step1"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_toRightOf="@+id/img_step1"
-            android:layout_toEndOf="@+id/img_step1"
             android:text="@string/first_start_step1_text"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            app:layout_constraintLeft_toRightOf="@+id/img_step1"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/img_step1"
+            tools:layout_constraintBottom_creator="1"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_conversion_absoluteHeight="21dp"
+            tools:layout_conversion_absoluteWidth="102dp"
+            tools:layout_conversion_absoluteX="64dp"
+            tools:layout_conversion_absoluteY="193dp"/>
+
         <ImageView
             android:id="@+id/img_step2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_step1_text"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@string/first_start_step2_img_desc"
-            android:src="@drawable/ic_c_first_start_step2_32dp" />
+            android:src="@drawable/ic_c_first_start_step2_32dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/img_step1"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_conversion_absoluteHeight="32dp"
+            tools:layout_conversion_absoluteWidth="32dp"
+            tools:layout_conversion_absoluteX="24dp"
+            tools:layout_conversion_absoluteY="231dp"
+            />
+
         <TextView
             android:id="@+id/txt_step2_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/img_step2"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_toRightOf="@+id/img_step2"
-            android:layout_toEndOf="@+id/img_step2"
             android:text="@string/first_start_step2_text"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            app:layout_constraintLeft_toRightOf="@+id/img_step2"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/img_step2"
+            tools:layout_constraintBottom_creator="1"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_conversion_absoluteHeight="21dp"
+            tools:layout_conversion_absoluteWidth="120dp"
+            tools:layout_conversion_absoluteX="64dp"
+            tools:layout_conversion_absoluteY="239dp"/>
+
         <ImageView
             android:id="@+id/img_step3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txt_step2_text"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@string/first_start_step3_img_desc"
-            android:src="@drawable/ic_c_first_start_step3_32dp" />
+            android:src="@drawable/ic_c_first_start_step3_32dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/img_step2"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_conversion_absoluteHeight="32dp"
+            tools:layout_conversion_absoluteWidth="32dp"
+            tools:layout_conversion_absoluteX="24dp"
+            tools:layout_conversion_absoluteY="276dp"/>
+
         <TextView
             android:id="@+id/txt_step3_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/img_step3"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_toRightOf="@+id/img_step3"
-            android:layout_toEndOf="@+id/img_step3"
             android:text="@string/first_start_step3_text"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            app:layout_constraintLeft_toRightOf="@+id/img_step3"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/img_step3"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintTop_creator="1"
+            tools:layout_conversion_absoluteHeight="43dp"
+            tools:layout_conversion_absoluteWidth="304dp"
+            tools:layout_conversion_absoluteX="64dp"
+            tools:layout_conversion_absoluteY="284dp"/>
+
         <Button
             android:id="@+id/btn_create_car"
-            android:background="@drawable/btn_material_accent"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txt_step3_text"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/btn_material_accent"
             android:onClick="onCreateCarClick"
-            android:text="@string/first_start_create_car" />
+            android:text="@string/first_start_create_car"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_step3_text"
+            tools:layout_constraintBottom_creator="1"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1"/>
+
         <Button
             android:id="@+id/btn_setup_sync"
-            android:background="@drawable/btn_material"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/btn_create_car"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:background="@drawable/btn_material"
             android:onClick="onSetupSyncClick"
-            android:text="@string/first_start_setup_sync" />
-    </RelativeLayout>
+            android:text="@string/first_start_setup_sync"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_create_car"
+            tools:layout_constraintBottom_creator="1"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1"/>
+
+    </android.support.constraint.ConstraintLayout>
 </ScrollView>
