@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="48.000004"
+   height="48"
+   id="svg2"
+   inkscape:label="Pozadí"
+   sodipodi:version="0.32"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="ic_data_detail_other.svg"
+   version="1.0"
+   inkscape:export-filename="C:\Users\Jan\Desktop\ic_data_detail_other.png"
+   inkscape:export-xdpi="479.99997"
+   inkscape:export-ydpi="479.99997">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.094799"
+     inkscape:cx="36.228039"
+     inkscape:cy="21.312986"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="1333"
+     inkscape:window-height="873"
+     inkscape:window-x="236"
+     inkscape:window-y="33"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata6">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>matice</dc:title>
+        <dc:date>17.11.2006</dc:date>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Petra Thurlova</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>ZS a MS Machovo namesti</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:language>cz</dc:language>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>matice</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <cc:license
+           rdf:resource="http://web.resource.org/cc/PublicDomain" />
+      </cc:Work>
+      <cc:License
+         rdf:about="http://web.resource.org/cc/PublicDomain">
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Reproduction" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Distribution" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Vrstva 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-179.7515,-581.28181)">
+    <rect
+       style="fill:#a4712a;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect1873"
+       width="12.23677"
+       height="0"
+       x="-173.35423"
+       y="181.51208"
+       rx="0.15000001"
+       ry="0" />
+    <path
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       d="m 196.11513,586.97227 c -1.52886,0.0303 -2.30572,0.50105 -1.71915,1.7452 6.09906,-1.52963 -15.76075,15.62111 -9.5074,16.27979 1.76261,-6.03585 5.76318,21.5658 9.32507,16.38399 -4.26591,-4.61956 21.37429,5.89297 18.85851,0.13024 -6.09076,1.5623 15.8198,-16.1379 9.53345,-16.2798 -1.81075,6.02158 -5.70307,-21.55002 -9.32507,-16.41003 3.35332,3.58993 -11.70521,-1.95751 -17.16541,-1.84939 z m 7.39754,10.41907 c 4.1331,0 7.50173,3.25576 7.50173,7.2673 0,4.01154 -3.36863,7.26731 -7.50173,7.26731 -4.13311,0 -7.47569,-3.25577 -7.47569,-7.26731 0,-4.01154 3.34258,-7.2673 7.47569,-7.2673 z"
+       id="path4594"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>
