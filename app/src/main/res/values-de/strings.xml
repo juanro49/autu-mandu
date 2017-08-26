@@ -16,8 +16,8 @@
 -->
 <resources>
     <string name="about_author">© Jan Kühle</string>
+    <string name="about_thanks">Danke an:</string>
     <string name="about_version">Version: %s</string>
-    <string name="about_description">Tragen Sie die laufenden Kosten Ihres Autos ein und erhalten Sie schöne Reports.</string>
     <string name="about_licenses">Lizenzen</string>
 
     <string name="drawer_reports">Reports</string>

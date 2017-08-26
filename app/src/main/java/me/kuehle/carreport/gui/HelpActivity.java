@@ -20,9 +20,8 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,15 +29,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.util.Assets;
 
 public class HelpActivity extends PreferenceActivity {
-    private static final String TAG = "HelpActivity";
-
     private Toolbar mActionBar;
 
     @Override
@@ -88,17 +85,13 @@ public class HelpActivity extends PreferenceActivity {
             TextView text = (TextView) v.findViewById(android.R.id.text1);
             text.setMovementMethod(LinkMovementMethod.getInstance());
 
-            try {
-                InputStream in = getActivity().getAssets().open(
-                        String.format("%s/%s.html", getLocalizedDirectory("help"), getHelpId()));
-                byte[] buffer = new byte[in.available()];
-                in.read(buffer);
-                in.close();
+            String assetPath = String.format(
+                    "%s/%s.html",
+                    getLocalizedDirectory("help"),
+                    getHelpId());
+            Spanned html = Assets.getHtml(getActivity(), assetPath);
 
-                text.setText(Html.fromHtml(new String(buffer)));
-            } catch (IOException e) {
-                Log.e(TAG, "Error reading help html file.", e);
-            }
+            text.setText(html);
 
             return v;
         }

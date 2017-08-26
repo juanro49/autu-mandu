@@ -17,7 +17,6 @@
 <resources>
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Versão: %s</string>
-    <string name="about_description">Indique os custos do seu veículo e receba relatórios e estatísticas.</string>
     <string name="about_licenses">Licenças</string>
 
     <string name="drawer_reports">Relatórios</string>

@@ -18,7 +18,6 @@
 
     <string name="about_author">© Jan Kühle</string>
     <string name="about_version">Version: %s</string>
-    <string name="about_description">Entrer les coûts de votre voiture et recever de jolies rapports et statistiques.</string>
     <string name="about_licenses">Licenses</string>
 
     <string name="drawer_reports">Rapports</string>
