@@ -73,8 +73,8 @@ public class CostsReport extends AbstractReport {
         }
     }
 
-    public static final int GRAPH_OPTION_MONTH = 0;
-    public static final int GRAPH_OPTION_YEAR = 1;
+    private static final int GRAPH_OPTION_MONTH = 0;
+    private static final int GRAPH_OPTION_YEAR = 1;
 
     private LongSparseArray<ReportChartData> mCostsPerMonth = new LongSparseArray<>();
     private LongSparseArray<ReportChartData> mCostsPerYear = new LongSparseArray<>();
@@ -160,7 +160,7 @@ public class CostsReport extends AbstractReport {
             mCostsPerYear.put(car.getId(), new ReportChartData(mContext, car.getName(),
                     car.getColor(), GRAPH_OPTION_YEAR));
 
-            int startMileage = Integer.MAX_VALUE;
+            final int startMileage = car.getInitialMileage();
             int endMileage = Integer.MIN_VALUE;
             DateTime startDate = new DateTime();
             DateTime endDate;
@@ -189,7 +189,6 @@ public class CostsReport extends AbstractReport {
                 mCostsPerMonth.get(car.getId()).add(date, refueling.getPrice());
                 mCostsPerYear.get(car.getId()).add(date, refueling.getPrice());
 
-                startMileage = Math.min(startMileage, refueling.getMileage());
                 endMileage = Math.max(endMileage, refueling.getMileage());
                 if (startDate.isAfter(date)) {
                     startDate = date;
@@ -246,7 +245,6 @@ public class CostsReport extends AbstractReport {
                 }
 
                 if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                    startMileage = Math.min(startMileage, otherCost.getMileage());
                     endMileage = Math.max(endMileage, otherCost.getMileage());
                 }
 
