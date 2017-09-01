@@ -18,10 +18,13 @@ package me.kuehle.carreport.util.reminder;
 
 import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
@@ -51,6 +54,7 @@ public class ReminderService extends IntentService {
     public static final String EXTRA_REMINDER_IDS = "REMINDER_IDS";
 
     private static final int NOTIFICATION_ID = 1;
+    private static final String NOTIFICATION_CHANNEL_ID = "reminders";
 
     public ReminderService() {
         super("Reminder Service");
@@ -113,6 +117,10 @@ public class ReminderService extends IntentService {
         }
 
         if (dueReminderIds.size() > 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notificationManager.createNotificationChannel(buildNotificationChannel(context));
+            }
+
             notificationManager.notify(NOTIFICATION_ID, buildNotification(context, ids));
         } else {
             notificationManager.cancel(NOTIFICATION_ID);
@@ -163,7 +171,7 @@ public class ReminderService extends IntentService {
     private static Notification buildNotification(Context context, long... reminderIds) {
         ReminderCursor reminder = new ReminderSelection().id(reminderIds).query(context.getContentResolver());
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_c_notification_24dp)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
@@ -223,5 +231,15 @@ public class ReminderService extends IntentService {
         }
 
         return builder.build();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static NotificationChannel buildNotificationChannel(Context context) {
+        NotificationChannel notificationChannel = new NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                context.getString(R.string.notification_reminder_channel),
+                NotificationManager.IMPORTANCE_LOW);
+
+        return notificationChannel;
     }
 }

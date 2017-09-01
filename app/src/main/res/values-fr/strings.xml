@@ -228,6 +228,7 @@
     <string name="calc_option_distance_to_fuel_price">Prix du carburant (%2$s) en fonction de la Distance (%1$s)</string>
     <string name="calc_option_fuel_price_to_distance">Distance (%2$s) en fonction du Prix du carburant (%1$s)</string>
 
+    <string name="notification_reminder_channel">Rappels</string>
     <string name="notification_reminder_title_single">Rappel: %s</string>
     <string name="notification_reminder_title_multiple">Rappels multiples</string>
     <string name="notification_reminder_action_done">Fini</string>

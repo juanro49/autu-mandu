@@ -251,6 +251,7 @@
     <string name="calc_option_distance_to_price">Distância (%1$s) para Preço (%2$s)</string>
     <string name="calc_option_price_to_distance">Preço (%1$s) para Distância (%2$s)</string>
 
+    <string name="notification_reminder_channel">Lembretes</string>
     <string name="notification_reminder_title_single">Lembrete: %s</string>
     <string name="notification_reminder_title_multiple">Vários lembretes</string>
     <string name="notification_reminder_action_done">Concluído</string>
