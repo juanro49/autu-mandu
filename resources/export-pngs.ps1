@@ -61,3 +61,22 @@ if ($Icon -eq "all" -or $Icon -eq "ic_c_launcher_96dp")
             "$Resources\ic_launcher.svg"
     }
 }
+
+if ($Icon -eq "all" -or $Icon -eq "ic_c_notification_24dp")
+{
+    Write-Host -----------------------------------------------
+    Write-Host ic_c_notification_24dp
+    Write-Host -----------------------------------------------
+
+    $Sizes = @( "xxhdpi", "xhdpi", "hdpi", "mdpi" )
+    $DPIs =  @( 288,      192,     144,    96     )
+    for ($i = 0; $i -lt $Sizes.Length; $i++)
+    {
+        & $Inkscape `
+            --without-gui `
+            --export-png="$Destination\drawable-$($Sizes[$i])\ic_c_notification_24dp.png" `
+            --export-area-page `
+            --export-dpi=$($DPIs[$i]) `
+            "$Resources\ic_notification.svg"
+    }
+}
