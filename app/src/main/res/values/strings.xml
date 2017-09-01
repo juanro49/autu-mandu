@@ -154,7 +154,7 @@
     <string name="alert_restore_failed">Restore failed</string>
     <string name="alert_export_csv_overwrite_title">Export CSV</string>
     <string name="alert_export_csv_overwrite_message">Export files from a previous export do already exist on SD card.</string>
-    <string name="alert_export_csv_failed">Export failed.</string>
+    <string name="alert_export_csv_failed">Export failed.\n\nReason: %s</string>
     <string name="alert_import_csv_title">Import CSV</string>
     <string name="alert_import_csv_message">Import will update existing entries and add new ones, but it will not delete entries.</string>
     <string name="alert_import_csv_failed">Import failed. No data was changed.\n\nReason: %s</string>

@@ -136,12 +136,10 @@
     <string name="alert_restore_failed">Échec de la restauration</string>
     <string name="alert_export_csv_overwrite_title">Exportation CSV</string>
     <string name="alert_export_csv_overwrite_message">Des fichiers d\'une exportation précédente existent déjà sur  la carte SD.</string>
-    <string name="alert_export_csv_failed">Echec de l\'exportation.</string>
+    <string name="alert_export_csv_failed">Echec de l\'exportation.\n\nRaison: %s</string>
     <string name="alert_import_csv_title">Importation CSV</string>
     <string name="alert_import_csv_message">L\'importation va mettre à jour les entrées existantes et ajouter les nouvelles. Cependant elle va supprimer aucune entrée.</string>
-    <string name="alert_import_csv_failed">Échec de l\'importation. Aucune donnée n\'a été modifié.\n
-    \n
-    Raison: %s</string>
+    <string name="alert_import_csv_failed">Échec de l\'importation. Aucune donnée n\'a été modifié.\n\nRaison: %s</string>
     <string name="alert_error_title">Erreur</string>
 
     <string name="toast_new_refueling">Consommation de carburant: %1$.2f %2$s %3$s</string>

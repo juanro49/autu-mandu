@@ -53,6 +53,9 @@ dependencies {
     // Charts
     compile 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
 
+    // CSV
+    compile 'org.apache.commons:commons-csv:1.4'
+
     // Dropbox
     compile 'com.dropbox.core:dropbox-core-sdk:3.0.3'
 

@@ -226,12 +226,15 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     getString(R.string.alert_export_csv_overwrite_message),
                     R.string.overwrite, android.R.string.cancel).show(
                     getFragmentManager(), null);
-        } else if (mCSVExportImport.export()) {
-            Toast.makeText(getActivity(), R.string.toast_export_csv_succeeded,
-                    Toast.LENGTH_SHORT).show();
-            setupImportCSVPreference();
         } else {
-            showError(getString(R.string.alert_export_csv_failed));
+            try {
+                mCSVExportImport.export();
+                Toast.makeText(getActivity(), R.string.toast_export_csv_succeeded,
+                        Toast.LENGTH_SHORT).show();
+                setupImportCSVPreference();
+            } catch (CSVImportException e) {
+                showError(getString(R.string.alert_export_csv_failed, e.getMessage()));
+            }
         }
     }
 

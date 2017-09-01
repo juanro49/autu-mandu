@@ -151,7 +151,7 @@
     <string name="alert_restore_failed">Wiederherstellen fehlgeschlagen</string>
     <string name="alert_export_csv_overwrite_title">CSV exportieren</string>
     <string name="alert_export_csv_overwrite_message">Es existieren bereits Exportdaten von einem vorigen Export auf der SD-Karte.</string>
-    <string name="alert_export_csv_failed">Export fehlgeschlagen</string>
+    <string name="alert_export_csv_failed">Export fehlgeschlagen.\n\nFehlerursache: %s</string>
     <string name="alert_import_csv_title">CSV importieren</string>
     <string name="alert_import_csv_message">Der Import aktualisiert bestehende Einträge und fügt neue hinzu, löscht aber keine Einträge.</string>
     <string name="alert_import_csv_failed">Import fehlgeschlagen. Es wurden keine Daten verändert.\n\nFehlerursache: %s</string>

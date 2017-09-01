@@ -150,7 +150,7 @@
     <string name="alert_restore_failed">A restauração falhou</string>
     <string name="alert_export_csv_overwrite_title">Exportar CSV</string>
     <string name="alert_export_csv_overwrite_message">Exporta arquivos a partir de uma exportação anterior no cartão SD.</string>
-    <string name="alert_export_csv_failed">A exportação falhou.</string>
+    <string name="alert_export_csv_failed">A exportação falhou.\n\nMotivo: %s</string>
     <string name="alert_import_csv_title">Importar CSV</string>
     <string name="alert_import_csv_message">A importação irá atualizar e adicionar novos dados, mas não excluirá os existentes.</string>
     <string name="alert_import_csv_failed">A importação falhou. Nenhum dado foi alterado.\n\nMotivo: %s</string>
