@@ -15,8 +15,6 @@
   limitations under the License.
 -->
 <resources>
-    <string name="app_name" translatable="false">Car Report</string>
-    <string name="app_description" translatable="false">Entrez les coûts induits de votre véhicule et obtenez de chouettes rapports et statistiques.</string>
 
     <string name="about_author">© Jan Kühle</string>
     <string name="about_thanks">Remerciements :</string>
@@ -81,7 +79,7 @@
     <string name="label_trust_certificate">Faire confiance à ce certificat</string>
 
     <string name="description_suspend">Vous pouvez supendre une voiture que vous n'utilisez plus. Les coûts récurents ne seront plus pris en compte à partir de la date de suspension. Les rapports par defaut concernent exclusivement les voitures non suspendues.</string>
-    <string name="description_category">Les pleins sont groupés par catégorie sur les différents rapports. Exemple: Essence, Diesel, GPL…</string>
+    <string name="description_category">Les pleins sont groupés par catégorie sur les différents rapports. Exemple : Essence, Diesel, GPL…</string>
     <string name="description_reminder_status_due">Échu</string>
     <string name="description_reminder_status_due_snoozed">Échu, reporté jusqu'à %s</string>
     <string name="description_reminder_status_due_dismissed">Échu, notification annulée</string>
@@ -276,31 +274,5 @@
     <string name="graph_close_full_screen_desc">Sortir du plein écran</string>
     <string name="drag_handle_desc">Déplacer la poignée</string>
     <string name="quit_snooze_desc">Sortir du report</string>
-
-    <string name="about_licenses_styles" translatable="false">
-        body {
-            color: #fff;
-            background-color: #424242;
-            font-family: sans-serif;
-            overflow-wrap: break-word;
-        }
-
-        pre {
-            color: #fff;
-            background-color: #303030;
-            padding: 1em;
-            white-space: pre-wrap;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        a {
-            color: #607d8b;
-        }
-    </string>
 
 </resources>
