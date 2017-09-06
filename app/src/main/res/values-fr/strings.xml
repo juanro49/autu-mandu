@@ -17,8 +17,8 @@
 <resources>
 
     <string name="about_author">© Jan Kühle</string>
-    <string name="about_thanks">Remerciements :</string>
-    <string name="about_version">Version : %s</string>
+    <string name="about_thanks">Remerciements&#8239;:</string>
+    <string name="about_version">Version&#8239;: %s</string>
     <string name="about_licenses">Licences</string>
 
     <string name="drawer_reports">Rapports</string>
@@ -79,7 +79,7 @@
     <string name="label_trust_certificate">Faire confiance à ce certificat</string>
 
     <string name="description_suspend">Vous pouvez supendre une voiture que vous n'utilisez plus. Les coûts récurents ne seront plus pris en compte à partir de la date de suspension. Les rapports par defaut concernent exclusivement les voitures non suspendues.</string>
-    <string name="description_category">Les pleins sont groupés par catégorie sur les différents rapports. Exemple : Essence, Diesel, GPL…</string>
+    <string name="description_category">Les pleins sont groupés par catégorie sur les différents rapports. Exemple&#8239;: Essence, Diesel, GPL…</string>
     <string name="description_reminder_status_due">Échu</string>
     <string name="description_reminder_status_due_snoozed">Échu, reporté jusqu'à %s</string>
     <string name="description_reminder_status_due_dismissed">Échu, notification annulée</string>
@@ -152,13 +152,13 @@
     <string name="alert_restore_failed">Échec de la restauration</string>
     <string name="alert_export_csv_overwrite_title">Exportation au format CSV</string>
     <string name="alert_export_csv_overwrite_message">Les fichiers d\'un export précédent existent déjà sur la carte SD.</string>
-    <string name="alert_export_csv_failed">Échec de l\'exportation.\n\nRaison : %s</string>
+    <string name="alert_export_csv_failed">Échec de l\'exportation.\n\nRaison&#8239;: %s</string>
     <string name="alert_import_csv_title">Importation au format CSV</string>
     <string name="alert_import_csv_message">L\'importation va mettre à jour les entrées existantes et ajouter les nouvelles. L\'import ne supprime aucune entrée.</string>
-    <string name="alert_import_csv_failed">Échec de l\'importation. Aucune donnée n\'a été modifiée.\n\nRaison : %s</string>
+    <string name="alert_import_csv_failed">Échec de l\'importation. Aucune donnée n\'a été modifiée.\n\nRaison&#8239;: %s</string>
     <string name="alert_error_title">Erreur</string>
 
-    <string name="toast_new_refueling">Consommation de carburant : %1$.2f %2$s %3$s</string>
+    <string name="toast_new_refueling">Consommation de carburant&#8239;: %1$.2f %2$s %3$s</string>
     <string name="toast_backup_succeeded">Sauvegarde réalisée avec succès dans le fichier %s.</string>
     <string name="toast_restore_succeeded">Restauration réalisée avec succès</string>
     <string name="toast_export_csv_succeeded">Exportation vers la carte SD réalisée avec succès.</string>
@@ -184,11 +184,11 @@
     <string name="report_day">Jour</string>
     <string name="report_month">Mois</string>
     <string name="report_year">Année</string>
-    <string name="report_toast_fuel_consumption">%1$s : %2$.2f %3$s of %4$s on %5$s</string>
+    <string name="report_toast_fuel_consumption">%1$s&#8239;: %2$.2f %3$s of %4$s on %5$s</string>
     <string name="report_toast_fuel_price">%1$.3f %2$s for %3$s on %4$s</string>
-    <string name="report_toast_mileage">"%1$s : %2$d %3$s on %4$s"</string>
-    <string name="report_toast_mileage_month">"%1$s : %2$.0f %3$s in %4$s"</string>
-    <string name="report_toast_costs">%1$s : %2$.0f %3$s in %4$s</string>
+    <string name="report_toast_mileage">"%1$s&#8239;: %2$d %3$s on %4$s"</string>
+    <string name="report_toast_mileage_month">"%1$s&#8239;: %2$.0f %3$s in %4$s"</string>
+    <string name="report_toast_costs">%1$s&#8239;: %2$.0f %3$s in %4$s</string>
     <string name="report_toast_guessed">Deviné pour compenser les pleins manquants.</string>
 
     <string name="pref_title_header_about">À propos de Car Report</string>
@@ -236,7 +236,7 @@
     <string name="help_section_csv">CSV</string>
 
     <string name="first_start_hi">Salut toi!</string>
-    <string name="first_start_intro">Car Report peut afficher de chouettes rapports à partir des dépenses effectuées pour votre voiture, incluant la consommation de carburant et tous les autres coûts. Pour bien démarrer, suivez ces quelques étapes :</string>
+    <string name="first_start_intro">Car Report peut afficher de chouettes rapports à partir des dépenses effectuées pour votre voiture, incluant la consommation de carburant et tous les autres coûts. Pour bien démarrer, suivez ces quelques étapes&#8239;:</string>
     <string name="first_start_step1_img_desc">Première étape</string>
     <string name="first_start_step1_text">Ajoutez une voiture</string>
     <string name="first_start_step2_img_desc">Seconde étape</string>
@@ -256,7 +256,7 @@
     <string name="calc_option_fuel_price_to_distance">Distance (%2$s) en fonction du prix du carburant (%1$s)</string>
 
     <string name="notification_reminder_channel">Rappels</string>
-    <string name="notification_reminder_title_single">Rappel : %s</string>
+    <string name="notification_reminder_title_single">Rappel&#8239;: %s</string>
     <string name="notification_reminder_title_multiple">Rappels multiples</string>
     <string name="notification_reminder_action_done">Fini</string>
     <string name="notification_reminder_action_snooze">Reporter</string>
