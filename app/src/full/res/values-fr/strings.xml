@@ -15,5 +15,5 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="toast_need_accounts_permission">Pour réaliser cette action Car Repor a besoin de connaître les comptes Google configurés sur votre téléphone.</string>
+    <string name="toast_need_accounts_permission">Pour réaliser cette action, Car Report a besoin d\'accéder aux comptes Google configurés sur votre téléphone.</string>
 </resources>
