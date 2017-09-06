@@ -66,7 +66,7 @@
     <string name="hint_reminder_after_time">Après un certain temps</string>
     <string name="hint_reminder_start_mileage">Commencer au kilométrage</string>
     <string name="hint_reminder_start_date">Commencer à la date</string>
-    <string name="hint_reminder_snoozed_until">Reporter jusqu'à</string>
+    <string name="hint_reminder_snoozed_until">Reporter jusqu\'à</string>
 
     <string name="label_partial">Partiel</string>
     <string name="label_color">Couleur</string>
@@ -78,23 +78,23 @@
     <string name="label_reminder_dismissed">Notification annulée</string>
     <string name="label_trust_certificate">Faire confiance à ce certificat</string>
 
-    <string name="description_suspend">Vous pouvez supendre une voiture que vous n'utilisez plus. Les coûts récurents ne seront plus pris en compte à partir de la date de suspension. Les rapports par defaut concernent exclusivement les voitures non suspendues.</string>
+    <string name="description_suspend">Vous pouvez supendre une voiture que vous n\'utilisez plus. Les coûts récurents ne seront plus pris en compte à partir de la date de suspension. Les rapports par defaut concernent exclusivement les voitures non suspendues.</string>
     <string name="description_category">Les pleins sont groupés par catégorie sur les différents rapports. Exemple&#8239;: Essence, Diesel, GPL…</string>
     <string name="description_reminder_status_due">Échu</string>
-    <string name="description_reminder_status_due_snoozed">Échu, reporté jusqu'à %s</string>
+    <string name="description_reminder_status_due_snoozed">Échu, reporté jusqu\'à %s</string>
     <string name="description_reminder_status_due_dismissed">Échu, notification annulée</string>
     <string name="description_reminder_status_distance_and_time">Échu dans %1$s ou le %2$s</string>
     <string name="description_reminder_status_distance">Échu dans %s</string>
     <string name="description_reminder_status_time">Échu le %s</string>
-    <string name="description_webdav_url">Entrez l\'URL d\'un dossier spécifique pour Car Report sur votre serveur WebDav. Car report va déposer ses fichiers à l'intérieur de ce dossier, sans rien consulter ou modifier d'autre.</string>
+    <string name="description_webdav_url">Entrez l\'URL d\'un dossier spécifique pour Car Report sur votre serveur WebDav. Car report va déposer ses fichiers à l\'intérieur de ce dossier, sans rien consulter ou modifier d\'autre.</string>
     <string name="description_webdav_trust_certificate">Android ne fait pas confiance au certificat utilisé pour ce site web.</string>
 
     <string name="validate_error_greater_zero">Doit être positif (>0)</string>
     <string name="validate_error_not_empty">Ne doit pas être vide</string>
-    <string name="validate_error_mileage_out_of_range_total">Le kilométrage doit être compris entre le kilométrage des pleins précédent et suivant en mode ajout de la distance totale. Si vous souhaitez seulement ajouter la distance d'un trajet, vous pouvez changer de mode dans les paramètres de l\'application.</string>
+    <string name="validate_error_mileage_out_of_range_total">Le kilométrage doit être compris entre le kilométrage des pleins précédent et suivant en mode ajout de la distance totale. Si vous souhaitez seulement ajouter la distance d\'un trajet, vous pouvez changer de mode dans les paramètres de l\'application.</string>
     <string name="validate_error_mileage_out_of_range_trip">Le kilométrage cumulé ne peux pas être supérieur au kilométrage du plein suivant en mode ajout de la distance par trajet. Si vous souhaitez entrer la distance totale, vous pouvez changer de mode dans les paramètres de l\'application.</string>
     <string name="validate_error_fuel_type_exists">Ce type de carburant existe déjà.</string>
-    <string name="validate_error_webdav_invalid_certificate">Le certificat n'est pas un certificat de confiance car invalide.</string>
+    <string name="validate_error_webdav_invalid_certificate">Le certificat n\'est pas un certificat de confiance car invalide.</string>
 
     <string name="suspended">Suspendu</string>
     <string name="suspended_since">Suspendu depuis le %s</string>
@@ -148,7 +148,7 @@
     <string name="alert_backup_overwrite_message">Un précédent fichier de sauvegarde existe déjà sur votre carte SD.</string>
     <string name="alert_backup_failed">Échec de la sauvegarde</string>
     <string name="alert_restore_title">Restauration</string>
-    <string name="alert_restore_message">La restauration d\'un fichier entraîne l'écrasement de toute vos données actuelles par les données importées. Assurez-vous également que le fichier importé provient bien d\'une version inférieure ou égale de l\'application que la version que vous utilisez actuellement.</string>
+    <string name="alert_restore_message">La restauration d\'un fichier entraîne l\'écrasement de toute vos données actuelles par les données importées. Assurez-vous également que le fichier importé provient bien d\'une version inférieure ou égale de l\'application que la version que vous utilisez actuellement.</string>
     <string name="alert_restore_failed">Échec de la restauration</string>
     <string name="alert_export_csv_overwrite_title">Exportation au format CSV</string>
     <string name="alert_export_csv_overwrite_message">Les fichiers d\'un export précédent existent déjà sur la carte SD.</string>
@@ -205,8 +205,8 @@
     <string name="pref_title_category_export">Export et Import</string>
     <string name="pref_title_behavior_default_car">Voiture par défaut</string>
     <string name="pref_title_behavior_show_car_menu">Voir le menu des voitures</string>
-    <string name="pref_title_behavior_distance_entry_mode">Mode d'ajout de la distance</string>
-    <string name="pref_title_behavior_price_entry_mode">Mode d'ajout du prix</string>
+    <string name="pref_title_behavior_distance_entry_mode">Mode d\'ajout de la distance</string>
+    <string name="pref_title_behavior_price_entry_mode">Mode d\'ajout du prix</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Compenser les pleins manquants (Beta)</string>
     <string name="pref_title_behavior_reminder_snooze_duration">Durée de report des rappels</string>
     <string name="pref_title_unit_currency">Monnaie</string>
@@ -219,7 +219,7 @@
     <string name="pref_title_exportcsv">Export CSV</string>
     <string name="pref_title_importcsv">Import CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Afficher le menu de sélection des voitures lorsque vous ajoutez un plein et que vous avez plusieurs voitures.</string>
-    <string name="pref_summary_behavior_auto_guess_missing_data">Essaye de détecter les pleins manquants. Cela va compenser les consommations significativement inférieures qui apparaissent lorsque vous oubliez d'ajouter un plein.</string>
+    <string name="pref_summary_behavior_auto_guess_missing_data">Essaye de détecter les pleins manquants. Cela va compenser les consommations significativement inférieures qui apparaissent lorsque vous oubliez d\'ajouter un plein.</string>
     <string name="pref_summary_sync_setup">Synchronisation très basique. Lorsque vous modifiez des données sur deux appareils en même temps et que vous les synchronisez, l\'appareil synchronisé en dernier perd ses modifications. Assurez-vous d\'avoir la même version de Car Report sur tous vos appareils.</string>
     <string name="pref_summary_sync_current_provider">Lié à %s. Cliquez pour supprimer le lien.</string>
     <string name="pref_summary_backup">Sauvegarder les données actuelles vers la carte SD.</string>
