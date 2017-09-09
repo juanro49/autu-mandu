@@ -49,7 +49,7 @@ public class Authenticator extends AbstractAccountAuthenticator {
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
         AccountManager accountManager = AccountManager.get(mContext);
         if (accountManager.getAccountsByType(ACCOUNT_TYPE).length > 0) {
-            throw new UnsupportedOperationException();
+            return null;
         }
 
         return createAuthenticatorAddAccountActivityIntentBundle(response);
