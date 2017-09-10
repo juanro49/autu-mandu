@@ -61,7 +61,7 @@
             android:name=".gui.PreferencesActivity"
             android:label="@string/title_settings"
             android:parentActivityName=".gui.MainActivity"
-            android:theme="@style/AppTheme.Preferences">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".gui.MainActivity"/>

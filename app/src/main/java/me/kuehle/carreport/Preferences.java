@@ -162,26 +162,32 @@ public class Preferences {
 
     // Deprecated Dropbox and Google Drive sync settings
 
+    @Deprecated
     public String getDeprecatedSynchronizationProvider() {
         return mPrefs.getString("sync_current_provider", null);
     }
 
+    @Deprecated
     public String getDeprecatedDropboxAccount() {
         return mPrefs.getString("sync_dropbox_account", null);
     }
 
+    @Deprecated
     public String getDeprecatedDropboxAccessToken() {
         return mPrefs.getString("sync_dropbox_token", null);
     }
 
+    @Deprecated
     public String getDeprecatedDropboxLocalRev() {
         return mPrefs.getString("sync_dropbox_rev", null);
     }
 
+    @Deprecated
     public String getDeprecatedGoogleDriveAccount() {
         return mPrefs.getString("sync_drive_account", null);
     }
 
+    @Deprecated
     public Date getDeprecatedGoogleDriveLocalModifiedDate() {
         try {
             long date = mPrefs.getLong("sync_drive_modified_date", -1);
@@ -195,6 +201,7 @@ public class Preferences {
         }
     }
 
+    @Deprecated
     public void removeDeprecatedSyncSettings() {
         Editor edit = mPrefs.edit();
         edit.remove("sync_dropbox_account");

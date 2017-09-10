@@ -47,15 +47,6 @@
     <style name="AppTheme.NoActionBar.NavigationDrawer">
     </style>
 
-    <style name="AppTheme.Preferences" parent="android:Theme.DeviceDefault">
-        <item name="android:actionBarStyle">@style/AppWidget.MaterializedHoloActionBar</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_24dp</item>
-
-        <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/AppWidget.MaterializedHoloActionBar</item>
-        <item name="homeAsUpIndicator">@drawable/ic_arrow_back_24dp</item>
-    </style>
-
     <style name="AppTheme.Dialog" parent="Theme.AppCompat.Dialog">
         <item name="android:background">@color/background</item>
         <item name="colorPrimary">@color/primary</item>

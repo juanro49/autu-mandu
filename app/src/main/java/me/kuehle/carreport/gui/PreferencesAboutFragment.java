@@ -49,9 +49,9 @@ public class PreferencesAboutFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_prefs_about, container, false);
-        TextView txtVersion = (TextView) root.findViewById(R.id.txt_version);
-        TextView txtThanks = (TextView) root.findViewById(R.id.txt_thanks);
-        Button btnLicenses = (Button) root.findViewById(R.id.btn_licenses);
+        TextView txtVersion = root.findViewById(R.id.txt_version);
+        TextView txtThanks = root.findViewById(R.id.txt_thanks);
+        Button btnLicenses = root.findViewById(R.id.btn_licenses);
 
         String strVersion = getString(R.string.about_version, BuildConfig.VERSION_NAME);
         txtVersion.setText(strVersion);
