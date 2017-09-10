@@ -86,6 +86,11 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
     protected void onTitleChanged(CharSequence title, int color) {
         super.onTitleChanged(title, color);
         mActionBar.setTitle(title);
+
+        // In single pane mode, this seems to be the only way to detect, that the view switched
+        // from a preference panel back to the header list.
+        mActionBar.getMenu().clear();
+        mCurrentMenuListener = null;
     }
 
     @Override
