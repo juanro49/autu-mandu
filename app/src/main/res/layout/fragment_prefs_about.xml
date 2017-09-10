@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_c_launcher_96dp"/>
+            android:src="@mipmap/ic_launcher_96dp"/>
 
         <TextView
             android:id="@+id/txt_version"
