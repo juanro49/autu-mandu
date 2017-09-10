@@ -34,6 +34,11 @@ import me.kuehle.carreport.util.Assets;
 
 public class HelpActivity extends AbstractPreferenceActivity {
     @Override
+    protected int getTitleResourceId() {
+        return R.string.title_help;
+    }
+
+    @Override
     protected int getHeadersResourceId() {
         return R.xml.help_headers;
     }

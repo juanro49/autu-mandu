@@ -24,6 +24,11 @@ import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
 public class PreferencesActivity extends AbstractPreferenceActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
     @Override
+    protected int getTitleResourceId() {
+        return R.string.title_settings;
+    }
+
+    @Override
     protected int getHeadersResourceId() {
         return R.xml.preference_headers;
     }

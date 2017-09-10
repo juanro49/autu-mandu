@@ -75,6 +75,7 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
                 finish();
             }
         });
+        inflateMenu();
 
         ViewGroup contentWrapper = contentView.findViewById(R.id.content_wrapper);
         LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);
@@ -89,21 +90,20 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
 
         // In single pane mode, this seems to be the only way to detect, that the view switched
         // from a preference panel back to the header list.
-        mActionBar.getMenu().clear();
-        mCurrentMenuListener = null;
+        if (title.equals(getString(getTitleResourceId()))) {
+            clearMenuAndListener();
+        }
     }
 
     @Override
     public void switchToHeader(String fragmentName, Bundle args) {
-        mActionBar.getMenu().clear();
-        mCurrentMenuListener = null;
+        clearMenuAndListener();
         super.switchToHeader(fragmentName, args);
     }
 
     @Override
     public void switchToHeader(Header header) {
-        mActionBar.getMenu().clear();
-        mCurrentMenuListener = null;
+        clearMenuAndListener();
         super.switchToHeader(header);
     }
 
@@ -112,7 +112,7 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
         super.onAttachFragment(fragment);
         if (fragment instanceof OptionsMenuListener) {
             mCurrentMenuListener = fragment;
-            mActionBar.inflateMenu(((OptionsMenuListener) fragment).getOptionsMenuResourceId());
+            inflateMenu();
         }
     }
 
@@ -132,6 +132,20 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
 
         return false;
     }
+
+    private void inflateMenu() {
+        if (mActionBar != null && mCurrentMenuListener != null) {
+            int menuRes = ((OptionsMenuListener) mCurrentMenuListener).getOptionsMenuResourceId();
+            mActionBar.inflateMenu(menuRes);
+        }
+    }
+
+    private void clearMenuAndListener() {
+        mActionBar.getMenu().clear();
+        mCurrentMenuListener = null;
+    }
+
+    protected abstract int getTitleResourceId();
 
     protected abstract int getHeadersResourceId();
 
