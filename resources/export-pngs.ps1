@@ -26,10 +26,10 @@ if ($Icon -eq "all" -or $Icon -eq "bg_drawer_top")
     }
 }
 
-if ($Icon -eq "all" -or $Icon -eq "ic_c_launcher_48dp")
+if ($Icon -eq "all" -or $Icon -eq "ic_launcher")
 {
     Write-Host -----------------------------------------------
-    Write-Host ic_c_launcher_48dp
+    Write-Host ic_launcher
     Write-Host -----------------------------------------------
 
     $Sizes = @( "xxxhdpi", "xxhdpi", "xhdpi", "hdpi", "mdpi" )
@@ -37,27 +37,9 @@ if ($Icon -eq "all" -or $Icon -eq "ic_c_launcher_48dp")
     {
         & $Inkscape `
             --without-gui `
-            --export-png="$Destination\drawable-$size\ic_c_launcher_48dp.png" `
+            --export-png="$Destination\mipmap-$size\ic_launcher.png" `
             --export-id="e-$size" `
             --export-dpi=96 `
-            "$Resources\ic_launcher.svg"
-    }
-}
-
-if ($Icon -eq "all" -or $Icon -eq "ic_c_launcher_96dp")
-{
-    Write-Host -----------------------------------------------
-    Write-Host ic_c_launcher_96dp
-    Write-Host -----------------------------------------------
-
-    $Sizes = @( "xxhdpi", "xhdpi", "hdpi", "mdpi" )
-    foreach ($size in $Sizes)
-    {
-        & $Inkscape `
-            --without-gui `
-            --export-png="$Destination\drawable-$size\ic_c_launcher_96dp.png" `
-            --export-id="e-$size" `
-            --export-dpi=192 `
             "$Resources\ic_launcher.svg"
     }
 }
