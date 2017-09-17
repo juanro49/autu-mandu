@@ -33,13 +33,14 @@ if ($Icon -eq "all" -or $Icon -eq "ic_launcher")
     Write-Host -----------------------------------------------
 
     $Sizes = @( "xxxhdpi", "xxhdpi", "xhdpi", "hdpi", "mdpi" )
-    foreach ($size in $Sizes)
+    $DPIs =  @( 384,       288,      192,     144,    96     )
+    for ($i = 0; $i -lt $Sizes.Length; $i++)
     {
         & $Inkscape `
             --without-gui `
-            --export-png="$Destination\mipmap-$size\ic_launcher.png" `
-            --export-id="e-$size" `
-            --export-dpi=96 `
+            --export-png="$Destination\mipmap-$($Sizes[$i])\ic_launcher.png" `
+            --export-area-page `
+            --export-dpi=$($DPIs[$i]) `
             "$Resources\ic_launcher.svg"
     }
 }
