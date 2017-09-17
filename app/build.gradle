@@ -33,15 +33,6 @@ android {
     lintOptions {
         checkReleaseBuilds false
     }
-    packagingOptions {
-        // These files are included in at least two of the following libraries:
-        // joda-time-2.6.jar, httpmime-4.0.3.jar, httpcore-4.0.1.jar, commons-logging-1.1.1.jar
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/DEPENDENCIES'
-    }
 }
 
 repositories {
@@ -76,21 +67,20 @@ dependencies {
 
     // The new Android Drive API, which is included in the play services, has caching bugs and does
     // not provide all functionality. Until this is fixed we have to use the old Google API.
-    fullCompile('com.google.oauth-client:google-oauth-client:1.21.0') {
+    fullCompile('com.google.oauth-client:google-oauth-client:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    fullCompile files('libs/google-api-client-1.21.0-self-build.jar')
-    fullCompile('com.google.apis:google-api-services-drive:v3-rev18-1.21.0') {
+    fullCompile('com.google.api-client:google-api-client:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
-        exclude module: 'google-api-client'
     }
-    fullCompile('com.google.api-client:google-api-client-android:1.21.0') {
+    fullCompile('com.google.apis:google-api-services-drive:v3-rev81-1.22.0') {
         exclude group: 'org.apache.httpcomponents'
-        exclude module: 'google-api-client'
     }
-    fullCompile('com.google.http-client:google-http-client-android:1.21.0') {
+    fullCompile('com.google.api-client:google-api-client-android:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
-        exclude module: 'google-api-client'
+    }
+    fullCompile('com.google.http-client:google-http-client-android:1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
     }
 
     // WebDAV
