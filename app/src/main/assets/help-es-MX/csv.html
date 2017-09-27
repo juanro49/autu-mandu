@@ -1,0 +1,51 @@
+<h1>General</h1>
+<p>Toda la base de datos se exporta utilizando un solo archivo por cada tabla. Esto significa que la información de una recarga se divide
+entre varios archivos. Puedes averiguar a qué vehículo corresponde el archivo leyendo el valor de la fila id en de la tabla cars de la columna cars</p>
+
+<h1>Columnas</h1>
+<big>cars</big>
+<p>_id: [int]<br>
+car__name: [string]<br>
+color: [int] Consulta <a href="http://developer.android.com/reference/android/graphics/Color.html">la documentación de la clase color de Android</a> para una explicación más detallada de cómo se calcula este valor.<br>
+initial_mileage: [int] El kilometraje inicial del vehículo al momento de registrarlo en la aplicación.<br>
+suspended_since: [date]</p>
+
+<big>fuel_types</big>
+<p>_id: [int]<br>
+fuel_type__name: [string]<br>
+category: [string]</p>
+
+<big>other_costs</big>
+<p>_id: [int]<br>
+car_id: [int] el ID del vehículo.<br>
+mileage: [int] Distancia total (odómetro).<br>
+price: [float]<br>
+recurrence_interval: [int] 0 = una vez, 1 = diario, 2 = mensual, 3 = every quarter, 4 = every year<br>
+recurrence_multiplier: [int] Especifica la recurrencia junto con recurrence_interval. Ejemplo: recurrence_interval = 2 y recurrence_multiplier = 5 significa cada 5 meses.<br>
+title: [string]<br>
+date: [date]<br>
+note: [string]<br>
+end_date: [date] Fin de recurrencia.</p>
+
+<big>refuelings</big>
+<p>_id: [int]<br>
+partial: [bool] (1 o 0)<br>
+date: [date]<br>
+note: [string]<br>
+volume: [float]<br>
+fuel_type: [int] el ID del tipo de combustible.<br>
+price: [float]<br>
+mileage: [int] Distancia total (odómetro).<br>
+car_id: [int] el ID del vehículo.</p>
+
+<big>reminders</big>
+<p>_id: [int]<br>
+title: [string]<br>
+after_time_span_unit: [int] 0 = días, 1 = meses, 2 = años<br>
+after_time_span_count: [int] Especifica un lapso de tiempo junto con after_time_span_unit. Ejemplo: after_time_span_unit = 1 y after_time_span_count = 5 significa después de 5 meses.<br>
+after_distance: [int]<br>
+start_date: [date]<br>
+start_mileage: [int]<br>
+car_id: [int] el ID del vehículo.<br>
+notification_dismissed: [bool] (1 o 0)<br>
+snoozed_until: [date]</p>
