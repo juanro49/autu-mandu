@@ -1,12 +1,9 @@
 .gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
-*.iws
+.idea
 .DS_Store
-Thumbs.db
-/build
+build
 *.apk
 *.iml
-/captures
-.externalNativeBuild
+*.iws
+local.properties
+Thumbs.db
