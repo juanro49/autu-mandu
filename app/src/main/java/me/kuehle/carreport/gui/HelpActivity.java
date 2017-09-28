@@ -25,9 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.util.Locale;
-
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
 import me.kuehle.carreport.util.Assets;
@@ -64,7 +61,7 @@ public class HelpActivity extends AbstractPreferenceActivity {
 
             String assetPath = String.format(
                     "%s/%s.html",
-                    getLocalizedDirectory("help"),
+                    getString(R.string.help_folder_name),
                     getHelpId());
             Spanned html = Assets.getHtml(getActivity(), assetPath);
 
@@ -74,22 +71,6 @@ public class HelpActivity extends AbstractPreferenceActivity {
         }
 
         protected abstract String getHelpId();
-
-        private String getLocalizedDirectory(String directory) {
-            String locale = Locale.getDefault().getLanguage().substring(0, 2)
-                    .toLowerCase(Locale.US);
-            String localizedDirectory = directory + "-" + locale;
-
-            try {
-                if (getActivity().getAssets().list(localizedDirectory).length > 0) {
-                    return localizedDirectory;
-                } else {
-                    return directory;
-                }
-            } catch (IOException e) {
-                return directory;
-            }
-        }
     }
 
     public static class GettingStartedFragment extends HelpFragment {

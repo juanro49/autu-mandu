@@ -233,6 +233,7 @@
     <string name="help_section_calculations">Berechnungen</string>
     <string name="help_section_fuel_types">Kraftstoffe</string>
     <string name="help_section_csv">CSV</string>
+    <string name="help_folder_name">help-de</string>
 
     <string name="first_start_hi">Hallo!</string>
     <string name="first_start_intro">Car Report kann Reports über Ausgaben für deine Autos anzeigen, z.B. Benzinverbrauch und gesamte Kosten. Starte mit diesen einfachen Schritten:</string>

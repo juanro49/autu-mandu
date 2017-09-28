@@ -232,6 +232,7 @@
     <string name="help_section_calculations">Cálculos</string>
     <string name="help_section_fuel_types">Tipos de combustível</string>
     <string name="help_section_csv">CSV</string>
+    <string name="help_folder_name">help-pt-rBR</string>
     
     <string name="first_start_hi">Olá!</string>
     <string name="first_start_intro">O Car Report pode apresentar bons relatórios das despesas do seu carro, incluindo o consumo de combustível e outros custos em geral. Começe com este passo simples:</string>

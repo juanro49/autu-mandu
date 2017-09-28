@@ -233,6 +233,7 @@
     <string name="help_section_calculations">Cálculos</string>
     <string name="help_section_fuel_types">Tipos de combustible</string>
     <string name="help_section_csv">CSV</string>
+    <string name="help_folder_name">help-es-rMX</string>
 
     <string name="first_start_hi">¡Hola!</string>
     <string name="first_start_intro">Car Report muestra reportes para tus gastos de vehículo como rendimiento de combustible y gastos generales. Comienza con los siguientes pasos:</string>

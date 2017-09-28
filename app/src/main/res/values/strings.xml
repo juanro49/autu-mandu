@@ -236,6 +236,7 @@
     <string name="help_section_calculations">Calculations</string>
     <string name="help_section_fuel_types">Fuel Types</string>
     <string name="help_section_csv">CSV</string>
+    <string name="help_folder_name">help</string>
     
     <string name="first_start_hi">Hi there!</string>
     <string name="first_start_intro">Car Report can display nice reports for your car expenses, including fuel consumption and overall costs. Start with these simple steps:</string>
