@@ -15,9 +15,6 @@
   limitations under the License.
 -->
 <resources>
-    <string name="app_name" translatable="false">Car Report</string>
-    <string name="app_description" translatable="false">Registra los gastos de tu vehículo y genera reportes y estadísticas.</string>
-
     <string name="about_author">© Jan Kühle</string>
     <string name="about_thanks">Gracias a:</string>
     <string name="about_version">Versión: %s</string>
@@ -276,30 +273,4 @@
     <string name="graph_close_full_screen_desc">Cerrar gráfica de pantalla completa</string>
     <string name="drag_handle_desc">Arrastrar manija</string>
     <string name="quit_snooze_desc">Deshabilitar posposición</string>
-
-    <string name="about_licenses_styles" translatable="false">
-        body {
-            color: #fff;
-            background-color: #424242;
-            font-family: sans-serif;
-            overflow-wrap: break-word;
-        }
-
-        pre {
-            color: #fff;
-            background-color: #303030;
-            padding: 1em;
-            white-space: pre-wrap;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        a {
-            color: #607d8b;
-        }
-    </string>
 </resources>
