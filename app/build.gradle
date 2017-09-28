@@ -12,10 +12,10 @@ android {
     }
     signingConfigs {
         release {
-            keyAlias carReportSignKeyAlias
-            keyPassword carReportSignKeyPassword
-            storeFile file(carReportSignStoreFile)
-            storePassword carReportSignStorePassword
+            keyAlias signing_key_alias
+            keyPassword signing_key_password
+            storeFile file(signing_key_store_file)
+            storePassword signing_key_store_password
         }
     }
     buildTypes {
