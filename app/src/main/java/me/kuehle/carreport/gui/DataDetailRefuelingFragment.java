@@ -38,6 +38,7 @@ import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.util.DateTimeInput;
+import me.kuehle.carreport.gui.util.FormFieldGreaterZeroOrEmptyValidator;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.provider.car.CarColumns;
@@ -151,7 +152,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 
             if (mPriceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME) {
                 edtVolume.setText(String.valueOf(refueling.getVolume()));
-                edtPrice.setText(String.valueOf(refueling.getPrice()));
+                if (refueling.getPrice() != 0.0f) {
+                    edtPrice.setText(String.valueOf(refueling.getPrice()));
+                }
             } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
                 edtVolume.setText(String.valueOf(refueling.getPrice() / refueling.getVolume()));
                 edtPrice.setText(String.valueOf(refueling.getPrice()));
@@ -256,11 +259,16 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 
     @Override
     protected boolean validate() {
+        final Preferences prefs = new Preferences(getActivity());
         FormValidator validator = new FormValidator();
 
         validator.add(new FormFieldGreaterZeroValidator(edtMileage));
         validator.add(new FormFieldGreaterZeroValidator(edtVolume));
-        validator.add(new FormFieldGreaterZeroValidator(edtPrice));
+        if (prefs.getPriceEntryMode() == PriceEntryMode.TOTAL_AND_VOLUME) {
+            validator.add(new FormFieldGreaterZeroOrEmptyValidator(edtPrice));
+        } else {
+            validator.add(new FormFieldGreaterZeroValidator(edtPrice));
+        }
 
         return validator.validate();
     }

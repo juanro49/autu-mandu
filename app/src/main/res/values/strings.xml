@@ -277,6 +277,7 @@
     <string name="graph_close_full_screen_desc">Close full screen graph</string>
     <string name="drag_handle_desc">Drag handle</string>
     <string name="quit_snooze_desc">Quit snooze</string>
+    <string name="notice_not_paid">Not paid</string>
 
     <string name="about_licenses_styles" translatable="false">
         body {
