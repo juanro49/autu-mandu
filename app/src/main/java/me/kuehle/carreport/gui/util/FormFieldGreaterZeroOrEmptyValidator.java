@@ -22,31 +22,31 @@ import android.widget.TextView;
 import me.kuehle.carreport.R;
 
 public class FormFieldGreaterZeroOrEmptyValidator extends AbstractFormFieldValidator {
-	public FormFieldGreaterZeroOrEmptyValidator(TextView field) {
-		super(field);
-	}
+    public FormFieldGreaterZeroOrEmptyValidator(TextView field) {
+        super(field);
+    }
 
-	@Override
-	protected int getMessage() {
-		return R.string.validate_error_greater_zero;
-	}
+    @Override
+    protected int getMessage() {
+        return R.string.validate_error_greater_zero;
+    }
 
-	@Override
-	protected boolean isValid() {
-		String textValue = fields[0].getText().toString();
-		if (textValue.isEmpty()) {
-			return true;
-		}
-		try {
-			double number = Double.parseDouble(textValue);
-			if (number <= 0) {
-				return false;
-			}
-		} catch (NumberFormatException e) {
-			return false;
-		}
+    @Override
+    protected boolean isValid() {
+        String textValue = fields[0].getText().toString();
+        if (textValue.isEmpty()) {
+            return true;
+        }
+        try {
+            double number = Double.parseDouble(textValue);
+            if (number <= 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 }
