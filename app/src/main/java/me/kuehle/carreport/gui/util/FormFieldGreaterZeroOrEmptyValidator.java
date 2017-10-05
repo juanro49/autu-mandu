@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package me.kuehle.carreport.gui.util;
 
 import android.widget.TextView;
@@ -37,6 +36,7 @@ public class FormFieldGreaterZeroOrEmptyValidator extends AbstractFormFieldValid
         if (textValue.isEmpty()) {
             return true;
         }
+
         try {
             double number = Double.parseDouble(textValue);
             if (number <= 0) {
