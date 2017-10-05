@@ -119,10 +119,14 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
         data.put(R.id.data1_calculated, String.format(Locale.getDefault(), "+ %d %s",
                 mileageDifference, mUnitDistance));
 
-        data.put(R.id.data2, String.format(Locale.getDefault(), "%.2f %s", refueling.getPrice(),
-                mUnitCurrency));
-        data.put(R.id.data2_calculated, String.format(Locale.getDefault(), "%.3f %s/%s",
-                refueling.getPrice() / volume, mUnitCurrency, mUnitVolume));
+        if (refueling.getPrice() != 0.0f) {
+            data.put(R.id.data2, String.format(Locale.getDefault(), "%.2f %s", refueling.getPrice(),
+                    mUnitCurrency));
+            data.put(R.id.data2_calculated, String.format(Locale.getDefault(), "%.3f %s/%s",
+                    refueling.getPrice() / volume, mUnitCurrency, mUnitVolume));
+        } else {
+            data.put(R.id.data2, getString(R.string.notice_not_paid));
+        }
 
         data.put(R.id.data3, String.format(Locale.getDefault(), "%.2f %s", volume, mUnitVolume));
         if (refueling.getPartial()) {

@@ -51,11 +51,17 @@ public class FuelPriceReport extends AbstractReport {
             mMax = Double.MIN_VALUE;
             mMin = Double.MAX_VALUE;
             mAverage = 0;
+            int count = 0;
             while (refueling.moveToNext()) {
+                if (refueling.getPrice() == 0.0f) {
+                    continue;
+                }
+
                 float fuelPrice = refueling.getPrice() / refueling.getVolume();
                 mAverage += fuelPrice;
                 mMax = Math.max(mMax, fuelPrice);
                 mMin = Math.min(mMin, fuelPrice);
+                count++;
 
                 add((float) refueling.getDate().getTime(),
                         fuelPrice,
@@ -67,7 +73,7 @@ public class FuelPriceReport extends AbstractReport {
                         false);
             }
 
-            mAverage /= refueling.getCount();
+            mAverage /= count;
         }
 
         public double getAverage() {

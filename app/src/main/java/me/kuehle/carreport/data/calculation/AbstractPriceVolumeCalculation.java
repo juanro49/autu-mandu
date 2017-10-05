@@ -63,7 +63,9 @@ public abstract class AbstractPriceVolumeCalculation extends AbstractCalculation
             if (refueling.getCount() > 0) {
                 List<Float> fuelPrices = new ArrayList<>(refueling.getCount());
                 while (refueling.moveToNext()) {
-                    fuelPrices.add(refueling.getPrice() / refueling.getVolume());
+                    if (refueling.getPrice() != 0.0f) {
+                        fuelPrices.add(refueling.getPrice() / refueling.getVolume());
+                    }
                 }
 
                 double avgFuelPrice = Calculator.avg(fuelPrices.toArray(new Float[refueling.getCount()]));

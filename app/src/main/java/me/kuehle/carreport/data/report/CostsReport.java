@@ -183,6 +183,9 @@ public class CostsReport extends AbstractReport {
             double totalCosts = 0;
 
             while (refueling.moveToNext()) {
+                if (refueling.getPrice() == 0.0f) {
+                    continue;
+                }
                 totalCosts += refueling.getPrice();
 
                 DateTime date = new DateTime(refueling.getDate());
