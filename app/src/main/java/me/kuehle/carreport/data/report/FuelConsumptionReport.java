@@ -31,6 +31,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -49,6 +50,7 @@ public class FuelConsumptionReport extends AbstractReport {
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
             mCursor = refueling;
 
+            long firstRefueling = RefuelingQueries.getFirstTimestamp(context);
             int lastMileage = 0;
             int totalDistance = 0, partialDistance = 0;
             float totalVolume = 0, partialVolume = 0;
@@ -79,7 +81,7 @@ public class FuelConsumptionReport extends AbstractReport {
                             tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
                         }
 
-                        add((float) refueling.getDate().getTime(),
+                        add(((refueling.getDate().getTime() - firstRefueling)/1000)/86400.0f,
                                 consumption,
                                 tooltip,
                                 refueling.getGuessed());
@@ -107,14 +109,16 @@ public class FuelConsumptionReport extends AbstractReport {
     private List<AbstractReportChartData> reportData = new ArrayList<>();
     private String mUnit;
     private DateFormat mDateFormat;
+    private long mFirstRefueling = 0;
 
     public FuelConsumptionReport(Context context) {
         super(context);
+        mFirstRefueling = RefuelingQueries.getFirstTimestamp(context);
     }
 
     @Override
     protected String formatXValue(float value, int chartOption) {
-        return mDateFormat.format(new Date((long) value));
+        return mDateFormat.format(new Date(mFirstRefueling + ((long) (value*86400))*1000L));
     }
 
     @Override
@@ -147,6 +151,7 @@ public class FuelConsumptionReport extends AbstractReport {
         ArrayList<Cursor> cursors = new ArrayList<>();
 
         // Collect report data and add info data which will be displayed next to the graph.
+        mFirstRefueling = RefuelingQueries.getFirstTimestamp(mContext);
         CarCursor car = new CarSelection().query(mContext.getContentResolver(), null,
                 CarColumns.NAME + " COLLATE UNICODE");
         cursors.add(car);
