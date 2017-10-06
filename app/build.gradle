@@ -7,8 +7,8 @@ android {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
         targetSdkVersion versions.targetSdk
-        versionCode 61
-        versionName "3.16.0"
+        versionCode 62
+        versionName "3.17.0"
     }
     signingConfigs {
         release {

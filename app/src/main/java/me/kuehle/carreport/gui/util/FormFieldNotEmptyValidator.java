@@ -17,20 +17,21 @@
 package me.kuehle.carreport.gui.util;
 
 import me.kuehle.carreport.R;
+
 import android.widget.TextView;
 
 public class FormFieldNotEmptyValidator extends AbstractFormFieldValidator {
-	public FormFieldNotEmptyValidator(TextView field) {
-		super(field);
-	}
+    public FormFieldNotEmptyValidator(TextView field) {
+        super(field);
+    }
 
-	@Override
-	public int getMessage() {
-		return R.string.validate_error_not_empty;
-	}
+    @Override
+    public int getMessage() {
+        return R.string.validate_error_not_empty;
+    }
 
-	@Override
-	public boolean isValid() {
-		return !fields[0].getText().toString().trim().isEmpty();
-	}
+    @Override
+    public boolean isValid() {
+        return !fields[0].getText().toString().trim().isEmpty();
+    }
 }

@@ -20,27 +20,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FormValidator {
-	private List<AbstractFormFieldValidator> fieldValidators = new ArrayList<>();
+    private List<AbstractFormFieldValidator> fieldValidators = new ArrayList<>();
 
-	public FormValidator() {
-	}
+    public FormValidator() {
+    }
 
-	public void add(AbstractFormFieldValidator fieldValidator) {
-		fieldValidators.add(fieldValidator);
-	}
+    public void add(AbstractFormFieldValidator fieldValidator) {
+        fieldValidators.add(fieldValidator);
+    }
 
-	public boolean validate() {
-		for (AbstractFormFieldValidator validator : fieldValidators) {
-			validator.clear();
-		}
-		
-		boolean valid = true;
-		for (AbstractFormFieldValidator validator : fieldValidators) {
-			if (!validator.validate()) {
-				valid = false;
-			}
-		}
+    public boolean validate() {
+        for (AbstractFormFieldValidator validator : fieldValidators) {
+            validator.clear();
+        }
 
-		return valid;
-	}
+        boolean valid = true;
+        for (AbstractFormFieldValidator validator : fieldValidators) {
+            if (!validator.validate()) {
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
 }

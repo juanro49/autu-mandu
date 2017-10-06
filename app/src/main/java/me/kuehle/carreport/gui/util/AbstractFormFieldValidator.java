@@ -30,11 +30,6 @@ public abstract class AbstractFormFieldValidator {
         this.fields = new TextView[]{field};
     }
 
-    public AbstractFormFieldValidator(TextView... fields) {
-        this.context = fields[0].getContext();
-        this.fields = fields;
-    }
-
     public void clear() {
         for (TextView field : fields) {
             setError(field, null);
