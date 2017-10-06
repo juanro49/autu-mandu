@@ -36,7 +36,7 @@ public abstract class AbstractReportChartData {
     public AbstractReportChartData(Context context, String name, int color) {
         mContext = context;
         mName = name;
-        mColor = color;
+        mColor = ReportColor.invertIfUseful(color);
     }
 
     public final OverallTrendReportChartData createOverallTrendData() {

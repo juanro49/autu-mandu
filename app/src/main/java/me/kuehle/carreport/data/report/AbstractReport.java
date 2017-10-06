@@ -91,7 +91,7 @@ public abstract class AbstractReport {
 
         public Section(String label, int color, int order) {
             super(label);
-            mColor = color;
+            mColor = ReportColor.invertIfUseful(color);
             mOrder = order;
             mItems = new ArrayList<>();
         }
