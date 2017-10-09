@@ -48,7 +48,6 @@ public class MileageReport extends AbstractReport {
             RefuelingBalancer balancer = new RefuelingBalancer(context);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId());
             mCursor = refueling;
-            long firstRefueling = RefuelingQueries.getFirstTimestamp(context);
 
             while (refueling.moveToNext()) {
                 String tooltip = mContext.getString(R.string.report_toast_mileage,
@@ -60,7 +59,7 @@ public class MileageReport extends AbstractReport {
                     tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
                 }
 
-                add(((refueling.getDate().getTime() - firstRefueling)/1000L)/86400.0f,
+                add(ReportDateHelper.toFloat(refueling.getDate()),
                         (float) refueling.getMileage(),
                         tooltip,
                         refueling.getGuessed());
@@ -81,7 +80,6 @@ public class MileageReport extends AbstractReport {
             RefuelingBalancer balancer = new RefuelingBalancer(context);
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
             mCursor = refueling;
-            long firstRefueling = RefuelingQueries.getFirstTimestamp(context);
 
             int lastRefuelingMileage = -1;
             while (refueling.moveToNext()) {
@@ -96,7 +94,7 @@ public class MileageReport extends AbstractReport {
                         tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
                     }
 
-                    add(((refueling.getDate().getTime() - firstRefueling)/1000L)/86400.0f,
+                    add(ReportDateHelper.toFloat(refueling.getDate()),
                             (float) mileageDiff,
                             tooltip,
                             refueling.getGuessed());
@@ -159,11 +157,9 @@ public class MileageReport extends AbstractReport {
     private String mUnit;
     private DateFormat mDateFormat;
     private String mMonthLabelFormat;
-    private long mFirstRefueling;
 
     public MileageReport(Context context) {
         super(context);
-        mFirstRefueling = RefuelingQueries.getFirstTimestamp(context);
     }
 
     @Override
@@ -175,7 +171,7 @@ public class MileageReport extends AbstractReport {
             DateTime date = new DateTime(year, month, 1, 0, 0);
             return date.toString(mMonthLabelFormat);
         } else {
-            return mDateFormat.format(new Date(mFirstRefueling + ((long) (value*86400))*1000));
+            return mDateFormat.format(ReportDateHelper.toDate(value));
         }
     }
 
@@ -227,7 +223,6 @@ public class MileageReport extends AbstractReport {
         }
 
         ArrayList<Cursor> cursors = new ArrayList<>();
-        mFirstRefueling = RefuelingQueries.getFirstTimestamp(mContext);
         // Car data
         CarCursor car = new CarSelection().query(mContext.getContentResolver(), null, CarColumns.NAME + " COLLATE UNICODE");
         cursors.add(car);

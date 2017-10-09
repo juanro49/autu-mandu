@@ -53,7 +53,6 @@ public class FuelPriceReport extends AbstractReport {
             mMin = Double.MAX_VALUE;
             mAverage = 0;
             int count = 0;
-            long firstRefueling = RefuelingQueries.getFirstTimestamp(context);
             while (refueling.moveToNext()) {
                 if (refueling.getPrice() == 0.0f) {
                     continue;
@@ -65,7 +64,7 @@ public class FuelPriceReport extends AbstractReport {
                 mMin = Math.min(mMin, fuelPrice);
                 count++;
 
-                add(((refueling.getDate().getTime() - firstRefueling)/1000)/86400.0f,
+                add(ReportDateHelper.toFloat(refueling.getDate()),
                         fuelPrice,
                         mContext.getString(R.string.report_toast_fuel_price,
                                 fuelPrice,
@@ -98,16 +97,14 @@ public class FuelPriceReport extends AbstractReport {
     private ArrayList<AbstractReportChartData> mReportChartData;
     private String mUnit;
     private DateFormat mDateFormat;
-    private long mFirstRefueling;
 
     public FuelPriceReport(Context context) {
         super(context);
-        mFirstRefueling = RefuelingQueries.getFirstTimestamp(context);
     }
 
     @Override
     protected String formatXValue(float value, int chartOption) {
-        return mDateFormat.format(new Date(mFirstRefueling + ((long) (value*86400))*1000));
+        return mDateFormat.format(ReportDateHelper.toDate(value));
     }
 
     @Override
@@ -138,7 +135,6 @@ public class FuelPriceReport extends AbstractReport {
 
         ArrayList<Cursor> cursors = new ArrayList<>();
 
-        mFirstRefueling = RefuelingQueries.getFirstTimestamp(mContext);
         FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver(), null,
                 FuelTypeColumns.NAME + " COLLATE UNICODE");
         cursors.add(fuelType);

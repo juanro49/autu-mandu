@@ -53,20 +53,4 @@ public class RefuelingQueries {
                         RefuelingColumns.ALL_COLUMNS,
                         RefuelingColumns.DATE);
     }
-
-    public static long getFirstTimestamp(Context context) {
-        RefuelingCursor firstRefueling = new RefuelingSelection()
-                .limit(1)
-                .query(context.getContentResolver(),
-                        new String[]{ RefuelingColumns.DATE },
-                        RefuelingColumns.DATE);
-        if (firstRefueling.moveToFirst()) {
-            long rtn = firstRefueling.getDate().getTime();
-            firstRefueling.close();
-            return rtn;
-        } else {
-            firstRefueling.close();
-            return 0L;
-        }
-    }
 }
