@@ -68,7 +68,7 @@
     <string name="hint_reminder_snoozed_until">Schlummern bis</string>
 
     <string name="label_partial">Teilfüllung</string>
-    <string name="label_color">Farbe</string>
+    <string name="label_color_in_reports">Farbe in Reports</string>
     <string name="label_suspend">Stilllegen</string>
     <string name="label_set_end_date">Enddatum setzen</string>
     <string name="label_car">Auto</string>
