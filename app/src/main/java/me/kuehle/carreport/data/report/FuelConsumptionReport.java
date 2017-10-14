@@ -31,6 +31,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -79,7 +80,7 @@ public class FuelConsumptionReport extends AbstractReport {
                             tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
                         }
 
-                        add((float) refueling.getDate().getTime(),
+                        add(ReportDateHelper.toFloat(refueling.getDate()),
                                 consumption,
                                 tooltip,
                                 refueling.getGuessed());
@@ -114,7 +115,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
     @Override
     protected String formatXValue(float value, int chartOption) {
-        return mDateFormat.format(new Date((long) value));
+        return mDateFormat.format(ReportDateHelper.toDate(value));
     }
 
     @Override

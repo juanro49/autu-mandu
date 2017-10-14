@@ -29,6 +29,7 @@ import java.util.Locale;
 import lecho.lib.hellocharts.util.ChartUtils;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
 import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
@@ -63,7 +64,7 @@ public class FuelPriceReport extends AbstractReport {
                 mMin = Math.min(mMin, fuelPrice);
                 count++;
 
-                add((float) refueling.getDate().getTime(),
+                add(ReportDateHelper.toFloat(refueling.getDate()),
                         fuelPrice,
                         mContext.getString(R.string.report_toast_fuel_price,
                                 fuelPrice,
@@ -103,7 +104,7 @@ public class FuelPriceReport extends AbstractReport {
 
     @Override
     protected String formatXValue(float value, int chartOption) {
-        return mDateFormat.format(new Date((long) value));
+        return mDateFormat.format(ReportDateHelper.toDate(value));
     }
 
     @Override
