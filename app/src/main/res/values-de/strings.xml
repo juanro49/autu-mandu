@@ -189,6 +189,8 @@
     <string name="report_toast_mileage_month">"%1$s: %2$.0f %3$s im %4$s"</string>
     <string name="report_toast_costs">%1$s: %2$.0f %3$s im %4$s</string>
     <string name="report_toast_guessed">Geschätzt um fehlende Tankfüllungen auszugleichen.</string>
+    <string name="report_price">%1$.2f %2$s</string>
+    <string name="report_price_estimated">vsl. %1$.2f %2$s</string>
 
     <string name="pref_title_header_about">Über Car Report</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>

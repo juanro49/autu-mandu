@@ -17,6 +17,7 @@
 package me.kuehle.carreport.data.report;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.support.v4.util.LongSparseArray;
 import android.text.format.DateFormat;
@@ -264,30 +265,37 @@ public class CostsReport extends AbstractReport {
             // 60 seconds per minute * 60 minutes per hour * 24 hours per day =
             // 86400 seconds per day
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_day),
-                    String.format("%.2f %s", costsPerSecond * 86400, mUnit)));
+                    mContext.getString((elapsedSeconds.getSeconds() > 86400 ?
+                                    R.string.report_price : R.string.report_price_estimated),
+                            costsPerSecond * 86400, mUnit)));
+                    //String.format("%.2f %s", costsPerSecond * 86400, mUnit)));
 
             // Average costs per month
             // 86400 seconds per day * 30,4375 days per month = 2629800 seconds
             // per month
             // (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_month),
-                    String.format("%.2f %s", costsPerSecond * 2629800, mUnit)));
+                    mContext.getString((elapsedSeconds.getSeconds() > 2629800 ?
+                                    R.string.report_price : R.string.report_price_estimated),
+                            costsPerSecond * 2629800, mUnit)));
 
             // Average costs per year
             // 86400 seconds per day * 365,25 days per year = 31557600 seconds
             // per year
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_year),
-                    String.format("%.2f %s", costsPerSecond * 31557600, mUnit)));
+                    mContext.getString((elapsedSeconds.getSeconds() > 31557600 ?
+                                    R.string.report_price : R.string.report_price_estimated),
+                            costsPerSecond * 31557600, mUnit)));
 
             // Average costs per [distance unit]
             int mileageDiff = Math.max(1, endMileage - startMileage);
             section.addItem(new Item("\u00D8 " + prefs.getUnitDistance(),
-                    String.format("%.2f %s", totalCosts / mileageDiff, mUnit)));
+                    mContext.getString(R.string.report_price, totalCosts / mileageDiff, mUnit)));
 
             // Total costs
             section.addItem(new Item(mContext.getString(R.string.report_since,
                     DateFormat.getDateFormat(mContext).format(startDate.toDate())),
-                    String.format("%.2f %s", totalCosts, mUnit)));
+                    mContext.getString(R.string.report_price, totalCosts, mUnit)));
         }
 
         return cursors.toArray(new Cursor[cursors.size()]);
