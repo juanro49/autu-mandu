@@ -71,7 +71,7 @@
     <string name="hint_reminder_snoozed_until">Snoozed until</string>
     
     <string name="label_partial">Partial</string>
-    <string name="label_color">Color</string>
+    <string name="label_color_in_reports">Color in reports</string>
     <string name="label_suspend">Suspend</string>
     <string name="label_set_end_date">Set end date</string>
     <string name="label_car">Car</string>

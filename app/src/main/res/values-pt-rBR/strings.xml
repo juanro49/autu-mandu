@@ -67,7 +67,7 @@
     <string name="hint_reminder_snoozed_until">Suspenso até</string>
     
     <string name="label_partial">Parcial</string>
-    <string name="label_color">Cor</string>
+    <string name="label_color_in_reports">Cor</string>
     <string name="label_suspend">Suspender</string>
     <string name="label_set_end_date">Definir a data final</string>
     <string name="label_car">Carro</string>

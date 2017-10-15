@@ -34,10 +34,10 @@
         <license>Apache Software License 2.0</license>
     </notice>
     <notice>
-        <name>Android Holo ColorPicker</name>
-        <url>https://github.com/LarsWerkman/HoloColorPicker</url>
-        <copyright>Copyright 2012 Lars Werkman</copyright>
-        <license>Apache Software License 2.0</license>
+        <name>AOSP color picker</name>
+        <url>https://github.com/JordanRobinson/android-color-picker</url>
+        <copyright>Copyright 2015 Jordan Robinson</copyright>
+        <license>MIT License</license>
     </notice>
     <notice>
         <name>FloatingActionButton</name>
