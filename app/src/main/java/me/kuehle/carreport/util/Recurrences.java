@@ -52,7 +52,7 @@ public class Recurrences {
     }
 
     /**
-     * Calculates the recurrences of an event.
+     * Calculates all recurrences of an event.
      * @param interval The interval the event occurs.
      * @param multiplier A multiplier of the interval.
      * @param start The beginning of the recurring event.
@@ -61,7 +61,7 @@ public class Recurrences {
      */
     public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start,
                                             Date end) {
-        return getRecurrencesBetween(interval, multiplier, start, end, start, new Date());
+        return getRecurrencesBetween(interval, multiplier, start, end, start, end);
     }
 
     /**
