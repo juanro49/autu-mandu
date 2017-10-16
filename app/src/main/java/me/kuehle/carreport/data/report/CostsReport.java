@@ -233,13 +233,11 @@ public class CostsReport extends AbstractReport {
                             otherCost.getRecurrenceInterval(),
                             otherCost.getRecurrenceMultiplier(),
                             otherCost.getDate());
-                    recurrencesInLastYear = Recurrences.getRecurrencesBetween(
+                    recurrencesInLastYear = Recurrences.getRecurrencesSince(
                             otherCost.getRecurrenceInterval(),
                             otherCost.getRecurrenceMultiplier(),
                             otherCost.getDate(),
-                            now,
-                            new Date(now.getTime() - YEAR_SECONDS * 1000),
-                            now);
+                            new Date(now.getTime() - YEAR_SECONDS * 1000));
                 } else {
                     recurrences = Recurrences.getRecurrencesBetween(
                             otherCost.getRecurrenceInterval(),
@@ -307,7 +305,6 @@ public class CostsReport extends AbstractReport {
                     mContext.getString((elapsedSeconds.getSeconds() > DAY_SECONDS ?
                                     R.string.report_price : R.string.report_price_estimated),
                             costsPerSecond * DAY_SECONDS, mUnit)));
-                    //String.format("%.2f %s", costsPerSecond * 86400, mUnit)));
 
             // Average costs per month
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_month),

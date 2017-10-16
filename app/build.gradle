@@ -97,6 +97,6 @@ dependencies {
     compile 'net.danlew:android.joda:2.9.9'
 
     // Required for instrumented tests
-    androidTestCompile 'com.android.support:support-annotations:26.1.0'
+    androidTestCompile "com.android.support:support-annotations:${versions.supportLibrary}"
     androidTestCompile 'com.android.support.test:runner:0.5'
 }

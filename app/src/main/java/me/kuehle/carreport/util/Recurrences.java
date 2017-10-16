@@ -26,10 +26,39 @@ import org.joda.time.Years;
 import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
 
 public class Recurrences {
+    /**
+     * Calculates the recurrences up to now.
+     * @param interval The interval the event occurs.
+     * @param multiplier A multiplier of the interval.
+     * @param start The beginning of the recurring event.
+     * @return The count of the recurrences.
+     */
     public static int getRecurrencesSince(RecurrenceInterval interval, int multiplier, Date start) {
         return getRecurrencesBetween(interval, multiplier, start, new Date());
     }
 
+    /**
+     * Calculates the recurrences between a specific date and now.
+     * @param interval The interval the event occurs.
+     * @param multiplier A multiplier of the interval.
+     * @param start The beginning of the recurring event.
+     * @param from The beginning of counting the recurences.
+     * @return The count of the recurrences.
+     */
+    public static int getRecurrencesSince(RecurrenceInterval interval, int multiplier, Date start,
+                                          Date from) {
+        Date now = new Date();
+        return getRecurrencesBetween(interval, multiplier, start, now, from, now);
+    }
+
+    /**
+     * Calculates the recurrences of an event.
+     * @param interval The interval the event occurs.
+     * @param multiplier A multiplier of the interval.
+     * @param start The beginning of the recurring event.
+     * @param end The end of the recurring event.
+     * @return The count of the recurrences.
+     */
     public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start,
                                             Date end) {
         return getRecurrencesBetween(interval, multiplier, start, end, start, new Date());
@@ -38,7 +67,7 @@ public class Recurrences {
     /**
      * Calculates the recurrences inside a timeframe.
      * @param interval The interval the event occurs.
-     * @param multiplier A multiplier.
+     * @param multiplier A multiplier of the interval.
      * @param start The beginning of the recurring event.
      * @param end The end of the recurring event.
      * @param from The beginning of the timeframe.
@@ -47,45 +76,48 @@ public class Recurrences {
      */
     public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start,
                                             Date end, Date from, Date to) {
-        DateTime then = new DateTime(start);
-        DateTime now = new DateTime(end);
-        if (then.isAfter(now) || to.getTime() < from.getTime()) {
+        DateTime startDateTime = new DateTime(start);
+        DateTime endDateTime = new DateTime(end);
+        if (startDateTime.isAfter(endDateTime) || to.getTime() < from.getTime()) {
             return 0;
         }
-        if (new DateTime(to).isBefore(now)) {
-            now = new DateTime(to);
+        if (new DateTime(to).isBefore(endDateTime)) {
+            endDateTime = new DateTime(to);
         }
         DateTime fromDateTime = new DateTime(from);
 
-        int count = (then.isAfter(fromDateTime) || then.isEqual(fromDateTime) ? 1 : 0);
+        int count = (startDateTime.isAfter(fromDateTime) || startDateTime.isEqual(fromDateTime) ?
+                1 : 0);
         switch (interval) {
             case ONCE:
                 break;
             case DAY:
-                if (fromDateTime.isAfter(then)) {
-                    then = fromDateTime;
+                if (fromDateTime.isAfter(startDateTime)) {
+                    startDateTime = fromDateTime;
                 }
-                count += Days.daysBetween(then, now).getDays() / multiplier;
+                count += Days.daysBetween(startDateTime, endDateTime).getDays() / multiplier;
                 break;
             case MONTH:
-                if (fromDateTime.isAfter(then)) {
-                    then.plusMonths(Months.monthsBetween(then, new DateTime(from)).getMonths() + 1);
+                if (fromDateTime.isAfter(startDateTime)) {
+                    startDateTime.plusMonths(Months.monthsBetween(startDateTime, fromDateTime).
+                            getMonths() + 1);
                 }
-                count += Months.monthsBetween(then, now).getMonths() / multiplier;
+                count += Months.monthsBetween(startDateTime, endDateTime).getMonths() / multiplier;
                 break;
             case QUARTER:
-                if (fromDateTime.isAfter(then)) {
-                    then.plusMonths((Months.monthsBetween(then, new DateTime(from)).getMonths() / 3)
-                            + 3);
+                if (fromDateTime.isAfter(startDateTime)) {
+                    startDateTime.plusMonths((Months.monthsBetween(startDateTime, fromDateTime).
+                            getMonths() / 3) + 3);
                 }
-                int quarters = Months.monthsBetween(then, now).getMonths() / 3;
+                int quarters = Months.monthsBetween(startDateTime, endDateTime).getMonths() / 3;
                 count += quarters / multiplier;
                 break;
             case YEAR:
-                if (fromDateTime.isAfter(then)) {
-                    then.plusYears(Years.yearsBetween(then, new DateTime(from)).getYears() + 1);
+                if (fromDateTime.isAfter(startDateTime)) {
+                    startDateTime.plusYears(Years.yearsBetween(startDateTime, fromDateTime).
+                            getYears() + 1);
                 }
-                count += Years.yearsBetween(then, now).getYears() / multiplier;
+                count += Years.yearsBetween(startDateTime, endDateTime).getYears() / multiplier;
                 break;
         }
 
