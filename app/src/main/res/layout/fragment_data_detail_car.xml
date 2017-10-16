@@ -52,7 +52,7 @@
                 android:layout_weight="1"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                android:text="@string/label_color"
+                android:text="@string/label_color_in_reports"
                 android:textSize="16sp"/>
 
             <View
