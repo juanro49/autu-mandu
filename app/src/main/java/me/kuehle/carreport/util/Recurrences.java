@@ -30,25 +30,61 @@ public class Recurrences {
         return getRecurrencesBetween(interval, multiplier, start, new Date());
     }
 
-    public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start, Date end) {
+    public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start,
+                                            Date end) {
+        return getRecurrencesBetween(interval, multiplier, start, end, start, new Date());
+    }
+
+    /**
+     * Calculates the recurrences inside a timeframe.
+     * @param interval The interval the event occurs.
+     * @param multiplier A multiplier.
+     * @param start The beginning of the recurring event.
+     * @param end The end of the recurring event.
+     * @param from The beginning of the timeframe.
+     * @param to The end of the timeframe.
+     * @return The count of the recurrences.
+     */
+    public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start,
+                                            Date end, Date from, Date to) {
         DateTime then = new DateTime(start);
         DateTime now = new DateTime(end);
+        if (then.isAfter(now) || to.getTime() < from.getTime()) {
+            return 0;
+        }
+        if (new DateTime(to).isBefore(now)) {
+            now = new DateTime(to);
+        }
+        DateTime fromDateTime = new DateTime(from);
 
-        int count = 1;
+        int count = (then.isAfter(fromDateTime) || then.isEqual(fromDateTime) ? 1 : 0);
         switch (interval) {
             case ONCE:
                 break;
             case DAY:
+                if (fromDateTime.isAfter(then)) {
+                    then = fromDateTime;
+                }
                 count += Days.daysBetween(then, now).getDays() / multiplier;
                 break;
             case MONTH:
+                if (fromDateTime.isAfter(then)) {
+                    then.plusMonths(Months.monthsBetween(then, new DateTime(from)).getMonths() + 1);
+                }
                 count += Months.monthsBetween(then, now).getMonths() / multiplier;
                 break;
             case QUARTER:
+                if (fromDateTime.isAfter(then)) {
+                    then.plusMonths((Months.monthsBetween(then, new DateTime(from)).getMonths() / 3)
+                            + 3);
+                }
                 int quarters = Months.monthsBetween(then, now).getMonths() / 3;
                 count += quarters / multiplier;
                 break;
             case YEAR:
+                if (fromDateTime.isAfter(then)) {
+                    then.plusYears(Years.yearsBetween(then, new DateTime(from)).getYears() + 1);
+                }
                 count += Years.yearsBetween(then, now).getYears() / multiplier;
                 break;
         }
