@@ -204,10 +204,18 @@ public class RecurrencesTest extends TestCase {
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                parser.parse("2017-09-15T00:00:00+00:00"),
-                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-08-15T00:00:00+00:00"),
+                parser.parse("2017-10-16T23:59:59+00:00"),
                 parser.parse("2017-09-15T00:01:40+00:00"),
-                parser.parse("2017-10-15T23:59:59+00:00")));
+                parser.parse("2017-10-16T23:59:59+00:00")));
+
+        assertEquals(1, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.MONTH,
+                1,
+                parser.parse("2017-09-15T00:00:00+00:00"),
+                parser.parse("2017-10-16T23:59:59+00:00"),
+                parser.parse("2017-09-15T00:01:40+00:00"),
+                parser.parse("2017-10-16T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
@@ -216,6 +224,14 @@ public class RecurrencesTest extends TestCase {
                 parser.parse("2017-10-15T23:59:59+00:00"),
                 parser.parse("2017-07-15T00:01:40+00:00"),
                 parser.parse("2017-10-15T23:59:59+00:00")));
+
+        assertEquals(3, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.QUARTER,
+                1,
+                parser.parse("2016-01-01T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-01-01T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
@@ -304,5 +320,43 @@ public class RecurrencesTest extends TestCase {
                 parser.parse("2015-11-16T00:00:00+00:00"),
                 parser.parse("2017-10-15T23:59:59+00:00"),
                 parser.parse("2015-11-16T00:00:00+00:00")));
+    }
+
+    /**
+     * This test test if the time frame behavior works for single events.
+     * @throws Exception
+     */
+    public void testGetRecurrencesBetweenSingleEvent() throws Exception {
+        assertEquals(1, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.ONCE,
+                1,
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00")));
+
+        assertEquals(1, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.ONCE,
+                1,
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-15T00:00:00+00:00"),
+                parser.parse("2017-10-17T00:00:00+00:00")));
+
+        assertEquals(0, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.ONCE,
+                1,
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-17T00:00:00+00:00"),
+                parser.parse("2017-10-18T00:00:00+00:00")));
+
+        assertEquals(0, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.ONCE,
+                1,
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T00:00:00+00:00")));
     }
 }
