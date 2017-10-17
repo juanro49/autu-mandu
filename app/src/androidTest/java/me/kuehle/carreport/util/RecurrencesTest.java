@@ -22,6 +22,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
@@ -29,6 +31,12 @@ import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
 import static org.junit.Assert.*;
 
 public class RecurrencesTest extends TestCase {
+    private DateFormat parser;
+
+    public void setUp() {
+        parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    }
+
     /**
      * A default test to ensure behaviour does not change.
      * @throws Exception
@@ -37,50 +45,50 @@ public class RecurrencesTest extends TestCase {
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 1,
-                new Date(1507939200000L),
-                new Date(1507939200000L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 1,
-                new Date(1507939200000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 2,
-                new Date(1507939200000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                new Date(1507939200000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                new Date(1505433600000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-09-15T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
                 1,
-                new Date(1500076800000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-07-15T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
                 1,
-                new Date(1447632000000L),
-                new Date(1508111999999L)));
+                parser.parse("2015-11-16T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
                 1,
-                new Date(1508111999999L),
-                new Date(1447632000000L)));
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2015-11-16T00:00:00+00:00")));
     }
 
     /**
@@ -92,66 +100,66 @@ public class RecurrencesTest extends TestCase {
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 1,
-                new Date(1507939200000L),
-                new Date(1507939200000L),
-                new Date(1507939100000L),
-                new Date(1507939200000L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-13T23:58:20+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 1,
-                new Date(1507939200000L),
-                new Date(1508111999999L),
-                new Date(1507939100000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-10-13T23:58:20+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 2,
-                new Date(1507939200000L),
-                new Date(1508111999999L),
-                new Date(1507939100000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-10-13T23:58:20+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                new Date(1507939200000L),
-                new Date(1508111999999L),
-                new Date(1507939100000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-10-13T23:58:20+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                new Date(1505433600000L),
-                new Date(1508111999999L),
-                new Date(1505433500000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-09-15T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-09-14T23:58:20+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
                 1,
-                new Date(1500076800000L),
-                new Date(1508111999999L),
-                new Date(1500076700000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-07-15T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-07-14T23:58:20+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
                 1,
-                new Date(1447632000000L),
-                new Date(1508111999999L),
-                new Date(1447631000000L),
-                new Date(1508111999999L)));
+                parser.parse("2015-11-16T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2015-11-15T23:43:20+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
                 1,
-                new Date(1508111999999L),
-                new Date(1447632000000L),
-                new Date(1508111999999L),
-                new Date(1447631000000L)));
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2015-11-16T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2015-11-15T23:43:20+00:00")));
     }
 
     /**
@@ -164,67 +172,67 @@ public class RecurrencesTest extends TestCase {
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 1,
-                new Date(1507939200000L),
-                new Date(1507939200000L),
-                new Date(1507939300000L),
-                new Date(1507939200000L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:01:40+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 1,
-                new Date(1507939200000L),
-                new Date(1508111999999L),
-                new Date(1507939300000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-10-14T00:01:40+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 2,
-                new Date(1507939200000L),
-                new Date(1508111999999L),
-                new Date(1507939300000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-10-14T00:01:40+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                new Date(1507939200000L),
-                new Date(1508111999999L),
-                new Date(1507939300000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-10-14T00:01:40+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                new Date(1505433600000L),
-                new Date(1508111999999L),
-                new Date(1505433700000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-09-15T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-09-15T00:01:40+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
                 1,
-                new Date(1500076800000L),
-                new Date(1508111999999L),
-                new Date(1500076900000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-07-15T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2017-07-15T00:01:40+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
                 1,
-                new Date(1447632000000L),
-                new Date(1508111999999L),
-                new Date(1447633000000L),
-                new Date(1508111999999L)));
+                parser.parse("2015-11-16T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2015-11-16T00:16:40+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         // negative assert - should not change.
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
                 1,
-                new Date(1508111999999L),
-                new Date(1447632000000L),
-                new Date(1508111999999L),
-                new Date(1447633000000L)));
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2015-11-16T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2015-11-16T00:16:40+00:00")));
     }
 
     /**
@@ -236,65 +244,65 @@ public class RecurrencesTest extends TestCase {
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 1,
-                new Date(1507939200000L),
-                new Date(1507939200000L),
-                new Date(1507939200000L),
-                new Date(1507939100000L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-13T23:58:20+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 1,
-                new Date(1507939200000L),
-                new Date(1508112000000L),
-                new Date(1507939200000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
                 2,
-                new Date(1507939200000L),
-                new Date(1508112000000L),
-                new Date(1507939200000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                new Date(1507939200000L),
-                new Date(1508112000000L),
-                new Date(1507939200000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-10-14T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
                 1,
-                new Date(1505433600000L),
-                new Date(1508112000000L),
-                new Date(1505433600000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-09-15T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-09-15T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
                 1,
-                new Date(1500076800000L),
-                new Date(1508112000000L),
-                new Date(1500076800000L),
-                new Date(1508111999999L)));
+                parser.parse("2017-07-15T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2017-07-15T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
                 1,
-                new Date(1447632000000L),
-                new Date(1508112000000L),
-                new Date(1447632000000L),
-                new Date(1508111999999L)));
+                parser.parse("2015-11-16T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2015-11-16T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00")));
 
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
                 1,
-                new Date(1508112000000L),
-                new Date(1447632000000L),
-                new Date(1508111999999L),
-                new Date(1447632000000L)));
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2015-11-16T00:00:00+00:00"),
+                parser.parse("2017-10-15T23:59:59+00:00"),
+                parser.parse("2015-11-16T00:00:00+00:00")));
     }
 }
