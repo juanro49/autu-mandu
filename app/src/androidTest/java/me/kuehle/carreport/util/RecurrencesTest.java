@@ -225,7 +225,7 @@ public class RecurrencesTest extends TestCase {
                 parser.parse("2017-07-15T00:01:40+00:00"),
                 parser.parse("2017-10-15T23:59:59+00:00")));
 
-        assertEquals(3, Recurrences.getRecurrencesBetween(
+        assertEquals(4, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
                 1,
                 parser.parse("2016-01-01T00:00:00+00:00"),
@@ -403,7 +403,7 @@ public class RecurrencesTest extends TestCase {
                 parser.parse("2016-01-01T00:00:00+00:00"),
                 parser.parse("2017-10-16T00:00:00+00:00"),
                 parser.parse("2016-01-02T01:00:00+00:00"),
-                parser.parse("2016-02-02T00:00:00+00:00")));
+                parser.parse("2016-03-02T00:00:00+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.MONTH,
@@ -435,7 +435,7 @@ public class RecurrencesTest extends TestCase {
                 parser.parse("2016-01-01T00:00:00+00:00"),
                 parser.parse("2017-10-16T00:00:00+00:00"),
                 parser.parse("2016-01-02T01:00:00+00:00"),
-                parser.parse("2016-06-02T00:00:00+00:00")));
+                parser.parse("2016-07-02T00:00:00+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
@@ -443,7 +443,7 @@ public class RecurrencesTest extends TestCase {
                 parser.parse("2016-01-01T00:00:00+00:00"),
                 parser.parse("2017-10-16T00:00:00+00:00"),
                 parser.parse("2016-01-02T00:00:00+00:00"),
-                parser.parse("2016-06-02T01:00:00+00:00")));
+                parser.parse("2016-09-02T01:00:00+00:00")));
 
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
