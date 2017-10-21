@@ -375,6 +375,14 @@ public class RecurrencesTest extends TestCase {
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
+                2,
+                parser.parse("2015-12-01T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2016-01-02T00:00:00+00:00"),
+                parser.parse("2016-01-04T00:00:00+00:00")));
+
+        assertEquals(2, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.DAY,
                 1,
                 parser.parse("2016-01-01T00:00:00+00:00"),
                 parser.parse("2017-10-16T00:00:00+00:00"),
@@ -403,6 +411,14 @@ public class RecurrencesTest extends TestCase {
                 parser.parse("2016-01-01T00:00:00+00:00"),
                 parser.parse("2017-10-16T00:00:00+00:00"),
                 parser.parse("2016-01-02T01:00:00+00:00"),
+                parser.parse("2016-03-02T00:00:00+00:00")));
+
+        assertEquals(2, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.MONTH,
+                2,
+                parser.parse("2015-01-01T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2016-01-01T00:00:00+00:00"),
                 parser.parse("2016-03-02T00:00:00+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
@@ -439,6 +455,14 @@ public class RecurrencesTest extends TestCase {
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.QUARTER,
+                2,
+                parser.parse("2015-01-01T00:00:00+00:00"),
+                parser.parse("2017-10-16T00:00:00+00:00"),
+                parser.parse("2016-01-01T00:00:00+00:00"),
+                parser.parse("2016-07-02T00:00:00+00:00")));
+
+        assertEquals(2, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.QUARTER,
                 1,
                 parser.parse("2016-01-01T00:00:00+00:00"),
                 parser.parse("2017-10-16T00:00:00+00:00"),
@@ -468,6 +492,14 @@ public class RecurrencesTest extends TestCase {
                 parser.parse("2017-10-01T00:00:00+00:00"),
                 parser.parse("2014-12-31T01:00:00+00:00"),
                 parser.parse("2015-12-31T00:00:00+00:00")));
+
+        assertEquals(2, Recurrences.getRecurrencesBetween(
+                RecurrenceInterval.YEAR,
+                3,
+                parser.parse("2008-01-01T00:00:00+00:00"),
+                parser.parse("2020-01-01T00:00:00+00:00"),
+                parser.parse("2011-12-31T01:00:00+00:00"),
+                parser.parse("2017-12-31T00:00:00+00:00")));
 
         assertEquals(2, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.YEAR,
