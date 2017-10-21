@@ -97,11 +97,13 @@ public class Recurrences {
                 break;
             case DAY:
                 if (fromDateTime.isAfter(startDateTime)) {
-                    int daysBetween = Days.daysBetween(startDateTime, fromDateTime).getDays();
-                    startDateTime = startDateTime.plusDays((daysBetween / multiplier) * multiplier);
-                    if (fromDateTime.isAfter(startDateTime)) {
-                        startDateTime = startDateTime.plusDays(multiplier);
+                    int intervalsBetween = Days.daysBetween(startDateTime, fromDateTime).getDays() /
+                            multiplier;
+                    if (fromDateTime.isAfter(startDateTime.
+                            plusDays(intervalsBetween * multiplier))) {
+                        intervalsBetween++;
                     }
+                    startDateTime = startDateTime.plusDays(intervalsBetween * multiplier);
                 }
                 if (startDateTime.isBefore(endDateTime) || startDateTime.equals(endDateTime)) {
                     count = Days.daysBetween(startDateTime, endDateTime).getDays() / multiplier + 1;
@@ -109,13 +111,13 @@ public class Recurrences {
                 break;
             case MONTH:
                 if (fromDateTime.isAfter(startDateTime)) {
-                    int monthsBetween = Months.monthsBetween(startDateTime, fromDateTime).
-                            getMonths();
-                    startDateTime = startDateTime.plusMonths((monthsBetween / multiplier) *
-                            multiplier);
-                    if (fromDateTime.isAfter(startDateTime)) {
-                        startDateTime = startDateTime.plusMonths(multiplier);
+                    int intervalsBetween = Months.monthsBetween(startDateTime, fromDateTime).
+                            getMonths() / multiplier;
+                    if (fromDateTime.isAfter(startDateTime.
+                            plusMonths(intervalsBetween * multiplier))) {
+                        intervalsBetween++;
                     }
+                    startDateTime = startDateTime.plusMonths(intervalsBetween * multiplier);
                 }
                 if (startDateTime.isBefore(endDateTime) || startDateTime.equals(endDateTime)) {
                     count = Months.monthsBetween(startDateTime, endDateTime).getMonths() /
@@ -124,13 +126,13 @@ public class Recurrences {
                 break;
             case QUARTER:
                 if (fromDateTime.isAfter(startDateTime)) {
-                    int quartersBetween = Months.monthsBetween(startDateTime, fromDateTime).
-                            getMonths() / 3;
-                    startDateTime = startDateTime.plusMonths(
-                             quartersBetween * 3 * multiplier);
-                    if (fromDateTime.isAfter(startDateTime)) {
-                        startDateTime = startDateTime.plusMonths(3 * multiplier);
+                    int intervalsBetween = Months.monthsBetween(startDateTime, fromDateTime).
+                            getMonths() / (3 * multiplier);
+                    if (fromDateTime.isAfter(startDateTime.
+                            plusMonths(intervalsBetween * 3 * multiplier))) {
+                        intervalsBetween++;
                     }
+                    startDateTime = startDateTime.plusMonths(intervalsBetween * 3 * multiplier);
                 }
                 if (startDateTime.isBefore(endDateTime) || startDateTime.equals(endDateTime)) {
                     int quarters = Months.monthsBetween(startDateTime, endDateTime).getMonths() / 3;
@@ -139,11 +141,13 @@ public class Recurrences {
                 break;
             case YEAR:
                 if (fromDateTime.isAfter(startDateTime)) {
-                    int yearsBetween = Years.yearsBetween(startDateTime, fromDateTime).getYears();
-                    startDateTime = startDateTime.plusYears(yearsBetween * multiplier);
-                    if (fromDateTime.isAfter(startDateTime)) {
-                        startDateTime = startDateTime.plusYears(multiplier);
+                    int intervalsBetween = Years.yearsBetween(startDateTime, fromDateTime).
+                            getYears() / multiplier;
+                    if (fromDateTime.isAfter(startDateTime.
+                            plusYears(intervalsBetween * multiplier))) {
+                        intervalsBetween++;
                     }
+                    startDateTime = startDateTime.plusYears(intervalsBetween * multiplier);
                 }
                 if (startDateTime.isBefore(endDateTime) || startDateTime.equals(endDateTime)) {
                     count = Years.yearsBetween(startDateTime, endDateTime).getYears() / multiplier +
