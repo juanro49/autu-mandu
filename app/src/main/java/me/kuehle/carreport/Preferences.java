@@ -142,8 +142,7 @@ public class Preferences {
     }
 
     public boolean isAutoGuessMissingDataEnabled() {
-        //return mPrefs.getBoolean("behavior_auto_guess_missing_data", false);
-        return false;
+        return mPrefs.getBoolean("behavior_auto_guess_missing_data", false);
     }
 
     public boolean isShowCarMenu() {
