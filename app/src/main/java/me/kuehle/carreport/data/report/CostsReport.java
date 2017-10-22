@@ -17,7 +17,6 @@
 package me.kuehle.carreport.data.report;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.support.v4.util.LongSparseArray;
 import android.text.format.DateFormat;
@@ -28,6 +27,7 @@ import org.joda.time.Seconds;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -115,7 +115,7 @@ public class CostsReport extends AbstractReport {
 
     @Override
     protected String formatYValue(float value, int chartOption) {
-        return String.format("%.0f", value);
+        return String.format(Locale.getDefault(), "%.0f", value);
     }
 
     @Override
