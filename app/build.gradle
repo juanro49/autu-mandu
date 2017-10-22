@@ -7,8 +7,8 @@ android {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
         targetSdkVersion versions.targetSdk
-        versionCode 63
-        versionName "3.17.0"
+        versionCode 64
+        versionName "3.18.0"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     signingConfigs {
@@ -34,6 +34,9 @@ android {
     lintOptions {
         checkReleaseBuilds false
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
 }
 
 repositories {
@@ -49,10 +52,10 @@ dependencies {
     compile 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
 
     // CSV
-    compile 'org.apache.commons:commons-csv:1.4'
+    compile 'org.apache.commons:commons-csv:1.5'
 
     // Dropbox
-    compile 'com.dropbox.core:dropbox-core-sdk:3.0.3'
+    compile 'com.dropbox.core:dropbox-core-sdk:3.0.5'
 
     // Support, AppCompat
     compile "com.android.support:support-v4:${versions.supportLibrary}"
@@ -85,7 +88,7 @@ dependencies {
     }
 
     // WebDAV
-    compile 'com.squareup.okhttp3:okhttp:3.8.1'
+    compile 'com.squareup.okhttp3:okhttp:3.9.0'
 
     // UI Helpers
     compile 'com.github.clans:fab:1.6.4'
@@ -98,5 +101,5 @@ dependencies {
 
     // Required for instrumented tests
     androidTestCompile "com.android.support:support-annotations:${versions.supportLibrary}"
-    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:runner:1.0.1'
 }
