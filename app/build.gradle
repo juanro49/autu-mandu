@@ -9,6 +9,7 @@ android {
         targetSdkVersion versions.targetSdk
         versionCode 63
         versionName "3.17.0"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     signingConfigs {
         release {
@@ -94,4 +95,8 @@ dependencies {
 
     // Joda-Time for Android
     compile 'net.danlew:android.joda:2.9.9'
+
+    // Required for instrumented tests
+    androidTestCompile "com.android.support:support-annotations:${versions.supportLibrary}"
+    androidTestCompile 'com.android.support.test:runner:0.5'
 }
