@@ -25,6 +25,8 @@ import android.util.SparseArray;
 
 import org.joda.time.DateTime;
 
+import java.util.Locale;
+
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.provider.othercost.OtherCostColumns;
@@ -92,11 +94,12 @@ public class DataListOtherFragment extends AbstractDataListFragment {
         data.put(R.id.title, otherCost.getTitle());
         data.put(R.id.date, mDateFormat.format(otherCost.getDate()));
         if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-            data.put(R.id.data1, String.format("%d %s", otherCost.getMileage(), mUnitDistance));
+            data.put(R.id.data1, String.format(Locale.getDefault(), "%d %s", otherCost.getMileage(),
+                    mUnitDistance));
         }
 
         float price = mIsExpenditure ? otherCost.getPrice() : -otherCost.getPrice();
-        data.put(R.id.data2, String.format("%.2f %s", price, mUnitCurrency));
+        data.put(R.id.data2, String.format(Locale.getDefault(), "%.2f %s", price, mUnitCurrency));
 
         data.put(R.id.data3, mRepeatIntervals[otherCost.getRecurrenceInterval().ordinal()]);
         if (!otherCost.getRecurrenceInterval().equals(RecurrenceInterval.ONCE)) {
@@ -109,9 +112,9 @@ public class DataListOtherFragment extends AbstractDataListFragment {
                         otherCost.getRecurrenceMultiplier(), otherCost.getDate(), otherCost.getEndDate());
             }
 
-            data.put(R.id.data2_calculated, String.format("%.2f %s", otherCost.getPrice() * recurrences,
-                    mUnitCurrency));
-            data.put(R.id.data3_calculated, String.format("x%d", recurrences));
+            data.put(R.id.data2_calculated, String.format(Locale.getDefault(), "%.2f %s",
+                    otherCost.getPrice() * recurrences, mUnitCurrency));
+            data.put(R.id.data3_calculated, String.format(Locale.getDefault(), "x%d", recurrences));
         }
 
         return data;
