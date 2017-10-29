@@ -149,13 +149,12 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
     public String uploadFile() throws SyncIoException, SyncParseException {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
-        if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-            throw new SyncParseException();
-        }
 
-        FileInputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(tempFile);
+        try (FileInputStream inputStream = new FileInputStream(tempFile)) {
+            if (!FileCopyUtil.copyFile(localFile, tempFile)) {
+                throw new SyncParseException();
+            }
+            
             FileMetadata remoteMetadata = mDbxClient.files()
                     .uploadBuilder("/" + localFile.getName())
                     .withMode(WriteMode.OVERWRITE)
@@ -167,14 +166,6 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
         } catch (DbxException | IOException e) {
             throw new SyncParseException(e);
         } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "Could not close input stream after uploading file.", e);
-                }
-            }
-
             if (!tempFile.delete()) {
                 Log.w(TAG, "Could not delete temp file after uploading.");
             }
@@ -186,9 +177,7 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
 
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(tempFile);
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
             mDbxClient.files()
                     .download("/" + localFile.getName())
                     .download(outputStream);
@@ -200,14 +189,6 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
         } catch (DbxException | IOException e) {
             throw new SyncParseException(e);
         } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "Could not close output stream after downloading file.", e);
-                }
-            }
-
             if (!tempFile.delete()) {
                 Log.w(TAG, "Could not delete temp file after downloading.");
             }

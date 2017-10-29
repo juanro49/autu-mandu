@@ -16,13 +16,9 @@
 
 package me.kuehle.carreport.gui.dialog;
 
-import me.kuehle.carreport.R;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,7 +29,8 @@ import android.view.View;
 
 import com.android.colorpicker.ColorPickerDialog;
 import com.android.colorpicker.ColorPickerPalette;
-import com.android.colorpicker.ColorPickerSwatch;
+
+import me.kuehle.carreport.R;
 
 public class SupportColorPickerDialogFragment extends DialogFragment {
     public interface SupportColorPickerDialogFragmentListener {
@@ -76,33 +73,19 @@ public class SupportColorPickerDialogFragment extends DialogFragment {
         final int[] colors = resources.getIntArray(R.array.selectable_colors);
         final int colorsPerRow = resources.getInteger(R.integer.color_picker_colors_per_row);
         colorPicker.init(ColorPickerDialog.SIZE_LARGE, colorsPerRow,
-                new ColorPickerSwatch.OnColorSelectedListener() {
-                    @Override
-                    public void onColorSelected(int color) {
-                        SupportColorPickerDialogFragment.this.setColor(color);
-                        colorPicker.drawPalette(colors, color);
-                    }
+                color -> {
+                    SupportColorPickerDialogFragment.this.setColor(color);
+                    colorPicker.drawPalette(colors, color);
                 });
         colorPicker.drawPalette(colors, mSelectedColor);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view);
         builder.setPositiveButton(args.getInt("positive"),
-                new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getListener()
-                                .onDialogPositiveClick(getTargetRequestCode(), mSelectedColor);
-                    }
-                });
+                (dialog, which) -> getListener().onDialogPositiveClick(getTargetRequestCode(),
+                        mSelectedColor));
         builder.setNegativeButton(args.getInt("negative"),
-                new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getListener().onDialogNegativeClick(
-                                getTargetRequestCode());
-                    }
-                });
+                (dialog, which) -> getListener().onDialogNegativeClick(getTargetRequestCode()));
         if (args.containsKey("title")) {
             builder.setTitle(args.getInt("title"));
         }
