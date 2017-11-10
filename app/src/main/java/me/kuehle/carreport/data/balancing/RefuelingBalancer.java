@@ -223,7 +223,7 @@ public class RefuelingBalancer {
                 // Possible distance is always the distance the car can possibly
                 // drive since the last (including partial) refueling.
                 int possibleDistance = avgDistance;
-                for (int pI = lastFullRefueling + 1; pI < i; pI++) {
+                for (int pI = lastFullRefueling + 1; pI < i && missingVolume > 0; pI++) {
                     int pDistance = refuelings.get(pI).mileage - refuelings.get(pI - 1).mileage;
                     if (pDistance <= possibleDistance) {
                         // Distance is possible so we assume nothing is missing
