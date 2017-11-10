@@ -2,16 +2,17 @@ buildscript {
     ext.versions = [
         'compileSdk': 26,
         'targetSdk': 26,
-        'buildTools': '26.0.2',
-        'supportLibrary': '26.1.0',
+        'buildTools': '27.0.0',
+        'supportLibrary': '27.0.0',
         'playServices': '11.4.2'
     ]
 
     repositories {
+        google()
         jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
     }
 }

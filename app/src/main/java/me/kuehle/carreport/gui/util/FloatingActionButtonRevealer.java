@@ -42,11 +42,6 @@ public class FloatingActionButtonRevealer {
 
     private static void showDelayed(final FloatingActionMenu fab) {
         fab.hideMenuButton(false);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                fab.showMenuButton(true);
-            }
-        }, 300);
+        new Handler().postDelayed(() -> fab.showMenuButton(true), 300);
     }
 }

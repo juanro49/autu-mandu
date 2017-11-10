@@ -244,18 +244,12 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
 
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
-        FileOutputStream outputStream = null;
-        try {
-            if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-                throw new SyncParseException();
-            }
-
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
             com.google.api.services.drive.model.File remoteFile = getRemoteFile();
             if (remoteFile == null) {
                 throw new SyncParseException();
             }
 
-            outputStream = new FileOutputStream(tempFile);
             mGoogleApiServiceDrive
                     .files()
                     .get(remoteFile.getId())
@@ -266,14 +260,6 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         } catch (IOException e) {
             throw new SyncIoException(e);
         } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    Log.w(TAG, "Could not close output stream after downloading.");
-                }
-            }
-
             if (!tempFile.delete()) {
                 Log.w(TAG, "Could not delete temp file after downloading.");
             }

@@ -21,7 +21,6 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -89,11 +88,12 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.dialog_fuel_type);
-        dialog.setTitle(mFuelType == null ? R.string.title_add_fuel_type :
-                R.string.title_edit_fuel_type);
+        dialog.setTitle(mFuelType == null
+                ? R.string.title_add_fuel_type
+                : R.string.title_edit_fuel_type);
 
-        mEdtName = (EditText) dialog.findViewById(R.id.edt_name);
-        mEdtCategory = (AutoCompleteTextView) dialog.findViewById(R.id.edt_category);
+        mEdtName = dialog.findViewById(R.id.edt_name);
+        mEdtCategory = dialog.findViewById(R.id.edt_category);
         mEdtCategory.setAdapter(new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_dropdown_item_1line,
                 FuelTypeQueries.getAllCategories(getActivity())));
@@ -106,21 +106,15 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
             mEdtCategory.setText(mFuelType.getCategory());
         }
 
-        dialog.findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (save()) {
-                    dialog.dismiss();
-                    getListener().onDialogPositiveClick(getTargetRequestCode());
-                }
+        dialog.findViewById(R.id.btn_ok).setOnClickListener(v -> {
+            if (save()) {
+                dialog.dismiss();
+                getListener().onDialogPositiveClick(getTargetRequestCode());
             }
         });
-        dialog.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                getListener().onDialogNegativeClick(getTargetRequestCode());
-            }
+        dialog.findViewById(R.id.btn_cancel).setOnClickListener(v -> {
+            dialog.dismiss();
+            getListener().onDialogNegativeClick(getTargetRequestCode());
         });
 
         return dialog;

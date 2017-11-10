@@ -64,8 +64,7 @@ public class SupportTimePickerDialogFragment extends DialogFragment implements
 		cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		cal.set(Calendar.MINUTE, minute);
 
-		getListener().onDialogPositiveClick(getTargetRequestCode(),
-				cal.getTime());
+		getListener().onDialogPositiveClick(getTargetRequestCode(), cal.getTime());
 	}
 
 	private SupportTimePickerDialogFragmentListener getListener() {

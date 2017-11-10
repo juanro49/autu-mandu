@@ -27,9 +27,14 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    flavorDimensions "tier"
     productFlavors {
-        foss
-        full
+        foss {
+            dimension "tier"
+        }
+        full {
+            dimension "tier"
+        }
     }
     lintOptions {
         checkReleaseBuilds false
@@ -37,11 +42,15 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 repositories {
+    google()
     jcenter()
-    maven { url "https://maven.google.com" }
 
     // Required for HelloCharts for Android
     maven { url "https://jitpack.io" }
@@ -49,21 +58,21 @@ repositories {
 
 dependencies {
     // Charts
-    compile 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
+    implementation 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
 
     // CSV
-    compile 'org.apache.commons:commons-csv:1.5'
+    implementation 'org.apache.commons:commons-csv:1.5'
 
     // Dropbox
-    compile 'com.dropbox.core:dropbox-core-sdk:3.0.5'
+    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.5'
 
     // Support, AppCompat
-    compile "com.android.support:support-v4:${versions.supportLibrary}"
-    compile "com.android.support:appcompat-v7:${versions.supportLibrary}"
-    compile "com.android.support:cardview-v7:${versions.supportLibrary}"
-    compile "com.android.support:recyclerview-v7:${versions.supportLibrary}"
-    compile "com.android.support:design:${versions.supportLibrary}"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation "com.android.support:support-v4:${versions.supportLibrary}"
+    implementation "com.android.support:appcompat-v7:${versions.supportLibrary}"
+    implementation "com.android.support:cardview-v7:${versions.supportLibrary}"
+    implementation "com.android.support:recyclerview-v7:${versions.supportLibrary}"
+    implementation "com.android.support:design:${versions.supportLibrary}"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 
     // Play Services: for Google Drive
     fullCompile "com.google.android.gms:play-services-auth:${versions.playServices}"
@@ -71,35 +80,35 @@ dependencies {
 
     // The new Android Drive API, which is included in the play services, has caching bugs and does
     // not provide all functionality. Until this is fixed we have to use the old Google API.
-    fullCompile('com.google.oauth-client:google-oauth-client:1.22.0') {
+    fullImplementation('com.google.oauth-client:google-oauth-client:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    fullCompile('com.google.api-client:google-api-client:1.22.0') {
+    fullImplementation('com.google.api-client:google-api-client:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    fullCompile('com.google.apis:google-api-services-drive:v3-rev81-1.22.0') {
+    fullImplementation('com.google.apis:google-api-services-drive:v3-rev81-1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    fullCompile('com.google.api-client:google-api-client-android:1.22.0') {
+    fullImplementation('com.google.api-client:google-api-client-android:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    fullCompile('com.google.http-client:google-http-client-android:1.22.0') {
+    fullImplementation('com.google.http-client:google-http-client-android:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
 
     // WebDAV
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
 
     // UI Helpers
-    compile 'com.github.clans:fab:1.6.4'
-    compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
-    compile 'de.psdev.licensesdialog:licensesdialog:1.8.2'
-    compile 'uk.co.jordanrobinson:android-color-picker:1.0.2'
+    implementation 'com.github.clans:fab:1.6.4'
+    implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
+    implementation 'de.psdev.licensesdialog:licensesdialog:1.8.2'
+    implementation 'uk.co.jordanrobinson:android-color-picker:1.0.2'
 
     // Joda-Time for Android
-    compile 'net.danlew:android.joda:2.9.9'
+    implementation 'net.danlew:android.joda:2.9.9'
 
     // Required for instrumented tests
-    androidTestCompile "com.android.support:support-annotations:${versions.supportLibrary}"
-    androidTestCompile 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation "com.android.support:support-annotations:${versions.supportLibrary}"
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
 }

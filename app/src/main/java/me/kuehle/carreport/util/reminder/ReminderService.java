@@ -63,6 +63,10 @@ public class ReminderService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         String action = intent.getAction();
+        if (action == null) {
+            return;
+        }
+
         long[] reminderIds = intent.getLongArrayExtra(EXTRA_REMINDER_IDS);
 
         switch (action) {

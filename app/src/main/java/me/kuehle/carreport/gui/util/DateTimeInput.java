@@ -19,7 +19,6 @@ package me.kuehle.carreport.gui.util;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.InputType;
-import android.view.View;
 import android.widget.EditText;
 
 import java.text.DateFormat;
@@ -59,18 +58,15 @@ public class DateTimeInput {
         mParent.setFocusable(false);
         mParent.setFocusableInTouchMode(false);
 
-        mParent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mMode == Mode.DATE) {
-                    SupportDatePickerDialogFragment
-                            .newInstance(targetFragment, requestCode, getDate())
-                            .show(fragmentManager, null);
-                } else {
-                    SupportTimePickerDialogFragment
-                            .newInstance(targetFragment, requestCode, getDate())
-                            .show(fragmentManager, null);
-                }
+        mParent.setOnClickListener(v -> {
+            if(mMode == Mode.DATE) {
+                SupportDatePickerDialogFragment
+                        .newInstance(targetFragment, requestCode, getDate())
+                        .show(fragmentManager, null);
+            } else {
+                SupportTimePickerDialogFragment
+                        .newInstance(targetFragment, requestCode, getDate())
+                        .show(fragmentManager, null);
             }
         });
     }

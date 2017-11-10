@@ -142,24 +142,18 @@ public class SimpleAnimator {
 
     private void applyHeightUpdater(ValueAnimator animator, int from, int to) {
         animator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));
-        animator.addUpdateListener(new AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                view.getLayoutParams().height = (Integer) animation.getAnimatedValue();
-                view.requestLayout();
-            }
+        animator.addUpdateListener(animation -> {
+            view.getLayoutParams().height = (Integer) animation.getAnimatedValue();
+            view.requestLayout();
         });
     }
 
     private void applyWeightUpdater(ValueAnimator animator, float from, float to) {
         animator.setValues(PropertyValuesHolder.ofFloat((String) null, from, to));
-        animator.addUpdateListener(new AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                ((LinearLayout.LayoutParams) view.getLayoutParams()).weight = (Float) animation
-                        .getAnimatedValue();
-                view.requestLayout();
-            }
+        animator.addUpdateListener(animation -> {
+            ((LinearLayout.LayoutParams) view.getLayoutParams()).weight = (Float) animation
+                    .getAnimatedValue();
+            view.requestLayout();
         });
     }
 

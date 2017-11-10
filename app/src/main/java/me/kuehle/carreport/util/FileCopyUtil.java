@@ -21,21 +21,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 
 public class FileCopyUtil {
     public static boolean copyFile(File from, File to) {
-        try {
-            FileInputStream inStream = new FileInputStream(from);
-            FileOutputStream outStream = new FileOutputStream(to);
-            FileChannel src = inStream.getChannel();
-            FileChannel dst = outStream.getChannel();
-            dst.transferFrom(src, 0, src.size());
-            src.close();
-            dst.close();
-            outStream.close();
-            inStream.close();
-            return true;
+        try (FileInputStream inStream = new FileInputStream(from)) {
+            try (FileOutputStream outStream = new FileOutputStream(to)) {
+                return copyFile(inStream, outStream);
+            }
         } catch (Exception e) {
             return false;
         }
