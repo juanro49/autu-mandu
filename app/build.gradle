@@ -7,8 +7,8 @@ android {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
         targetSdkVersion versions.targetSdk
-        versionCode 65
-        versionName "3.18.1"
+        versionCode 66
+        versionName "3.18.2"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     signingConfigs {
@@ -75,8 +75,8 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 
     // Play Services: for Google Drive
-    fullCompile "com.google.android.gms:play-services-auth:${versions.playServices}"
-    fullCompile "com.google.android.gms:play-services-drive:${versions.playServices}"
+    fullImplementation "com.google.android.gms:play-services-auth:${versions.playServices}"
+    fullImplementation "com.google.android.gms:play-services-drive:${versions.playServices}"
 
     // The new Android Drive API, which is included in the play services, has caching bugs and does
     // not provide all functionality. Until this is fixed we have to use the old Google API.
