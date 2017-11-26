@@ -81,13 +81,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 Application.reinitializeDatabase();
             }
         } catch (SyncAuthException e) {
-            Log.e(TAG, "Error syncing.", e);
+            Log.e(TAG, "Auth error while syncing.", e);
             syncResult.stats.numAuthExceptions++;
         } catch (SyncIoException e) {
-            Log.e(TAG, "Error syncing.", e);
+            Log.e(TAG, "IO error while syncing.", e);
             syncResult.stats.numIoExceptions++;
         } catch (SyncParseException e) {
-            Log.e(TAG, "Error syncing.", e);
+            Log.e(TAG, "Parse error while syncing.", e);
             syncResult.stats.numParseExceptions++;
         }
     }

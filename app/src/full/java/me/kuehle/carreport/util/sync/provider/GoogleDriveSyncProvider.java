@@ -298,7 +298,7 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         }
     }
 
-    private com.google.api.services.drive.model.File getRemoteFile() throws SyncIoException {
+    private com.google.api.services.drive.model.File getRemoteFile() throws SyncIoException, SyncParseException {
         File localFile = getLocalFile();
         com.google.api.services.drive.model.File remoteFile = null;
         try {
@@ -329,6 +329,12 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
             }
         } catch (IOException e) {
             throw new SyncIoException(e);
+        } catch (Exception e) {
+            // There are reported app crashes with an IllegalArgumentException. It causes the app
+            // to crash while it's not even visibly running. I can't find any documentation about
+            // this exception though. To avoid crashes for users, this catches all exceptions and
+            // reports them as good as possible.
+            throw new SyncParseException(e);
         }
     }
 
