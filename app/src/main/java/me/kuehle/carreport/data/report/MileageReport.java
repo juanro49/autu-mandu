@@ -54,7 +54,8 @@ public class MileageReport extends AbstractReport {
                         car.getName(),
                         refueling.getMileage(),
                         mUnit,
-                        formatXValue(refueling.getDate().getTime(), GRAPH_OPTION_ACCUMULATED));
+                        formatXValue(ReportDateHelper.toFloat(refueling.getDate()),
+                                GRAPH_OPTION_ACCUMULATED));
                 if (refueling.getGuessed()) {
                     tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
                 }
@@ -89,7 +90,8 @@ public class MileageReport extends AbstractReport {
                             car.getName(),
                             mileageDiff,
                             mUnit,
-                            formatXValue(refueling.getDate().getTime(), GRAPH_OPTION_PER_REFUELING));
+                            formatXValue(ReportDateHelper.toFloat(refueling.getDate()),
+                                    GRAPH_OPTION_PER_REFUELING));
                     if (refueling.getGuessed()) {
                         tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
                     }
