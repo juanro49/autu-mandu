@@ -203,12 +203,12 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
         try {
             if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-                throw new SyncParseException();
+                throw new SyncParseException("Copying database to temp file failed.");
             }
 
             com.google.api.services.drive.model.File remoteFile = getRemoteFile();
             com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-            FileContent mediaContent = new FileContent("application/x-sqlite", localFile);
+            FileContent mediaContent = new FileContent("application/x-sqlite", tempFile);
             com.google.api.services.drive.model.File newFile;
             if (remoteFile == null) {
                 body.setName(localFile.getName());
