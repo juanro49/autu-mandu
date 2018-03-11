@@ -6,8 +6,8 @@ android {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
         targetSdkVersion versions.targetSdk
-        versionCode 68
-        versionName "3.18.4"
+        versionCode 69
+        versionName "3.19.0"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     signingConfigs {
@@ -26,13 +26,13 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    flavorDimensions "tier"
+    flavorDimensions "default"
     productFlavors {
         foss {
-            dimension "tier"
+            dimension "default"
         }
         full {
-            dimension "tier"
+            dimension "default"
         }
     }
     lintOptions {
