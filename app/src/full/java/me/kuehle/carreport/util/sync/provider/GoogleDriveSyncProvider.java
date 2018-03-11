@@ -20,6 +20,7 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -286,14 +287,18 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
             mIsAuthenticationInProgress = false;
             if (connectionResult.hasResolution()) {
                 try {
-                    connectionResult.startResolutionForResult(mAuthenticatorAddAccountActivity,
+                    connectionResult.startResolutionForResult(
+                            mAuthenticatorAddAccountActivity,
                             REQUEST_RESOLVE_CONNECTION);
                 } catch (IntentSender.SendIntentException e) {
                     mAuthenticatorAddAccountActivity.onAuthenticationResult(null, null, null, null);
                 }
             } else {
                 GoogleApiAvailability.getInstance().showErrorDialogFragment(
-                        mAuthenticatorAddAccountActivity, connectionResult.getErrorCode(), 0);
+                        mAuthenticatorAddAccountActivity,
+                        connectionResult.getErrorCode(),
+                        REQUEST_RESOLVE_CONNECTION,
+                        dialogInterface -> mAuthenticatorAddAccountActivity.onAuthenticationResult(null, null, null, null));
             }
         }
     }
