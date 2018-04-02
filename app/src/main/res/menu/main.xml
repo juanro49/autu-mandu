@@ -15,13 +15,13 @@
   limitations under the License.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/menu_synchronize"
         android:icon="@drawable/ic_sync_24dp"
-        app:showAsAction="always"
         android:title="@string/menu_synchronize"
+        app:showAsAction="always"
         tools:ignore="AlwaysShowAction">
     </item>
 </menu>

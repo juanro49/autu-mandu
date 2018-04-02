@@ -19,7 +19,6 @@ package me.kuehle.carreport.gui;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -52,7 +51,7 @@ public class PreferencesReportOrderFragment extends Fragment {
 
         ReportOrderAdapter adapter = new ReportOrderAdapter();
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(android.R.id.list);
+        RecyclerView recyclerView = view.findViewById(android.R.id.list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -68,7 +67,7 @@ public class PreferencesReportOrderFragment extends Fragment {
         public ReportOrderViewHolder(View itemView) {
             super(itemView);
 
-            mTitle = (TextView) itemView.findViewById(android.R.id.text1);
+            mTitle = itemView.findViewById(android.R.id.text1);
             itemView.findViewById(R.id.drag_handle).setOnTouchListener(this);
         }
 
@@ -78,7 +77,7 @@ public class PreferencesReportOrderFragment extends Fragment {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 mItemTouchHelper.startDrag(this);
             }
 

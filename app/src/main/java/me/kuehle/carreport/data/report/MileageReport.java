@@ -32,6 +32,7 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
 import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -53,12 +54,13 @@ public class MileageReport extends AbstractReport {
                         car.getName(),
                         refueling.getMileage(),
                         mUnit,
-                        formatXValue(refueling.getDate().getTime(), GRAPH_OPTION_ACCUMULATED));
+                        formatXValue(ReportDateHelper.toFloat(refueling.getDate()),
+                                GRAPH_OPTION_ACCUMULATED));
                 if (refueling.getGuessed()) {
                     tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
                 }
 
-                add((float) refueling.getDate().getTime(),
+                add(ReportDateHelper.toFloat(refueling.getDate()),
                         (float) refueling.getMileage(),
                         tooltip,
                         refueling.getGuessed());
@@ -88,12 +90,13 @@ public class MileageReport extends AbstractReport {
                             car.getName(),
                             mileageDiff,
                             mUnit,
-                            formatXValue(refueling.getDate().getTime(), GRAPH_OPTION_PER_REFUELING));
+                            formatXValue(ReportDateHelper.toFloat(refueling.getDate()),
+                                    GRAPH_OPTION_PER_REFUELING));
                     if (refueling.getGuessed()) {
                         tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
                     }
 
-                    add((float) refueling.getDate().getTime(),
+                    add(ReportDateHelper.toFloat(refueling.getDate()),
                             (float) mileageDiff,
                             tooltip,
                             refueling.getGuessed());
@@ -170,7 +173,7 @@ public class MileageReport extends AbstractReport {
             DateTime date = new DateTime(year, month, 1, 0, 0);
             return date.toString(mMonthLabelFormat);
         } else {
-            return mDateFormat.format(new Date((long) value));
+            return mDateFormat.format(ReportDateHelper.toDate(value));
         }
     }
 
@@ -222,7 +225,6 @@ public class MileageReport extends AbstractReport {
         }
 
         ArrayList<Cursor> cursors = new ArrayList<>();
-
         // Car data
         CarCursor car = new CarSelection().query(mContext.getContentResolver(), null, CarColumns.NAME + " COLLATE UNICODE");
         cursors.add(car);

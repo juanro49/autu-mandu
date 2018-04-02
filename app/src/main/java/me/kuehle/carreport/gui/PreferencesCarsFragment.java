@@ -39,11 +39,13 @@ import android.widget.TextView;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
+import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
 
 public class PreferencesCarsFragment extends ListFragment implements
+        AbstractPreferenceActivity.OptionsMenuListener,
         MessageDialogFragmentListener, LoaderManager.LoaderCallbacks<Cursor> {
     private class CarAdapter extends CursorAdapter {
         public CarAdapter() {
@@ -56,8 +58,8 @@ public class PreferencesCarsFragment extends ListFragment implements
                     R.layout.list_item_car, parent, false);
 
             CarViewHolder holder = new CarViewHolder();
-            holder.name = (TextView) view.findViewById(android.R.id.text1);
-            holder.suspended = (TextView) view.findViewById(android.R.id.text2);
+            holder.name = view.findViewById(android.R.id.text1);
+            holder.suspended = view.findViewById(android.R.id.text2);
             holder.color = view.findViewById(android.R.id.custom);
             view.setTag(holder);
 
@@ -171,14 +173,8 @@ public class PreferencesCarsFragment extends ListFragment implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.edit_cars, menu);
+    public int getOptionsMenuResourceId() {
+        return R.menu.edit_cars;
     }
 
     @Override

@@ -24,6 +24,8 @@ import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 
+import java.util.Locale;
+
 import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -107,36 +109,41 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
         data.put(R.id.subtitle, refueling.getFuelTypeName());
         data.put(R.id.date, mDateFormat.format(refueling.getDate()));
 
-        data.put(R.id.data1, String.format("%d %s", mileage, mUnitDistance));
+        data.put(R.id.data1, String.format(Locale.getDefault(), "%d %s", mileage, mUnitDistance));
 
         int mileageDifference = mileage - refueling.getCarInitialMileage();
         if (moveToNextNotGuessedRefueling(refueling)) {
             mileageDifference = mileage - refueling.getMileage();
         }
         refueling.moveToPosition(position);
-        data.put(R.id.data1_calculated, String.format("+ %d %s", mileageDifference, mUnitDistance));
+        data.put(R.id.data1_calculated, String.format(Locale.getDefault(), "+ %d %s",
+                mileageDifference, mUnitDistance));
 
-        data.put(R.id.data2, String.format("%.2f %s", refueling.getPrice(), mUnitCurrency));
-        data.put(R.id.data2_calculated, String.format("%.3f %s/%s",
-                refueling.getPrice() / volume, mUnitCurrency,
-                mUnitVolume));
+        if (refueling.getPrice() != 0.0f) {
+            data.put(R.id.data2, String.format(Locale.getDefault(), "%.2f %s", refueling.getPrice(),
+                    mUnitCurrency));
+            data.put(R.id.data2_calculated, String.format(Locale.getDefault(), "%.3f %s/%s",
+                    refueling.getPrice() / volume, mUnitCurrency, mUnitVolume));
+        } else {
+            data.put(R.id.data2, getString(R.string.notice_not_paid));
+        }
 
-        data.put(R.id.data3, String.format("%.2f %s", volume, mUnitVolume));
+        data.put(R.id.data3, String.format(Locale.getDefault(), "%.2f %s", volume, mUnitVolume));
         if (refueling.getPartial()) {
             data.put(R.id.data3_calculated, getString(R.string.label_partial));
-        } else if (moveToNextNotGuessedRefueling(refueling)) {
+        } else if (moveToNextNotGuessedRefuelingOfSameFuelTypeCategory(refueling)) {
             float diffVolume = volume;
             do {
                 if (refueling.getPartial()) {
                     diffVolume += refueling.getVolume();
                 } else {
                     int diffMileage = mileage - refueling.getMileage();
-                    data.put(R.id.data3_calculated, String.format("%.2f %s",
+                    data.put(R.id.data3_calculated, String.format(Locale.getDefault(), "%.2f %s",
                             mFuelConsumption.computeFuelConsumption(diffVolume, diffMileage),
                             mFuelConsumption.getUnitLabel()));
                     break;
                 }
-            } while (moveToNextNotGuessedRefueling(refueling));
+            } while (moveToNextNotGuessedRefuelingOfSameFuelTypeCategory(refueling));
         }
         refueling.moveToPosition(position);
 
@@ -160,6 +167,20 @@ public class DataListRefuelingFragment extends AbstractDataListFragment {
     private boolean moveToNextNotGuessedRefueling(BalancedRefuelingCursor refueling) {
         while (refueling.moveToNext()) {
             if (!refueling.getGuessed()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean moveToNextNotGuessedRefuelingOfSameFuelTypeCategory(BalancedRefuelingCursor refueling) {
+        String fuelTypeCategory = refueling.getFuelTypeCategory();
+        while (moveToNextNotGuessedRefueling(refueling)) {
+            if ((fuelTypeCategory == null &&
+                    refueling.getFuelTypeCategory() == null) ||
+                    (fuelTypeCategory != null &&
+                            fuelTypeCategory.equals(refueling.getFuelTypeCategory()))) {
                 return true;
             }
         }

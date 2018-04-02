@@ -203,7 +203,7 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
     protected void addUnitToHint(EditText editText, int hintResource, CharSequence unit) {
         CharSequence newHint = String.format("%s [%s]", getString(hintResource), unit);
 
-        ViewParent parent = editText.getParent();
+        ViewParent parent = editText.getParent().getParent();
         if (parent instanceof TextInputLayout) {
             ((TextInputLayout) parent).setHint(newHint);
         } else {

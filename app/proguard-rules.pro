@@ -27,13 +27,9 @@
 #####################################
 
 # Dropbox
--keepattributes *Annotation*,EnclosingMethod,InnerClasses,Signature
--keepnames class com.fasterxml.jackson.** { *; }
--dontwarn com.fasterxml.jackson.databind.**
 -dontwarn com.dropbox.core.http.OkHttpRequestor
 -dontwarn com.dropbox.core.http.OkHttpRequestor$*
 -dontwarn javax.servlet.**
--adaptresourcefilenames com/dropbox/core/http/trusted-certs.raw
 
 # Misc
 -dontwarn org.slf4j.*

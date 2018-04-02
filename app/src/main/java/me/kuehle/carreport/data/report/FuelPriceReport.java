@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import lecho.lib.hellocharts.util.ChartUtils;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
 import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
@@ -50,13 +52,19 @@ public class FuelPriceReport extends AbstractReport {
             mMax = Double.MIN_VALUE;
             mMin = Double.MAX_VALUE;
             mAverage = 0;
+            int count = 0;
             while (refueling.moveToNext()) {
+                if (refueling.getPrice() == 0.0f) {
+                    continue;
+                }
+
                 float fuelPrice = refueling.getPrice() / refueling.getVolume();
                 mAverage += fuelPrice;
                 mMax = Math.max(mMax, fuelPrice);
                 mMin = Math.min(mMin, fuelPrice);
+                count++;
 
-                add((float) refueling.getDate().getTime(),
+                add(ReportDateHelper.toFloat(refueling.getDate()),
                         fuelPrice,
                         mContext.getString(R.string.report_toast_fuel_price,
                                 fuelPrice,
@@ -66,7 +74,7 @@ public class FuelPriceReport extends AbstractReport {
                         false);
             }
 
-            mAverage /= refueling.getCount();
+            mAverage /= count;
         }
 
         public double getAverage() {
@@ -96,7 +104,7 @@ public class FuelPriceReport extends AbstractReport {
 
     @Override
     protected String formatXValue(float value, int chartOption) {
-        return mDateFormat.format(new Date((long) value));
+        return mDateFormat.format(ReportDateHelper.toDate(value));
     }
 
     @Override
@@ -144,13 +152,13 @@ public class FuelPriceReport extends AbstractReport {
 
                 Section section = addDataSection(fuelType.getName(), color);
                 section.addItem(new Item(mContext
-                        .getString(R.string.report_highest), String.format(
+                        .getString(R.string.report_highest), String.format(Locale.getDefault(),
                         "%.3f %s", data.getMax(), mUnit)));
                 section.addItem(new Item(mContext
-                        .getString(R.string.report_lowest), String.format(
+                        .getString(R.string.report_lowest), String.format(Locale.getDefault(),
                         "%.3f %s", data.getMin(), mUnit)));
                 section.addItem(new Item(mContext
-                        .getString(R.string.report_average), String.format(
+                        .getString(R.string.report_average), String.format(Locale.getDefault(),
                         "%.3f %s", data.getAverage(), mUnit)));
 
                 currentColor++;

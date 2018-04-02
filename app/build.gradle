@@ -1,99 +1,113 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion versions.compileSdk
     defaultConfig {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
-        targetSdkVersion 23
-        versionCode 51
-        versionName "3.11.1"
+        targetSdkVersion versions.targetSdk
+        versionCode 69
+        versionName "3.19.0"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     signingConfigs {
         release {
-            keyAlias carReportSignKeyAlias
-            keyPassword carReportSignKeyPassword
-            storeFile file(carReportSignStoreFile)
-            storePassword carReportSignStorePassword
+            keyAlias signing_key_alias
+            keyPassword signing_key_password
+            storeFile file(signing_key_store_file)
+            storePassword signing_key_store_password
         }
     }
     buildTypes {
         release {
             minifyEnabled true
-            shrinkResources false // Currently this changes the size of resources from 1932KB to 1943KB, making it useless.
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
     }
+    flavorDimensions "default"
     productFlavors {
-        foss
-        full
+        foss {
+            dimension "default"
+        }
+        full {
+            dimension "default"
+        }
     }
     lintOptions {
         checkReleaseBuilds false
     }
     packagingOptions {
-        // These files are included in at least two of the following libraries:
-        // joda-time-2.6.jar, httpmime-4.0.3.jar, httpcore-4.0.1.jar, commons-logging-1.1.1.jar
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
         exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/DEPENDENCIES'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 repositories {
+    google()
+    jcenter()
+
     // Required for HelloCharts for Android
     maven { url "https://jitpack.io" }
 }
 
 dependencies {
     // Charts
-    compile 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
+    implementation 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
+
+    // CSV
+    implementation 'org.apache.commons:commons-csv:1.5'
 
     // Dropbox
-    compile 'com.dropbox.core:dropbox-core-sdk:2.0.3'
+    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.6'
 
     // Support, AppCompat
-    compile 'com.android.support:support-v4:23.3.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:cardview-v7:23.3.0'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
+    implementation "com.android.support:support-v4:${versions.supportLibrary}"
+    implementation "com.android.support:appcompat-v7:${versions.supportLibrary}"
+    implementation "com.android.support:cardview-v7:${versions.supportLibrary}"
+    implementation "com.android.support:recyclerview-v7:${versions.supportLibrary}"
+    implementation "com.android.support:design:${versions.supportLibrary}"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 
     // Play Services: for Google Drive
-    fullCompile 'com.google.android.gms:play-services-drive:8.4.0'
+    fullImplementation "com.google.android.gms:play-services-auth:${versions.playServices}"
+    fullImplementation "com.google.android.gms:play-services-drive:${versions.playServices}"
 
     // The new Android Drive API, which is included in the play services, has caching bugs and does
     // not provide all functionality. Until this is fixed we have to use the old Google API.
-    fullCompile('com.google.oauth-client:google-oauth-client:1.21.0') {
+    fullImplementation('com.google.oauth-client:google-oauth-client:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    fullCompile files('libs/google-api-client-1.21.0-self-build.jar')
-    fullCompile('com.google.apis:google-api-services-drive:v3-rev18-1.21.0') {
+    fullImplementation('com.google.api-client:google-api-client:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
-        exclude module: 'google-api-client'
     }
-    fullCompile('com.google.api-client:google-api-client-android:1.21.0') {
+    fullImplementation('com.google.apis:google-api-services-drive:v3-rev81-1.22.0') {
         exclude group: 'org.apache.httpcomponents'
-        exclude module: 'google-api-client'
     }
-    fullCompile('com.google.http-client:google-http-client-android:1.21.0') {
+    fullImplementation('com.google.api-client:google-api-client-android:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
-        exclude module: 'google-api-client'
+    }
+    fullImplementation('com.google.http-client:google-http-client-android:1.22.0') {
+        exclude group: 'org.apache.httpcomponents'
     }
 
     // WebDAV
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 
     // UI Helpers
-    compile 'com.larswerkman:HoloColorPicker:1.5'
-    compile 'com.github.clans:fab:1.6.3'
-    compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
-    compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
+    implementation 'com.github.clans:fab:1.6.4'
+    implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
+    implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
+    implementation 'uk.co.jordanrobinson:android-color-picker:1.0.2'
 
     // Joda-Time for Android
-    compile 'net.danlew:android.joda:2.9.3'
+    implementation 'net.danlew:android.joda:2.9.9.2'
+
+    // Required for instrumented tests
+    androidTestImplementation "com.android.support:support-annotations:${versions.supportLibrary}"
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
 }

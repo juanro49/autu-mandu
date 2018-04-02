@@ -1,0 +1,11 @@
+<h1>Rendimiento</h1>
+<p>Los kilómetros se suman de una carga de tanque completa a la siguiente carga completa para calcular el rendimiento.
+Es por esto que recargas parciales sólo se consideran a la próxima carga completa de tanque.</p>
+
+<h1>Compensación de recargas sin registro</h1>
+<p>Para reconocer recargas que no se registraron, la aplicación busca consumo de combustible que es más bajo (&lt; 80%)
+que el promedio. Después calcula cuándo pudieron haber ocurrido las recargas sin registro basándose en la
+distancia promedio entre recargas y se agregan temporalmente (con valores promedio de rendimiento y precio)
+para lograr valores más balanceados.</p>
+<p>Estos valores balanceados son utilizados en el reporte de rendimiento de combustible, kilometraje, reporte de gastos, y en la calculadora.
+La lista de datos muestra un estimado de las recargas sin registro pero muestra el valor real para rendimiento de combustible.</p>

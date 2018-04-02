@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-
 package me.kuehle.carreport.gui.util;
 
 import me.kuehle.carreport.R;
+
 import android.widget.TextView;
 
 public class FormFieldGreaterZeroValidator extends AbstractFormFieldValidator {
-	public FormFieldGreaterZeroValidator(TextView field) {
-		super(field);
-	}
+    public FormFieldGreaterZeroValidator(TextView field) {
+        super(field);
+    }
 
-	@Override
-	protected int getMessage() {
-		return R.string.validate_error_greater_zero;
-	}
+    @Override
+    protected int getMessage() {
+        return R.string.validate_error_greater_zero;
+    }
 
-	@Override
-	protected boolean isValid() {
-		try {
-			double number = Double.parseDouble(fields[0].getText().toString());
-			if (number <= 0) {
-				return false;
-			}
-		} catch (NumberFormatException e) {
-			return false;
-		}
+    @Override
+    protected boolean isValid() {
+        try {
+            double number = Double.parseDouble(fields[0].getText().toString());
+            if (number <= 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 }

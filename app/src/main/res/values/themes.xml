@@ -31,7 +31,7 @@
     <style name="AppTheme" parent="AppTheme.Base">
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="AppTheme">
+    <style name="AppTheme.NoActionBar">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionModeOverlay">true</item>
@@ -44,16 +44,17 @@
         <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.NavigationDrawer" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.NoActionBar.NavigationDrawer">
     </style>
 
-    <style name="AppTheme.Preferences" parent="android:Theme.DeviceDefault">
-        <item name="android:actionBarStyle">@style/AppWidget.MaterializedHoloActionBar</item>
-        <item name="android:homeAsUpIndicator">@drawable/abc_ic_ab_back_mtrl_am_alpha</item>
-
-        <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/AppWidget.MaterializedHoloActionBar</item>
-        <item name="homeAsUpIndicator">@drawable/abc_ic_ab_back_mtrl_am_alpha</item>
+    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:background">@color/background</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/primary_text</item>
+        <item name="colorControlActivated">@color/accent</item>
+        <item name="colorControlHighlight">@color/ripple</item>
     </style>
 
 </resources>

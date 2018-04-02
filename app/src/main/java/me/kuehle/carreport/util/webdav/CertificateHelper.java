@@ -58,13 +58,11 @@ public class CertificateHelper {
         String validFrom = dateFormat.format(certificate.getNotBefore());
         String validUntil = dateFormat.format(certificate.getNotAfter());
 
-        return String.format("" +
-                        "Subject: %s\n" +
-                        "Alt. names: %s\n" +
-                        "Serialnumber: %s\n" +
-                        "Issuer: %s\n" +
-                        "Valid: %s - %s\n",
-                subject, TextUtils.join(", ", subjectAltNames), serialNumber, issuer, validFrom, validUntil);
+        return "Subject: " + subject +
+                "\nAlt. names: " + TextUtils.join(", ", subjectAltNames) +
+                "\nSerialnumber: " + serialNumber +
+                "\nIssuer: " + issuer +
+                "\nValid: " + validFrom + " - " + validUntil;
     }
 
     public static String toString(X509Certificate certificate) throws CertificateEncodingException {

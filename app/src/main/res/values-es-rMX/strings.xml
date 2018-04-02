@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2012 Jan Kühle
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<resources>
+    <string name="about_author">© Jan Kühle</string>
+    <string name="about_thanks">Gracias a:</string>
+    <string name="about_version">Versión: %s</string>
+    <string name="about_licenses">Licencias</string>
+
+    <string name="drawer_reports">Reportes</string>
+    <string name="drawer_calculator">Calculadora</string>
+    <string name="drawer_settings">Ajustes</string>
+    <string name="drawer_help">Ayuda</string>
+    <string name="drawer_open">Abrir navegación</string>
+    <string name="drawer_close">Cerrar navegación</string>
+
+    <string name="menu_synchronize">Sincronizar</string>
+    <string name="menu_save">Guardar</string>
+    <string name="menu_cancel">Cancelar</string>
+    <string name="menu_delete">Eliminar</string>
+    <string name="menu_add_car">Agregar vehículo</string>
+    <string name="menu_add_fuel_type">Agregar tipo de combustible</string>
+    <string name="menu_add_reminder">Agregar recordatorio</string>
+    <string name="menu_show_trend">Mostrar tendencia</string>
+    <string name="menu_show_overall_trend">Mostrar tendencia general</string>
+
+    <string name="fab_add_refueling">Recargas</string>
+    <string name="fab_add_other_expenditure">Otros gastos</string>
+    <string name="fab_add_other_income">Otros ingresos</string>
+
+    <string name="section_suspend">Suspender</string>
+    <string name="section_advanced">Ajustes avanzados</string>
+
+    <string name="hint_mileage_optional">Distancia total (opcional)</string>
+    <string name="hint_volume">Volumen</string>
+    <string name="hint_price">Precio</string>
+    <string name="hint_price_total">Precio total</string>
+    <string name="hint_price_per_unit">Precio por unidad</string>
+    <string name="hint_note_optional">Nota (opcional)</string>
+    <string name="hint_title">Título</string>
+    <string name="hint_name">Nombre</string>
+    <string name="hint_date">Fecha</string>
+    <string name="hint_time">Hora</string>
+    <string name="hint_end_date">Fecha final</string>
+    <string name="hint_suspend_date">Fecha de suspensión</string>
+    <string name="hint_category">Categoría</string>
+    <string name="hint_url">URL</string>
+    <string name="hint_user_name">Nombre de usuario</string>
+    <string name="hint_password">Contraseña</string>
+    <string name="hint_initial_mileage">Kilometraje inicial</string>
+    <string name="hint_reminder_after_distance">Después de distancia</string>
+    <string name="hint_reminder_after_time">Después de tiempo</string>
+    <string name="hint_reminder_start_mileage">Kilometraje inicial</string>
+    <string name="hint_reminder_start_date">Fecha incial</string>
+    <string name="hint_reminder_snoozed_until">Posponer hasta</string>
+
+    <string name="label_partial">Parcial</string>
+    <string name="label_color_in_reports">Color</string>
+    <string name="label_suspend">Suspender</string>
+    <string name="label_set_end_date">Set end date</string>
+    <string name="label_car">Vehículo</string>
+    <string name="label_recurrence">Recurrencia</string>
+    <string name="label_reminder_type">Tipo</string>
+    <string name="label_reminder_dismissed">Notificación descartada</string>
+    <string name="label_trust_certificate">Confiar en este certificado</string>
+
+    <string name="description_suspend">Puedes suspender un vehículo cuando ya no lo utilizas. Esto cancela todos los gastos recurrentes hasta la fecha de suspensión. Adicionalmente, los reportes se enfocan únicamente en vehículos activos.</string>
+    <string name="description_category">Recargas se agrupan por esta categoría para cada reporte. Ejemplos: Gasolina, Diesel, Gas.</string>
+    <string name="description_reminder_status_due">Vencido</string>
+    <string name="description_reminder_status_due_snoozed">Vencido, pospuesto hasta %s</string>
+    <string name="description_reminder_status_due_dismissed">Vencido, notificación descartada</string>
+    <string name="description_reminder_status_distance_and_time">Vence en %1$s o %2$s</string>
+    <string name="description_reminder_status_distance">Vence en %s</string>
+    <string name="description_reminder_status_time">Vence en %s</string>
+    <string name="description_webdav_url">Favor de introducir la URL a una carpeta especial para Car Report en tu servidor WebDAV. Car Report guardará sus datos en esta carpeta. No hará modificaciones fuera de esta carpeta.</string>
+    <string name="description_webdav_trust_certificate">El sitio web utiliza un certificado de seguridad que no es confiado por Android.</string>
+
+    <string name="validate_error_greater_zero">Debe ser mayor a 0</string>
+    <string name="validate_error_not_empty">No debe estar vacío</string>
+    <string name="validate_error_mileage_out_of_range_total">El kilometraje debe tener un valor entre la recarga anterior y la recarga siguiente en modo de registro de distancia total. Si quieres registar distancia por viaje, puedes cambiar el modo de registro en los ajustes.</string>
+    <string name="validate_error_mileage_out_of_range_trip">El kilometraje acumulado no puede ser mayor al kilometraje de la siguiente recarga en modo de registro de distancia por viaje. Si quiciste ingresar distancia total, puedes cambiar el modo de registro en los ajustes.</string>
+    <string name="validate_error_fuel_type_exists">Este tipo de combustible ya existe.</string>
+    <string name="validate_error_webdav_invalid_certificate">El certificado de seguridad no pudo ser confiado. Parece que no es válido.</string>
+
+    <string name="suspended">Suspendido</string>
+    <string name="suspended_since">Suspendido desde %s</string>
+    <string name="overwrite">Reemplazar</string>
+    <string name="restore">Restaurar</string>
+    <string name="import_">Importar</string>
+
+    <string name="title_first_start">Primeros pazos</string>
+    <string name="title_add_refueling">Agregar recarga</string>
+    <string name="title_edit_refueling">Modificar recarga</string>
+    <string name="title_settings">Ajustes</string>
+    <string name="title_help">Ayuda</string>
+    <string name="title_add_other_expenditure">Agregar otro gasto</string>
+    <string name="title_add_other_income">Agregar otro ingreso</string>
+    <string name="title_edit_other_expenditure">Modificar otro gasto</string>
+    <string name="title_edit_other_income">Modificar otro ingreso</string>
+    <string name="title_add_car">Agregar vehículo</string>
+    <string name="title_edit_car">Modificar vehículo</string>
+    <string name="title_add_fuel_type">Agregar tipo de combustible</string>
+    <string name="title_edit_fuel_type">Modificar tipo de combustible</string>
+    <string name="title_add_reminder">Agregar recordatorio</string>
+    <string name="title_edit_reminder">Modificar recordatorio</string>
+    <string name="cab_title_selected">%d seleccionado</string>
+    <string name="edit_title_refueling">Recarga</string>
+
+    <string name="edit_message_no_entry_selected">Ningún registro seleccionado</string>
+
+    <string name="alert_delete_title">Confirmar eliminación</string>
+    <string name="alert_delete_refueling_message">Esta recarga será eliminada.</string>
+    <string name="alert_delete_refuelings_message">Las %d recargas seleccionadas serán eliminadas.</string>
+    <string name="alert_delete_other_expenditure_message">Este gasto será eliminado.</string>
+    <string name="alert_delete_other_income_message">Este ingreso será eliminado.</string>
+    <string name="alert_delete_other_expenditures_message">Los %d gastos seleccionados serán eliminados.</string>
+    <string name="alert_delete_other_incomes_message">Los %d ingresos seleccionados serán eliminados.</string>
+    <string name="alert_delete_car_message">Este vehículo será eliminado.</string>
+    <string name="alert_delete_cars_message">Los %d vehículos seleccionados serán eliminados.</string>
+    <string name="alert_delete_fuel_types_message">Los %d tipos de combustible serán eliminados.</string>
+    <string name="alert_delete_reminder_message">Este recordatorio será eliminado.</string>
+    <string name="alert_delete_reminders_message">Los %d recordatorios seleccionados serán eliminados.</string>
+    <string name="alert_cannot_delete_last_car">El último vehículo no se puede eliminar.</string>
+    <string name="alert_cannot_delete_fuel_type">No se puede eliminar el tipo de combustible porque es utilizado por al menos una recarga o tanque de combustible.</string>
+    <string name="alert_about_licenses_title">Licencias</string>
+    <string name="alert_change_color_title">Elegir color</string>
+    <string name="alert_sync_finishing_authentication">Terminando autenticación…</string>
+    <string name="alert_sync_performing_first_sync">Haciendo primera sincronización…</string>
+    <string name="alert_sync_first_sync_message">Existe información remota. Elige qué información quieres utilizar para la primera sincronización.</string>
+    <string name="alert_sync_first_sync_download">Información remota</string>
+    <string name="alert_sync_first_sync_upload">Información local</string>
+    <string name="alert_sync_first_sync_error">Hubo un problema con la primera sincronización. Asegura que tu conexión de red esté funcionando correctamente e intenta de nuevo.</string>
+    <string name="alert_backup_overwrite_title">Respaldar</string>
+    <string name="alert_backup_overwrite_message">Ya existe un archivo de respaldo en la tarjeta SD.</string>
+    <string name="alert_backup_failed">Respaldo falló</string>
+    <string name="alert_restore_title">Restaurar</string>
+    <string name="alert_restore_message">Al restaurar de un archivo, toda la información actual será sobreescrita. Asegura que el archivo de respaldo se generó con una versión de aplicación igual o menor a la que se encuentra instalada actualmente.</string>
+    <string name="alert_restore_failed">Restauración falló</string>
+    <string name="alert_export_csv_overwrite_title">Exportar CSV</string>
+    <string name="alert_export_csv_overwrite_message">Ya existen archivos de una exportación anterior en la tarjeta SD.</string>
+    <string name="alert_export_csv_failed">Exportación falló.\n\nRazón: %s</string>
+    <string name="alert_import_csv_title">Importar CSV</string>
+    <string name="alert_import_csv_message">La importación actualiza los registros actuales y agrega nuevos registros pero no borra registros.</string>
+    <string name="alert_import_csv_failed">Importación falló. No hubo cambios en la información.\n\nRazón: %s</string>
+    <string name="alert_error_title">Error</string>
+
+    <string name="toast_new_refueling">Rendimiento de combustible: %1$.2f %2$s %3$s</string>
+    <string name="toast_backup_succeeded">Respaldo al archivo %s fue exitoso.</string>
+    <string name="toast_restore_succeeded">Restauración exitosa</string>
+    <string name="toast_export_csv_succeeded">Exportación a tarjeta SD exitosa.</string>
+    <string name="toast_import_csv_succeeded">Importación exitosa.</string>
+    <string name="toast_need_storage_permission">Para utilizar esta función, Car Report requiere acceso a tus archivos.</string>
+
+    <string name="report_title_fuel_consumption">Rendimiento de combustible</string>
+    <string name="report_title_fuel_price">Precio de combustible</string>
+    <string name="report_title_mileage">Kilometraje</string>
+    <string name="report_title_costs">Gastos</string>
+    <string name="report_trend_label">%s (Tendencia)</string>
+    <string name="report_overall_trend_label">%s (Tendencia general)</string>
+    <string name="report_graph_month_history">Historial Mensual</string>
+    <string name="report_graph_year_history">Historial Anual</string>
+    <string name="report_graph_accumulated">Acumulado</string>
+    <string name="report_graph_per_refueling">Por Recarga</string>
+    <string name="report_graph_per_month">Por Mes</string>
+    <string name="report_not_enough_data">No hay suficiente información</string>
+    <string name="report_since">&#931; desde %s</string>
+    <string name="report_lowest">Más bajo</string>
+    <string name="report_highest">Más alto</string>
+    <string name="report_average">Promedio</string>
+    <string name="report_day">Día</string>
+    <string name="report_month">Mes</string>
+    <string name="report_year">Año</string>
+    <string name="report_toast_fuel_consumption">%1$s: %2$.2f %3$s de %4$s el %5$s</string>
+    <string name="report_toast_fuel_price">%1$.3f %2$s por %3$s el %4$s</string>
+    <string name="report_toast_mileage">"%1$s: %2$d %3$s el %4$s"</string>
+    <string name="report_toast_mileage_month">"%1$s: %2$.0f %3$s en %4$s"</string>
+    <string name="report_toast_costs">%1$s: %2$.0f %3$s en %4$s</string>
+    <string name="report_toast_guessed">Estimado para compensar recargas sin registro.</string>
+
+    <string name="pref_title_header_about">Acerca de Car Report</string>
+    <string name="pref_title_header_general">Ajustes generales</string>
+    <string name="pref_title_header_cars">Vehículos</string>
+    <string name="pref_title_header_fuel_types">Tipos de combustible</string>
+    <string name="pref_title_header_reminders">Recordatorios</string>
+    <string name="pref_title_header_report_order">Orden de reportes</string>
+    <string name="pref_title_header_backup">Respaldo &amp; Exportación</string>
+    <string name="pref_title_category_synchronization">Sincronización</string>
+    <string name="pref_title_category_behavior">Comportamiento</string>
+    <string name="pref_title_category_units">Unidades</string>
+    <string name="pref_title_category_backup">Respaldo &amp; Restauración</string>
+    <string name="pref_title_category_export">Exportación &amp; Importación</string>
+    <string name="pref_title_behavior_default_car">Vehículo predeterminado</string>
+    <string name="pref_title_behavior_show_car_menu">Mostrar menú de vehículo</string>
+    <string name="pref_title_behavior_distance_entry_mode">Modo registro de distancia</string>
+    <string name="pref_title_behavior_price_entry_mode">Modo registro de precio</string>
+    <string name="pref_title_behavior_auto_guess_missing_data">Compensar recargas sin registro (Beta)</string>
+    <string name="pref_title_behavior_reminder_snooze_duration">Duración de posposición de recordatorio</string>
+    <string name="pref_title_unit_currency">Moneda</string>
+    <string name="pref_title_unit_volume">Volumen</string>
+    <string name="pref_title_unit_distance">Distancia</string>
+    <string name="pref_title_unit_fuel_consumption">Rendimiento de combustible</string>
+    <string name="pref_title_sync_setup">Configurar sincronización</string>
+    <string name="pref_title_backup">Respaldar</string>
+    <string name="pref_title_restore">Restaurar</string>
+    <string name="pref_title_exportcsv">Exportar CSV</string>
+    <string name="pref_title_importcsv">Importar CSV</string>
+    <string name="pref_summary_behavior_show_car_menu">Mostrar un menú para seleccionar vehículo cuando se registre una recarga y exista más de un vehículo configurado.</string>
+    <string name="pref_summary_behavior_auto_guess_missing_data">Intentar de reconocer recargas que no se registraron. Esto compensará el consumo de combustible significativamente menor que ocurre cuando se olvida registar una recarga.</string>
+    <string name="pref_summary_sync_setup">Una sincronización muy básica. Cuando hay un cambio simultáneo en la información de dos distintos dispositivos, el último dispositivo que sincronice perderá sus cambios. Asegura que los dispositivos tengan la misma versión de Car Report instalada.</string>
+    <string name="pref_summary_sync_current_provider">Vinculado a %s. Toca para deshacer vínculo.</string>
+    <string name="pref_summary_backup">Respaldar la información actual a la tarjeta SD.</string>
+    <string name="pref_summary_restore">Restaurar información del archivo %s en la tarjeta SD.</string>
+    <string name="pref_summary_restore_no_data">El archivo %s no existe en la tarjeta SD.</string>
+    <string name="pref_summary_export_csv">Exportar información en formato CSV compatible con Microsoft Excel o LibreOffice Calc.</string>
+    <string name="pref_summary_import_csv">Importar información de archivo CSV. Los archivos deben tener el mismo formato que los CSV que se generan al momento de exportar.</string>
+    <string name="pref_summary_import_csv_no_data">No hay archivos en el directorio %s en la tarjeta SD.</string>
+
+    <string name="help_section_getting_started">Inicio</string>
+    <string name="help_section_tips">Consejos</string>
+    <string name="help_section_calculations">Cálculos</string>
+    <string name="help_section_fuel_types">Tipos de combustible</string>
+    <string name="help_section_csv">CSV</string>
+    <string name="help_folder_name">help-es-rMX</string>
+
+    <string name="first_start_hi">¡Hola!</string>
+    <string name="first_start_intro">Car Report muestra reportes para tus gastos de vehículo como rendimiento de combustible y gastos generales. Comienza con los siguientes pasos:</string>
+    <string name="first_start_step1_img_desc">Primer paso</string>
+    <string name="first_start_step1_text">Registra un vehículo</string>
+    <string name="first_start_step2_img_desc">Segundo paso</string>
+    <string name="first_start_step2_text">Registra recargas de combustible</string>
+    <string name="first_start_step3_img_desc">Tercer paso</string>
+    <string name="first_start_step3_text">Después de dos recargas, podrás visualizar los primeros gráficos.</string>
+    <string name="first_start_create_car">Registrar vehículo</string>
+    <string name="first_start_setup_sync">Configurar sincronización</string>
+
+    <string name="calc_option_volume_to_distance">Volumen (%1$s) por Distancia (%2$s)</string>
+    <string name="calc_option_distance_to_volume">Distancia (%1$s) por Volumen (%2$s)</string>
+    <string name="calc_option_volume_to_price">Volumen (%1$s) por Precio (%2$s)</string>
+    <string name="calc_option_price_to_volume">Precio (%1$s) por Volumen (%2$s)</string>
+    <string name="calc_option_distance_to_price">Distancia (%1$s) por Precio (%2$s)</string>
+    <string name="calc_option_price_to_distance">Precio (%1$s) por Distancia (%2$s)</string>
+    <string name="calc_option_distance_to_fuel_price">Distancia (%1$s) por Precio de combustible (%2$s)</string>
+    <string name="calc_option_fuel_price_to_distance">Precio de combustible (%1$s) por Distancia (%2$s)</string>
+
+    <string name="notification_reminder_channel">Recordatorios</string>
+    <string name="notification_reminder_title_single">Recordatorio: %s</string>
+    <string name="notification_reminder_title_multiple">Varios recordatorios</string>
+    <string name="notification_reminder_action_done">Guardar</string>
+    <string name="notification_reminder_action_snooze">Posponer</string>
+    <string name="notification_reminder_action_snooze_all">Posponer todos</string>
+
+    <string name="distance_entry_mode_trip">Distancia por viaje</string>
+    <string name="distance_entry_mode_total">Distancia total</string>
+    <string name="price_entry_mode_per_unit_and_volume">Precio por unidad &amp; volumen</string>
+    <string name="price_entry_mode_per_unit_and_total">Precio por unidad &amp; precio total</string>
+    <string name="price_entry_mode_total_and_volume">Precio total &amp; volumen</string>
+    <string name="missing_refueling">Recarga sin registro</string>
+    <string name="invalid_data">Este registro contiene información inválida. Modifica el registro y guardalo para mostrar el error detallado.</string>
+    <string name="graph_details_desc">Detalles de la gráfica</string>
+    <string name="graph_options_desc">Ajustes de la gráfica</string>
+    <string name="graph_close_full_screen_desc">Cerrar gráfica de pantalla completa</string>
+    <string name="drag_handle_desc">Arrastrar manija</string>
+    <string name="quit_snooze_desc">Deshabilitar posposición</string>
+</resources>

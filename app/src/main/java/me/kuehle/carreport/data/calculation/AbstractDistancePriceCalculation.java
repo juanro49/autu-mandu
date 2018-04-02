@@ -69,23 +69,15 @@ public abstract class AbstractDistancePriceCalculation extends AbstractCalculati
 
         while (car.moveToNext()) {
             double totalCosts = 0;
-            int startMileage = -1;
-            int endMileage = -1;
+            final int startMileage = car.getInitialMileage();
+            int endMileage = Integer.MIN_VALUE;
 
             BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId());
             refueling.registerContentObserver(observer);
             mCursorStore.add(refueling);
             while (refueling.moveToNext()) {
-                if (startMileage == -1) {
-                    if (!refueling.getPartial()) {
-                        startMileage = refueling.getMileage();
-                    }
-
-                    continue;
-                }
-
                 totalCosts += refueling.getPrice();
-                endMileage = refueling.getMileage();
+                endMileage = Math.max(endMileage, refueling.getMileage());
             }
 
             if (mIncludeOtherCosts) {
@@ -106,7 +98,6 @@ public abstract class AbstractDistancePriceCalculation extends AbstractCalculati
                     totalCosts += otherCost.getPrice() * recurrences;
 
                     if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                        startMileage = Math.min(startMileage, otherCost.getMileage());
                         endMileage = Math.max(endMileage, otherCost.getMileage());
                     }
                 }

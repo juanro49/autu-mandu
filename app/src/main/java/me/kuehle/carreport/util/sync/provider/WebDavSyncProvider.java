@@ -145,11 +145,12 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
     public String uploadFile() throws SyncAuthException, SyncIoException, SyncParseException {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
-        if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-            throw new SyncParseException();
-        }
 
         try {
+            if (!FileCopyUtil.copyFile(localFile, tempFile)) {
+                throw new SyncParseException("Copying database to temp file failed.");
+            }
+
             mWebDavClient.upload(tempFile, localFile.getName(), "application/x-sqlite");
             return getRemoteFileRev();
         } catch (HttpException e) {

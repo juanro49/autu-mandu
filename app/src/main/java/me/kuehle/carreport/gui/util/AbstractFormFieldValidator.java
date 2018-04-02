@@ -30,11 +30,6 @@ public abstract class AbstractFormFieldValidator {
         this.fields = new TextView[]{field};
     }
 
-    public AbstractFormFieldValidator(TextView... fields) {
-        this.context = fields[0].getContext();
-        this.fields = fields;
-    }
-
     public void clear() {
         for (TextView field : fields) {
             setError(field, null);
@@ -67,7 +62,7 @@ public abstract class AbstractFormFieldValidator {
     protected abstract boolean isValid();
 
     private static void setError(TextView field, String error) {
-        ViewParent parent = field.getParent();
+        ViewParent parent = field.getParent().getParent();
         if (parent instanceof TextInputLayout) {
             ((TextInputLayout) parent).setError(error);
         } else {

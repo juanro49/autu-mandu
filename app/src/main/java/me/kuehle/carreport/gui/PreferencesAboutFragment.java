@@ -18,16 +18,17 @@ package me.kuehle.carreport.gui;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import de.psdev.licensesdialog.LicensesDialog;
-import de.psdev.licensesdialog.licenses.MITLicense;
-import de.psdev.licensesdialog.model.Notice;
 import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.util.Assets;
 
 public class PreferencesAboutFragment extends Fragment {
     private View.OnClickListener licensesOnClickListener = new View.OnClickListener() {
@@ -48,10 +49,17 @@ public class PreferencesAboutFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_prefs_about, container, false);
+        TextView txtVersion = root.findViewById(R.id.txt_version);
+        TextView txtThanks = root.findViewById(R.id.txt_thanks);
+        Button btnLicenses = root.findViewById(R.id.btn_licenses);
 
         String strVersion = getString(R.string.about_version, BuildConfig.VERSION_NAME);
-        ((TextView) root.findViewById(R.id.txt_version)).setText(strVersion);
-        root.findViewById(R.id.btn_licenses).setOnClickListener(licensesOnClickListener);
+        txtVersion.setText(strVersion);
+
+        Spanned htmlThanks = Assets.getHtml(getActivity(), "thanks.html");
+        txtThanks.setText(htmlThanks);
+
+        btnLicenses.setOnClickListener(licensesOnClickListener);
 
         return root;
     }

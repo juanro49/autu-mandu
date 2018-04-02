@@ -25,7 +25,9 @@ import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
@@ -39,6 +41,23 @@ import me.kuehle.carreport.provider.othercost.OtherCostSelection;
 import me.kuehle.carreport.util.Recurrences;
 
 public class CostsReport extends AbstractReport {
+
+    /**
+     * 86400 seconds per day * 365,25 days per year = 31557600 seconds per year
+     */
+    private static final long YEAR_SECONDS = 31557600;
+
+    /**
+     * 86400 seconds per day * 30,4375 days per month = 2629800 seconds per month
+     * (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
+     */
+    private static final long MONTH_SECONDS = 2629800;
+
+    /**
+     * 60 seconds per minute * 60 minutes per hour * 24 hours per day = 86400 seconds per day
+     */
+    private static final long DAY_SECONDS = 86400;
+
     private class ReportChartData extends AbstractReportChartColumnData {
         private int mOption;
 
@@ -73,8 +92,8 @@ public class CostsReport extends AbstractReport {
         }
     }
 
-    public static final int GRAPH_OPTION_MONTH = 0;
-    public static final int GRAPH_OPTION_YEAR = 1;
+    private static final int GRAPH_OPTION_MONTH = 0;
+    private static final int GRAPH_OPTION_YEAR = 1;
 
     private LongSparseArray<ReportChartData> mCostsPerMonth = new LongSparseArray<>();
     private LongSparseArray<ReportChartData> mCostsPerYear = new LongSparseArray<>();
@@ -96,7 +115,7 @@ public class CostsReport extends AbstractReport {
 
     @Override
     protected String formatYValue(float value, int chartOption) {
-        return String.format("%.0f", value);
+        return String.format(Locale.getDefault(), "%.0f", value);
     }
 
     @Override
@@ -160,7 +179,7 @@ public class CostsReport extends AbstractReport {
             mCostsPerYear.put(car.getId(), new ReportChartData(mContext, car.getName(),
                     car.getColor(), GRAPH_OPTION_YEAR));
 
-            int startMileage = Integer.MAX_VALUE;
+            final int startMileage = car.getInitialMileage();
             int endMileage = Integer.MIN_VALUE;
             DateTime startDate = new DateTime();
             DateTime endDate;
@@ -181,38 +200,61 @@ public class CostsReport extends AbstractReport {
             }
 
             double totalCosts = 0;
+            double costsWithinYear = 0;
 
             while (refueling.moveToNext()) {
+                if (refueling.getPrice() == 0.0f) {
+                    continue;
+                }
                 totalCosts += refueling.getPrice();
 
                 DateTime date = new DateTime(refueling.getDate());
                 mCostsPerMonth.get(car.getId()).add(date, refueling.getPrice());
                 mCostsPerYear.get(car.getId()).add(date, refueling.getPrice());
 
-                startMileage = Math.min(startMileage, refueling.getMileage());
+                if (Seconds.secondsBetween(endDate, date).getSeconds() < YEAR_SECONDS) {
+                    costsWithinYear += refueling.getPrice();
+                }
+
                 endMileage = Math.max(endMileage, refueling.getMileage());
                 if (startDate.isAfter(date)) {
                     startDate = date;
                 }
             }
 
+            Date now = new Date();
+
             while (otherCost.moveToNext()) {
                 int recurrences;
+                int recurrencesInLastYear;
                 if (otherCost.getEndDate() == null ||
                         new DateTime(otherCost.getEndDate()).isAfterNow()) {
                     recurrences = Recurrences.getRecurrencesSince(
                             otherCost.getRecurrenceInterval(),
                             otherCost.getRecurrenceMultiplier(),
                             otherCost.getDate());
+                    recurrencesInLastYear = Recurrences.getRecurrencesSince(
+                            otherCost.getRecurrenceInterval(),
+                            otherCost.getRecurrenceMultiplier(),
+                            otherCost.getDate(),
+                            new Date(now.getTime() - YEAR_SECONDS * 1000));
                 } else {
                     recurrences = Recurrences.getRecurrencesBetween(
                             otherCost.getRecurrenceInterval(),
                             otherCost.getRecurrenceMultiplier(),
                             otherCost.getDate(),
                             otherCost.getEndDate());
+                    recurrencesInLastYear = Recurrences.getRecurrencesBetween(
+                            otherCost.getRecurrenceInterval(),
+                            otherCost.getRecurrenceMultiplier(),
+                            otherCost.getDate(),
+                            otherCost.getEndDate(),
+                            new Date(now.getTime() - YEAR_SECONDS * 1000),
+                            otherCost.getEndDate());
                 }
 
                 totalCosts += otherCost.getPrice() * recurrences;
+                costsWithinYear += otherCost.getPrice() * recurrencesInLastYear;
 
                 DateTime date = new DateTime(otherCost.getDate());
                 DateTime recurrenceEndDate;
@@ -246,7 +288,6 @@ public class CostsReport extends AbstractReport {
                 }
 
                 if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                    startMileage = Math.min(startMileage, otherCost.getMileage());
                     endMileage = Math.max(endMileage, otherCost.getMileage());
                 }
 
@@ -260,33 +301,36 @@ public class CostsReport extends AbstractReport {
             double costsPerSecond = totalCosts / elapsedSeconds.getSeconds();
 
             // Average costs per day
-            // 60 seconds per minute * 60 minutes per hour * 24 hours per day =
-            // 86400 seconds per day
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_day),
-                    String.format("%.2f %s", costsPerSecond * 86400, mUnit)));
+                    mContext.getString((elapsedSeconds.getSeconds() > DAY_SECONDS ?
+                                    R.string.report_price : R.string.report_price_estimated),
+                            costsPerSecond * DAY_SECONDS, mUnit)));
 
             // Average costs per month
-            // 86400 seconds per day * 30,4375 days per month = 2629800 seconds
-            // per month
-            // (365,25 days per year means 365,25 / 12 = 30,4375 days per month)
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_month),
-                    String.format("%.2f %s", costsPerSecond * 2629800, mUnit)));
+                    mContext.getString((elapsedSeconds.getSeconds() > MONTH_SECONDS ?
+                                    R.string.report_price : R.string.report_price_estimated),
+                            costsPerSecond * MONTH_SECONDS, mUnit)));
 
             // Average costs per year
-            // 86400 seconds per day * 365,25 days per year = 31557600 seconds
-            // per year
             section.addItem(new Item("\u00D8 " + mContext.getString(R.string.report_year),
-                    String.format("%.2f %s", costsPerSecond * 31557600, mUnit)));
+                    mContext.getString((elapsedSeconds.getSeconds() > YEAR_SECONDS ?
+                                    R.string.report_price : R.string.report_price_estimated),
+                            costsPerSecond * YEAR_SECONDS, mUnit)));
 
             // Average costs per [distance unit]
             int mileageDiff = Math.max(1, endMileage - startMileage);
             section.addItem(new Item("\u00D8 " + prefs.getUnitDistance(),
-                    String.format("%.2f %s", totalCosts / mileageDiff, mUnit)));
+                    mContext.getString(R.string.report_price, totalCosts / mileageDiff, mUnit)));
+
+            // Total costs in last year
+            section.addItem(new Item(mContext.getString(R.string.report_last_year),
+                    mContext.getString(R.string.report_price, costsWithinYear, mUnit)));
 
             // Total costs
             section.addItem(new Item(mContext.getString(R.string.report_since,
                     DateFormat.getDateFormat(mContext).format(startDate.toDate())),
-                    String.format("%.2f %s", totalCosts, mUnit)));
+                    mContext.getString(R.string.report_price, totalCosts, mUnit)));
         }
 
         return cursors.toArray(new Cursor[cursors.size()]);

@@ -36,10 +36,13 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.query.ReminderQueries;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
+import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
 import me.kuehle.carreport.provider.reminder.ReminderColumns;
 import me.kuehle.carreport.provider.reminder.ReminderCursor;
 import me.kuehle.carreport.provider.reminder.ReminderSelection;
@@ -47,6 +50,7 @@ import me.kuehle.carreport.util.TimeSpan;
 import me.kuehle.carreport.util.reminder.ReminderService;
 
 public class PreferencesRemindersFragment extends ListFragment implements
+        AbstractPreferenceActivity.OptionsMenuListener,
         MessageDialogFragment.MessageDialogFragmentListener,
         LoaderManager.LoaderCallbacks<Cursor> {
     private class ReminderAdapter extends CursorAdapter {
@@ -68,11 +72,11 @@ public class PreferencesRemindersFragment extends ListFragment implements
                     parent, false);
 
             ReminderViewHolder holder = new ReminderViewHolder();
-            holder.title = (TextView) view.findViewById(R.id.txt_title);
-            holder.car = (TextView) view.findViewById(R.id.txt_car);
-            holder.afterDistance = (TextView) view.findViewById(R.id.txt_after_distance);
-            holder.afterTime = (TextView) view.findViewById(R.id.txt_after_time);
-            holder.status = (TextView) view.findViewById(R.id.txt_status);
+            holder.title = view.findViewById(R.id.txt_title);
+            holder.car = view.findViewById(R.id.txt_car);
+            holder.afterDistance = view.findViewById(R.id.txt_after_distance);
+            holder.afterTime = view.findViewById(R.id.txt_after_time);
+            holder.status = view.findViewById(R.id.txt_status);
 
             View btnDone = view.findViewById(R.id.btn_done);
             View btnSnooze = view.findViewById(R.id.btn_snooze);
@@ -111,7 +115,10 @@ public class PreferencesRemindersFragment extends ListFragment implements
             holder.title.setText(reminder.getTitle());
             holder.car.setText(reminder.getCarName());
             if (reminder.getAfterDistance() != null) {
-                holder.afterDistance.setText(String.format("%d %s", reminder.getAfterDistance(),
+                holder.afterDistance.setText(String.format(
+                        Locale.getDefault(),
+                        "%d %s",
+                        reminder.getAfterDistance(),
                         mUnitDistance));
                 holder.afterDistance.setVisibility(View.VISIBLE);
             } else {
@@ -143,12 +150,12 @@ public class PreferencesRemindersFragment extends ListFragment implements
                 if (reminder.getAfterDistance() != null && reminder.getAfterTimeSpanUnit() != null) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_distance_and_time,
-                            String.format("%d %s", queries.getDistanceToDue(), mUnitDistance),
+                            String.format(Locale.getDefault(), "%d %s", queries.getDistanceToDue(), mUnitDistance),
                             TimeSpan.fromMillis(queries.getTimeToDue()).toLocalizedString(getActivity())));
                 } else if (reminder.getAfterDistance() != null) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_distance,
-                            String.format("%d %s", queries.getDistanceToDue(), mUnitDistance)));
+                            String.format(Locale.getDefault(), "%d %s", queries.getDistanceToDue(), mUnitDistance)));
                 } else {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_time,
@@ -244,14 +251,8 @@ public class PreferencesRemindersFragment extends ListFragment implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.edit_reminders, menu);
+    public int getOptionsMenuResourceId() {
+        return R.menu.edit_reminders;
     }
 
     @Override

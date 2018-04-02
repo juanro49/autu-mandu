@@ -1,0 +1,64 @@
+<!--
+  ~ Copyright 2017 Jan Kühle
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="108dp"
+        android:height="108dp"
+        android:viewportHeight="108"
+        android:viewportWidth="108">
+    <path
+        android:fillColor="#0a1651"
+        android:pathData="M 0 4.5666016e-7 H 108 V 108.000000457 H 0 V 4.5666016e-7 Z"
+        android:strokeWidth="6.47810984"/>
+    <group
+        android:translateY="0.50003">
+        <path
+            android:pathData="M 0,17.999969 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+        <path
+            android:pathData="M 0,6 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+        <path
+            android:pathData="M 0,29.999971 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+        <path
+            android:pathData="M 0,41.999966 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+        <path
+            android:pathData="M 0,53.999969 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+        <path
+            android:pathData="M 0,65.999969 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+        <path
+            android:pathData="M 0,77.999962 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+        <path
+            android:pathData="M 0,89.999962 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+        <path
+            android:pathData="M 0,101.99997 H 108"
+            android:strokeColor="#2b3ca8"
+            android:strokeWidth="1"/>
+    </group>
+</vector>

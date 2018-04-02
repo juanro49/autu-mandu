@@ -34,6 +34,7 @@ import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 import me.kuehle.carreport.util.Calculator;
 
 public class RefuelingBalancer {
+    @SuppressWarnings("WeakerAccess")
     private class BalancedRefueling {
         public long _id;
         public Date date;
@@ -108,7 +109,7 @@ public class RefuelingBalancer {
         }
     }
 
-    public static final float MAX_RELATIVE_CONSUMPTION_DEVIATION = 0.2f;
+    private static final float MAX_RELATIVE_CONSUMPTION_DEVIATION = 0.2f;
 
     private Context mContext;
     private Preferences mPrefs;
@@ -176,8 +177,9 @@ public class RefuelingBalancer {
             return refuelings;
         }
 
-        float avgConsumption = getBalancedAverageConsumption(refuelings);
         int avgDistance = getBalancedAverageDistanceOfFullRefuelings(refuelings);
+        float avgVolume = getBalancedAverageVolumeOfFullRefuelings(refuelings);
+        float avgConsumption = avgVolume / avgDistance;
         float avgPricePerUnit = getAveragePricePerUnit(refuelings);
 
         int distance = 0;
@@ -221,7 +223,7 @@ public class RefuelingBalancer {
                 // Possible distance is always the distance the car can possibly
                 // drive since the last (including partial) refueling.
                 int possibleDistance = avgDistance;
-                for (int pI = lastFullRefueling + 1; pI < i; pI++) {
+                for (int pI = lastFullRefueling + 1; pI < i && missingVolume > 0; pI++) {
                     int pDistance = refuelings.get(pI).mileage - refuelings.get(pI - 1).mileage;
                     if (pDistance <= possibleDistance) {
                         // Distance is possible so we assume nothing is missing
@@ -235,15 +237,7 @@ public class RefuelingBalancer {
 
                         // Always try to refill as much fuel as possible...
                         float newVolume = avgDistance * avgConsumption;
-                        // but ensure that the current partial refueling is
-                        // feasible
-                        // --> the volume is possible (tank is not overfull
-                        // after refueling)...
-                        float pVolume = refuelings.get(pI).volume;
-                        if (newVolume > pDistance * avgConsumption - pVolume) {
-                            newVolume = pDistance * avgConsumption - pVolume;
-                        }
-                        // and ensure that we don't add more volume than what's
+                        // but ensure that we don't add more volume than what's
                         // actually missing.
                         if (newVolume > missingVolume) {
                             newVolume = missingVolume;
@@ -351,76 +345,6 @@ public class RefuelingBalancer {
     }
 
     /**
-     * Gets the average fuel consumption, not taking into account the
-     * outstanding values, where refuelings were missing.
-     *
-     * @param refuelings a list of refuelings with the same fuel tank.
-     * @return the balanced average fuel consumption.
-     */
-    private static float getBalancedAverageConsumption(List<BalancedRefueling> refuelings) {
-        Vector<Float> allConsumptions = new Vector<>();
-        Vector<Integer> allDistances = new Vector<>();
-        Vector<Float> allVolumes = new Vector<>();
-
-        // Calculate consumptions for all refuelings in the specified list.
-        // There is not need to use the fuel consumption class here because
-        // these values are just for internal comparison.
-        int totalDistance = 0, distance = 0;
-        float totalVolume = 0, volume = 0;
-        int lastFullRefueling = -1;
-        for (int i = 0; i < refuelings.size(); i++) {
-            BalancedRefueling refueling = refuelings.get(i);
-            if (lastFullRefueling < 0) {
-                if (!refueling.partial) {
-                    lastFullRefueling = i;
-                }
-
-                continue;
-            }
-
-            distance += refueling.mileage - refuelings.get(i - 1).mileage;
-            volume += refueling.volume;
-
-            if (!refueling.partial) {
-                totalDistance += distance;
-                totalVolume += volume;
-
-                allConsumptions.add(volume / distance);
-                allDistances.add(distance);
-                allVolumes.add(volume);
-
-                distance = 0;
-                volume = 0;
-
-                lastFullRefueling = i;
-            }
-        }
-
-        float avgConsumption = totalVolume / totalDistance;
-
-        // Remove outstanding values from the average.
-        boolean updated;
-        do {
-            updated = false;
-            for (int i = allConsumptions.size() - 1; i >= 0; i--) {
-                if (allConsumptions.get(i) / avgConsumption < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
-                    totalDistance -= allDistances.get(i);
-                    totalVolume -= allVolumes.get(i);
-                    avgConsumption = totalVolume / totalDistance;
-
-                    allConsumptions.remove(i);
-                    allDistances.remove(i);
-                    allVolumes.remove(i);
-
-                    updated = true;
-                }
-            }
-        } while (updated);
-
-        return avgConsumption;
-    }
-
-    /**
      * Gets the average distance, that was driven before a full refueling. This
      * should give an idea of how far the car gets with a full tank.
      *
@@ -431,34 +355,38 @@ public class RefuelingBalancer {
         Vector<Integer> allDistances = new Vector<>();
 
         for (int i = 1; i < refuelings.size(); i++) {
-            if (!refuelings.get(i).partial) {
-                allDistances.add(refuelings.get(i).mileage
-                        - refuelings.get(i - 1).mileage);
+            if (!refuelings.get(i).partial && !refuelings.get(i - 1).partial) {
+                allDistances.add(refuelings.get(i).mileage - refuelings.get(i - 1).mileage);
             }
         }
 
-        // Remove the top 20% to get rid of the very high distances.
-        Collections.sort(allDistances);
-        int size = allDistances.size();
-        for (int i = size - 1; i >= size * 0.8; i--) {
-            allDistances.remove(i);
+        if (allDistances.size() == 0) {
+            // There are no 2 consecutive full refuelings. Use all refuelings then.
+            for (int i = 1; i < refuelings.size(); i++) {
+                allDistances.add(refuelings.get(i).mileage - refuelings.get(i - 1).mileage);
+            }
         }
 
-        int avgDistance = Calculator.avg(allDistances
-                .toArray(new Integer[allDistances.size()]));
+        // Remove the top and bottom 20% to get rid of the very high distances.
+        Collections.sort(allDistances);
+        int removeCount = Math.round(allDistances.size() * 0.2f);
+        for (int i = 0; i < removeCount; i++) {
+            allDistances.remove(0);
+            allDistances.remove(allDistances.size() - 1);
+        }
+
+        int avgDistance = Calculator.avg(allDistances.toArray(new Integer[allDistances.size()]));
 
         // Remove outstanding values from the average.
         boolean updated;
         do {
             updated = false;
             for (int i = allDistances.size() - 1; i >= 0; i--) {
-                float relativeDistance = (float) allDistances.get(i)
-                        / (float) avgDistance;
+                float relativeDistance = (float) allDistances.get(i) / (float) avgDistance;
                 if (relativeDistance < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
                         || relativeDistance > (1 + MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
                     allDistances.remove(i);
-                    avgDistance = Calculator.avg(allDistances
-                            .toArray(new Integer[allDistances.size()]));
+                    avgDistance = Calculator.avg(allDistances.toArray(new Integer[allDistances.size()]));
 
                     updated = true;
                 }
@@ -466,6 +394,58 @@ public class RefuelingBalancer {
         } while (updated);
 
         return avgDistance;
+    }
+
+    /**
+     * Gets the average volume, that filled in a full refueling. This
+     * should give an idea of how much fits into the tank.
+     *
+     * @param refuelings a list of refuelings with the same fuel tank.
+     * @return the average volume for full refuelings.
+     */
+    private static float getBalancedAverageVolumeOfFullRefuelings(List<BalancedRefueling> refuelings) {
+        Vector<Float> allVolumes = new Vector<>();
+
+        for (int i = 1; i < refuelings.size(); i++) {
+            if (!refuelings.get(i).partial && !refuelings.get(i - 1).partial) {
+                allVolumes.add(refuelings.get(i).volume);
+            }
+        }
+
+        if (allVolumes.size() == 0) {
+            // There are no 2 consecutive full refuelings. Use all refuelings then.
+            for (int i = 1; i < refuelings.size(); i++) {
+                allVolumes.add(refuelings.get(i).volume);
+            }
+        }
+
+        // Remove the top and bottom 20% to get rid of the very high distances.
+        Collections.sort(allVolumes);
+        int removeCount = Math.round(allVolumes.size() * 0.2f);
+        for (int i = 0; i < removeCount; i++) {
+            allVolumes.remove(0);
+            allVolumes.remove(allVolumes.size() - 1);
+        }
+
+        float avgVolume = Calculator.avg(allVolumes.toArray(new Float[allVolumes.size()]));
+
+        // Remove outstanding values from the average.
+        boolean updated;
+        do {
+            updated = false;
+            for (int i = allVolumes.size() - 1; i >= 0; i--) {
+                float relativeVolume = allVolumes.get(i) / avgVolume;
+                if (relativeVolume < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
+                        || relativeVolume > (1 + MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
+                    allVolumes.remove(i);
+                    avgVolume = Calculator.avg(allVolumes.toArray(new Float[allVolumes.size()]));
+
+                    updated = true;
+                }
+            }
+        } while (updated);
+
+        return avgVolume;
     }
 
     /**

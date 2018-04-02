@@ -38,7 +38,7 @@ public class NewRefuelingSnackbar {
         }
 
         RefuelingCursor previousRefueling = RefuelingQueries.getPrevious(context,
-                refueling.getCarId(), refueling.getDate());
+                refueling.getCarId(), refueling.getDate(), refueling.getFuelTypeCategory());
         if (previousRefueling.moveToFirst() && !refueling.getPartial()) {
             float consumption = getFuelConsumptionToPreviousRefueling(fuelConsumption,
                     refueling.getVolume(), refueling.getMileage(), previousRefueling);
@@ -68,7 +68,7 @@ public class NewRefuelingSnackbar {
      * specified previous refueling. This modifies the previousRefueling cursor. It will have
      * one of the following results:
      * <p/>
-     * Calculation was successfull:
+     * Calculation was successful:
      * Returns fuel consumption.
      * Cursor previousRefueling points to the previous full refueling.
      * Calculation failed:

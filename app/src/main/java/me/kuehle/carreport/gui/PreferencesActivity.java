@@ -16,52 +16,33 @@
 
 package me.kuehle.carreport.gui;
 
-import android.app.ActionBar;
-import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.support.v4.app.ActivityCompat;
-import android.view.MenuItem;
-
-import java.util.List;
 
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
 
-public class PreferencesActivity extends PreferenceActivity implements
+public class PreferencesActivity extends AbstractPreferenceActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+    protected int getTitleResourceId() {
+        return R.string.title_settings;
     }
 
     @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.preference_headers, target);
+    protected int getHeadersResourceId() {
+        return R.xml.preference_headers;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    protected boolean isValidFragment(String fragmentName) {
-        return PreferencesGeneralFragment.class.getName().equals(fragmentName)
-                || PreferencesCarsFragment.class.getName().equals(fragmentName)
-                || PreferencesFuelTypesFragment.class.getName().equals(fragmentName)
-                || PreferencesRemindersFragment.class.getName().equals(fragmentName)
-                || PreferencesReportOrderFragment.class.getName().equals(fragmentName)
-                || PreferencesBackupFragment.class.getName().equals(fragmentName)
-                || PreferencesAboutFragment.class.getName().equals(fragmentName);
+    protected Class[] getFragmentClasses() {
+        return new Class[]{
+                PreferencesGeneralFragment.class,
+                PreferencesCarsFragment.class,
+                PreferencesFuelTypesFragment.class,
+                PreferencesRemindersFragment.class,
+                PreferencesReportOrderFragment.class,
+                PreferencesBackupFragment.class,
+                PreferencesAboutFragment.class
+        };
     }
 }

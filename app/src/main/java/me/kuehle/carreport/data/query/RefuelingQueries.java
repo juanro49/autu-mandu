@@ -25,13 +25,23 @@ import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 
 public class RefuelingQueries {
     public static RefuelingCursor getPrevious(Context context, long carId, Date date) {
-        return new RefuelingSelection()
+        return getPrevious(context, carId, date, null);
+    }
+
+    public static RefuelingCursor getPrevious(Context context, long carId, Date date, String fuelTypeCategory) {
+        RefuelingSelection sel = new RefuelingSelection()
                 .carId(carId)
                 .and()
-                .dateBefore(date)
-                .query(context.getContentResolver(),
-                        RefuelingColumns.ALL_COLUMNS,
-                        RefuelingColumns.DATE + " DESC");
+                .dateBefore(date);
+        String[] columns = RefuelingColumns.ALL_COLUMNS;
+
+        if (fuelTypeCategory != null) {
+            sel.and().fuelTypeCategory(fuelTypeCategory);
+            columns = null;
+        }
+
+        return sel.query(context.getContentResolver(),
+                columns, RefuelingColumns.DATE + " DESC");
     }
 
     public static RefuelingCursor getNext(Context context, long carId, Date date) {

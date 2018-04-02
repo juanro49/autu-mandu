@@ -18,66 +18,37 @@ package me.kuehle.carreport.gui;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Html;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Locale;
-
 import me.kuehle.carreport.R;
+import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
+import me.kuehle.carreport.util.Assets;
 
-public class HelpActivity extends PreferenceActivity {
-    private static final String TAG = "HelpActivity";
-
-    private Toolbar mActionBar;
-
+public class HelpActivity extends AbstractPreferenceActivity {
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mActionBar.setTitle(getTitle());
+    protected int getTitleResourceId() {
+        return R.string.title_help;
     }
 
     @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.help_headers, target);
+    protected int getHeadersResourceId() {
+        return R.xml.help_headers;
     }
 
     @Override
-    public void setContentView(int layoutResID) {
-        ViewGroup contentView = (ViewGroup) LayoutInflater.from(this).inflate(
-                R.layout.activity_help, new LinearLayout(this), false);
-
-        mActionBar = (Toolbar) contentView.findViewById(R.id.action_bar);
-        mActionBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        ViewGroup contentWrapper = (ViewGroup) contentView.findViewById(R.id.content_wrapper);
-        LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);
-
-        getWindow().setContentView(contentView);
-    }
-
-    @Override
-    protected boolean isValidFragment(String fragmentName) {
-        return GettingStartedFragment.class.getName().equals(fragmentName)
-                || FuelTypesFragment.class.getName().equals(fragmentName)
-                || TipsFragment.class.getName().equals(fragmentName)
-                || CalculationsFragment.class.getName().equals(fragmentName)
-                || CSVFragment.class.getName().equals(fragmentName);
+    protected Class[] getFragmentClasses() {
+        return new Class[]{
+                GettingStartedFragment.class,
+                FuelTypesFragment.class,
+                TipsFragment.class,
+                CalculationsFragment.class,
+                CSVFragment.class
+        };
     }
 
     private static abstract class HelpFragment extends Fragment {
@@ -85,41 +56,21 @@ public class HelpActivity extends PreferenceActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.fragment_help_detail, container, false);
-            TextView text = (TextView) v.findViewById(android.R.id.text1);
+            TextView text = v.findViewById(android.R.id.text1);
             text.setMovementMethod(LinkMovementMethod.getInstance());
 
-            try {
-                InputStream in = getActivity().getAssets().open(
-                        String.format("%s/%s.html", getLocalizedDirectory("help"), getHelpId()));
-                byte[] buffer = new byte[in.available()];
-                in.read(buffer);
-                in.close();
+            String assetPath = String.format(
+                    "%s/%s.html",
+                    getString(R.string.help_folder_name),
+                    getHelpId());
+            Spanned html = Assets.getHtml(getActivity(), assetPath);
 
-                text.setText(Html.fromHtml(new String(buffer)));
-            } catch (IOException e) {
-                Log.e(TAG, "Error reading help html file.", e);
-            }
+            text.setText(html);
 
             return v;
         }
 
         protected abstract String getHelpId();
-
-        private String getLocalizedDirectory(String directory) {
-            String locale = Locale.getDefault().getLanguage().substring(0, 2)
-                    .toLowerCase(Locale.US);
-            String localizedDirectory = directory + "-" + locale;
-
-            try {
-                if (getActivity().getAssets().list(localizedDirectory).length > 0) {
-                    return localizedDirectory;
-                } else {
-                    return directory;
-                }
-            } catch (IOException e) {
-                return directory;
-            }
-        }
     }
 
     public static class GettingStartedFragment extends HelpFragment {

@@ -35,10 +35,12 @@ import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.query.FuelTypeQueries;
 import me.kuehle.carreport.gui.dialog.EditFuelTypeDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
+import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
 import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
 
 public class PreferencesFuelTypesFragment extends ListFragment implements
+        AbstractPreferenceActivity.OptionsMenuListener,
         MessageDialogFragment.MessageDialogFragmentListener,
         EditFuelTypeDialogFragment.EditFuelTypeDialogFragmentListener,
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -136,14 +138,8 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.edit_fuel_types, menu);
+    public int getOptionsMenuResourceId() {
+        return R.menu.edit_fuel_types;
     }
 
     @Override

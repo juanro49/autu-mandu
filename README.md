@@ -1,6 +1,6 @@
 # Car Report
 
-## Description
+> Android app for saving and looking up costs (refuelings, ...) of your car.
 
 Car Report is an android app, which lets you enter refuelings and other income and expenses of your
 cars and displays nice reports. The following are currently included:
@@ -16,7 +16,7 @@ inspection once a year.
 It provides synchronization with Dropbox and Google Drive and has basic backup/restore and CSV
 import/export functionality.
 
-## Get it
+## Install
 
 [Car Report on Play Store](https://play.google.com/store/apps/details?id=me.kuehle.carreport)
 *(This is the full version.)*
@@ -24,7 +24,7 @@ import/export functionality.
 [Car Report on F-Droid](https://f-droid.org/repository/browse/?fdid=me.kuehle.carreport)
 *(This is a special FOSS version without Google Drive sync.)*
 
-## Build it
+## Build
 
 The app uses gradle, so to build it just open a command line, switch to the app directory and
 execute one of the following commands.
@@ -42,3 +42,7 @@ although they are not used for compiling. If you don't have these libraries avai
 to temporary remove all lines prefixed with ```fullCompile``` from the *build.gradle* file in the
 app folder. See [this comment](https://bitbucket.org/frigus02/car-report/issues/53/dependence-on-proprietary-components#comment-21959839)
 for more information.
+
+## License
+
+[Apache 2.0 © Jan Kühle.](../COPYING)

@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
                 android:layout_weight="1"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
-                android:text="@string/label_color"
+                android:text="@string/label_color_in_reports"
                 android:textSize="16sp"/>
 
             <View
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/layout_color">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_initial_mileage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,7 +109,7 @@
             android:layout_marginLeft="36dp"
             android:layout_marginStart="36dp">
 
-            <EditText
+            <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_suspend_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

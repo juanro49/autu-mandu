@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import org.joda.time.DateTime;
 
 import me.kuehle.carreport.Application;
+import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarContentValues;
 import me.kuehle.carreport.provider.fueltype.FuelTypeContentValues;
 import me.kuehle.carreport.provider.othercost.OtherCostContentValues;
@@ -32,15 +33,20 @@ import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
 import me.kuehle.carreport.provider.refueling.RefuelingContentValues;
 
 public class DemoData {
-    private static final CharSequence MENU_TITLE = "Create demo data";
+    private static final CharSequence MENU_TITLE_CREATE = "Create demo data";
+    private static final CharSequence MENU_TITLE_REMOVE = "Remove demo data";
 
     public static void createMenuItem(Menu menu) {
-        menu.add(MENU_TITLE);
+        menu.add(MENU_TITLE_CREATE);
+        menu.add(MENU_TITLE_REMOVE);
     }
 
     public static boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getTitle().equals(MENU_TITLE)) {
+        if (item.getTitle().equals(MENU_TITLE_CREATE)) {
             addDemoData();
+            return true;
+        } else if (item.getTitle().equals(MENU_TITLE_REMOVE)) {
+            removeDemoData();
             return true;
         }
 
@@ -72,18 +78,18 @@ public class DemoData {
             puntoMileage += randInt(570, 620);
             float volume = randFloat(43, 48);
             boolean partial = false;
-            if (randInt(0, 5) == 5) {
+            if (randBooleanTrueInOneOutOf(6)) {
                 volume -= randFloat(20, 40);
                 partial = true;
             }
 
             float price = volume * randFloat(140, 160) / 100;
             long fuelType = super95;
-            if (randInt(0, 3) == 3) {
+            if (randBooleanTrueInOneOutOf(4)) {
                 fuelType = superE10;
             }
 
-            if (randInt(0, 9) != 9) {
+            if (!randBooleanTrueInOneOutOf(15)) {
                 createRefueling(context, puntoDate, puntoMileage, volume, price, partial, "",
                         fuelType, punto);
             }
@@ -93,36 +99,59 @@ public class DemoData {
 
         long astra = createCar(context, "Opel Astra", Color.RED);
 
-        int astraCount = 30;
-        DateTime astraDate = DateTime.now().minusMonths(astraCount / 3).withSecondOfMinute(0).withMillisOfSecond(0);
-        int astraMileage = 120000;
+        int astraCountSuper95 = 30;
+        int astraCountLpg = 30;
+        DateTime astraDateSuper95 = DateTime.now().minusMonths(astraCountSuper95 / 3).withSecondOfMinute(0).withMillisOfSecond(0);
+        DateTime astraDateLpg = DateTime.now().minusMonths(astraCountSuper95 / 3).withSecondOfMinute(0).withMillisOfSecond(0);
+        int astraMileageSuper95 = 120000;
+        int astraMileageLpg = 120000;
 
-        createOtherCost(context, "Steuern", astraDate, null, -1, 250, RecurrenceInterval.YEAR, 1,
+        createOtherCost(context, "Steuern", astraDateSuper95, null, -1, 250, RecurrenceInterval.YEAR, 1,
                 "", astra);
-        createOtherCost(context, "Versicherung", astraDate, null, -1, 40, RecurrenceInterval.MONTH,
+        createOtherCost(context, "Versicherung", astraDateSuper95, null, -1, 40, RecurrenceInterval.MONTH,
                 1, "", astra);
 
-        for (int i = 0; i < astraCount; i++) {
-            astraDate = astraDate.plusDays(randInt(8, 13));
-            astraMileage += randInt(570, 620);
+        for (int i = 0; i < astraCountSuper95; i++) {
+            astraDateSuper95 = astraDateSuper95.plusDays(randInt(8, 13));
+            astraMileageSuper95 += randInt(570, 620);
             float volume = randFloat(55, 60);
             boolean partial = false;
-            if (randInt(0, 5) == 5) {
+            if (randBooleanTrueInOneOutOf(6)) {
                 volume -= randFloat(20, 40);
                 partial = true;
             }
 
             float price = volume * randFloat(140, 160) / 100;
-            long fuelType = super95;
-            if (randInt(0, 1) == 1) {
-                fuelType = lpg;
-            }
 
-            if (randInt(0, 9) != 9) {
-                createRefueling(context, astraDate, astraMileage, volume, price, partial, "",
-                        fuelType, astra);
+            if (!randBooleanTrueInOneOutOf(15)) {
+                createRefueling(context, astraDateSuper95, astraMileageSuper95, volume, price, partial, "",
+                        super95, astra);
             }
         }
+
+        for (int i = 0; i < astraCountLpg; i++) {
+            astraDateLpg = astraDateLpg.plusDays(randInt(8, 13));
+            astraMileageLpg += randInt(570, 620);
+            float volume = randFloat(25, 30);
+            boolean partial = false;
+            if (randBooleanTrueInOneOutOf(6)) {
+                volume -= randFloat(10, 20);
+                partial = true;
+            }
+
+            float price = volume * randFloat(85, 105) / 100;
+
+            if (!randBooleanTrueInOneOutOf(15)) {
+                createRefueling(context, astraDateLpg, astraMileageLpg, volume, price, partial, "",
+                        lpg, astra);
+            }
+        }
+    }
+
+    public static void removeDemoData() {
+        Context context = Application.getContext();
+
+        context.getContentResolver().delete(CarColumns.CONTENT_URI, null, null);
     }
 
     private static long createCar(Context context, String name, int color) {
@@ -182,6 +211,10 @@ public class DemoData {
 
     private static float randFloat(int min, int max) {
         return (float) randInt(min * 10, max * 10) / 10;
+    }
+
+    private static boolean randBooleanTrueInOneOutOf(int x) {
+        return randInt(0, x) == 0;
     }
 
     private static long getIdFromUri(Uri uri) {

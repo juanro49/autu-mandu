@@ -16,13 +16,10 @@
 
 package me.kuehle.carreport.gui.dialog;
 
-import me.kuehle.carreport.R;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -30,88 +27,82 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.larswerkman.holocolorpicker.ColorPicker;
-import com.larswerkman.holocolorpicker.SaturationBar;
-import com.larswerkman.holocolorpicker.ValueBar;
+import com.android.colorpicker.ColorPickerDialog;
+import com.android.colorpicker.ColorPickerPalette;
+
+import me.kuehle.carreport.R;
 
 public class SupportColorPickerDialogFragment extends DialogFragment {
-	public interface SupportColorPickerDialogFragmentListener {
-		void onDialogNegativeClick(int requestCode);
+    public interface SupportColorPickerDialogFragmentListener {
+        void onDialogNegativeClick(int requestCode);
 
-		void onDialogPositiveClick(int requestCode, int color);
-	}
+        void onDialogPositiveClick(int requestCode, int color);
+    }
 
-	public static SupportColorPickerDialogFragment newInstance(Fragment parent,
-			int requestCode, Integer title, int color) {
-		SupportColorPickerDialogFragment f = new SupportColorPickerDialogFragment();
-		f.setTargetFragment(parent, requestCode);
+    public static SupportColorPickerDialogFragment newInstance(Fragment parent,
+                                                               int requestCode, Integer title, int color) {
+        SupportColorPickerDialogFragment f = new SupportColorPickerDialogFragment();
+        f.setTargetFragment(parent, requestCode);
 
-		Bundle args = new Bundle();
-		args.putInt("color", color);
-		args.putInt("positive", android.R.string.ok);
-		args.putInt("negative", android.R.string.cancel);
-		if (title != null) {
-			args.putInt("title", title);
-		}
+        Bundle args = new Bundle();
+        args.putInt("color", color);
+        args.putInt("positive", android.R.string.ok);
+        args.putInt("negative", android.R.string.cancel);
+        if (title != null) {
+            args.putInt("title", title);
+        }
 
-		f.setArguments(args);
-		return f;
-	}
+        f.setArguments(args);
+        return f;
+    }
 
-	private ColorPicker mColorPicker;
+    private int mSelectedColor;
 
     @NonNull
     @Override
     @SuppressLint("InflateParams")
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		Bundle args = getArguments();
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Bundle args = getArguments();
 
-		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View view = inflater.inflate(R.layout.dialog_color_picker, null);
-		mColorPicker = (ColorPicker) view.findViewById(R.id.picker);
-		mColorPicker.addSaturationBar((SaturationBar) view
-				.findViewById(R.id.saturationbar));
-		mColorPicker.addValueBar((ValueBar) view.findViewById(R.id.valuebar));
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.dialog_color_picker, null);
 
-		mColorPicker.setOldCenterColor(args.getInt("color"));
-		if (savedInstanceState != null) {
-			mColorPicker.setColor(savedInstanceState.getInt("color"));
-		} else {
-			mColorPicker.setColor(args.getInt("color"));
-		}
+        final ColorPickerPalette colorPicker = view.findViewById(R.id.palette);
+        mSelectedColor = (savedInstanceState != null ? savedInstanceState : args).getInt("color");
+        Resources resources = getResources();
+        final int[] colors = resources.getIntArray(R.array.selectable_colors);
+        final int colorsPerRow = resources.getInteger(R.integer.color_picker_colors_per_row);
+        colorPicker.init(ColorPickerDialog.SIZE_LARGE, colorsPerRow,
+                color -> {
+                    SupportColorPickerDialogFragment.this.setColor(color);
+                    colorPicker.drawPalette(colors, color);
+                });
+        colorPicker.drawPalette(colors, mSelectedColor);
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setView(view);
-		builder.setPositiveButton(args.getInt("positive"),
-				new OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						getListener()
-								.onDialogPositiveClick(getTargetRequestCode(),
-										mColorPicker.getColor());
-					}
-				});
-		builder.setNegativeButton(args.getInt("negative"),
-				new OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						getListener().onDialogNegativeClick(
-								getTargetRequestCode());
-					}
-				});
-		if (args.containsKey("title")) {
-			builder.setTitle(args.getInt("title"));
-		}
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setView(view);
+        builder.setPositiveButton(args.getInt("positive"),
+                (dialog, which) -> getListener().onDialogPositiveClick(getTargetRequestCode(),
+                        mSelectedColor));
+        builder.setNegativeButton(args.getInt("negative"),
+                (dialog, which) -> getListener().onDialogNegativeClick(getTargetRequestCode()));
+        if (args.containsKey("title")) {
+            builder.setTitle(args.getInt("title"));
+        }
 
-		return builder.create();
-	}
+        return builder.create();
+    }
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt("color", mColorPicker.getColor());
-	}
+    public void setColor(int color) {
+        mSelectedColor = color;
+    }
 
-	private SupportColorPickerDialogFragmentListener getListener() {
-		return (SupportColorPickerDialogFragmentListener) getTargetFragment();
-	}
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt("color", mSelectedColor);
+    }
+
+    private SupportColorPickerDialogFragmentListener getListener() {
+        return (SupportColorPickerDialogFragmentListener) getTargetFragment();
+    }
 }
