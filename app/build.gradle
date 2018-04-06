@@ -2,13 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
     defaultConfig {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
         targetSdkVersion versions.targetSdk
-        versionCode 66
-        versionName "3.18.2"
+        versionCode 69
+        versionName "3.19.0"
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     signingConfigs {
@@ -27,13 +26,13 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    flavorDimensions "tier"
+    flavorDimensions "default"
     productFlavors {
         foss {
-            dimension "tier"
+            dimension "default"
         }
         full {
-            dimension "tier"
+            dimension "default"
         }
     }
     lintOptions {
@@ -64,7 +63,7 @@ dependencies {
     implementation 'org.apache.commons:commons-csv:1.5'
 
     // Dropbox
-    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.5'
+    implementation 'com.dropbox.core:dropbox-core-sdk:3.0.6'
 
     // Support, AppCompat
     implementation "com.android.support:support-v4:${versions.supportLibrary}"
@@ -97,16 +96,16 @@ dependencies {
     }
 
     // WebDAV
-    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 
     // UI Helpers
     implementation 'com.github.clans:fab:1.6.4'
     implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
-    implementation 'de.psdev.licensesdialog:licensesdialog:1.8.2'
+    implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
     implementation 'uk.co.jordanrobinson:android-color-picker:1.0.2'
 
     // Joda-Time for Android
-    implementation 'net.danlew:android.joda:2.9.9'
+    implementation 'net.danlew:android.joda:2.9.9.2'
 
     // Required for instrumented tests
     androidTestImplementation "com.android.support:support-annotations:${versions.supportLibrary}"

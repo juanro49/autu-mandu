@@ -20,6 +20,7 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -203,12 +204,12 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
         try {
             if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-                throw new SyncParseException();
+                throw new SyncParseException("Copying database to temp file failed.");
             }
 
             com.google.api.services.drive.model.File remoteFile = getRemoteFile();
             com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
-            FileContent mediaContent = new FileContent("application/x-sqlite", localFile);
+            FileContent mediaContent = new FileContent("application/x-sqlite", tempFile);
             com.google.api.services.drive.model.File newFile;
             if (remoteFile == null) {
                 body.setName(localFile.getName());
@@ -286,19 +287,23 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
             mIsAuthenticationInProgress = false;
             if (connectionResult.hasResolution()) {
                 try {
-                    connectionResult.startResolutionForResult(mAuthenticatorAddAccountActivity,
+                    connectionResult.startResolutionForResult(
+                            mAuthenticatorAddAccountActivity,
                             REQUEST_RESOLVE_CONNECTION);
                 } catch (IntentSender.SendIntentException e) {
                     mAuthenticatorAddAccountActivity.onAuthenticationResult(null, null, null, null);
                 }
             } else {
                 GoogleApiAvailability.getInstance().showErrorDialogFragment(
-                        mAuthenticatorAddAccountActivity, connectionResult.getErrorCode(), 0);
+                        mAuthenticatorAddAccountActivity,
+                        connectionResult.getErrorCode(),
+                        REQUEST_RESOLVE_CONNECTION,
+                        dialogInterface -> mAuthenticatorAddAccountActivity.onAuthenticationResult(null, null, null, null));
             }
         }
     }
 
-    private com.google.api.services.drive.model.File getRemoteFile() throws SyncIoException {
+    private com.google.api.services.drive.model.File getRemoteFile() throws SyncIoException, SyncParseException {
         File localFile = getLocalFile();
         com.google.api.services.drive.model.File remoteFile = null;
         try {
@@ -329,6 +334,12 @@ public class GoogleDriveSyncProvider extends AbstractSyncProvider implements
             }
         } catch (IOException e) {
             throw new SyncIoException(e);
+        } catch (Exception e) {
+            // There are reported app crashes with an IllegalArgumentException. It causes the app
+            // to crash while it's not even visibly running. I can't find any documentation about
+            // this exception though. To avoid crashes for users, this catches all exceptions and
+            // reports them as good as possible.
+            throw new SyncParseException(e);
         }
     }
 

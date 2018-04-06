@@ -150,17 +150,19 @@ public class DropboxSyncProvider extends AbstractSyncProvider {
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
 
-        try (FileInputStream inputStream = new FileInputStream(tempFile)) {
+        try {
             if (!FileCopyUtil.copyFile(localFile, tempFile)) {
-                throw new SyncParseException();
+                throw new SyncParseException("Copying database to temp file failed.");
             }
-            
-            FileMetadata remoteMetadata = mDbxClient.files()
-                    .uploadBuilder("/" + localFile.getName())
-                    .withMode(WriteMode.OVERWRITE)
-                    .start()
-                    .uploadAndFinish(inputStream);
-            return remoteMetadata.getRev();
+
+            try (FileInputStream inputStream = new FileInputStream(tempFile)) {
+                FileMetadata remoteMetadata = mDbxClient.files()
+                        .uploadBuilder("/" + localFile.getName())
+                        .withMode(WriteMode.OVERWRITE)
+                        .start()
+                        .uploadAndFinish(inputStream);
+                return remoteMetadata.getRev();
+            }
         } catch (NetworkIOException e) {
             throw new SyncIoException(e);
         } catch (DbxException | IOException e) {
