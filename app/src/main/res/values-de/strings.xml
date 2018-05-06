@@ -224,9 +224,8 @@
     <string name="pref_summary_behavior_auto_guess_missing_data">Versuche fehlende Tankfüllungen zu erkennen. Dadurch werden die erheblich geringeren Benzinverbräuche, die entstehen, wenn eine Tankfüllung verbessen wird einzutragen, ausgeglichen.</string>
     <string name="pref_summary_sync_setup">Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>
     <string name="pref_summary_sync_current_provider">Verbunden mit %s. Klicke, um die Verbindung zu trennen.</string>
-    <string name="pref_summary_backup">Daten auf der SD-Karte sichern.</string>
-    <string name="pref_summary_restore">Daten aus der Datei %s von der SD-Karte wiederherstellen.</string>
-    <string name="pref_summary_restore_no_data">Die Datei %s wurde nicht auf der SD-Karte gefunden.</string>
+    <string name="pref_summary_backup">Daten in lokalen Speicher sichern.</string>
+    <string name="pref_summary_restore">Daten aus einer Datei wiederherstellen.</string>
     <string name="pref_summary_export_csv">Daten als CSV exportieren, um sie in anderen Programmen wie Microsoft Excel oder LibreOffice Calc verwenden zu können.</string>
     <string name="pref_summary_import_csv">Daten von CSV-Dateien importieren. Die Dateien müssen so aussehen, wie die, die beim Export generiert werden.</string>
     <string name="pref_summary_import_csv_no_data">Es wurden Dateien im Ordner %s auf der SD-Karte gefunden.</string>

@@ -23,8 +23,12 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -59,6 +63,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     private static final int REQUEST_RESTORE_PERMISSIONS = 17;
     private static final int REQUEST_EXPORT_CSV_PERMISSIONS = 18;
     private static final int REQUEST_IMPORT_CSV_PERMISSIONS = 19;
+    private static final int REQUEST_SELECT_RESTORE_FILE = 20;
 
     private AccountManager mAccountManager;
     private Backup mBackup;
@@ -209,7 +214,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     .show(getFragmentManager(), null);
         } else if (mBackup.backup()) {
             Toast.makeText(getActivity(),
-                    getString(R.string.toast_backup_succeeded, Backup.FILE_NAME),
+                    getString(R.string.toast_backup_succeeded, mBackup.getBackupFile().getAbsolutePath()),
                     Toast.LENGTH_SHORT).show();
             setupRestorePreference();
         } else {
@@ -263,11 +268,21 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     getString(R.string.alert_restore_message),
                     R.string.restore, android.R.string.cancel)
                     .show(getFragmentManager(), null);
-        } else if (mBackup.restore()) {
-            Toast.makeText(getActivity(), R.string.toast_restore_succeeded,
-                    Toast.LENGTH_SHORT).show();
         } else {
-            showError(getString(R.string.alert_restore_failed));
+            Intent chooserSpecIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            chooserSpecIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            chooserSpecIntent.setType("*/*");
+
+            try {
+                startActivityForResult(
+                        Intent.createChooser(
+                                chooserSpecIntent,
+                                getString(R.string.pref_action_select_backup_file)),
+                        REQUEST_SELECT_RESTORE_FILE);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(getActivity(), R.string.pref_summary_no_file_selector,
+                        Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -289,16 +304,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
 
     private void setupRestorePreference() {
         Preference restore = findPreference("restore");
-        if (mBackup.backupFileExists()) {
-            restore.setSummary(getString(R.string.pref_summary_restore,
-                    Backup.FILE_NAME));
-            restore.setEnabled(true);
-        } else {
-            restore.setSummary(getString(R.string.pref_summary_restore_no_data,
-                    Backup.FILE_NAME));
-            restore.setEnabled(false);
-        }
-
+        restore.setSummary(getString(R.string.pref_summary_restore));
+        restore.setEnabled(true);
         restore.setOnPreferenceClickListener(
                 createOnClickListenerToAskForStorageAccess(REQUEST_RESTORE_PERMISSIONS));
     }
@@ -353,5 +360,37 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         MessageDialogFragment.newInstance(this, 0, R.string.alert_error_title,
                 message, android.R.string.ok, null)
                 .show(getFragmentManager(), null);
+    }
+
+    /**
+     * Uses the result of a file chooser for restoring a backup.
+     * @see PreferenceFragment#onActivityResult(int, int, Intent)
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_SELECT_RESTORE_FILE) {
+            if (resultCode == Activity.RESULT_OK) {
+                Uri backupUri = data.getData();
+                if (backupUri != null) {
+                    Log.d(TAG, backupUri.getPath());
+                    if (!backupUri.getPath().
+                            matches(".*[/:](cr-[0-9]+-[0-9]+-[0-9]+\\.db|carreport\\.backup)$")) {
+                        Toast.makeText(getActivity(), R.string.pref_summary_restore_file_seems_wrong,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        if (mBackup.restore(backupUri)) {
+                            Toast.makeText(getActivity(), R.string.toast_restore_succeeded,
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            showError(getString(R.string.alert_restore_failed));
+                        }
+                    }
+                } else {
+                    Toast.makeText(getActivity(), R.string.pref_summary_restore_file_seems_wrong,
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

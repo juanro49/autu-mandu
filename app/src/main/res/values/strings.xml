@@ -227,12 +227,14 @@
     <string name="pref_summary_behavior_auto_guess_missing_data">Try to recognize missing refuelings. This will balance the significantly lower fuel consumptions, that occure when you forget to insert a refueling.</string>
     <string name="pref_summary_sync_setup">This is a very basic synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>
     <string name="pref_summary_sync_current_provider">Linked to %s. Click to unlink.</string>
-    <string name="pref_summary_backup">Backup the current data to SD card.</string>
-    <string name="pref_summary_restore">Restore data from file %s on SD card.</string>
-    <string name="pref_summary_restore_no_data">File %s does not exist on SD card.</string>
+    <string name="pref_summary_backup">Backup the current data to local storage.</string>
+    <string name="pref_summary_restore">Restore data from a file in your storage.</string>
     <string name="pref_summary_export_csv">Export data as CSV so you can use it in other programs like Microsoft Excel or LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Import data from CSV files. The files must look like the ones, that are generated during CSV export.</string>
     <string name="pref_summary_import_csv_no_data">Files do not exist in directory %s on SD card.</string>
+    <string name="pref_action_select_backup_file">Select file to restore from.</string>
+    <string name="pref_summary_no_file_selector">There is no file selector installed on your phone. Can\'t restore.</string>
+    <string name="pref_summary_restore_file_seems_wrong">The selected file seems to be not right or nothing selected.</string>
     
     <string name="help_section_getting_started">Getting Started</string>
     <string name="help_section_tips">Tips</string>
