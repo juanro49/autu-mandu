@@ -277,4 +277,16 @@
     <string name="drag_handle_desc">Drag-Bereich</string>
     <string name="quit_snooze_desc">Schlummern beenden</string>
     <string name="notice_not_paid">Nicht bezahlt</string>
+    <string name="empty_if_unknown">Bitte leer lassen, wenn Sie nicht wissen, was einzutragen ist.</string>
+    <string name="toast_auto_backup_succeeded">Auto-Backup erfolgreich.</string>
+    <string name="toast_auto_backup_failed">Auto-Backup fehlgeschlagen.</string>
+    <string name="pref_title_behavior_auto_backup">Aktiviere automatische Backups</string>
+    <string name="pref_title_behavior_keep_backups">Anzahl der Backups</string>
+    <string name="pref_title_backup_location">Backup-Ziel</string>
+    <string name="pref_summary_backup_location">Ein Pfad, an dem Backups abgelegt werden. Wenn nicht gesetzt, wird ein Ordner auf der SD oder im internen Speicher angelegt.</string>
+    <string name="pref_summary_behavior_auto_backup">Ein Backup beim Öffnen der App starten, maximal einmal am Tag.</string>
+    <string name="pref_summary_behavior_keep_backups">Behalte maximal eine gewisse Anzahl an Backups.</string>
+    <string name="pref_action_select_backup_file">Datei für Wiederherstellung wählen</string>
+    <string name="pref_summary_no_file_selector">Auf diesem Gerät fehlt eine App zum auswählen des Backups.</string>
+    <string name="pref_summary_restore_file_seems_wrong">Es wurde nicht ausgewählt oder die Datei scheint nicht für eine Wiederherstellung geeignet.</string>
 </resources>
