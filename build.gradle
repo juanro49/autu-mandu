@@ -2,8 +2,8 @@ buildscript {
     ext.versions = [
         'compileSdk': 27,
         'targetSdk': 27,
-        'supportLibrary': '27.1.0',
-        'playServices': '11.8.0'
+        'supportLibrary': '27.1.1',
+        'playServices': '15.0.1'
     ]
 
     repositories {
