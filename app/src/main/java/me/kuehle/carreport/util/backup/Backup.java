@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -58,6 +59,29 @@ public class Backup {
     public File getBackupFile() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return new File(prefs.getBackupPath(), "cr-" + df.format(new Date()) + ".db");
+    }
+
+    /**
+     * Do an automatically triggered backup, if necessary.
+     * @return true or false corresponding to {@link #backup()} or null, if no backup needed.
+     */
+    public Boolean autoBackup() {
+        if (backupFileExists() || !prefs.getAutoBackupEnabled()) {
+            return null;
+        } else {
+            boolean rtn = backup();
+            if (rtn) {
+                File backupDir = getBackupFile().getParentFile();
+                File[] backupFiles = backupDir.listFiles(file -> file.getName().matches(
+                        "cr-[0-9]+-[0-9]+-[0-9]+\\.db"));
+                Arrays.sort(backupFiles);
+                for (int deletionIndex = backupFiles.length - prefs.getAutoBackupRetention() - 1;
+                     deletionIndex >= 0; deletionIndex--) {
+                    backupFiles[deletionIndex].delete();
+                }
+            }
+            return rtn;
+        }
     }
 
     /**

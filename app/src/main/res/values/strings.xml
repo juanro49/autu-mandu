@@ -103,6 +103,7 @@
     <string name="overwrite">Overwrite</string>
     <string name="restore">Restore</string>
     <string name="import_">Import</string>
+    <string name="empty_if_unknown">Please leave empty if you don\'t know what to enter here.</string>
     
     <string name="title_first_start">First steps</string>
     <string name="title_add_refueling">Add refueling</string>
@@ -166,6 +167,8 @@
     <string name="toast_export_csv_succeeded">Export to SD card completed successfully.</string>
     <string name="toast_import_csv_succeeded">Import completed successfully.</string>
     <string name="toast_need_storage_permission">To perform this action Car Report needs to have access to your files.</string>
+    <string name="toast_auto_backup_succeeded">Automatic backup succeeded.</string>
+    <string name="toast_auto_backup_failed">Automatic backup failed.</string>
     
     <string name="report_title_fuel_consumption">Fuel consumption</string>
     <string name="report_title_fuel_price">Fuel price</string>
@@ -222,6 +225,7 @@
     <string name="pref_title_unit_fuel_consumption">Fuel Consumption</string>
     <string name="pref_title_sync_setup">Set up synchronization</string>
     <string name="pref_title_backup">Backup</string>
+    <string name="pref_title_backup_location">Backup target</string>
     <string name="pref_title_restore">Restore</string>
     <string name="pref_title_exportcsv">Export CSV</string>
     <string name="pref_title_importcsv">Import CSV</string>
@@ -230,6 +234,7 @@
     <string name="pref_summary_sync_setup">This is a very basic synchronization. When you change data on two devices simultaniously and then synchronize, the device, which synchronizes last, will loose its changes. Also make sure you have the same version of Car Report on all devices.</string>
     <string name="pref_summary_sync_current_provider">Linked to %s. Click to unlink.</string>
     <string name="pref_summary_backup">Backup the current data to local storage.</string>
+    <string name="pref_summary_backup_location">A path where backups are stored. If empty, a separate folder inside your internal storage or SD will be used.</string>
     <string name="pref_summary_restore">Restore data from a file in your storage.</string>
     <string name="pref_summary_export_csv">Export data as CSV so you can use it in other programs like Microsoft Excel or LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Import data from CSV files. The files must look like the ones, that are generated during CSV export.</string>

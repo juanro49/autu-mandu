@@ -33,7 +33,7 @@
             android:key="behavior_auto_backup"
             android:summary="@string/pref_summary_behavior_auto_backup"
             android:title="@string/pref_title_behavior_auto_backup" />
-        <EditTextPreference
+        <me.kuehle.carreport.gui.util.IntEditTextPreference
             android:dependency="behavior_auto_backup"
             android:defaultValue="12"
             android:key="behaviour_keep_backups"
@@ -42,6 +42,14 @@
             android:singleLine="true"
             android:summary="@string/pref_summary_behavior_keep_backups"
             android:title="@string/pref_title_behavior_keep_backups" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:dialogMessage="@string/empty_if_unknown"
+            android:key="backup_folder"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:summary="@string/pref_summary_backup_location"
+            android:title="@string/pref_title_backup_location" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_export" >
         <Preference

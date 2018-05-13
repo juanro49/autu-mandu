@@ -19,13 +19,17 @@ package me.kuehle.carreport.gui;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SyncInfo;
 import android.content.SyncStatusObserver;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -44,6 +48,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -59,6 +64,7 @@ import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.util.DemoData;
+import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 import me.kuehle.carreport.util.sync.Authenticator;
 import me.kuehle.carreport.util.sync.SyncProviders;
@@ -155,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements
                 ContentResolver.SYNC_OBSERVER_TYPE_PENDING |
                         ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE,
                 mSyncStatusObserver);
+
+        new BackupHook().execute(this);
     }
 
     @Override
@@ -532,5 +540,20 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return null;
+    }
+
+    static class BackupHook extends AsyncTask<Context, Void, Void> {
+        @Override
+        protected Void doInBackground(Context... context) {
+            Backup backup = new Backup(context[0]);
+            Boolean result = backup.autoBackup();
+            if (result != null) {
+                Handler resultHandler = new Handler(context[0].getMainLooper());
+                resultHandler.post(() -> Toast.makeText(context[0],
+                        (result ? R.string.toast_auto_backup_succeeded :
+                        R.string.toast_auto_backup_failed), Toast.LENGTH_SHORT).show());
+            }
+            return null;
+        }
     }
 }

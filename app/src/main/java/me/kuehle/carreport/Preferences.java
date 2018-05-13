@@ -164,10 +164,19 @@ public class Preferences {
 
     public String getBackupPath() {
         final String key = "backup_folder";
-        String backupDir = new File(Environment.getExternalStorageDirectory(),
-                "CarReportBackups").getAbsolutePath();
+        String savedValue = mPrefs.getString(key, "");
+        return (savedValue.isEmpty() ? new File(Environment.getExternalStorageDirectory(),
+                "CarReportBackups").getAbsolutePath() : savedValue);
+    }
 
-        return mPrefs.getString(key, backupDir);
+    public boolean getAutoBackupEnabled() {
+        final String key = "behavior_auto_backup";
+        return mPrefs.getBoolean(key, false);
+    }
+
+    public int getAutoBackupRetention() {
+        final String key = "behaviour_keep_backups";
+        return mPrefs.getInt(key, 12);
     }
 
     // Deprecated Dropbox and Google Drive sync settings
