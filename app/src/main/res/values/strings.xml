@@ -214,6 +214,8 @@
     <string name="pref_title_behavior_price_entry_mode">Price Entry Mode</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Balance missing refuelings (Beta)</string>
     <string name="pref_title_behavior_reminder_snooze_duration">Reminder snooze duration</string>
+    <string name="pref_title_behavior_auto_backup">Enable automatic backups</string>
+    <string name="pref_title_behavior_keep_backups">Count of backups kept</string>
     <string name="pref_title_unit_currency">Currency</string>
     <string name="pref_title_unit_volume">Volume</string>
     <string name="pref_title_unit_distance">Distance</string>
@@ -232,6 +234,8 @@
     <string name="pref_summary_export_csv">Export data as CSV so you can use it in other programs like Microsoft Excel or LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Import data from CSV files. The files must look like the ones, that are generated during CSV export.</string>
     <string name="pref_summary_import_csv_no_data">Files do not exist in directory %s on SD card.</string>
+    <string name="pref_summary_behavior_auto_backup">Do a backup when opening the main screen, maximum once daily.</string>
+    <string name="pref_summary_behavior_keep_backups">Keep at maximum a defined number of backup when doing automatic backups.</string>
     <string name="pref_action_select_backup_file">Select file to restore from.</string>
     <string name="pref_summary_no_file_selector">There is no file selector installed on your phone. Can\'t restore.</string>
     <string name="pref_summary_restore_file_seems_wrong">The selected file seems to be not right or nothing selected.</string>
