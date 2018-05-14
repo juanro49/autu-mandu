@@ -58,6 +58,7 @@ import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.gui.util.AutoBackupTask;
 import me.kuehle.carreport.gui.util.NewRefuelingSnackbar;
 import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements
                         ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE,
                 mSyncStatusObserver);
 
-        new BackupHook().execute(this);
+        new AutoBackupTask(this).execute();
     }
 
     @Override
@@ -540,20 +541,5 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return null;
-    }
-
-    static class BackupHook extends AsyncTask<Context, Void, Void> {
-        @Override
-        protected Void doInBackground(Context... context) {
-            Backup backup = new Backup(context[0]);
-            Boolean result = backup.autoBackup();
-            if (result != null) {
-                Handler resultHandler = new Handler(context[0].getMainLooper());
-                resultHandler.post(() -> Toast.makeText(context[0],
-                        (result ? R.string.toast_auto_backup_succeeded :
-                        R.string.toast_auto_backup_failed), Toast.LENGTH_SHORT).show());
-            }
-            return null;
-        }
     }
 }
