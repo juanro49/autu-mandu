@@ -19,10 +19,12 @@ package me.kuehle.carreport;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -158,6 +160,23 @@ public class Preferences {
         Editor edit = mPrefs.edit();
         edit.putString("behavior_report_order", TextUtils.join(",", reportNames));
         edit.apply();
+    }
+
+    public String getBackupPath() {
+        final String key = "backup_folder";
+        String savedValue = mPrefs.getString(key, "");
+        return (savedValue.isEmpty() ? new File(Environment.getExternalStorageDirectory(),
+                "CarReportBackups").getAbsolutePath() : savedValue);
+    }
+
+    public boolean getAutoBackupEnabled() {
+        final String key = "behavior_auto_backup";
+        return mPrefs.getBoolean(key, false);
+    }
+
+    public int getAutoBackupRetention() {
+        final String key = "behaviour_keep_backups";
+        return mPrefs.getInt(key, 12);
     }
 
     // Deprecated Dropbox and Google Drive sync settings

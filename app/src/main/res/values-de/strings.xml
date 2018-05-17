@@ -224,9 +224,8 @@
     <string name="pref_summary_behavior_auto_guess_missing_data">Versuche fehlende Tankfüllungen zu erkennen. Dadurch werden die erheblich geringeren Benzinverbräuche, die entstehen, wenn eine Tankfüllung verbessen wird einzutragen, ausgeglichen.</string>
     <string name="pref_summary_sync_setup">Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>
     <string name="pref_summary_sync_current_provider">Verbunden mit %s. Klicke, um die Verbindung zu trennen.</string>
-    <string name="pref_summary_backup">Daten auf der SD-Karte sichern.</string>
-    <string name="pref_summary_restore">Daten aus der Datei %s von der SD-Karte wiederherstellen.</string>
-    <string name="pref_summary_restore_no_data">Die Datei %s wurde nicht auf der SD-Karte gefunden.</string>
+    <string name="pref_summary_backup">Daten in lokalen Speicher sichern.</string>
+    <string name="pref_summary_restore">Daten aus einer Datei wiederherstellen.</string>
     <string name="pref_summary_export_csv">Daten als CSV exportieren, um sie in anderen Programmen wie Microsoft Excel oder LibreOffice Calc verwenden zu können.</string>
     <string name="pref_summary_import_csv">Daten von CSV-Dateien importieren. Die Dateien müssen so aussehen, wie die, die beim Export generiert werden.</string>
     <string name="pref_summary_import_csv_no_data">Es wurden Dateien im Ordner %s auf der SD-Karte gefunden.</string>
@@ -278,4 +277,16 @@
     <string name="drag_handle_desc">Drag-Bereich</string>
     <string name="quit_snooze_desc">Schlummern beenden</string>
     <string name="notice_not_paid">Nicht bezahlt</string>
+    <string name="empty_if_unknown">Bitte leer lassen, wenn Sie nicht wissen, was einzutragen ist.</string>
+    <string name="toast_auto_backup_succeeded">Auto-Backup erfolgreich.</string>
+    <string name="toast_auto_backup_failed">Auto-Backup fehlgeschlagen.</string>
+    <string name="pref_title_behavior_auto_backup">Aktiviere automatische Backups</string>
+    <string name="pref_title_behavior_keep_backups">Anzahl der Backups</string>
+    <string name="pref_title_backup_location">Backup-Ziel</string>
+    <string name="pref_summary_backup_location">Ein Pfad, an dem Backups abgelegt werden. Wenn nicht gesetzt, wird ein Ordner auf der SD oder im internen Speicher angelegt.</string>
+    <string name="pref_summary_behavior_auto_backup">Ein Backup beim Öffnen der App starten, maximal einmal am Tag.</string>
+    <string name="pref_summary_behavior_keep_backups">Behalte maximal eine gewisse Anzahl an Backups.</string>
+    <string name="pref_action_select_backup_file">Datei für Wiederherstellung wählen</string>
+    <string name="pref_summary_no_file_selector">Auf diesem Gerät fehlt eine App zum auswählen des Backups.</string>
+    <string name="pref_summary_restore_file_seems_wrong">Es wurde nicht ausgewählt oder die Datei scheint nicht für eine Wiederherstellung geeignet.</string>
 </resources>
