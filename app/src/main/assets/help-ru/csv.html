@@ -1,0 +1,52 @@
+<h1>Общее</h1>
+<p>Вся база данных экспортируется по одному файлу на каждую таблицу.
+Это значит, что данные об одной заправке распределяются между несколькими файлами.
+Код авто можно найти в таблице cars в колонке Id.</p>
+
+<h1>Колонки</h1>
+<big>cars</big>
+<p>_id: [int]<br>
+car__name: [string]<br>
+color: [int] Подробнее в <a href="http://developer.android.com/reference/android/graphics/Color.html">документации о цветах android</a>, где описано, как вычисляются значения.<br>
+initial_mileage: [int] Начальный пробег авто при доавлении в приложение.<br>
+suspended_since: [date]</p>
+
+<big>fuel_types</big>
+<p>_id: [int]<br>
+fuel_type__name: [string]<br>
+category: [string]</p>
+
+<big>other_costs</big>
+<p>_id: [int]<br>
+car_id: [int] код авто.<br>
+mileage: [int] Общий пробег (одометр).<br>
+price: [float]<br>
+recurrence_interval: [int] 0 = один раз, 1 = каждый день, 2 = каждый месяц, 3 = квартал, 4 = год<br>
+recurrence_multiplier: [int] множитель к recurrence_interval. Например: interval = 2 и multiplier = 5 означает раз в 5 месяцев.<br>
+title: [string]<br>
+date: [date]<br>
+note: [string]<br>
+end_date: [date] Дата окончания повторения.</p>
+
+<big>refuelings</big>
+<p>_id: [int]<br>
+partial: [bool] (1 или 0)<br>
+date: [date]<br>
+note: [string]<br>
+volume: [float]<br>
+fuel_type: [int] код (Id) типа топлива.<br>
+price: [float]<br>
+mileage: [int] Общий пробег (одометр).<br>
+car_id: [int] код авто.</p>
+
+<big>reminders</big>
+<p>_id: [int]<br>
+title: [string]<br>
+after_time_span_unit: [int] 0 = дней, 1 = месяцев, 2 = лет<br>
+after_time_span_count: [int] Отрезок времени вместе с with after_time_span_unit. Например: unit = 1 и count = 5 означает через 5 месяцев.<br>
+after_distance: [int]<br>
+start_date: [date]<br>
+start_mileage: [int]<br>
+car_id: [int] код авто.<br>
+notification_dismissed: [bool] (1 или 0)<br>
+snoozed_until: [date]</p>
