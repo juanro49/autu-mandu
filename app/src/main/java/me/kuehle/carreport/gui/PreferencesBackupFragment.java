@@ -27,6 +27,7 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -64,6 +65,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     private static final int REQUEST_EXPORT_CSV_PERMISSIONS = 18;
     private static final int REQUEST_IMPORT_CSV_PERMISSIONS = 19;
     private static final int REQUEST_SELECT_RESTORE_FILE = 20;
+    private static final int REQUEST_AUTO_BACKUP_PERMISSIONS = 21;
 
     private AccountManager mAccountManager;
     private Backup mBackup;
@@ -137,6 +139,10 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             Preference backup = findPreference("backup");
             backup.setOnPreferenceClickListener(
                     createOnClickListenerToAskForStorageAccess(REQUEST_BACKUP_PERMISSIONS));
+
+            Preference autoBackup = findPreference("behavior_auto_backup");
+            autoBackup.setOnPreferenceChangeListener(
+                    createOnChangeListenerToAskForStorageAccess(REQUEST_AUTO_BACKUP_PERMISSIONS));
         }
 
         // Restore
@@ -198,9 +204,19 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 doImportCSV(false);
             }
+        } else if (requestCode == REQUEST_AUTO_BACKUP_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                enableAutoBackup();
+            }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private void enableAutoBackup() {
+        SharedPreferences.Editor prefEditor = findPreference("behavior_auto_backup").getEditor();
+        prefEditor.putBoolean("behavior_auto_backup", true);
+        prefEditor.apply();
     }
 
     private void doBackup(boolean userWasAskedForOverwrite) {
@@ -330,6 +346,32 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         }
     }
 
+    private Preference.OnPreferenceChangeListener createOnChangeListenerToAskForStorageAccess(
+            final int requestCode) {
+        final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        return new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                if(((Boolean)o)) {
+                    if (ContextCompat.checkSelfPermission(getActivity(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                            PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                            Toast.makeText(getActivity(), R.string.toast_need_storage_permission,
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                        ActivityCompat.requestPermissions(getActivity(), permissions, requestCode);
+                        return false;
+                    }
+                }
+                return true;
+            }
+        };
+    }
+
     private OnPreferenceClickListener createOnClickListenerToAskForStorageAccess(final int requestCode) {
         final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
@@ -372,7 +414,6 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             if (resultCode == Activity.RESULT_OK) {
                 Uri backupUri = data.getData();
                 if (backupUri != null) {
-                    Log.d(TAG, backupUri.getPath());
                     if (!backupUri.getPath().
                             matches(".*[/:](cr-[0-9]+-[0-9]+-[0-9]+\\.db|carreport\\.backup)$")) {
                         Toast.makeText(getActivity(), R.string.pref_summary_restore_file_seems_wrong,
