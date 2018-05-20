@@ -16,7 +16,11 @@
 
 package me.kuehle.carreport.gui;
 
+import android.os.Build;
+import android.preference.PreferenceFragment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
@@ -44,5 +48,17 @@ public class PreferencesActivity extends AbstractPreferenceActivity implements
                 PreferencesBackupFragment.class,
                 PreferencesAboutFragment.class
         };
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            for (PreferenceFragment pf : getAttachedFragments()) {
+                if (pf.isVisible()) {
+                    Log.d("PrefAct", "Sending to "+ pf.getClass().getCanonicalName());
+                    pf.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                }
+            }
+        }
     }
 }

@@ -27,13 +27,13 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
+import android.preference.TwoStatePreference;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -214,9 +214,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     }
 
     private void enableAutoBackup() {
-        SharedPreferences.Editor prefEditor = findPreference("behavior_auto_backup").getEditor();
-        prefEditor.putBoolean("behavior_auto_backup", true);
-        prefEditor.apply();
+        TwoStatePreference autoBackupPref = (TwoStatePreference) findPreference("behavior_auto_backup");
+        autoBackupPref.setChecked(true);
     }
 
     private void doBackup(boolean userWasAskedForOverwrite) {
