@@ -55,7 +55,6 @@ public class PreferencesActivity extends AbstractPreferenceActivity implements
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             for (PreferenceFragment pf : getAttachedFragments()) {
                 if (pf.isVisible()) {
-                    Log.d("PrefAct", "Sending to "+ pf.getClass().getCanonicalName());
                     pf.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 }
             }
