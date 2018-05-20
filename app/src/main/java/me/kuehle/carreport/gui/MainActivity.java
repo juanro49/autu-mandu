@@ -19,13 +19,17 @@ package me.kuehle.carreport.gui;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SyncInfo;
 import android.content.SyncStatusObserver;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -44,6 +48,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -53,12 +58,14 @@ import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.gui.util.AutoBackupTask;
 import me.kuehle.carreport.gui.util.NewRefuelingSnackbar;
 import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
 import me.kuehle.carreport.util.DemoData;
+import me.kuehle.carreport.util.backup.Backup;
 import me.kuehle.carreport.util.sync.AbstractSyncProvider;
 import me.kuehle.carreport.util.sync.Authenticator;
 import me.kuehle.carreport.util.sync.SyncProviders;
@@ -155,6 +162,8 @@ public class MainActivity extends AppCompatActivity implements
                 ContentResolver.SYNC_OBSERVER_TYPE_PENDING |
                         ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE,
                 mSyncStatusObserver);
+
+        new AutoBackupTask(this).execute();
     }
 
     @Override
