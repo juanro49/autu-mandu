@@ -160,7 +160,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 edtPrice.setText(String.valueOf(refueling.getPrice()));
             } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
                 edtVolume.setText(String.valueOf(refueling.getVolume()));
-                edtPrice.setText(String.valueOf(refueling.getPrice() / refueling.getVolume()));
+                if (refueling.getPrice() != 0.0f) {
+                    edtPrice.setText(String.valueOf(refueling.getPrice() / refueling.getVolume()));
+                }
             }
 
             updateMileageInputWarningVisibility();
@@ -191,18 +193,18 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     protected void initFields(Bundle savedInstanceState, View v) {
         final Preferences prefs = new Preferences(getActivity());
 
-        edtDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_date),
+        edtDate = new DateTimeInput(v.findViewById(R.id.edt_date),
                 DateTimeInput.Mode.DATE);
-        edtTime = new DateTimeInput((EditText) v.findViewById(R.id.edt_time),
+        edtTime = new DateTimeInput(v.findViewById(R.id.edt_time),
                 DateTimeInput.Mode.TIME);
-        edtMileage = (EditText) v.findViewById(R.id.edt_mileage);
-        txtMileageWarning = (TextView) v.findViewById(R.id.txt_mileage_input_warning);
-        edtVolume = (EditText) v.findViewById(R.id.edt_volume);
-        chkPartial = (CheckBox) v.findViewById(R.id.chk_partial);
-        edtPrice = (EditText) v.findViewById(R.id.edt_price);
-        spnFuelType = (Spinner) v.findViewById(R.id.spn_fuel_type);
-        edtNote = (EditText) v.findViewById(R.id.edt_note);
-        spnCar = (Spinner) v.findViewById(R.id.spn_car);
+        edtMileage = v.findViewById(R.id.edt_mileage);
+        txtMileageWarning = v.findViewById(R.id.txt_mileage_input_warning);
+        edtVolume = v.findViewById(R.id.edt_volume);
+        chkPartial = v.findViewById(R.id.chk_partial);
+        edtPrice = v.findViewById(R.id.edt_price);
+        spnFuelType = v.findViewById(R.id.spn_fuel_type);
+        edtNote = v.findViewById(R.id.edt_note);
+        spnCar = v.findViewById(R.id.spn_car);
 
         // Date and time
         edtDate.applyOnClickListener(DataDetailRefuelingFragment.this, PICK_DATE_REQUEST_CODE,
@@ -219,12 +221,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         txtMileageWarning.setText(mDistanceEntryMode == DistanceEntryMode.TOTAL
                 ? R.string.validate_error_mileage_out_of_range_total
                 : R.string.validate_error_mileage_out_of_range_trip);
-        edtMileage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                updateMileageInputWarningVisibility();
-            }
-        });
+        edtMileage.setOnFocusChangeListener((v1, hasFocus) -> updateMileageInputWarningVisibility());
 
         // Price entry mode
         mPriceEntryMode = prefs.getPriceEntryMode();
@@ -264,7 +261,8 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 
         validator.add(new FormFieldGreaterZeroValidator(edtMileage));
         validator.add(new FormFieldGreaterZeroValidator(edtVolume));
-        if (prefs.getPriceEntryMode() == PriceEntryMode.TOTAL_AND_VOLUME) {
+        if (prefs.getPriceEntryMode() == PriceEntryMode.TOTAL_AND_VOLUME ||
+                prefs.getPriceEntryMode() == PriceEntryMode.PER_UNIT_AND_VOLUME) {
             validator.add(new FormFieldGreaterZeroOrEmptyValidator(edtPrice));
         } else {
             validator.add(new FormFieldGreaterZeroValidator(edtPrice));
