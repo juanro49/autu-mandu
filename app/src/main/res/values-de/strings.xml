@@ -202,7 +202,7 @@
     <string name="pref_title_header_report_order">Reihenfolge der Reports</string>
     <string name="pref_title_category_behavior">Verhalten</string>
     <string name="pref_title_category_units">Einheiten</string>
-    <string name="pref_title_category_synchronization">Synchronisation</string>
+    <string name="pref_title_category_synchronization">Backup-Synchronisierung</string>
     <string name="pref_title_category_backup">Sichern &amp; Wiederherstellen</string>
     <string name="pref_title_category_export">Exportieren &amp; Importieren</string>
     <string name="pref_title_behavior_default_car">Standard-Auto</string>
@@ -215,15 +215,15 @@
     <string name="pref_title_unit_volume">Volumen</string>
     <string name="pref_title_unit_distance">Entfernung</string>
     <string name="pref_title_unit_fuel_consumption">Benzinverbrauch</string>
-    <string name="pref_title_sync_setup">Synchronisation einrichten</string>
+    <string name="pref_title_sync_setup">Backup-Synchronisierung einrichten</string>
     <string name="pref_title_backup">Sichern</string>
     <string name="pref_title_restore">Wiederherstellen</string>
     <string name="pref_title_exportcsv">CSV exportieren</string>
     <string name="pref_title_importcsv">CSV importieren</string>
     <string name="pref_summary_behavior_show_car_menu">Zeige ein Menü zur Autoauswahl, wenn Sie eine Tankfüllung hinzufügen und mehr als ein Auto haben.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Versuche fehlende Tankfüllungen zu erkennen. Dadurch werden die erheblich geringeren Benzinverbräuche, die entstehen, wenn eine Tankfüllung verbessen wird einzutragen, ausgeglichen.</string>
-    <string name="pref_summary_sync_setup">Das ist eine sehr einfache Synchronisation. Wenn Sie auf zwei Geräten gleichzeitig etwas ändern und dann synchronisieren, wird das Gerät, das später synchronisiert, seine Änderungen verlieren. Achten Sie auch darauf die gleiche Version von Car Report auf allen Geräten installiert zu haben.</string>
-    <string name="pref_summary_sync_current_provider">Verbunden mit %s. Klicke, um die Verbindung zu trennen.</string>
+    <string name="pref_summary_sync_setup">Kann bei mehreren Benutzern Daten verlieren, sie ersetzt immer alle Daten. Verwenden Sie bitte die gleiche CarReport-Version auf allen Geräten.</string>
+    <string name="pref_summary_sync_current_provider">Verbunden mit %s. Klicke, um die Verbindung zu trennen. Kann bei mehreren Benutzern Daten verlieren.</string>
     <string name="pref_summary_backup">Daten in lokalen Speicher sichern.</string>
     <string name="pref_summary_restore">Daten aus einer Datei wiederherstellen.</string>
     <string name="pref_summary_export_csv">Daten als CSV exportieren, um sie in anderen Programmen wie Microsoft Excel oder LibreOffice Calc verwenden zu können.</string>
