@@ -222,7 +222,7 @@
     <string name="pref_title_importcsv">CSV importieren</string>
     <string name="pref_summary_behavior_show_car_menu">Zeige ein Menü zur Autoauswahl, wenn Sie eine Tankfüllung hinzufügen und mehr als ein Auto haben.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Versuche fehlende Tankfüllungen zu erkennen. Dadurch werden die erheblich geringeren Benzinverbräuche, die entstehen, wenn eine Tankfüllung verbessen wird einzutragen, ausgeglichen.</string>
-    <string name="pref_summary_sync_setup">Kann bei mehreren Benutzern Daten verlieren, sie ersetzt immer alle Daten. Verwenden Sie bitte die gleiche CarReport-Version auf allen Geräten.</string>
+    <string name="pref_summary_sync_setup">Kann bei Benutzung mit mehreren Personen zu Datenverlust führen. Es werden immer alle Daten ersetzt. Verwenden Sie bitte die gleiche Car Report-Version auf allen Geräten.</string>
     <string name="pref_summary_sync_current_provider">Verbunden mit %s. Klicke, um die Verbindung zu trennen. Kann bei mehreren Benutzern Daten verlieren.</string>
     <string name="pref_summary_backup">Daten in lokalen Speicher sichern.</string>
     <string name="pref_summary_restore">Daten aus einer Datei wiederherstellen.</string>
