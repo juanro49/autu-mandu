@@ -18,32 +18,36 @@ package me.kuehle.carreport.gui.util;
 
 import android.widget.TextView;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+
 import me.kuehle.carreport.R;
 
-public class FormFieldGreaterZeroOrEmptyValidator extends AbstractFormFieldValidator {
-    public FormFieldGreaterZeroOrEmptyValidator(TextView field) {
+public class FormFieldGreaterEqualZeroValidator extends AbstractFormFieldValidator {
+    public FormFieldGreaterEqualZeroValidator(TextView field) {
         super(field);
     }
 
     @Override
     protected int getMessage() {
-        return R.string.validate_error_greater_zero;
+        return R.string.validate_error_greater_equal_zero;
     }
 
     @Override
     protected boolean isValid() {
         String textValue = fields[0].getText().toString();
-        if (textValue.isEmpty()) {
-            return true;
-        }
-
         try {
-            double number = Double.parseDouble(textValue);
-            if (number <= 0) {
+            double number = Double.parseDouble(fields[0].getText().toString());
+            if (number < 0) {
                 return false;
             }
         } catch (NumberFormatException e) {
-            return false;
+            try {
+                Number number = NumberFormat.getNumberInstance().parse(textValue);
+                return ((double) number >= 0);
+            } catch (ParseException f) {
+                return false;
+            }
         }
 
         return true;
