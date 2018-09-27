@@ -200,7 +200,7 @@
     <string name="pref_title_header_reminders">Напоминания</string>
     <string name="pref_title_header_report_order">Порядок отчетов</string>
     <string name="pref_title_header_backup">Копии &amp; экспорт</string>
-    <string name="pref_title_category_synchronization">Синхронизация</string>
+    <!-- needs retranslation <string name="pref_title_category_synchronization">Синхронизация</string>!-->
     <string name="pref_title_category_behavior">Поведение</string>
     <string name="pref_title_category_units">Эдиницы</string>
     <string name="pref_title_category_backup">Копирование &amp; востановление</string>
@@ -215,15 +215,15 @@
     <string name="pref_title_unit_volume">Объем</string>
     <string name="pref_title_unit_distance">Пробег</string>
     <string name="pref_title_unit_fuel_consumption">Расход топлива</string>
-    <string name="pref_title_sync_setup">Настройка синхронизации</string>
+    <!-- needs retranslation <string name="pref_title_sync_setup">Настройка синхронизации</string>!-->
     <string name="pref_title_backup">Резервная копия</string>
     <string name="pref_title_restore">Востановление</string>
     <string name="pref_title_exportcsv">Экспорт CSV</string>
     <string name="pref_title_importcsv">Импорт CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Показывать меню выбора авто при вводе заправки, если есть больше одного авто.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Пытаться определить пропущенные заправки. Если вы забудете ввести заправку, значительное занижение расхода повлечет перерасчет.</string>
-    <string name="pref_summary_sync_setup">Синхронизация работает очень просто. Если вы поменяете данные на двух устройствах одновременно и запустите синхронизацию, устройство синхронизирующееся последним потеряет свои изменения. Убедитесь, что на всех устройствах установленна одна и таже версия Car Report.</string>
-    <string name="pref_summary_sync_current_provider">Соединено с %s. Нажмите чтобы разьединить.</string>
+    <!-- needs retranslation <string name="pref_summary_sync_setup">Синхронизация работает очень просто. Если вы поменяете данные на двух устройствах одновременно и запустите синхронизацию, устройство синхронизирующееся последним потеряет свои изменения. Убедитесь, что на всех устройствах установленна одна и таже версия Car Report.</string>!-->
+    <!-- needs retranslation <string name="pref_summary_sync_current_provider">Соединено с %s. Нажмите чтобы разьединить.</string>!-->
     <string name="pref_summary_backup">Резервное копирование на SD карту.</string>
     <string name="pref_summary_restore">Востановление данных из файла %s на SD карте.</string>
     <string name="pref_summary_restore_no_data">Файл %s отсутствует на SD карте.</string>
