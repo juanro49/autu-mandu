@@ -89,6 +89,7 @@
     <string name="description_webdav_trust_certificate">Die Webseite verwendet ein Zertifikat, dem Android nicht vertraut.</string>
 
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
+    <string name="validate_error_greater_equal_zero">Muss größer oder gleich 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
     <string name="validate_error_mileage_out_of_range_total">Der Kilometerstand muss bei Eingabe der Gesamtkilometer zwischen dem der letzten und der nächsten Tankfüllung liegen. Wenn Sie Tageskilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_mileage_out_of_range_trip">Der kumulierte Kilometerstand darf bei Eingabe der Tageskilometer den Kilometerstand der nächsten Tankfüllung nicht übersteigen. Wenn Sie Gesamtkilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>

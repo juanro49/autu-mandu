@@ -31,6 +31,9 @@ import android.view.ViewParent;
 import android.view.animation.Animation;
 import android.widget.EditText;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportMessageDialogFragment.SupportMessageDialogFragmentListener;
@@ -183,7 +186,12 @@ public abstract class AbstractDataDetailFragment extends Fragment implements
         try {
             return Double.parseDouble(strDouble);
         } catch (NumberFormatException e) {
-            return defaultValue;
+            try {
+                Number number = NumberFormat.getNumberInstance().parse(strDouble);
+                return ((double) number);
+            } catch (Exception f) {
+                return defaultValue;
+            }
         }
     }
 
