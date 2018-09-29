@@ -92,6 +92,7 @@
     <string name="description_webdav_trust_certificate">The website uses a certificate, which is not trusted by Android.</string>
 
     <string name="validate_error_greater_zero">Has to be greater 0</string>
+    <string name="validate_error_greater_equal_zero">Has to be greater or equal 0</string>
     <string name="validate_error_not_empty">Must not be empty</string>
     <string name="validate_error_mileage_out_of_range_total">Mileage needs to be between the mileage of the previous and next refueling in total distance entry mode. If you meant to insert trip distance, you can change entry mode in the settings.</string>
     <string name="validate_error_mileage_out_of_range_trip">The cumulated mileage cannot be higher than the mileage of the next refueling in trip distance entry mode. If you meant to insert total distance, you can change entry mode in the settings.</string>

@@ -38,7 +38,8 @@ import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.util.DateTimeInput;
-import me.kuehle.carreport.gui.util.FormFieldGreaterZeroOrEmptyValidator;
+import me.kuehle.carreport.gui.util.FormFieldGreaterEqualZeroOrEmptyValidator;
+import me.kuehle.carreport.gui.util.FormFieldGreaterEqualZeroValidator;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.provider.car.CarColumns;
@@ -263,9 +264,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         validator.add(new FormFieldGreaterZeroValidator(edtVolume));
         if (prefs.getPriceEntryMode() == PriceEntryMode.TOTAL_AND_VOLUME ||
                 prefs.getPriceEntryMode() == PriceEntryMode.PER_UNIT_AND_VOLUME) {
-            validator.add(new FormFieldGreaterZeroOrEmptyValidator(edtPrice));
+            validator.add(new FormFieldGreaterEqualZeroOrEmptyValidator(edtPrice));
         } else {
-            validator.add(new FormFieldGreaterZeroValidator(edtPrice));
+            validator.add(new FormFieldGreaterEqualZeroValidator(edtPrice));
         }
 
         return validator.validate();
