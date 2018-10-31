@@ -19,7 +19,7 @@ package me.kuehle.carreport.util.sync.provider;
 import android.accounts.Account;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.dropbox.core.DbxException;

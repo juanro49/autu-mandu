@@ -22,7 +22,7 @@
             android:layout_gravity="center_horizontal"
             android:background="?attr/detailsElementBackground">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -211,5 +211,5 @@
             tools:layout_constraintLeft_creator="1"
             tools:layout_constraintRight_creator="1"/>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

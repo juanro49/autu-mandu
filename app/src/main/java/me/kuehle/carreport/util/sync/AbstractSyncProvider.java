@@ -18,8 +18,8 @@ package me.kuehle.carreport.util.sync;
 
 import android.accounts.Account;
 import android.content.Intent;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
 
 import org.json.JSONObject;
 

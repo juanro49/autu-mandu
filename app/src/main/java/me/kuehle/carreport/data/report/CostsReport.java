@@ -18,7 +18,7 @@ package me.kuehle.carreport.data.report;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.util.LongSparseArray;
+import androidx.collection.LongSparseArray;
 import android.text.format.DateFormat;
 
 import org.joda.time.DateTime;

@@ -17,7 +17,7 @@
 package me.kuehle.carreport.gui.util;
 
 import android.content.Context;
-import android.support.design.widget.TextInputLayout;
+import com.google.android.material.textfield.TextInputLayout;
 import android.view.ViewParent;
 import android.widget.TextView;
 
