@@ -20,7 +20,7 @@ import android.content.ContentUris;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
+import com.google.android.material.textfield.TextInputLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;

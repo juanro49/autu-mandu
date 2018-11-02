@@ -66,12 +66,12 @@ dependencies {
     implementation 'com.dropbox.core:dropbox-core-sdk:3.0.8'
 
     // Support, AppCompat
-    implementation "com.android.support:support-v4:${versions.supportLibrary}"
-    implementation "com.android.support:appcompat-v7:${versions.supportLibrary}"
-    implementation "com.android.support:cardview-v7:${versions.supportLibrary}"
-    implementation "com.android.support:recyclerview-v7:${versions.supportLibrary}"
-    implementation "com.android.support:design:${versions.supportLibrary}"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
 
     // Play Services: for Google Drive
     fullImplementation "com.google.android.gms:play-services-auth:${versions.playServices}"
@@ -108,6 +108,6 @@ dependencies {
     implementation 'net.danlew:android.joda:2.9.9.4'
 
     // Required for instrumented tests
-    androidTestImplementation "com.android.support:support-annotations:${versions.supportLibrary}"
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'androidx.annotation:annotation:1.0.0'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
 }

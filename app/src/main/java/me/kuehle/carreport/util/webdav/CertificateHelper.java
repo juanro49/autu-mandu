@@ -16,7 +16,7 @@
 package me.kuehle.carreport.util.webdav;
 
 import android.content.Context;
-import android.support.v4.text.TextUtilsCompat;
+import androidx.core.text.TextUtilsCompat;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Base64;
@@ -31,7 +31,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
