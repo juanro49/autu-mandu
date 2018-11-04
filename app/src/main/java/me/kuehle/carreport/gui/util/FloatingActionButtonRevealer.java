@@ -16,7 +16,7 @@
 package me.kuehle.carreport.gui.util;
 
 import android.os.Handler;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.clans.fab.FloatingActionMenu;
 

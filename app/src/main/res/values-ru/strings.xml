@@ -226,7 +226,7 @@
     <!-- needs retranslation <string name="pref_summary_sync_current_provider">Соединено с %s. Нажмите чтобы разьединить.</string>!-->
     <string name="pref_summary_backup">Резервное копирование на SD карту.</string>
     <string name="pref_summary_restore">Востановление данных из файла %s на SD карте.</string>
-    <string name="pref_summary_restore_no_data">Файл %s отсутствует на SD карте.</string>
+    <!--<string name="pref_summary_restore_no_data">Файл %s отсутствует на SD карте.</string>!-->
     <string name="pref_summary_export_csv">Эксопрт данных в CSV для использования в других программах типа Microsoft Excel или LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Импорт данных из CSV файла. Файлы должны быть похожи на те, что создаются при CSV экспорте.</string>
     <string name="pref_summary_import_csv_no_data">Нет файлов в каталоге %s на SD карте.</string>

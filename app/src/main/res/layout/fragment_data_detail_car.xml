@@ -23,19 +23,19 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
         <!-- Name -->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_name_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_name"
                 android:inputType="text"
                 android:singleLine="true"/>
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Color -->
         <LinearLayout
             android:id="@+id/layout_color"
@@ -63,19 +63,19 @@
                 android:background="@drawable/bg_color_indicator"/>
         </LinearLayout>
         <!-- Initial Mileage -->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_initial_mileage_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/layout_color">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_initial_mileage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_initial_mileage"
                 android:inputType="number"/>
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Suspend -->
         <TextView
             android:id="@+id/txt_section_suspend"
@@ -101,7 +101,7 @@
             android:layout_below="@id/txt_description_suspend"
             android:text="@string/label_suspend"/>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_suspend_date_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -109,11 +109,11 @@
             android:layout_marginLeft="36dp"
             android:layout_marginStart="36dp">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_suspend_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_suspend_date"/>
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
     </RelativeLayout>
 </ScrollView>

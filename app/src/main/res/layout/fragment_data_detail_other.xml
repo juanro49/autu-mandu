@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
         <!-- Title -->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_title_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -31,33 +31,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_title" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Mileage -->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_mileage_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/edt_title_input_layout">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_mileage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_mileage_optional"
                 android:inputType="number" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Price -->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_price_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/edt_mileage_input_layout">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_price"
                 android:inputType="number|numberDecimal" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Section: Advanced -->
         <TextView
             style="@style/AppWidget.SectionHeader"
@@ -67,7 +67,7 @@
             android:layout_below="@id/edt_price_input_layout"
             android:text="@string/section_advanced" />
         <!-- Date -->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_date_input_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -76,13 +76,13 @@
             android:layout_alignParentStart="true"
             android:layout_toLeftOf="@+id/edt_time_input_layout"
             android:layout_toStartOf="@+id/edt_time_input_layout">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_date" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_time_input_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -91,12 +91,12 @@
             android:layout_alignParentEnd="true"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_time"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_time" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Recurrence -->
         <TextView
             style="@style/AppWidget.FloatingSpinnerLabel"
@@ -119,32 +119,32 @@
             android:layout_marginLeft="36dp"
             android:layout_marginStart="36dp"
             android:text="@string/label_set_end_date" />
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_end_date_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/chk_end_date"
             android:layout_marginLeft="36dp"
             android:layout_marginStart="36dp">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_end_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_end_date" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Note -->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_note_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/edt_end_date_input_layout">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/hint_note_optional"
                 android:inputType="text|textMultiLine" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Car -->
         <TextView
             style="@style/AppWidget.FloatingSpinnerLabel"

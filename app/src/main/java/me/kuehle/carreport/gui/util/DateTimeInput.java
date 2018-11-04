@@ -16,8 +16,8 @@
 
 package me.kuehle.carreport.gui.util;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import android.text.InputType;
 import android.widget.EditText;
 
