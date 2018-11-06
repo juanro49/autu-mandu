@@ -26,6 +26,7 @@ import me.kuehle.carreport.provider.base.AbstractSelection;
 /**
  * Selection for the {@code car} table.
  */
+@Deprecated
 public class CarSelection extends AbstractSelection<CarSelection> {
     @Override
     protected Uri baseUri() {

@@ -26,6 +26,7 @@ import me.kuehle.carreport.provider.base.AbstractSelection;
 /**
  * Selection for the {@code fuel_type} table.
  */
+@Deprecated
 public class FuelTypeSelection extends AbstractSelection<FuelTypeSelection> {
     @Override
     protected Uri baseUri() {

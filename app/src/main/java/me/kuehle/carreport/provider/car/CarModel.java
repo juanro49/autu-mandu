@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 /**
  * A car.
  */
+@Deprecated
 public interface CarModel extends BaseModel {
 
     /**

@@ -18,6 +18,7 @@ package me.kuehle.carreport.provider.othercost;
 /**
  * Possible values for the {@code recurrence_interval} column of the {@code other_cost} table.
  */
+@Deprecated
 public enum RecurrenceInterval {
     /**
      * 
