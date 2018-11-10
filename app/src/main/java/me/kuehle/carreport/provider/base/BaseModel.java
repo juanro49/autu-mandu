@@ -15,5 +15,6 @@
  */
 package me.kuehle.carreport.provider.base;
 
+@Deprecated
 public interface BaseModel {
 }

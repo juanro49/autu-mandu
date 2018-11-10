@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.provider.BaseColumns;
 
+@Deprecated
 public abstract class AbstractCursor extends CursorWrapper {
     private final HashMap<String, Integer> mColumnIndexes;
 

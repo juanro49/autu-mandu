@@ -25,17 +25,19 @@ import android.os.Build;
 import android.util.Log;
 
 import me.kuehle.carreport.BuildConfig;
+import me.kuehle.carreport.model.CarReportDatabase;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.othercost.OtherCostColumns;
 import me.kuehle.carreport.provider.refueling.RefuelingColumns;
 import me.kuehle.carreport.provider.reminder.ReminderColumns;
 
+@Deprecated
 public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = DataSQLiteOpenHelper.class.getSimpleName();
 
     public static final String DATABASE_FILE_NAME = "data.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 11;
     private static DataSQLiteOpenHelper sInstance;
     private final Context mContext;
     private final DataSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
@@ -116,36 +118,23 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
     private static DataSQLiteOpenHelper newInstance(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            return newInstancePreHoneycomb(context);
-        }
+        // prepare structures with Room
+        CarReportDatabase roomDB = CarReportDatabase.getInstance(context);
+        roomDB.getCarDao().getAll();
+        roomDB.getFuelTypeDao().getAll();
+        roomDB.getOtherCostDao().getAll();
+        roomDB.getRefuelingDao().getAll();
+        roomDB.getReminderDao().getAll();
+
+        // Execute legacy.
         return newInstancePostHoneycomb(context);
     }
 
 
-    /*
-     * Pre Honeycomb.
-     */
-    private static DataSQLiteOpenHelper newInstancePreHoneycomb(Context context) {
-        return new DataSQLiteOpenHelper(context);
-    }
-
-    private DataSQLiteOpenHelper(Context context) {
-        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION);
-        mContext = context;
-        mOpenHelperCallbacks = new DataSQLiteOpenHelperCallbacks();
-    }
-
-
-    /*
-     * Post Honeycomb.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static DataSQLiteOpenHelper newInstancePostHoneycomb(Context context) {
         return new DataSQLiteOpenHelper(context, new DefaultDatabaseErrorHandler());
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private DataSQLiteOpenHelper(Context context, DatabaseErrorHandler errorHandler) {
         super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION, errorHandler);
         mContext = context;
@@ -157,11 +146,7 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         if (BuildConfig.DEBUG) Log.d(TAG, "onCreate");
         mOpenHelperCallbacks.onPreCreate(mContext, db);
-        db.execSQL(SQL_CREATE_TABLE_CAR);
-        db.execSQL(SQL_CREATE_TABLE_FUEL_TYPE);
-        db.execSQL(SQL_CREATE_TABLE_OTHER_COST);
-        db.execSQL(SQL_CREATE_TABLE_REFUELING);
-        db.execSQL(SQL_CREATE_TABLE_REMINDER);
+        // Do nothing any more here, action happens in CarReportDatabase
         mOpenHelperCallbacks.onPostCreate(mContext, db);
     }
 
@@ -170,6 +155,7 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
         super.onOpen(db);
         if (!db.isReadOnly()) {
             setForeignKeyConstraintsEnabled(db);
+
         }
         mOpenHelperCallbacks.onOpen(mContext, db);
     }
@@ -193,6 +179,7 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        mOpenHelperCallbacks.onUpgrade(mContext, db, oldVersion, newVersion);
+        // Do nothing here, action happens in CarReportDatabase
+        //mOpenHelperCallbacks.onUpgrade(mContext, db, oldVersion, newVersion);
     }
 }

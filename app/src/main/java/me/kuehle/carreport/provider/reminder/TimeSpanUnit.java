@@ -18,6 +18,7 @@ package me.kuehle.carreport.provider.reminder;
 /**
  * Possible values for the {@code after_time_span_unit} column of the {@code reminder} table.
  */
+@Deprecated
 public enum TimeSpanUnit {
     /**
      * 

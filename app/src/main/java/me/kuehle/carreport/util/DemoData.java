@@ -158,6 +158,7 @@ public class DemoData {
         return getIdFromUri(new CarContentValues()
                 .putName(name)
                 .putColor(color)
+                .putInitialMileage(0)
                 .insert(context.getContentResolver()));
     }
 

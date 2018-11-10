@@ -19,6 +19,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
 
+@Deprecated
 public abstract class AbstractContentValues {
     protected final ContentValues mContentValues = new ContentValues();
 

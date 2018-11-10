@@ -22,6 +22,7 @@ import java.util.List;
 import android.content.ContentResolver;
 import android.net.Uri;
 
+@Deprecated
 public abstract class AbstractSelection<T extends AbstractSelection<?>> {
     private static final String EQ = "=?";
     private static final String PAREN_OPEN = "(";

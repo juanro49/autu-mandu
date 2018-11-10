@@ -8,7 +8,8 @@ android {
         targetSdkVersion versions.targetSdk
         versionCode 73
         versionName "3.23.0"
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     signingConfigs {
         release {
@@ -45,6 +46,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    // 2018 style of testing
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
 }
 
 repositories {
@@ -56,6 +61,9 @@ repositories {
 }
 
 dependencies {
+    // Multidex
+    implementation 'com.android.support:multidex:1.0.3'
+
     // Charts
     implementation 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
 
@@ -72,6 +80,11 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+
+    // Room Persistence
+    def room_version = "2.1.0-alpha02"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 
     // Play Services: for Google Drive
     fullImplementation "com.google.android.gms:play-services-auth:${versions.playServices}"

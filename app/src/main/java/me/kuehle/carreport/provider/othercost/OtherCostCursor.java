@@ -27,6 +27,7 @@ import me.kuehle.carreport.provider.car.*;
 /**
  * Cursor wrapper for the {@code other_cost} table.
  */
+@Deprecated
 public class OtherCostCursor extends AbstractCursor implements OtherCostModel {
     public OtherCostCursor(Cursor cursor) {
         super(cursor);

@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 /**
  * A refueling for a car.
  */
+@Deprecated
 public interface RefuelingModel extends BaseModel {
 
     /**
