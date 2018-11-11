@@ -32,6 +32,7 @@ import android.provider.BaseColumns;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
+@Deprecated
 public abstract class BaseContentProvider extends ContentProvider {
     public static final String QUERY_NOTIFY = "QUERY_NOTIFY";
     public static final String QUERY_GROUP_BY = "QUERY_GROUP_BY";

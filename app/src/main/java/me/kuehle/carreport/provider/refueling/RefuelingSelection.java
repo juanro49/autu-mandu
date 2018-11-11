@@ -28,6 +28,7 @@ import me.kuehle.carreport.provider.car.*;
 /**
  * Selection for the {@code refueling} table.
  */
+@Deprecated
 public class RefuelingSelection extends AbstractSelection<RefuelingSelection> {
     @Override
     protected Uri baseUri() {

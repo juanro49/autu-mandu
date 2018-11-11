@@ -28,6 +28,7 @@ import me.kuehle.carreport.provider.car.*;
 /**
  * Cursor wrapper for the {@code refueling} table.
  */
+@Deprecated
 public class RefuelingCursor extends AbstractCursor implements RefuelingModel {
     public RefuelingCursor(Cursor cursor) {
         super(cursor);

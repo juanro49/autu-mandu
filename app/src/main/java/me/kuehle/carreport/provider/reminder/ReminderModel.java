@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 /**
  * A reminder for a certain event of a car.
  */
+@Deprecated
 public interface ReminderModel extends BaseModel {
 
     /**

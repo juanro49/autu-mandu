@@ -24,6 +24,7 @@ import me.kuehle.carreport.provider.base.AbstractCursor;
 /**
  * Cursor wrapper for the {@code fuel_type} table.
  */
+@Deprecated
 public class FuelTypeCursor extends AbstractCursor implements FuelTypeModel {
     public FuelTypeCursor(Cursor cursor) {
         super(cursor);

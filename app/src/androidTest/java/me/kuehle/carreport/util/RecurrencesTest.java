@@ -18,17 +18,24 @@
 
 package me.kuehle.carreport.util;
 
-import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import androidx.test.filters.SmallTest;
 import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
 
-public class RecurrencesTest extends TestCase {
+import static org.junit.Assert.*;
+
+@SmallTest
+public class RecurrencesTest {
     private DateFormat parser;
 
+    @Before
     public void setUp() {
         parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US);
     }
@@ -36,6 +43,7 @@ public class RecurrencesTest extends TestCase {
     /**
      * A default test to ensure behaviour does not change.
      */
+    @Test
     public void testGetRecurrencesBetweenDefaultTimeframe() throws Exception {
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
@@ -90,6 +98,7 @@ public class RecurrencesTest extends TestCase {
      * This test should behave same as {@link #testGetRecurrencesBetweenDefaultTimeframe()} as the
      * time frame is always extended in front of the start.
      */
+    @Test
     public void testGetRecurrencesBetweenWithLongerTimeFrame() throws Exception {
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
@@ -161,6 +170,7 @@ public class RecurrencesTest extends TestCase {
      * {@link #testGetRecurrencesBetweenDefaultTimeframe()} as the time frame is always shortened in
      * front of the start. The positive asserts shall return always 1 recurrence less.
      */
+    @Test
     public void testGetRecurrencesBetweenShortenedStart() throws Exception {
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
@@ -248,6 +258,7 @@ public class RecurrencesTest extends TestCase {
      * This test should behave different as {@link #testGetRecurrencesBetweenDefaultTimeframe()} as
      * the time frame was shortened in the end.
      */
+    @Test
     public void testGetRecurrencesBetweenShortenedEnd() throws Exception {
         assertEquals(0, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,
@@ -317,6 +328,7 @@ public class RecurrencesTest extends TestCase {
     /**
      * This test test if the time frame behavior works for single events.
      */
+    @Test
     public void testGetRecurrencesBetweenSingleEvent() throws Exception {
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.ONCE,
@@ -354,6 +366,7 @@ public class RecurrencesTest extends TestCase {
     /**
      * These checks are done with moved timeframe.
      */
+    @Test
     public void testGetRecurrencesBetweenMovedTimeframe() throws Exception {
         assertEquals(1, Recurrences.getRecurrencesBetween(
                 RecurrenceInterval.DAY,

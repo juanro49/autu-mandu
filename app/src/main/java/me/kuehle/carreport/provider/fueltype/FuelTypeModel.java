@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 /**
  * A fuel type.
  */
+@Deprecated
 public interface FuelTypeModel extends BaseModel {
 
     /**

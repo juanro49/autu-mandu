@@ -28,6 +28,7 @@ import me.kuehle.carreport.provider.reminder.ReminderColumns;
 /**
  * A car.
  */
+@Deprecated
 public class CarColumns implements BaseColumns {
     public static final String TABLE_NAME = "car";
     public static final Uri CONTENT_URI = Uri.parse(DataProvider.CONTENT_URI_BASE + "/" + TABLE_NAME);

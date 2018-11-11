@@ -27,6 +27,7 @@ import me.kuehle.carreport.provider.car.*;
 /**
  * Cursor wrapper for the {@code reminder} table.
  */
+@Deprecated
 public class ReminderCursor extends AbstractCursor implements ReminderModel {
     public ReminderCursor(Cursor cursor) {
         super(cursor);

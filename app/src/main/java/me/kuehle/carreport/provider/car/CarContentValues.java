@@ -27,6 +27,7 @@ import me.kuehle.carreport.provider.base.AbstractContentValues;
 /**
  * Content values wrapper for the {@code car} table.
  */
+@Deprecated
 public class CarContentValues extends AbstractContentValues {
     @Override
     public Uri uri() {

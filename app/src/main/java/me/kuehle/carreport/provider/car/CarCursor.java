@@ -26,6 +26,7 @@ import me.kuehle.carreport.provider.base.AbstractCursor;
 /**
  * Cursor wrapper for the {@code car} table.
  */
+@Deprecated
 public class CarCursor extends AbstractCursor implements CarModel {
     public CarCursor(Cursor cursor) {
         super(cursor);
