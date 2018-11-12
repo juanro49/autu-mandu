@@ -51,3 +51,6 @@
 -keep class com.google.api.services.drive.** { *; }
 -keep class * extends com.google.api.client.json.GenericJson { *; }
 -dontwarn com.google.**
+
+# RecyclerView
+-keep class androidx.appcompat.widget.RebindReportingHolder { *; }
