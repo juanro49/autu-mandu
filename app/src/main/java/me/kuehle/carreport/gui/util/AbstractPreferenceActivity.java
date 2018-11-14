@@ -19,7 +19,9 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,14 +42,13 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
 
     private Toolbar mActionBar;
     private Fragment mCurrentMenuListener;
-    private List<PreferenceFragment> mAttachedPrefFragments;
+    private List<PreferenceFragment> mAttachedPrefFragments = new ArrayList<>(getFragmentClasses().length);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mActionBar.setTitle(getTitle());
         mActionBar.setOnMenuItemClickListener(this);
-        mAttachedPrefFragments = new ArrayList<>(getFragmentClasses().length);
     }
 
     @Override
