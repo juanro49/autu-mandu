@@ -36,7 +36,7 @@ import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.query.OtherCostQueries;
+import me.kuehle.carreport.presentation.OtherCostPresenter;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.util.DateTimeInput;
@@ -232,7 +232,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment
         // Title
         mEdtTitle.setAdapter(new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item, android.R.id.text1,
-                OtherCostQueries.getTitles(getActivity(), isExpenditure())));
+                OtherCostPresenter.getInstance(getActivity()).getTitles(isExpenditure())));
 
         // Date + Time
         mEdtDate.applyOnClickListener(DataDetailOtherFragment.this, PICK_DATE_REQUEST_CODE,

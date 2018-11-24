@@ -35,11 +35,11 @@ import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.query.CarQueries;
 import me.kuehle.carreport.data.query.ReminderQueries;
 import me.kuehle.carreport.gui.MainActivity;
 import me.kuehle.carreport.gui.PreferencesActivity;
 import me.kuehle.carreport.gui.PreferencesRemindersFragment;
+import me.kuehle.carreport.presentation.CarPresenter;
 import me.kuehle.carreport.provider.reminder.ReminderColumns;
 import me.kuehle.carreport.provider.reminder.ReminderContentValues;
 import me.kuehle.carreport.provider.reminder.ReminderCursor;
@@ -133,12 +133,13 @@ public class ReminderService extends IntentService {
 
     public static void markRemindersDone(Context context, long... reminderIds) {
         Date now = new Date();
+        CarPresenter carPresenter = CarPresenter.getInstance(context);
 
         ReminderCursor reminder = new ReminderSelection().id(reminderIds).query(context.getContentResolver());
         while (reminder.moveToNext()) {
             ReminderContentValues values = new ReminderContentValues();
             values.putStartDate(now);
-            values.putStartMileage(CarQueries.getLatestMileage(context, reminder.getCarId()));
+            values.putStartMileage(carPresenter.getLatestMileage(reminder.getCarId()));
             values.putSnoozedUntilNull();
             values.putNotificationDismissed(false);
             values.update(context.getContentResolver(), new ReminderSelection().id(reminder.getId()));

@@ -19,6 +19,7 @@ import android.content.Context;
 
 import java.util.Date;
 
+import me.kuehle.carreport.presentation.CarPresenter;
 import me.kuehle.carreport.provider.reminder.ReminderCursor;
 import me.kuehle.carreport.util.TimeSpan;
 
@@ -33,7 +34,7 @@ public class ReminderQueries {
 
     public Integer getDistanceToDue() {
         if (mReminder.getAfterDistance() != null) {
-            int latestMileage = CarQueries.getLatestMileage(mContext, mReminder.getCarId());
+            int latestMileage = CarPresenter.getInstance(mContext).getLatestMileage(mReminder.getCarId());
             return mReminder.getStartMileage() + mReminder.getAfterDistance() - latestMileage;
         } else {
             return null;

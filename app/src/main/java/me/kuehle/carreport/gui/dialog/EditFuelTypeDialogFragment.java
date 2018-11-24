@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.query.FuelTypeQueries;
+import me.kuehle.carreport.presentation.FuelTypePresenter;
 import me.kuehle.carreport.gui.util.AbstractFormFieldValidator;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
@@ -96,7 +96,7 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
         mEdtCategory = dialog.findViewById(R.id.edt_category);
         mEdtCategory.setAdapter(new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_dropdown_item_1line,
-                FuelTypeQueries.getAllCategories(getActivity())));
+                FuelTypePresenter.getInstance(getActivity()).getAllCategories()));
 
         if (savedInstanceState != null) {
             mEdtName.setText(savedInstanceState.getString("name"));

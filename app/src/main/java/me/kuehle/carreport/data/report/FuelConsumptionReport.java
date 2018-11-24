@@ -22,7 +22,6 @@ import android.database.Cursor;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,8 +29,7 @@ import me.kuehle.carreport.FuelConsumption;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
-import me.kuehle.carreport.data.query.CarQueries;
-import me.kuehle.carreport.data.query.RefuelingQueries;
+import me.kuehle.carreport.presentation.CarPresenter;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -146,6 +144,7 @@ public class FuelConsumptionReport extends AbstractReport {
         mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
 
         ArrayList<Cursor> cursors = new ArrayList<>();
+        CarPresenter carPresenter = CarPresenter.getInstance(mContext);
 
         // Collect report data and add info data which will be displayed next to the graph.
         CarCursor car = new CarSelection().query(mContext.getContentResolver(), null,
@@ -154,8 +153,7 @@ public class FuelConsumptionReport extends AbstractReport {
         while (car.moveToNext()) {
             boolean sectionAdded = false;
 
-            String[] categories = CarQueries.getUsedFuelTypeCategories(mContext, car.getId());
-            for (String category : categories) {
+            for (String category : carPresenter.getUsedFuelTypeCategories(car.getId())) {
                 ReportChartData carData = new ReportChartData(mContext, car, category);
                 if (carData.isEmpty()) {
                     continue;

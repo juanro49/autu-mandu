@@ -33,7 +33,7 @@ import me.kuehle.carreport.DistanceEntryMode;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.PriceEntryMode;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.query.FuelTypeQueries;
+import me.kuehle.carreport.presentation.FuelTypePresenter;
 import me.kuehle.carreport.data.query.RefuelingQueries;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportTimePickerDialogFragment.SupportTimePickerDialogFragmentListener;
@@ -78,9 +78,17 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     private Spinner spnFuelType;
     private EditText edtNote;
     private Spinner spnCar;
+    private FuelTypePresenter mFuelTypePresenter;
 
     private DistanceEntryMode mDistanceEntryMode;
     private PriceEntryMode mPriceEntryMode;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mFuelTypePresenter = FuelTypePresenter.getInstance(getActivity());
+    }
 
     @Override
     public void onDialogPositiveClick(int requestCode, Date date) {
@@ -111,7 +119,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
             }
 
             // By default select most often used fuel type for this car.
-            long mostUsedFuelTypeId = FuelTypeQueries.getMostUsedId(getActivity(), selectCarId);
+            long mostUsedFuelTypeId = mFuelTypePresenter.getMostUsedId(selectCarId);
             if (mostUsedFuelTypeId > 0) {
                 for (int pos = 0; pos < spnFuelType.getCount(); pos++) {
                     if (spnFuelType.getItemIdAtPosition(pos) == mostUsedFuelTypeId) {
@@ -239,7 +247,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         }
 
         // Fuel Type
-        FuelTypeQueries.ensureAtLeastOne(getActivity());
+        mFuelTypePresenter.ensureAtLeastOne();
 
         FuelTypeCursor fuelType = new FuelTypeSelection().query(getActivity().getContentResolver(),
                 null, FuelTypeColumns.NAME + " COLLATE UNICODE");

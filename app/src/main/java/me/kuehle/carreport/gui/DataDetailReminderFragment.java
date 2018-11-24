@@ -32,13 +32,13 @@ import java.util.Date;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.query.CarQueries;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment;
 import me.kuehle.carreport.gui.util.DateTimeInput;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.gui.util.SimpleAnimator;
+import me.kuehle.carreport.presentation.CarPresenter;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -67,6 +67,8 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
     private SimpleAnimator mEdtAfterDistanceAnimator;
     private SimpleAnimator mEdtAfterTimeAnimator;
     private SimpleAnimator mSpnAfterTimeUnitAnimator;
+
+    private CarPresenter mCarPresenter;
 
     @Override
     public void onDialogPositiveClick(int requestCode, Date date) {
@@ -143,7 +145,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!isInEditMode() || mLastPosition != ListView.INVALID_POSITION) {
-                    mEdtStartMileage.setText(String.valueOf(CarQueries.getLatestMileage(getActivity(), id)));
+                    mEdtStartMileage.setText(String.valueOf(mCarPresenter.getLatestMileage(id)));
                 }
 
                 mLastPosition = position;
@@ -208,6 +210,13 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment imple
                 mEdtSnoozedUntil.setDate(null);
             }
         });
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mCarPresenter = CarPresenter.getInstance(getContext());
     }
 
     @Override
