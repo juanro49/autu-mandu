@@ -76,9 +76,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 String newLocalRev = syncProvider.uploadFile();
                 syncProvider.setLocalFileRev(newLocalRev);
             } else {
+                Application.closeDatabases();
                 syncProvider.downloadFile();
                 syncProvider.setLocalFileRev(remoteRev);
-                Application.reinitializeDatabase();
             }
         } catch (SyncAuthException e) {
             Log.e(TAG, "Auth error while syncing.", e);

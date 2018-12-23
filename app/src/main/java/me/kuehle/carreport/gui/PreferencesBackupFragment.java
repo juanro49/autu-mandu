@@ -418,6 +418,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                         Toast.makeText(getActivity(), R.string.pref_summary_restore_file_seems_wrong,
                                 Toast.LENGTH_LONG).show();
                     } else {
+                        Log.v(TAG, "Restoring from URI "+ backupUri.toString());
                         if (mBackup.restore(backupUri)) {
                             Toast.makeText(getActivity(), R.string.toast_restore_succeeded,
                                     Toast.LENGTH_SHORT).show();
