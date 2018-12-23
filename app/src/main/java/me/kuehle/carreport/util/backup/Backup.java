@@ -89,6 +89,7 @@ public class Backup {
      * @return Whether the database was backed successfully.
      */
     public boolean backup() {
+        Application.closeDatabases();
         File backupFile = getBackupFile();
         File backupDir = backupFile.getParentFile();
         if (!backupDir.isDirectory()) {
@@ -109,6 +110,7 @@ public class Backup {
      * @return Whether the restore succeed.
      */
     public boolean restore(Uri backup) {
+        Application.closeDatabases();
         File internalBackupFile = new File(dbFile.getParent(), INTERNAL_BACKUP);
         if (FileCopyUtil.copyFile(dbFile, internalBackupFile)) {
             try {
@@ -116,7 +118,6 @@ public class Backup {
                 OutputStream backupTarget = new FileOutputStream(dbFile);
                 if (FileCopyUtil.copyFile(backupSource, backupTarget)) {
                     if (checkBackupSanity(dbFile)) {
-                        Application.reinitializeDatabase();
                         return true;
                     } else {
                         throw new IOException("Backup is insane.");
@@ -126,7 +127,6 @@ public class Backup {
             } catch (IOException e) {
                 Log.w(TAG, "Need to restore internally, got Exception.", e);
                 FileCopyUtil.copyFile(internalBackupFile, dbFile);
-                Application.reinitializeDatabase();
             }
         } else {
             Log.e(TAG, "Could not do an internal Backup before restore.");

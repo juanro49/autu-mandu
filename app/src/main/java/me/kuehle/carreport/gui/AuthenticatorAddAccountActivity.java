@@ -224,10 +224,10 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             protected Boolean doInBackground(Void... params) {
                 try {
                     String remoteRev;
+                    Application.closeDatabases();
                     if (download) {
                         mSelectedSyncProvider.downloadFile();
                         remoteRev = mSelectedSyncProvider.getRemoteFileRev();
-                        Application.reinitializeDatabase();
                     } else {
                         remoteRev = mSelectedSyncProvider.uploadFile();
                     }
