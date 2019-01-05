@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 Copyright 2019 Marco Bresciani
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,27 +41,4 @@ limitations under the License.
         <item>Anni</item>
     </string-array>
 
-    <integer-array name="selectable_colors">
-        <item>@color/red</item>
-        <item>@color/pink</item>
-        <item>@color/purple</item>
-        <item>@color/deep_purple</item>
-        <item>@color/indigo</item>
-        <item>@color/blue</item>
-        <item>@color/light_blue</item>
-        <item>@color/cyan</item>
-        <item>@color/teal</item>
-        <item>@color/green</item>
-        <item>@color/light_green</item>
-        <item>@color/lime</item>
-        <item>@color/yellow</item>
-        <item>@color/amber</item>
-        <item>@color/orange</item>
-        <item>@color/deep_orange</item>
-        <item>@color/brown</item>
-        <item>@color/dark_grey</item>
-        <item>@color/blue_grey</item>
-        <item>@color/grey</item>
-        <item>@color/white</item>
-    </integer-array>
 </resources>

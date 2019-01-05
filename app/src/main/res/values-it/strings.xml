@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 Copyright 2019 Marco Bresciani
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <resources>
-    <string name="app_name" translatable="false">Car Report</string>
-    <string name="app_description" translatable="false">Enter the costs
-        of your car and receive nice reports and statistics.
-    </string>
-
     <string name="about_author">© Jan Kühle</string>
     <string name="about_thanks">Ringraziameti:</string>
     <string name="about_version">Versione: %s</string>
@@ -40,8 +34,7 @@ limitations under the License.
     <string name="menu_add_fuel_type">Aggiungi tipo carburante</string>
     <string name="menu_add_reminder">Aggiungi nota</string>
     <string name="menu_show_trend">Mostra andamento</string>
-    <string name="menu_show_overall_trend">Mostra andamento generale
-    </string>
+    <string name="menu_show_overall_trend">Mostra andamento generale</string>
 
     <string name="fab_add_refueling">Rifornimento</string>
     <string name="fab_add_other_expenditure">Altre spese</string>
@@ -50,8 +43,7 @@ limitations under the License.
     <string name="section_suspend">Sospendi</string>
     <string name="section_advanced">Opzioni avanzate</string>
 
-    <string name="hint_mileage_optional">Distanza totale (opzionale)
-    </string>
+    <string name="hint_mileage_optional">Distanza totale (opzionale)</string>
     <string name="hint_volume">Quantità</string>
     <string name="hint_price">Prezzo</string>
     <string name="hint_price_total">Prezzo totale</string>
@@ -68,11 +60,9 @@ limitations under the License.
     <string name="hint_user_name">Nome utente</string>
     <string name="hint_password">Password</string>
     <string name="hint_initial_mileage">Chilometraggio iniziale</string>
-    <string name="hint_reminder_after_distance">Dopo una distanza
-    </string>
+    <string name="hint_reminder_after_distance">Dopo una distanza</string>
     <string name="hint_reminder_after_time">Dopo un tempo</string>
-    <string name="hint_reminder_start_mileage">Inizia a chilometraggio
-    </string>
+    <string name="hint_reminder_start_mileage">Inizia a chilometraggio</string>
     <string name="hint_reminder_start_date">Inizia a data</string>
     <string name="hint_reminder_snoozed_until">Sospeso fino a</string>
 
@@ -83,227 +73,106 @@ limitations under the License.
     <string name="label_car">Auto</string>
     <string name="label_recurrence">Ricorrenza</string>
     <string name="label_reminder_type">Tipo</string>
-    <string name="label_reminder_dismissed">Notifica disattivata
-    </string>
-    <string name="label_trust_certificate">Accetta il certificato
-    </string>
+    <string name="label_reminder_dismissed">Notifica disattivata</string>
+    <string name="label_trust_certificate">Accetta il certificato</string>
 
-    <string name="description_suspend">Puoi sospendere un\'auto quando
-        non la usi più. Questo cancellerà tutti i costi periodici alla
-        data di sospensione. Inoltre, i rapporti mostreranno solo le
-        auto attive.
-    </string>
-    <string name="description_category">I rifornimenti sono raggruppati
-        per categoria nei differenti rapporti. Esempi: benzina, diesel,
-        gas.
-    </string>
+    <string name="description_suspend">Puoi sospendere un\'auto quando non la usi più. Questo cancellerà tutti i costi periodici alla data di sospensione. Inoltre, i rapporti mostreranno solo le auto attive.</string>
+    <string name="description_category">I rifornimenti sono raggruppati per categoria nei differenti rapporti. Esempi: benzina, diesel, gas.</string>
     <string name="description_reminder_status_due">Scadenza</string>
-    <string name="description_reminder_status_due_snoozed">Scadenza,
-        posposta fino al %s
-    </string>
-    <string name="description_reminder_status_due_dismissed">Scadenza,
-        notifica disattivata
-    </string>
-    <string name="description_reminder_status_distance_and_time">
-        Scadenza in %1$s o %2$s
-    </string>
-    <string name="description_reminder_status_distance">Scadenza in %s
-    </string>
-    <string name="description_reminder_status_time">Scadenza in %s
-    </string>
-    <string name="description_webdav_url">Per favore inserisci un URL in
-        una cartella sul tuo server WebDAV per Car Report. Car Report
-        memorizzerà i tuoi dati in questa cartella e non toccherà niente
-        fuori di essa.
-    </string>
-    <string name="description_webdav_trust_certificate">Il sito usa un
-        certificato non riconosciuto da Android.
-    </string>
+    <string name="description_reminder_status_due_snoozed">Scadenza, posposta fino al %s</string>
+    <string name="description_reminder_status_due_dismissed">Scadenza, notifica disattivata</string>
+    <string name="description_reminder_status_distance_and_time">Scadenza in %1$s o %2$s</string>
+    <string name="description_reminder_status_distance">Scadenza in %s</string>
+    <string name="description_reminder_status_time">Scadenza in %s</string>
+    <string name="description_webdav_url">Per favore inserisci un URL in una cartella sul tuo server WebDAV per Car Report. Car Report memorizzerà i tuoi dati in questa cartella e non toccherà niente fuori di essa.</string>
+    <string name="description_webdav_trust_certificate">Il sito usa un certificato non riconosciuto da Android.</string>
 
-    <string name="validate_error_greater_zero">Deve essere maggiore di
-        0
-    </string>
-    <string name="validate_error_greater_equal_zero">Deve essere
-        maggiore o uguale a 0
-    </string>
-    <string name="validate_error_not_empty">Non può essere vuoto
-    </string>
-    <string name="validate_error_mileage_out_of_range_total">Il
-        chilometraggio deve essere tra il chilometraggio dei
-        rifornimenti precedente e successivo in termini di distanza
-        totale. Se vuoi inserire la distanza parziale devi cambiare la
-        modalità di inserimento nelle impostazioni.
-    </string>
-    <string name="validate_error_mileage_out_of_range_trip">Il
-        chilometraggio accumulato non può essere superiore al
-        chilometraggio al rifornimento successivo nel caso di distanza
-        parziale. Se vuoi inserire la distanza totale devi cambiare la
-        modalità di inserimento nelle impostazioni.
-    </string>
-    <string name="validate_error_fuel_type_exists">Questo tipo di
-        carburante esiste già.
-    </string>
-    <string name="validate_error_webdav_invalid_certificate">Il
-        certificato non può essere riconosciuto. Sembra invalido.
-    </string>
+    <string name="validate_error_greater_zero">Deve essere maggiore di 0</string>
+    <string name="validate_error_greater_equal_zero">Deve essere maggiore o uguale a 0</string>
+    <string name="validate_error_not_empty">Non può essere vuoto</string>
+    <string name="validate_error_mileage_out_of_range_total">Il chilometraggio deve essere tra il chilometraggio dei rifornimenti precedente e successivo in termini di distanza totale. Se vuoi inserire la distanza parziale devi cambiare la modalità di inserimento nelle impostazioni.</string>
+    <string name="validate_error_mileage_out_of_range_trip">Il chilometraggio accumulato non può essere superiore al chilometraggio al rifornimento successivo nel caso di distanza parziale. Se vuoi inserire la distanza totale devi cambiare la modalità di inserimento nelle impostazioni.</string>
+    <string name="validate_error_fuel_type_exists">Questo tipo di carburante esiste già.</string>
+    <string name="validate_error_webdav_invalid_certificate">Il certificato non può essere riconosciuto. Sembra invalido.</string>
 
     <string name="suspended">Sospeso</string>
     <string name="suspended_since">Sospeso dal %s</string>
     <string name="overwrite">Sovrascrivi</string>
     <string name="restore">Ripristina</string>
     <string name="import_">Importa</string>
-    <string name="empty_if_unknown">Lascia pure vuoto se non sai cosa
-        inserire qui.
-    </string>
+    <string name="empty_if_unknown">Lascia pure vuoto se non sai cosa inserire qui.</string>
 
     <string name="title_first_start">Primi passi</string>
     <string name="title_add_refueling">Aggiungi rifornimento</string>
     <string name="title_edit_refueling">Modifica rifornimento</string>
     <string name="title_settings">Impostazioni</string>
     <string name="title_help">Aiuto</string>
-    <string name="title_add_other_expenditure">Aggiungi altre spese
-    </string>
-    <string name="title_add_other_income">Aggiungi altre entrate
-    </string>
-    <string name="title_edit_other_expenditure">Modifica altre spese
-    </string>
-    <string name="title_edit_other_income">Modifica altre entrate
-    </string>
+    <string name="title_add_other_expenditure">Aggiungi altre spese</string>
+    <string name="title_add_other_income">Aggiungi altre entrate</string>
+    <string name="title_edit_other_expenditure">Modifica altre spese</string>
+    <string name="title_edit_other_income">Modifica altre entrate</string>
     <string name="title_add_car">Aggiungi auto</string>
     <string name="title_edit_car">Modifica auto</string>
     <string name="title_add_fuel_type">Aggiungi tipo carburante</string>
-    <string name="title_edit_fuel_type">Modifica tipo carburante
-    </string>
+    <string name="title_edit_fuel_type">Modifica tipo carburante</string>
     <string name="title_add_reminder">Aggiungi nota</string>
     <string name="title_edit_reminder">Modifica nota</string>
     <string name="cab_title_selected">%d selezionato</string>
     <string name="edit_title_refueling">Rifornimento</string>
 
-    <string name="edit_message_no_entry_selected">Nessuna voce
-        selezionata
-    </string>
+    <string name="edit_message_no_entry_selected">Nessuna voce selezionata</string>
 
     <string name="alert_delete_title">Conferma cancellazione</string>
-    <string name="alert_delete_refueling_message">Questo rifornimento
-        sarà cancellato.
-    </string>
-    <string name="alert_delete_refuelings_message">I %d rifornimenti
-        selezionati saranno cancellati.
-    </string>
-    <string name="alert_delete_other_expenditure_message">Questa spesa
-        sarà cancellata.
-    </string>
-    <string name="alert_delete_other_income_message">Questa entrata sarà
-        cancellata.
-    </string>
-    <string name="alert_delete_other_expenditures_message">Le %d spese
-        selezionate saranno cancellate.
-    </string>
-    <string name="alert_delete_other_incomes_message">Le %d entrate
-        selezionate saranno cancellate.
-    </string>
-    <string name="alert_delete_car_message">Questa auto sarà
-        cancellata.
-    </string>
-    <string name="alert_delete_cars_message">Le %d auto selezionate
-        saranno cancellate.
-    </string>
-    <string name="alert_delete_fuel_types_message">I %d tipi di
-        carburante selezionati saranno cancellati.
-    </string>
-    <string name="alert_delete_reminder_message">Questa nota sarà
-        cancellata.
-    </string>
-    <string name="alert_delete_reminders_message">Le %d note selezionate
-        saranno cancellate.
-    </string>
-    <string name="alert_cannot_delete_last_car">Un\'auto non può essere
-        cancellata.
-    </string>
-    <string name="alert_cannot_delete_fuel_type">Non posso cancellare il
-        tipo carburante perché è usato in almeno un rifornimento o
-        serbatoio.
-    </string>
+    <string name="alert_delete_refueling_message">Questo rifornimento sarà cancellato.</string>
+    <string name="alert_delete_refuelings_message">I %d rifornimenti selezionati saranno cancellati.</string>
+    <string name="alert_delete_other_expenditure_message">Questa spesa sarà cancellata.</string>
+    <string name="alert_delete_other_income_message">Questa entrata sarà cancellata.</string>
+    <string name="alert_delete_other_expenditures_message">Le %d spese selezionate saranno cancellate.</string>
+    <string name="alert_delete_other_incomes_message">Le %d entrate selezionate saranno cancellate.</string>
+    <string name="alert_delete_car_message">Questa auto sarà cancellata.</string>
+    <string name="alert_delete_cars_message">Le %d auto selezionate saranno cancellate.</string>
+    <string name="alert_delete_fuel_types_message">I %d tipi di carburante selezionati saranno cancellati.</string>
+    <string name="alert_delete_reminder_message">Questa nota sarà cancellata.</string>
+    <string name="alert_delete_reminders_message">Le %d note selezionate saranno cancellate.</string>
+    <string name="alert_cannot_delete_last_car">Un\'auto non può essere cancellata.</string>
+    <string name="alert_cannot_delete_fuel_type">Non posso cancellare il tipo carburante perché è usato in almeno un rifornimento o serbatoio.</string>
     <string name="alert_about_licenses_title">Licenze</string>
     <string name="alert_change_color_title">Scegli il colore</string>
-    <string name="alert_sync_finishing_authentication">Sto completando
-        l\'autenticazione…
-    </string>
-    <string name="alert_sync_performing_first_sync">Eseguo la prima
-        sincronizzazione…
-    </string>
-    <string name="alert_sync_first_sync_message">Sono disponibili dati
-        remoti. Scegli i dati da usare per la prima sincronizzazione.
-    </string>
+    <string name="alert_sync_finishing_authentication">Sto completando l\'autenticazione…</string>
+    <string name="alert_sync_performing_first_sync">Eseguo la prima sincronizzazione…</string>
+    <string name="alert_sync_first_sync_message">Sono disponibili dati remoti. Scegli i dati da usare per la prima sincronizzazione.</string>
     <string name="alert_sync_first_sync_download">Dati online</string>
     <string name="alert_sync_first_sync_upload">Dati locali</string>
-    <string name="alert_sync_first_sync_error">C\'è stato un errore
-        nella
-        prima sincronizzazione. Verifica che la rete funzioni e riprova.
-    </string>
+    <string name="alert_sync_first_sync_error">C\'è stato un errore nella prima sincronizzazione. Verifica che la rete funzioni e riprova.</string>
     <string name="alert_backup_overwrite_title">Archiviazione</string>
-    <string name="alert_backup_overwrite_message">C\'è già un file di
-        archivio sulla scheda SD.
-    </string>
+    <string name="alert_backup_overwrite_message">C\'è già un file di archivio sulla scheda SD.</string>
     <string name="alert_backup_failed">Archiviazione fallita</string>
     <string name="alert_restore_title">Ripristino</string>
-    <string name="alert_restore_message">Quando si ripristina da file,
-        tutti i dati esistenti sono sovrascritti. Assicurati che
-        l\'archivio provenga da un\'applicazione con versione uguale o
-        minore di quella installata.
-    </string>
+    <string name="alert_restore_message">Quando si ripristina da file, tutti i dati esistenti sono sovrascritti. Assicurati che l\'archivio provenga da un\'applicazione con versione uguale o minore di quella installata.</string>
     <string name="alert_restore_failed">Ripristino fallito</string>
-    <string name="alert_export_csv_overwrite_title">Esportazione CSV
-    </string>
-    <string name="alert_export_csv_overwrite_message">Ci sono già dei
-        file precedentemente esportati sulla scheda SD.
-    </string>
-    <string name="alert_export_csv_failed">Esportazione
-        fallita.\n\Motivo: %s
-    </string>
+    <string name="alert_export_csv_overwrite_title">Esportazione CSV</string>
+    <string name="alert_export_csv_overwrite_message">Ci sono già dei file precedentemente esportati sulla scheda SD.</string>
+    <string name="alert_export_csv_failed">Esportazione fallita.\n\nMotivo: %s</string>
     <string name="alert_import_csv_title">Importazione CSV</string>
-    <string name="alert_import_csv_message">L\'importazione aggiornerà
-        le
-        voci e ne aggiungerà di nuove ma non cancellerà nulla.
-    </string>
-    <string name="alert_import_csv_failed">Impostazione fallita. Dati
-        non modificati.\n\nMotivo: %s
-    </string>
+    <string name="alert_import_csv_message">L\'importazione aggiornerà le voci e ne aggiungerà di nuove ma non cancellerà nulla.</string>
+    <string name="alert_import_csv_failed">Impostazione fallita. Dati non modificati.\n\nMotivo: %s</string>
     <string name="alert_error_title">Errore</string>
 
-    <string name="toast_new_refueling">Consumo carburante: %1$.2f %2$s
-        %3$s
-    </string>
-    <string name="toast_backup_succeeded">Archiviazione sul file %s
-        completata correttamente.
-    </string>
-    <string name="toast_restore_succeeded">Ripristino completato
-        correttamente.
-    </string>
-    <string name="toast_export_csv_succeeded">Esportazione su scheda SD
-        completata correttamente.
-    </string>
-    <string name="toast_import_csv_succeeded">Importazione completata
-        correttamente.
-    </string>
-    <string name="toast_need_storage_permission">Per eseguire questa
-        azione Car Report ha bisogno di accedere ai tuoi file.
-    </string>
-    <string name="toast_auto_backup_succeeded">Archiviazione automatica
-        eseguita.
-    </string>
-    <string name="toast_auto_backup_failed">Archiviazione automatica
-        fallita.
-    </string>
+    <string name="toast_new_refueling">Consumo carburante: %1$.2f %2$s %3$s</string>
+    <string name="toast_backup_succeeded">Archiviazione sul file %s completata correttamente.</string>
+    <string name="toast_restore_succeeded">Ripristino completato correttamente.</string>
+    <string name="toast_export_csv_succeeded">Esportazione su scheda SD completata correttamente.</string>
+    <string name="toast_import_csv_succeeded">Importazione completata correttamente.</string>
+    <string name="toast_need_storage_permission">Per eseguire questa azione Car Report ha bisogno di accedere ai tuoi file.</string>
+    <string name="toast_auto_backup_succeeded">Archiviazione automatica eseguita.</string>
+    <string name="toast_auto_backup_failed">Archiviazione automatica fallita.</string>
 
-    <string name="report_title_fuel_consumption">Consumo carburante
-    </string>
+    <string name="report_title_fuel_consumption">Consumo carburante</string>
     <string name="report_title_fuel_price">Prezzo carburante</string>
     <string name="report_title_mileage">Chilometraggio</string>
     <string name="report_title_costs">Costi</string>
     <string name="report_trend_label">%s (Andamento)</string>
-    <string name="report_overall_trend_label">%s (Andamento medio)
-    </string>
+    <string name="report_overall_trend_label">%s (Andamento medio)</string>
     <string name="report_graph_month_history">Storico mensile</string>
     <string name="report_graph_year_history">Storico annuale</string>
     <string name="report_graph_accumulated">Cumulato</string>
@@ -318,248 +187,106 @@ limitations under the License.
     <string name="report_day">Giorno</string>
     <string name="report_month">Mese</string>
     <string name="report_year">Anno</string>
-    <string name="report_toast_fuel_consumption">%1$s: %2$.2f %3$s di
-        %4$s il %5$s
-    </string>
-    <string name="report_toast_fuel_price">%1$.3f %2$s per %3$s il
-        %4$s
-    </string>
-    <string name="report_toast_mileage">"%1$s: %2$d %3$s il %4$s"
-    </string>
-    <string name="report_toast_mileage_month">"%1$s: %2$.0f %3$s in
-        %4$s"
-    </string>
+    <string name="report_toast_fuel_consumption">%1$s: %2$.2f %3$s di %4$s il %5$s</string>
+    <string name="report_toast_fuel_price">%1$.3f %2$s per %3$s il %4$s</string>
+    <string name="report_toast_mileage">"%1$s: %2$d %3$s il %4$s"</string>
+    <string name="report_toast_mileage_month">"%1$s: %2$.0f %3$s in %4$s"</string>
     <string name="report_toast_costs">%1$s: %2$.0f %3$s in %4$s</string>
-    <string name="report_toast_guessed">Approssimato per bilanciare i
-        rifornimanti mancanti.
-    </string>
+    <string name="report_toast_guessed">Approssimato per bilanciare i rifornimanti mancanti.</string>
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">est. %1$.2f %2$s</string>
 
-    <string name="pref_title_header_about">A proposito di Car Report
-    </string>
-    <string name="pref_title_header_general">Impostazioni generali
-    </string>
+    <string name="pref_title_header_about">A proposito di Car Report</string>
+    <string name="pref_title_header_general">Impostazioni generali</string>
     <string name="pref_title_header_cars">Auto</string>
-    <string name="pref_title_header_fuel_types">Tipi di carburante
-    </string>
+    <string name="pref_title_header_fuel_types">Tipi di carburante</string>
     <string name="pref_title_header_reminders">Note</string>
-    <string name="pref_title_header_report_order">Ordine rapporti
-    </string>
-    <string name="pref_title_header_backup">Archiviazione &amp;
-        esportazione
-    </string>
-    <string name="pref_title_category_synchronization">Sincronizza
-        archivio
-    </string>
+    <string name="pref_title_header_report_order">Ordine rapporti</string>
+    <string name="pref_title_header_backup">Archiviazione &amp; esportazion</string>
+    <string name="pref_title_category_synchronization">Sincronizza archivio</string>
     <string name="pref_title_category_behavior">Comportamento</string>
     <string name="pref_title_category_units">Unità</string>
-    <string name="pref_title_category_backup">Archiviazione &amp;
-        Ripristino
-    </string>
-    <string name="pref_title_category_export">Esportazione &amp;
-        Importazione
-    </string>
+    <string name="pref_title_category_backup">Archiviazione &amp; Ripristino</string>
+    <string name="pref_title_category_export">Esportazione &amp; Importazione</string>
     <string name="pref_title_behavior_default_car">Default car</string>
-    <string name="pref_title_behavior_show_car_menu">Mostra menu auto
-    </string>
-    <string name="pref_title_behavior_distance_entry_mode">Modalità
-        inserimento distanze
-    </string>
-    <string name="pref_title_behavior_price_entry_mode">Modalità
-        inserimento prezzi
-    </string>
-    <string name="pref_title_behavior_auto_guess_missing_data">Bilancia
-        rifornimenti mancanti (Beta)
-    </string>
-    <string name="pref_title_behavior_reminder_snooze_duration">Durata
-        rimando nota
-    </string>
-    <string name="pref_title_behavior_auto_backup">Abilita archiviazione
-        automatica
-    </string>
-    <string name="pref_title_behavior_keep_backups">Conta gli archivi
-        mantenuti
-    </string>
+    <string name="pref_title_behavior_show_car_menu">Mostra menu auto</string>
+    <string name="pref_title_behavior_distance_entry_mode">Modalità inserimento distanze</string>
+    <string name="pref_title_behavior_price_entry_mode">Modalità inserimento prezzi</string>
+    <string name="pref_title_behavior_auto_guess_missing_data">Bilancia rifornimenti mancanti (Beta)</string>
+    <string name="pref_title_behavior_reminder_snooze_duration">Durata rimando nota</string>
+    <string name="pref_title_behavior_auto_backup">Abilita archiviazione automatica</string>
+    <string name="pref_title_behavior_keep_backups">Conta gli archivi mantenuti</string>
     <string name="pref_title_unit_currency">Valuta</string>
     <string name="pref_title_unit_volume">Quantità</string>
     <string name="pref_title_unit_distance">Distanza</string>
-    <string name="pref_title_unit_fuel_consumption">Consumo carburante
-    </string>
-    <string name="pref_title_sync_setup">Prepara sincronizzazione
-        archivio
-    </string>
+    <string name="pref_title_unit_fuel_consumption">Consumo carburante</string>
+    <string name="pref_title_sync_setup">Prepara sincronizzazione archivio</string>
     <string name="pref_title_backup">Archivia</string>
-    <string name="pref_title_backup_location">Destinazione archivio
-    </string>
+    <string name="pref_title_backup_location">Destinazione archivio</string>
     <string name="pref_title_restore">Ripristina</string>
     <string name="pref_title_exportcsv">Esportazione CSV</string>
     <string name="pref_title_importcsv">Importazione CSV</string>
-    <string name="pref_summary_behavior_show_car_menu">Mostra un menu
-        scelta auto quando aggiungi un rifornimento e hai più di
-        un\'auto.
-    </string>
-    <string name="pref_summary_behavior_auto_guess_missing_data">Prova a
-        identificare rifornimenti mancanti. Questo bilancia i consumi di
-        carburante significativamente bassi che accadono quando
-        dimentichi di inserire un rifornimento.
-    </string>
-    <string name="pref_summary_sync_setup">Può causare perdite di dati
-        se usata da più persone. La sincronizzazione rimpiazza sempre
-        tutti i dati. Per favore usa sempre la stessa versione di Car
-        Report su tutti i dispositivi.
-    </string>
-    <string name="pref_summary_sync_current_provider">Collegato a %s.
-        Clicca per scollegare. La sincronizzazione può causare perdite
-        di dati se usata da più persone.
-    </string>
-    <string name="pref_summary_backup">Archivia i dati nella memoria
-        locale.
-    </string>
-    <string name="pref_summary_backup_location">Percorso in cui i file
-        sono archiviati. Se vuoto, sarà usata una cartella separata
-        nella tua memoria locale o scheda SD.
-    </string>
-    <string name="pref_summary_restore">Ripristina i dati da un file
-        nella tua memoria.
-    </string>
-    <string name="pref_summary_export_csv">Esporta i dati in CSV così
-        che puoi usarli in altri programmi come Microsoft Excel o
-        LibreOffice Calc.
-    </string>
-    <string name="pref_summary_import_csv">Importa i dati da file CSV. I
-        file devono avere la stessa struttura di quelli creati con
-        l\'esportazione CSV.
-    </string>
-    <string name="pref_summary_import_csv_no_data">I file non esistono
-        nella directory %s sulla scheda SD.
-    </string>
-    <string name="pref_summary_behavior_auto_backup">Esegui
-        un\'archiviazione automatica quando apri la schermata
-        principale, massimo una volta al giorno.
-    </string>
-    <string name="pref_summary_behavior_keep_backups">Mantieni un
-        massimo numero predefinito di archiviazioni automatiche.
-    </string>
-    <string name="pref_action_select_backup_file">Scegli il file da
-        ripristinare.
-    </string>
-    <string name="pref_summary_no_file_selector">Non c\'è
-        nessun\'applicazione di selezione file nel tuo telefono. Non
-        posso ripristinare.
-    </string>
-    <string name="pref_summary_restore_file_seems_wrong">O non hai
-        selezionato alcun file, o il file selezionato non sembra usabile
-        per il ripristino.
-    </string>
+    <string name="pref_summary_behavior_show_car_menu">Mostra un menu scelta auto quando aggiungi un rifornimento e hai più di un\'auto.</string>
+    <string name="pref_summary_behavior_auto_guess_missing_data">Prova a identificare rifornimenti mancanti. Questo bilancia i consumi di carburante significativamente bassi che accadono quando dimentichi di inserire un rifornimento.</string>
+    <string name="pref_summary_sync_setup">Può causare perdite di dati se usata da più persone. La sincronizzazione rimpiazza sempre tutti i dati. Per favore usa sempre la stessa versione di Car Report su tutti i dispositivi.</string>
+    <string name="pref_summary_sync_current_provider">Collegato a %s. Clicca per scollegare. La sincronizzazione può causare perdite di dati se usata da più persone.</string>
+    <string name="pref_summary_backup">Archivia i dati nella memoria locale.</string>
+    <string name="pref_summary_backup_location">Percorso in cui i file sono archiviati. Se vuoto, sarà usata una cartella separata nella tua memoria locale o scheda SD.</string>
+    <string name="pref_summary_restore">Ripristina i dati da un file nella tua memoria.</string>
+    <string name="pref_summary_export_csv">Esporta i dati in CSV così che puoi usarli in altri programmi come Microsoft Excel o LibreOffice Calc.</string>
+    <string name="pref_summary_import_csv">Importa i dati da file CSV. I file devono avere la stessa struttura di quelli creati con l\'esportazione CSV.</string>
+    <string name="pref_summary_import_csv_no_data">I file non esistono nella directory %s sulla scheda SD.</string>
+    <string name="pref_summary_behavior_auto_backup">Esegui un\'archiviazione automatica quando apri la schermata principale, massimo una volta al giorno.</string>
+    <string name="pref_summary_behavior_keep_backups">Mantieni un massimo numero predefinito di archiviazioni automatiche.</string>
+    <string name="pref_action_select_backup_file">Scegli il file da ripristinare.</string>
+    <string name="pref_summary_no_file_selector">Non c\'è nessun\'applicazione di selezione file nel tuo telefono. Non posso ripristinare.</string>
+    <string name="pref_summary_restore_file_seems_wrong">O non hai selezionato alcun file, o il file selezionato non sembra usabile per il ripristino.</string>
 
     <string name="help_section_getting_started">Per iniziare</string>
     <string name="help_section_tips">Suggerimenti</string>
     <string name="help_section_calculations">Calcoli</string>
     <string name="help_section_fuel_types">Tipi di carburante</string>
     <string name="help_section_csv">CSV</string>
-    <string name="help_folder_name">Aiuto</string>
+    <string name="help_folder_name">help-it</string>
 
     <string name="first_start_hi">Ciao!</string>
-    <string name="first_start_intro">Car Report può mostrare degli utili
-        rapporti per le tue spese dell'auto, incluso il consumo di
-        carburante e i costi generali. Inizia con questi semplici passi:
-    </string>
+    <string name="first_start_intro">Car Report può mostrare degli utili rapporti per le tue spese dell\'auto, incluso il consumo di carburante e i costi generali. Inizia con questi semplici passi:</string>
     <string name="first_start_step1_img_desc">Primo passo</string>
     <string name="first_start_step1_text">Crea un\'auto.</string>
     <string name="first_start_step2_img_desc">Secondo passo</string>
-    <string name="first_start_step2_text">Aggiungi rifornimenti.
-    </string>
+    <string name="first_start_step2_text">Aggiungi rifornimenti.</string>
     <string name="first_start_step3_img_desc">Terzo passo</string>
-    <string name="first_start_step3_text">Dopo due rifornimenti vedrai i
-        primi grafici.
-    </string>
-    <string name="first_start_create_car">Crea un'auto</string>
-    <string name="first_start_setup_sync">Imposta la sincronizzazione
-    </string>
+    <string name="first_start_step3_text">Dopo due rifornimenti vedrai i primi grafici.</string>
+    <string name="first_start_create_car">Crea un\'auto</string>
+    <string name="first_start_setup_sync">Imposta la sincronizzazione</string>
 
-    <string name="calc_option_volume_to_distance">Quantità (%1$s) a
-        Distanza (%2$s)
-    </string>
-    <string name="calc_option_distance_to_volume">Distanza (%1$s) a
-        Quantità (%2$s)
-    </string>
-    <string name="calc_option_volume_to_price">Quantità (%1$s) a Costo
-        (%2$s)
-    </string>
-    <string name="calc_option_price_to_volume">Costo (%1$s) a Quantità
-        (%2$s)
-    </string>
-    <string name="calc_option_distance_to_price">Distanza (%1$s) a Costo
-        (%2$s)
-    </string>
-    <string name="calc_option_price_to_distance">Costo (%1$s) a Distanza
-        (%2$s)
-    </string>
-    <string name="calc_option_distance_to_fuel_price">Distanza (%1$s) a
-        Costo carburante (%2$s)
-    </string>
-    <string name="calc_option_fuel_price_to_distance">Costo carburante
-        (%1$s) a Distanza (%2$s)
-    </string>
+    <string name="calc_option_volume_to_distance">Quantità (%1$s) a Distanza (%2$s)</string>
+    <string name="calc_option_distance_to_volume">Distanza (%1$s) a Quantità (%2$s)</string>
+    <string name="calc_option_volume_to_price">Quantità (%1$s) a Costo (%2$s)</string>
+    <string name="calc_option_price_to_volume">Costo (%1$s) a Quantità (%2$s)</string>
+    <string name="calc_option_distance_to_price">Distanza (%1$s) a Costo (%2$s)</string>
+    <string name="calc_option_price_to_distance">Costo (%1$s) a Distanza (%2$s)</string>
+    <string name="calc_option_distance_to_fuel_price">Distanza (%1$s) a Costo carburante (%2$s)</string>
+    <string name="calc_option_fuel_price_to_distance">Costo carburante (%1$s) a Distanza (%2$s)</string>
 
     <string name="notification_reminder_channel">Note</string>
     <string name="notification_reminder_title_single">Nota: %s</string>
-    <string name="notification_reminder_title_multiple">Note multiple
-    </string>
+    <string name="notification_reminder_title_multiple">Note multiple</string>
     <string name="notification_reminder_action_done">Fatto</string>
     <string name="notification_reminder_action_snooze">Posponi</string>
-    <string name="notification_reminder_action_snooze_all">Posponi
-        tutti
-    </string>
+    <string name="notification_reminder_action_snooze_all">Posponi tutti</string>
 
     <string name="distance_entry_mode_trip">Distanza viaggio</string>
     <string name="distance_entry_mode_total">Distanza totale</string>
-    <string name="price_entry_mode_per_unit_and_volume">Costo per unità
-        &amp; quantità
-    </string>
-    <string name="price_entry_mode_per_unit_and_total">Costo per unità
-        &amp; costo totale
-    </string>
-    <string name="price_entry_mode_total_and_volume">Costo totale &amp;
-        quantità
-    </string>
+    <string name="price_entry_mode_per_unit_and_volume">Costo per unità &amp; quantità</string>
+    <string name="price_entry_mode_per_unit_and_total">Costo per unità &amp; costo totale</string>
+    <string name="price_entry_mode_total_and_volume">Costo totale &amp; quantità</string>
     <string name="missing_refueling">Rifornimento mancante</string>
-    <string name="invalid_data">Questa voce contiene dati non validi.
-        Modificala e salvala per vedere il dettaglio degli errori.
-    </string>
+    <string name="invalid_data">Questa voce contiene dati non validi. Modificala e salvala per vedere il dettaglio degli errori.</string>
     <string name="graph_details_desc">Dettagli grafico</string>
     <string name="graph_options_desc">Opzioni grafico</string>
-    <string name="graph_close_full_screen_desc">Chiudi grafico a pieno
-        schermo
-    </string>
+    <string name="graph_close_full_screen_desc">Chiudi grafico a pieno schermo</string>
     <string name="drag_handle_desc">Trascina</string>
     <string name="quit_snooze_desc">Ferma sospensione</string>
     <string name="notice_not_paid">Non pagato</string>
-
-    <string name="about_licenses_styles" translatable="false">
-        body {
-        color: #fff;
-        background-color: #424242;
-        font-family: sans-serif;
-        overflow-wrap: break-word;
-        }
-
-        pre {
-        color: #fff;
-        background-color: #303030;
-        padding: 1em;
-        white-space: pre-wrap;
-        }
-
-        ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-        }
-
-        a {
-        color: #607d8b;
-        }
-    </string>
 </resources>
