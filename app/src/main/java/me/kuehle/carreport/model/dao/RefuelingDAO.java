@@ -21,7 +21,7 @@ public interface RefuelingDAO {
     Refueling getById(long id);
 
     @Insert
-    void insert(Refueling... refuelings);
+    long[] insert(Refueling... refuelings);
 
     @Update
     void update(Refueling... refuelings);

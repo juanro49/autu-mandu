@@ -18,7 +18,7 @@ public interface ReminderDAO {
     Reminder getById(long id);
 
     @Insert
-    void insert(Reminder... reminders);
+    long[] insert(Reminder... reminders);
 
     @Update
     void update(Reminder... reminders);

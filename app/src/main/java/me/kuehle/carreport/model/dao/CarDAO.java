@@ -18,7 +18,7 @@ public interface CarDAO {
     Car getById(long id);
 
     @Insert
-    void insert(Car... car);
+    long[] insert(Car... car);
 
     @Update
     void update(Car... car);

@@ -18,7 +18,7 @@ public interface FuelTypeDAO {
     FuelType getById(long id);
 
     @Insert
-    void insert(FuelType... fuelTypes);
+    long[] insert(FuelType... fuelTypes);
 
     @Update
     void update(FuelType... fuelTypes);

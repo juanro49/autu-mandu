@@ -18,7 +18,7 @@ public interface OtherCostDAO {
     OtherCost getById(long id);
 
     @Insert
-    void insert(OtherCost... otherCosts);
+    long[] insert(OtherCost... otherCosts);
 
     @Update
     void update(OtherCost... otherCosts);
