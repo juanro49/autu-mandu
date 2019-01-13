@@ -22,6 +22,11 @@ public class FuelType implements IFuelType {
     public FuelType(){
     }
 
+    public FuelType(@NonNull String name, String category) {
+        this.setName(name);
+        this.setCategory(category);
+    }
+
     @Override
     public Long getId() {
         return id;

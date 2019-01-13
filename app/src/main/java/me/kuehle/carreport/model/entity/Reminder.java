@@ -52,6 +52,22 @@ public class Reminder implements IReminder {
     @ColumnInfo(name = "car_id")
     private long carId;
 
+    public Reminder() {}
+
+    public Reminder(long carId, @NonNull String title, TimeSpanUnit afterTimeSpanUnit,
+                    Integer afterTimeSpanCount, Integer afterDistance, @NonNull Date startDate,
+                    int startMileage, boolean notificationDismissed, Date snoozedUntil) {
+        this.setCarId(carId);
+        this.setTitle(title);
+        this.setAfterTimeSpanUnit(afterTimeSpanUnit);
+        this.setAfterTimeSpanCount(afterTimeSpanCount);
+        this.setAfterDistance(afterDistance);
+        this.setStartDate(startDate);
+        this.setStartMileage(startMileage);
+        this.setNotificationDismissed(notificationDismissed);
+        this.setSnoozedUntil(snoozedUntil);
+    }
+
     @Override
     public Long getId() {
         return id;

@@ -29,6 +29,13 @@ public class Car implements ICar {
 
     public Car() {}
 
+    public Car(@NonNull String name, int color, int initialMileage, Date suspension) {
+        this.setName(name);
+        this.setColor(color);
+        this.setInitialMileage(initialMileage);
+        this.setSuspension(suspension);
+    }
+
     @Override
     public Long getId() {
         return id;
