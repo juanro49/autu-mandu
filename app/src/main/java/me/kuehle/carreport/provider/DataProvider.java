@@ -32,6 +32,7 @@ import me.kuehle.carreport.provider.othercost.OtherCostColumns;
 import me.kuehle.carreport.provider.refueling.RefuelingColumns;
 import me.kuehle.carreport.provider.reminder.ReminderColumns;
 
+@Deprecated
 public class DataProvider extends BaseContentProvider {
     private static final String TAG = DataProvider.class.getSimpleName();
 

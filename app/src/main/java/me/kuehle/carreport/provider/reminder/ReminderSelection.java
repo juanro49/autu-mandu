@@ -27,6 +27,7 @@ import me.kuehle.carreport.provider.car.*;
 /**
  * Selection for the {@code reminder} table.
  */
+@Deprecated
 public class ReminderSelection extends AbstractSelection<ReminderSelection> {
     @Override
     protected Uri baseUri() {

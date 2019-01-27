@@ -19,6 +19,7 @@ package me.kuehle.carreport.util.backup;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -26,12 +27,16 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.QuoteMode;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.Date;
+import java.util.concurrent.Semaphore;
 
 import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
@@ -54,16 +59,19 @@ import me.kuehle.carreport.provider.reminder.ReminderColumns;
 import me.kuehle.carreport.provider.reminder.ReminderContentValues;
 import me.kuehle.carreport.provider.reminder.ReminderCursor;
 import me.kuehle.carreport.provider.reminder.ReminderSelection;
-import me.kuehle.carreport.util.Convert;
 
 public class CSVExportImport {
+    private static final String LOG_TAG = "CSVExportImport";
     public static final String DIRECTORY = "Car Report CSV";
+    private static final String DATE_INVALID_FORMAT_EXC = "A date has an invalid format. Please " +
+        "change either data to match the defined ISO-based date or your phone localization.";
 
     public Context mContext;
 
     private File mExportDir;
 
     private CSVFormat mCSVFormat;
+    private Semaphore mImExportSemaphore;
 
     private static String[] allTables = {
             CarColumns.TABLE_NAME,
@@ -80,33 +88,41 @@ public class CSVExportImport {
 
         mCSVFormat = CSVFormat.DEFAULT
                 .withQuoteMode(QuoteMode.MINIMAL)
+                .withDelimiter(',')
                 .withIgnoreEmptyLines()
                 .withIgnoreSurroundingSpaces()
                 .withIgnoreHeaderCase()
                 .withHeader()
                 .withTrim();
 
-        String locale = Locale.getDefault().getLanguage().substring(0, 2).toLowerCase(Locale.US);
-        if (locale.equals("de")) {
-            mCSVFormat = mCSVFormat.withDelimiter(';');
-        }
+        mImExportSemaphore = new Semaphore(1);
     }
 
     public void export() throws CSVImportException {
-        if (!mExportDir.isDirectory()) {
-            if (!mExportDir.mkdir()) {
-                throw new CSVImportException("Could not create export directory.");
-            }
+        try {
+            mImExportSemaphore.acquire();
+        } catch (InterruptedException e) {
+            throw new CSVImportException("Another import or export is already running.");
         }
 
         try {
+            if (!mExportDir.isDirectory()) {
+                if (!mExportDir.mkdir()) {
+                    throw new CSVImportException("Could not create export directory.");
+                }
+            }
+
             exportCars();
             exportFuelTypes();
             exportOtherCosts();
             exportRefuelings();
             exportReminders();
+        } catch (CSVImportException e) {
+            throw e;
         } catch (Exception e) {
             throw new CSVImportException(e);
+        } finally {
+            mImExportSemaphore.release();
         }
     }
 
@@ -123,7 +139,7 @@ public class CSVExportImport {
                     car.getName(),
                     car.getColor(),
                     car.getInitialMileage(),
-                    Convert.toString(car.getSuspendedSince()));
+                    CSVConvert.toString(car.getSuspendedSince()));
         }
 
         csv.close();
@@ -157,12 +173,12 @@ public class CSVExportImport {
             csv.printRecord(
                     otherCost.getId(),
                     otherCost.getTitle(),
-                    Convert.toString(otherCost.getDate()),
+                    CSVConvert.toString(otherCost.getDate()),
                     otherCost.getMileage(),
-                    Convert.toString(otherCost.getPrice()),
-                    Convert.toString(otherCost.getRecurrenceInterval()),
+                    CSVConvert.toString(otherCost.getPrice()),
+                    CSVConvert.toString(otherCost.getRecurrenceInterval()),
                     otherCost.getRecurrenceMultiplier(),
-                    Convert.toString(otherCost.getEndDate()),
+                    CSVConvert.toString(otherCost.getEndDate()),
                     otherCost.getNote(),
                     otherCost.getCarId());
         }
@@ -180,10 +196,10 @@ public class CSVExportImport {
         while (refueling.moveToNext()) {
             csv.printRecord(
                     refueling.getId(),
-                    Convert.toString(refueling.getDate()),
+                    CSVConvert.toString(refueling.getDate()),
                     refueling.getMileage(),
-                    Convert.toString(refueling.getVolume()),
-                    Convert.toString(refueling.getPrice()),
+                    CSVConvert.toString(refueling.getVolume()),
+                    CSVConvert.toString(refueling.getPrice()),
                     refueling.getPartial(),
                     refueling.getNote(),
                     refueling.getFuelTypeId(),
@@ -204,13 +220,13 @@ public class CSVExportImport {
             csv.printRecord(
                     reminder.getId(),
                     reminder.getTitle(),
-                    Convert.toString(reminder.getAfterTimeSpanUnit()),
+                    CSVConvert.toString(reminder.getAfterTimeSpanUnit()),
                     reminder.getAfterTimeSpanCount(),
                     reminder.getAfterDistance(),
-                    Convert.toString(reminder.getStartDate()),
+                    CSVConvert.toString(reminder.getStartDate()),
                     reminder.getStartMileage(),
                     reminder.getNotificationDismissed(),
-                    Convert.toString(reminder.getSnoozedUntil()),
+                    CSVConvert.toString(reminder.getSnoozedUntil()),
                     reminder.getCarId());
         }
 
@@ -239,12 +255,43 @@ public class CSVExportImport {
         return false;
     }
 
+    private boolean filesUseSemicolon() {
+        File carFile = new File(mExportDir, "car.csv");
+        try {
+            BufferedReader bufCarFile = new BufferedReader(new FileReader(carFile));
+            String line = "";
+            while (line.isEmpty()) {
+                line = bufCarFile.readLine();
+            }
+            bufCarFile.close();
+            String[] splitBySemicolon = line.split(";");
+            return (splitBySemicolon.length >= 4);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Could not determine whether files are using semicolon as " +
+                "delimiter. Continuing to import.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void import_() throws CSVImportException {
-        if (!allExportFilesExist()) {
-            throw new CSVImportException("Some import files are missing.");
+        try {
+            mImExportSemaphore.acquire();
+        } catch (InterruptedException e) {
+            throw new CSVImportException("Another import or export is already running.");
         }
 
+        boolean semicolonDelimiter = false;
         try {
+            if (!allExportFilesExist()) {
+                throw new CSVImportException("Some import files are missing.");
+            }
+
+            semicolonDelimiter = filesUseSemicolon();
+            if (semicolonDelimiter) {
+                this.mCSVFormat = this.mCSVFormat.withDelimiter(';');
+            }
+
             ArrayList<ContentProviderOperation> operations = new ArrayList<>();
             operations.addAll(importCars());
             operations.addAll(importFuelTypes());
@@ -253,12 +300,19 @@ public class CSVExportImport {
             operations.addAll(importReminders());
 
             mContext.getContentResolver().applyBatch(DataProvider.AUTHORITY, operations);
+        } catch (CSVImportException e) {
+            throw e;
         } catch (Exception e) {
             throw new CSVImportException(e);
+        } finally {
+            if (semicolonDelimiter) {
+                this.mCSVFormat = this.mCSVFormat.withDelimiter(',');
+            }
+            mImExportSemaphore.release();
         }
     }
 
-    private ArrayList<ContentProviderOperation> importCars() throws IOException {
+    private ArrayList<ContentProviderOperation> importCars() throws IOException, CSVImportException {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         CSVParser csv = CSVParser.parse(
@@ -267,15 +321,19 @@ public class CSVExportImport {
                 mCSVFormat);
 
         for (CSVRecord record : csv) {
-            Long id = Convert.toLong(record.get(CarColumns._ID));
+            Long id = CSVConvert.toLong(record.get(CarColumns._ID));
 
             CarContentValues values = new CarContentValues();
             values.putName(record.get(CarColumns.NAME));
             //noinspection ConstantConditions
-            values.putColor(Convert.toInteger(record.get(CarColumns.COLOR)));
+            values.putColor(CSVConvert.toInteger(record.get(CarColumns.COLOR)));
             //noinspection ConstantConditions
-            values.putInitialMileage(Convert.toInteger(record.get(CarColumns.INITIAL_MILEAGE)));
-            values.putSuspendedSince(Convert.toDate(record.get(CarColumns.SUSPENDED_SINCE)));
+            values.putInitialMileage(CSVConvert.toInteger(record.get(CarColumns.INITIAL_MILEAGE)));
+            Date suspensionDate = CSVConvert.toDate(record.get(CarColumns.SUSPENDED_SINCE));
+            if (!record.get(CarColumns.SUSPENDED_SINCE).isEmpty() && suspensionDate == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putSuspendedSince(suspensionDate);
 
             boolean updated = false;
             if (id != null) {
@@ -313,7 +371,7 @@ public class CSVExportImport {
                 mCSVFormat);
 
         for (CSVRecord record : csv) {
-            Long id = Convert.toLong(record.get(FuelTypeColumns._ID));
+            Long id = CSVConvert.toLong(record.get(FuelTypeColumns._ID));
 
             FuelTypeContentValues values = new FuelTypeContentValues();
             values.putName(record.get(FuelTypeColumns.NAME));
@@ -346,7 +404,7 @@ public class CSVExportImport {
         return operations;
     }
 
-    private ArrayList<ContentProviderOperation> importOtherCosts() throws IOException {
+    private ArrayList<ContentProviderOperation> importOtherCosts() throws IOException, CSVImportException {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         CSVParser csv = CSVParser.parse(
@@ -355,23 +413,31 @@ public class CSVExportImport {
                 mCSVFormat);
 
         for (CSVRecord record : csv) {
-            Long id = Convert.toLong(record.get(OtherCostColumns._ID));
+            Long id = CSVConvert.toLong(record.get(OtherCostColumns._ID));
 
             OtherCostContentValues values = new OtherCostContentValues();
             values.putTitle(record.get(OtherCostColumns.TITLE));
             //noinspection ConstantConditions
-            values.putDate(Convert.toDate(record.get(OtherCostColumns.DATE)));
-            values.putMileage(Convert.toInteger(record.get(OtherCostColumns.MILEAGE)));
+            Date date = CSVConvert.toDate(record.get(OtherCostColumns.DATE));
+            if (date == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putDate(date);
+            values.putMileage(CSVConvert.toInteger(record.get(OtherCostColumns.MILEAGE)));
             //noinspection ConstantConditions
-            values.putPrice(Convert.toFloat(record.get(OtherCostColumns.PRICE)));
+            values.putPrice(CSVConvert.toFloat(record.get(OtherCostColumns.PRICE)));
             //noinspection ConstantConditions
-            values.putRecurrenceInterval(Convert.toRecurrenceInterval(record.get(OtherCostColumns.RECURRENCE_INTERVAL)));
+            values.putRecurrenceInterval(CSVConvert.toRecurrenceInterval(record.get(OtherCostColumns.RECURRENCE_INTERVAL)));
             //noinspection ConstantConditions
-            values.putRecurrenceMultiplier(Convert.toInteger(record.get(OtherCostColumns.RECURRENCE_MULTIPLIER)));
-            values.putEndDate(Convert.toDate(record.get(OtherCostColumns.END_DATE)));
+            values.putRecurrenceMultiplier(CSVConvert.toInteger(record.get(OtherCostColumns.RECURRENCE_MULTIPLIER)));
+            Date endDate = CSVConvert.toDate(record.get(OtherCostColumns.END_DATE));
+            if (!record.get(OtherCostColumns.END_DATE).isEmpty() && endDate == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putEndDate(endDate);
             values.putNote(record.get(OtherCostColumns.NOTE));
             //noinspection ConstantConditions
-            values.putCarId(Convert.toLong(record.get(OtherCostColumns.CAR_ID)));
+            values.putCarId(CSVConvert.toLong(record.get(OtherCostColumns.CAR_ID)));
 
             boolean updated = false;
             if (id != null) {
@@ -400,7 +466,7 @@ public class CSVExportImport {
         return operations;
     }
 
-    private ArrayList<ContentProviderOperation> importRefuelings() throws IOException {
+    private ArrayList<ContentProviderOperation> importRefuelings() throws IOException, CSVImportException {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         CSVParser csv = CSVParser.parse(
@@ -409,24 +475,28 @@ public class CSVExportImport {
                 mCSVFormat);
 
         for (CSVRecord record : csv) {
-            Long id = Convert.toLong(record.get(RefuelingColumns._ID));
+            Long id = CSVConvert.toLong(record.get(RefuelingColumns._ID));
 
             RefuelingContentValues values = new RefuelingContentValues();
             //noinspection ConstantConditions
-            values.putDate(Convert.toDate(record.get(RefuelingColumns.DATE)));
+            Date date = CSVConvert.toDate(record.get(RefuelingColumns.DATE));
+            if (date == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putDate(date);
             //noinspection ConstantConditions
-            values.putMileage(Convert.toInteger(record.get(RefuelingColumns.MILEAGE)));
+            values.putMileage(CSVConvert.toInteger(record.get(RefuelingColumns.MILEAGE)));
             //noinspection ConstantConditions
-            values.putVolume(Convert.toFloat(record.get(RefuelingColumns.VOLUME)));
+            values.putVolume(CSVConvert.toFloat(record.get(RefuelingColumns.VOLUME)));
             //noinspection ConstantConditions
-            values.putPrice(Convert.toFloat(record.get(RefuelingColumns.PRICE)));
+            values.putPrice(CSVConvert.toFloat(record.get(RefuelingColumns.PRICE)));
             //noinspection ConstantConditions
-            values.putPartial(Convert.toBoolean(record.get(RefuelingColumns.PARTIAL)));
+            values.putPartial(CSVConvert.toBoolean(record.get(RefuelingColumns.PARTIAL)));
             values.putNote(record.get(RefuelingColumns.NOTE));
             //noinspection ConstantConditions
-            values.putFuelTypeId(Convert.toLong(record.get(RefuelingColumns.FUEL_TYPE_ID)));
+            values.putFuelTypeId(CSVConvert.toLong(record.get(RefuelingColumns.FUEL_TYPE_ID)));
             //noinspection ConstantConditions
-            values.putCarId(Convert.toLong(record.get(RefuelingColumns.CAR_ID)));
+            values.putCarId(CSVConvert.toLong(record.get(RefuelingColumns.CAR_ID)));
 
             boolean updated = false;
             if (id != null) {
@@ -463,22 +533,22 @@ public class CSVExportImport {
                 mCSVFormat);
 
         for (CSVRecord record : csv) {
-            Long id = Convert.toLong(record.get(ReminderColumns._ID));
+            Long id = CSVConvert.toLong(record.get(ReminderColumns._ID));
 
             ReminderContentValues values = new ReminderContentValues();
             values.putTitle(record.get(ReminderColumns.TITLE));
-            values.putAfterTimeSpanUnit(Convert.toTimeSpanUnit(record.get(ReminderColumns.AFTER_TIME_SPAN_UNIT)));
-            values.putAfterTimeSpanCount(Convert.toInteger(record.get(ReminderColumns.AFTER_TIME_SPAN_COUNT)));
-            values.putAfterDistance(Convert.toInteger(record.get(ReminderColumns.AFTER_DISTANCE)));
+            values.putAfterTimeSpanUnit(CSVConvert.toTimeSpanUnit(record.get(ReminderColumns.AFTER_TIME_SPAN_UNIT)));
+            values.putAfterTimeSpanCount(CSVConvert.toInteger(record.get(ReminderColumns.AFTER_TIME_SPAN_COUNT)));
+            values.putAfterDistance(CSVConvert.toInteger(record.get(ReminderColumns.AFTER_DISTANCE)));
             //noinspection ConstantConditions
-            values.putStartDate(Convert.toDate(record.get(ReminderColumns.START_DATE)));
+            values.putStartDate(CSVConvert.toDate(record.get(ReminderColumns.START_DATE)));
             //noinspection ConstantConditions
-            values.putStartMileage(Convert.toInteger(record.get(ReminderColumns.START_MILEAGE)));
+            values.putStartMileage(CSVConvert.toInteger(record.get(ReminderColumns.START_MILEAGE)));
             //noinspection ConstantConditions
-            values.putNotificationDismissed(Convert.toBoolean(record.get(ReminderColumns.NOTIFICATION_DISMISSED)));
-            values.putSnoozedUntil(Convert.toDate(record.get(ReminderColumns.SNOOZED_UNTIL)));
+            values.putNotificationDismissed(CSVConvert.toBoolean(record.get(ReminderColumns.NOTIFICATION_DISMISSED)));
+            values.putSnoozedUntil(CSVConvert.toDate(record.get(ReminderColumns.SNOOZED_UNTIL)));
             //noinspection ConstantConditions
-            values.putCarId(Convert.toLong(record.get(ReminderColumns.CAR_ID)));
+            values.putCarId(CSVConvert.toLong(record.get(ReminderColumns.CAR_ID)));
 
             boolean updated = false;
             if (id != null) {
@@ -506,4 +576,5 @@ public class CSVExportImport {
 
         return operations;
     }
+
 }

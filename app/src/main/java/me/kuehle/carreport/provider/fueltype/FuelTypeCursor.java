@@ -15,17 +15,16 @@
  */
 package me.kuehle.carreport.provider.fueltype;
 
-import java.util.Date;
-
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import me.kuehle.carreport.provider.base.AbstractCursor;
 
 /**
  * Cursor wrapper for the {@code fuel_type} table.
  */
+@Deprecated
 public class FuelTypeCursor extends AbstractCursor implements FuelTypeModel {
     public FuelTypeCursor(Cursor cursor) {
         super(cursor);

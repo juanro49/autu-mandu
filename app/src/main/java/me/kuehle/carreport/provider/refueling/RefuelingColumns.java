@@ -28,6 +28,7 @@ import me.kuehle.carreport.provider.reminder.ReminderColumns;
 /**
  * A refueling for a car.
  */
+@Deprecated
 public class RefuelingColumns implements BaseColumns {
     public static final String TABLE_NAME = "refueling";
     public static final Uri CONTENT_URI = Uri.parse(DataProvider.CONTENT_URI_BASE + "/" + TABLE_NAME);

@@ -18,7 +18,10 @@ package me.kuehle.carreport.gui.util;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.support.v7.widget.Toolbar;
+import android.preference.PreferenceFragment;
+
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import me.kuehle.carreport.R;
@@ -38,6 +42,7 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
 
     private Toolbar mActionBar;
     private Fragment mCurrentMenuListener;
+    private List<PreferenceFragment> mAttachedPrefFragments = new ArrayList<>(getFragmentClasses().length);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,6 +115,9 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
+        if (fragment instanceof PreferenceFragment && !mAttachedPrefFragments.contains(fragment)) {
+            mAttachedPrefFragments.add((PreferenceFragment) fragment);
+        }
         if (fragment instanceof OptionsMenuListener) {
             mCurrentMenuListener = fragment;
             inflateMenu();
@@ -143,6 +151,10 @@ public abstract class AbstractPreferenceActivity extends PreferenceActivity impl
     private void clearMenuAndListener() {
         mActionBar.getMenu().clear();
         mCurrentMenuListener = null;
+    }
+
+    protected List<PreferenceFragment> getAttachedFragments() {
+        return new ArrayList<>(mAttachedPrefFragments);
     }
 
     protected abstract int getTitleResourceId();

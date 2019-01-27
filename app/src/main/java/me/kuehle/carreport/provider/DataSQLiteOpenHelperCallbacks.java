@@ -32,6 +32,7 @@ import me.kuehle.carreport.BuildConfig;
  * <p/>
  * This file will not be overwritten if you re-run the content provider generator.
  */
+@Deprecated
 public class DataSQLiteOpenHelperCallbacks {
     private static final String TAG = DataSQLiteOpenHelperCallbacks.class.getSimpleName();
 

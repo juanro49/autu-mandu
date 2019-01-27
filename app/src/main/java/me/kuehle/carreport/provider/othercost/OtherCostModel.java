@@ -19,12 +19,13 @@ import me.kuehle.carreport.provider.base.BaseModel;
 
 import java.util.Date;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * A cost for a car, that is not a refueling. Can also be an income, in which case the price is negative.
  */
+@Deprecated
 public interface OtherCostModel extends BaseModel {
 
     /**

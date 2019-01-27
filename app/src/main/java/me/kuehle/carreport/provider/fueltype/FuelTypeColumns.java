@@ -28,6 +28,7 @@ import me.kuehle.carreport.provider.reminder.ReminderColumns;
 /**
  * A fuel type.
  */
+@Deprecated
 public class FuelTypeColumns implements BaseColumns {
     public static final String TABLE_NAME = "fuel_type";
     public static final Uri CONTENT_URI = Uri.parse(DataProvider.CONTENT_URI_BASE + "/" + TABLE_NAME);

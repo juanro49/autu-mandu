@@ -133,6 +133,9 @@
             android:authorities="me.kuehle.carreport.provider"
             android:exported="false"/>
 
+        <!-- For 2018-style testing !-->
+        <uses-library android:name="android.test.runner" android:required="false" />
+
     </application>
 
 </manifest>

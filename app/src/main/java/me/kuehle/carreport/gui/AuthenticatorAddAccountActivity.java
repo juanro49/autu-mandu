@@ -29,8 +29,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -224,10 +224,10 @@ public class AuthenticatorAddAccountActivity extends AccountAuthenticatorActivit
             protected Boolean doInBackground(Void... params) {
                 try {
                     String remoteRev;
+                    Application.closeDatabases();
                     if (download) {
                         mSelectedSyncProvider.downloadFile();
                         remoteRev = mSelectedSyncProvider.getRemoteFileRev();
-                        Application.reinitializeDatabase();
                     } else {
                         remoteRev = mSelectedSyncProvider.uploadFile();
                     }

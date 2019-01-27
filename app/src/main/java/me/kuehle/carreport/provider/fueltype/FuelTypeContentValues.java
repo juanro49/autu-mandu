@@ -15,18 +15,17 @@
  */
 package me.kuehle.carreport.provider.fueltype;
 
-import java.util.Date;
-
 import android.content.ContentResolver;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import me.kuehle.carreport.provider.base.AbstractContentValues;
 
 /**
  * Content values wrapper for the {@code fuel_type} table.
  */
+@Deprecated
 public class FuelTypeContentValues extends AbstractContentValues {
     @Override
     public Uri uri() {

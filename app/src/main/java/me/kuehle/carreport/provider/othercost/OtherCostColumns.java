@@ -28,6 +28,7 @@ import me.kuehle.carreport.provider.reminder.ReminderColumns;
 /**
  * A cost for a car, that is not a refueling. Can also be an income, in which case the price is negative.
  */
+@Deprecated
 public class OtherCostColumns implements BaseColumns {
     public static final String TABLE_NAME = "other_cost";
     public static final Uri CONTENT_URI = Uri.parse(DataProvider.CONTENT_URI_BASE + "/" + TABLE_NAME);

@@ -27,6 +27,7 @@ import me.kuehle.carreport.provider.car.*;
 /**
  * Selection for the {@code other_cost} table.
  */
+@Deprecated
 public class OtherCostSelection extends AbstractSelection<OtherCostSelection> {
     @Override
     protected Uri baseUri() {

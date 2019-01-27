@@ -29,13 +29,15 @@ import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.util.Date;
 
+import androidx.multidex.MultiDexApplication;
+import me.kuehle.carreport.model.CarReportDatabase;
 import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
 import me.kuehle.carreport.util.reminder.ReminderEnablerReceiver;
 import me.kuehle.carreport.util.reminder.ReminderService;
 import me.kuehle.carreport.util.sync.Authenticator;
 
-public class Application extends android.app.Application {
+public class Application extends MultiDexApplication {
     private static final String TAG = "Application";
     private static Application instance;
 
@@ -43,8 +45,10 @@ public class Application extends android.app.Application {
         return instance;
     }
 
-    public static void reinitializeDatabase() {
+    public static void closeDatabases() {
         if (instance != null) {
+            Log.v(TAG, "Closing Database via abstraction layers.");
+            CarReportDatabase.getInstance(instance).close();
             DataSQLiteOpenHelper.getInstance(instance).close();
         }
     }
