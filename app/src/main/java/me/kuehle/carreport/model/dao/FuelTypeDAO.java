@@ -18,8 +18,12 @@ public interface FuelTypeDAO {
     FuelType getById(long id);
 
     @Query("SELECT ft.* FROM refueling r INNER JOIN fuel_type ft ON r.fuel_type_id = ft._id " +
-            "WHERE r.car_id = :car_id GROUP BY r.fuel_type_id ORDER BY count(r._id) DESC LIMIT 1")
+        "WHERE r.car_id = :car_id GROUP BY r.fuel_type_id ORDER BY count(r._id) DESC LIMIT 1")
     FuelType getMostUsedForCar(long car_id);
+
+    @Query("SELECT DISTINCT ft.* FROM refueling r INNER JOIN fuel_type ft ON " +
+        "r.fuel_type_id = ft._id WHERE r.car_id = :car_id")
+    List<FuelType> getFuelTypesForCar(long car_id);
 
     @Query("SELECT count(_id) FROM refueling WHERE fuel_type_id = :id")
     int getUsageCount(long id);

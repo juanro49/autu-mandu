@@ -3,27 +3,13 @@ package me.kuehle.carreport.presentation;
 import android.content.Context;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import me.kuehle.carreport.model.CarReportDatabase;
-import me.kuehle.carreport.model.dao.CarDAO;
-import me.kuehle.carreport.model.dao.CarDAO_Impl;
-import me.kuehle.carreport.model.dao.FuelTypeDAO;
-import me.kuehle.carreport.model.dao.RefuelingDAO;
 import me.kuehle.carreport.model.entity.Car;
+import me.kuehle.carreport.model.entity.FuelType;
 import me.kuehle.carreport.model.entity.OtherCost;
 import me.kuehle.carreport.model.entity.Refueling;
-import me.kuehle.carreport.provider.car.CarColumns;
-import me.kuehle.carreport.provider.car.CarCursor;
-import me.kuehle.carreport.provider.car.CarSelection;
-import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
-import me.kuehle.carreport.provider.othercost.OtherCostColumns;
-import me.kuehle.carreport.provider.othercost.OtherCostCursor;
-import me.kuehle.carreport.provider.othercost.OtherCostSelection;
-import me.kuehle.carreport.provider.refueling.RefuelingColumns;
-import me.kuehle.carreport.provider.refueling.RefuelingCursor;
-import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 
 public class CarPresenter {
 
@@ -47,14 +33,8 @@ public class CarPresenter {
     public Set<String> getUsedFuelTypeCategories(long carId) {
         Set<String> categories = new HashSet<>();
 
-        Set<Long> fueltypeIds = new HashSet<>();
-        for (Refueling ref: mDB.getRefuelingDao().getAllForCar(carId)) {
-            fueltypeIds.add(ref.getFuelTypeId());
-        }
-
-        FuelTypeDAO ftDAO = mDB.getFuelTypeDao();
-        for (long ftId: fueltypeIds) {
-            categories.add(ftDAO.getById(ftId).getCategory());
+        for (FuelType ft: mDB.getFuelTypeDao().getFuelTypesForCar(carId)) {
+            categories.add(ft.getCategory());
         }
 
         return categories;
