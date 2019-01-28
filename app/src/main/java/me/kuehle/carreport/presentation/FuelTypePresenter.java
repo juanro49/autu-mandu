@@ -20,6 +20,8 @@ import android.content.Context;
 import java.util.HashSet;
 import java.util.Set;
 
+import me.kuehle.carreport.model.CarReportDatabase;
+import me.kuehle.carreport.model.entity.FuelType;
 import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.fueltype.FuelTypeContentValues;
 import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
@@ -31,9 +33,11 @@ import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 public class FuelTypePresenter {
 
     private Context mContext;
+    private CarReportDatabase mDB;
 
     private FuelTypePresenter(Context context) {
         mContext = context;
+        mDB = CarReportDatabase.getInstance(mContext);
     }
 
     public static FuelTypePresenter getInstance(Context context) {
@@ -43,11 +47,8 @@ public class FuelTypePresenter {
     public String[] getAllCategories() {
         Set<String> categories = new HashSet<>();
 
-        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver(),
-                new String[]{FuelTypeColumns.CATEGORY},
-                FuelTypeColumns.CATEGORY + " COLLATE UNICODE ASC");
-        while (fuelType.moveToNext()) {
-            categories.add(fuelType.getCategory());
+        for (FuelType ft: mDB.getFuelTypeDao().getAll()) {
+            categories.add(ft.getCategory());
         }
 
         return categories.toArray(new String[categories.size()]);
@@ -64,22 +65,15 @@ public class FuelTypePresenter {
     }
 
     public long getMostUsedId(long carId) {
-        RefuelingCursor cursor = new RefuelingSelection()
-                .carId(carId)
-                .groupBy(RefuelingColumns.FUEL_TYPE_ID)
-                .limit(1)
-                .query(mContext.getContentResolver(),
-                        new String[]{RefuelingColumns.FUEL_TYPE_ID},
-                        String.format("COUNT(%s) DESC", RefuelingColumns._ID));
-        if (cursor.moveToNext()) {
-            return cursor.getFuelTypeId();
+        FuelType mostUsed = mDB.getFuelTypeDao().getMostUsedForCar(carId);
+        if (mostUsed != null) {
+            return mostUsed.getId();
         } else {
             return 0;
         }
     }
 
     public boolean isUsed(long fuelTypeId) {
-        RefuelingCursor refueling = new RefuelingSelection().fuelTypeId(fuelTypeId).query(mContext.getContentResolver(), new String[]{RefuelingColumns._ID});
-        return refueling.getCount() > 0;
+        return mDB.getFuelTypeDao().getUsageCount(fuelTypeId) > 0;
     }
 }
