@@ -1,0 +1,59 @@
+<h1>Generale</h1>
+<p>L'intero database viene esportato un file per tabella. Questo
+    significa che i dati di un rifornimento sono separati su file
+    multipli. Puoi trovare l'auto cercando il valore della colonna auto
+    nella colonna Id della tabella auto.</p>
+
+<h1>Colonne</h1>
+<big>cars</big>
+<p>_id: [int]<br>
+    car__name: [string]<br>
+    color: [int] Fai riferimento alla <a
+        href="http://developer.android.com/reference/android/graphics/Color.html">documentazione sui
+        colori Android</a> per una descrizione più dettagliata su come sono calcolati i valori.<br>
+    initial_mileage: [int] Distanza iniziale percorsa dall'auto, quando si inizia ad usare
+    l'applicazione.<br>
+    suspended_since: [date]</p>
+
+<big>fuel_types</big>
+<p>_id: [int]<br>
+    fuel_type__name: [string]<br>
+    category: [string]</p>
+
+<big>other_costs</big>
+<p>_id: [int]<br>
+    car_id: [int] l'identificativo dell'auto.<br>
+    mileage: [int] Distanza totale (contachilometri).<br>
+    price: [float]<br>
+    recurrence_interval: [int] 0 = una volta, 1 = giornaliero, 2 = mensile, 3 = trimestrale, 4 =
+    annuale<br>
+    recurrence_multiplier: [int] Specifica il periodi di ricorrenza insieme con recurrence_interval.
+    Esempio: interval = 2 e multiplier = 5 significa ogni 5 mesi.<br>
+    title: [string]<br>
+    date: [date]<br>
+    note: [string]<br>
+    end_date: [date] Data di fine ricorrenza.</p>
+
+<big>refuelings</big>
+<p>_id: [int]<br>
+    partial: [bool] (1 o 0)<br>
+    date: [date]<br>
+    note: [string]<br>
+    volume: [float]<br>
+    fuel_type: [int] l'identificativo del tipo di carburante.<br>
+    price: [float]<br>
+    mileage: [int] Distanza totale (contachilometir).<br>
+    car_id: [int] l'identificativo dell'auto.</p>
+
+<big>reminders</big>
+<p>_id: [int]<br>
+    title: [string]<br>
+    after_time_span_unit: [int] 0 = giorni, 1 = mesi, 2 = anni<br>
+    after_time_span_count: [int] Specifica un intervallo di tempo insieme a after_time_span_unit.
+    Esempio: unit = 1 e count = 5 significa dopo 5 mesi.<br>
+    after_distance: [int]<br>
+    start_date: [date]<br>
+    start_mileage: [int]<br>
+    car_id: [int] l'identificativo dell'auto.<br>
+    notification_dismissed: [bool] (1 o 0)<br>
+    snoozed_until: [date]</p>

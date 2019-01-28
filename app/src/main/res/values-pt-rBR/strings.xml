@@ -16,7 +16,7 @@
 -->
 <resources>
     <string name="about_author">© Jan Kühle</string>
-    <string name="about_thanks">Agradecimentos para:</string>
+    <string name="about_thanks">Agradecimentos a:</string>
     <string name="about_version">Versão: %s</string>
     <string name="about_licenses">Licenças</string>
 
@@ -89,6 +89,7 @@
     <string name="description_webdav_trust_certificate">A página Web usa um certificado que o Android não confia.</string>
 
     <string name="validate_error_greater_zero">Deve ser maior que 0</string>
+    <string name="validate_error_greater_equal_zero">Deve ser maior ou igual a 0</string>
     <string name="validate_error_not_empty">Não deve ficar em branco</string>
     <string name="validate_error_mileage_out_of_range_total">Quilometragem precisa estar entre a quilometragem anterior e a do próximo abastecimento no modo de entrada por distância total. Se quiser inserir a distância da viagem, altere o modo de entrada de dados nas configurações.</string>
     <string name="validate_error_mileage_out_of_range_trip">A quilometragem acumulada não pode ser maior que a quilometragem do próximo reabastecimento no modo de entrada por distância da viagem. Se quiser inserir a distância total, altere o modo de entrada de dados nas configurações.</string>
@@ -100,6 +101,7 @@
     <string name="overwrite">Substituir</string>
     <string name="restore">Restaurar</string>
     <string name="import_">Importar</string>
+    <string name="empty_if_unknown">Deixe em branco se não souber o que inserir aqui.</string>
 
     <string name="title_first_start">Primeiros passos</string>
     <string name="title_add_refueling">Adicionar abastecimento</string>
@@ -163,6 +165,8 @@
     <string name="toast_export_csv_succeeded">Exportação para cartão SD concluída com sucesso.</string>
     <string name="toast_import_csv_succeeded">Importação concluída com sucesso.</string>
     <string name="toast_need_storage_permission">Para efetuar esta operação, o Car Report precisa ter acesso aos seus arquivos.</string>
+    <string name="toast_auto_backup_succeeded">O backup automático foi realizado com sucesso.</string>
+    <string name="toast_auto_backup_failed">O backup automático falhou.</string>
 
     <string name="report_title_fuel_consumption">Consumo de combustível</string>
     <string name="report_title_fuel_price">Preço do combustível</string>
@@ -177,7 +181,7 @@
     <string name="report_graph_per_month">Por mês</string>
     <string name="report_not_enough_data">Não há dados suficientes</string>
     <string name="report_since">Total desde %s</string>
-    <string name="report_last_year">Σ desde um ano atrás</string>
+    <string name="report_last_year">&#931; desde um ano atrás</string>
     <string name="report_lowest">Menor</string>
     <string name="report_highest">Maior</string>
     <string name="report_average">Média</string>
@@ -200,7 +204,7 @@
     <string name="pref_title_header_reminders">Lembretes</string>
     <string name="pref_title_header_report_order">Ordem dos relatórios</string>
     <string name="pref_title_header_backup">Backup e Exportação</string>
-    <!-- needs retranslation <string name="pref_title_category_synchronization">Sincronização</string>!-->
+    <string name="pref_title_category_synchronization">Sincronizar backup</string>
     <string name="pref_title_category_behavior">Comportamento</string>
     <string name="pref_title_category_units">Unidades</string>
     <string name="pref_title_category_backup">Backup e Restauração</string>
@@ -211,24 +215,33 @@
     <string name="pref_title_behavior_price_entry_mode">Modo de entrada por preço</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Projetar abastecimentos não cadastrados (Beta)</string>
     <string name="pref_title_behavior_reminder_snooze_duration">Duração do lembrete de suspensão</string>
+    <string name="pref_title_behavior_auto_backup">Ativar backups automáticos</string>
+    <string name="pref_title_behavior_keep_backups">Número de backups mantidos</string>
     <string name="pref_title_unit_currency">Moeda</string>
     <string name="pref_title_unit_volume">Volume</string>
     <string name="pref_title_unit_distance">Distância</string>
     <string name="pref_title_unit_fuel_consumption">Consumo de combustível</string>
-    <!-- needs retranslation <string name="pref_title_sync_setup">Configurar sincronização</string>!-->
+    <string name="pref_title_sync_setup">Configurar sincronização de backup</string>
     <string name="pref_title_backup">Backup</string>
+    <string name="pref_title_backup_location">Destino do backup</string>
     <string name="pref_title_restore">Restaurar</string>
     <string name="pref_title_exportcsv">Exportar CSV</string>
     <string name="pref_title_importcsv">Importar CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Se tiver mais de um carro, mostra um menu para escolher em qual deles um  abastecimento será adicionado.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Tentar identificar os abastecimentos não cadastrados. Isso vai equilibrar os consumos de combustível significativamente mais baixos, que ocorrem quando você esqueçe de inserir um abastecimento.</string>
-    <!-- needs retranslation <string name="pref_summary_sync_setup">Isto é uma sincronização muito básica. Quando você altera uma informação em dois aparelhos de forma simultânea e então sincroniza, o aparelho que sincronizar por último perderá as alterações. Também é necessário confirmar que todos os aparelhos usam a mesma versão do Car Report.</string>!-->
-    <!-- needs retranslation <string name="pref_summary_sync_current_provider">Vinculado a %s. Clique para desvincular.</string>!-->
-    <!-- needs retranslation <string name="pref_summary_backup">Faz backup dos dados atuais em um cartão SD.</string>!-->
-    <!-- needs retranslation <string name="pref_summary_restore">Restaura os dados a partir do arquivo %s do cartão SD.</string>!-->
+    <string name="pref_summary_sync_setup">Pode resultar em perda de dados quando utilizado por mais de uma pessoa. A sincronização sempre substituirá todos os dados. Use a mesma versão do Car Report em todos os dispositivos.</string>
+    <string name="pref_summary_sync_current_provider">Conectado com %s. Clique para desconectar. A sincronização poderá resultar em perda de dados quando feita por mais de uma pessoa.</string>
+    <string name="pref_summary_backup">Faça backup dos dados atuais para o armazenamento local.</string>
+    <string name="pref_summary_backup_location">Um caminho onde os backups são armazenados. Se estiver em branco será usada uma pasta separada dentro do seu armazenamento interno ou SD.</string>
+    <string name="pref_summary_restore">Restaurar dados de um arquivo do seu armazenamento.</string>
     <string name="pref_summary_export_csv">Exporta os dados para CSV, de forma que possam ser utilizados em outros programas, como o Microsoft Excel ou LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Importa os dados de arquivos CSV. Os arquivos devem ter a mesma estrutura dos gerados com a exportação de CSV.</string>
     <string name="pref_summary_import_csv_no_data">Os arquivos não existem na pasta %s do cartão SD.</string>
+    <string name="pref_summary_behavior_auto_backup">Faça um backup quando abrir a tela principal, no máximo uma vez por dia.</string>
+    <string name="pref_summary_behavior_keep_backups">Manter no máximo um número definido para backups automáticos.</string>
+    <string name="pref_action_select_backup_file">Selecione o arquivo a restaurar.</string>
+    <string name="pref_summary_no_file_selector">Não há nenhum seletor de arquivos instalado no seu telefone. Não é possível restaurar.</string>
+    <string name="pref_summary_restore_file_seems_wrong">Parece que o arquivo indicado não pode ser usado para restaurar nada do que foi selecionado.</string>
 
     <string name="help_section_getting_started">Introdução</string>
     <string name="help_section_tips">Dicas</string>
@@ -238,7 +251,7 @@
     <string name="help_folder_name">help-pt-rBR</string>
 
     <string name="first_start_hi">Olá!</string>
-    <string name="first_start_intro">O Car Report pode apresentar bons relatórios das despesas do seu carro, incluindo o consumo de combustível e outros custos em geral. Começe com este passo simples:</string>
+    <string name="first_start_intro">O Car Report pode apresentar bons relatórios das despesas do seu carro, incluindo o consumo de combustível e outros custos em geral. Começe com estas simples etapas:</string>
     <string name="first_start_step1_img_desc">Primeiro passo</string>
     <string name="first_start_step1_text">Criar um carro.</string>
     <string name="first_start_step2_img_desc">Segundo passo</string>
