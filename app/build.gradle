@@ -6,8 +6,8 @@ android {
         applicationId "me.kuehle.carreport"
         minSdkVersion 15
         targetSdkVersion versions.targetSdk
-        versionCode 77
-        versionName "3.24.0"
+        versionCode 78
+        versionName "3.24.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

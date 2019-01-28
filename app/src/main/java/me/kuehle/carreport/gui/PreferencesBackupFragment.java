@@ -272,6 +272,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                         Toast.LENGTH_SHORT).show();
             } catch (CSVImportException e) {
                 showError(getString(R.string.alert_import_csv_failed, e.getMessage()));
+                e.printStackTrace();
             }
         }
     }
