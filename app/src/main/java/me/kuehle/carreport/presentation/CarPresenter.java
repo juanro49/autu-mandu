@@ -6,6 +6,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import me.kuehle.carreport.model.CarReportDatabase;
+import me.kuehle.carreport.model.dao.CarDAO;
+import me.kuehle.carreport.model.dao.CarDAO_Impl;
+import me.kuehle.carreport.model.dao.FuelTypeDAO;
+import me.kuehle.carreport.model.dao.RefuelingDAO;
+import me.kuehle.carreport.model.entity.Car;
+import me.kuehle.carreport.model.entity.OtherCost;
+import me.kuehle.carreport.model.entity.Refueling;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -20,9 +28,11 @@ import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 public class CarPresenter {
 
     private Context mContext;
+    private CarReportDatabase mDB;
 
     private CarPresenter(Context context) {
         mContext = context;
+        mDB = CarReportDatabase.getInstance(mContext);
     }
 
     /**
@@ -37,12 +47,14 @@ public class CarPresenter {
     public Set<String> getUsedFuelTypeCategories(long carId) {
         Set<String> categories = new HashSet<>();
 
-        RefuelingCursor refueling = new RefuelingSelection().carId(carId).query(
-                mContext.getContentResolver(),
-                new String[]{FuelTypeColumns.CATEGORY},
-                FuelTypeColumns.CATEGORY + " COLLATE UNICODE ASC");
-        while (refueling.moveToNext()) {
-            categories.add(refueling.getFuelTypeCategory());
+        Set<Long> fueltypeIds = new HashSet<>();
+        for (Refueling ref: mDB.getRefuelingDao().getAllForCar(carId)) {
+            fueltypeIds.add(ref.getFuelTypeId());
+        }
+
+        FuelTypeDAO ftDAO = mDB.getFuelTypeDao();
+        for (long ftId: fueltypeIds) {
+            categories.add(ftDAO.getById(ftId).getCategory());
         }
 
         return categories;
@@ -52,24 +64,16 @@ public class CarPresenter {
         int latestRefuelingMileage = 0;
         int latestOtherCostMileage = 0;
 
-        CarCursor car = new CarSelection().id(carId).query(mContext.getContentResolver());
-        car.moveToNext();
-
-        RefuelingCursor refueling = new RefuelingSelection().carId(carId).limit(1).query(
-                mContext.getContentResolver(),
-                new String[]{RefuelingColumns.MILEAGE},
-                RefuelingColumns.MILEAGE + " DESC");
-        if (refueling.moveToNext()) {
-            latestRefuelingMileage = refueling.getMileage();
+        Car car = mDB.getCarDao().getById(carId);
+        if (car == null) {
+            return 0;
         }
 
-        OtherCostCursor otherCost = new OtherCostSelection().carId(carId).limit(1).query(
-                mContext.getContentResolver(),
-                new String[]{OtherCostColumns.MILEAGE},
-                OtherCostColumns.MILEAGE + " DESC");
-        if (otherCost.moveToNext() && otherCost.getMileage() != null) {
-            latestOtherCostMileage = otherCost.getMileage();
-        }
+        Refueling ref = mDB.getRefuelingDao().getLastForCar(carId);
+        latestRefuelingMileage = (ref == null ? 0 : ref.getMileage());
+
+        OtherCost oc = mDB.getOtherCostDao().getLastForCar(carId);
+        latestOtherCostMileage = (oc == null ? 0 : oc.getMileage());
 
         return Math.max(car.getInitialMileage(), Math.max(latestOtherCostMileage, latestRefuelingMileage));
     }
@@ -78,7 +82,6 @@ public class CarPresenter {
      * @return The count of all cars.
      */
     public int getCount() {
-        CarCursor cursor = new CarSelection().query(mContext.getContentResolver(), new String[]{CarColumns._ID});
-        return cursor.getCount();
+        return mDB.getCarDao().getAll().size();
     }
 }

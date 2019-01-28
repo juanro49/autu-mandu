@@ -17,6 +17,9 @@ public interface OtherCostDAO {
     @Query("SELECT * FROM other_cost WHERE _id = :id")
     OtherCost getById(long id);
 
+    @Query("SELECT * FROM other_cost WHERE car_id = :car AND mileage IS NOT NULL ORDER BY mileage DESC LIMIT 1")
+    OtherCost getLastForCar(long car);
+
     @Insert
     long[] insert(OtherCost... otherCosts);
 

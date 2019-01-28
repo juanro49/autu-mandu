@@ -20,6 +20,9 @@ public interface RefuelingDAO {
     @Query("SELECT * FROM refueling WHERE _id = :id")
     Refueling getById(long id);
 
+    @Query("SELECT * FROM refueling WHERE car_id = :car ORDER BY mileage DESC LIMIT 1")
+    Refueling getLastForCar(long car);
+
     @Insert
     long[] insert(Refueling... refuelings);
 
