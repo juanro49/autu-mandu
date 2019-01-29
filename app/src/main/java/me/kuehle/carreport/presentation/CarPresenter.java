@@ -13,12 +13,10 @@ import me.kuehle.carreport.model.entity.Refueling;
 
 public class CarPresenter {
 
-    private Context mContext;
     private CarReportDatabase mDB;
 
     private CarPresenter(Context context) {
-        mContext = context;
-        mDB = CarReportDatabase.getInstance(mContext);
+        mDB = CarReportDatabase.getInstance(context);
     }
 
     /**
@@ -41,19 +39,16 @@ public class CarPresenter {
     }
 
     public int getLatestMileage(long carId) {
-        int latestRefuelingMileage = 0;
-        int latestOtherCostMileage = 0;
-
         Car car = mDB.getCarDao().getById(carId);
         if (car == null) {
             return 0;
         }
 
         Refueling ref = mDB.getRefuelingDao().getLastForCar(carId);
-        latestRefuelingMileage = (ref == null ? 0 : ref.getMileage());
+        int latestRefuelingMileage = (ref == null ? 0 : ref.getMileage());
 
         OtherCost oc = mDB.getOtherCostDao().getLastForCar(carId);
-        latestOtherCostMileage = (oc == null ? 0 : oc.getMileage());
+        int latestOtherCostMileage = (oc == null ? 0 : oc.getMileage());
 
         return Math.max(car.getInitialMileage(), Math.max(latestOtherCostMileage, latestRefuelingMileage));
     }

@@ -24,12 +24,10 @@ import me.kuehle.carreport.model.dao.OtherCostDAO;
 
 public class OtherCostPresenter {
 
-    private Context mContext;
     private CarReportDatabase mDB;
 
     private OtherCostPresenter(Context context){
-        mContext = context;
-        mDB = CarReportDatabase.getInstance(mContext);
+        mDB = CarReportDatabase.getInstance(context);
     }
 
     public static OtherCostPresenter getInstance(Context context) {
