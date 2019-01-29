@@ -5,6 +5,7 @@ import java.util.Date;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import me.kuehle.carreport.model.ICar;
 
@@ -29,6 +30,7 @@ public class Car implements ICar {
 
     public Car() {}
 
+    @Ignore
     public Car(@NonNull String name, int color, int initialMileage, Date suspension) {
         this.setName(name);
         this.setColor(color);

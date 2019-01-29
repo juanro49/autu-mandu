@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import me.kuehle.carreport.model.IReminder;
 import me.kuehle.carreport.model.entity.helper.TimeSpanUnit;
@@ -54,6 +55,7 @@ public class Reminder implements IReminder {
 
     public Reminder() {}
 
+    @Ignore
     public Reminder(long carId, @NonNull String title, TimeSpanUnit afterTimeSpanUnit,
                     Integer afterTimeSpanCount, Integer afterDistance, @NonNull Date startDate,
                     int startMileage, boolean notificationDismissed, Date snoozedUntil) {
