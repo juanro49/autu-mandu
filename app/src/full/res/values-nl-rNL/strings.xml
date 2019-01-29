@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toast_need_accounts_permission">Om deze actie uit te voeren moet Car Report in staat zijn om uw geconfigureerde Google-accounts te lezen.</string>
+</resources>

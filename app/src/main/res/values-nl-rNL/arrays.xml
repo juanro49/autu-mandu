@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="data_list_page_titles">
+        <item>Tankbeurten</item>
+        <item>Andere uitgaven</item>
+        <item>Andere inkomsten</item>
+    </string-array>
+
+    <string-array name="repeat_intervals">
+        <item>Eenmalig</item>
+        <item>Herhaal elke dag</item>
+        <item>Herhaal elke maand</item>
+        <item>Herhaal elk kwartaal</item>
+        <item>Herhaal elk jaar</item>
+    </string-array>
+
+    <string-array name="reminder_after_types">
+        <item>Na afstand of tijd, afhankelijk van wat het eerst komt</item>
+        <item>Na afstand</item>
+        <item>Na tijd</item>
+    </string-array>
+
+    <string-array name="time_units">
+        <item>Dag(en)</item>
+        <item>Maand(en)</item>
+        <item>Jaar(en)</item>
+    </string-array>
+</resources>
