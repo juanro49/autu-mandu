@@ -26,9 +26,6 @@ import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.fueltype.FuelTypeContentValues;
 import me.kuehle.carreport.provider.fueltype.FuelTypeCursor;
 import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
-import me.kuehle.carreport.provider.refueling.RefuelingColumns;
-import me.kuehle.carreport.provider.refueling.RefuelingCursor;
-import me.kuehle.carreport.provider.refueling.RefuelingSelection;
 
 public class FuelTypePresenter {
 
