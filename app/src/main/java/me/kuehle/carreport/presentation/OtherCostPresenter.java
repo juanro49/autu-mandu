@@ -17,19 +17,19 @@ package me.kuehle.carreport.presentation;
 
 import android.content.Context;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
-import me.kuehle.carreport.provider.othercost.OtherCostColumns;
-import me.kuehle.carreport.provider.othercost.OtherCostCursor;
-import me.kuehle.carreport.provider.othercost.OtherCostSelection;
+import me.kuehle.carreport.model.CarReportDatabase;
+import me.kuehle.carreport.model.dao.OtherCostDAO;
 
 public class OtherCostPresenter {
 
     private Context mContext;
+    private CarReportDatabase mDB;
 
     private OtherCostPresenter(Context context){
         mContext = context;
+        mDB = CarReportDatabase.getInstance(mContext);
     }
 
     public static OtherCostPresenter getInstance(Context context) {
@@ -37,22 +37,13 @@ public class OtherCostPresenter {
     }
 
     public String[] getTitles(boolean expenditures) {
-        Set<String> titles = new HashSet<>();
-
-        OtherCostSelection otherCostTitleQuery = new OtherCostSelection();
+        OtherCostDAO ocDAO = mDB.getOtherCostDao();
+        List<String> titles;
         if (expenditures) {
-            otherCostTitleQuery.priceGt(0);
+            titles = ocDAO.getPositiveCostTitles();
         } else {
-            otherCostTitleQuery.priceLt(0);
+            titles = ocDAO.getNegativeCostTitles();
         }
-
-        OtherCostCursor otherCost = otherCostTitleQuery.query(mContext.getContentResolver(),
-                new String[]{OtherCostColumns.TITLE},
-                OtherCostColumns.TITLE + " COLLATE UNICODE ASC");
-        while (otherCost.moveToNext()) {
-            titles.add(otherCost.getTitle());
-        }
-
-        return titles.toArray(new String[titles.size()]);
+        return titles.toArray(new String[0]);
     }
 }
