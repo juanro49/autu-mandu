@@ -48,7 +48,7 @@ public class FuelTypePresenter {
             categories.add(ft.getCategory());
         }
 
-        return categories.toArray(new String[categories.size()]);
+        return categories.toArray(new String[0]);
     }
 
     public void ensureAtLeastOne() {
