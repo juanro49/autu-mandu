@@ -49,13 +49,13 @@
     <string name="hint_price">Стоимость</string>
     <string name="hint_price_total">Общая стоимость</string>
     <string name="hint_price_per_unit">Цена за единицу</string>
-    <string name="hint_note_optional">Примичание (если есть)</string>
+    <string name="hint_note_optional">Примечание (если есть)</string>
     <string name="hint_title">Заголовок</string>
     <string name="hint_name">Наименование</string>
     <string name="hint_date">Дата</string>
     <string name="hint_time">Время</string>
     <string name="hint_end_date">Дата окончания</string>
-    <string name="hint_suspend_date">Приостоновленно</string>
+    <string name="hint_suspend_date">Приостановлено</string>
     <string name="hint_category">Категория</string>
     <string name="hint_url">URL</string>
     <string name="hint_user_name">Имя пользователя</string>
@@ -78,7 +78,7 @@
     <string name="label_trust_certificate">Доверять сертификату</string>
 
     <string name="description_suspend">Вы можете приостановить учет авто когда уже не используете его. В результате все повторяющиеся траты перестанут насчитываться. Также авто не будет попадать в отчет по умолчанию.</string>
-    <string name="description_category">Некоторые отчеты групируется по категории топлива. Например: Бензин, салярка, газ.</string>
+    <string name="description_category">Некоторые отчеты группируется по категории топлива. Например: Бензин, солярка, газ.</string>
     <string name="description_reminder_status_due">Установлено</string>
     <string name="description_reminder_status_due_snoozed">Установлено, отложено до %s</string>
     <string name="description_reminder_status_due_dismissed">Установлено без уведомления</string>
@@ -86,14 +86,14 @@
     <string name="description_reminder_status_distance">Установлено на %s</string>
     <string name="description_reminder_status_time">Установлено на %s</string>
     <string name="description_webdav_url">Пожалуйста укажите URL к папке на вашем WebDAV сервере. Car Report будет записывать в эту папку. Данные вне папки не будут изменены.</string>
-    <string name="description_webdav_trust_certificate">Android не доверяет сертификату этого вэб сайта.</string>
+    <string name="description_webdav_trust_certificate">Android не доверяет сертификату этого веб-сайта.</string>
 
     <string name="validate_error_greater_zero">Должно быть больше 0</string>
     <string name="validate_error_not_empty">Должно быть заполнено</string>
     <string name="validate_error_mileage_out_of_range_total">Пробег должен быть между пробегом прошлой и следующей заправки. Чтобы указать пробег поездки необходимо изменить настройки заполнения.</string>
     <string name="validate_error_mileage_out_of_range_trip">Общий пробег не может быть больше чем пробег следующей заправки в этом режиме заполнения. Чтобы указать общий пробег необходимо изменить настройки заполнения.</string>
     <string name="validate_error_fuel_type_exists">Этот тип топлива не настроен.</string>
-    <string name="validate_error_webdav_invalid_certificate">Сертификат вероятно недействителен и не может быть использован.</string>
+    <string name="validate_error_webdav_invalid_certificate">Сертификат, вероятно, недействителен и не может быть использован.</string>
 
     <string name="suspended">Приостановлено</string>
     <string name="suspended_since">Приостановлено с %s</string>
@@ -146,9 +146,9 @@
     <string name="alert_backup_overwrite_title">Резервное копирование</string>
     <string name="alert_backup_overwrite_message">На SD карте есть предыдущая копия.</string>
     <string name="alert_backup_failed">Ошибка копирования</string>
-    <string name="alert_restore_title">Востановить</string>
-    <string name="alert_restore_message">Перед восстановлением текущие данные будут удалены. Убедитесь, что копия сделана на текуще или более ранней версии приложения.</string>
-    <string name="alert_restore_failed">Ошибка востановления</string>
+    <string name="alert_restore_title">Восстановить</string>
+    <string name="alert_restore_message">Перед восстановлением текущие данные будут удалены. Убедитесь, что копия сделана на текущей или более ранней версии приложения.</string>
+    <string name="alert_restore_failed">Ошибка восстановления</string>
     <string name="alert_export_csv_overwrite_title">Экспорт CSV</string>
     <string name="alert_export_csv_overwrite_message">На SD карте существует предыдущий файл экспорта.</string>
     <string name="alert_export_csv_failed">Ошибка экспорта.\n\nПричина: %s</string>
@@ -159,7 +159,7 @@
 
     <string name="toast_new_refueling">Расход топлива: %1$.2f %2$s %3$s</string>
     <string name="toast_backup_succeeded">Копирование в файл %s завершилось успешно.</string>
-    <string name="toast_restore_succeeded">Востановние завершилось успешно</string>
+    <string name="toast_restore_succeeded">Восстановление завершилось успешно</string>
     <string name="toast_export_csv_succeeded">Экспорт на SD карту завершился успешно.</string>
     <string name="toast_import_csv_succeeded">Импорт завершился успешно.</string>
     <string name="toast_need_storage_permission">Для выполнения этой операции Car Report необходим доступ к файлам.</string>
@@ -202,22 +202,22 @@
     <string name="pref_title_header_backup">Копии &amp; экспорт</string>
     <!-- needs retranslation <string name="pref_title_category_synchronization">Синхронизация</string>!-->
     <string name="pref_title_category_behavior">Поведение</string>
-    <string name="pref_title_category_units">Эдиницы</string>
-    <string name="pref_title_category_backup">Копирование &amp; востановление</string>
+    <string name="pref_title_category_units">Единицы</string>
+    <string name="pref_title_category_backup">Копирование &amp; восстановление</string>
     <string name="pref_title_category_export">Экспорт &amp; импорт</string>
     <string name="pref_title_behavior_default_car">Текущее авто</string>
     <string name="pref_title_behavior_show_car_menu">Показать меню авто</string>
     <string name="pref_title_behavior_distance_entry_mode">Режим ввода пробега</string>
     <string name="pref_title_behavior_price_entry_mode">Режим ввода цены</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Расчитать пропущенные заправки (Beta)</string>
-    <string name="pref_title_behavior_reminder_snooze_duration">Время отложенных напонинаний</string>
+    <string name="pref_title_behavior_reminder_snooze_duration">Время отложенных напоминаний</string>
     <string name="pref_title_unit_currency">Валюта</string>
     <string name="pref_title_unit_volume">Объем</string>
     <string name="pref_title_unit_distance">Пробег</string>
     <string name="pref_title_unit_fuel_consumption">Расход топлива</string>
     <!-- needs retranslation <string name="pref_title_sync_setup">Настройка синхронизации</string>!-->
     <string name="pref_title_backup">Резервная копия</string>
-    <string name="pref_title_restore">Востановление</string>
+    <string name="pref_title_restore">Восстановление</string>
     <string name="pref_title_exportcsv">Экспорт CSV</string>
     <string name="pref_title_importcsv">Импорт CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Показывать меню выбора авто при вводе заправки, если есть больше одного авто.</string>
@@ -225,9 +225,9 @@
     <!-- needs retranslation <string name="pref_summary_sync_setup">Синхронизация работает очень просто. Если вы поменяете данные на двух устройствах одновременно и запустите синхронизацию, устройство синхронизирующееся последним потеряет свои изменения. Убедитесь, что на всех устройствах установленна одна и таже версия Car Report.</string>!-->
     <!-- needs retranslation <string name="pref_summary_sync_current_provider">Соединено с %s. Нажмите чтобы разьединить.</string>!-->
     <string name="pref_summary_backup">Резервное копирование на SD карту.</string>
-    <string name="pref_summary_restore">Востановление данных из файла %s на SD карте.</string>
+    <string name="pref_summary_restore">Восстановление данных из файла %s на SD карте.</string>
     <!--<string name="pref_summary_restore_no_data">Файл %s отсутствует на SD карте.</string>!-->
-    <string name="pref_summary_export_csv">Эксопрт данных в CSV для использования в других программах типа Microsoft Excel или LibreOffice Calc.</string>
+    <string name="pref_summary_export_csv">Экспорт данных в CSV для использования в других программах типа Microsoft Excel или LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Импорт данных из CSV файла. Файлы должны быть похожи на те, что создаются при CSV экспорте.</string>
     <string name="pref_summary_import_csv_no_data">Нет файлов в каталоге %s на SD карте.</string>
     
@@ -265,12 +265,12 @@
     <string name="notification_reminder_action_snooze">Отложить</string>
     <string name="notification_reminder_action_snooze_all">Отложить все</string>
 
-    <string name="distance_entry_mode_trip">Длинна маршрута</string>
+    <string name="distance_entry_mode_trip">Длина маршрута</string>
     <string name="distance_entry_mode_total">Общий пробег</string>
     <string name="price_entry_mode_per_unit_and_volume">Цена за единицу &amp; объем</string>
     <string name="price_entry_mode_per_unit_and_total">Цена за единицу &amp; итоговая цена</string>
     <string name="price_entry_mode_total_and_volume">Итоговая цена &amp; объем</string>
-    <string name="missing_refueling">Заправка пропущенна</string>
+    <string name="missing_refueling">Заправка пропущена</string>
     <string name="invalid_data">Эта запись содержит ошибки. Измените ее и сохраните, чтобы увидеть подробности.</string>
     <string name="graph_details_desc">График подробно</string>
     <string name="graph_options_desc">Опции графика</string>
