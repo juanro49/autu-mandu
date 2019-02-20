@@ -202,12 +202,12 @@ limitations under the License.
     <string name="pref_title_header_fuel_types">Tipi di carburante</string>
     <string name="pref_title_header_reminders">Note</string>
     <string name="pref_title_header_report_order">Ordine rapporti</string>
-    <string name="pref_title_header_backup">Archiviazione &amp; esportazion</string>
+    <string name="pref_title_header_backup">Archiviazione &amp; esportazione</string>
     <string name="pref_title_category_synchronization">Sincronizza archivio</string>
     <string name="pref_title_category_behavior">Comportamento</string>
     <string name="pref_title_category_units">Unità</string>
-    <string name="pref_title_category_backup">Archiviazione &amp; Ripristino</string>
-    <string name="pref_title_category_export">Esportazione &amp; Importazione</string>
+    <string name="pref_title_category_backup">Archiviazione &amp; ripristino</string>
+    <string name="pref_title_category_export">Esportazione &amp; importazione</string>
     <string name="pref_title_behavior_default_car">Default car</string>
     <string name="pref_title_behavior_show_car_menu">Mostra menu auto</string>
     <string name="pref_title_behavior_distance_entry_mode">Modalità inserimento distanze</string>
