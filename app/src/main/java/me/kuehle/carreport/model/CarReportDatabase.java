@@ -27,6 +27,7 @@ import me.kuehle.carreport.model.entity.OtherCost;
 import me.kuehle.carreport.model.entity.Refueling;
 import me.kuehle.carreport.model.entity.Reminder;
 import me.kuehle.carreport.model.entity.helper.SQLTypeConverters;
+import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
 
 import static me.kuehle.carreport.provider.DataSQLiteOpenHelper.DATABASE_FILE_NAME;
 
@@ -46,6 +47,11 @@ public abstract class CarReportDatabase extends RoomDatabase {
     private static final String DB_NAME = DATABASE_FILE_NAME;
     private static final String LOG_TAG = "CarReportDatabase";
 
+    /**
+     * Get an instance of the persistent Database used by the app.
+     * @param context A Context inside the Database should be used.
+     * @return The instance of the Database.
+     */
     public static synchronized CarReportDatabase getInstance(Context context) {
         if (sInstance == null) {
             sInstance = Room.databaseBuilder(context, CarReportDatabase.class, DB_NAME).
@@ -70,6 +76,15 @@ public abstract class CarReportDatabase extends RoomDatabase {
                     build();
         }
         return sInstance;
+    }
+
+    public static void resetInstance() {
+        // We need to call back legacy.
+        DataSQLiteOpenHelper.resetInstance();
+        if (sInstance != null) {
+            sInstance.close();
+            sInstance = null;
+        }
     }
 
     private static class AssetFileBasedMigration extends Migration {

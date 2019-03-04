@@ -107,6 +107,17 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
 
     // @formatter:on
 
+    /**
+     * Closes connection and forces re initialization of connection.
+     */
+    public static void resetInstance() {
+        if (sInstance != null) {
+            Log.d(TAG, "resetting instance");
+            sInstance.close();
+            sInstance = null;
+        }
+    }
+
     public static DataSQLiteOpenHelper getInstance(Context context) {
         // Use the application context, which will ensure that you
         // don't accidentally leak an Activity's context.
@@ -126,17 +137,21 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
         roomDB.getRefuelingDao().getAll();
         roomDB.getReminderDao().getAll();
 
+        String name = roomDB.getOpenHelper().getDatabaseName();
+        Log.d(TAG, String.format("Using database at %s via classic content provider.",
+                context.getDatabasePath(name).getAbsolutePath()));
+
         // Execute legacy.
-        return newInstancePostHoneycomb(context);
+        return newInstancePostHoneycomb(context, name);
     }
 
 
-    private static DataSQLiteOpenHelper newInstancePostHoneycomb(Context context) {
-        return new DataSQLiteOpenHelper(context, new DefaultDatabaseErrorHandler());
+    private static DataSQLiteOpenHelper newInstancePostHoneycomb(Context context, String path) {
+        return new DataSQLiteOpenHelper(context, path, new DefaultDatabaseErrorHandler());
     }
 
-    private DataSQLiteOpenHelper(Context context, DatabaseErrorHandler errorHandler) {
-        super(context, DATABASE_FILE_NAME, null, DATABASE_VERSION, errorHandler);
+    private DataSQLiteOpenHelper(Context context, String path, DatabaseErrorHandler errorHandler) {
+        super(context, path,null, DATABASE_VERSION, errorHandler);
         mContext = context;
         mOpenHelperCallbacks = new DataSQLiteOpenHelperCallbacks();
     }

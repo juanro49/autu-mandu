@@ -33,7 +33,6 @@ import android.widget.EditText;
 import java.util.Date;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.query.CarQueries;
 import me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment;
 import me.kuehle.carreport.gui.dialog.SupportColorPickerDialogFragment.SupportColorPickerDialogFragmentListener;
 import me.kuehle.carreport.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
@@ -41,6 +40,7 @@ import me.kuehle.carreport.gui.util.DateTimeInput;
 import me.kuehle.carreport.gui.util.FormFieldNotEmptyValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
 import me.kuehle.carreport.gui.util.SimpleAnimator;
+import me.kuehle.carreport.presentation.CarPresenter;
 import me.kuehle.carreport.provider.car.CarContentValues;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -64,8 +64,8 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-
-        if (CarQueries.getCount(getActivity()) == 1) {
+        CarPresenter cp = CarPresenter.getInstance(getContext());
+        if (cp.getCount() == 1) {
             menu.removeItem(R.id.menu_delete);
         }
     }

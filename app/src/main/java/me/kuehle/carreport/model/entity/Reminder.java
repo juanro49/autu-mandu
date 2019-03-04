@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import me.kuehle.carreport.model.IReminder;
 import me.kuehle.carreport.model.entity.helper.TimeSpanUnit;
@@ -51,6 +52,23 @@ public class Reminder implements IReminder {
 
     @ColumnInfo(name = "car_id")
     private long carId;
+
+    public Reminder() {}
+
+    @Ignore
+    public Reminder(long carId, @NonNull String title, TimeSpanUnit afterTimeSpanUnit,
+                    Integer afterTimeSpanCount, Integer afterDistance, @NonNull Date startDate,
+                    int startMileage, boolean notificationDismissed, Date snoozedUntil) {
+        this.setCarId(carId);
+        this.setTitle(title);
+        this.setAfterTimeSpanUnit(afterTimeSpanUnit);
+        this.setAfterTimeSpanCount(afterTimeSpanCount);
+        this.setAfterDistance(afterDistance);
+        this.setStartDate(startDate);
+        this.setStartMileage(startMileage);
+        this.setNotificationDismissed(notificationDismissed);
+        this.setSnoozedUntil(snoozedUntil);
+    }
 
     @Override
     public Long getId() {

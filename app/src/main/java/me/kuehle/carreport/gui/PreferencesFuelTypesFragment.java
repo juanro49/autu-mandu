@@ -32,7 +32,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.query.FuelTypeQueries;
+import me.kuehle.carreport.presentation.FuelTypePresenter;
 import me.kuehle.carreport.gui.dialog.EditFuelTypeDialogFragment;
 import me.kuehle.carreport.gui.dialog.MessageDialogFragment;
 import me.kuehle.carreport.gui.util.AbstractPreferenceActivity;
@@ -66,7 +66,7 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
                 case R.id.menu_delete:
                     long[] ids = getListView().getCheckedItemIds();
                     for (long id : ids) {
-                        if (FuelTypeQueries.isUsed(getActivity(), id)) {
+                        if (FuelTypePresenter.getInstance(getActivity()).isUsed(id)) {
                             MessageDialogFragment.newInstance(null, 0, R.string.alert_delete_title,
                                     getString(R.string.alert_cannot_delete_fuel_type),
                                     android.R.string.ok, null)

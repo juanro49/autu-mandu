@@ -48,8 +48,8 @@ public class Application extends MultiDexApplication {
     public static void closeDatabases() {
         if (instance != null) {
             Log.v(TAG, "Closing Database via abstraction layers.");
-            CarReportDatabase.getInstance(instance).close();
-            DataSQLiteOpenHelper.getInstance(instance).close();
+            CarReportDatabase.resetInstance();
+            DataSQLiteOpenHelper.resetInstance();
         }
     }
 

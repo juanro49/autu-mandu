@@ -25,7 +25,7 @@ import java.util.List;
 
 import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
-import me.kuehle.carreport.data.query.CarQueries;
+import me.kuehle.carreport.presentation.CarPresenter;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -56,13 +56,13 @@ public abstract class AbstractVolumeDistanceCalculation extends AbstractCalculat
         mColors = new ArrayList<>();
 
         RefuelingBalancer balancer = new RefuelingBalancer(mContext);
+        CarPresenter carPresenter = CarPresenter.getInstance(mContext);
 
         CarCursor car = new CarSelection().query(mContext.getContentResolver(), null, CarColumns.NAME + " COLLATE UNICODE");
         car.registerContentObserver(observer);
         mCursorStore.add(car);
         while (car.moveToNext()) {
-            String[] categories = CarQueries.getUsedFuelTypeCategories(mContext, car.getId());
-            for (String category : categories) {
+            for (String category : carPresenter.getUsedFuelTypeCategories(car.getId())) {
                 BalancedRefuelingCursor refueling = balancer.getBalancedRefuelings(car.getId(), category);
                 refueling.registerContentObserver(observer);
                 mCursorStore.add(refueling);

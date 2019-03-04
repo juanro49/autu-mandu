@@ -24,15 +24,13 @@ import org.joda.time.DateTime;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
 import me.kuehle.carreport.data.balancing.BalancedRefuelingCursor;
 import me.kuehle.carreport.data.balancing.RefuelingBalancer;
-import me.kuehle.carreport.data.query.CarQueries;
-import me.kuehle.carreport.data.query.RefuelingQueries;
+import me.kuehle.carreport.presentation.CarPresenter;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -226,6 +224,7 @@ public class MileageReport extends AbstractReport {
 
         ArrayList<Cursor> cursors = new ArrayList<>();
         // Car data
+        CarPresenter carPresenter = CarPresenter.getInstance(mContext);
         CarCursor car = new CarSelection().query(mContext.getContentResolver(), null, CarColumns.NAME + " COLLATE UNICODE");
         cursors.add(car);
         while (car.moveToNext()) {
@@ -238,8 +237,7 @@ public class MileageReport extends AbstractReport {
             }
 
             // Per refueling data
-            String[] categories = CarQueries.getUsedFuelTypeCategories(mContext, car.getId());
-            for (String category : categories) {
+            for (String category : carPresenter.getUsedFuelTypeCategories(car.getId())) {
                 ReportChartDataPerRefueling carDataPerRefueling = new ReportChartDataPerRefueling(
                         mContext, car, category);
                 cursors.addAll(Arrays.asList(carDataPerRefueling.getUsedCursors()));

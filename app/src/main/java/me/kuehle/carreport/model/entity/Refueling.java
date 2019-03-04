@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import me.kuehle.carreport.model.IRefueling;
 
@@ -53,6 +54,21 @@ public class Refueling implements IRefueling {
 
     @ColumnInfo(name = "car_id")
     private long carId;
+
+    public Refueling() {}
+
+    @Ignore
+    public Refueling(long carId, long fuelTypeId, @NonNull Date date, int mileage, float volume,
+                     float price, boolean partial, @NonNull String note) {
+        this.setCarId(carId);
+        this.setFuelTypeId(fuelTypeId);
+        this.setDate(date);
+        this.setMileage(mileage);
+        this.setVolume(volume);
+        this.setPrice(price);
+        this.setPartial(partial);
+        this.setNote(note);
+    }
 
     @Override
     public Long getId() {

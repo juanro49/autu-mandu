@@ -3,6 +3,7 @@ package me.kuehle.carreport.model.entity;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import me.kuehle.carreport.model.IFuelType;
 
@@ -20,6 +21,12 @@ public class FuelType implements IFuelType {
     private String category;
 
     public FuelType(){
+    }
+
+    @Ignore
+    public FuelType(@NonNull String name, String category) {
+        this.setName(name);
+        this.setCategory(category);
     }
 
     @Override

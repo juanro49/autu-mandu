@@ -53,9 +53,9 @@ import java.util.Date;
 import me.kuehle.carreport.BuildConfig;
 import me.kuehle.carreport.Preferences;
 import me.kuehle.carreport.R;
-import me.kuehle.carreport.data.query.CarQueries;
 import me.kuehle.carreport.gui.util.AutoBackupTask;
 import me.kuehle.carreport.gui.util.NewRefuelingSnackbar;
+import me.kuehle.carreport.presentation.CarPresenter;
 import me.kuehle.carreport.provider.DataProvider;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
         mNavigationView.getMenu().performIdentifierAction(item.getItemId(), 0);
 
         // When there is no car, show the first start activity.
-        if (CarQueries.getCount(this) == 0) {
+        if (CarPresenter.getInstance(getApplicationContext()).getCount() == 0) {
             Intent intent = new Intent(this, FirstStartActivity.class);
             startActivityForResult(intent, REQUEST_FIRST_START);
         }

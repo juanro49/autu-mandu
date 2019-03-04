@@ -56,6 +56,20 @@ public class OtherCost implements IOtherCost {
 
     public OtherCost() {}
 
+    public OtherCost(@NonNull String title, long carId, @NonNull Date date, Integer mileage,
+                     float price, @NonNull RecurrenceInterval recurrenceInterval,
+                     int recurrenceMultiplier, Date endDate, @NonNull String note) {
+        this.setTitle(title);
+        this.setCarId(carId);
+        this.setDate(date);
+        this.setMileage(mileage);
+        this.setPrice(price);
+        this.setRecurrenceInterval(recurrenceInterval);
+        this.setRecurrenceMultiplier(recurrenceMultiplier);
+        this.setEndDate(endDate);
+        this.setNote(note);
+    }
+
     @Override
     public Long getId() {
         return id;
