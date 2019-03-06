@@ -18,7 +18,6 @@ package me.kuehle.carreport.util.backup;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.util.Log;
@@ -117,7 +116,7 @@ public class Backup {
                 InputStream backupSource = resolver.openInputStream(backup);
                 OutputStream backupTarget = new FileOutputStream(dbFile);
                 if (FileCopyUtil.copyFile(backupSource, backupTarget)) {
-                    if (checkBackupSanity(dbFile)) {
+                    if (checkBackupSanity()) {
                         return true;
                     } else {
                         throw new IOException("Backup is insane.");
@@ -135,19 +134,15 @@ public class Backup {
     }
 
     /**
-     * Checks a file for sanity for use as restored backup.
-     * @param dbFile A file that claims to be a valid backup-file.
-     * @return Whether the file is valid.
+     * Checks whether the current DB file is valid.
+     * @return Whether the DB is valid.
      */
-    private boolean checkBackupSanity(File dbFile) {
+    private boolean checkBackupSanity() {
         try {
-            SQLiteDatabase instance = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null,
-                    SQLiteDatabase.OPEN_READONLY);
-            instance.rawQuery("PRAGMA integrity_check(1)", null);
-            // TODO: a version check should be built in here. This would require a schema change.
-            instance.close();
+            DataSQLiteOpenHelper.getInstance(Application.getContext());
             return true;
-        } catch (SQLiteException e) {
+        } catch (Exception e) {
+            Application.closeDatabases();
             Log.e(TAG, "Database is broken.", e);
             return false;
         }
