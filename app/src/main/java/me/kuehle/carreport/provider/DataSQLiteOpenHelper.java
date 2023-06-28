@@ -31,13 +31,14 @@ import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.othercost.OtherCostColumns;
 import me.kuehle.carreport.provider.refueling.RefuelingColumns;
 import me.kuehle.carreport.provider.reminder.ReminderColumns;
+import me.kuehle.carreport.provider.station.StationColumns;
 
 @Deprecated
 public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = DataSQLiteOpenHelper.class.getSimpleName();
 
     public static final String DATABASE_FILE_NAME = "data.db";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
     private static DataSQLiteOpenHelper sInstance;
     private final Context mContext;
     private final DataSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
@@ -49,7 +50,8 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
             + CarColumns.NAME + " TEXT NOT NULL, "
             + CarColumns.COLOR + " INTEGER NOT NULL, "
             + CarColumns.INITIAL_MILEAGE + " INTEGER NOT NULL DEFAULT 0, "
-            + CarColumns.SUSPENDED_SINCE + " INTEGER "
+            + CarColumns.SUSPENDED_SINCE + " INTEGER, "
+            + CarColumns.BUYING_PRICE + " REAL "
             + " );";
 
     public static final String SQL_CREATE_TABLE_FUEL_TYPE = "CREATE TABLE IF NOT EXISTS "
@@ -59,6 +61,13 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
             + FuelTypeColumns.CATEGORY + " TEXT "
             + ", CONSTRAINT unique_name UNIQUE (fuel_type__name) ON CONFLICT REPLACE"
             + " );";
+
+    public static final String SQL_CREATE_TABLE_STATION = "CREATE TABLE IF NOT EXISTS "
+        + StationColumns.TABLE_NAME + " ( "
+        + StationColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        + StationColumns.NAME + " TEXT NOT NULL "
+        + ", CONSTRAINT unique_name UNIQUE (station__name) ON CONFLICT REPLACE"
+        + " );";
 
     public static final String SQL_CREATE_TABLE_OTHER_COST = "CREATE TABLE IF NOT EXISTS "
             + OtherCostColumns.TABLE_NAME + " ( "
@@ -87,6 +96,7 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
             + RefuelingColumns.FUEL_TYPE_ID + " INTEGER NOT NULL, "
             + RefuelingColumns.CAR_ID + " INTEGER NOT NULL "
             + ", CONSTRAINT fk_fuel_type_id FOREIGN KEY (" + RefuelingColumns.FUEL_TYPE_ID + ") REFERENCES fuel_type (_id) ON DELETE CASCADE"
+            + ", CONSTRAINT fk_station_id FOREIGN KEY (" + RefuelingColumns.STATION_ID + ") REFERENCES station (_id) ON DELETE CASCADE"
             + ", CONSTRAINT fk_car_id FOREIGN KEY (" + RefuelingColumns.CAR_ID + ") REFERENCES car (_id) ON DELETE CASCADE"
             + " );";
 
@@ -133,6 +143,7 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
         CarReportDatabase roomDB = CarReportDatabase.getInstance(context);
         roomDB.getCarDao().getAll();
         roomDB.getFuelTypeDao().getAll();
+        roomDB.getStationDao().getAll();
         roomDB.getOtherCostDao().getAll();
         roomDB.getRefuelingDao().getAll();
         roomDB.getReminderDao().getAll();

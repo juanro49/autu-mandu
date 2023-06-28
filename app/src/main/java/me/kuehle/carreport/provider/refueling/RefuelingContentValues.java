@@ -110,6 +110,10 @@ public class RefuelingContentValues extends AbstractContentValues {
         return this;
     }
 
+    public RefuelingContentValues putStationId(long value) {
+        mContentValues.put(RefuelingColumns.STATION_ID, value);
+        return this;
+    }
 
     public RefuelingContentValues putCarId(long value) {
         mContentValues.put(RefuelingColumns.CAR_ID, value);

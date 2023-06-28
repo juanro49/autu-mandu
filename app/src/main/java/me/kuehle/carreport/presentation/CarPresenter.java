@@ -2,7 +2,9 @@ package me.kuehle.carreport.presentation;
 
 import android.content.Context;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import me.kuehle.carreport.model.CarReportDatabase;
@@ -10,6 +12,7 @@ import me.kuehle.carreport.model.entity.Car;
 import me.kuehle.carreport.model.entity.FuelType;
 import me.kuehle.carreport.model.entity.OtherCost;
 import me.kuehle.carreport.model.entity.Refueling;
+import me.kuehle.carreport.model.entity.Station;
 
 public class CarPresenter {
 
@@ -36,6 +39,16 @@ public class CarPresenter {
         }
 
         return categories;
+    }
+
+    public Map<String, Double> getUsedStations(long carId) {
+        Map<String, Double> stations = new HashMap<>();
+        for (Station s: mDB.getStationDao().getUsedForCar(carId)) {
+            double volume = mDB.getStationDao().getVolumeForStationAndCar(carId, s.getId());
+            stations.put(s.getName(), volume);
+        }
+
+        return stations;
     }
 
     public int getLatestMileage(long carId) {

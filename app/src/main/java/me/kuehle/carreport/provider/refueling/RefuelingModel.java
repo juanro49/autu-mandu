@@ -20,7 +20,6 @@ import me.kuehle.carreport.provider.base.BaseModel;
 import java.util.Date;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 /**
  * A refueling for a car.
@@ -66,6 +65,11 @@ public interface RefuelingModel extends BaseModel {
      * Get the {@code fuel_type_id} value.
      */
     long getFuelTypeId();
+
+    /**
+     * Get the {@code station_id} value.
+     */
+    long getStationId();
 
     /**
      * Get the {@code car_id} value.

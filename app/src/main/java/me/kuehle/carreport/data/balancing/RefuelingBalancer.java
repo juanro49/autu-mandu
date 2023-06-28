@@ -31,6 +31,7 @@ import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.refueling.RefuelingColumns;
 import me.kuehle.carreport.provider.refueling.RefuelingCursor;
 import me.kuehle.carreport.provider.refueling.RefuelingSelection;
+import me.kuehle.carreport.provider.station.StationColumns;
 import me.kuehle.carreport.util.Calculator;
 
 public class RefuelingBalancer {
@@ -44,15 +45,19 @@ public class RefuelingBalancer {
         public boolean partial;
         public String note;
         public long fuelTypeId;
+        public long stationId;
         public long carId;
 
         public String fuelTypeName;
         public String fuelTypeCategory;
 
+        public String stationName;
+
         public String carName;
         public int carColor;
         public int carInitialMileage;
         public Date carSuspendedSince;
+        public double carBuyingPrice;
 
         public boolean guessed = false;
         public boolean valid = true;
@@ -66,21 +71,25 @@ public class RefuelingBalancer {
             this.partial = refueling.getPartial();
             this.note = refueling.getNote();
             this.fuelTypeId = refueling.getFuelTypeId();
+            this.stationId = refueling.getStationId();
             this.carId = refueling.getCarId();
 
             this.fuelTypeName = refueling.getFuelTypeName();
             this.fuelTypeCategory = refueling.getFuelTypeCategory();
 
+            this.stationName = refueling.getStationName();
+
             this.carName = refueling.getCarName();
             this.carColor = refueling.getCarColor();
             this.carInitialMileage = refueling.getCarInitialMileage();
             this.carSuspendedSince = refueling.getCarSuspendedSince();
+            this.carBuyingPrice = refueling.getCarBuyingPrice();
         }
 
         public BalancedRefueling(long _id, Date date, int mileage, float volume, float price,
-                                 boolean partial, String note, long fuelTypeId, long carId,
-                                 String fuelTypeName, String fuelTypeCategory, String carName,
-                                 int carColor, int carInitialMileage, Date carSuspendedSince) {
+                                 boolean partial, String note, long fuelTypeId, long stationId, long carId,
+                                 String fuelTypeName, String fuelTypeCategory, String stationName, String carName,
+                                 int carColor, int carInitialMileage, Date carSuspendedSince, double carBuyingPrice) {
             this._id = _id;
             this.date = date;
             this.mileage = mileage;
@@ -89,22 +98,26 @@ public class RefuelingBalancer {
             this.partial = partial;
             this.note = note;
             this.fuelTypeId = fuelTypeId;
+            this.stationId = stationId;
             this.carId = carId;
 
             this.fuelTypeName = fuelTypeName;
             this.fuelTypeCategory = fuelTypeCategory;
 
+            this.stationName = stationName;
+
             this.carName = carName;
             this.carColor = carColor;
             this.carInitialMileage = carInitialMileage;
             this.carSuspendedSince = carSuspendedSince;
+            this.carBuyingPrice = carBuyingPrice;
         }
 
         public Object[] values() {
             return new Object[]{
-                    _id, date.getTime(), mileage, volume, price, partial ? 1 : 0, note, valid ? 1 : 0, guessed ? 1 : 0, fuelTypeId, carId,
-                    fuelTypeName, fuelTypeCategory,
-                    carName, carColor, carInitialMileage, carSuspendedSince != null ? carSuspendedSince.getTime() : null
+                    _id, date.getTime(), mileage, volume, price, partial ? 1 : 0, note, valid ? 1 : 0, guessed ? 1 : 0, fuelTypeId, stationId, carId,
+                    fuelTypeName, fuelTypeCategory, stationName,
+                    carName, carColor, carInitialMileage, carSuspendedSince != null ? carSuspendedSince.getTime() : null, carBuyingPrice
             };
         }
     }
@@ -154,10 +167,11 @@ public class RefuelingBalancer {
             Collections.reverse(balancedRefuelingList);
         }
 
-        String[] columns = new String[BalancedRefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1 + CarColumns.ALL_COLUMNS.length - 1];
+        String[] columns = new String[BalancedRefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1 + StationColumns.ALL_COLUMNS.length - 1 + CarColumns.ALL_COLUMNS.length - 1];
         System.arraycopy(BalancedRefuelingColumns.ALL_COLUMNS, 0, columns, 0, BalancedRefuelingColumns.ALL_COLUMNS.length);
         System.arraycopy(FuelTypeColumns.ALL_COLUMNS, 1, columns, BalancedRefuelingColumns.ALL_COLUMNS.length, FuelTypeColumns.ALL_COLUMNS.length - 1);
-        System.arraycopy(CarColumns.ALL_COLUMNS, 1, columns, BalancedRefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1, CarColumns.ALL_COLUMNS.length - 1);
+        System.arraycopy(StationColumns.ALL_COLUMNS, 1, columns, BalancedRefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1, StationColumns.ALL_COLUMNS.length - 1);
+        System.arraycopy(CarColumns.ALL_COLUMNS, 1, columns, BalancedRefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1 + StationColumns.ALL_COLUMNS.length - 1, CarColumns.ALL_COLUMNS.length - 1);
 
         MatrixCursor balancedRefuelingCursor = new MatrixCursor(columns, balancedRefuelingList.size());
         balancedRefuelingCursor.setNotificationUri(mContext.getContentResolver(), refuelingSelection.uri());
@@ -264,8 +278,8 @@ public class RefuelingBalancer {
 
                         // Add the refueling to the list and mark it as "guessed".
                         BalancedRefueling guess = new BalancedRefueling(nextId++, newDate, newMileage, newVolume, newPrice,
-                                false, "", refueling.fuelTypeId, refueling.carId, refueling.fuelTypeName, refueling.fuelTypeCategory,
-                                refueling.carName, refueling.carColor, refueling.carInitialMileage, refueling.carSuspendedSince);
+                                false, "", refueling.fuelTypeId, refueling.stationId, refueling.carId, refueling.fuelTypeName, refueling.fuelTypeCategory,
+                                refueling.stationName, refueling.carName, refueling.carColor, refueling.carInitialMileage, refueling.carSuspendedSince, refueling.carBuyingPrice);
                         guess.guessed = true;
                         refuelings.add(pI, guess);
 
@@ -323,8 +337,8 @@ public class RefuelingBalancer {
 
                     // Add the refueling to the list and mark it as "guessed".
                     BalancedRefueling guess = new BalancedRefueling(nextId++, newDate, newMileage, newVolume, newPrice,
-                            partial, "", refueling.fuelTypeId, refueling.carId, refueling.fuelTypeName, refueling.fuelTypeCategory,
-                            refueling.carName, refueling.carColor, refueling.carInitialMileage, refueling.carSuspendedSince);
+                            partial, "", refueling.fuelTypeId, refueling.stationId, refueling.carId, refueling.fuelTypeName, refueling.fuelTypeCategory,
+                            refueling.stationName, refueling.carName, refueling.carColor, refueling.carInitialMileage, refueling.carSuspendedSince, refueling.carBuyingPrice);
                     guess.guessed = true;
                     refuelings.add(i, guess);
 

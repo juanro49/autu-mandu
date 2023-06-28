@@ -192,4 +192,34 @@ public class CarSelection extends AbstractSelection<CarSelection> {
         addLessThanOrEquals(CarColumns.SUSPENDED_SINCE, value);
         return this;
     }
+
+    public CarSelection BuyingPrice(double... value) {
+        addEquals(CarColumns.BUYING_PRICE, toObjectArray(value));
+        return this;
+    }
+
+    /*public CarSelection make(String... value) {
+        addEquals(CarColumns.MAKE, value);
+        return this;
+    }
+
+    public CarSelection model(String... value) {
+        addEquals(CarColumns.MODEL, value);
+        return this;
+    }
+
+    public CarSelection year(int... value) {
+        addEquals(CarColumns.YEAR, toObjectArray(value));
+        return this;
+    }
+
+    public CarSelection licensePlate(String... value) {
+        addEquals(CarColumns.LICENSE_PLATE, value);
+        return this;
+    }
+
+    public CarSelection buyingDate(Date... value) {
+        addEquals(CarColumns.BUYING_DATE, value);
+        return this;
+    }*/
 }

@@ -24,6 +24,8 @@ import android.view.MenuItem;
 
 import org.joda.time.DateTime;
 
+import java.util.Date;
+
 import me.kuehle.carreport.Application;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarContentValues;
@@ -31,6 +33,7 @@ import me.kuehle.carreport.provider.fueltype.FuelTypeContentValues;
 import me.kuehle.carreport.provider.othercost.OtherCostContentValues;
 import me.kuehle.carreport.provider.othercost.RecurrenceInterval;
 import me.kuehle.carreport.provider.refueling.RefuelingContentValues;
+import me.kuehle.carreport.provider.station.StationContentValues;
 
 public class DemoData {
     private static final CharSequence MENU_TITLE_CREATE = "Create demo data";
@@ -60,9 +63,11 @@ public class DemoData {
         long superE10 = createFuelType(context, "Super E10", "Benzin");
         long lpg = createFuelType(context, "LPG", "Gas");
 
+        long stationId =  createStation(context, "Iberdoex");
+
         // Fiat Punto
 
-        long punto = createCar(context, "Fiat Punto", Color.BLUE);
+        long punto = createCar(context, "Fiat Punto", Color.BLUE, "Fiat", "Punto", 2023, "0000ABC", new Date());
 
         int puntoCount = 50;
         DateTime puntoDate = DateTime.now().minusMonths(puntoCount / 2).withSecondOfMinute(0).withMillisOfSecond(0);
@@ -91,13 +96,13 @@ public class DemoData {
 
             if (!randBooleanTrueInOneOutOf(15)) {
                 createRefueling(context, puntoDate, puntoMileage, volume, price, partial, "",
-                        fuelType, punto);
+                        fuelType, stationId, punto);
             }
         }
 
         // Opel Astra
 
-        long astra = createCar(context, "Opel Astra", Color.RED);
+        long astra = createCar(context, "Opel Astra", Color.RED, "Opel", "Astra", 2010, "9999XYZ", new Date());
 
         int astraCountSuper95 = 30;
         int astraCountLpg = 30;
@@ -125,7 +130,7 @@ public class DemoData {
 
             if (!randBooleanTrueInOneOutOf(15)) {
                 createRefueling(context, astraDateSuper95, astraMileageSuper95, volume, price, partial, "",
-                        super95, astra);
+                        super95, stationId, astra);
             }
         }
 
@@ -143,7 +148,7 @@ public class DemoData {
 
             if (!randBooleanTrueInOneOutOf(15)) {
                 createRefueling(context, astraDateLpg, astraMileageLpg, volume, price, partial, "",
-                        lpg, astra);
+                        lpg, stationId, astra);
             }
         }
     }
@@ -154,11 +159,17 @@ public class DemoData {
         context.getContentResolver().delete(CarColumns.CONTENT_URI, null, null);
     }
 
-    private static long createCar(Context context, String name, int color) {
+    private static long createCar(Context context, String name, int color, String make, String model, int year, String licensePlate, Date buyingDate) {
         return getIdFromUri(new CarContentValues()
                 .putName(name)
                 .putColor(color)
                 .putInitialMileage(0)
+                .putBuyingPrice(0)
+                /*.putMake(make)
+                .putModel(model)
+                .putYear(year)
+                .putLicensePlate(licensePlate)
+                .putBuyingDate(buyingDate)*/
                 .insert(context.getContentResolver()));
     }
 
@@ -169,9 +180,15 @@ public class DemoData {
                 .insert(context.getContentResolver()));
     }
 
+    private static long createStation(Context context, String name) {
+        return getIdFromUri(new StationContentValues()
+            .putName(name)
+            .insert(context.getContentResolver()));
+    }
+
     private static long createRefueling(Context context, DateTime date, int mileage, float volume,
                                         float price, boolean partial, String note, long fuelTypeId,
-                                        long carId) {
+                                        long stationId, long carId) {
         // Has a chance of 10% to fail. This emulates, that the user forgot to enter the refueling.
         if (Math.random() > 0.95) {
             return -1;
@@ -185,6 +202,7 @@ public class DemoData {
                 .putPartial(partial)
                 .putNote(note)
                 .putFuelTypeId(fuelTypeId)
+                .putStationId(stationId)
                 .putCarId(carId)
                 .insert(context.getContentResolver()));
     }

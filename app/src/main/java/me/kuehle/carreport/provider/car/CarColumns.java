@@ -19,11 +19,6 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 import me.kuehle.carreport.provider.DataProvider;
-import me.kuehle.carreport.provider.car.CarColumns;
-import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
-import me.kuehle.carreport.provider.othercost.OtherCostColumns;
-import me.kuehle.carreport.provider.refueling.RefuelingColumns;
-import me.kuehle.carreport.provider.reminder.ReminderColumns;
 
 /**
  * A car.
@@ -58,6 +53,35 @@ public class CarColumns implements BaseColumns {
      */
     public static final String SUSPENDED_SINCE = "suspended_since";
 
+    /**
+     * Buying price of the car.
+     */
+    public static final String BUYING_PRICE = "buying_price";
+
+    /**
+     * Make of the car.
+     */
+    //public static final String MAKE = "make";
+
+    /**
+     * Model of the car.
+     */
+    //public static final String MODEL = "model";
+
+    /**
+     * Year of the car.
+     */
+    //public static final String YEAR = "year";
+
+    /**
+     * License plate of the car.
+     */
+    //public static final String LICENSE_PLATE = "license_plate";
+
+    /**
+     * Buying date of the car.
+     */
+    //public static final String BUYING_DATE = "buying_date";
 
     public static final String DEFAULT_ORDER = TABLE_NAME + "." +_ID;
 
@@ -67,7 +91,13 @@ public class CarColumns implements BaseColumns {
             NAME,
             COLOR,
             INITIAL_MILEAGE,
-            SUSPENDED_SINCE
+            SUSPENDED_SINCE,
+            BUYING_PRICE,
+            /*MAKE,
+            MODEL,
+            YEAR,
+            LICENSE_PLATE,
+            BUYING_DATE*/
     };
     // @formatter:on
 
@@ -78,6 +108,12 @@ public class CarColumns implements BaseColumns {
             if (c.equals(COLOR) || c.contains("." + COLOR)) return true;
             if (c.equals(INITIAL_MILEAGE) || c.contains("." + INITIAL_MILEAGE)) return true;
             if (c.equals(SUSPENDED_SINCE) || c.contains("." + SUSPENDED_SINCE)) return true;
+            if (c.equals(BUYING_PRICE) || c.contains("." + BUYING_PRICE)) return true;
+            /*if (c.equals(MAKE) || c.contains("." + MAKE)) return true;
+            if (c.equals(MODEL) || c.contains("." + MODEL)) return true;
+            if (c.equals(YEAR) || c.contains("." + YEAR)) return true;
+            if (c.equals(LICENSE_PLATE) || c.contains("." + LICENSE_PLATE)) return true;
+            if (c.equals(BUYING_DATE) || c.contains("." + BUYING_DATE)) return true;*/
         }
         return false;
     }

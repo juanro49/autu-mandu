@@ -32,6 +32,7 @@ public class DataDetailActivity extends AppCompatActivity implements
     public static final int EXTRA_EDIT_OTHER = 1;
     public static final int EXTRA_EDIT_CAR = 2;
     public static final int EXTRA_EDIT_REMINDER = 3;
+    public static final int EXTRA_EDIT_STATION = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

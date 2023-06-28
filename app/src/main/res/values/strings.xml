@@ -16,7 +16,7 @@
 -->
 <resources>
     <string name="app_name" translatable="false">Car Report</string>
-    <string name="app_description" translatable="false">Enter the costs of your car and receive nice reports and statistics.</string>
+    <string name="app_description">Enter the costs of your car and receive nice reports and statistics.</string>
 
     <string name="about_author">© Jan Kühle</string>
     <string name="about_thanks">Thanks to:</string>
@@ -36,6 +36,7 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_add_car">Add car</string>
     <string name="menu_add_fuel_type">Add fuel type</string>
+    <string name="menu_add_station">Add station</string>
     <string name="menu_add_reminder">Add reminder</string>
     <string name="menu_show_trend">Show trend</string>
     <string name="menu_show_overall_trend">Show overall trend</string>
@@ -46,7 +47,7 @@
 
     <string name="section_suspend">Suspend</string>
     <string name="section_advanced">Advanced options</string>
-    
+
     <string name="hint_mileage_optional">Total distance (optional)</string>
     <string name="hint_volume">Volume</string>
     <string name="hint_price">Price</string>
@@ -64,12 +65,13 @@
     <string name="hint_user_name">User name</string>
     <string name="hint_password">Password</string>
     <string name="hint_initial_mileage">Initial mileage</string>
+    <string name="hint_buying_price">Buying Price</string>
     <string name="hint_reminder_after_distance">After distance</string>
     <string name="hint_reminder_after_time">After time</string>
     <string name="hint_reminder_start_mileage">Start at mileage</string>
     <string name="hint_reminder_start_date">Start at date</string>
     <string name="hint_reminder_snoozed_until">Snoozed until</string>
-    
+
     <string name="label_partial">Partial</string>
     <string name="label_color_in_reports">Color in reports</string>
     <string name="label_suspend">Suspend</string>
@@ -97,6 +99,7 @@
     <string name="validate_error_mileage_out_of_range_total">Mileage needs to be between the mileage of the previous and next refueling in total distance entry mode. If you meant to insert trip distance, you can change entry mode in the settings.</string>
     <string name="validate_error_mileage_out_of_range_trip">The cumulated mileage cannot be higher than the mileage of the next refueling in trip distance entry mode. If you meant to insert total distance, you can change entry mode in the settings.</string>
     <string name="validate_error_fuel_type_exists">This fuel type does already exist.</string>
+    <string name="validate_error_station_exists">This station does already exist.</string>
     <string name="validate_error_webdav_invalid_certificate">The certificate could not be trusted. It seems invalid.</string>
 
     <string name="suspended">Suspended</string>
@@ -105,7 +108,7 @@
     <string name="restore">Restore</string>
     <string name="import_">Import</string>
     <string name="empty_if_unknown">Please leave empty if you don\'t know what to enter here.</string>
-    
+
     <string name="title_first_start">First steps</string>
     <string name="title_add_refueling">Add refueling</string>
     <string name="title_edit_refueling">Edit refueling</string>
@@ -121,9 +124,11 @@
     <string name="title_edit_fuel_type">Edit fuel type</string>
     <string name="title_add_reminder">Add reminder</string>
     <string name="title_edit_reminder">Edit reminder</string>
+    <string name="title_add_station">Add station</string>
+    <string name="title_edit_station">Edit station</string>
     <string name="cab_title_selected">%d selected</string>
     <string name="edit_title_refueling">Refueling</string>
-    
+
     <string name="edit_message_no_entry_selected">No entry selected</string>
 
     <string name="alert_delete_title">Confirm delete</string>
@@ -136,10 +141,12 @@
     <string name="alert_delete_car_message">This car will be deleted.</string>
     <string name="alert_delete_cars_message">The %d selected cars will be deleted.</string>
     <string name="alert_delete_fuel_types_message">The %d selected fuel types will be deleted.</string>
+    <string name="alert_delete_station_message">The %d selected stations and asociated refuelings will be deleted.</string>
     <string name="alert_delete_reminder_message">This reminder will be deleted.</string>
     <string name="alert_delete_reminders_message">The %d selected reminders will be deleted.</string>
     <string name="alert_cannot_delete_last_car">One car cannot be deleted.</string>
     <string name="alert_cannot_delete_fuel_type">Cannot delete fuel type, because it is used by at least one refueling or fuel tank.</string>
+    <string name="alert_cannot_delete_station">Cannot delete station, because it is used by at least one refueling or fuel tank.</string>
     <string name="alert_about_licenses_title">Licenses</string>
     <string name="alert_change_color_title">Choose color</string>
     <string name="alert_sync_finishing_authentication">Finishing authentication…</string>
@@ -170,7 +177,7 @@
     <string name="toast_need_storage_permission">To perform this action Car Report needs to have access to your files.</string>
     <string name="toast_auto_backup_succeeded">Automatic backup succeeded.</string>
     <string name="toast_auto_backup_failed">Automatic backup failed.</string>
-    
+
     <string name="report_title_fuel_consumption">Fuel consumption</string>
     <string name="report_title_fuel_price">Fuel price</string>
     <string name="report_title_mileage">Mileage</string>
@@ -204,6 +211,7 @@
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>
     <string name="pref_title_header_fuel_types">Fuel Types</string>
+    <string name="pref_title_header_stations">Stations</string>
     <string name="pref_title_header_reminders">Reminders</string>
     <string name="pref_title_header_report_order">Report order</string>
     <string name="pref_title_header_backup">Backup &amp; Export</string>
@@ -245,14 +253,14 @@
     <string name="pref_action_select_backup_file">Select file to restore from.</string>
     <string name="pref_summary_no_file_selector">There is no file selector installed on your phone. Can\'t restore.</string>
     <string name="pref_summary_restore_file_seems_wrong">The selected file seems to be not usable for restore or nothing selected.</string>
-    
+
     <string name="help_section_getting_started">Getting Started</string>
     <string name="help_section_tips">Tips</string>
     <string name="help_section_calculations">Calculations</string>
     <string name="help_section_fuel_types">Fuel Types</string>
     <string name="help_section_csv">CSV</string>
     <string name="help_folder_name">help</string>
-    
+
     <string name="first_start_hi">Hi there!</string>
     <string name="first_start_intro">Car Report can display nice reports for your car expenses, including fuel consumption and overall costs. Start with these simple steps:</string>
     <string name="first_start_step1_img_desc">First step</string>
@@ -263,7 +271,7 @@
     <string name="first_start_step3_text">After two refuelings you should see the first graphs.</string>
     <string name="first_start_create_car">Create a car</string>
     <string name="first_start_setup_sync">Setup synchronization</string>
-    
+
     <string name="calc_option_volume_to_distance">Volume (%1$s) to Distance (%2$s)</string>
     <string name="calc_option_distance_to_volume">Distance (%1$s) to Volume (%2$s)</string>
     <string name="calc_option_volume_to_price">Volume (%1$s) to Price (%2$s)</string>

@@ -24,6 +24,7 @@ import android.net.Uri;
 import me.kuehle.carreport.provider.base.AbstractSelection;
 import me.kuehle.carreport.provider.fueltype.*;
 import me.kuehle.carreport.provider.car.*;
+import me.kuehle.carreport.provider.station.StationColumns;
 
 /**
  * Selection for the {@code refueling} table.
@@ -317,6 +318,66 @@ public class RefuelingSelection extends AbstractSelection<RefuelingSelection> {
 
     public RefuelingSelection fuelTypeCategoryEndsWith(String... value) {
         addEndsWith(FuelTypeColumns.CATEGORY, value);
+        return this;
+    }
+
+    public RefuelingSelection stationId(long... value) {
+        addEquals(RefuelingColumns.STATION_ID, toObjectArray(value));
+        return this;
+    }
+
+    public RefuelingSelection stationIdNot(long... value) {
+        addNotEquals(RefuelingColumns.STATION_ID, toObjectArray(value));
+        return this;
+    }
+
+    public RefuelingSelection stationIdGt(long value) {
+        addGreaterThan(RefuelingColumns.STATION_ID, value);
+        return this;
+    }
+
+    public RefuelingSelection stationIdGtEq(long value) {
+        addGreaterThanOrEquals(RefuelingColumns.STATION_ID, value);
+        return this;
+    }
+
+    public RefuelingSelection stationIdLt(long value) {
+        addLessThan(RefuelingColumns.STATION_ID, value);
+        return this;
+    }
+
+    public RefuelingSelection stationIdLtEq(long value) {
+        addLessThanOrEquals(RefuelingColumns.STATION_ID, value);
+        return this;
+    }
+
+    public RefuelingSelection stationName(String... value) {
+        addEquals(StationColumns.NAME, value);
+        return this;
+    }
+
+    public RefuelingSelection stationNameNot(String... value) {
+        addNotEquals(StationColumns.NAME, value);
+        return this;
+    }
+
+    public RefuelingSelection stationNameLike(String... value) {
+        addLike(StationColumns.NAME, value);
+        return this;
+    }
+
+    public RefuelingSelection stationNameContains(String... value) {
+        addContains(StationColumns.NAME, value);
+        return this;
+    }
+
+    public RefuelingSelection stationNameStartsWith(String... value) {
+        addStartsWith(StationColumns.NAME, value);
+        return this;
+    }
+
+    public RefuelingSelection stationNameEndsWith(String... value) {
+        addEndsWith(StationColumns.NAME, value);
         return this;
     }
 

@@ -108,10 +108,16 @@ public class DataFragment extends Fragment implements DataListCallback,
         @Override
         public Fragment getItem(int position) {
             AbstractDataListFragment fragment;
-            if (position == 0) {
-                fragment = new DataListRefuelingFragment();
-            } else {
-                fragment = new DataListOtherFragment();
+
+            switch(position) {
+                case 0:
+                    fragment = new DataListRefuelingFragment();
+                    break;
+                case 3:
+                    fragment = new DataListStationFragment();
+                    break;
+                default:
+                    fragment = new DataListOtherFragment();
             }
 
             Bundle args = new Bundle();
@@ -218,35 +224,64 @@ public class DataFragment extends Fragment implements DataListCallback,
     @Override
     public void onItemSelected(int edit, long id) {
         if (mTwoPane) {
-            AbstractDataDetailFragment fragment;
-            if (edit == DataDetailActivity.EXTRA_EDIT_REFUELING) {
+            AbstractDataDetailFragment fragment = null;
+            boolean editStation = false;
+
+            if (edit == DataDetailActivity.EXTRA_EDIT_REFUELING)
+            {
                 fragment = DataDetailRefuelingFragment.newInstance(id);
-            } else {
+            }
+            else if (edit == DataDetailActivity.EXTRA_EDIT_STATION)
+            {
+                editStation = true;
+
+                Intent intent = new Intent(getActivity(), PreferencesActivity.class);
+                intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT, PreferencesStationsFragment.class.getName());
+                intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT_TITLE, R.string.pref_title_header_stations);
+            }
+            else
+            {
                 fragment = DataDetailOtherFragment.newInstance(id);
             }
 
-            mBackStackListener.skipNextIfPop();
+            if (!editStation)
+            {
+                mBackStackListener.skipNextIfPop();
 
-            FragmentManager fm = getChildFragmentManager();
+                FragmentManager fm = getChildFragmentManager();
 
-            // Disable the fragment animations, when we are just replacing an existing detail
-            // fragment.
-            if (fm.getBackStackEntryCount() > 0) {
-                FragmentUtils.DISABLE_FRAGMENT_ANIMATIONS = 2;
-            }
+                // Disable the fragment animations, when we are just replacing an existing detail
+                // fragment.
+                if (fm.getBackStackEntryCount() > 0)
+                {
+                    FragmentUtils.DISABLE_FRAGMENT_ANIMATIONS = 2;
+                }
 
-            fm.popBackStack("detail", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                fm.popBackStack("detail", FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-            fm.beginTransaction()
+                fm.beginTransaction()
                     .replace(R.id.detail, fragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .addToBackStack("detail")
                     .commit();
+            }
         } else {
-            Intent intent = new Intent(getActivity(), DataDetailActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-            intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
-            intent.putExtra(AbstractDataDetailFragment.EXTRA_ID, id);
+            Intent intent;
+
+            if (edit == DataDetailActivity.EXTRA_EDIT_STATION)
+            {
+                intent = new Intent(getActivity(), PreferencesActivity.class);
+                intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT, PreferencesStationsFragment.class.getName());
+                intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT_TITLE, R.string.pref_title_header_stations);
+            }
+            else
+            {
+                intent = new Intent(getActivity(), DataDetailActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                intent.putExtra(DataDetailActivity.EXTRA_EDIT, edit);
+                intent.putExtra(AbstractDataDetailFragment.EXTRA_ID, id);
+            }
+
             startActivityForResult(intent, 0);
         }
     }

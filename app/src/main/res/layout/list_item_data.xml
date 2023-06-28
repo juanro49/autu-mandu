@@ -37,127 +37,139 @@
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="0.5">
 
             <TextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceListItem"
-                tools:text="Refueling"/>
+                tools:text="Refueling" />
 
             <TextView
                 android:id="@+id/subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:layout_below="@id/title"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_marginTop="-5dp"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                tools:text="Super 95"/>
+                tools:text="Super 95" />
 
             <TextView
                 android:id="@+id/date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:layout_below="@id/subtitle"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_marginTop="-3dp"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                tools:text="28.12.15"/>
+                tools:text="28.12.15" />
+
+            <TextView
+                android:id="@+id/station"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/date"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="-1dp"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                tools:text="Iberdoex" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="0.5">
 
             <TextView
                 android:id="@+id/data1_calculated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
                 android:background="@drawable/bg_list_item_data_calculated"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmallInverse"
                 tools:ignore="RelativeOverlap"
-                tools:text="+ 625 km"/>
+                tools:text="+ 625 km" />
 
             <TextView
                 android:id="@+id/data2_calculated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/data1_calculated"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@id/data1_calculated"
                 android:layout_marginTop="2dp"
                 android:background="@drawable/bg_list_item_data_calculated"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmallInverse"
-                tools:text="1,229 EUR/l"/>
+                tools:text="1,229 EUR/l" />
 
             <TextView
                 android:id="@+id/data3_calculated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/data2_calculated"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@id/data2_calculated"
                 android:layout_marginTop="2dp"
                 android:background="@drawable/bg_list_item_data_calculated"
                 android:paddingLeft="3dp"
                 android:paddingRight="3dp"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmallInverse"
-                tools:text="7,94 l/100km"/>
+                tools:text="7,94 l/100km" />
 
             <TextView
                 android:id="@+id/data1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/data1_calculated"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                tools:text="150536 km"/>
+                tools:text="150536 km" />
 
             <TextView
                 android:id="@+id/data2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/data2_calculated"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                tools:text="61,00 EUR"/>
+                tools:text="61,00 EUR" />
 
             <TextView
                 android:id="@+id/data3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/data3_calculated"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                tools:text="49,63 l"/>
+                tools:text="49,63 l" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -167,5 +179,5 @@
         android:layout_height="wrap_content"
         android:text="@string/invalid_data"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/error_text"/>
+        android:textColor="@color/error_text" />
 </LinearLayout>

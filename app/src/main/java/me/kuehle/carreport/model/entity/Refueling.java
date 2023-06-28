@@ -18,6 +18,12 @@ import me.kuehle.carreport.model.IRefueling;
                 onDelete = ForeignKey.CASCADE
         ),
         @ForeignKey(
+            parentColumns = { "_id" },
+            childColumns = { "station_id" },
+            entity = Station.class,
+            onDelete = ForeignKey.CASCADE
+        ),
+        @ForeignKey(
                 parentColumns = { "_id" },
                 childColumns = { "car_id" },
                 entity = Car.class,
@@ -52,16 +58,20 @@ public class Refueling implements IRefueling {
     @ColumnInfo(name = "fuel_type_id")
     private long fuelTypeId;
 
+    @ColumnInfo(name = "station_id")
+    private long stationId;
+
     @ColumnInfo(name = "car_id")
     private long carId;
 
     public Refueling() {}
 
     @Ignore
-    public Refueling(long carId, long fuelTypeId, @NonNull Date date, int mileage, float volume,
+    public Refueling(long carId, long fuelTypeId, long stationId, @NonNull Date date, int mileage, float volume,
                      float price, boolean partial, @NonNull String note) {
         this.setCarId(carId);
         this.setFuelTypeId(fuelTypeId);
+        this.setStationId(stationId);
         this.setDate(date);
         this.setMileage(mileage);
         this.setVolume(volume);
@@ -151,5 +161,16 @@ public class Refueling implements IRefueling {
 
     public void setCarId(long carId) {
         this.carId = carId;
+    }
+
+    @Override
+    public long getStationId()
+    {
+        return stationId;
+    }
+
+    public void setStationId(long stationId)
+    {
+        this.stationId = stationId;
     }
 }

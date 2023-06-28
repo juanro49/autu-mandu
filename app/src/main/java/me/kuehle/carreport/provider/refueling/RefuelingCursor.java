@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import me.kuehle.carreport.provider.base.AbstractCursor;
 import me.kuehle.carreport.provider.fueltype.*;
 import me.kuehle.carreport.provider.car.*;
+import me.kuehle.carreport.provider.station.StationColumns;
 
 /**
  * Cursor wrapper for the {@code refueling} table.
@@ -141,6 +142,28 @@ public class RefuelingCursor extends AbstractCursor implements RefuelingModel {
     }
 
     /**
+     * Get the {@code station_id} value.
+     */
+    public long getStationId() {
+        Long res = getLongOrNull(RefuelingColumns.STATION_ID);
+        if (res == null)
+            throw new NullPointerException("The value of 'station_id' in the database was null, which is not allowed according to the model definition");
+        return res;
+    }
+
+    /**
+     * Name of the station, e.g. Iberdoex.
+     * Cannot be {@code null}.
+     */
+    @NonNull
+    public String getStationName() {
+        String res = getStringOrNull(StationColumns.NAME);
+        if (res == null)
+            throw new NullPointerException("The value of 'name' in the database was null, which is not allowed according to the model definition");
+        return res;
+    }
+
+    /**
      * Get the {@code car_id} value.
      */
     public long getCarId() {
@@ -189,6 +212,16 @@ public class RefuelingCursor extends AbstractCursor implements RefuelingModel {
     @Nullable
     public Date getCarSuspendedSince() {
         Date res = getDateOrNull(CarColumns.SUSPENDED_SINCE);
+        return res;
+    }
+
+    /**
+     * When the car has been suspended, this contains the start date.
+     * Can be {@code null}.
+     */
+    @Nullable
+    public double getCarBuyingPrice() {
+        Double res = getDoubleOrNull(CarColumns.BUYING_PRICE);
         return res;
     }
 }

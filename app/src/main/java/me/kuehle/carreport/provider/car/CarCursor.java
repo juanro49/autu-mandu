@@ -83,4 +83,56 @@ public class CarCursor extends AbstractCursor implements CarModel {
         Date res = getDateOrNull(CarColumns.SUSPENDED_SINCE);
         return res;
     }
+
+    /**
+     * Buying price of the car.
+     */
+    public double getBuyingPrice() {
+        Double res = getDoubleOrNull(CarColumns.BUYING_PRICE);
+        return res;
+    }
+
+    /**
+     * Make of the car.
+     */
+    /*@Nullable
+    public String getMake() {
+        String res = getStringOrNull(CarColumns.MAKE);
+        return res;
+    }*/
+
+    /**
+     * Model of the car.
+     */
+    /*@Nullable
+    public String getModel() {
+        String res = getStringOrNull(CarColumns.MODEL);
+        return res;
+    }*/
+
+    /**
+     * Year of the car.
+     */
+    /*public int getYear() {
+        Integer res = getIntegerOrNull(CarColumns.YEAR);
+        return res;
+    }*/
+
+    /**
+     * License plate of the car.
+     */
+    /*@Nullable
+    public String getLicensePlate() {
+        String res = getStringOrNull(CarColumns.LICENSE_PLATE);
+        return res;
+    }*/
+
+    /**
+     * Buying date of the car.
+     */
+    /*@Nullable
+    public Date getBuyingDate() {
+        Date res = getDateOrNull(CarColumns.BUYING_DATE);
+        return res;
+    }*/
 }

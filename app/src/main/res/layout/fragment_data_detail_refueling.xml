@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
         <!-- Mileage -->
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_mileage_input_layout"
             android:layout_width="match_parent"
@@ -67,20 +68,35 @@
             android:id="@+id/spn_fuel_type"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
+            android:layout_below="@id/txt_mileage_input_warning"
+            android:layout_alignBaseline="@id/edt_volume_input_layout"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/txt_mileage_input_warning"
-            android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="9dp"/>
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="9dp" />
 
         <!-- Partial -->
         <CheckBox
             android:id="@+id/chk_partial"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_width="211dp"
+            android:layout_height="47dp"
             android:layout_below="@id/edt_volume_input_layout"
-            android:text="@string/label_partial"/>
+            android:layout_marginTop="1dp"
+            android:text="@string/label_partial" />
+
+        <Spinner
+            android:id="@+id/spn_station"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/spn_fuel_type"
+            android:layout_alignBaseline="@id/chk_partial"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="30dp"
+            android:layout_toRightOf="@+id/chk_partial" />
 
         <!-- Price -->
         <com.google.android.material.textfield.TextInputLayout

@@ -27,4 +27,34 @@ public interface ICar {
      * @return When the car has been suspended, this contains the start date.
      */
     Date getSuspension();
+
+    /**
+     * @return Buying price of the car.
+     */
+    double getBuyingprice();
+
+    /**
+     * @return Make of the car.
+     */
+    //String getMake();
+
+    /**
+     * @return Model of the car.
+     */
+    //String getModel();
+
+    /**
+     * @return Year of was car manufactured.
+     */
+    //int getYear();
+
+    /**
+     * @return License plate of the car.
+     */
+    //String getLicensePlate();
+
+    /**
+     * @return Buying date of the car.
+     */
+    //Date getBuyingdate();
 }

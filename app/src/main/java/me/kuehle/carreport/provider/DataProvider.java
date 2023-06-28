@@ -31,6 +31,7 @@ import me.kuehle.carreport.provider.fueltype.FuelTypeColumns;
 import me.kuehle.carreport.provider.othercost.OtherCostColumns;
 import me.kuehle.carreport.provider.refueling.RefuelingColumns;
 import me.kuehle.carreport.provider.reminder.ReminderColumns;
+import me.kuehle.carreport.provider.station.StationColumns;
 
 @Deprecated
 public class DataProvider extends BaseContentProvider {
@@ -59,7 +60,8 @@ public class DataProvider extends BaseContentProvider {
     private static final int URI_TYPE_REMINDER = 8;
     private static final int URI_TYPE_REMINDER_ID = 9;
 
-
+    private static final int URI_TYPE_STATION = 10;
+    private static final int URI_TYPE_STATION_ID = 11;
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -68,6 +70,8 @@ public class DataProvider extends BaseContentProvider {
         URI_MATCHER.addURI(AUTHORITY, CarColumns.TABLE_NAME + "/#", URI_TYPE_CAR_ID);
         URI_MATCHER.addURI(AUTHORITY, FuelTypeColumns.TABLE_NAME, URI_TYPE_FUEL_TYPE);
         URI_MATCHER.addURI(AUTHORITY, FuelTypeColumns.TABLE_NAME + "/#", URI_TYPE_FUEL_TYPE_ID);
+        URI_MATCHER.addURI(AUTHORITY, StationColumns.TABLE_NAME, URI_TYPE_STATION);
+        URI_MATCHER.addURI(AUTHORITY, StationColumns.TABLE_NAME + "/#", URI_TYPE_STATION_ID);
         URI_MATCHER.addURI(AUTHORITY, OtherCostColumns.TABLE_NAME, URI_TYPE_OTHER_COST);
         URI_MATCHER.addURI(AUTHORITY, OtherCostColumns.TABLE_NAME + "/#", URI_TYPE_OTHER_COST_ID);
         URI_MATCHER.addURI(AUTHORITY, RefuelingColumns.TABLE_NAME, URI_TYPE_REFUELING);
@@ -99,6 +103,11 @@ public class DataProvider extends BaseContentProvider {
                 return TYPE_CURSOR_DIR + FuelTypeColumns.TABLE_NAME;
             case URI_TYPE_FUEL_TYPE_ID:
                 return TYPE_CURSOR_ITEM + FuelTypeColumns.TABLE_NAME;
+
+            case URI_TYPE_STATION:
+                return TYPE_CURSOR_DIR + StationColumns.TABLE_NAME;
+            case URI_TYPE_STATION_ID:
+                return TYPE_CURSOR_ITEM + StationColumns.TABLE_NAME;
 
             case URI_TYPE_OTHER_COST:
                 return TYPE_CURSOR_DIR + OtherCostColumns.TABLE_NAME;
@@ -169,6 +178,10 @@ public class DataProvider extends BaseContentProvider {
             case URI_TYPE_FUEL_TYPE_ID:
                 return FuelTypeColumns.ALL_COLUMNS;
 
+            case URI_TYPE_STATION:
+            case URI_TYPE_STATION_ID:
+                return StationColumns.ALL_COLUMNS;
+
             case URI_TYPE_OTHER_COST:
             case URI_TYPE_OTHER_COST_ID:
                 projection = new String[OtherCostColumns.ALL_COLUMNS.length + CarColumns.ALL_COLUMNS.length - 1];
@@ -178,10 +191,11 @@ public class DataProvider extends BaseContentProvider {
 
             case URI_TYPE_REFUELING:
             case URI_TYPE_REFUELING_ID:
-                projection = new String[RefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1 + CarColumns.ALL_COLUMNS.length - 1];
+                projection = new String[RefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1 + StationColumns.ALL_COLUMNS.length - 1 + CarColumns.ALL_COLUMNS.length - 1];
                 System.arraycopy(RefuelingColumns.ALL_COLUMNS, 0, projection, 0, RefuelingColumns.ALL_COLUMNS.length);
                 System.arraycopy(FuelTypeColumns.ALL_COLUMNS, 1, projection, RefuelingColumns.ALL_COLUMNS.length, FuelTypeColumns.ALL_COLUMNS.length - 1);
-                System.arraycopy(CarColumns.ALL_COLUMNS, 1, projection, RefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1, CarColumns.ALL_COLUMNS.length - 1);
+                System.arraycopy(StationColumns.ALL_COLUMNS, 1, projection, RefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1, StationColumns.ALL_COLUMNS.length - 1);
+                System.arraycopy(CarColumns.ALL_COLUMNS, 1, projection, RefuelingColumns.ALL_COLUMNS.length + FuelTypeColumns.ALL_COLUMNS.length - 1 + StationColumns.ALL_COLUMNS.length - 1, CarColumns.ALL_COLUMNS.length - 1);
                 return projection;
 
             case URI_TYPE_REMINDER:
@@ -218,6 +232,14 @@ public class DataProvider extends BaseContentProvider {
                 res.orderBy = FuelTypeColumns.DEFAULT_ORDER;
                 break;
 
+            case URI_TYPE_STATION:
+            case URI_TYPE_STATION_ID:
+                res.table = StationColumns.TABLE_NAME;
+                res.idColumn = StationColumns._ID;
+                res.tablesWithJoins = StationColumns.TABLE_NAME;
+                res.orderBy = StationColumns.DEFAULT_ORDER;
+                break;
+
             case URI_TYPE_OTHER_COST:
             case URI_TYPE_OTHER_COST_ID:
                 res.table = OtherCostColumns.TABLE_NAME;
@@ -236,6 +258,9 @@ public class DataProvider extends BaseContentProvider {
                 res.tablesWithJoins = RefuelingColumns.TABLE_NAME;
                 if (FuelTypeColumns.hasColumns(projection)) {
                     res.tablesWithJoins += " LEFT OUTER JOIN " + FuelTypeColumns.TABLE_NAME + " AS " + RefuelingColumns.PREFIX_FUEL_TYPE + " ON " + RefuelingColumns.TABLE_NAME + "." + RefuelingColumns.FUEL_TYPE_ID + "=" + RefuelingColumns.PREFIX_FUEL_TYPE + "." + FuelTypeColumns._ID;
+                }
+                if (StationColumns.hasColumns(projection)) {
+                    res.tablesWithJoins += " LEFT OUTER JOIN " + StationColumns.TABLE_NAME + " AS " + RefuelingColumns.PREFIX_STATION + " ON " + RefuelingColumns.TABLE_NAME + "." + RefuelingColumns.STATION_ID + "=" + RefuelingColumns.PREFIX_STATION + "." + StationColumns._ID;
                 }
                 if (CarColumns.hasColumns(projection)) {
                     res.tablesWithJoins += " LEFT OUTER JOIN " + CarColumns.TABLE_NAME + " AS " + RefuelingColumns.PREFIX_CAR + " ON " + RefuelingColumns.TABLE_NAME + "." + RefuelingColumns.CAR_ID + "=" + RefuelingColumns.PREFIX_CAR + "." + CarColumns._ID;
@@ -261,6 +286,7 @@ public class DataProvider extends BaseContentProvider {
         switch (matchedId) {
             case URI_TYPE_CAR_ID:
             case URI_TYPE_FUEL_TYPE_ID:
+            case URI_TYPE_STATION_ID:
             case URI_TYPE_OTHER_COST_ID:
             case URI_TYPE_REFUELING_ID:
             case URI_TYPE_REMINDER_ID:

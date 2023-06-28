@@ -89,4 +89,52 @@ public class CarContentValues extends AbstractContentValues {
         mContentValues.put(CarColumns.SUSPENDED_SINCE, value);
         return this;
     }
+
+    /**
+     * Buying price of the car.
+     */
+    public CarContentValues putBuyingPrice(double value) {
+        mContentValues.put(CarColumns.BUYING_PRICE, value);
+        return this;
+    }
+
+    /**
+     * Make of the car.
+     */
+    /*public CarContentValues putMake(String value) {
+        mContentValues.put(CarColumns.MAKE, value);
+        return this;
+    }*/
+
+    /**
+     * Model of the car.
+     */
+    /*public CarContentValues putModel(String value) {
+        mContentValues.put(CarColumns.MODEL, value);
+        return this;
+    }*/
+
+    /**
+     * Year of the car.
+     */
+    /*public CarContentValues putYear(int value) {
+        mContentValues.put(CarColumns.YEAR, value);
+        return this;
+    }*/
+
+    /**
+     * License plate of the car.
+     */
+    /*public CarContentValues putLicensePlate(String value) {
+        mContentValues.put(CarColumns.LICENSE_PLATE, value);
+        return this;
+    }*/
+
+    /**
+     * Buying date of the car.
+     */
+    /*public CarContentValues putBuyingDate(@Nullable Date value) {
+        mContentValues.put(CarColumns.BUYING_DATE, value == null ? null : value.getTime());
+        return this;
+    }*/
 }

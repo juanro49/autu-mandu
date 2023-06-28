@@ -41,6 +41,7 @@ public class BalancedRefuelingColumns extends RefuelingColumns {
             VALID,
             GUESSED,
             FUEL_TYPE_ID,
+            STATION_ID,
             CAR_ID,
     };
     // @formatter:on

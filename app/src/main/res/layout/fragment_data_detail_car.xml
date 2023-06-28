@@ -15,7 +15,8 @@
   limitations under the License.
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
             android:layout_height="match_parent">
 
     <RelativeLayout
@@ -76,13 +77,27 @@
                 android:hint="@string/hint_initial_mileage"
                 android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
+        <!-- Buying Price -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_buying_price_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_initial_mileage_input_layout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_buying_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_buying_price"
+                android:inputType="number|numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Suspend -->
         <TextView
             android:id="@+id/txt_section_suspend"
             style="@style/AppWidget.SectionHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_initial_mileage_input_layout"
+            android:layout_below="@id/edt_buying_price_input_layout"
             android:text="@string/section_suspend"/>
 
         <TextView

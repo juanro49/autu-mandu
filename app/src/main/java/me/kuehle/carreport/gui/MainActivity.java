@@ -162,12 +162,17 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_FIRST_START && resultCode == RESULT_CANCELED) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_FIRST_START && resultCode == RESULT_CANCELED)
+        {
             finish();
-        } else {
+        } else
+        {
             // Rebuild the menu, so a change in the show_car_menu option will take effect.
-            if (requestCode == REQUEST_FROM_DRAWER) {
+            if (requestCode == REQUEST_FROM_DRAWER)
+            {
                 invalidateOptionsMenu();
             }
 
@@ -176,12 +181,14 @@ public class MainActivity extends AppCompatActivity implements
 
             // If a new refueling has been added, show Snackbar with details.
             if (requestCode % REQUEST_ADD_DATA == DataDetailActivity.EXTRA_EDIT_REFUELING
-                    && resultCode == RESULT_OK
-                    && data != null
-                    && mCurrentFragment != null) {
+                && resultCode == RESULT_OK
+                && data != null
+                && mCurrentFragment != null)
+            {
                 long newId = data.getLongExtra(DataDetailActivity.EXTRA_NEW_ID, 0);
                 View view = mCurrentFragment.getView();
-                if (newId > 0 && view != null) {
+                if (newId > 0 && view != null)
+                {
                     NewRefuelingSnackbar.show(view, newId);
                 }
             }

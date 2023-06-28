@@ -56,6 +56,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     private View colorIndicator;
     private int color;
     private EditText edtInitialMileage;
+    private EditText edtBuyingPrice;
     private CheckBox chkSuspend;
     private DateTimeInput edtSuspendDate;
     private SimpleAnimator edtSuspendDateAnimator;
@@ -105,11 +106,13 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
                 edtName.setText(car.getName());
                 color = car.getColor();
                 edtInitialMileage.setText(String.valueOf(car.getInitialMileage()));
+                edtBuyingPrice.setText(String.valueOf(car.getBuyingPrice()));
                 chkSuspend.setChecked(car.getSuspendedSince() != null);
                 edtSuspendDate.setDate(car.getSuspendedSince() != null ? car.getSuspendedSince() : new Date());
             } else {
                 color = getResources().getColor(R.color.accent);
                 edtInitialMileage.setText("0");
+                edtBuyingPrice.setText("0");
                 edtSuspendDate.setDate(new Date());
             }
         } else {
@@ -148,6 +151,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         edtName = (EditText) v.findViewById(R.id.edt_name);
         colorIndicator = v.findViewById(R.id.btn_color);
         edtInitialMileage = (EditText) v.findViewById(R.id.edt_initial_mileage);
+        edtBuyingPrice = (EditText) v.findViewById(R.id.edt_buying_price);;
         chkSuspend = (CheckBox) v.findViewById(R.id.chk_suspend);
         edtSuspendDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_suspend_date),
                 DateTimeInput.Mode.DATE);
@@ -188,6 +192,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         values.putName(edtName.getText().toString());
         values.putColor(color);
         values.putInitialMileage(getIntegerFromEditText(edtInitialMileage, 0));
+        values.putBuyingPrice(getDoubleFromEditText(edtBuyingPrice, 0));
         values.putSuspendedSince(chkSuspend.isChecked() ? edtSuspendDate.getDate() : null);
 
         if (isInEditMode()) {

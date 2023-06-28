@@ -20,6 +20,7 @@
         <item>Refuelings</item>
         <item>Other Expenditures</item>
         <item>Other Income</item>
+        <item>Stations</item>
     </string-array>
 
     <string-array name="repeat_intervals">

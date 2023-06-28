@@ -21,19 +21,21 @@ import me.kuehle.carreport.model.dao.FuelTypeDAO;
 import me.kuehle.carreport.model.dao.OtherCostDAO;
 import me.kuehle.carreport.model.dao.RefuelingDAO;
 import me.kuehle.carreport.model.dao.ReminderDAO;
+import me.kuehle.carreport.model.dao.StationDAO;
 import me.kuehle.carreport.model.entity.Car;
 import me.kuehle.carreport.model.entity.FuelType;
 import me.kuehle.carreport.model.entity.OtherCost;
 import me.kuehle.carreport.model.entity.Refueling;
 import me.kuehle.carreport.model.entity.Reminder;
+import me.kuehle.carreport.model.entity.Station;
 import me.kuehle.carreport.model.entity.helper.SQLTypeConverters;
 import me.kuehle.carreport.provider.DataSQLiteOpenHelper;
 
 import static me.kuehle.carreport.provider.DataSQLiteOpenHelper.DATABASE_FILE_NAME;
 
 @Database(
-    entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class},
-    version = 11
+    entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class, Station.class},
+    version = 12
 )
 @TypeConverters({SQLTypeConverters.class})
 public abstract class CarReportDatabase extends RoomDatabase {
@@ -42,6 +44,7 @@ public abstract class CarReportDatabase extends RoomDatabase {
     public abstract OtherCostDAO getOtherCostDao();
     public abstract RefuelingDAO getRefuelingDao();
     public abstract ReminderDAO getReminderDao();
+    public abstract StationDAO getStationDao();
 
     private static CarReportDatabase sInstance;
     private static final String DB_NAME = DATABASE_FILE_NAME;
@@ -66,7 +69,8 @@ public abstract class CarReportDatabase extends RoomDatabase {
                         new AssetFileBasedMigration(context, 8),
                         new AssetFileBasedMigration(context, 9),
                         new AssetFileBasedMigration(context, 10),
-                        new Migration(10, 11) {
+                        new AssetFileBasedMigration(context, 11),
+                        new Migration(11, 12) {
                             @Override
                             public void migrate(@NonNull SupportSQLiteDatabase database) {
                                 // Do nothing, just migrate to room.

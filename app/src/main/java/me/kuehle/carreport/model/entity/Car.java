@@ -28,14 +28,38 @@ public class Car implements ICar {
     @ColumnInfo(name = "suspended_since")
     private Date suspension;
 
+    @ColumnInfo(name = "buying_price")
+    private double buyingprice = 0;
+
+    /*@ColumnInfo(name = "make")
+    private String make;
+
+    @ColumnInfo(name = "model")
+    private String model;
+
+    @ColumnInfo(name = "year")
+    private int year;
+
+    @ColumnInfo(name = "license_plate")
+    private String licensePlate;
+
+    @ColumnInfo(name = "buying_date")
+    private Date buyingdate;*/
+
     public Car() {}
 
     @Ignore
-    public Car(@NonNull String name, int color, int initialMileage, Date suspension) {
+    public Car(@NonNull String name, int color, int initialMileage, Date suspension, double buyingPrice/*, Date buyingDate, String make, String model, String licensePlate, int year*/) {
         this.setName(name);
         this.setColor(color);
         this.setInitialMileage(initialMileage);
         this.setSuspension(suspension);
+        this.setBuyingprice(buyingPrice);
+        /*this.setBuyingdate(buyingDate);
+        this.setMake(make);
+        this.setModel(model);
+        this.setLicensePlate(licensePlate);
+        this.setYear(year);*/
     }
 
     @Override
@@ -83,4 +107,70 @@ public class Car implements ICar {
     public void setSuspension(Date suspension) {
         this.suspension = suspension;
     }
+
+    @Override
+    public double getBuyingprice()
+    {
+        return buyingprice;
+    }
+
+    public void setBuyingprice(double buyingprice)
+    {
+        this.buyingprice = buyingprice;
+    }
+
+    /*@Override
+    public String getMake()
+    {
+        return make;
+    }
+
+    public void setMake(String make)
+    {
+        this.make = make;
+    }
+
+    @Override
+    public String getModel()
+    {
+        return model;
+    }
+
+    public void setModel(String model)
+    {
+        this.model = model;
+    }
+
+    @Override
+    public int getYear()
+    {
+        return year;
+    }
+
+    public void setYear(int year)
+    {
+        this.year = year;
+    }
+
+    @Override
+    public String getLicensePlate()
+    {
+        return licensePlate;
+    }
+
+    public void setLicensePlate(String licensePlate)
+    {
+        this.licensePlate = licensePlate;
+    }
+
+    @Override
+    public Date getBuyingdate()
+    {
+        return buyingdate;
+    }
+
+    public void setBuyingdate(Date buyingdate)
+    {
+        this.buyingdate = buyingdate;
+    }*/
 }

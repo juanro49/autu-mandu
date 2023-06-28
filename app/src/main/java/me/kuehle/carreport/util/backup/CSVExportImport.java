@@ -29,7 +29,6 @@ import org.apache.commons.csv.QuoteMode;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -59,6 +58,10 @@ import me.kuehle.carreport.provider.reminder.ReminderColumns;
 import me.kuehle.carreport.provider.reminder.ReminderContentValues;
 import me.kuehle.carreport.provider.reminder.ReminderCursor;
 import me.kuehle.carreport.provider.reminder.ReminderSelection;
+import me.kuehle.carreport.provider.station.StationColumns;
+import me.kuehle.carreport.provider.station.StationContentValues;
+import me.kuehle.carreport.provider.station.StationCursor;
+import me.kuehle.carreport.provider.station.StationSelection;
 
 public class CSVExportImport {
     private static final String LOG_TAG = "CSVExportImport";
@@ -76,6 +79,7 @@ public class CSVExportImport {
     private static String[] allTables = {
             CarColumns.TABLE_NAME,
             FuelTypeColumns.TABLE_NAME,
+            StationColumns.TABLE_NAME,
             OtherCostColumns.TABLE_NAME,
             RefuelingColumns.TABLE_NAME,
             ReminderColumns.TABLE_NAME
@@ -114,6 +118,7 @@ public class CSVExportImport {
 
             exportCars();
             exportFuelTypes();
+            exportStations();
             exportOtherCosts();
             exportRefuelings();
             exportReminders();
@@ -139,7 +144,13 @@ public class CSVExportImport {
                     car.getName(),
                     car.getColor(),
                     car.getInitialMileage(),
-                    CSVConvert.toString(car.getSuspendedSince()));
+                    CSVConvert.toString(car.getSuspendedSince()),
+                    car.getBuyingPrice()/*,
+                    car.getMake(),
+                    car.getModel(),
+                    car.getYear(),
+                    car.getLicensePlate(),
+                    CSVConvert.toString(car.getBuyingDate())*/);
         }
 
         csv.close();
@@ -157,6 +168,22 @@ public class CSVExportImport {
                     fuelType.getId(),
                     fuelType.getName(),
                     fuelType.getCategory());
+        }
+
+        csv.close();
+    }
+
+    private void exportStations() throws IOException {
+        CSVPrinter csv = new CSVPrinter(
+            new PrintWriter(new File(mExportDir, StationColumns.TABLE_NAME + ".csv")),
+            mCSVFormat);
+        csv.printRecord((Object[]) StationColumns.ALL_COLUMNS);
+
+        StationCursor station = new StationSelection().query(mContext.getContentResolver());
+        while (station.moveToNext()) {
+            csv.printRecord(
+                station.getId(),
+                station.getName());
         }
 
         csv.close();
@@ -203,6 +230,7 @@ public class CSVExportImport {
                     refueling.getPartial(),
                     refueling.getNote(),
                     refueling.getFuelTypeId(),
+                    refueling.getStationId(),
                     refueling.getCarId());
         }
 
@@ -295,6 +323,7 @@ public class CSVExportImport {
             ArrayList<ContentProviderOperation> operations = new ArrayList<>();
             operations.addAll(importCars());
             operations.addAll(importFuelTypes());
+            operations.addAll(importStations());
             operations.addAll(importOtherCosts());
             operations.addAll(importRefuelings());
             operations.addAll(importReminders());
@@ -334,6 +363,18 @@ public class CSVExportImport {
                 throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
             }
             values.putSuspendedSince(suspensionDate);
+            //noinspection ConstantConditions
+            values.putBuyingPrice(CSVConvert.toFloat(record.get(CarColumns.BUYING_PRICE)));
+            /*values.putMake(record.get(CarColumns.MAKE));
+            values.putModel(record.get(CarColumns.MODEL));
+            //noinspection ConstantConditions
+            values.putYear(CSVConvert.toInteger(record.get(CarColumns.YEAR)));
+            values.putLicensePlate(record.get(CarColumns.LICENSE_PLATE));
+            Date buyingDate = CSVConvert.toDate(record.get(CarColumns.BUYING_DATE));
+            if (!record.get(CarColumns.BUYING_DATE).isEmpty() && buyingDate == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putBuyingDate(buyingDate);*/
 
             boolean updated = false;
             if (id != null) {
@@ -398,6 +439,47 @@ public class CSVExportImport {
                 operations.add(ContentProviderOperation.newInsert(values.uri())
                         .withValues(values.values())
                         .build());
+            }
+        }
+
+        return operations;
+    }
+
+    private ArrayList<ContentProviderOperation> importStations() throws IOException {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
+        CSVParser csv = CSVParser.parse(
+            new File(mExportDir, StationColumns.TABLE_NAME + ".csv"),
+            Charset.defaultCharset(),
+            mCSVFormat);
+
+        for (CSVRecord record : csv) {
+            Long id = CSVConvert.toLong(record.get(StationColumns._ID));
+
+            StationContentValues values = new StationContentValues();
+            values.putName(record.get(StationColumns.NAME));
+
+            boolean updated = false;
+            if (id != null) {
+                StationSelection selection = new StationSelection().id(id);
+                StationCursor station = selection.query(mContext.getContentResolver());
+                if (station.getCount() > 0) {
+                    operations.add(ContentProviderOperation.newUpdate(values.uri())
+                        .withSelection(selection.sel(), selection.args())
+                        .withValues(values.values())
+                        .build());
+                    updated = true;
+                }
+            }
+
+            if (!updated) {
+                if (id != null) {
+                    values.values().put(StationColumns._ID, id);
+                }
+
+                operations.add(ContentProviderOperation.newInsert(values.uri())
+                    .withValues(values.values())
+                    .build());
             }
         }
 
@@ -495,6 +577,8 @@ public class CSVExportImport {
             values.putNote(record.get(RefuelingColumns.NOTE));
             //noinspection ConstantConditions
             values.putFuelTypeId(CSVConvert.toLong(record.get(RefuelingColumns.FUEL_TYPE_ID)));
+            //noinspection ConstantConditions
+            values.putStationId(CSVConvert.toLong(record.get(RefuelingColumns.STATION_ID)));
             //noinspection ConstantConditions
             values.putCarId(CSVConvert.toLong(record.get(RefuelingColumns.CAR_ID)));
 

@@ -46,6 +46,11 @@ public interface IRefueling {
     long getFuelTypeId();
 
     /**
+     * @return The station of this refueling.
+     */
+    long getStationId();
+
+    /**
      * @return The car which has been refueled.
      */
     long getCarId();

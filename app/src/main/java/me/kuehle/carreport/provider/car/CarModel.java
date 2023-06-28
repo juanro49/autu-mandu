@@ -51,4 +51,38 @@ public interface CarModel extends BaseModel {
      */
     @Nullable
     Date getSuspendedSince();
+
+    /**
+     * Buying price of the car.
+     */
+    double getBuyingPrice();
+
+    /**
+     * Make of the car.
+     */
+    /*@Nullable
+    String getMake();*/
+
+    /**
+     * Model of the car.
+     */
+    /*@Nullable
+    String getModel();*/
+
+    /**
+     * Year of the car.
+     */
+    //int getYear();
+
+    /**
+     * License plate of the car.
+     */
+    /*@Nullable
+    String getLicensePlate();*/
+
+    /**
+     * Buying date of the car.
+     */
+    /*@Nullable
+    Date getBuyingDate();*/
 }

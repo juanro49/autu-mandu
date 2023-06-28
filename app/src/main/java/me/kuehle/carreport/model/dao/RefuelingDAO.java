@@ -14,6 +14,9 @@ public interface RefuelingDAO {
     @Query("SELECT * FROM refueling WHERE car_id = :car_id ORDER BY date")
     List<Refueling> getAllForCar(long car_id);
 
+    @Query("SELECT * FROM refueling WHERE station_id = :station_id ORDER BY date")
+    List<Refueling> getAllForStation(long station_id);
+
     @Query("SELECT * FROM refueling ORDER BY date")
     List<Refueling> getAll();
 

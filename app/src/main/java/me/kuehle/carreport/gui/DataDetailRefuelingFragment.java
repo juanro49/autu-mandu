@@ -42,6 +42,7 @@ import me.kuehle.carreport.gui.util.FormFieldGreaterEqualZeroOrEmptyValidator;
 import me.kuehle.carreport.gui.util.FormFieldGreaterEqualZeroValidator;
 import me.kuehle.carreport.gui.util.FormFieldGreaterZeroValidator;
 import me.kuehle.carreport.gui.util.FormValidator;
+import me.kuehle.carreport.presentation.StationPresenter;
 import me.kuehle.carreport.provider.car.CarColumns;
 import me.kuehle.carreport.provider.car.CarCursor;
 import me.kuehle.carreport.provider.car.CarSelection;
@@ -51,6 +52,9 @@ import me.kuehle.carreport.provider.fueltype.FuelTypeSelection;
 import me.kuehle.carreport.provider.refueling.RefuelingContentValues;
 import me.kuehle.carreport.provider.refueling.RefuelingCursor;
 import me.kuehle.carreport.provider.refueling.RefuelingSelection;
+import me.kuehle.carreport.provider.station.StationColumns;
+import me.kuehle.carreport.provider.station.StationCursor;
+import me.kuehle.carreport.provider.station.StationSelection;
 
 public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         implements SupportDatePickerDialogFragmentListener,
@@ -76,9 +80,11 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
     private CheckBox chkPartial;
     private EditText edtPrice;
     private Spinner spnFuelType;
+    private Spinner spnStation;
     private EditText edtNote;
     private Spinner spnCar;
     private FuelTypePresenter mFuelTypePresenter;
+    private StationPresenter mStationPresenter;
 
     private DistanceEntryMode mDistanceEntryMode;
     private PriceEntryMode mPriceEntryMode;
@@ -88,6 +94,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         super.onCreate(savedInstanceState);
 
         mFuelTypePresenter = FuelTypePresenter.getInstance(getActivity());
+        mStationPresenter = StationPresenter.getInstance(getActivity());
     }
 
     @Override
@@ -127,6 +134,16 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                     }
                 }
             }
+
+            // By default select most often used station for this car.
+            long mostUsedStationId = mStationPresenter.getMostUsedId(selectCarId);
+            if (mostUsedStationId > 0) {
+                for (int pos = 0; pos < spnStation.getCount(); pos++) {
+                    if (spnStation.getItemIdAtPosition(pos) == mostUsedStationId) {
+                        spnStation.setSelection(pos);
+                    }
+                }
+            }
         } else {
             RefuelingCursor refueling = new RefuelingSelection().id(mId).query(getActivity().getContentResolver());
             refueling.moveToNext();
@@ -139,6 +156,12 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
             for (int pos = 0; pos < spnFuelType.getCount(); pos++) {
                 if (spnFuelType.getItemIdAtPosition(pos) == refueling.getFuelTypeId()) {
                     spnFuelType.setSelection(pos);
+                }
+            }
+
+            for (int pos = 0; pos < spnStation.getCount(); pos++) {
+                if (spnStation.getItemIdAtPosition(pos) == refueling.getStationId()) {
+                    spnStation.setSelection(pos);
                 }
             }
 
@@ -212,6 +235,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         chkPartial = v.findViewById(R.id.chk_partial);
         edtPrice = v.findViewById(R.id.edt_price);
         spnFuelType = v.findViewById(R.id.spn_fuel_type);
+        spnStation = v.findViewById(R.id.spn_station);
         edtNote = v.findViewById(R.id.edt_note);
         spnCar = v.findViewById(R.id.spn_car);
 
@@ -255,6 +279,15 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
                 android.R.layout.simple_spinner_dropdown_item,
                 fuelType, new String[]{FuelTypeColumns.NAME}, new int[]{android.R.id.text1}, 0));
 
+        // Station
+        mStationPresenter.ensureAtLeastOne();
+
+        StationCursor station = new StationSelection().query(getActivity().getContentResolver(),
+            null, StationColumns.NAME + " COLLATE UNICODE");
+        spnStation.setAdapter(new SimpleCursorAdapter(getActivity(),
+            android.R.layout.simple_spinner_dropdown_item,
+            station, new String[]{StationColumns.NAME}, new int[]{android.R.id.text1}, 0));
+
         // Car
         CarCursor car = new CarSelection().query(getActivity().getContentResolver(), null,
                 CarColumns.NAME + " COLLATE UNICODE");
@@ -296,6 +329,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
         values.putPartial(chkPartial.isChecked());
         values.putNote(edtNote.getText().toString().trim());
         values.putFuelTypeId(spnFuelType.getSelectedItemId());
+        values.putStationId(spnStation.getSelectedItemId());
         values.putCarId(spnCar.getSelectedItemId());
 
         float volume = (float) getDoubleFromEditText(edtVolume, 0);

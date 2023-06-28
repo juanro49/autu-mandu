@@ -42,6 +42,7 @@ public class PreferencesActivity extends AbstractPreferenceActivity implements
                 PreferencesGeneralFragment.class,
                 PreferencesCarsFragment.class,
                 PreferencesFuelTypesFragment.class,
+                PreferencesStationsFragment.class,
                 PreferencesRemindersFragment.class,
                 PreferencesReportOrderFragment.class,
                 PreferencesBackupFragment.class,

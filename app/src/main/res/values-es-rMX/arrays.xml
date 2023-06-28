@@ -20,6 +20,7 @@
         <item>Recargas</item>
         <item>Otros Gastos</item>
         <item>Otros Ingresos</item>
+        <item>Estaciones</item>
     </string-array>
 
     <string-array name="repeat_intervals">
