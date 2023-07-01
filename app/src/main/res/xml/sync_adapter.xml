@@ -16,8 +16,8 @@
   -->
 <sync-adapter
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:contentAuthority="me.kuehle.carreport.provider"
-    android:accountType="me.kuehle.carreport.sync"
+    android:contentAuthority="org.juanro.autumandu.provider"
+    android:accountType="org.juanro.autumandu.sync"
     android:userVisible="true"
     android:supportsUploading="true"
     android:allowParallelSyncs="false"

@@ -33,7 +33,7 @@
             android:key="behavior_auto_backup"
             android:summary="@string/pref_summary_behavior_auto_backup"
             android:title="@string/pref_title_behavior_auto_backup" />
-        <me.kuehle.carreport.gui.util.IntEditTextPreference
+        <org.juanro.autumandu.gui.util.IntEditTextPreference
             android:dependency="behavior_auto_backup"
             android:defaultValue="12"
             android:key="behaviour_keep_backups"

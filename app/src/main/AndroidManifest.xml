@@ -129,8 +129,8 @@
         </receiver>
 
         <provider
-            android:name="me.kuehle.carreport.provider.DataProvider"
-            android:authorities="me.kuehle.carreport.provider"
+            android:name="org.juanro.autumandu.provider.DataProvider"
+            android:authorities="org.juanro.autumandu.provider"
             android:exported="false"/>
 
         <!-- For 2018-style testing !-->

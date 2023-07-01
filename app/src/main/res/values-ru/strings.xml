@@ -43,7 +43,7 @@
 
     <string name="section_suspend">Приостановить</string>
     <string name="section_advanced">Продвинутые опции</string>
-    
+
     <string name="hint_mileage_optional">Общий пробег (если есть)</string>
     <string name="hint_volume">Объем</string>
     <string name="hint_price">Стоимость</string>
@@ -66,7 +66,7 @@
     <string name="hint_reminder_start_mileage">Пробег (начало)</string>
     <string name="hint_reminder_start_date">Дата (начало)</string>
     <string name="hint_reminder_snoozed_until">Отложен до</string>
-    
+
     <string name="label_partial">Частично</string>
     <string name="label_color_in_reports">Цвета отчета</string>
     <string name="label_suspend">Приостановить</string>
@@ -85,7 +85,7 @@
     <string name="description_reminder_status_distance_and_time">Установлено на %1$ или %2$</string>
     <string name="description_reminder_status_distance">Установлено на %s</string>
     <string name="description_reminder_status_time">Установлено на %s</string>
-    <string name="description_webdav_url">Пожалуйста укажите URL к папке на вашем WebDAV сервере. Car Report будет записывать в эту папку. Данные вне папки не будут изменены.</string>
+    <string name="description_webdav_url">Пожалуйста укажите URL к папке на вашем WebDAV сервере. Autu Mandu будет записывать в эту папку. Данные вне папки не будут изменены.</string>
     <string name="description_webdav_trust_certificate">Android не доверяет сертификату этого веб-сайта.</string>
 
     <string name="validate_error_greater_zero">Должно быть больше 0</string>
@@ -100,7 +100,7 @@
     <string name="overwrite">Переписать</string>
     <string name="restore">Восстановить</string>
     <string name="import_">Импортировать</string>
-    
+
     <string name="title_first_start">Первые шаги</string>
     <string name="title_add_refueling">Добавить заправку</string>
     <string name="title_edit_refueling">Изменить заправку</string>
@@ -118,7 +118,7 @@
     <string name="title_edit_reminder">Изменить напоминание</string>
     <string name="cab_title_selected">%d выбрано</string>
     <string name="edit_title_refueling">Заправка</string>
-    
+
     <string name="edit_message_no_entry_selected">Ничего не выбрано</string>
 
     <string name="alert_delete_title">Подтвердить удаление</string>
@@ -162,8 +162,8 @@
     <string name="toast_restore_succeeded">Восстановление завершилось успешно</string>
     <string name="toast_export_csv_succeeded">Экспорт на SD карту завершился успешно.</string>
     <string name="toast_import_csv_succeeded">Импорт завершился успешно.</string>
-    <string name="toast_need_storage_permission">Для выполнения этой операции Car Report необходим доступ к файлам.</string>
-    
+    <string name="toast_need_storage_permission">Для выполнения этой операции Autu Mandu необходим доступ к файлам.</string>
+
     <string name="report_title_fuel_consumption">Расход топлива</string>
     <string name="report_title_fuel_price">Цена топлива</string>
     <string name="report_title_mileage">Пробег</string>
@@ -193,7 +193,7 @@
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">прибл. %1$.2f %2$s</string>
 
-    <string name="pref_title_header_about">О программе Car Report</string>
+    <string name="pref_title_header_about">О программе Autu Mandu</string>
     <string name="pref_title_header_general">Общие настройки</string>
     <string name="pref_title_header_cars">Авто</string>
     <string name="pref_title_header_fuel_types">Типы топлива</string>
@@ -222,7 +222,7 @@
     <string name="pref_title_importcsv">Импорт CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Показывать меню выбора авто при вводе заправки, если есть больше одного авто.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Пытаться определить пропущенные заправки. Если вы забудете ввести заправку, значительное занижение расхода повлечет перерасчет.</string>
-    <!-- needs retranslation <string name="pref_summary_sync_setup">Синхронизация работает очень просто. Если вы поменяете данные на двух устройствах одновременно и запустите синхронизацию, устройство синхронизирующееся последним потеряет свои изменения. Убедитесь, что на всех устройствах установленна одна и таже версия Car Report.</string>!-->
+    <!-- needs retranslation <string name="pref_summary_sync_setup">Синхронизация работает очень просто. Если вы поменяете данные на двух устройствах одновременно и запустите синхронизацию, устройство синхронизирующееся последним потеряет свои изменения. Убедитесь, что на всех устройствах установленна одна и таже версия Autu Mandu.</string>!-->
     <!-- needs retranslation <string name="pref_summary_sync_current_provider">Соединено с %s. Нажмите чтобы разьединить.</string>!-->
     <string name="pref_summary_backup">Резервное копирование на SD карту.</string>
     <string name="pref_summary_restore">Восстановление данных из файла %s на SD карте.</string>
@@ -230,16 +230,16 @@
     <string name="pref_summary_export_csv">Экспорт данных в CSV для использования в других программах типа Microsoft Excel или LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Импорт данных из CSV файла. Файлы должны быть похожи на те, что создаются при CSV экспорте.</string>
     <string name="pref_summary_import_csv_no_data">Нет файлов в каталоге %s на SD карте.</string>
-    
+
     <string name="help_section_getting_started">Начало работы</string>
     <string name="help_section_tips">Подсказки</string>
     <string name="help_section_calculations">Расчеты</string>
     <string name="help_section_fuel_types">Типы топлива</string>
     <string name="help_section_csv">CSV</string>
     <string name="help_folder_name">help-ru</string>
-    
+
     <string name="first_start_hi">Привет!</string>
-    <string name="first_start_intro">Car Report отображает наглядные отчеты по расходам на авто, включая расход топлива и общую стоимость обслуживания. Начните с простого:</string>
+    <string name="first_start_intro">Autu Mandu отображает наглядные отчеты по расходам на авто, включая расход топлива и общую стоимость обслуживания. Начните с простого:</string>
     <string name="first_start_step1_img_desc">Шаг первый</string>
     <string name="first_start_step1_text">Создайте запись о авто.</string>
     <string name="first_start_step2_img_desc">Шаг второй</string>
@@ -248,7 +248,7 @@
     <string name="first_start_step3_text">После двух заправок Вы увидете первый график.</string>
     <string name="first_start_create_car">Создайте авто</string>
     <string name="first_start_setup_sync">Настройте синхронизацию</string>
-    
+
     <string name="calc_option_volume_to_distance">Объем (%1$s) на пробег (%2$s)</string>
     <string name="calc_option_distance_to_volume">Пробег (%1$s) на объем (%2$s)</string>
     <string name="calc_option_volume_to_price">Объем (%1$s) к цене (%2$s)</string>

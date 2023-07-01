@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="bottom|end"
     android:padding="@dimen/fab_margin"
-    app:layout_behavior="me.kuehle.carreport.gui.util.FloatingActionMenuBehavior"
+    app:layout_behavior="org.juanro.autumandu.gui.util.FloatingActionMenuBehavior"
     app:menu_backgroundColor="#aa000000"
     app:menu_colorNormal="@color/button_accent"
     app:menu_colorPressed="@color/button_accent_pressed"

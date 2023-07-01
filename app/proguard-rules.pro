@@ -9,18 +9,18 @@
 
 
 #####################################
-# Car Report
+# Autu Mandu
 #####################################
 
 # Reports
--keep class me.kuehle.carreport.data.report.* { *; }
+-keep class org.juanro.autumandu.data.report.* { *; }
 
 # Preferences
--keep class me.kuehle.carreport.gui.Preferences*
--keep class me.kuehle.carreport.gui.HelpActivity$*
+-keep class org.juanro.autumandu.gui.Preferences*
+-keep class org.juanro.autumandu.gui.HelpActivity$*
 
 # Sync Providers
--keep class me.kuehle.carreport.util.sync.provider.*
+-keep class org.juanro.autumandu.util.sync.provider.*
 
 #####################################
 # Libraries

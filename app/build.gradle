@@ -2,12 +2,16 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion versions.compileSdk
+    compileSdkPreview "UpsideDownCake"
+    buildToolsVersion '33.0.1'
+    namespace 'org.juanro.autumandu'
+
     defaultConfig {
-        applicationId "me.kuehle.carreport"
+        applicationId "org.juanro.autumandu"
         minSdkVersion 15
-        targetSdkVersion versions.targetSdk
-        versionCode 79
-        versionName "3.25.0"
+        targetSdk versions.targetSdk
+        versionCode 100
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

@@ -16,24 +16,24 @@
 -->
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesGeneralFragment"
+        android:fragment="org.juanro.autumandu.gui.PreferencesGeneralFragment"
         android:title="@string/pref_title_header_general" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesCarsFragment"
+        android:fragment="org.juanro.autumandu.gui.PreferencesCarsFragment"
         android:title="@string/pref_title_header_cars" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesFuelTypesFragment"
+        android:fragment="org.juanro.autumandu.gui.PreferencesFuelTypesFragment"
         android:title="@string/pref_title_header_fuel_types" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesStationsFragment"
+        android:fragment="org.juanro.autumandu.gui.PreferencesStationsFragment"
         android:title="@string/pref_title_header_stations" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesRemindersFragment"
+        android:fragment="org.juanro.autumandu.gui.PreferencesRemindersFragment"
         android:title="@string/pref_title_header_reminders" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesBackupFragment"
+        android:fragment="org.juanro.autumandu.gui.PreferencesBackupFragment"
         android:title="@string/pref_title_header_backup" />
     <header
-        android:fragment="me.kuehle.carreport.gui.PreferencesAboutFragment"
+        android:fragment="org.juanro.autumandu.gui.PreferencesAboutFragment"
         android:title="@string/pref_title_header_about" />
 </preference-headers>

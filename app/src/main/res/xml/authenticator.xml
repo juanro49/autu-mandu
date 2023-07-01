@@ -19,4 +19,4 @@
     android:label="@string/app_name"
     android:icon="@mipmap/ic_launcher"
     android:smallIcon="@mipmap/ic_launcher"
-    android:accountType="me.kuehle.carreport.sync"/>
+    android:accountType="org.juanro.autumandu.sync"/>

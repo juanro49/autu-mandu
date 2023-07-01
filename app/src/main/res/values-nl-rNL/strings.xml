@@ -70,7 +70,7 @@
     <string name="description_reminder_status_distance_and_time">Vervalt over %1$s of %2$s</string>
     <string name="description_reminder_status_distance">Vervalt over %s</string>
     <string name="description_reminder_status_time">Vervalt over %s</string>
-    <string name="description_webdav_url">Voer de URL in naar een speciale map voor autorapporten op uw WebDAV-server. Car Report slaat zijn gegevens op in deze map, het zal niets aanraken buiten deze map.</string>
+    <string name="description_webdav_url">Voer de URL in naar een speciale map voor autorapporten op uw WebDAV-server. Autu Mandu slaat zijn gegevens op in deze map, het zal niets aanraken buiten deze map.</string>
     <string name="description_webdav_trust_certificate">De website maakt gebruik van een certificaat, dat niet vertrouwd wordt door Android.</string>
 
     <string name="validate_error_greater_zero">Moet groter zijn dan 0</string>
@@ -150,7 +150,7 @@
     <string name="toast_restore_succeeded">Herstel succesvol afgerond</string>
     <string name="toast_export_csv_succeeded">Exporteren naar een SD-kaart is succesvol afgerond.</string>
     <string name="toast_import_csv_succeeded">Import succesvol afgerond.</string>
-    <string name="toast_need_storage_permission">Om deze actie uit te voeren moet Car Report toegang hebben tot uw bestanden.</string>
+    <string name="toast_need_storage_permission">Om deze actie uit te voeren moet Autu Mandu toegang hebben tot uw bestanden.</string>
     <string name="toast_auto_backup_succeeded">Automatische backup is geslaagd.</string>
     <string name="toast_auto_backup_failed">Automatische backup is mislukt.</string>
 
@@ -183,7 +183,7 @@
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">est. %1$.2f %2$s</string>
 
-    <string name="pref_title_header_about">Over Car Report</string>
+    <string name="pref_title_header_about">Over Autu Mandu</string>
     <string name="pref_title_header_general">Algemene instellingen</string>
     <string name="pref_title_header_cars">Auto\'s</string>
     <string name="pref_title_header_fuel_types">Brandstoftypen</string>
@@ -215,7 +215,7 @@
     <string name="pref_title_importcsv">Importeer CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Toon een autokeuzemenu, bij het toevoegen van een tankbeurt indien u meer dan één auto heeft.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Probeer ontbrekende tankbeurten te herkennen. Dit compenseert het aanzienlijk lagere brandstofverbruik, dat optreedt wanneer u vergeet een tankbeurt in te voeren.</string>
-    <string name="pref_summary_sync_setup">Kan leiden tot gegevensverlies bij gebruik met meerdere personen. De synchronisatie vervangt altijd alle gegevens. Gebruik dezelfde versie van Car Report op alle apparaten.</string>
+    <string name="pref_summary_sync_setup">Kan leiden tot gegevensverlies bij gebruik met meerdere personen. De synchronisatie vervangt altijd alle gegevens. Gebruik dezelfde versie van Autu Mandu op alle apparaten.</string>
     <string name="pref_summary_sync_current_provider">Gekoppeld aan %s. Klik om te ontkoppelen. Synchronisatie kan leiden tot gegevensverlies bij gebruik met meerdere personen.</string>
     <string name="pref_summary_backup">Maak een backup van de huidige gegevens naar de lokale opslag.</string>
     <string name="pref_summary_backup_location">Een pad waar backups worden opgeslagen. Als deze leeg is, wordt een aparte map in uw interne geheugen of SD gebruikt.</string>
@@ -237,7 +237,7 @@
     <string name="help_folder_name">help</string>
 
     <string name="first_start_hi">Hallo daar!</string>
-    <string name="first_start_intro">Car Report kan mooie rapporten weergeven voor uw autokosten, inclusief brandstofverbruik en totale kosten. Begin met deze eenvoudige stappen:</string>
+    <string name="first_start_intro">Autu Mandu kan mooie rapporten weergeven voor uw autokosten, inclusief brandstofverbruik en totale kosten. Begin met deze eenvoudige stappen:</string>
     <string name="first_start_step1_img_desc">Stap 1</string>
     <string name="first_start_step1_text">Maak een auto aan.</string>
     <string name="first_start_step2_img_desc">Stap 2</string>

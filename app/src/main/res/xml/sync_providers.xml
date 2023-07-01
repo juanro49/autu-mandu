@@ -15,5 +15,5 @@
   ~ limitations under the License.
   -->
 <sync-providers>
-    <sync-provider class="me.kuehle.carreport.util.sync.provider.WebDavSyncProvider"/>
+    <sync-provider class="org.juanro.autumandu.util.sync.provider.WebDavSyncProvider"/>
 </sync-providers>

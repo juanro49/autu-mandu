@@ -85,7 +85,7 @@
     <string name="description_reminder_status_distance_and_time">Vence en %1$s o %2$s</string>
     <string name="description_reminder_status_distance">Vence en %s</string>
     <string name="description_reminder_status_time">Vence en %s</string>
-    <string name="description_webdav_url">Favor de introducir la URL a una carpeta especial para Car Report en tu servidor WebDAV. Car Report guardará sus datos en esta carpeta. No hará modificaciones fuera de esta carpeta.</string>
+    <string name="description_webdav_url">Favor de introducir la URL a una carpeta especial para Autu Mandu en tu servidor WebDAV. Autu Mandu guardará sus datos en esta carpeta. No hará modificaciones fuera de esta carpeta.</string>
     <string name="description_webdav_trust_certificate">El sitio web utiliza un certificado de seguridad que no es confiado por Android.</string>
 
     <string name="validate_error_greater_zero">Debe ser mayor a 0</string>
@@ -162,7 +162,7 @@
     <string name="toast_restore_succeeded">Restauración exitosa</string>
     <string name="toast_export_csv_succeeded">Exportación a tarjeta SD exitosa.</string>
     <string name="toast_import_csv_succeeded">Importación exitosa.</string>
-    <string name="toast_need_storage_permission">Para utilizar esta función, Car Report requiere acceso a tus archivos.</string>
+    <string name="toast_need_storage_permission">Para utilizar esta función, Autu Mandu requiere acceso a tus archivos.</string>
 
     <string name="report_title_fuel_consumption">Rendimiento de combustible</string>
     <string name="report_title_fuel_price">Precio de combustible</string>
@@ -190,7 +190,7 @@
     <string name="report_toast_costs">%1$s: %2$.0f %3$s en %4$s</string>
     <string name="report_toast_guessed">Estimado para compensar recargas sin registro.</string>
 
-    <string name="pref_title_header_about">Acerca de Car Report</string>
+    <string name="pref_title_header_about">Acerca de Autu Mandu</string>
     <string name="pref_title_header_general">Ajustes generales</string>
     <string name="pref_title_header_cars">Vehículos</string>
     <string name="pref_title_header_fuel_types">Tipos de combustible</string>
@@ -234,7 +234,7 @@
     <string name="help_folder_name">help-es-rMX</string>
 
     <string name="first_start_hi">¡Hola!</string>
-    <string name="first_start_intro">Car Report muestra reportes para tus gastos de vehículo como rendimiento de combustible y gastos generales. Comienza con los siguientes pasos:</string>
+    <string name="first_start_intro">Autu Mandu muestra reportes para tus gastos de vehículo como rendimiento de combustible y gastos generales. Comienza con los siguientes pasos:</string>
     <string name="first_start_step1_img_desc">Primer paso</string>
     <string name="first_start_step1_text">Registra un vehículo</string>
     <string name="first_start_step2_img_desc">Segundo paso</string>

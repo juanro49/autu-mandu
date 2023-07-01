@@ -1,8 +1,8 @@
 {
     "syntaxVersion": 3,
-    "projectPackageId": "me.kuehle.carreport",
-    "authority": "me.kuehle.carreport.provider",
-    "providerJavaPackage": "me.kuehle.carreport.provider",
+    "projectPackageId": "org.juanro.autumandu",
+    "authority": "org.juanro.autumandu.provider",
+    "providerJavaPackage": "org.juanro.autumandu.provider",
     "providerClassName": "DataProvider",
     "sqliteOpenHelperClassName": "DataSQLiteOpenHelper",
     "sqliteOpenHelperCallbacksClassName": "DataSQLiteOpenHelperCallbacks",

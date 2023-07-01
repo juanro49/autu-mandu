@@ -86,7 +86,7 @@
     <string name="description_reminder_status_distance_and_time">Échu dans %1$s ou le %2$s</string>
     <string name="description_reminder_status_distance">Échu dans %s</string>
     <string name="description_reminder_status_time">Échu le %s</string>
-    <string name="description_webdav_url">Entrez l\'URL d\'un dossier spécifique pour Car Report sur votre serveur WebDav. Car report va déposer ses fichiers à l\'intérieur de ce dossier, sans rien consulter ou modifier d\'autre.</string>
+    <string name="description_webdav_url">Entrez l\'URL d\'un dossier spécifique pour Autu Mandu sur votre serveur WebDav. Autu Mandu va déposer ses fichiers à l\'intérieur de ce dossier, sans rien consulter ou modifier d\'autre.</string>
     <string name="description_webdav_trust_certificate">Android ne fait pas confiance au certificat utilisé pour ce site web.</string>
 
     <string name="validate_error_greater_zero">Doit être positif (>0)</string>
@@ -163,7 +163,7 @@
     <string name="toast_restore_succeeded">Restauration réalisée avec succès</string>
     <string name="toast_export_csv_succeeded">Exportation vers la carte SD réalisée avec succès.</string>
     <string name="toast_import_csv_succeeded">Importation réalisée avec succès.</string>
-    <string name="toast_need_storage_permission">Pour réaliser cette action vous devez autoriser Car Report à accéder à vos fichiers.</string>
+    <string name="toast_need_storage_permission">Pour réaliser cette action vous devez autoriser Autu Mandu à accéder à vos fichiers.</string>
 
     <string name="report_title_fuel_consumption">Consommation de carburant</string>
     <string name="report_title_fuel_price">Prix du carburant</string>
@@ -191,7 +191,7 @@
     <string name="report_toast_costs">%1$s&#8239;: %2$.0f %3$s in %4$s</string>
     <string name="report_toast_guessed">Deviné pour compenser les pleins manquants.</string>
 
-    <string name="pref_title_header_about">À propos de Car Report</string>
+    <string name="pref_title_header_about">À propos de Autu Mandu</string>
     <string name="pref_title_header_general">Paramètres généraux</string>
     <string name="pref_title_header_cars">Voitures</string>
     <string name="pref_title_header_fuel_types">Types de carburant</string>
@@ -220,7 +220,7 @@
     <string name="pref_title_importcsv">Import CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Afficher le menu de sélection des voitures lorsque vous ajoutez un plein et que vous avez plusieurs voitures.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Essaye de détecter les pleins manquants. Cela va compenser les consommations significativement inférieures qui apparaissent lorsque vous oubliez d\'ajouter un plein.</string>
-    <!-- needs retranslation <string name="pref_summary_sync_setup">Synchronisation très basique. Lorsque vous modifiez des données sur deux appareils en même temps et que vous les synchronisez, l\'appareil synchronisé en dernier perd ses modifications. Assurez-vous d\'avoir la même version de Car Report sur tous vos appareils.</string>!-->
+    <!-- needs retranslation <string name="pref_summary_sync_setup">Synchronisation très basique. Lorsque vous modifiez des données sur deux appareils en même temps et que vous les synchronisez, l\'appareil synchronisé en dernier perd ses modifications. Assurez-vous d\'avoir la même version de Autu Mandu sur tous vos appareils.</string>!-->
     <!-- needs retranslation <string name="pref_summary_sync_current_provider">Lié à %s. Cliquez pour supprimer le lien.</string>!-->
     <!-- needs retranslation <string name="pref_summary_backup">Sauvegarder les données actuelles vers la carte SD.</string>!-->
     <!-- needs retranslation <string name="pref_summary_restore">Restaurer les données depuis le fichier %s sur la carte SD</string>!-->
@@ -235,7 +235,7 @@
     <string name="help_section_csv">CSV</string>
 
     <string name="first_start_hi">Salut toi!</string>
-    <string name="first_start_intro">Car Report peut afficher de chouettes rapports à partir des dépenses effectuées pour votre voiture, incluant la consommation de carburant et tous les autres coûts. Pour bien démarrer, suivez ces quelques étapes&#8239;:</string>
+    <string name="first_start_intro">Autu Mandu peut afficher de chouettes rapports à partir des dépenses effectuées pour votre voiture, incluant la consommation de carburant et tous les autres coûts. Pour bien démarrer, suivez ces quelques étapes&#8239;:</string>
     <string name="first_start_step1_img_desc">Première étape</string>
     <string name="first_start_step1_text">Ajoutez une voiture</string>
     <string name="first_start_step2_img_desc">Seconde étape</string>

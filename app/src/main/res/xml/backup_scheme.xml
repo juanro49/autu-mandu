@@ -16,6 +16,6 @@
   -->
 <full-backup-content>
     <include domain="database" path="data.db"/>
-    <include domain="sharedpref" path="me.kuehle.carreport_preferences.xml"/>
-    <include domain="sharedpref" path="me.kuehle.carreport.gui.ReportFragment.xml"/>
+    <include domain="sharedpref" path="org.juanro.autumandu_preferences.xml"/>
+    <include domain="sharedpref" path="org.juanro.autumandu.gui.ReportFragment.xml"/>
 </full-backup-content>

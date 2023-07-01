@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 <resources>
-    <string name="app_name" translatable="false">Car Report</string>
+    <string name="app_name" translatable="false">Autu Mandu</string>
     <string name="app_description">Enter the costs of your car and receive nice reports and statistics.</string>
 
     <string name="about_author">© Jan Kühle</string>
@@ -90,7 +90,7 @@
     <string name="description_reminder_status_distance_and_time">Due in %1$s or %2$s</string>
     <string name="description_reminder_status_distance">Due in %s</string>
     <string name="description_reminder_status_time">Due in %s</string>
-    <string name="description_webdav_url">Please enter the URL to a special folder for Car Report on your WebDAV server. Car Report will store its data inside this folder, it won\'t touch anything outside of it.</string>
+    <string name="description_webdav_url">Please enter the URL to a special folder for Autu Mandu on your WebDAV server. Autu Mandu will store its data inside this folder, it won\'t touch anything outside of it.</string>
     <string name="description_webdav_trust_certificate">The website uses a certificate, which is not trusted by Android.</string>
 
     <string name="validate_error_greater_zero">Has to be greater 0</string>
@@ -174,7 +174,7 @@
     <string name="toast_restore_succeeded">Restore completed successfully</string>
     <string name="toast_export_csv_succeeded">Export to SD card completed successfully.</string>
     <string name="toast_import_csv_succeeded">Import completed successfully.</string>
-    <string name="toast_need_storage_permission">To perform this action Car Report needs to have access to your files.</string>
+    <string name="toast_need_storage_permission">To perform this action Autu Mandu needs to have access to your files.</string>
     <string name="toast_auto_backup_succeeded">Automatic backup succeeded.</string>
     <string name="toast_auto_backup_failed">Automatic backup failed.</string>
 
@@ -207,7 +207,7 @@
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">est. %1$.2f %2$s</string>
 
-    <string name="pref_title_header_about">About Car Report</string>
+    <string name="pref_title_header_about">About Autu Mandu</string>
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>
     <string name="pref_title_header_fuel_types">Fuel Types</string>
@@ -240,7 +240,7 @@
     <string name="pref_title_importcsv">Import CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Show a car selection menu, when adding a refueling and you have more than one car.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Try to recognize missing refuelings. This will balance the significantly lower fuel consumptions, that occure when you forget to insert a refueling.</string>
-    <string name="pref_summary_sync_setup">Can result in data loss when used with multiple people. The sync always replaces all data. Please use same version of Car Report on all devices.</string>
+    <string name="pref_summary_sync_setup">Can result in data loss when used with multiple people. The sync always replaces all data. Please use same version of Autu Mandu on all devices.</string>
     <string name="pref_summary_sync_current_provider">Linked to %s. Click to unlink. Sync can result in data loss when used with multiple people.</string>
     <string name="pref_summary_backup">Backup the current data to local storage.</string>
     <string name="pref_summary_backup_location">A path where backups are stored. If empty, a separate folder inside your internal storage or SD will be used.</string>
@@ -262,7 +262,7 @@
     <string name="help_folder_name">help</string>
 
     <string name="first_start_hi">Hi there!</string>
-    <string name="first_start_intro">Car Report can display nice reports for your car expenses, including fuel consumption and overall costs. Start with these simple steps:</string>
+    <string name="first_start_intro">Autu Mandu can display nice reports for your car expenses, including fuel consumption and overall costs. Start with these simple steps:</string>
     <string name="first_start_step1_img_desc">First step</string>
     <string name="first_start_step1_text">Create a car.</string>
     <string name="first_start_step2_img_desc">Second step</string>

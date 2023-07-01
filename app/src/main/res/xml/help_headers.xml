@@ -16,18 +16,18 @@
 -->
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
     <header
-        android:fragment="me.kuehle.carreport.gui.HelpActivity$GettingStartedFragment"
+        android:fragment="org.juanro.autumandu.gui.HelpActivity$GettingStartedFragment"
         android:title="@string/help_section_getting_started" />
     <header
-        android:fragment="me.kuehle.carreport.gui.HelpActivity$FuelTypesFragment"
+        android:fragment="org.juanro.autumandu.gui.HelpActivity$FuelTypesFragment"
         android:title="@string/help_section_fuel_types" />
     <header
-        android:fragment="me.kuehle.carreport.gui.HelpActivity$TipsFragment"
+        android:fragment="org.juanro.autumandu.gui.HelpActivity$TipsFragment"
         android:title="@string/help_section_tips" />
     <header
-        android:fragment="me.kuehle.carreport.gui.HelpActivity$CalculationsFragment"
+        android:fragment="org.juanro.autumandu.gui.HelpActivity$CalculationsFragment"
         android:title="@string/help_section_calculations" />
     <header
-        android:fragment="me.kuehle.carreport.gui.HelpActivity$CSVFragment"
+        android:fragment="org.juanro.autumandu.gui.HelpActivity$CSVFragment"
         android:title="@string/help_section_csv" />
 </preference-headers>

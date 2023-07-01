@@ -84,7 +84,7 @@ limitations under the License.
     <string name="description_reminder_status_distance_and_time">Scadenza in %1$s o %2$s</string>
     <string name="description_reminder_status_distance">Scadenza in %s</string>
     <string name="description_reminder_status_time">Scadenza in %s</string>
-    <string name="description_webdav_url">Per favore inserisci un URL in una cartella sul tuo server WebDAV per Car Report. Car Report memorizzerà i tuoi dati in questa cartella e non toccherà niente fuori di essa.</string>
+    <string name="description_webdav_url">Per favore inserisci un URL in una cartella sul tuo server WebDAV per Autu Mandu. Autu Mandu memorizzerà i tuoi dati in questa cartella e non toccherà niente fuori di essa.</string>
     <string name="description_webdav_trust_certificate">Il sito usa un certificato non riconosciuto da Android.</string>
 
     <string name="validate_error_greater_zero">Deve essere maggiore di 0</string>
@@ -163,7 +163,7 @@ limitations under the License.
     <string name="toast_restore_succeeded">Ripristino completato correttamente.</string>
     <string name="toast_export_csv_succeeded">Esportazione su scheda SD completata correttamente.</string>
     <string name="toast_import_csv_succeeded">Importazione completata correttamente.</string>
-    <string name="toast_need_storage_permission">Per eseguire questa azione Car Report ha bisogno di accedere ai tuoi file.</string>
+    <string name="toast_need_storage_permission">Per eseguire questa azione Autu Mandu ha bisogno di accedere ai tuoi file.</string>
     <string name="toast_auto_backup_succeeded">Archiviazione automatica eseguita.</string>
     <string name="toast_auto_backup_failed">Archiviazione automatica fallita.</string>
 
@@ -196,7 +196,7 @@ limitations under the License.
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">est. %1$.2f %2$s</string>
 
-    <string name="pref_title_header_about">A proposito di Car Report</string>
+    <string name="pref_title_header_about">A proposito di Autu Mandu</string>
     <string name="pref_title_header_general">Impostazioni generali</string>
     <string name="pref_title_header_cars">Auto</string>
     <string name="pref_title_header_fuel_types">Tipi di carburante</string>
@@ -228,7 +228,7 @@ limitations under the License.
     <string name="pref_title_importcsv">Importazione CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Mostra un menu scelta auto quando aggiungi un rifornimento e hai più di un\'auto.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Prova a identificare rifornimenti mancanti. Questo bilancia i consumi di carburante significativamente bassi che accadono quando dimentichi di inserire un rifornimento.</string>
-    <string name="pref_summary_sync_setup">Può causare perdite di dati se usata da più persone. La sincronizzazione rimpiazza sempre tutti i dati. Per favore usa sempre la stessa versione di Car Report su tutti i dispositivi.</string>
+    <string name="pref_summary_sync_setup">Può causare perdite di dati se usata da più persone. La sincronizzazione rimpiazza sempre tutti i dati. Per favore usa sempre la stessa versione di Autu Mandu su tutti i dispositivi.</string>
     <string name="pref_summary_sync_current_provider">Collegato a %s. Clicca per scollegare. La sincronizzazione può causare perdite di dati se usata da più persone.</string>
     <string name="pref_summary_backup">Archivia i dati nella memoria locale.</string>
     <string name="pref_summary_backup_location">Percorso in cui i file sono archiviati. Se vuoto, sarà usata una cartella separata nella tua memoria locale o scheda SD.</string>
@@ -250,7 +250,7 @@ limitations under the License.
     <string name="help_folder_name">help-it</string>
 
     <string name="first_start_hi">Ciao!</string>
-    <string name="first_start_intro">Car Report può mostrare degli utili rapporti per le tue spese dell\'auto, incluso il consumo di carburante e i costi generali. Inizia con questi semplici passi:</string>
+    <string name="first_start_intro">Autu Mandu può mostrare degli utili rapporti per le tue spese dell\'auto, incluso il consumo di carburante e i costi generali. Inizia con questi semplici passi:</string>
     <string name="first_start_step1_img_desc">Primo passo</string>
     <string name="first_start_step1_text">Crea un\'auto.</string>
     <string name="first_start_step2_img_desc">Secondo passo</string>

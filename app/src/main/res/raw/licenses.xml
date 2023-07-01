@@ -16,6 +16,12 @@
   -->
 <notices>
     <notice>
+        <name>Car-report</name>
+        <url>https://bitbucket.org/frigus02/car-report/</url>
+        <copyright>Copyright 2012 Jan Kühle</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
         <name>HelloCharts for Android</name>
         <url>https://github.com/lecho/hellocharts-android</url>
         <copyright>Copyright 2014 Leszek Wach</copyright>

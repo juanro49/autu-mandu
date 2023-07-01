@@ -85,7 +85,7 @@
     <string name="description_reminder_status_distance_and_time">Vence em %1$s ou %2$s</string>
     <string name="description_reminder_status_distance">Vence em %s</string>
     <string name="description_reminder_status_time">Vence em %s</string>
-    <string name="description_webdav_url">Digite a URL da pasta especial do Car Report no seu servidor WebDAV. O Car Report armazenará os dados apenas dentro dessa pasta.</string>
+    <string name="description_webdav_url">Digite a URL da pasta especial do Autu Mandu no seu servidor WebDAV. O Autu Mandu armazenará os dados apenas dentro dessa pasta.</string>
     <string name="description_webdav_trust_certificate">A página Web usa um certificado que o Android não confia.</string>
 
     <string name="validate_error_greater_zero">Deve ser maior que 0</string>
@@ -164,7 +164,7 @@
     <string name="toast_restore_succeeded">Restauração concluída com sucesso</string>
     <string name="toast_export_csv_succeeded">Exportação para cartão SD concluída com sucesso.</string>
     <string name="toast_import_csv_succeeded">Importação concluída com sucesso.</string>
-    <string name="toast_need_storage_permission">Para efetuar esta operação, o Car Report precisa ter acesso aos seus arquivos.</string>
+    <string name="toast_need_storage_permission">Para efetuar esta operação, o Autu Mandu precisa ter acesso aos seus arquivos.</string>
     <string name="toast_auto_backup_succeeded">O backup automático foi realizado com sucesso.</string>
     <string name="toast_auto_backup_failed">O backup automático falhou.</string>
 
@@ -197,7 +197,7 @@
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">est. %1$.2f %2$s</string>
 
-    <string name="pref_title_header_about">Sobre o Car Report</string>
+    <string name="pref_title_header_about">Sobre o Autu Mandu</string>
     <string name="pref_title_header_general">Configurações gerais</string>
     <string name="pref_title_header_cars">Carros</string>
     <string name="pref_title_header_fuel_types">Tipos de combustível</string>
@@ -229,7 +229,7 @@
     <string name="pref_title_importcsv">Importar CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Se tiver mais de um carro, mostra um menu para escolher em qual deles um  abastecimento será adicionado.</string>
     <string name="pref_summary_behavior_auto_guess_missing_data">Tentar identificar os abastecimentos não cadastrados. Isso vai equilibrar os consumos de combustível significativamente mais baixos, que ocorrem quando você esqueçe de inserir um abastecimento.</string>
-    <string name="pref_summary_sync_setup">Pode resultar em perda de dados quando utilizado por mais de uma pessoa. A sincronização sempre substituirá todos os dados. Use a mesma versão do Car Report em todos os dispositivos.</string>
+    <string name="pref_summary_sync_setup">Pode resultar em perda de dados quando utilizado por mais de uma pessoa. A sincronização sempre substituirá todos os dados. Use a mesma versão do Autu Mandu em todos os dispositivos.</string>
     <string name="pref_summary_sync_current_provider">Conectado com %s. Clique para desconectar. A sincronização poderá resultar em perda de dados quando feita por mais de uma pessoa.</string>
     <string name="pref_summary_backup">Faça backup dos dados atuais para o armazenamento local.</string>
     <string name="pref_summary_backup_location">Um caminho onde os backups são armazenados. Se estiver em branco será usada uma pasta separada dentro do seu armazenamento interno ou SD.</string>
@@ -251,7 +251,7 @@
     <string name="help_folder_name">help-pt-rBR</string>
 
     <string name="first_start_hi">Olá!</string>
-    <string name="first_start_intro">O Car Report pode apresentar bons relatórios das despesas do seu carro, incluindo o consumo de combustível e outros custos em geral. Começe com estas simples etapas:</string>
+    <string name="first_start_intro">O Autu Mandu pode apresentar bons relatórios das despesas do seu carro, incluindo o consumo de combustível e outros custos em geral. Começe com estas simples etapas:</string>
     <string name="first_start_step1_img_desc">Primeiro passo</string>
     <string name="first_start_step1_text">Criar um carro.</string>
     <string name="first_start_step2_img_desc">Segundo passo</string>
