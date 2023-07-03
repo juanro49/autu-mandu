@@ -1,9 +1,9 @@
 # Autu Mandu
 ---
 
-| License | Translations | Code Quality | Downloads | Vulnerabilities | Dependences | Bugs |
-|---|---|---|---|---|---|---|
-| [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) | [![Estado de la traducción](https://hosted.weblate.org/widgets/autu-mandu/-/autu-mandu/svg-badge.svg)](https://hosted.weblate.org/engage/autu-mandu/?utm_source=widget) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/37fe446752b94703a745172c36a049bc)](https://www.codacy.com/app/juanro49/Autu-Mandu?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=juanro49/Autu-Mandu&amp;utm_campaign=Badge_Grade) | [![GitHub All Releases](https://img.shields.io/github/downloads/juanro49/autu-mandu/total.svg)](https://github.com/juanro49/autu-mandu/blob/master/README.md#descarga) | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=juanro49_Autu-mandu&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=juanro49_Autu-Mandu) | [![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/juanro49/autu-mandu.svg)](https://libraries.io/github/juanro49/autu-mandu) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=juanro49_Autu-Mandu&metric=bugs)](https://sonarcloud.io/dashboard?id=juanro49_Autu-Mandu) |
+| License | Translations | Downloads | Vulnerabilities | Dependences | Bugs |
+|---|---|---|---|---|---|
+| [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) | [![Estado de la traducción](https://hosted.weblate.org/widgets/autu-mandu/-/autu-mandu/svg-badge.svg)](https://hosted.weblate.org/engage/autu-mandu/?utm_source=widget) | [![GitHub All Releases](https://img.shields.io/github/downloads/juanro49/autu-mandu/total.svg)](https://github.com/juanro49/autu-mandu#install) | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=juanro49_autu-mandu&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=juanro49_autu-mandu) | [![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/juanro49/autu-mandu.svg)](https://libraries.io/github/juanro49/autu-mandu) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=juanro49_autu-mandu&metric=bugs)](https://sonarcloud.io/dashboard?id=juanro49_autu-mandu) |
 
 
 > Android app for saving and looking up costs of your car.
