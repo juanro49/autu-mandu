@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<manifest package="me.kuehle.carreport"
+<manifest package="org.juanro.autumandu"
           xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
@@ -23,13 +23,9 @@
 
     <!-- Purpose: sync -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
-    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="22"/>
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" android:maxSdkVersion="22"/>
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" android:maxSdkVersion="22"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" android:maxSdkVersion="22"/>
 
     <!-- Purpose: setup reminder service, so reminders work after reboot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -47,7 +43,8 @@
         <activity
             android:name=".gui.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar.NavigationDrawer">
+            android:theme="@style/AppTheme.NoActionBar.NavigationDrawer"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -80,18 +77,6 @@
             android:excludeFromRecents="true"
             android:theme="@style/AppTheme.Dialog"/>
         <activity
-            android:name="com.dropbox.core.android.AuthActivity"
-            android:configChanges="orientation|keyboard"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <data android:scheme="db-a6edub2n9b029if"/>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".gui.dialog.SetupWebDavSyncDialogActivity"
             android:excludeFromRecents="true"
             android:theme="@style/AppTheme.Dialog"/>
@@ -109,7 +94,8 @@
         <service
             android:name=".util.sync.SyncService"
             android:process=":sync"
-            tools:ignore="ExportedService">
+            tools:ignore="ExportedService"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter"/>
             </intent-filter>
@@ -122,7 +108,8 @@
             android:exported="false"
             android:process=":reminder"/>
 
-        <receiver android:name=".util.reminder.ReminderEnablerReceiver">
+        <receiver android:name=".util.reminder.ReminderEnablerReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>

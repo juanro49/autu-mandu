@@ -18,7 +18,7 @@
     <string name="app_name" translatable="false">Autu Mandu</string>
     <string name="app_description">Enter the costs of your car and receive nice reports and statistics.</string>
 
-    <string name="about_author">© Jan Kühle</string>
+    <string name="about_author" translatable="false">© Jan Kühle 2012, Juanro49 2023</string>
     <string name="about_thanks">Thanks to:</string>
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Licenses</string>
@@ -301,6 +301,25 @@
     <string name="drag_handle_desc">Drag handle</string>
     <string name="quit_snooze_desc">Quit snooze</string>
     <string name="notice_not_paid">Not paid</string>
+
+    <string name="title_refuelings">Refuelings</string>
+    <string name="title_expenditures">Other Expenditures</string>
+    <string name="title_income">Other Income</string>
+    <string name="title_stations">Stations</string>
+
+    <string name="repeat_once">Once</string>
+    <string name="repeat_day">Repeat every day</string>
+    <string name="repeat_month">Repeat every month</string>
+    <string name="repeat_quarter">Repeat every quarter</string>
+    <string name="repeat_year">Repeat every year</string>
+
+    <string name="reminder_distance_time">After distance or time, whichever comes first</string>
+    <string name="reminder_distance">After distance</string>
+    <string name="reminder_time">After time</string>
+
+    <string name="time_day">Day(s)</string>
+    <string name="time_month">Month(s)</string>
+    <string name="time_year">Year(s)</string>
 
     <string name="about_licenses_styles" translatable="false">
         body {

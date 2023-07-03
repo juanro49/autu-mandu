@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <resources>
-    <string name="about_author">© Jan Kühle</string>
     <string name="about_thanks">Danke an:</string>
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Lizenzen</string>
@@ -290,4 +289,22 @@
     <string name="pref_action_select_backup_file">Datei für Wiederherstellung wählen</string>
     <string name="pref_summary_no_file_selector">Auf diesem Gerät fehlt eine App zum auswählen des Backups.</string>
     <string name="pref_summary_restore_file_seems_wrong">Es wurde nicht ausgewählt oder die Datei scheint nicht für eine Wiederherstellung geeignet.</string>
+
+    <string name="title_refuelings">Tankfüllungen</string>
+    <string name="title_expenditures">Andere Ausgaben</string>
+    <string name="title_income">Andere Einnahmen</string>
+
+    <string name="repeat_once">Einmalig</string>
+    <string name="repeat_day">Jeden Tag wiederholen</string>
+    <string name="repeat_month">Jeden Monat wiederholen</string>
+    <string name="repeat_quarter">Jeden Quartal wiederholen</string>
+    <string name="repeat_year">Jeden Jahr wiederholen</string>
+
+    <string name="reminder_distance_time">Nach Kilometern oder Zeit, je nachdem, was zuerst eintritt</string>
+    <string name="reminder_distance">Nach Kilometern</string>
+    <string name="reminder_time">Nach Zeit</string>
+
+    <string name="time_day">Tag(e)</string>
+    <string name="time_month">Monat(e)</string>
+    <string name="time_year">Jahr(e)</string>
 </resources>

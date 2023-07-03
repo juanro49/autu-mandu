@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about_author">© Jan Kühle</string>
     <string name="about_thanks">Met dank aan:</string>
     <string name="about_version">Versie: %s</string>
     <string name="about_licenses">Licenties</string>
@@ -276,4 +275,22 @@
     <string name="drag_handle_desc">Sleepgebied</string>
     <string name="quit_snooze_desc">Sluimeren stoppen</string>
     <string name="notice_not_paid">Niet betaald</string>
+
+    <string name="title_refuelings">Tankbeurten</string>
+    <string name="title_expenditures">Andere uitgaven</string>
+    <string name="title_income">Andere inkomsten</string>
+
+    <string name="repeat_once">Eenmalig</string>
+    <string name="repeat_day">Herhaal elke dag</string>
+    <string name="repeat_month">Herhaal elke maand</string>
+    <string name="repeat_quarter">Herhaal elk kwartaal</string>
+    <string name="repeat_year">Herhaal elk jaar</string>
+
+    <string name="reminder_distance_time">Na afstand of tijd, afhankelijk van wat het eerst komt</string>
+    <string name="reminder_distance">Na afstand</string>
+    <string name="reminder_time">Na tijd</string>
+
+    <string name="time_day">Dag(en)</string>
+    <string name="time_month">Maand(en)</string>
+    <string name="time_year">Jaar(en)</string>
 </resources>

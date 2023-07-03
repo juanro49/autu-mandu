@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <resources>
-    <string name="about_author">© Jan Kühle</string>
     <string name="about_thanks">Agradecimentos a:</string>
     <string name="about_version">Versão: %s</string>
     <string name="about_licenses">Licenças</string>
@@ -290,4 +289,22 @@
     <string name="drag_handle_desc">Arraste a alça</string>
     <string name="quit_snooze_desc">Reativar</string>
     <string name="notice_not_paid">Não pago</string>
+
+    <string name="title_refuelings">Abastecimentos</string>
+    <string name="title_expenditures">Despesas</string>
+    <string name="title_income">Receitas</string>
+
+    <string name="repeat_once">Apenas uma vez</string>
+    <string name="repeat_day">Repetir a cada dia</string>
+    <string name="repeat_month">Repetir a cada mês</string>
+    <string name="repeat_quarter">Repetir a cada trimestre</string>
+    <string name="repeat_year">Repetir a cada ano</string>
+
+    <string name="reminder_distance_time">Após distância ou tempo, o que ocorrer primeiro</string>
+    <string name="reminder_distance">Após uma distância</string>
+    <string name="reminder_time">Após um tempo</string>
+
+    <string name="time_day">Dia(s)</string>
+    <string name="time_month">Mês(s)</string>
+    <string name="time_year">Ano(s)</string>
 </resources>

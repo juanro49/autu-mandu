@@ -15,7 +15,8 @@
   limitations under the License.
 -->
 <resources>
-    <string name="about_author">© Jan Kühle</string>
+    <string name="app_description">Introduce los costes de tu coche y recibe bonitos informes y estadísticas.</string>
+
     <string name="about_thanks">Gracias a:</string>
     <string name="about_version">Versión: %s</string>
     <string name="about_licenses">Licencias</string>
@@ -33,6 +34,7 @@
     <string name="menu_delete">Eliminar</string>
     <string name="menu_add_car">Agregar vehículo</string>
     <string name="menu_add_fuel_type">Agregar tipo de combustible</string>
+    <string name="menu_add_station">Añadir estación</string>
     <string name="menu_add_reminder">Agregar recordatorio</string>
     <string name="menu_show_trend">Mostrar tendencia</string>
     <string name="menu_show_overall_trend">Mostrar tendencia general</string>
@@ -66,6 +68,7 @@
     <string name="hint_reminder_start_mileage">Kilometraje inicial</string>
     <string name="hint_reminder_start_date">Fecha incial</string>
     <string name="hint_reminder_snoozed_until">Posponer hasta</string>
+    <string name="hint_buying_price">Precio de compra</string>
 
     <string name="label_partial">Parcial</string>
     <string name="label_color_in_reports">Color</string>
@@ -94,6 +97,7 @@
     <string name="validate_error_mileage_out_of_range_trip">El kilometraje acumulado no puede ser mayor al kilometraje de la siguiente recarga en modo de registro de distancia por viaje. Si quiciste ingresar distancia total, puedes cambiar el modo de registro en los ajustes.</string>
     <string name="validate_error_fuel_type_exists">Este tipo de combustible ya existe.</string>
     <string name="validate_error_webdav_invalid_certificate">El certificado de seguridad no pudo ser confiado. Parece que no es válido.</string>
+    <string name="validate_error_station_exists">La estación ya existe.</string>
 
     <string name="suspended">Suspendido</string>
     <string name="suspended_since">Suspendido desde %s</string>
@@ -104,6 +108,8 @@
     <string name="title_first_start">Primeros pazos</string>
     <string name="title_add_refueling">Agregar recarga</string>
     <string name="title_edit_refueling">Modificar recarga</string>
+    <string name="title_add_station">Añadir estación</string>
+    <string name="title_edit_station">Editar estación</string>
     <string name="title_settings">Ajustes</string>
     <string name="title_help">Ayuda</string>
     <string name="title_add_other_expenditure">Agregar otro gasto</string>
@@ -124,6 +130,7 @@
     <string name="alert_delete_title">Confirmar eliminación</string>
     <string name="alert_delete_refueling_message">Esta recarga será eliminada.</string>
     <string name="alert_delete_refuelings_message">Las %d recargas seleccionadas serán eliminadas.</string>
+    <string name="alert_delete_station_message">Se borrarán las %d estaciones seleccionadas y los repostajes asociados.</string>
     <string name="alert_delete_other_expenditure_message">Este gasto será eliminado.</string>
     <string name="alert_delete_other_income_message">Este ingreso será eliminado.</string>
     <string name="alert_delete_other_expenditures_message">Los %d gastos seleccionados serán eliminados.</string>
@@ -135,6 +142,7 @@
     <string name="alert_delete_reminders_message">Los %d recordatorios seleccionados serán eliminados.</string>
     <string name="alert_cannot_delete_last_car">El último vehículo no se puede eliminar.</string>
     <string name="alert_cannot_delete_fuel_type">No se puede eliminar el tipo de combustible porque es utilizado por al menos una recarga o tanque de combustible.</string>
+    <string name="alert_cannot_delete_station">No se puede eliminar la estación, porque es utilizada por al menos un repostaje.</string>
     <string name="alert_about_licenses_title">Licencias</string>
     <string name="alert_change_color_title">Elegir color</string>
     <string name="alert_sync_finishing_authentication">Terminando autenticación…</string>
@@ -197,7 +205,8 @@
     <string name="pref_title_header_reminders">Recordatorios</string>
     <string name="pref_title_header_report_order">Orden de reportes</string>
     <string name="pref_title_header_backup">Respaldo &amp; Exportación</string>
-    <!-- needs retranslation <string name="pref_title_category_synchronization">Sincronización</string>!-->
+    <string name="pref_title_category_synchronization">Sincronización</string>
+    <string name="pref_title_header_stations">Estaciones</string>
     <string name="pref_title_category_behavior">Comportamiento</string>
     <string name="pref_title_category_units">Unidades</string>
     <string name="pref_title_category_backup">Respaldo &amp; Restauración</string>
@@ -212,16 +221,16 @@
     <string name="pref_title_unit_volume">Volumen</string>
     <string name="pref_title_unit_distance">Distancia</string>
     <string name="pref_title_unit_fuel_consumption">Rendimiento de combustible</string>
-    <!-- needs retranslation <string name="pref_title_sync_setup">Configurar sincronización</string>!-->
+    <string name="pref_title_sync_setup">Configurar sincronización</string>
     <string name="pref_title_backup">Respaldar</string>
     <string name="pref_title_restore">Restaurar</string>
     <string name="pref_title_exportcsv">Exportar CSV</string>
     <string name="pref_title_importcsv">Importar CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Mostrar un menú para seleccionar vehículo cuando se registre una recarga y exista más de un vehículo configurado.</string>
-    <!-- needs retranslation <string name="pref_summary_behavior_auto_guess_missing_data">Intentar de reconocer recargas que no se registraron. Esto compensará el consumo de combustible significativamente menor que ocurre cuando se olvida registar una recarga.</string>!-->
-    <!-- needs retranslation <string name="pref_summary_sync_current_provider">Vinculado a %s. Toca para deshacer vínculo.</string>!-->
-    <!-- needs retranslation <string name="pref_summary_backup">Respaldar la información actual a la tarjeta SD.</string>!-->
-    <!-- needs retranslation <string name="pref_summary_restore">Restaurar información del archivo %s en la tarjeta SD.</string>!-->
+    <string name="pref_summary_behavior_auto_guess_missing_data">Intentar de reconocer recargas que no se registraron. Esto compensará el consumo de combustible significativamente menor que ocurre cuando se olvida registar una recarga.</string>
+    <string name="pref_summary_sync_current_provider">Vinculado a %s. Toca para deshacer vínculo.</string>
+    <string name="pref_summary_backup">Respaldar la información actual a la tarjeta SD.</string>
+    <string name="pref_summary_restore">Restaurar información del archivo %s en la tarjeta SD.</string>
     <string name="pref_summary_export_csv">Exportar información en formato CSV compatible con Microsoft Excel o LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Importar información de archivo CSV. Los archivos deben tener el mismo formato que los CSV que se generan al momento de exportar.</string>
     <string name="pref_summary_import_csv_no_data">No hay archivos en el directorio %s en la tarjeta SD.</string>
@@ -272,4 +281,23 @@
     <string name="graph_close_full_screen_desc">Cerrar gráfica de pantalla completa</string>
     <string name="drag_handle_desc">Arrastrar manija</string>
     <string name="quit_snooze_desc">Deshabilitar posposición</string>
+
+    <string name="title_refuelings">Recargas</string>
+    <string name="title_expenditures">Otros Gastos</string>
+    <string name="title_income">Otros Ingresos</string>
+    <string name="title_stations">Estaciones</string>
+
+    <string name="repeat_once">Una vez</string>
+    <string name="repeat_day">Repetir todos los días</string>
+    <string name="repeat_month">Repetir cada mes</string>
+    <string name="repeat_quarter">Repetir cada trimestre</string>
+    <string name="repeat_year">Repetir cada año</string>
+
+    <string name="reminder_distance_time">Después de distancia o tiempo, el que ocurra primero</string>
+    <string name="reminder_distance">Después de distancia</string>
+    <string name="reminder_time">Después de tiempo</string>
+
+    <string name="time_day">Día(s)</string>
+    <string name="time_month">Mes(es)</string>
+    <string name="time_year">Año(s)</string>
 </resources>

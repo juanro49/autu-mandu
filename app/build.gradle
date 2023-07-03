@@ -2,8 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion versions.compileSdk
-    compileSdkPreview "UpsideDownCake"
-    buildToolsVersion '33.0.1'
+    buildToolsVersion versions.buildTools
     namespace 'org.juanro.autumandu'
 
     defaultConfig {
@@ -14,7 +13,14 @@ android {
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
+
     signingConfigs {
         release {
             keyAlias signing_key_alias
@@ -23,6 +29,7 @@ android {
             storePassword signing_key_store_password
         }
     }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -31,37 +38,36 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     flavorDimensions "default"
     productFlavors {
         foss {
             dimension "default"
         }
-        full {
-            dimension "default"
-        }
     }
-    lintOptions {
+
+    lint {
         checkReleaseBuilds false
     }
+
     packagingOptions {
-        exclude 'META-INF/LICENSE'
+        resources {
+            excludes += ['META-INF/LICENSE']
+        }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+
+    //compileOptions {
+    //    sourceCompatibility JavaVersion.VERSION_1_8
+    //    targetCompatibility JavaVersion.VERSION_1_8
+    //}
 
     // 2018 style of testing
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
-}
-
-repositories {
-    google()
-    jcenter()
-
-    // Required for HelloCharts for Android
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -72,58 +78,35 @@ dependencies {
     implementation 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
 
     // CSV
-    implementation 'org.apache.commons:commons-csv:1.5'
+    implementation 'org.apache.commons:commons-csv:1.10.0'
 
     // Support, AppCompat
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.7.0-alpha02'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.3.1-rc01'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
     implementation 'com.google.android.material:material:1.10.0-alpha04'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.0-alpha10'
 
     // Room Persistence
-    def room_version = "2.1.0-alpha02"
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-
-    // Play Services: for Google Drive
-    fullImplementation "com.google.android.gms:play-services-auth:${versions.playServices}"
-    fullImplementation "com.google.android.gms:play-services-drive:${versions.playServices}"
-
-    // The new Android Drive API, which is included in the play services, has caching bugs and does
-    // not provide all functionality. Until this is fixed we have to use the old Google API.
-    fullImplementation('com.google.oauth-client:google-oauth-client:1.22.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
-    fullImplementation('com.google.api-client:google-api-client:1.22.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
-    fullImplementation('com.google.apis:google-api-services-drive:v3-rev81-1.22.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
-    fullImplementation('com.google.api-client:google-api-client-android:1.22.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
-    fullImplementation('com.google.http-client:google-http-client-android:1.22.0') {
-        exclude group: 'org.apache.httpcomponents'
-    }
+    implementation "androidx.room:room-runtime:2.6.0-alpha02"
+    annotationProcessor "androidx.room:room-compiler:2.6.0-alpha02"
 
     // WebDAV
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
 
     // UI Helpers
     implementation 'com.github.clans:fab:1.6.4'
     implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
-    implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
+    implementation 'de.psdev.licensesdialog:licensesdialog:2.2.0'
     implementation 'uk.co.jordanrobinson:android-color-picker:1.0.2'
 
     // Joda-Time for Android
-    implementation 'net.danlew:android.joda:2.9.9.4'
+    implementation 'net.danlew:android.joda:2.12.5'
 
     // Required for instrumented tests
-    androidTestImplementation 'androidx.annotation:annotation:1.7.0-alpha02'
-    androidTestImplementation 'androidx.test:runner:1.6.0-alpha02'
+    androidTestImplementation 'androidx.annotation:annotation:1.6.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
 
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {

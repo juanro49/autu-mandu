@@ -15,8 +15,6 @@
   limitations under the License.
 -->
 <resources>
-
-    <string name="about_author">© Jan Kühle</string>
     <string name="about_thanks">Remerciements&#8239;:</string>
     <string name="about_version">Version&#8239;: %s</string>
     <string name="about_licenses">Licences</string>
@@ -274,4 +272,21 @@
     <string name="drag_handle_desc">Déplacer la poignée</string>
     <string name="quit_snooze_desc">Sortir du report</string>
 
+    <string name="title_refuelings">Pleins</string>
+    <string name="title_expenditures">Autres dépenses</string>
+    <string name="title_income">Autres apports</string>
+
+    <string name="repeat_once">Une fois</string>
+    <string name="repeat_day">Chaque jour</string>
+    <string name="repeat_month">Chaque mois</string>
+    <string name="repeat_quarter">Chaque trimestre</string>
+    <string name="repeat_year">Chaque année</string>
+
+    <string name="reminder_distance_time">Après une certaine distance ou temps, le premier des deux échu</string>
+    <string name="reminder_distance">Après une certaine distance</string>
+    <string name="reminder_time">Après une certaine temps</string>
+
+    <string name="time_day">Jour(s)</string>
+    <string name="time_month">Mois</string>
+    <string name="time_year">Année(s)</string>
 </resources>

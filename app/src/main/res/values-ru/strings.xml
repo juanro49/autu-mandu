@@ -15,7 +15,6 @@
   limitations under the License.
 -->
 <resources>
-
     <string name="about_thanks">Благодарность:</string>
     <string name="about_version">Версия: %s</string>
     <string name="about_licenses">Лицензии</string>
@@ -279,4 +278,21 @@
     <string name="quit_snooze_desc">Покинуть отложенное</string>
     <string name="notice_not_paid">Не оплачено</string>
 
+    <string name="title_refuelings">Заправка</string>
+    <string name="title_expenditures">Прочие расходы</string>
+    <string name="title_income">Прочий доход</string>
+
+    <string name="repeat_once">Одноразово</string>
+    <string name="repeat_day">Повторять каждый день</string>
+    <string name="repeat_month">Повторять каждый месяц</string>
+    <string name="repeat_quarter">Повторять каждый квартал</string>
+    <string name="repeat_year">Повторять каждый год</string>
+
+    <string name="reminder_distance_time">По пробегу или времени, что раньше</string>
+    <string name="reminder_distance">По пробегу</string>
+    <string name="reminder_time">По времени</string>
+
+    <string name="time_day">Дней</string>
+    <string name="time_month">Месяцев</string>
+    <string name="time_year">Лет</string>
 </resources>

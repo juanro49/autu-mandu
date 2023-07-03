@@ -17,30 +17,30 @@
 <resources>
 
     <string-array name="data_list_page_titles">
-        <item>Refuelings</item>
-        <item>Other Expenditures</item>
-        <item>Other Income</item>
-        <item>Stations</item>
+        <item>@string/title_refuelings</item>
+        <item>@string/title_expenditures</item>
+        <item>@string/title_income</item>
+        <item>@string/title_stations</item>
     </string-array>
 
     <string-array name="repeat_intervals">
-        <item>Once</item>
-        <item>Repeat every day</item>
-        <item>Repeat every month</item>
-        <item>Repeat every quarter</item>
-        <item>Repeat every year</item>
+        <item>@string/repeat_once</item>
+        <item>@string/repeat_day</item>
+        <item>@string/repeat_month</item>
+        <item>@string/repeat_quarter</item>
+        <item>@string/repeat_year</item>
     </string-array>
 
     <string-array name="reminder_after_types">
-        <item>After distance or time, whichever comes first</item>
-        <item>After distance</item>
-        <item>After time</item>
+        <item>@string/reminder_distance_time</item>
+        <item>@string/reminder_distance</item>
+        <item>@string/reminder_time</item>
     </string-array>
 
     <string-array name="time_units">
-        <item>Day(s)</item>
-        <item>Month(s)</item>
-        <item>Year(s)</item>
+        <item>@string/time_day</item>
+        <item>@string/time_month</item>
+        <item>@string/time_year</item>
     </string-array>
 
     <integer-array name="selectable_colors">
