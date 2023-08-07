@@ -1,9 +1,9 @@
 # Autu Mandu
 ---
 
-| License | Translations | Code Quality | Downloads | Vulnerabilities | Dependences | Bugs |
-|---|---|---|---|---|---|---|
-| [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) | [![Estado de la traducción](https://hosted.weblate.org/widgets/autu-mandu/-/autu-mandu/svg-badge.svg)](https://hosted.weblate.org/engage/autu-mandu/?utm_source=widget) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/37fe446752b94703a745172c36a049bc)](https://www.codacy.com/app/juanro49/Autu-Mandu?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=juanro49/Autu-Mandu&amp;utm_campaign=Badge_Grade) | [![GitHub All Releases](https://img.shields.io/github/downloads/juanro49/autu-mandu/total.svg)](https://github.com/juanro49/autu-mandu/blob/master/README.md#descarga) | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=juanro49_Autu-mandu&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=juanro49_Autu-Mandu) | [![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/juanro49/autu-mandu.svg)](https://libraries.io/github/juanro49/autu-mandu) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=juanro49_Autu-Mandu&metric=bugs)](https://sonarcloud.io/dashboard?id=juanro49_Autu-Mandu) |
+| License | Translations | Downloads | Vulnerabilities | Dependences | Bugs |
+|---|---|---|---|---|---|
+| [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) | [![Estado de la traducción](https://hosted.weblate.org/widgets/autu-mandu/-/autu-mandu/svg-badge.svg)](https://hosted.weblate.org/engage/autu-mandu/?utm_source=widget) | [![GitHub All Releases](https://img.shields.io/github/downloads/juanro49/autu-mandu/total.svg)](https://github.com/juanro49/autu-mandu#install) | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=juanro49_autu-mandu&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=juanro49_autu-mandu) | [![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/juanro49/autu-mandu.svg)](https://libraries.io/github/juanro49/autu-mandu) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=juanro49_autu-mandu&metric=bugs)](https://sonarcloud.io/dashboard?id=juanro49_autu-mandu) |
 
 
 > Android app for saving and looking up costs of your car.
@@ -29,7 +29,24 @@ You can translate this project using [Weblate](https://hosted.weblate.org/projec
 
 ## Install
 
-[Autu Mandu on F-Droid](https://f-droid.org/repository/browse/?fdid=org.juanro.autumandu) (Coming soon...)
+[<img src="https://user-images.githubusercontent.com/663460/26973090-f8fdc986-4d14-11e7-995a-e7c5e79ed925.png"
+    alt="Download APK from GitHub"
+    height="80">](https://github.com/juanro49/autu-mandu/releases/latest)
+[<img src="https://raw.githubusercontent.com/vitorpamplona/amethyst/main/docs/design/obtainium.png"
+    alt="Get it on Obtaininum"
+    height="80">](https://github.com/ImranR98/Obtainium)
+
+> Coming soon...
+
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
+    alt="Get it on IzzyOnDroid repo F-Droid"
+    height="80">](https://apt.izzysoft.de/fdroid/?author=Juanro49)
+[<img src="https://stc.utdstc.com/img/download-uptodown1.png"
+    alt="Get it on UptoDown"
+    height="60">](https://www.uptodown.com/developer/juanro49)
+<img src="https://consumer-img.huawei.com/content/dam/huawei-cbg-site/common/campaign/emui91/images/Badge-Black.png"
+    alt="Get it on AppGallery"
+    height="60">
 
 ## Build
 
@@ -42,6 +59,9 @@ gradle assembleFossRelease
 ```
 ## Donations
 [<img src="https://coindrop.to/embed-button.png" border-radius="10px" height="57" width="200px" alt="Coindrop.to me">](https://coindrop.to/juanro49) [<img alt="Donate using Liberapay" border-radius="10px" height="57" width="200px" src="https://liberapay.com/assets/widgets/donate.svg">](https://liberapay.com/juanro49/donate) [<img src="https://cdn.lemediaen442.fr/wp-content/uploads/2021/09/11110246/La-June.jpg" border-radius="10px" height="57" width="200px" alt="moneda libre G1">](https://demo.cesium.app/api/#/v1/payment/5eETo8btrVGYTTyC5nAvqCPmLBok4aRLhxiGP7dy3Wqw?comment=Donaci%C3%B3n%20github)
+
+## Contributors
+[<img src="https://contrib.rocks/image?repo=juanro49/autu-mandu" />](https://github.com/juanro49/autu-mandu/graphs/contributors)
 
 ## License
 
