@@ -1,0 +1,5 @@
+Autu Mandu is an android application based on the discontinued Car Report with some new options that allows you to enter refueling and other income and expenses of your vehicles in addition to displaying nice reports.
+
+You can add mileage and time based reminders for recurring car related actions, e.g. general inspection once a year.
+
+It offers synchronization with webdav and has basic backup/restore and CSV import/export functions.
