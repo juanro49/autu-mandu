@@ -5,6 +5,12 @@
 |---|---|---|---|---|---|
 | [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) | [![Estado de la traducción](https://hosted.weblate.org/widgets/autu-mandu/-/autu-mandu/svg-badge.svg)](https://hosted.weblate.org/engage/autu-mandu/?utm_source=widget) | [![GitHub All Releases](https://img.shields.io/github/downloads/juanro49/autu-mandu/total.svg)](https://github.com/juanro49/autu-mandu#install) | [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=juanro49_autu-mandu&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=juanro49_autu-mandu) | [![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/juanro49/autu-mandu.svg)](https://libraries.io/github/juanro49/autu-mandu) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=juanro49_autu-mandu&metric=bugs)](https://sonarcloud.io/dashboard?id=juanro49_autu-mandu) |
 
+<p>
+    <img src="./metadata/android/es-ES/images/phoneScreenshots/Autu-Mandu_001.png" data-canonical-src="./metadata/android/es-ES/images/phoneScreenshots/Autu-Mandu_001.png" width="200px"/>
+    <img src="./metadata/android/es-ES/images/phoneScreenshots/Autu-Mandu_002.png" data-canonical-src="./metadata/android/es-ES/images/phoneScreenshots/Autu-Mandu_002.png" width="200px"/>
+    <img src="./metadata/android/es-ES/images/phoneScreenshots/Autu-Mandu_003.png" data-canonical-src="./metadata/android/es-ES/images/phoneScreenshots/Autu-Mandu_003.png" width="200px"/>
+    <img src="./metadata/android/es-ES/images/phoneScreenshots/Autu-Mandu_004.png" data-canonical-src="./metadata/android/es-ES/images/phoneScreenshots/Autu-Mandu_004.png" width="200px"/>
+</p>
 
 > Android app for saving and looking up costs of your car.
 
