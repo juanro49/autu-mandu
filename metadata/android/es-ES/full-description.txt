@@ -1,0 +1,5 @@
+Autu Mandu es una aplicación android basada en la discontinuada Car Report con algunas nuevas opciones que te permite introducir repostajes y otros ingresos y gastos de tus vehículos además de mostrar bonitos informes.
+
+Puede añadir recordatorios basados en el kilometraje y la hora para acciones recurrentes relacionadas con el coche, por ejemplo, la inspección general una vez al año.
+
+Ofrece sincronización con webdav y dispone de funciones básicas de copia de seguridad/restauración e importación/exportación de CSV.
