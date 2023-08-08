@@ -20,6 +20,7 @@
 
     <!-- Purpose: backup/restore, CSV export/import -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
 
     <!-- Purpose: sync -->
     <uses-permission android:name="android.permission.INTERNET"/>
