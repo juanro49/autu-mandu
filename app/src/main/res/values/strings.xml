@@ -19,6 +19,7 @@
     <string name="about_author" translatable="false">© Jan Kühle 2012, Juanro49 2023</string>
     <string name="about_thanks">Thanks to:</string>
     <string name="about_version">Version: %s</string>
+    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="about_licenses">Licenses</string>
     <string name="drawer_reports">Reports</string>
     <string name="drawer_calculator">Calculator</string>

@@ -46,6 +46,16 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/about_author"/>
 
+        <TextView
+            android:id="@+id/txt_git"
+            android:autoLink="all"
+            android:linksClickable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:text="@string/about_git" />
+
         <Button
             android:id="@+id/btn_licenses"
             android:layout_width="wrap_content"
