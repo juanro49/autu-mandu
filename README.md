@@ -71,9 +71,9 @@ gradle assembleFossRelease
 ## Donations
 [<img src="https://coindrop.to/embed-button.png" border-radius="10px" height="57" width="200px" alt="Coindrop.to me">](https://coindrop.to/juanro49) [<img alt="Donate using Liberapay" border-radius="10px" height="57" width="200px" src="https://liberapay.com/assets/widgets/donate.svg">](https://liberapay.com/juanro49/donate) [<img src="https://cdn.lemediaen442.fr/wp-content/uploads/2021/09/11110246/La-June.jpg" border-radius="10px" height="57" width="200px" alt="moneda libre G1">](https://demo.cesium.app/api/#/v1/payment/5eETo8btrVGYTTyC5nAvqCPmLBok4aRLhxiGP7dy3Wqw?comment=Donaci%C3%B3n%20github)
 
-![Sponsors](https://img.shields.io/github/sponsors/juanro49)
+[<img src="https://img.shields.io/github/sponsors/juanro49" alt="Sponsors">](https://github.com/sponsors/juanro49)
+[<img src="https://img.shields.io/liberapay/patrons/juanro49" alt="Liberapay Patrons">](https://liberapay.com/juanro49)
 ![Liberapay](https://img.shields.io/liberapay/receives/juanro49)
-![Liberapay Patrons](https://img.shields.io/liberapay/patrons/juanro49)
 
 ## Contributors
 
