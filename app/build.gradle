@@ -105,8 +105,8 @@ dependencies {
     implementation 'net.danlew:android.joda:2.12.5'
 
     // Required for instrumented tests
-    androidTestImplementation 'androidx.annotation:annotation:1.6.0'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.annotation:annotation:1.7.0-alpha03'
+    androidTestImplementation 'androidx.test:runner:1.6.0-alpha03'
 
     constraints {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
