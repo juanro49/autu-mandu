@@ -14,7 +14,7 @@
 
 > Android app for saving and looking up costs of your car.
 
-Autu Mandu is an android app, based on descontinued [Car Report](https://bitbucket.org/frigus02/car-report) which lets you enter refuelings and other income and expenses of your cars and displays nice reports.
+Autu Mandu (Automobile control in [Extremaduran](https://ext.wikipedia.org/wiki/Lengua_estreme%C3%B1a)) is an android app, based on descontinued [Car Report](https://bitbucket.org/frigus02/car-report) which lets you enter refuelings and other income and expenses of your cars and displays nice reports.
 
 The following options are currently included:
 - [x] Fuel consumption between full refuelings
