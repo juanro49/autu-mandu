@@ -17,6 +17,7 @@
 package org.juanro.autumandu.gui;
 
 import android.content.ContentUris;
+import android.content.CursorLoader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -43,6 +44,7 @@ import org.juanro.autumandu.gui.util.FormFieldGreaterEqualZeroValidator;
 import org.juanro.autumandu.gui.util.FormFieldGreaterZeroValidator;
 import org.juanro.autumandu.gui.util.FormValidator;
 import org.juanro.autumandu.presentation.StationPresenter;
+import org.juanro.autumandu.provider.DataProvider;
 import org.juanro.autumandu.provider.car.CarColumns;
 import org.juanro.autumandu.provider.car.CarCursor;
 import org.juanro.autumandu.provider.car.CarSelection;
@@ -281,9 +283,12 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
 
         // Station
         mStationPresenter.ensureAtLeastOne();
+        StationSelection ss = new StationSelection();
+        String[] projection = StationColumns.ALL_COLUMNS;
 
-        StationCursor station = new StationSelection().query(getActivity().getContentResolver(),
-            null, StationColumns.NAME + " COLLATE UNICODE");
+        StationCursor station = ss.query(getActivity().getContentResolver(),
+            projection, StationColumns.NAME + " COLLATE UNICODE");
+
         spnStation.setAdapter(new SimpleCursorAdapter(getActivity(),
             android.R.layout.simple_spinner_dropdown_item,
             station, new String[]{StationColumns.NAME}, new int[]{android.R.id.text1}, 0));

@@ -180,7 +180,11 @@ public class DataProvider extends BaseContentProvider {
 
             case URI_TYPE_STATION:
             case URI_TYPE_STATION_ID:
-                return StationColumns.ALL_COLUMNS;
+                //return StationColumns.ALL_COLUMNS;
+                projection = new String[StationColumns.ALL_COLUMNS.length + RefuelingColumns.ALL_COLUMNS.length - 1];
+                System.arraycopy(StationColumns.ALL_COLUMNS, 0, projection, 0, StationColumns.ALL_COLUMNS.length);
+                System.arraycopy(RefuelingColumns.ALL_COLUMNS, 1, projection, StationColumns.ALL_COLUMNS.length, RefuelingColumns.ALL_COLUMNS.length - 1);
+                return projection;
 
             case URI_TYPE_OTHER_COST:
             case URI_TYPE_OTHER_COST_ID:
@@ -237,6 +241,9 @@ public class DataProvider extends BaseContentProvider {
                 res.table = StationColumns.TABLE_NAME;
                 res.idColumn = StationColumns._ID;
                 res.tablesWithJoins = StationColumns.TABLE_NAME;
+                if (RefuelingColumns.hasColumns(projection)) {
+                    res.tablesWithJoins += " LEFT OUTER JOIN " + RefuelingColumns.TABLE_NAME + " AS " + StationColumns.PREFIX_REFUELING + " ON " + StationColumns.TABLE_NAME + "." + StationColumns._ID + "=" + StationColumns.PREFIX_REFUELING + "." + RefuelingColumns.STATION_ID;
+                }
                 res.orderBy = StationColumns.DEFAULT_ORDER;
                 break;
 

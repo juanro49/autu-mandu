@@ -47,6 +47,22 @@ public class StationSelection extends AbstractSelection<StationSelection> {
     }
 
     /**
+     * Query the given content resolver using this selection to consult uri with params.
+     *
+     * @param contentResolver The content resolver to query.
+     * @param uri The uri with params
+     * @param projection A list of which columns to return. Passing null will return all columns, which is inefficient.
+     * @param sortOrder How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort
+     *            order, which may be unordered.
+     * @return A {@code StationCursor} object, which is positioned before the first entry, or null.
+     */
+    public StationCursor query(ContentResolver contentResolver, Uri uri, String[] projection, String sortOrder) {
+        Cursor cursor = contentResolver.query(uri, projection, sel(), args(), sortOrder);
+        if (cursor == null) return null;
+        return new StationCursor(cursor);
+    }
+
+    /**
      * Equivalent of calling {@code query(contentResolver, projection, null)}.
      */
     public StationCursor query(ContentResolver contentResolver, String[] projection) {

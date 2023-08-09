@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 import org.juanro.autumandu.provider.DataProvider;
+import org.juanro.autumandu.provider.refueling.RefuelingColumns;
 
 /**
  * A station.
@@ -38,6 +39,11 @@ public class StationColumns implements BaseColumns {
      */
     public static final String NAME = "station__name";
 
+    /**
+     * Volume of the station.
+     */
+    public static final String VOLUME = "volume";
+
 
     public static final String DEFAULT_ORDER = TABLE_NAME + "." +_ID;
 
@@ -56,4 +62,5 @@ public class StationColumns implements BaseColumns {
         return false;
     }
 
+    public static final String PREFIX_REFUELING = TABLE_NAME + "__" + RefuelingColumns.TABLE_NAME;
 }

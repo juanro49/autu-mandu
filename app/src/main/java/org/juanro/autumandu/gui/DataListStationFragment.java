@@ -28,6 +28,7 @@ import java.util.Locale;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.presentation.StationPresenter;
+import org.juanro.autumandu.provider.DataProvider;
 import org.juanro.autumandu.provider.station.StationColumns;
 import org.juanro.autumandu.provider.station.StationCursor;
 import org.juanro.autumandu.provider.station.StationSelection;
@@ -50,8 +51,8 @@ public class DataListStationFragment extends AbstractDataListFragment {
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         StationSelection where = new StationSelection();
 
-        return new CursorLoader(getActivity(), where.uri(), null, where.sel(), where.args(),
-            StationColumns.NAME + " DESC");
+        return new CursorLoader(getActivity(), DataProvider.groupBy(where.uri(), StationColumns.NAME), null, where.sel(), where.args(),
+            "sum(" + StationColumns.VOLUME + ") DESC");
     }
 
     @Override
