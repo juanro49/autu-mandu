@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Jan Kühle built the Car Report app as a open source app. This SERVICE is provided by Jan Kühle at no cost and is intended for use as is.
+Juanro49 built Autu Mandu (fork of Jan Kühle Car Report app) as a open source app. This SERVICE is provided by Juanro49 at no cost and is intended for use as is.
 
 This page is used to inform website visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.
 
@@ -11,26 +11,7 @@ The terms used in this Privacy Policy have the same meanings as in our Terms and
 
 ## Information Collection and Use
 
-For a better experience while using our Service, I may require you to provide us with certain personally identifiable information, including but not limited to your Google account name, if you choose to synchronize your data with Google Drive. The information that I request is retained on your device and is not collected by me in any way.
-
-The app does use third party services that may collect information used to identify you.
-
-
-## Log Data
-
-I want to inform you that whenever you use my Service, in case of an error in the app I collect data and information (through third party products) on your phone called Log Data. This Log Data may include information such as your devices's Internet Protocol ("IP") address, device name, operating system version, configuration of the app when utilising my Service, the time and date of your use of the Service, and other statistics.
-
-
-## Service Providers
-
-I may employ third-party companies and individuals due to the following reasons:
-
-*   To facilitate our Service;
-*   To provide the Service on our behalf;
-*   To perform Service-related services; or
-*   To assist us in analyzing how our Service is used.
-
-I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.
+The app does use third party services that may collect information used to identify you if you choose to synchronize your data with one webdav server. The information that I request is retained on your device and is not collected by me in any way.
 
 
 ## Security
