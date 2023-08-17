@@ -3,14 +3,12 @@
     <string name="about_thanks">Met dank aan:</string>
     <string name="about_version">Versie: %s</string>
     <string name="about_licenses">Licenties</string>
-
     <string name="drawer_reports">Rapporten</string>
     <string name="drawer_calculator">Rekenmachine</string>
     <string name="drawer_settings">Instellingen</string>
     <string name="drawer_help">Help</string>
     <string name="drawer_open">Open navigatie</string>
     <string name="drawer_close">Sluit navigatie</string>
-
     <string name="menu_synchronize">Synchroniseren</string>
     <string name="menu_save">Klaar</string>
     <string name="menu_cancel">Annuleren</string>
@@ -20,14 +18,11 @@
     <string name="menu_add_reminder">Herinnering toevoegen</string>
     <string name="menu_show_trend">Trend weergeven</string>
     <string name="menu_show_overall_trend">Globale trend weergeven</string>
-
     <string name="fab_add_refueling">Tanken</string>
     <string name="fab_add_other_expenditure">Andere uitgaven</string>
     <string name="fab_add_other_income">Andere inkomsten</string>
-
     <string name="section_suspend">Opschorten</string>
     <string name="section_advanced">Geavanceerde opties</string>
-
     <string name="hint_mileage_optional">Totale afstand (optioneel)</string>
     <string name="hint_volume">Volume</string>
     <string name="hint_price">Prijs</string>
@@ -50,7 +45,6 @@
     <string name="hint_reminder_start_mileage">Start op kilometerstand</string>
     <string name="hint_reminder_start_date">Start op datum</string>
     <string name="hint_reminder_snoozed_until">Sluimeren tot</string>
-
     <string name="label_partial">Gedeeltelijk</string>
     <string name="label_color_in_reports">Kleur in rapporten</string>
     <string name="label_suspend">Opschorten</string>
@@ -60,7 +54,6 @@
     <string name="label_reminder_type">Type</string>
     <string name="label_reminder_dismissed">Melding verwijderd</string>
     <string name="label_trust_certificate">Vertrouw dit certificaat</string>
-
     <string name="description_suspend">U kunt een auto opschorten als u deze niet meer gebruikt. Dit annuleert alle herhalingskosten tot de opschortingsdatum. Ook de rapporten zoomen standaard alleen in op actieve auto\'s.</string>
     <string name="description_category">Tankbeurten zijn gegroepeerd per categorie voor verschillende rapporten. Voorbeelden: Benzine, diesel, gas.</string>
     <string name="description_reminder_status_due">Vervallen</string>
@@ -71,7 +64,6 @@
     <string name="description_reminder_status_time">Vervalt over %s</string>
     <string name="description_webdav_url">Voer de URL in naar een speciale map voor autorapporten op uw WebDAV-server. Autu Mandu slaat zijn gegevens op in deze map, het zal niets aanraken buiten deze map.</string>
     <string name="description_webdav_trust_certificate">De website maakt gebruik van een certificaat, dat niet vertrouwd wordt door Android.</string>
-
     <string name="validate_error_greater_zero">Moet groter zijn dan 0</string>
     <string name="validate_error_greater_equal_zero">Moet groter of gelijk zijn dan 0</string>
     <string name="validate_error_not_empty">Mag niet leeg zijn</string>
@@ -80,14 +72,12 @@
 </string>
     <string name="validate_error_fuel_type_exists">Dit type brandstof bestaat al.</string>
     <string name="validate_error_webdav_invalid_certificate">Het certificaat kon niet worden vertrouwd. Het lijkt ongeldig.</string>
-
     <string name="suspended">Opgeschort</string>
     <string name="suspended_since">Opgeschort sinds %s</string>
     <string name="overwrite">Overschrijven</string>
     <string name="restore">Herstellen</string>
     <string name="import_">Importeren</string>
     <string name="empty_if_unknown">Laat a.u.b. leeg als u niet weet wat je hier moet invoeren.</string>
-
     <string name="title_first_start">Eerste stappen</string>
     <string name="title_add_refueling">Tankbeurt toevoegen</string>
     <string name="title_edit_refueling">Tankbeurt bewerken</string>
@@ -105,9 +95,7 @@
     <string name="title_edit_reminder">Herinnering bewerken</string>
     <string name="cab_title_selected">%d geselecteerd</string>
     <string name="edit_title_refueling">Tankbeurt</string>
-
     <string name="edit_message_no_entry_selected">Geen invoer geselecteerd</string>
-
     <string name="alert_delete_title">Bevestig verwijderen</string>
     <string name="alert_delete_refueling_message">Deze tankbeurt zal verwijderd worden.</string>
     <string name="alert_delete_refuelings_message">De %d geselecteerde tankbeurten zullen verwijderd worden.</string>
@@ -143,7 +131,6 @@
     <string name="alert_import_csv_message">Import zal bestaande items bijwerken en nieuwe toevoegen, maar het zal geen items verwijderen.</string>
     <string name="alert_import_csv_failed">Import mislukt. Er werden geen gegevens gewijzigd.\n\nReden: %s</string>
     <string name="alert_error_title">Error</string>
-
     <string name="toast_new_refueling">Brandstofverbruik: %1$.2f %2$s %3$s</string>
     <string name="toast_backup_succeeded">Backup naar bestand %s succesvol afgerond.</string>
     <string name="toast_restore_succeeded">Herstel succesvol afgerond</string>
@@ -152,7 +139,6 @@
     <string name="toast_need_storage_permission">Om deze actie uit te voeren moet Autu Mandu toegang hebben tot uw bestanden.</string>
     <string name="toast_auto_backup_succeeded">Automatische backup is geslaagd.</string>
     <string name="toast_auto_backup_failed">Automatische backup is mislukt.</string>
-
     <string name="report_title_fuel_consumption">Brandstofverbruik</string>
     <string name="report_title_fuel_price">Brandstofprijs</string>
     <string name="report_title_mileage">Kilometerstand</string>
@@ -165,8 +151,8 @@
     <string name="report_graph_per_refueling">Per tankbeurt</string>
     <string name="report_graph_per_month">Per Maand</string>
     <string name="report_not_enough_data">Te weinig gegevens</string>
-    <string name="report_since">&#931; sinds %s</string>
-    <string name="report_last_year">&#931; sinds een jaar geleden</string>
+    <string name="report_since">Σ sinds %s</string>
+    <string name="report_last_year">Σ sinds een jaar geleden</string>
     <string name="report_lowest">laagste</string>
     <string name="report_highest">Hoogste</string>
     <string name="report_average">gemiddelde</string>
@@ -181,7 +167,6 @@
     <string name="report_toast_guessed">Geschat ter compensatie van ontbrekende tankvullingen.</string>
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">est. %1$.2f %2$s</string>
-
     <string name="pref_title_header_about">Over Autu Mandu</string>
     <string name="pref_title_header_general">Algemene instellingen</string>
     <string name="pref_title_header_cars">Auto\'s</string>
@@ -227,14 +212,12 @@
     <string name="pref_action_select_backup_file">Selecteer een bestand om vanuit te herstellen.</string>
     <string name="pref_summary_no_file_selector">Er is geen bestandkiezer geïnstalleerd op uw telefoon. Kan niet herstellen.</string>
     <string name="pref_summary_restore_file_seems_wrong">Het geselecteerde bestand lijkt niet bruikbaar te zijn voor herstel of niets geselecteerd.</string>
-
     <string name="help_section_getting_started">Aan de slag</string>
     <string name="help_section_tips">Tips</string>
     <string name="help_section_calculations">Berekeningen</string>
     <string name="help_section_fuel_types">Brandstoftypen</string>
     <string name="help_section_csv">CSV</string>
     <string name="help_folder_name">help</string>
-
     <string name="first_start_hi">Hallo daar!</string>
     <string name="first_start_intro">Autu Mandu kan mooie rapporten weergeven voor uw autokosten, inclusief brandstofverbruik en totale kosten. Begin met deze eenvoudige stappen:</string>
     <string name="first_start_step1_img_desc">Stap 1</string>
@@ -245,7 +228,6 @@
     <string name="first_start_step3_text">Na twee tankbeurten moet je de eerste grafieken zien.</string>
     <string name="first_start_create_car">Maak een auto aan</string>
     <string name="first_start_setup_sync">Synchronisatie instellen</string>
-
     <string name="calc_option_volume_to_distance">Volume (%1$s) naar Afstand (%2$s)</string>
     <string name="calc_option_distance_to_volume">Afstand (%1$s) naar Volume (%2$s)</string>
     <string name="calc_option_volume_to_price">Volume (%1$s) naar Prijs (%2$s)</string>
@@ -254,14 +236,12 @@
     <string name="calc_option_price_to_distance">Prijs (%1$s) naar Afstand (%2$s)</string>
     <string name="calc_option_distance_to_fuel_price">Afstand (%1$s) naar Brandstofprijs (%2$s)</string>
     <string name="calc_option_fuel_price_to_distance">Brandstofprijs (%1$s) to Afstand (%2$s)</string>
-
     <string name="notification_reminder_channel">Herinneringen</string>
     <string name="notification_reminder_title_single">Herinnering: %s</string>
     <string name="notification_reminder_title_multiple">Meerdere Herinneringen</string>
     <string name="notification_reminder_action_done">Klaar</string>
     <string name="notification_reminder_action_snooze">Sluimeren</string>
     <string name="notification_reminder_action_snooze_all">Allemaal sluimeren</string>
-
     <string name="distance_entry_mode_trip">Rit afstand</string>
     <string name="distance_entry_mode_total">Totale afstand</string>
     <string name="price_entry_mode_per_unit_and_volume">Prijs per eenheid &amp; volume</string>
@@ -275,22 +255,29 @@
     <string name="drag_handle_desc">Sleepgebied</string>
     <string name="quit_snooze_desc">Sluimeren stoppen</string>
     <string name="notice_not_paid">Niet betaald</string>
-
     <string name="title_refuelings">Tankbeurten</string>
     <string name="title_expenditures">Andere uitgaven</string>
     <string name="title_income">Andere inkomsten</string>
-
     <string name="repeat_once">Eenmalig</string>
     <string name="repeat_day">Herhaal elke dag</string>
     <string name="repeat_month">Herhaal elke maand</string>
     <string name="repeat_quarter">Herhaal elk kwartaal</string>
     <string name="repeat_year">Herhaal elk jaar</string>
-
     <string name="reminder_distance_time">Na afstand of tijd, afhankelijk van wat het eerst komt</string>
     <string name="reminder_distance">Na afstand</string>
     <string name="reminder_time">Na tijd</string>
-
     <string name="time_day">Dag(en)</string>
     <string name="time_month">Maand(en)</string>
     <string name="time_year">Jaar(en)</string>
+    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
+    <string name="menu_add_station">Voeg station toe</string>
+    <string name="hint_buying_price">Koop Prijs</string>
+    <string name="validate_error_station_exists">Dit station bestaat al.</string>
+    <string name="alert_delete_station_message">De %d geselecteerde stations en bijbehorende tankbeurten worden verwijderd.</string>
+    <string name="app_description">Voer de kosten van uw auto in en ontvang mooie rapporten en statistieken.</string>
+    <string name="title_add_station">Voeg station toe</string>
+    <string name="title_edit_station">Bewerk station</string>
+    <string name="alert_cannot_delete_station">Station kan niet worden verwijderd, omdat het wordt gebruikt door ten minste één tank- of brandstoftank.</string>
+    <string name="pref_title_header_stations">Stations</string>
+    <string name="title_stations">Stations</string>
 </resources>
