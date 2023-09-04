@@ -51,12 +51,9 @@ You can translate this project using [Weblate](https://hosted.weblate.org/projec
 [<img src="https://consumer-img.huawei.com/content/dam/huawei-cbg-site/common/campaign/emui91/images/Badge-Black.png"
     alt="Get it on AppGallery"
     height="60">](https://url.cloud.huawei.com/n83tvRcJmE?shareTo=qrcode)
-
-> Coming soon...
-
 [<img src="https://stc.utdstc.com/img/download-uptodown1.png"
     alt="Get it on UptoDown"
-    height="60">](https://www.uptodown.com/developer/juanro49)
+    height="60">](https://autu-mandu.uptodown.com/android)
 
 ## Build
 
