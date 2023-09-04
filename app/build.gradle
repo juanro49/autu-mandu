@@ -9,8 +9,8 @@ android {
         applicationId "org.juanro.autumandu"
         minSdkVersion 15
         targetSdk versions.targetSdk
-        versionCode 400
-        versionName "4.0.0"
+        versionCode 401
+        versionName "4.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
