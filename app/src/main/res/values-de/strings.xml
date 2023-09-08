@@ -13,19 +13,16 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<resources>
-    <string name="about_thanks">Danke an:</string>
+--><resources>
+    <string name="about_thanks">Dank an:</string>
     <string name="about_version">Version: %s</string>
     <string name="about_licenses">Lizenzen</string>
-
-    <string name="drawer_reports">Reports</string>
+    <string name="drawer_reports">Berichte</string>
     <string name="drawer_calculator">Rechner</string>
     <string name="drawer_settings">Einstellungen</string>
     <string name="drawer_help">Hilfe</string>
     <string name="drawer_open">Navigation öffnen</string>
     <string name="drawer_close">Navigation schließen</string>
-
     <string name="menu_synchronize">Synchronisieren</string>
     <string name="menu_save">Fertig</string>
     <string name="menu_cancel">Abbrechen</string>
@@ -35,14 +32,11 @@
     <string name="menu_add_reminder">Erinnerung hinzufügen</string>
     <string name="menu_show_trend">Trend anzeigen</string>
     <string name="menu_show_overall_trend">Gesamttrend anzeigen</string>
-
     <string name="fab_add_refueling">Tankfüllung</string>
     <string name="fab_add_other_expenditure">Andere Ausgabe</string>
     <string name="fab_add_other_income">Andere Einnahme</string>
-
     <string name="section_suspend">Stilllegen</string>
     <string name="section_advanced">Erweiterte Optionen</string>
-
     <string name="hint_mileage_optional">Gesamtkilometer (optional)</string>
     <string name="hint_volume">Volumen</string>
     <string name="hint_price">Preis</string>
@@ -65,7 +59,6 @@
     <string name="hint_reminder_start_mileage">Starte bei Kilometerstand</string>
     <string name="hint_reminder_start_date">Starte bei Datum</string>
     <string name="hint_reminder_snoozed_until">Schlummern bis</string>
-
     <string name="label_partial">Teilfüllung</string>
     <string name="label_color_in_reports">Farbe in Reports</string>
     <string name="label_suspend">Stilllegen</string>
@@ -75,7 +68,6 @@
     <string name="label_reminder_type">Typ</string>
     <string name="label_reminder_dismissed">Benachrichtigung entfernt</string>
     <string name="label_trust_certificate">Diesem Zertifikat vertrauen</string>
-
     <string name="description_suspend">Wenn Sie ein Auto nicht mehr benutzen, können Sie es stilllegen. Dadurch werden sich wiederholenden Kosten zu dem Stilllegezeitpunkt beendet. Außerdem zoomen die Reports standardmäßig nur auf aktive Autos.</string>
     <string name="description_category">Tankfüllungen werden in verschiedenen Reports nach diesen Kateogrien gruppiert. Beispiele: Benzin, Diesel, Gas.</string>
     <string name="description_reminder_status_due">Fällig</string>
@@ -86,7 +78,6 @@
     <string name="description_reminder_status_time">Fällig in %s</string>
     <string name="description_webdav_url">Bitte geben Sie hier die URL zu einem speziellen Ordner für Autu Mandu auf Ihrem WebDAV-Server ein. Autu Mandu wird seine Dateien in diesem Ordner speichern, alles außerhalb des Ordners wird nicht angeführt.</string>
     <string name="description_webdav_trust_certificate">Die Webseite verwendet ein Zertifikat, dem Android nicht vertraut.</string>
-
     <string name="validate_error_greater_zero">Muss größer als 0 sein</string>
     <string name="validate_error_greater_equal_zero">Muss größer oder gleich 0 sein</string>
     <string name="validate_error_not_empty">Darf nicht leer sein</string>
@@ -94,13 +85,11 @@
     <string name="validate_error_mileage_out_of_range_trip">Der kumulierte Kilometerstand darf bei Eingabe der Tageskilometer den Kilometerstand der nächsten Tankfüllung nicht übersteigen. Wenn Sie Gesamtkilometer eingeben möchten, können Sie die Eingabemethode in den Einstellungen ändern.</string>
     <string name="validate_error_fuel_type_exists">Diese Kaftstoffart existiert bereits.</string>
     <string name="validate_error_webdav_invalid_certificate">Dem Zertifikat konnte nicht vertraut werden. Es ist möglicherweise beschädigt.</string>
-
     <string name="suspended">Stillgelegt</string>
     <string name="suspended_since">Stillgelegt seit %s</string>
     <string name="overwrite">Überschreiben</string>
     <string name="restore">Wiederherstellen</string>
     <string name="import_">Importieren</string>
-
     <string name="title_first_start">Erste Schritte</string>
     <string name="title_add_refueling">Tankfüllung hinzufügen</string>
     <string name="title_edit_refueling">Tankfüllung bearbeiten</string>
@@ -118,9 +107,7 @@
     <string name="title_edit_reminder">Erinnerung bearbeiten</string>
     <string name="cab_title_selected">%d ausgewählt</string>
     <string name="edit_title_refueling">Tankfüllung</string>
-
     <string name="edit_message_no_entry_selected">Kein Eintrag ausgewählt</string>
-
     <string name="alert_delete_title">Löschen bestätigen</string>
     <string name="alert_delete_refueling_message">Diese Tankfüllung wird gelöscht.</string>
     <string name="alert_delete_refuelings_message">Die %d ausgewählten Tankfüllungen werden gelöscht.</string>
@@ -156,14 +143,12 @@
     <string name="alert_import_csv_message">Der Import aktualisiert bestehende Einträge und fügt neue hinzu, löscht aber keine Einträge.</string>
     <string name="alert_import_csv_failed">Import fehlgeschlagen. Es wurden keine Daten verändert.\n\nFehlerursache: %s</string>
     <string name="alert_error_title">Fehler</string>
-
     <string name="toast_new_refueling">Benzinverbrauch: %1$.2f %2$s %3$s</string>
     <string name="toast_backup_succeeded">Sichern der Daten zur Datei %s war erfolgreich.</string>
     <string name="toast_restore_succeeded">Wiederherstellen der Daten war erfolgreich</string>
     <string name="toast_export_csv_succeeded">Export auf die SD-Karte war erfolgreich</string>
     <string name="toast_import_csv_succeeded">Importieren der Daten war erfolgreich</string>
     <string name="toast_need_storage_permission">Um diese Aktion durchzuführen, braucht Autu Mandu Zugriff auf Ihre Dateien.</string>
-
     <string name="report_title_fuel_consumption">Benzinverbrauch</string>
     <string name="report_title_fuel_price">Benzinpreis</string>
     <string name="report_title_mileage">Kilometerstand</string>
@@ -176,8 +161,8 @@
     <string name="report_graph_per_refueling">Pro Tankfüllung</string>
     <string name="report_graph_per_month">Pro Monat</string>
     <string name="report_not_enough_data">Zu wenige Daten</string>
-    <string name="report_since">&#931; seit %s</string>
-    <string name="report_last_year">&#931; seit einem Jahr</string>
+    <string name="report_since">Σ seit %s</string>
+    <string name="report_last_year">Σ seit einem Jahr</string>
     <string name="report_lowest">Niedrigster</string>
     <string name="report_highest">Höchster</string>
     <string name="report_average">Durchschnitt</string>
@@ -192,7 +177,6 @@
     <string name="report_toast_guessed">Geschätzt um fehlende Tankfüllungen auszugleichen.</string>
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">vsl. %1$.2f %2$s</string>
-
     <string name="pref_title_header_about">Über Autu Mandu</string>
     <string name="pref_title_header_general">Allgemeine Einstellungen</string>
     <string name="pref_title_header_cars">Autos</string>
@@ -229,16 +213,14 @@
     <string name="pref_summary_export_csv">Daten als CSV exportieren, um sie in anderen Programmen wie Microsoft Excel oder LibreOffice Calc verwenden zu können.</string>
     <string name="pref_summary_import_csv">Daten von CSV-Dateien importieren. Die Dateien müssen so aussehen, wie die, die beim Export generiert werden.</string>
     <string name="pref_summary_import_csv_no_data">Es wurden Dateien im Ordner %s auf der SD-Karte gefunden.</string>
-
     <string name="help_section_getting_started">Einstieg</string>
     <string name="help_section_tips">Tipps</string>
     <string name="help_section_calculations">Berechnungen</string>
     <string name="help_section_fuel_types">Kraftstoffe</string>
     <string name="help_section_csv">CSV</string>
     <string name="help_folder_name">help-de</string>
-
     <string name="first_start_hi">Hallo!</string>
-    <string name="first_start_intro">Autu Mandu kann Reports über Ausgaben für deine Autos anzeigen, z.B. Benzinverbrauch und gesamte Kosten. Starte mit diesen einfachen Schritten:</string>
+    <string name="first_start_intro">Autu Mandu kann Berichte über Ausgaben für deine Autos anzeigen, z. B. Benzinverbrauch und Gesamtkosten. Starte mit diesen einfachen Schritten:</string>
     <string name="first_start_step1_img_desc">Erster Schritt</string>
     <string name="first_start_step1_text">Erstelle ein Auto.</string>
     <string name="first_start_step2_img_desc">Zweiter Schritt</string>
@@ -247,7 +229,6 @@
     <string name="first_start_step3_text">Nach zwei Tankfüllungen solltest du die ersten Graphen sehen.</string>
     <string name="first_start_create_car">Auto erstellen</string>
     <string name="first_start_setup_sync">Synchronisation einrichten</string>
-
     <string name="calc_option_volume_to_distance">Volumen (%1$s) nach Strecke (%2$s)</string>
     <string name="calc_option_distance_to_volume">Strecke (%1$s) nach Volumen (%2$s)</string>
     <string name="calc_option_volume_to_price">Volumen (%1$s) nach Preis (%2$s)</string>
@@ -256,14 +237,12 @@
     <string name="calc_option_price_to_distance">Preis (%1$s) nach Strecke (%2$s)</string>
     <string name="calc_option_distance_to_fuel_price">Strecke (%1$s) nach Benzinpreis (%2$s)</string>
     <string name="calc_option_fuel_price_to_distance">Benzinpreis (%1$s) nach Strecke (%2$s)</string>
-
     <string name="notification_reminder_channel">Erinnerungen</string>
     <string name="notification_reminder_title_single">Erinnerung: %s</string>
     <string name="notification_reminder_title_multiple">Mehrere Erinnerungen</string>
     <string name="notification_reminder_action_done">Erledigt</string>
     <string name="notification_reminder_action_snooze">Schlummern</string>
     <string name="notification_reminder_action_snooze_all">Alle schlummern</string>
-
     <string name="distance_entry_mode_trip">Tageskilometer</string>
     <string name="distance_entry_mode_total">Gesamtkilometer</string>
     <string name="price_entry_mode_per_unit_and_volume">Preis pro Einheit &amp; Volumen</string>
@@ -288,23 +267,21 @@
     <string name="pref_summary_behavior_keep_backups">Behalte maximal eine gewisse Anzahl an Backups.</string>
     <string name="pref_action_select_backup_file">Datei für Wiederherstellung wählen</string>
     <string name="pref_summary_no_file_selector">Auf diesem Gerät fehlt eine App zum auswählen des Backups.</string>
-    <string name="pref_summary_restore_file_seems_wrong">Es wurde nicht ausgewählt oder die Datei scheint nicht für eine Wiederherstellung geeignet.</string>
-
+    <string name="pref_summary_restore_file_seems_wrong">Es wurde nichts ausgewählt oder die Datei scheint nicht für eine Wiederherstellung geeignet.</string>
     <string name="title_refuelings">Tankfüllungen</string>
     <string name="title_expenditures">Andere Ausgaben</string>
     <string name="title_income">Andere Einnahmen</string>
-
     <string name="repeat_once">Einmalig</string>
     <string name="repeat_day">Jeden Tag wiederholen</string>
     <string name="repeat_month">Jeden Monat wiederholen</string>
     <string name="repeat_quarter">Jeden Quartal wiederholen</string>
     <string name="repeat_year">Jeden Jahr wiederholen</string>
-
     <string name="reminder_distance_time">Nach Kilometern oder Zeit, je nachdem, was zuerst eintritt</string>
     <string name="reminder_distance">Nach Kilometern</string>
     <string name="reminder_time">Nach Zeit</string>
-
     <string name="time_day">Tag(e)</string>
     <string name="time_month">Monat(e)</string>
     <string name="time_year">Jahr(e)</string>
+    <string name="app_description">Geben Sie die Kosten für Ihr Auto ein und erhalten Sie schöne Berichte und Statistiken.</string>
+    <string name="menu_add_station">Tankstelle hinzufügen</string>
 </resources>
