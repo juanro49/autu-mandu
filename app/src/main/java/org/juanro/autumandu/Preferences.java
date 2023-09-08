@@ -165,8 +165,16 @@ public class Preferences {
     public String getBackupPath() {
         final String key = "backup_folder";
         String savedValue = mPrefs.getString(key, "");
-        return (savedValue.isEmpty() ? new File(Environment.getExternalStorageDirectory(),
-                "AutuManduBackups").getAbsolutePath() : savedValue);
+
+        if (savedValue.isEmpty())
+        {
+            Editor edit = mPrefs.edit();
+            edit.putString("backup_folder", new File(mContext.getExternalFilesDir(null), "AutuManduBackups").getAbsolutePath());
+            edit.apply();
+            savedValue = mPrefs.getString(key, "");
+        }
+
+        return savedValue;
     }
 
     public boolean getAutoBackupEnabled() {

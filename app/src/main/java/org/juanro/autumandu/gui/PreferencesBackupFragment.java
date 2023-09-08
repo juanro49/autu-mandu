@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -179,6 +180,8 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             doExportCSV(true);
         } else if (requestCode == REQUEST_IMPORT_CSV) {
             doImportCSV(true);
+        } else if (requestCode == REQUEST_AUTO_BACKUP_PERMISSIONS) {
+            enableAutoBackup();
         }
     }
 
@@ -354,9 +357,11 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
                 if(((Boolean)o)) {
-                    if (ContextCompat.checkSelfPermission(getActivity(),
+                    if ((ContextCompat.checkSelfPermission(getActivity(),
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                            PackageManager.PERMISSION_GRANTED) {
+                            PackageManager.PERMISSION_GRANTED) &&
+                                (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU))
+                    {
                         if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                             Toast.makeText(getActivity(), R.string.toast_need_storage_permission,
@@ -378,7 +383,13 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
         return new OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (ContextCompat.checkSelfPermission(getActivity(),
+
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                {
+                    onRequestPermissionsResult(requestCode, permissions,
+                        new int[]{PackageManager.PERMISSION_GRANTED});
+                }
+                else if (ContextCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                         PackageManager.PERMISSION_GRANTED) {
                     onRequestPermissionsResult(requestCode, permissions,

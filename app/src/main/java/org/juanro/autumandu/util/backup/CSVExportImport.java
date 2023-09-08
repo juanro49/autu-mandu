@@ -65,7 +65,7 @@ import org.juanro.autumandu.provider.station.StationSelection;
 
 public class CSVExportImport {
     private static final String LOG_TAG = "CSVExportImport";
-    public static final String DIRECTORY = "Autu Mandu CSV";
+    public static final String DIRECTORY = "CSV";
     private static final String DATE_INVALID_FORMAT_EXC = "A date has an invalid format. Please " +
         "change either data to match the defined ISO-based date or your phone localization.";
 
@@ -87,7 +87,7 @@ public class CSVExportImport {
 
     public CSVExportImport(Context context) {
         mContext = context;
-        File mExternalStorageDir = Environment.getExternalStorageDirectory();
+        File mExternalStorageDir = new File(mContext.getExternalFilesDir(null), "AutuManduBackups");
         mExportDir = new File(mExternalStorageDir, DIRECTORY);
 
         mCSVFormat = CSVFormat.DEFAULT
