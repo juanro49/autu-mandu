@@ -80,6 +80,9 @@ dependencies {
     // CSV
     implementation 'org.apache.commons:commons-csv:1.10.0'
 
+    // Filesystem tools
+    implementation 'androidx.documentfile:documentfile:1.1.0-alpha01'
+
     // Support, AppCompat
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.7.0-alpha03'

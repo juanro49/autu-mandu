@@ -42,14 +42,19 @@
             android:singleLine="true"
             android:summary="@string/pref_summary_behavior_keep_backups"
             android:title="@string/pref_title_behavior_keep_backups" />
-        <EditTextPreference
-            android:defaultValue=""
-            android:dialogMessage="@string/empty_if_unknown"
+        <Preference
             android:key="backup_folder"
+            android:title="@string/pref_title_backup_location"
+            android:summary="@string/pref_summary_backup_location"
+            android:dialogMessage="@string/empty_if_unknown"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:summary="@string/pref_summary_backup_location"
-            android:title="@string/pref_title_backup_location" />
+             />
+        <Preference
+            android:key="restore_folder"
+            android:title="@string/pref_title_restore_backup_location"
+            android:summary="@string/pref_summary_restore_backup_location"
+            />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_export" >
         <Preference

@@ -18,8 +18,12 @@ package org.juanro.autumandu.util.backup;
 
 import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.os.Environment;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
 import android.util.Log;
+
+import androidx.documentfile.provider.DocumentFile;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -29,6 +33,7 @@ import org.apache.commons.csv.QuoteMode;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Semaphore;
 
+import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.provider.DataProvider;
 import org.juanro.autumandu.provider.car.CarColumns;
 import org.juanro.autumandu.provider.car.CarContentValues;
@@ -62,6 +68,7 @@ import org.juanro.autumandu.provider.station.StationColumns;
 import org.juanro.autumandu.provider.station.StationContentValues;
 import org.juanro.autumandu.provider.station.StationCursor;
 import org.juanro.autumandu.provider.station.StationSelection;
+import org.juanro.autumandu.util.FileCopyUtil;
 
 public class CSVExportImport {
     private static final String LOG_TAG = "CSVExportImport";
@@ -75,6 +82,7 @@ public class CSVExportImport {
 
     private CSVFormat mCSVFormat;
     private Semaphore mImExportSemaphore;
+    private Preferences prefs;
 
     private static String[] allTables = {
             CarColumns.TABLE_NAME,
@@ -87,7 +95,8 @@ public class CSVExportImport {
 
     public CSVExportImport(Context context) {
         mContext = context;
-        File mExternalStorageDir = new File(mContext.getExternalFilesDir(null), "AutuManduBackups");
+        prefs = new Preferences(context);
+        File mExternalStorageDir = new File(prefs.getDefaultBackupPath());
         mExportDir = new File(mExternalStorageDir, DIRECTORY);
 
         mCSVFormat = CSVFormat.DEFAULT
@@ -122,6 +131,37 @@ public class CSVExportImport {
             exportOtherCosts();
             exportRefuelings();
             exportReminders();
+
+            if (!prefs.getDefaultBackupPath().equals(prefs.getBackupPath()))
+            {
+                Uri externalChildDocumentsUri = DocumentsContract.buildChildDocumentsUriUsingTree(Uri.parse(prefs.getBackupPath()), DocumentsContract.getTreeDocumentId(Uri.parse(prefs.getBackupPath())));
+                DocumentFile internalDir = DocumentFile.fromFile(mExportDir);
+                DocumentFile[] internalFiles = internalDir.listFiles();
+                DocumentFile externalDir = DocumentFile.fromTreeUri(mContext, externalChildDocumentsUri);
+
+                for (DocumentFile file: internalFiles) {
+                    Uri doc = Uri.parse(externalDir.getUri() + "%2F" + file.getName());
+                    DocumentFile externalFile = DocumentFile.fromSingleUri(mContext, doc);
+                    boolean fileExists = externalDir.findFile(file.getName()) != null;
+
+                    if (fileExists)
+                    {
+                        externalFile.delete();
+                    }
+
+                    externalDir.createFile(file.getType(), file.getName());
+
+                    try {
+                        ParcelFileDescriptor pfdIn = mContext.getContentResolver().openFileDescriptor(file.getUri(), "r");
+                        ParcelFileDescriptor pfdOut = mContext.getContentResolver().openFileDescriptor(externalFile.getUri(), "rw");
+
+                        FileCopyUtil.copyFile(pfdIn, pfdOut);
+                    } catch (FileNotFoundException e) {
+                        Log.e("CSVExportException", "External backup error " + e.getMessage());
+                    }
+                }
+            }
+
         } catch (CSVImportException e) {
             throw e;
         } catch (Exception e) {
@@ -180,10 +220,14 @@ public class CSVExportImport {
         csv.printRecord((Object[]) StationColumns.ALL_COLUMNS);
 
         StationCursor station = new StationSelection().query(mContext.getContentResolver());
+        long id = -1;
         while (station.moveToNext()) {
-            csv.printRecord(
-                station.getId(),
-                station.getName());
+            if(id != station.getId()) {
+                csv.printRecord(
+                    station.getId(),
+                    station.getName());
+            }
+            id = station.getId();
         }
 
         csv.close();
@@ -265,11 +309,48 @@ public class CSVExportImport {
         for (String table : allTables) {
             File file = new File(mExportDir, table + ".csv");
             if (!file.isFile()) {
+                if (!prefs.getDefaultBackupPath().equals(prefs.getBackupPath()))
+                {
+                    copyExportFilesToAppStorage();
+                }
+
                 return false;
             }
         }
 
         return true;
+    }
+
+    public void copyExportFilesToAppStorage()
+    {
+        Uri path = Uri.parse(prefs.getBackupPath());
+        DocumentFile externalDir = DocumentFile.fromTreeUri(mContext, path);
+        DocumentFile[] externalFiles = externalDir.listFiles();
+        DocumentFile internalDir = null;
+
+        if (!mExportDir.isDirectory()) {
+            if (!mExportDir.mkdir()) {
+                File mExternalStorageDir = new File(prefs.getDefaultBackupPath());
+                mExportDir = new File(mExternalStorageDir, DIRECTORY);
+            }
+        }
+
+        internalDir = DocumentFile.fromFile(mExportDir);
+
+        for (DocumentFile file: externalFiles) {
+            if(file.getName().endsWith(".csv")) {
+                DocumentFile internalFile = internalDir.createFile("*/*", file.getName());
+
+                try {
+                    ParcelFileDescriptor pfdIn = mContext.getContentResolver().openFileDescriptor(file.getUri(), "r");
+                    ParcelFileDescriptor pfdOut = mContext.getContentResolver().openFileDescriptor(internalFile.getUri(), "rw");
+
+                    FileCopyUtil.copyFile(pfdIn, pfdOut);
+                } catch (FileNotFoundException e) {
+                    Log.e("CSVExportException", "External backup error " + e.getMessage());
+                }
+            }
+        }
     }
 
     public boolean anyExportFileExist() {

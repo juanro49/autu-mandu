@@ -16,6 +16,8 @@
 
 package org.juanro.autumandu.util;
 
+import android.os.ParcelFileDescriptor;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,6 +28,26 @@ public class FileCopyUtil {
     public static boolean copyFile(File from, File to) {
         try (FileInputStream inStream = new FileInputStream(from)) {
             try (FileOutputStream outStream = new FileOutputStream(to)) {
+                return copyFile(inStream, outStream);
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean copyFile(File from, ParcelFileDescriptor to) {
+        try (FileInputStream inStream = new FileInputStream(from)) {
+            try (FileOutputStream outStream = new FileOutputStream(to.getFileDescriptor())) {
+                return copyFile(inStream, outStream);
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean copyFile(ParcelFileDescriptor from, ParcelFileDescriptor to) {
+        try (FileInputStream inStream = new FileInputStream(from.getFileDescriptor())) {
+            try (FileOutputStream outStream = new FileOutputStream(to.getFileDescriptor())) {
                 return copyFile(inStream, outStream);
             }
         } catch (Exception e) {

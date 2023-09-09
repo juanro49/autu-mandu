@@ -191,6 +191,7 @@
     <string name="report_toast_guessed">Guessed to balance missing refuelings.</string>
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">est. %1$.2f %2$s</string>
+    <string name="pref_default_backup_path_restored">Default backup path restored: </string>
     <string name="pref_title_header_about">About Autu Mandu</string>
     <string name="pref_title_header_general">General settings</string>
     <string name="pref_title_header_cars">Cars</string>
@@ -219,6 +220,7 @@
     <string name="pref_title_sync_setup">Set up backup sync</string>
     <string name="pref_title_backup">Backup</string>
     <string name="pref_title_backup_location">Backup target</string>
+    <string name="pref_title_restore_backup_location">Restore target</string>
     <string name="pref_title_restore">Restore</string>
     <string name="pref_title_exportcsv">Export CSV</string>
     <string name="pref_title_importcsv">Import CSV</string>
@@ -228,6 +230,7 @@
     <string name="pref_summary_sync_current_provider">Linked to %s. Click to unlink. Sync can result in data loss when used with multiple people.</string>
     <string name="pref_summary_backup">Backup the current data to local storage.</string>
     <string name="pref_summary_backup_location">A path where backups are stored. If empty, a separate folder inside your internal storage or SD will be used.</string>
+    <string name="pref_summary_restore_backup_location">Restore default path where backups are stored.</string>
     <string name="pref_summary_restore">Restore data from a file in your storage.</string>
     <string name="pref_summary_export_csv">Export data as CSV so you can use it in other programs like Microsoft Excel or LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Import data from CSV files. The files must look like the ones, that are generated during CSV export.</string>

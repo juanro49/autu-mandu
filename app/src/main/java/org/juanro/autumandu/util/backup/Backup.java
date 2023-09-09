@@ -19,18 +19,25 @@ package org.juanro.autumandu.util.backup;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
 import android.util.Log;
 
+import androidx.documentfile.provider.DocumentFile;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.juanro.autumandu.Application;
 import org.juanro.autumandu.Preferences;
@@ -44,19 +51,32 @@ public class Backup {
     private File dbFile;
     private Preferences prefs;
     private ContentResolver resolver;
+    private Context mContext;
 
     public Backup(Context context) {
         prefs = new Preferences(context);
         dbFile = new File(DataSQLiteOpenHelper.getInstance(context).getReadableDatabase().getPath());
+        mContext = context;
         resolver = context.getContentResolver();
     }
 
     /**
      * @return The target path for a backup.
      */
-    public File getBackupFile() {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        return new File(prefs.getBackupPath(), "cr-" + df.format(new Date()) + ".db");
+    public DocumentFile getBackupDir() {
+        DocumentFile backupDir = null;
+
+        if (prefs.getBackupPath().startsWith("/"))
+        {
+            backupDir = DocumentFile.fromFile(new File(prefs.getBackupPath()));
+        }
+        else
+        {
+            Uri backupDirUri = DocumentsContract.buildChildDocumentsUriUsingTree(Uri.parse(prefs.getBackupPath()), DocumentsContract.getTreeDocumentId(Uri.parse(prefs.getBackupPath())));
+            backupDir = DocumentFile.fromTreeUri(mContext, backupDirUri);
+        }
+
+        return backupDir;
     }
 
     /**
@@ -69,13 +89,19 @@ public class Backup {
         } else {
             boolean rtn = backup();
             if (rtn) {
-                File backupDir = getBackupFile().getParentFile();
-                File[] backupFiles = backupDir.listFiles(file -> file.getName().matches(
-                        "cr-[0-9]+-[0-9]+-[0-9]+\\.db"));
-                Arrays.sort(backupFiles);
-                for (int deletionIndex = backupFiles.length - prefs.getAutoBackupRetention() - 1;
+                DocumentFile backupDir = getBackupDir();
+                DocumentFile[] allFiles = backupDir.listFiles();
+                ArrayList<String> backupFiles = new ArrayList<String>();
+
+                for (final DocumentFile file: allFiles) {
+                    if (file.getName().matches("cr-[0-9]+-[0-9]+-[0-9]+\\.db")) {
+                        backupFiles.add(file.getName());
+                    }
+                }
+                Arrays.sort(backupFiles.toArray());
+                for (int deletionIndex = backupFiles.size() - prefs.getAutoBackupRetention() - 1;
                      deletionIndex >= 0; deletionIndex--) {
-                    backupFiles[deletionIndex].delete();
+                    Objects.requireNonNull(backupDir.findFile(backupFiles.get(deletionIndex))).delete();
                 }
             }
             return rtn;
@@ -88,18 +114,27 @@ public class Backup {
      */
     public boolean backup() {
         Application.closeDatabases();
-        File backupFile = getBackupFile();
-        File backupDir = backupFile.getParentFile();
-        if (!backupDir.isDirectory()) {
-            if (!backupDir.mkdir()) {
-                return false;
-            }
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        DocumentFile backupFile = getBackupDir().createFile("*/*", "cr-" + df.format(new Date()) + ".db");
+        //File backupFile = getBackupFile();
+        //File backupDir = backupFile.getParentFile();
+
+        ParcelFileDescriptor pfd = null;
+        try {
+            pfd = resolver.openFileDescriptor(backupFile.getUri(), "w");
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "Backup error " + e.getMessage());
+            return false;
         }
-        return FileCopyUtil.copyFile(dbFile, backupFile);
+
+        return FileCopyUtil.copyFile(dbFile, pfd);
     }
 
     public boolean backupFileExists() {
-        return getBackupFile().isFile();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Uri filePath = Uri.parse(getBackupDir().getUri().toString() + "%2Fcr-" + df.format(new Date()) + ".db");
+        DocumentFile file = DocumentFile.fromSingleUri(mContext, filePath);
+        return file != null ? file.isFile() : false;
     }
 
     /**

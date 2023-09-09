@@ -169,12 +169,41 @@ public class Preferences {
         if (savedValue.isEmpty())
         {
             Editor edit = mPrefs.edit();
-            edit.putString("backup_folder", new File(mContext.getExternalFilesDir(null), "AutuManduBackups").getAbsolutePath());
+            edit.putString(key, mContext.getExternalFilesDir(null).getAbsolutePath());
             edit.apply();
             savedValue = mPrefs.getString(key, "");
         }
 
         return savedValue;
+    }
+
+    public void setBackupPath(String path)
+    {
+        Editor edit = mPrefs.edit();
+        edit.putString("backup_folder", path);
+        edit.apply();
+    }
+
+    public String getDefaultBackupPath() {
+        final String key = "backup_folder_default";
+        String savedValue = mPrefs.getString(key, "");
+
+        if (savedValue.isEmpty())
+        {
+            Editor edit = mPrefs.edit();
+            edit.putString(key, mContext.getExternalFilesDir(null).getAbsolutePath());
+            edit.apply();
+            savedValue = mPrefs.getString(key, "");
+        }
+
+        return savedValue;
+    }
+
+    public void restoreDefaultBackupPath()
+    {
+        Editor edit = mPrefs.edit();
+        edit.putString("backup_folder", mContext.getExternalFilesDir(null).getAbsolutePath());
+        edit.apply();
     }
 
     public boolean getAutoBackupEnabled() {

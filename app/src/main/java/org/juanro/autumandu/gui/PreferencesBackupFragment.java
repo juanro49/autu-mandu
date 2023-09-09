@@ -38,11 +38,13 @@ import android.preference.TwoStatePreference;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
 
+import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.dialog.MessageDialogFragment;
 import org.juanro.autumandu.gui.dialog.MessageDialogFragment.MessageDialogFragmentListener;
@@ -67,10 +69,15 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
     private static final int REQUEST_IMPORT_CSV_PERMISSIONS = 19;
     private static final int REQUEST_SELECT_RESTORE_FILE = 20;
     private static final int REQUEST_AUTO_BACKUP_PERMISSIONS = 21;
+    private static final int REQUEST_ACCESS_STORAGE = 22;
+    private static final int REQUEST_BACKUP_FOLDER_PERMISSIONS = 23;
+    private static final int REQUEST_RESTORE_BACKUP_FOLDER_PERMISSIONS = 24;
 
     private AccountManager mAccountManager;
     private Backup mBackup;
     private CSVExportImport mCSVExportImport;
+    private Uri baseDocumentTreeUri;
+    private Preferences prefs;
 
     private OnPreferenceClickListener mSetupSync = new OnPreferenceClickListener() {
         @Override
@@ -151,6 +158,21 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             setupRestorePreference();
         }
 
+        // Backup Folder
+        {
+            Preference backupFolder = findPreference("backup_folder");
+            backupFolder.setOnPreferenceClickListener(
+                createOnClickListenerToAskForStorageAccess(REQUEST_BACKUP_FOLDER_PERMISSIONS));
+
+            Preference restoreBackupFolder = findPreference("restore_folder");
+            restoreBackupFolder.setOnPreferenceClickListener(
+                createOnClickListenerToAskForStorageAccess(REQUEST_RESTORE_BACKUP_FOLDER_PERMISSIONS));
+
+            Preference autoBackup = findPreference("behavior_auto_backup");
+            autoBackup.setOnPreferenceChangeListener(
+                createOnChangeListenerToAskForStorageAccess(REQUEST_AUTO_BACKUP_PERMISSIONS));
+        }
+
         // Export CSV
         {
             Preference export = findPreference("exportcsv");
@@ -180,8 +202,6 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             doExportCSV(true);
         } else if (requestCode == REQUEST_IMPORT_CSV) {
             doImportCSV(true);
-        } else if (requestCode == REQUEST_AUTO_BACKUP_PERMISSIONS) {
-            enableAutoBackup();
         }
     }
 
@@ -211,6 +231,17 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 enableAutoBackup();
             }
+        } else if (requestCode == REQUEST_BACKUP_FOLDER_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                changeBackupDirectory();
+            }
+        } else if (requestCode == REQUEST_RESTORE_BACKUP_FOLDER_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                prefs = new Preferences(this.getContext());
+                prefs.restoreDefaultBackupPath();
+                Toast.makeText(getActivity(), getString(R.string.pref_default_backup_path_restored) + prefs.getBackupPath(),
+                    Toast.LENGTH_LONG).show();
+            }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -232,7 +263,7 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     .show(getFragmentManager(), null);
         } else if (mBackup.backup()) {
             Toast.makeText(getActivity(),
-                    getString(R.string.toast_backup_succeeded, mBackup.getBackupFile().getAbsolutePath()),
+                    getString(R.string.toast_backup_succeeded, mBackup.getBackupDir().getUri().toString()),
                     Toast.LENGTH_SHORT).show();
             setupRestorePreference();
         } else {
@@ -415,6 +446,15 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                 .show(getFragmentManager(), null);
     }
 
+    public void changeBackupDirectory() {
+        // Choose a directory using the system's file picker.
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
+        startActivityForResult(intent, REQUEST_ACCESS_STORAGE);
+    }
+
     /**
      * Uses the result of a file chooser for restoring a backup.
      * @see PreferenceFragment#onActivityResult(int, int, Intent)
@@ -441,6 +481,19 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                 } else {
                     Toast.makeText(getActivity(), R.string.pref_summary_restore_file_seems_wrong,
                             Toast.LENGTH_LONG).show();
+                }
+            }
+        } else if (requestCode == REQUEST_ACCESS_STORAGE) {
+            if (resultCode == Activity.RESULT_OK)
+            {
+                if (data != null) {
+                    baseDocumentTreeUri = data.getData();
+
+                    final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+                    getActivity().getContentResolver().takePersistableUriPermission(baseDocumentTreeUri, takeFlags);
+                    prefs = new Preferences(this.getContext());
+                    prefs.setBackupPath(baseDocumentTreeUri.toString());
                 }
             }
         }
