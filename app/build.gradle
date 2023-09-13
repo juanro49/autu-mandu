@@ -9,8 +9,8 @@ android {
         applicationId "org.juanro.autumandu"
         minSdkVersion 15
         targetSdk versions.targetSdk
-        versionCode 401
-        versionName "4.0.1"
+        versionCode 402
+        versionName "4.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -108,7 +108,7 @@ dependencies {
     implementation 'net.danlew:android.joda:2.12.5'
 
     // Required for instrumented tests
-    androidTestImplementation 'androidx.annotation:annotation:1.7.0-rc01'
+    androidTestImplementation 'androidx.annotation:annotation:1.7.0'
     androidTestImplementation 'androidx.test:runner:1.6.0-alpha04'
 
     constraints {
