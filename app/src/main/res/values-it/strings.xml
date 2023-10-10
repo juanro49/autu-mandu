@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 Copyright 2019 Marco Bresciani
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,36 +13,30 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->
-<resources>
-    <string name="about_thanks">Ringraziameti:</string>
+--><resources>
+    <string name="about_thanks">Ringraziamenti:</string>
     <string name="about_version">Versione: %s</string>
     <string name="about_licenses">Licenze</string>
-
-    <string name="drawer_reports">Rapporti</string>
+    <string name="drawer_reports">Resoconti</string>
     <string name="drawer_calculator">Calcolatore</string>
     <string name="drawer_settings">Impostazioni</string>
     <string name="drawer_help">Aiuto</string>
     <string name="drawer_open">Apri navigazione</string>
     <string name="drawer_close">Chiudi navigazione</string>
-
     <string name="menu_synchronize">Sincronizza</string>
     <string name="menu_save">Fatto</string>
     <string name="menu_cancel">Annulla</string>
     <string name="menu_delete">Cancella</string>
     <string name="menu_add_car">Aggiungi auto</string>
     <string name="menu_add_fuel_type">Aggiungi tipo carburante</string>
-    <string name="menu_add_reminder">Aggiungi nota</string>
+    <string name="menu_add_reminder">Aggiungi promemoria</string>
     <string name="menu_show_trend">Mostra andamento</string>
     <string name="menu_show_overall_trend">Mostra andamento generale</string>
-
     <string name="fab_add_refueling">Rifornimento</string>
-    <string name="fab_add_other_expenditure">Altre spese</string>
+    <string name="fab_add_other_expenditure">Altra spesa</string>
     <string name="fab_add_other_income">Altre entrate</string>
-
     <string name="section_suspend">Sospendi</string>
     <string name="section_advanced">Opzioni avanzate</string>
-
     <string name="hint_mileage_optional">Distanza totale (opzionale)</string>
     <string name="hint_volume">Quantità</string>
     <string name="hint_price">Prezzo</string>
@@ -64,9 +59,8 @@ limitations under the License.
     <string name="hint_reminder_start_mileage">Inizia a chilometraggio</string>
     <string name="hint_reminder_start_date">Inizia a data</string>
     <string name="hint_reminder_snoozed_until">Sospeso fino a</string>
-
     <string name="label_partial">Parziale</string>
-    <string name="label_color_in_reports">Colore nei rapporti</string>
+    <string name="label_color_in_reports">Colore nei resoconti</string>
     <string name="label_suspend">Sospendi</string>
     <string name="label_set_end_date">Imposta data finale</string>
     <string name="label_car">Auto</string>
@@ -74,9 +68,8 @@ limitations under the License.
     <string name="label_reminder_type">Tipo</string>
     <string name="label_reminder_dismissed">Notifica disattivata</string>
     <string name="label_trust_certificate">Accetta il certificato</string>
-
-    <string name="description_suspend">Puoi sospendere un\'auto quando non la usi più. Questo cancellerà tutti i costi periodici alla data di sospensione. Inoltre, i rapporti mostreranno solo le auto attive.</string>
-    <string name="description_category">I rifornimenti sono raggruppati per categoria nei differenti rapporti. Esempi: benzina, diesel, gas.</string>
+    <string name="description_suspend">Puoi sospendere un\'auto quando non la usi più. Questo sospenderà tutti i costi periodici alla data di sospensione. Inoltre, i resoconti mostreranno solo le auto attive.</string>
+    <string name="description_category">I rifornimenti sono raggruppati per categoria nei differenti resoconti. Esempi: benzina, diesel, gas.</string>
     <string name="description_reminder_status_due">Scadenza</string>
     <string name="description_reminder_status_due_snoozed">Scadenza, posposta fino al %s</string>
     <string name="description_reminder_status_due_dismissed">Scadenza, notifica disattivata</string>
@@ -85,7 +78,6 @@ limitations under the License.
     <string name="description_reminder_status_time">Scadenza in %s</string>
     <string name="description_webdav_url">Per favore inserisci un URL in una cartella sul tuo server WebDAV per Autu Mandu. Autu Mandu memorizzerà i tuoi dati in questa cartella e non toccherà niente fuori di essa.</string>
     <string name="description_webdav_trust_certificate">Il sito usa un certificato non riconosciuto da Android.</string>
-
     <string name="validate_error_greater_zero">Deve essere maggiore di 0</string>
     <string name="validate_error_greater_equal_zero">Deve essere maggiore o uguale a 0</string>
     <string name="validate_error_not_empty">Non può essere vuoto</string>
@@ -93,14 +85,12 @@ limitations under the License.
     <string name="validate_error_mileage_out_of_range_trip">Il chilometraggio accumulato non può essere superiore al chilometraggio al rifornimento successivo nel caso di distanza parziale. Se vuoi inserire la distanza totale devi cambiare la modalità di inserimento nelle impostazioni.</string>
     <string name="validate_error_fuel_type_exists">Questo tipo di carburante esiste già.</string>
     <string name="validate_error_webdav_invalid_certificate">Il certificato non può essere riconosciuto. Sembra invalido.</string>
-
     <string name="suspended">Sospeso</string>
     <string name="suspended_since">Sospeso dal %s</string>
     <string name="overwrite">Sovrascrivi</string>
     <string name="restore">Ripristina</string>
     <string name="import_">Importa</string>
     <string name="empty_if_unknown">Lascia pure vuoto se non sai cosa inserire qui.</string>
-
     <string name="title_first_start">Primi passi</string>
     <string name="title_add_refueling">Aggiungi rifornimento</string>
     <string name="title_edit_refueling">Modifica rifornimento</string>
@@ -118,9 +108,7 @@ limitations under the License.
     <string name="title_edit_reminder">Modifica nota</string>
     <string name="cab_title_selected">%d selezionato</string>
     <string name="edit_title_refueling">Rifornimento</string>
-
     <string name="edit_message_no_entry_selected">Nessuna voce selezionata</string>
-
     <string name="alert_delete_title">Conferma cancellazione</string>
     <string name="alert_delete_refueling_message">Questo rifornimento sarà cancellato.</string>
     <string name="alert_delete_refuelings_message">I %d rifornimenti selezionati saranno cancellati.</string>
@@ -156,16 +144,14 @@ limitations under the License.
     <string name="alert_import_csv_message">L\'importazione aggiornerà le voci e ne aggiungerà di nuove ma non cancellerà nulla.</string>
     <string name="alert_import_csv_failed">Impostazione fallita. Dati non modificati.\n\nMotivo: %s</string>
     <string name="alert_error_title">Errore</string>
-
     <string name="toast_new_refueling">Consumo carburante: %1$.2f %2$s %3$s</string>
     <string name="toast_backup_succeeded">Archiviazione sul file %s completata correttamente.</string>
-    <string name="toast_restore_succeeded">Ripristino completato correttamente.</string>
+    <string name="toast_restore_succeeded">Ripristino completato correttamente</string>
     <string name="toast_export_csv_succeeded">Esportazione su scheda SD completata correttamente.</string>
     <string name="toast_import_csv_succeeded">Importazione completata correttamente.</string>
     <string name="toast_need_storage_permission">Per eseguire questa azione Autu Mandu ha bisogno di accedere ai tuoi file.</string>
     <string name="toast_auto_backup_succeeded">Archiviazione automatica eseguita.</string>
     <string name="toast_auto_backup_failed">Archiviazione automatica fallita.</string>
-
     <string name="report_title_fuel_consumption">Consumo carburante</string>
     <string name="report_title_fuel_price">Prezzo carburante</string>
     <string name="report_title_mileage">Chilometraggio</string>
@@ -178,8 +164,8 @@ limitations under the License.
     <string name="report_graph_per_refueling">Per rifornimento</string>
     <string name="report_graph_per_month">Per mese</string>
     <string name="report_not_enough_data">Dati insufficienti</string>
-    <string name="report_since">&#931; dal %s</string>
-    <string name="report_last_year">&#931; da un anno fa</string>
+    <string name="report_since">Σ dal %s</string>
+    <string name="report_last_year">Σ da un anno fa</string>
     <string name="report_lowest">Minimo</string>
     <string name="report_highest">Massimo</string>
     <string name="report_average">Medio</string>
@@ -194,13 +180,12 @@ limitations under the License.
     <string name="report_toast_guessed">Approssimato per bilanciare i rifornimanti mancanti.</string>
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">est. %1$.2f %2$s</string>
-
     <string name="pref_title_header_about">A proposito di Autu Mandu</string>
     <string name="pref_title_header_general">Impostazioni generali</string>
     <string name="pref_title_header_cars">Auto</string>
     <string name="pref_title_header_fuel_types">Tipi di carburante</string>
     <string name="pref_title_header_reminders">Note</string>
-    <string name="pref_title_header_report_order">Ordine rapporti</string>
+    <string name="pref_title_header_report_order">Ordine resoconti</string>
     <string name="pref_title_header_backup">Archiviazione &amp; esportazione</string>
     <string name="pref_title_category_synchronization">Sincronizza archivio</string>
     <string name="pref_title_category_behavior">Comportamento</string>
@@ -240,16 +225,14 @@ limitations under the License.
     <string name="pref_action_select_backup_file">Scegli il file da ripristinare.</string>
     <string name="pref_summary_no_file_selector">Non c\'è nessun\'applicazione di selezione file nel tuo telefono. Non posso ripristinare.</string>
     <string name="pref_summary_restore_file_seems_wrong">O non hai selezionato alcun file, o il file selezionato non sembra usabile per il ripristino.</string>
-
     <string name="help_section_getting_started">Per iniziare</string>
     <string name="help_section_tips">Suggerimenti</string>
     <string name="help_section_calculations">Calcoli</string>
     <string name="help_section_fuel_types">Tipi di carburante</string>
     <string name="help_section_csv">CSV</string>
     <string name="help_folder_name">help-it</string>
-
     <string name="first_start_hi">Ciao!</string>
-    <string name="first_start_intro">Autu Mandu può mostrare degli utili rapporti per le tue spese dell\'auto, incluso il consumo di carburante e i costi generali. Inizia con questi semplici passi:</string>
+    <string name="first_start_intro">Autu Mandu può mostrare dei resoconti utili per le tue spese dell\'auto, incluso il consumo di carburante e i costi generali. Inizia con questi semplici passi:</string>
     <string name="first_start_step1_img_desc">Primo passo</string>
     <string name="first_start_step1_text">Crea un\'auto.</string>
     <string name="first_start_step2_img_desc">Secondo passo</string>
@@ -258,7 +241,6 @@ limitations under the License.
     <string name="first_start_step3_text">Dopo due rifornimenti vedrai i primi grafici.</string>
     <string name="first_start_create_car">Crea un\'auto</string>
     <string name="first_start_setup_sync">Imposta la sincronizzazione</string>
-
     <string name="calc_option_volume_to_distance">Quantità (%1$s) a Distanza (%2$s)</string>
     <string name="calc_option_distance_to_volume">Distanza (%1$s) a Quantità (%2$s)</string>
     <string name="calc_option_volume_to_price">Quantità (%1$s) a Costo (%2$s)</string>
@@ -267,14 +249,12 @@ limitations under the License.
     <string name="calc_option_price_to_distance">Costo (%1$s) a Distanza (%2$s)</string>
     <string name="calc_option_distance_to_fuel_price">Distanza (%1$s) a Costo carburante (%2$s)</string>
     <string name="calc_option_fuel_price_to_distance">Costo carburante (%1$s) a Distanza (%2$s)</string>
-
     <string name="notification_reminder_channel">Note</string>
     <string name="notification_reminder_title_single">Nota: %s</string>
     <string name="notification_reminder_title_multiple">Note multiple</string>
     <string name="notification_reminder_action_done">Fatto</string>
     <string name="notification_reminder_action_snooze">Posponi</string>
     <string name="notification_reminder_action_snooze_all">Posponi tutti</string>
-
     <string name="distance_entry_mode_trip">Distanza viaggio</string>
     <string name="distance_entry_mode_total">Distanza totale</string>
     <string name="price_entry_mode_per_unit_and_volume">Costo per unità &amp; quantità</string>
@@ -288,22 +268,32 @@ limitations under the License.
     <string name="drag_handle_desc">Trascina</string>
     <string name="quit_snooze_desc">Ferma sospensione</string>
     <string name="notice_not_paid">Non pagato</string>
-
     <string name="title_refuelings">Rifornimenti</string>
     <string name="title_expenditures">Altre spese</string>
     <string name="title_income">Altre entrate</string>
-
     <string name="repeat_once">Una volta</string>
     <string name="repeat_day">Ripeti giornalmente</string>
     <string name="repeat_month">Ripeti giornalmente</string>
     <string name="repeat_quarter">Ripeti giornalmente</string>
     <string name="repeat_year">Ripeti giornalmente</string>
-
     <string name="reminder_distance_time">Dopo il primo avvenimento, tra distanza o tempo</string>
     <string name="reminder_distance">Dopo una distanza</string>
     <string name="reminder_time">Dopo un tempo</string>
-
     <string name="time_day">Giorni</string>
     <string name="time_month">Mesi</string>
     <string name="time_year">Anni</string>
+    <string name="app_description">Inserisci i costi della tua auto e ricevi resoconti e statistiche.</string>
+    <string name="pref_default_backup_path_restored">Impostato percorso di backup predefinito:</string>
+    <string name="pref_title_restore_backup_location">Ripristina archivio</string>
+    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
+    <string name="title_stations">Stazioni di rifornimento</string>
+    <string name="hint_buying_price">Prezzo d\'acquisto</string>
+    <string name="validate_error_station_exists">Questa stazione di rifornimento esiste già.</string>
+    <string name="title_edit_station">Modifica stazione di rifornimento</string>
+    <string name="title_add_station">Aggiungi stazione di rifornimento</string>
+    <string name="alert_cannot_delete_station">Non posso cancellare la stazione di rifornimento selezionata perché è usata in almeno un rifornimento o serbatoio.</string>
+    <string name="pref_title_header_stations">Stazioni di rifornimento</string>
+    <string name="menu_add_station">Aggiungi stazione di rifornimento</string>
+    <string name="alert_delete_station_message">Le seguenti %d stazioni e i rispettivi rifornimenti verranno cancellati.</string>
+    <string name="pref_summary_restore_backup_location">Ripristina percorso predefinito per i backup.</string>
 </resources>
