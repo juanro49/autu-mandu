@@ -283,4 +283,7 @@
     <string name="about_thanks">Agradecimentos a:</string>
     <string name="distance_entry_mode_total">Distância total</string>
     <string name="time_month">Mês(s)</string>
+    <string name="notification_reminder_action_snooze">Suspender</string>
+    <string name="pref_title_restore_backup_location">Restaurar alvo</string>
+    <string name="pref_summary_restore_backup_location">Restaurar o caminho padrão onde os backups são armazenados.</string>
 </resources>
