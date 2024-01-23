@@ -35,7 +35,7 @@ import/export functionality.
 
 You can translate this project using [Weblate](https://hosted.weblate.org/projects/autu-mandu/)
 
-[![Estado de la traducción](https://hosted.weblate.org/widgets/autu-mandu/-/autu-mandu/multi-auto.svg)](https://hosted.weblate.org/engage/autu-mandu/?utm_source=widget)
+[![Estado de la traducción](https://hosted.weblate.org/widget/autu-mandu/autu-mandu/multi-auto.svg)](https://hosted.weblate.org/engage/autu-mandu/?utm_source=widget)
 
 ## Install
 
