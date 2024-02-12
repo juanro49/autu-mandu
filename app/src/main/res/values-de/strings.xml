@@ -284,4 +284,10 @@
     <string name="time_year">Jahr(e)</string>
     <string name="app_description">Geben Sie die Kosten für Ihr Auto ein und erhalten Sie schöne Berichte und Statistiken.</string>
     <string name="menu_add_station">Tankstelle hinzufügen</string>
+    <string name="hint_buying_price">Kaufpreis</string>
+    <string name="validate_error_station_exists">Diese Tankstelle existiert bereits.</string>
+    <string name="title_stations">Tankstellen</string>
+    <string name="title_add_station">Tankstelle hinzufügen</string>
+    <string name="title_edit_station">Tankstelle bearbeiten</string>
+    <string name="pref_title_header_stations">Tankstellen</string>
 </resources>
