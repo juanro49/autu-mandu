@@ -146,8 +146,8 @@
     <string name="toast_new_refueling">Benzinverbrauch: %1$.2f %2$s %3$s</string>
     <string name="toast_backup_succeeded">Sichern der Daten zur Datei %s war erfolgreich.</string>
     <string name="toast_restore_succeeded">Wiederherstellen der Daten war erfolgreich</string>
-    <string name="toast_export_csv_succeeded">Export auf die SD-Karte war erfolgreich</string>
-    <string name="toast_import_csv_succeeded">Importieren der Daten war erfolgreich</string>
+    <string name="toast_export_csv_succeeded">Export auf die SD-Karte war erfolgreich.</string>
+    <string name="toast_import_csv_succeeded">Importieren der Daten war erfolgreich.</string>
     <string name="toast_need_storage_permission">Um diese Aktion durchzuführen, braucht Autu Mandu Zugriff auf Ihre Dateien.</string>
     <string name="report_title_fuel_consumption">Benzinverbrauch</string>
     <string name="report_title_fuel_price">Benzinpreis</string>
@@ -290,4 +290,5 @@
     <string name="title_add_station">Tankstelle hinzufügen</string>
     <string name="title_edit_station">Tankstelle bearbeiten</string>
     <string name="pref_title_header_stations">Tankstellen</string>
+    <string name="alert_delete_station_message">Die %d markierten Tankstellen und die dazugehörige Tankfüllungen werden gelöscht.</string>
 </resources>
