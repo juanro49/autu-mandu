@@ -280,4 +280,7 @@
     <string name="alert_cannot_delete_station">Station kan niet worden verwijderd, omdat het wordt gebruikt door ten minste één tank- of brandstoftank.</string>
     <string name="pref_title_header_stations">Stations</string>
     <string name="title_stations">Stations</string>
+    <string name="pref_default_backup_path_restored">Standaard back-uppad hersteld:</string>
+    <string name="pref_title_restore_backup_location">Doel herstellen</string>
+    <string name="pref_summary_restore_backup_location">Herstel standaardpad waar back-ups worden opgeslagen.</string>
 </resources>
