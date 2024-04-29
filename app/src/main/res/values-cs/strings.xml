@@ -4,8 +4,8 @@
     <string name="menu_show_trend">Ukázat trend</string>
     <string name="menu_show_overall_trend">Ukázat celkový trend</string>
     <string name="fab_add_refueling">Doplnění paliva</string>
-    <string name="fab_add_other_expenditure">Jiné výdaje</string>
-    <string name="fab_add_other_income">Jiné příjmy</string>
+    <string name="fab_add_other_expenditure">Jiný výdaj</string>
+    <string name="fab_add_other_income">Jiný příjem</string>
     <string name="section_advanced">Pokročilé nastavení</string>
     <string name="hint_mileage_optional">Celková vzdálenost (nepovinný údaj)</string>
     <string name="hint_volume">Volume</string>
@@ -32,7 +32,7 @@
     <string name="alert_delete_station_message">%d vybraných čerpacích stanic a jejich souvisejících tankování budou smazána.</string>
     <string name="alert_delete_reminder_message">Tato upomínka bude smazána.</string>
     <string name="alert_delete_reminders_message">%d vybraných upomínek bude smazáno.</string>
-    <string name="drawer_reports">Zápisy</string>
+    <string name="drawer_reports">Grafy</string>
     <string name="app_description">Zadejte náklady vašeho vozu a získejte pěkné přehledy a statistiky.</string>
     <string name="drawer_open">Vysunout menu</string>
     <string name="drawer_calculator">Kalkulačka</string>
@@ -142,7 +142,7 @@
     <string name="notification_reminder_title_multiple">Vícero upomínek</string>
     <string name="notification_reminder_action_done">Hotovo</string>
     <string name="notification_reminder_action_snooze">Odložit</string>
-    <string name="distance_entry_mode_total">Celková vzdálenost</string>
+    <string name="distance_entry_mode_total">Stav tachometru</string>
     <string name="price_entry_mode_per_unit_and_volume">Cena za jednotku &amp; objem</string>
     <string name="toast_import_csv_succeeded">Importování bylo úspěšně dokončeno.</string>
     <string name="toast_need_storage_permission">Abyste mohli tuto akci provést, Autu Mandu potřebuje přístup k vašim souborům.</string>
@@ -221,8 +221,8 @@
     <string name="pref_title_header_fuel_types">Typy paliv</string>
     <string name="pref_title_header_stations">Čerpací stanice</string>
     <string name="pref_title_header_reminders">Upomínky</string>
-    <string name="pref_title_header_report_order">Postupy podávání zpráv</string>
-    <string name="pref_title_header_backup">Zálohování a obnovení</string>
+    <string name="pref_title_header_report_order">Řazení grafů na úvodní obrazovce</string>
+    <string name="pref_title_header_backup">Zálohování a export</string>
     <string name="pref_title_category_synchronization">Zálohování synchronizace</string>
     <string name="pref_title_category_behavior">Chování</string>
     <string name="pref_title_category_units">Jednotky</string>
