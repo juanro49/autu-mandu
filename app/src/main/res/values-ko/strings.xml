@@ -1,2 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_description">차량 비용을 입력하면 유용한 보고서와 통계를 받아볼 수 있습니다.</string>
+    <string name="about_thanks">감사합니다:</string>
+    <string name="about_version">버전:%s</string>
+    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
+    <string name="about_licenses">라이선스</string>
+    <string name="drawer_reports">레포트</string>
+    <string name="drawer_calculator">계산기</string>
+    <string name="drawer_settings">설정</string>
+    <string name="menu_synchronize">동기화</string>
+    <string name="menu_cancel">취소</string>
+    <string name="menu_add_car">차량 추가</string>
+    <string name="menu_add_fuel_type">연료 종류 추가</string>
+    <string name="drawer_help">도움말</string>
+    <string name="drawer_open">탐색</string>
+    <string name="drawer_close">닫기</string>
+    <string name="menu_save">완료</string>
+    <string name="menu_add_station">정류소 추가</string>
+    <string name="menu_show_trend">트렌드 보기</string>
+    <string name="menu_delete">삭제</string>
+    <string name="menu_add_reminder">알림 추가</string>
+    <string name="menu_show_overall_trend">전반적인 트렌드 보기</string>
+    <string name="fab_add_refueling">연료 보급</string>
+</resources>
