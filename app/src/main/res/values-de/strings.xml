@@ -291,4 +291,9 @@
     <string name="title_edit_station">Tankstelle bearbeiten</string>
     <string name="pref_title_header_stations">Tankstellen</string>
     <string name="alert_delete_station_message">Die %d markierten Tankstellen und die dazugehörige Tankfüllungen werden gelöscht.</string>
+    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
+    <string name="alert_cannot_delete_station">Station kann nicht gelöscht werden, weil sie in mindestens einem Auffüllvorgang verwendet wird.</string>
+    <string name="pref_title_restore_backup_location">Wiederherstellungsziel</string>
+    <string name="pref_default_backup_path_restored">Standard-Sicherungspfad wiederhergestellt:</string>
+    <string name="pref_summary_restore_backup_location">Standardpfad für die Speicherung von Sicherungen wiederherstellen.</string>
 </resources>
