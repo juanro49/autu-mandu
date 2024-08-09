@@ -171,4 +171,13 @@
     <string name="title_expenditures">مصروفات اخرى</string>
     <string name="title_income">ايراد اخر</string>
     <string name="title_refuelings">التزويدات بالوقود</string>
+    <string name="import_">استيراد</string>
+    <string name="empty_if_unknown">برجاء تركها فارغة اذا كنت لا تعلم ماذا عليك ان تكتب هنا.</string>
+    <string name="restore">إستعادة</string>
+    <string name="drawer_open">فتح قائمة التنقل</string>
+    <string name="drawer_close">اغلاق قائمة التنقل</string>
+    <string name="label_reminder_dismissed">تم رفض الاشعار</string>
+    <string name="description_reminder_status_due_dismissed">مستحق, تم رفض الاشعار</string>
+    <string name="description_webdav_trust_certificate">يستخد هذا الموقع شهادة غير معتمد بواسطة أندرويد.</string>
+    <string name="validate_error_webdav_invalid_certificate">لا يمكن الوثوق بهذه الشهادة, يبدو انها غير صالحة.</string>
 </resources>
