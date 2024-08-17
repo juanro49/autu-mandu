@@ -180,4 +180,9 @@
     <string name="description_reminder_status_due_dismissed">مستحق, تم رفض الاشعار</string>
     <string name="description_webdav_trust_certificate">يستخد هذا الموقع شهادة غير معتمد بواسطة أندرويد.</string>
     <string name="validate_error_webdav_invalid_certificate">لا يمكن الوثوق بهذه الشهادة, يبدو انها غير صالحة.</string>
+    <string name="alert_export_csv_overwrite_title">تصدير CSV</string>
+    <string name="alert_import_csv_title">استيراد CSV</string>
+    <string name="pref_title_category_export">استيراد و تصدير</string>
+    <string name="pref_title_exportcsv">تصدير CSV</string>
+    <string name="pref_title_importcsv">استيراد CSV</string>
 </resources>
