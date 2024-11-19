@@ -192,7 +192,7 @@ public class ReminderService extends IntentService {
                 .addNextIntentWithParentStack(new Intent(context, MainActivity.class))
                 .addNextIntent(contentIntent);
         PendingIntent pendingContentIntent = stackBuilder.getPendingIntent(0,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent.FLAG_UPDATE_CURRENT |  PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingContentIntent);
 
         // Dismiss intent
