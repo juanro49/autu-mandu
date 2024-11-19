@@ -1,31 +1,31 @@
 buildscript {
     ext.versions = [
-        'compileSdk': 34,
-        'targetSdk': 34,
-        'buildTools': '34.0.0'
+        'compileSdk': 35,
+        'targetSdk': 35,
+        'buildTools': '35.0.0'
     ]
 
     repositories {
         mavenCentral()
-        jcenter()
         google()
         maven { url 'https://oss.sonatype.org/content/repositories/releases/'}
         // Required for HelloCharts for Android
         maven { url "https://jitpack.io" }
+        maven { url "https://artifactory.appodeal.com/appodeal-public"}
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.0-beta03'
+        classpath 'com.android.tools.build:gradle:8.7.2'
     }
 }
 
 allprojects {
     repositories {
         mavenCentral()
-        jcenter()
         google()
         maven { url 'https://oss.sonatype.org/content/repositories/releases/'}
         // Required for HelloCharts for Android
         maven { url "https://jitpack.io" }
+        maven { url "https://artifactory.appodeal.com/appodeal-public"}
     }
 }
