@@ -294,7 +294,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment
             station, new String[]{StationColumns.NAME}, new int[]{android.R.id.text1}, 0));
 
         // Car
-        CarCursor car = new CarSelection().query(getActivity().getContentResolver(), null,
+        CarCursor car = new CarSelection().suspendedSince((Date) null).query(getActivity().getContentResolver(), null,
                 CarColumns.NAME + " COLLATE UNICODE");
         spnCar.setAdapter(new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_spinner_dropdown_item,
