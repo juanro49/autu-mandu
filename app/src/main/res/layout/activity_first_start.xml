@@ -20,7 +20,8 @@
             android:layout_width="?attr/detailsElementLayoutWidth"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:background="?attr/detailsElementBackground">
+            android:background="?attr/detailsElementBackground"
+            android:fitsSystemWindows="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
