@@ -465,18 +465,12 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
             if (resultCode == Activity.RESULT_OK) {
                 Uri backupUri = data.getData();
                 if (backupUri != null) {
-                    if (!backupUri.getPath().
-                            matches(".*[/:](cr-[0-9]+-[0-9]+-[0-9]+\\.db|autumandu\\.backup)$")) {
-                        Toast.makeText(getActivity(), R.string.pref_summary_restore_file_seems_wrong,
-                                Toast.LENGTH_LONG).show();
+                    Log.v(TAG, "Restoring from URI "+ backupUri.toString());
+                    if (mBackup.restore(backupUri)) {
+                        Toast.makeText(getActivity(), R.string.toast_restore_succeeded,
+                                Toast.LENGTH_SHORT).show();
                     } else {
-                        Log.v(TAG, "Restoring from URI "+ backupUri.toString());
-                        if (mBackup.restore(backupUri)) {
-                            Toast.makeText(getActivity(), R.string.toast_restore_succeeded,
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            showError(getString(R.string.alert_restore_failed));
-                        }
+                        showError(getString(R.string.alert_restore_failed));
                     }
                 } else {
                     Toast.makeText(getActivity(), R.string.pref_summary_restore_file_seems_wrong,
