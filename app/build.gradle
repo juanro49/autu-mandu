@@ -9,8 +9,8 @@ android {
         applicationId "org.juanro.autumandu"
         minSdkVersion 21
         targetSdk versions.targetSdk
-        versionCode 403
-        versionName "4.0.3"
+        versionCode 404
+        versionName "4.0.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -68,6 +68,13 @@ android {
     // 2018 style of testing
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
+
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs.
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles.
+        includeInBundle = false
+    }
 }
 
 dependencies {
@@ -88,8 +95,9 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.4.0-rc01'
-    implementation 'com.google.android.material:material:1.13.0-alpha07'
+    implementation 'com.google.android.material:material:1.13.0-alpha08'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
+    implementation 'androidx.fragment:fragment:1.8.5'
 
     // Room Persistence
     implementation 'androidx.room:room-runtime:2.7.0-alpha11'
@@ -108,15 +116,6 @@ dependencies {
     implementation 'net.danlew:android.joda:2.13.0'
 
     // Required for instrumented tests
-    androidTestImplementation 'androidx.annotation:annotation:1.8.2'
+    androidTestImplementation 'androidx.annotation:annotation:1.9.1'
     androidTestImplementation 'androidx.test:runner:1.6.2'
-
-    constraints {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
-            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
-        }
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
-            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
-        }
-    }
 }

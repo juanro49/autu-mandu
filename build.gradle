@@ -11,7 +11,7 @@ buildscript {
         maven { url 'https://oss.sonatype.org/content/repositories/releases/'}
         // Required for HelloCharts for Android
         maven { url "https://jitpack.io" }
-        maven { url "https://artifactory.appodeal.com/appodeal-public"}
+        maven { url "https://archiva.haynespro.com/artifactory/repo"}
     }
 
     dependencies {
@@ -26,6 +26,6 @@ allprojects {
         maven { url 'https://oss.sonatype.org/content/repositories/releases/'}
         // Required for HelloCharts for Android
         maven { url "https://jitpack.io" }
-        maven { url "https://artifactory.appodeal.com/appodeal-public"}
+        maven { url "https://archiva.haynespro.com/artifactory/repo/"}
     }
 }
