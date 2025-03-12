@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_description">Syötä autosi kustannukset ja vastaanota mukavia raportteja ja tilastoja.</string>
-    <string name="about_thanks">Ansiosta:</string>
+    <string name="about_thanks">Kiitokset:</string>
     <string name="about_version">Versio: %s</string>
     <string name="about_licenses">Lisenssit</string>
     <string name="drawer_reports">Raportit</string>
