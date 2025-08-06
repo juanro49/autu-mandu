@@ -20,6 +20,11 @@ import android.content.ContentUris;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
+
+import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog;
+import com.github.dhaval2404.colorpicker.listener.ColorListener;
+import com.github.dhaval2404.colorpicker.model.ColorShape;
+import com.github.dhaval2404.colorpicker.model.ColorSwatch;
 import com.google.android.material.textfield.TextInputLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,9 +37,8 @@ import android.widget.EditText;
 
 import java.util.Date;
 
+import org.jetbrains.annotations.NotNull;
 import org.juanro.autumandu.R;
-import org.juanro.autumandu.gui.dialog.SupportColorPickerDialogFragment;
-import org.juanro.autumandu.gui.dialog.SupportColorPickerDialogFragment.SupportColorPickerDialogFragmentListener;
 import org.juanro.autumandu.gui.dialog.SupportDatePickerDialogFragment.SupportDatePickerDialogFragmentListener;
 import org.juanro.autumandu.gui.util.DateTimeInput;
 import org.juanro.autumandu.gui.util.FormFieldNotEmptyValidator;
@@ -45,8 +49,7 @@ import org.juanro.autumandu.provider.car.CarContentValues;
 import org.juanro.autumandu.provider.car.CarCursor;
 import org.juanro.autumandu.provider.car.CarSelection;
 
-public class DataDetailCarFragment extends AbstractDataDetailFragment implements
-        SupportColorPickerDialogFragmentListener, SupportDatePickerDialogFragmentListener {
+public class DataDetailCarFragment extends AbstractDataDetailFragment implements SupportDatePickerDialogFragmentListener {
     private static final int REQUEST_PICK_COLOR = 1;
     private static final int REQUEST_PICK_SUSPEND_DATE = 2;
 
@@ -79,14 +82,6 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     public void onDialogPositiveClick(int requestCode, Date date) {
         if (requestCode == REQUEST_PICK_SUSPEND_DATE) {
             edtSuspendDate.setDate(date);
-        }
-    }
-
-    @Override
-    public void onDialogPositiveClick(int requestCode, int color) {
-        if (requestCode == REQUEST_PICK_COLOR) {
-            this.color = color;
-            colorIndicator.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
         }
     }
 
@@ -163,10 +158,21 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         rowColor.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                SupportColorPickerDialogFragment.newInstance(
-                        DataDetailCarFragment.this, REQUEST_PICK_COLOR,
-                        R.string.alert_change_color_title, color).show(
-                        getFragmentManager(), null);
+                // Java Code
+                new MaterialColorPickerDialog
+                    .Builder(getContext())
+                    .setTitle(R.string.alert_change_color_title)
+                    .setColorShape(ColorShape.CIRCLE)
+                    .setColorSwatch(ColorSwatch._300)
+                    .setDefaultColor(color)
+                    .setColorListener(new ColorListener() {
+                        @Override
+                        public void onColorSelected(int colorInt, @NotNull String colorHex) {
+                            color = colorInt;
+                            colorIndicator.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
+                        }
+                    })
+                    .show();
             }
         });
 

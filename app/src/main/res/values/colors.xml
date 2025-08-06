@@ -62,4 +62,7 @@
     <color name="dark_grey">#383838</color>
     <color name="blue_grey">#5e7c8b</color>
     <color name="white">#ffffff</color>
+    <color name="positiveButtonTextColor">@color/accent</color>
+    <color name="negativeButtonTextColor">@color/accent</color>
+    <color name="bottomSheetDividerColor">#F5F5F5</color>
 </resources>
