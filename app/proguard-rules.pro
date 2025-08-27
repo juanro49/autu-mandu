@@ -54,3 +54,6 @@
 
 # RecyclerView
 -keep class androidx.appcompat.widget.RebindReportingHolder { *; }
+
+# CSV
+-dontwarn edu.umd.**
