@@ -59,6 +59,11 @@ public class CarColumns implements BaseColumns {
     public static final String BUYING_PRICE = "buying_price";
 
     /**
+     * Number of tires of the car
+     */
+    public static final String NUM_TIRES = "num_tires";
+
+    /**
      * Make of the car.
      */
     //public static final String MAKE = "make";
@@ -93,6 +98,7 @@ public class CarColumns implements BaseColumns {
             INITIAL_MILEAGE,
             SUSPENDED_SINCE,
             BUYING_PRICE,
+            NUM_TIRES,
             /*MAKE,
             MODEL,
             YEAR,
@@ -109,6 +115,7 @@ public class CarColumns implements BaseColumns {
             if (c.equals(INITIAL_MILEAGE) || c.contains("." + INITIAL_MILEAGE)) return true;
             if (c.equals(SUSPENDED_SINCE) || c.contains("." + SUSPENDED_SINCE)) return true;
             if (c.equals(BUYING_PRICE) || c.contains("." + BUYING_PRICE)) return true;
+            if (c.equals(NUM_TIRES) || c.contains("." + NUM_TIRES)) return true;
             /*if (c.equals(MAKE) || c.contains("." + MAKE)) return true;
             if (c.equals(MODEL) || c.contains("." + MODEL)) return true;
             if (c.equals(YEAR) || c.contains("." + YEAR)) return true;

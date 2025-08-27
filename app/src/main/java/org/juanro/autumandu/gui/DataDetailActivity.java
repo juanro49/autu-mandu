@@ -33,6 +33,7 @@ public class DataDetailActivity extends AppCompatActivity implements
     public static final int EXTRA_EDIT_CAR = 2;
     public static final int EXTRA_EDIT_REMINDER = 3;
     public static final int EXTRA_EDIT_STATION = 4;
+    public static final int EXTRA_EDIT_TIRE = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,8 @@ public class DataDetailActivity extends AppCompatActivity implements
                 fragment = new DataDetailOtherFragment();
             } else if (edit == EXTRA_EDIT_CAR) {
                 fragment = new DataDetailCarFragment();
+            } else if (edit == EXTRA_EDIT_TIRE) {
+                fragment = new DataDetailTireFragment();
             } else {
                 fragment = new DataDetailReminderFragment();
             }

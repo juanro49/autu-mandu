@@ -216,12 +216,19 @@ public class RefuelingCursor extends AbstractCursor implements RefuelingModel {
     }
 
     /**
-     * When the car has been suspended, this contains the start date.
-     * Can be {@code null}.
+     * Buying price of car.
      */
-    @Nullable
     public double getCarBuyingPrice() {
         Double res = getDoubleOrNull(CarColumns.BUYING_PRICE);
+        return res;
+    }
+
+    /**
+     * Number of tires of car.
+     */
+    @Nullable
+    public int getCarNumTires() {
+        Integer res = getIntegerOrNull(CarColumns.NUM_TIRES);
         return res;
     }
 }

@@ -58,6 +58,11 @@ public interface CarModel extends BaseModel {
     double getBuyingPrice();
 
     /**
+     * Number of tires of the car.
+     */
+    int getNumTires();
+
+    /**
      * Make of the car.
      */
     /*@Nullable

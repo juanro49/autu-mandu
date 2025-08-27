@@ -93,6 +93,17 @@ public class CarCursor extends AbstractCursor implements CarModel {
     }
 
     /**
+     * Number of tires of the car
+     */
+    public int getNumTires() {
+        Integer res = getIntegerOrNull(CarColumns.NUM_TIRES);
+
+        if (res == null)
+            throw new NullPointerException("The value of 'num_tires' in the database was null, which is not allowed according to the model definition");
+        return res;
+    }
+
+    /**
      * Make of the car.
      */
     /*@Nullable

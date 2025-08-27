@@ -22,20 +22,23 @@ import org.juanro.autumandu.model.dao.OtherCostDAO;
 import org.juanro.autumandu.model.dao.RefuelingDAO;
 import org.juanro.autumandu.model.dao.ReminderDAO;
 import org.juanro.autumandu.model.dao.StationDAO;
+import org.juanro.autumandu.model.dao.TireDAO;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.OtherCost;
 import org.juanro.autumandu.model.entity.Refueling;
 import org.juanro.autumandu.model.entity.Reminder;
 import org.juanro.autumandu.model.entity.Station;
+import org.juanro.autumandu.model.entity.TireList;
+import org.juanro.autumandu.model.entity.TireUsage;
 import org.juanro.autumandu.model.entity.helper.SQLTypeConverters;
 import org.juanro.autumandu.provider.DataSQLiteOpenHelper;
 
 import static org.juanro.autumandu.provider.DataSQLiteOpenHelper.DATABASE_FILE_NAME;
 
 @Database(
-    entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class, Station.class},
-    version = 12
+    entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class, Station.class, TireList.class, TireUsage.class},
+    version = 13
 )
 @TypeConverters({SQLTypeConverters.class})
 public abstract class AutuManduDatabase extends RoomDatabase {
@@ -45,6 +48,7 @@ public abstract class AutuManduDatabase extends RoomDatabase {
     public abstract RefuelingDAO getRefuelingDao();
     public abstract ReminderDAO getReminderDao();
     public abstract StationDAO getStationDao();
+    public abstract TireDAO getTireDao();
 
     private static AutuManduDatabase sInstance;
     private static final String DB_NAME = DATABASE_FILE_NAME;
@@ -70,16 +74,17 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                         new AssetFileBasedMigration(context, 9),
                         new AssetFileBasedMigration(context, 10),
                         new AssetFileBasedMigration(context, 11),
-                        new Migration(11, 12) {
+                        new AssetFileBasedMigration(context, 12),
+                        new Migration(12, 13) {
                             @Override
                             public void migrate(@NonNull SupportSQLiteDatabase database) {
                                 // Do nothing, just migrate to room.
                                 // Empty Migration creates the master table and does a sanity check.
                                 Log.i(LOG_TAG, String.format(Locale.US,
-                                    "Migrating to new version 12."));
-                                new AssetFileBasedMigration(context, 11).migrate(database);
+                                    "Migrating to new version 13."));
+                                new AssetFileBasedMigration(context, 12).migrate(database);
                                 Log.i(LOG_TAG, String.format(Locale.US,
-                                    "Migrated to new version 12."));
+                                    "Migrated to new version 13."));
                             }
                         }).
                     build();

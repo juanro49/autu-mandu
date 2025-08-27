@@ -34,6 +34,11 @@ public interface ICar {
     double getBuyingprice();
 
     /**
+     * @return Number of tires of the car.
+     */
+    int getNumTires();
+
+    /**
      * @return Make of the car.
      */
     //String getMake();

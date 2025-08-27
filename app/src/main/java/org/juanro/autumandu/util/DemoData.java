@@ -34,6 +34,7 @@ import org.juanro.autumandu.provider.othercost.OtherCostContentValues;
 import org.juanro.autumandu.provider.othercost.RecurrenceInterval;
 import org.juanro.autumandu.provider.refueling.RefuelingContentValues;
 import org.juanro.autumandu.provider.station.StationContentValues;
+import org.juanro.autumandu.provider.tirelist.TireListContentValues;
 
 public class DemoData {
     private static final CharSequence MENU_TITLE_CREATE = "Create demo data";
@@ -78,6 +79,8 @@ public class DemoData {
         createOtherCost(context, "Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1,
                 "", punto);
 
+        createTire(context, puntoDate, null, 50, 4, "Insa Turbo", "Eco Evolution", "", punto);
+
         for (int i = 0; i < puntoCount; i++) {
             puntoDate = puntoDate.plusDays(randInt(12, 18));
             puntoMileage += randInt(570, 620);
@@ -115,6 +118,8 @@ public class DemoData {
                 "", astra);
         createOtherCost(context, "Versicherung", astraDateSuper95, null, -1, 40, RecurrenceInterval.MONTH,
                 1, "", astra);
+
+        createTire(context, astraDateSuper95, null, 50, 4, "Insa Turbo", "All Season 4", "", astra);
 
         for (int i = 0; i < astraCountSuper95; i++) {
             astraDateSuper95 = astraDateSuper95.plusDays(randInt(8, 13));
@@ -165,6 +170,7 @@ public class DemoData {
                 .putColor(color)
                 .putInitialMileage(0)
                 .putBuyingPrice(0)
+                .putNumTires(4)
                 /*.putMake(make)
                 .putModel(model)
                 .putYear(year)
@@ -222,6 +228,19 @@ public class DemoData {
                 .putNote(note)
                 .putCarId(carId)
                 .insert(context.getContentResolver()));
+    }
+
+    private static long createTire(Context context, DateTime buyDate, DateTime trashDate, float price, int quantity, String manufacturer, String model, String note, long carId) {
+        return getIdFromUri(new TireListContentValues()
+            .putBuyDate(buyDate.toDate())
+            .putTrashDate(trashDate == null ? null : trashDate.toDate())
+            .putPrice(price)
+            .putQuantity(quantity)
+            .putManufacturer(manufacturer)
+            .putModel(model)
+            .putNote(note)
+            .putCarId(carId)
+            .insert(context.getContentResolver()));
     }
 
     private static int randInt(int min, int max) {

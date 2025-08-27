@@ -21,6 +21,7 @@ The following options are currently included:
 - [x] Fuel price of refueling
 - [x] Station of refueling
 - [x] Mileage between refuelings
+- [x] Tire management
 - [x] Costs in general
 - [ ] Trip journal
 - [ ] Stations map with price

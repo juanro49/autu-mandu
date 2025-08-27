@@ -38,6 +38,8 @@ import org.juanro.autumandu.provider.car.CarCursor;
 import org.juanro.autumandu.provider.car.CarSelection;
 import org.juanro.autumandu.provider.othercost.OtherCostCursor;
 import org.juanro.autumandu.provider.othercost.OtherCostSelection;
+import org.juanro.autumandu.provider.tirelist.TireListCursor;
+import org.juanro.autumandu.provider.tirelist.TireListSelection;
 import org.juanro.autumandu.util.Recurrences;
 
 public class CostsReport extends AbstractReport {
@@ -193,8 +195,9 @@ public class CostsReport extends AbstractReport {
             cursors.add(refueling);
             OtherCostCursor otherCost = new OtherCostSelection().carId(car.getId()).query(mContext.getContentResolver());
             cursors.add(otherCost);
+            TireListCursor tireList = new TireListSelection().carId(car.getId()).query(mContext.getContentResolver());
 
-            if ((refueling.getCount() + otherCost.getCount()) < 2) {
+            if ((refueling.getCount() + otherCost.getCount() + tireList.getCount()) < 2) {
                 section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
                 continue;
             }
@@ -293,6 +296,25 @@ public class CostsReport extends AbstractReport {
 
                 if (startDate.isAfter(otherCost.getDate().getTime())) {
                     startDate = new DateTime(otherCost.getDate());
+                }
+            }
+
+            while (tireList.moveToNext()) {
+                if (tireList.getPrice() == 0.0f) {
+                    continue;
+                }
+                totalCosts += tireList.getPrice();
+
+                DateTime date = new DateTime(tireList.getBuyDate());
+                mCostsPerMonth.get(car.getId()).add(date, tireList.getPrice());
+                mCostsPerYear.get(car.getId()).add(date, tireList.getPrice());
+
+                if (Seconds.secondsBetween(endDate, date).getSeconds() < YEAR_SECONDS) {
+                    costsWithinYear += tireList.getPrice();
+                }
+
+                if (startDate.isAfter(date)) {
+                    startDate = date;
                 }
             }
 

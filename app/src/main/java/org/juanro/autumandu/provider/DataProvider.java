@@ -32,6 +32,8 @@ import org.juanro.autumandu.provider.othercost.OtherCostColumns;
 import org.juanro.autumandu.provider.refueling.RefuelingColumns;
 import org.juanro.autumandu.provider.reminder.ReminderColumns;
 import org.juanro.autumandu.provider.station.StationColumns;
+import org.juanro.autumandu.provider.tirelist.TireListColumns;
+import org.juanro.autumandu.provider.tireusage.TireUsageColumns;
 
 @Deprecated
 public class DataProvider extends BaseContentProvider {
@@ -63,6 +65,12 @@ public class DataProvider extends BaseContentProvider {
     private static final int URI_TYPE_STATION = 10;
     private static final int URI_TYPE_STATION_ID = 11;
 
+    private static final int URI_TYPE_TIRE_LIST = 12;
+    private static final int URI_TYPE_TIRE_LIST_ID = 13;
+
+    private static final int URI_TYPE_TIRE_USAGE = 14;
+    private static final int URI_TYPE_TIRE_USAGE_ID = 15;
+
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
@@ -78,6 +86,10 @@ public class DataProvider extends BaseContentProvider {
         URI_MATCHER.addURI(AUTHORITY, RefuelingColumns.TABLE_NAME + "/#", URI_TYPE_REFUELING_ID);
         URI_MATCHER.addURI(AUTHORITY, ReminderColumns.TABLE_NAME, URI_TYPE_REMINDER);
         URI_MATCHER.addURI(AUTHORITY, ReminderColumns.TABLE_NAME + "/#", URI_TYPE_REMINDER_ID);
+        URI_MATCHER.addURI(AUTHORITY, TireListColumns.TABLE_NAME, URI_TYPE_TIRE_LIST);
+        URI_MATCHER.addURI(AUTHORITY, TireListColumns.TABLE_NAME + "/#", URI_TYPE_TIRE_LIST_ID);
+        URI_MATCHER.addURI(AUTHORITY, TireUsageColumns.TABLE_NAME, URI_TYPE_TIRE_USAGE);
+        URI_MATCHER.addURI(AUTHORITY, TireUsageColumns.TABLE_NAME + "/#", URI_TYPE_TIRE_USAGE_ID);
     }
 
     @Override
@@ -124,6 +136,15 @@ public class DataProvider extends BaseContentProvider {
             case URI_TYPE_REMINDER_ID:
                 return TYPE_CURSOR_ITEM + ReminderColumns.TABLE_NAME;
 
+            case URI_TYPE_TIRE_LIST:
+                return TYPE_CURSOR_DIR + StationColumns.TABLE_NAME;
+            case URI_TYPE_TIRE_LIST_ID:
+                return TYPE_CURSOR_ITEM + StationColumns.TABLE_NAME;
+
+            case URI_TYPE_TIRE_USAGE:
+                return TYPE_CURSOR_DIR + StationColumns.TABLE_NAME;
+            case URI_TYPE_TIRE_USAGE_ID:
+                return TYPE_CURSOR_ITEM + StationColumns.TABLE_NAME;
         }
         return null;
     }
@@ -209,6 +230,20 @@ public class DataProvider extends BaseContentProvider {
                 System.arraycopy(CarColumns.ALL_COLUMNS, 1, projection, ReminderColumns.ALL_COLUMNS.length, CarColumns.ALL_COLUMNS.length - 1);
                 return projection;
 
+            case URI_TYPE_TIRE_LIST:
+            case URI_TYPE_TIRE_LIST_ID:
+                projection = new String[TireListColumns.ALL_COLUMNS.length + CarColumns.ALL_COLUMNS.length - 1];
+                System.arraycopy(TireListColumns.ALL_COLUMNS, 0, projection, 0, TireListColumns.ALL_COLUMNS.length);
+                System.arraycopy(CarColumns.ALL_COLUMNS, 1, projection, TireListColumns.ALL_COLUMNS.length, CarColumns.ALL_COLUMNS.length - 1);
+                return projection;
+
+            case URI_TYPE_TIRE_USAGE:
+            case URI_TYPE_TIRE_USAGE_ID:
+                projection = new String[TireUsageColumns.ALL_COLUMNS.length + TireListColumns.ALL_COLUMNS.length - 1];
+                System.arraycopy(TireUsageColumns.ALL_COLUMNS, 0, projection, 0, TireUsageColumns.ALL_COLUMNS.length);
+                System.arraycopy(TireListColumns.ALL_COLUMNS, 1, projection, TireUsageColumns.ALL_COLUMNS.length, TireListColumns.ALL_COLUMNS.length - 1);
+                return projection;
+
             default:
                 throw new IllegalArgumentException("The uri '" + uri + "' is not supported by this ContentProvider");
         }
@@ -286,6 +321,28 @@ public class DataProvider extends BaseContentProvider {
                 res.orderBy = ReminderColumns.DEFAULT_ORDER;
                 break;
 
+            case URI_TYPE_TIRE_LIST:
+            case URI_TYPE_TIRE_LIST_ID:
+                res.table = TireListColumns.TABLE_NAME;
+                res.idColumn = TireListColumns._ID;
+                res.tablesWithJoins = TireListColumns.TABLE_NAME;
+                if (CarColumns.hasColumns(projection)) {
+                    res.tablesWithJoins += " LEFT OUTER JOIN " + CarColumns.TABLE_NAME + " AS " + TireListColumns.PREFIX_CAR + " ON " + TireListColumns.TABLE_NAME + "." + TireListColumns.CAR_ID + "=" + TireListColumns.PREFIX_CAR + "." + CarColumns._ID;
+                }
+                res.orderBy = TireListColumns.DEFAULT_ORDER;
+                break;
+
+            case URI_TYPE_TIRE_USAGE:
+            case URI_TYPE_TIRE_USAGE_ID:
+                res.table = TireUsageColumns.TABLE_NAME;
+                res.idColumn = TireUsageColumns._ID;
+                res.tablesWithJoins = TireUsageColumns.TABLE_NAME;
+                if (TireListColumns.hasColumns(projection)) {
+                    res.tablesWithJoins += " LEFT OUTER JOIN " + TireListColumns.TABLE_NAME + " AS " + TireUsageColumns.PREFIX_TIRE_LIST + " ON " + TireUsageColumns.TABLE_NAME + "." + TireUsageColumns.TIRE_ID + "=" + TireUsageColumns.PREFIX_TIRE_LIST + "." + TireListColumns._ID;
+                }
+                res.orderBy = TireUsageColumns.DEFAULT_ORDER;
+                break;
+
             default:
                 throw new IllegalArgumentException("The uri '" + uri + "' is not supported by this ContentProvider");
         }
@@ -297,6 +354,8 @@ public class DataProvider extends BaseContentProvider {
             case URI_TYPE_OTHER_COST_ID:
             case URI_TYPE_REFUELING_ID:
             case URI_TYPE_REMINDER_ID:
+            case URI_TYPE_TIRE_LIST_ID:
+            case URI_TYPE_TIRE_USAGE_ID:
                 id = uri.getLastPathSegment();
         }
         if (id != null) {

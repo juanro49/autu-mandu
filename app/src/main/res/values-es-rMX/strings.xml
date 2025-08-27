@@ -13,7 +13,8 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
---><resources>
+-->
+<resources>
     <string name="app_description">Introduce los costes de tu coche y recibe bonitos informes y estadísticas.</string>
     <string name="about_thanks">Gracias a:</string>
     <string name="about_version">Versión: %s</string>
@@ -28,6 +29,7 @@
     <string name="menu_save">Guardar</string>
     <string name="menu_cancel">Cancelar</string>
     <string name="menu_delete">Eliminar</string>
+    <string name="menu_mount_umount">Montar/Desmontar</string>
     <string name="menu_add_car">Agregar vehículo</string>
     <string name="menu_add_fuel_type">Agregar tipo de combustible</string>
     <string name="menu_add_station">Añadir estación</string>
@@ -37,6 +39,7 @@
     <string name="fab_add_refueling">Recargas</string>
     <string name="fab_add_other_expenditure">Otros gastos</string>
     <string name="fab_add_other_income">Otros ingresos</string>
+    <string name="fab_add_tires">Nuevos neumáticos</string>
     <string name="section_suspend">Suspender</string>
     <string name="section_advanced">Ajustes avanzados</string>
     <string name="hint_mileage_optional">Distancia total (opcional)</string>
@@ -56,21 +59,32 @@
     <string name="hint_user_name">Nombre de usuario</string>
     <string name="hint_password">Contraseña</string>
     <string name="hint_initial_mileage">Kilometraje inicial</string>
+    <string name="hint_num_tires">Número de ruedas</string>
+    <string name="hint_manufacturer">Fabricante</string>
+    <string name="hint_model">Modelo</string>
+    <string name="hint_buying_price">Precio de compra</string>
+    <string name="hint_trash_date">Fecha eliminación</string>
     <string name="hint_reminder_after_distance">Después de distancia</string>
     <string name="hint_reminder_after_time">Después de tiempo</string>
     <string name="hint_reminder_start_mileage">Kilometraje inicial</string>
     <string name="hint_reminder_start_date">Fecha incial</string>
     <string name="hint_reminder_snoozed_until">Posponer hasta</string>
-    <string name="hint_buying_price">Precio de compra</string>
+    <string name="hint_mount_distance">Distancia al montar</string>
+    <string name="hint_umount_distance">Distancia al desmontar</string>
+    <string name="hint_mount_date">Fecha montaje</string>
+    <string name="hint_umount_date">Fecha desmontaje</string>
     <string name="label_partial">Parcial</string>
     <string name="label_color_in_reports">Color</string>
     <string name="label_suspend">Suspender</string>
-    <string name="label_set_end_date">Set end date</string>
+    <string name="label_set_end_date">Establecer fecha fin</string>
+    <string name="label_set_trash_date">Establecer fecha eliminación</string>
     <string name="label_car">Vehículo</string>
     <string name="label_recurrence">Recurrencia</string>
     <string name="label_reminder_type">Tipo</string>
     <string name="label_reminder_dismissed">Notificación descartada</string>
     <string name="label_trust_certificate">Confiar en este certificado</string>
+    <string name="label_mount_tire">Montar</string>
+    <string name="label_umount_tire">Desmontar</string>
     <string name="description_suspend">Puedes suspender un vehículo cuando ya no lo utilizas. Esto cancela todos los gastos recurrentes hasta la fecha de suspensión. Adicionalmente, los reportes se enfocan únicamente en vehículos activos.</string>
     <string name="description_category">Recargas se agrupan por esta categoría para cada reporte. Ejemplos: Gasolina, Diesel, Gas.</string>
     <string name="description_reminder_status_due">Vencido</string>
@@ -96,8 +110,6 @@
     <string name="title_first_start">Primeros pazos</string>
     <string name="title_add_refueling">Agregar recarga</string>
     <string name="title_edit_refueling">Modificar recarga</string>
-    <string name="title_add_station">Añadir estación</string>
-    <string name="title_edit_station">Editar estación</string>
     <string name="title_settings">Ajustes</string>
     <string name="title_help">Ayuda</string>
     <string name="title_add_other_expenditure">Agregar otro gasto</string>
@@ -110,6 +122,10 @@
     <string name="title_edit_fuel_type">Modificar tipo de combustible</string>
     <string name="title_add_reminder">Agregar recordatorio</string>
     <string name="title_edit_reminder">Modificar recordatorio</string>
+    <string name="title_add_station">Añadir estación</string>
+    <string name="title_edit_station">Editar estación</string>
+    <string name="title_add_tire">Añadir ruedas</string>
+    <string name="title_edit_tire">Editar ruedas</string>
     <string name="cab_title_selected">%d seleccionado</string>
     <string name="edit_title_refueling">Recarga</string>
     <string name="edit_message_no_entry_selected">Ningún registro seleccionado</string>
@@ -126,6 +142,8 @@
     <string name="alert_delete_fuel_types_message">Los %d tipos de combustible serán eliminados.</string>
     <string name="alert_delete_reminder_message">Este recordatorio será eliminado.</string>
     <string name="alert_delete_reminders_message">Los %d recordatorios seleccionados serán eliminados.</string>
+    <string name="alert_delete_tire_message">Los %d juegos de ruedas seleccionados serán eliminados.</string>
+    <string name="alert_mount_umount_message">El juego de ruedas seleccionado será montado/desmontado.</string>
     <string name="alert_cannot_delete_last_car">El último vehículo no se puede eliminar.</string>
     <string name="alert_cannot_delete_fuel_type">No se puede eliminar el tipo de combustible porque es utilizado por al menos una recarga o tanque de combustible.</string>
     <string name="alert_cannot_delete_station">No se puede eliminar la estación, porque es utilizada por al menos un repostaje.</string>
@@ -156,6 +174,7 @@
     <string name="toast_export_csv_succeeded">Exportación a tarjeta SD exitosa.</string>
     <string name="toast_import_csv_succeeded">Importación exitosa.</string>
     <string name="toast_need_storage_permission">Para utilizar esta función, Autu Mandu requiere acceso a tus archivos.</string>
+    <string name="toast_all_tires_mounted">El número de ruedas a montar es superior al número de ruedas del coche</string>
     <string name="report_title_fuel_consumption">Rendimiento de combustible</string>
     <string name="report_title_fuel_price">Precio de combustible</string>
     <string name="report_title_mileage">Kilometraje</string>
@@ -263,6 +282,7 @@
     <string name="title_expenditures">Otros Gastos</string>
     <string name="title_income">Otros Ingresos</string>
     <string name="title_stations">Estaciones</string>
+    <string name="title_tires">Neumáticos</string>
     <string name="repeat_once">Una vez</string>
     <string name="repeat_day">Repetir todos los días</string>
     <string name="repeat_month">Repetir cada mes</string>
@@ -296,4 +316,6 @@
     <string name="report_last_year">Σ el último año</string>
     <string name="pref_summary_sync_setup">Puede resultar en pérdida de datos cuando se utiliza con varias personas. La sincronización siempre reemplaza todos los datos. Utilice la misma versión de Autu Mandu en todos los dispositivos.</string>
     <string name="pref_summary_restore_backup_location">Restaurar ruta predeterminada donde se almacenan copias de seguridad.</string>
+    <string name="tire_state_mounted">Montada</string>
+    <string name="tire_state_trashed">Desechada</string>
 </resources>

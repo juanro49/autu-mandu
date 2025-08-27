@@ -19,7 +19,7 @@
     <string name="about_author" translatable="false">© Jan Kühle 2012, Juanro49 2023</string>
     <string name="about_thanks">Thanks to:</string>
     <string name="about_version">Version: %s</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
+    <string name="about_git" translatable="false">https://github.com/juanro49/autu-mandu</string>
     <string name="about_licenses">Licenses</string>
     <string name="drawer_reports">Reports</string>
     <string name="drawer_calculator">Calculator</string>
@@ -31,6 +31,7 @@
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
     <string name="menu_delete">Delete</string>
+    <string name="menu_mount_umount">Mount/Umount</string>
     <string name="menu_add_car">Add car</string>
     <string name="menu_add_fuel_type">Add fuel type</string>
     <string name="menu_add_station">Add station</string>
@@ -40,6 +41,7 @@
     <string name="fab_add_refueling">Refueling</string>
     <string name="fab_add_other_expenditure">Other expenditure</string>
     <string name="fab_add_other_income">Other income</string>
+    <string name="fab_add_tires">New Tires</string>
     <string name="section_suspend">Suspend</string>
     <string name="section_advanced">Advanced options</string>
     <string name="hint_mileage_optional">Total distance (optional)</string>
@@ -59,21 +61,32 @@
     <string name="hint_user_name">User name</string>
     <string name="hint_password">Password</string>
     <string name="hint_initial_mileage">Initial mileage</string>
+    <string name="hint_num_tires">Tires number</string>
+    <string name="hint_manufacturer">Manufacturer</string>
+    <string name="hint_model">Model</string>
     <string name="hint_buying_price">Buying Price</string>
+    <string name="hint_trash_date">Trash Date</string>
     <string name="hint_reminder_after_distance">After distance</string>
     <string name="hint_reminder_after_time">After time</string>
     <string name="hint_reminder_start_mileage">Start at mileage</string>
     <string name="hint_reminder_start_date">Start at date</string>
     <string name="hint_reminder_snoozed_until">Snoozed until</string>
+    <string name="hint_mount_distance">Mount distance</string>
+    <string name="hint_umount_distance">Umount distance</string>
+    <string name="hint_mount_date">Mount date</string>
+    <string name="hint_umount_date">Umount date</string>
     <string name="label_partial">Partial</string>
     <string name="label_color_in_reports">Color in reports</string>
     <string name="label_suspend">Suspend</string>
     <string name="label_set_end_date">Set end date</string>
+    <string name="label_set_trash_date">Set trash date</string>
     <string name="label_car">Car</string>
     <string name="label_recurrence">Recurrence</string>
     <string name="label_reminder_type">Type</string>
     <string name="label_reminder_dismissed">Notification dismissed</string>
     <string name="label_trust_certificate">Trust this certificate</string>
+    <string name="label_mount_tire">Mount</string>
+    <string name="label_umount_tire">Umount</string>
     <string name="description_suspend">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports by default zoom to active cars only.</string>
     <string name="description_category">Refuelings are grouped by this category for different reports. Examples: Petrol, Diesel, Gas.</string>
     <string name="description_reminder_status_due">Due</string>
@@ -115,6 +128,8 @@
     <string name="title_edit_reminder">Edit reminder</string>
     <string name="title_add_station">Add station</string>
     <string name="title_edit_station">Edit station</string>
+    <string name="title_add_tire">Add tire</string>
+    <string name="title_edit_tire">Edit tire</string>
     <string name="cab_title_selected">%d selected</string>
     <string name="edit_title_refueling">Refueling</string>
     <string name="edit_message_no_entry_selected">No entry selected</string>
@@ -131,6 +146,8 @@
     <string name="alert_delete_station_message">The %d selected stations and asociated refuelings will be deleted.</string>
     <string name="alert_delete_reminder_message">This reminder will be deleted.</string>
     <string name="alert_delete_reminders_message">The %d selected reminders will be deleted.</string>
+    <string name="alert_delete_tire_message">The %d selected tire set will be deleted.</string>
+    <string name="alert_mount_umount_message">The selected tire set will be mounted/umounted.</string>
     <string name="alert_cannot_delete_last_car">One car cannot be deleted.</string>
     <string name="alert_cannot_delete_fuel_type">Cannot delete fuel type, because it is used by at least one refueling or fuel tank.</string>
     <string name="alert_cannot_delete_station">Cannot delete station, because it is used by at least one refueling or fuel tank.</string>
@@ -163,6 +180,7 @@
     <string name="toast_need_storage_permission">To perform this action Autu Mandu needs to have access to your files.</string>
     <string name="toast_auto_backup_succeeded">Automatic backup succeeded.</string>
     <string name="toast_auto_backup_failed">Automatic backup failed.</string>
+    <string name="toast_all_tires_mounted">The number of wheels to be mounted is greater than the number of wheels of the car.</string>
     <string name="report_title_fuel_consumption">Fuel consumption</string>
     <string name="report_title_fuel_price">Fuel price</string>
     <string name="report_title_mileage">Mileage</string>
@@ -287,6 +305,7 @@
     <string name="title_expenditures">Other Expenditures</string>
     <string name="title_income">Other Income</string>
     <string name="title_stations">Stations</string>
+    <string name="title_tires">Tires</string>
     <string name="repeat_once">Once</string>
     <string name="repeat_day">Repeat every day</string>
     <string name="repeat_month">Repeat every month</string>
@@ -298,6 +317,8 @@
     <string name="time_day">Day(s)</string>
     <string name="time_month">Month(s)</string>
     <string name="time_year">Year(s)</string>
+    <string name="tire_state_mounted">Mounted</string>
+    <string name="tire_state_trashed">Trashed</string>
     <string name="about_licenses_styles" translatable="false">
         body {
             color: #fff;

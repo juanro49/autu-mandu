@@ -72,4 +72,18 @@ public class CarPresenter {
     public int getCount() {
         return mDB.getCarDao().getAll().size();
     }
+
+    /**
+     * @return The count of tires of car.
+     */
+    public int getCarNumTires(long carId) {
+        return mDB.getCarDao().getCarNumTires(carId);
+    }
+
+    /**
+     * @return The count of mounted tires in car.
+     */
+    public int getCarNumMountedTires(long carId) {
+        return mDB.getTireDao().getNumTiresMounted(carId);
+    }
 }

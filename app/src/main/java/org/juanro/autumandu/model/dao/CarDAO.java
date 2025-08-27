@@ -17,6 +17,9 @@ public interface CarDAO {
     @Query("SELECT * FROM car WHERE _id = :id")
     Car getById(long id);
 
+    @Query("SELECT num_tires FROM car WHERE _id = :id;")
+    int getCarNumTires(long id);
+
     @Insert
     long[] insert(Car... car);
 

@@ -98,6 +98,11 @@ public class CarContentValues extends AbstractContentValues {
         return this;
     }
 
+    public CarContentValues putNumTires(int value) {
+        mContentValues.put(CarColumns.NUM_TIRES, value);
+        return this;
+    }
+
     /**
      * Make of the car.
      */

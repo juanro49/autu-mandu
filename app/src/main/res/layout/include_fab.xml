@@ -33,6 +33,17 @@
     <com.github.clans.fab.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onFABAddTiresClicked"
+        android:src="@drawable/ic_c_tire_24dp"
+        app:fab_colorNormal="@color/button_accent"
+        app:fab_colorPressed="@color/button_accent_pressed"
+        app:fab_colorRipple="@color/ripple"
+        app:fab_label="@string/fab_add_tires"
+        app:fab_size="mini"/>
+
+    <com.github.clans.fab.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:onClick="onFABAddOtherIncomeClicked"
         android:src="@drawable/ic_c_other_24dp"
         app:fab_colorNormal="@color/button_accent"

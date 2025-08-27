@@ -85,8 +85,20 @@ public class DataFragment extends Fragment implements DataListCallback,
             }
 
             if (mTxtNoEntrySelected != null) {
-                int id = position == 0 ? R.drawable.ic_c_refueling_128dp
-                        : R.drawable.ic_c_other_128dp;
+                int id;
+
+                switch(position) {
+                    case 0:
+                    case 3:
+                        id = R.drawable.ic_c_refueling_128dp;
+                        break;
+                    case 4:
+                        id = R.drawable.ic_c_tire_128dp;
+                        break;
+                    default:
+                        id = R.drawable.ic_c_other_128dp;
+                }
+
                 mTxtNoEntrySelected.setCompoundDrawablesWithIntrinsicBounds(0, id, 0, 0);
             }
         }
@@ -113,7 +125,10 @@ public class DataFragment extends Fragment implements DataListCallback,
                 case 0:
                     fragment = new DataListRefuelingFragment();
                     break;
-                case 3:
+                case 1:
+                    fragment = new DataListTireFragment();
+                    break;
+                case 4:
                     fragment = new DataListStationFragment();
                     break;
                 default:
@@ -123,10 +138,10 @@ public class DataFragment extends Fragment implements DataListCallback,
             Bundle args = new Bundle();
             args.putBoolean(AbstractDataListFragment.EXTRA_ACTIVATE_ON_CLICK, mTwoPane);
             args.putLong(AbstractDataListFragment.EXTRA_CAR_ID, mCarId);
-            if (position == 1) {
+            if (position == 2) {
                 args.putInt(DataListOtherFragment.EXTRA_OTHER_TYPE,
                         DataListOtherFragment.EXTRA_OTHER_TYPE_EXPENDITURE);
-            } else if (position == 2) {
+            } else if (position == 3) {
                 args.putInt(DataListOtherFragment.EXTRA_OTHER_TYPE,
                         DataListOtherFragment.EXTRA_OTHER_TYPE_INCOME);
             }
@@ -238,6 +253,10 @@ public class DataFragment extends Fragment implements DataListCallback,
                 Intent intent = new Intent(getActivity(), PreferencesActivity.class);
                 intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT, PreferencesStationsFragment.class.getName());
                 intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT_TITLE, R.string.pref_title_header_stations);
+            }
+            else if (edit == DataDetailActivity.EXTRA_EDIT_TIRE)
+            {
+                fragment = DataDetailTireFragment.newInstance(id);
             }
             else
             {

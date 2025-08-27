@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 
 import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dao.TireDAO;
+import org.juanro.autumandu.model.entity.TireList;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +52,8 @@ public class CarPresenterTest {
         car1.setName("Gasoline car - "+ PECULIARITY);
         car1.setColor(Color.BLUE);
         car1.setInitialMileage(0);
+        car1.setBuyingprice(6300);
+        car1.setNumTires(4);
         Car car2 = new Car();
         car2.setName("Diesel car - "+ PECULIARITY);
         car2.setColor(Color.RED);
@@ -128,6 +132,22 @@ public class CarPresenterTest {
         ref6.setVolume(10);
         ref6.setNote(PECULIARITY);
         refDAO.insert(ref1, ref2, ref3, ref4, ref5, ref6);
+
+        TireDAO tireDAO = mDB.getTireDao();
+        TireList tire1 = new TireList();
+        tire1.setCarId(mGasolineCarId);
+        tire1.setManufacturer("Insa Turbo");
+        tire1.setModel("Eco Evolution");
+        tire1.setPrice(50);
+        tire1.setQuantity(4);
+        tire1.setBuyDate(new Date());
+        TireList tire2 = new TireList();
+        tire2.setCarId(mMixedCarId);
+        tire2.setManufacturer("Insa Turbo");
+        tire2.setModel("All Season 4");
+        tire2.setPrice(60);
+        tire2.setBuyDate(new Date());
+        tireDAO.insert(tire1, tire2);
     }
 
     @After

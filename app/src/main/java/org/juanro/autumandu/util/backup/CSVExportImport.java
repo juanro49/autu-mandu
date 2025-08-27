@@ -68,6 +68,14 @@ import org.juanro.autumandu.provider.station.StationColumns;
 import org.juanro.autumandu.provider.station.StationContentValues;
 import org.juanro.autumandu.provider.station.StationCursor;
 import org.juanro.autumandu.provider.station.StationSelection;
+import org.juanro.autumandu.provider.tirelist.TireListColumns;
+import org.juanro.autumandu.provider.tirelist.TireListContentValues;
+import org.juanro.autumandu.provider.tirelist.TireListCursor;
+import org.juanro.autumandu.provider.tirelist.TireListSelection;
+import org.juanro.autumandu.provider.tireusage.TireUsageColumns;
+import org.juanro.autumandu.provider.tireusage.TireUsageContentValues;
+import org.juanro.autumandu.provider.tireusage.TireUsageCursor;
+import org.juanro.autumandu.provider.tireusage.TireUsageSelection;
 import org.juanro.autumandu.util.FileCopyUtil;
 
 public class CSVExportImport {
@@ -85,12 +93,14 @@ public class CSVExportImport {
     private Preferences prefs;
 
     private static String[] allTables = {
-            CarColumns.TABLE_NAME,
-            FuelTypeColumns.TABLE_NAME,
-            StationColumns.TABLE_NAME,
-            OtherCostColumns.TABLE_NAME,
-            RefuelingColumns.TABLE_NAME,
-            ReminderColumns.TABLE_NAME
+        CarColumns.TABLE_NAME,
+        FuelTypeColumns.TABLE_NAME,
+        StationColumns.TABLE_NAME,
+        OtherCostColumns.TABLE_NAME,
+        RefuelingColumns.TABLE_NAME,
+        ReminderColumns.TABLE_NAME,
+        TireListColumns.TABLE_NAME,
+        TireUsageColumns.TABLE_NAME,
     };
 
     public CSVExportImport(Context context) {
@@ -131,6 +141,8 @@ public class CSVExportImport {
             exportOtherCosts();
             exportRefuelings();
             exportReminders();
+            exportTireList();
+            exportTireUsages();
 
             if (!prefs.getDefaultBackupPath().equals(prefs.getBackupPath()))
             {
@@ -185,7 +197,8 @@ public class CSVExportImport {
                     car.getColor(),
                     car.getInitialMileage(),
                     CSVConvert.toString(car.getSuspendedSince()),
-                    car.getBuyingPrice()/*,
+                    car.getBuyingPrice(),
+                    car.getNumTires()/*,
                     car.getMake(),
                     car.getModel(),
                     car.getYear(),
@@ -305,6 +318,49 @@ public class CSVExportImport {
         csv.close();
     }
 
+    private void exportTireList() throws IOException {
+        CSVPrinter csv = new CSVPrinter(
+            new PrintWriter(new File(mExportDir, TireListColumns.TABLE_NAME + ".csv")),
+            mCSVFormat);
+        csv.printRecord((Object[]) TireListColumns.ALL_COLUMNS);
+
+        TireListCursor tireList = new TireListSelection().query(mContext.getContentResolver());
+        while (tireList.moveToNext()) {
+            csv.printRecord(
+                tireList.getId(),
+                CSVConvert.toString(tireList.getBuyDate()),
+                CSVConvert.toString(tireList.getTrashDate()),
+                CSVConvert.toString(tireList.getPrice()),
+                tireList.getQuantity(),
+                tireList.getManufacturer(),
+                tireList.getModel(),
+                tireList.getNote(),
+                tireList.getCarId());
+        }
+
+        csv.close();
+    }
+
+    private void exportTireUsages() throws IOException {
+        CSVPrinter csv = new CSVPrinter(
+            new PrintWriter(new File(mExportDir, TireUsageColumns.TABLE_NAME + ".csv")),
+            mCSVFormat);
+        csv.printRecord((Object[]) TireUsageColumns.ALL_COLUMNS);
+
+        TireUsageCursor tireUsage = new TireUsageSelection().query(mContext.getContentResolver());
+        while (tireUsage.moveToNext()) {
+            csv.printRecord(
+                tireUsage.getId(),
+                tireUsage.getDistanceMount(),
+                CSVConvert.toString(tireUsage.getDateMount()),
+                tireUsage.getDistanceUmount(),
+                CSVConvert.toString(tireUsage.getDateUmount()),
+                tireUsage.getTireId());
+        }
+
+        csv.close();
+    }
+
     public boolean allExportFilesExist() {
         for (String table : allTables) {
             File file = new File(mExportDir, table + ".csv");
@@ -408,6 +464,8 @@ public class CSVExportImport {
             operations.addAll(importOtherCosts());
             operations.addAll(importRefuelings());
             operations.addAll(importReminders());
+            operations.addAll(importTireList());
+            operations.addAll(importTireUsages());
 
             mContext.getContentResolver().applyBatch(DataProvider.AUTHORITY, operations);
         } catch (CSVImportException e) {
@@ -446,6 +504,7 @@ public class CSVExportImport {
             values.putSuspendedSince(suspensionDate);
             //noinspection ConstantConditions
             values.putBuyingPrice(CSVConvert.toFloat(record.get(CarColumns.BUYING_PRICE)));
+            values.putNumTires(CSVConvert.toInteger(record.get(CarColumns.NUM_TIRES)));
             /*values.putMake(record.get(CarColumns.MAKE));
             values.putModel(record.get(CarColumns.MODEL));
             //noinspection ConstantConditions
@@ -742,4 +801,112 @@ public class CSVExportImport {
         return operations;
     }
 
+    private ArrayList<ContentProviderOperation> importTireList() throws IOException, CSVImportException {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
+        CSVParser csv = CSVParser.parse(
+            new File(mExportDir, TireListColumns.TABLE_NAME + ".csv"),
+            Charset.defaultCharset(),
+            mCSVFormat);
+
+        for (CSVRecord record : csv) {
+            Long id = CSVConvert.toLong(record.get(TireListColumns._ID));
+
+            TireListContentValues values = new TireListContentValues();
+            values.putManufacturer(record.get(TireListColumns.MANUFACTURER));
+            values.putModel(record.get(TireListColumns.MODEL));
+            Date buyDate = CSVConvert.toDate(record.get(TireListColumns.BUY_DATE));
+            if (buyDate == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putBuyDate(buyDate);
+            values.putQuantity(CSVConvert.toInteger(record.get(TireListColumns.QUANTITY)));
+            values.putPrice(CSVConvert.toFloat(record.get(TireListColumns.PRICE)));
+            Date trashDate = CSVConvert.toDate(record.get(TireListColumns.TRASH_DATE));
+            if (!record.get(TireListColumns.TRASH_DATE).isEmpty() && trashDate == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putTrashDate(trashDate);
+            values.putNote(record.get(TireListColumns.NOTE));
+            values.putCarId(CSVConvert.toLong(record.get(TireListColumns.CAR_ID)));
+
+            boolean updated = false;
+            if (id != null) {
+                TireListSelection selection = new TireListSelection().id(id);
+                TireListCursor tireList = selection.query(mContext.getContentResolver());
+                if (tireList.getCount() > 0) {
+                    operations.add(ContentProviderOperation.newUpdate(values.uri())
+                        .withSelection(selection.sel(), selection.args())
+                        .withValues(values.values())
+                        .build());
+                    updated = true;
+                }
+            }
+
+            if (!updated) {
+                if (id != null) {
+                    values.values().put(TireListColumns._ID, id);
+                }
+
+                operations.add(ContentProviderOperation.newInsert(values.uri())
+                    .withValues(values.values())
+                    .build());
+            }
+        }
+
+        return operations;
+    }
+
+    private ArrayList<ContentProviderOperation> importTireUsages() throws IOException, CSVImportException {
+        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+
+        CSVParser csv = CSVParser.parse(
+            new File(mExportDir, TireUsageColumns.TABLE_NAME + ".csv"),
+            Charset.defaultCharset(),
+            mCSVFormat);
+
+        for (CSVRecord record : csv) {
+            Long id = CSVConvert.toLong(record.get(TireUsageColumns._ID));
+
+            TireUsageContentValues values = new TireUsageContentValues();
+            values.putDistanceMount(CSVConvert.toInteger(record.get(TireUsageColumns.DISTANCE_MOUNT)));
+            Date dateMount = CSVConvert.toDate(record.get(TireUsageColumns.DATE_MOUNT));
+            if (dateMount == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putDateMount(dateMount);
+            values.putDistanceUmount(CSVConvert.toInteger(record.get(TireUsageColumns.DISTANCE_UMOUNT)));
+            Date dateUmount = CSVConvert.toDate(record.get(TireUsageColumns.DATE_UMOUNT));
+            if (!record.get(TireUsageColumns.DATE_UMOUNT).isEmpty() && dateUmount == null) {
+                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
+            }
+            values.putDateUmount(dateUmount);
+            values.putTireId(CSVConvert.toLong(record.get(TireUsageColumns.TIRE_ID)));
+
+            boolean updated = false;
+            if (id != null) {
+                TireUsageSelection selection = new TireUsageSelection().id(id);
+                TireUsageCursor tireUsage = selection.query(mContext.getContentResolver());
+                if (tireUsage.getCount() > 0) {
+                    operations.add(ContentProviderOperation.newUpdate(values.uri())
+                        .withSelection(selection.sel(), selection.args())
+                        .withValues(values.values())
+                        .build());
+                    updated = true;
+                }
+            }
+
+            if (!updated) {
+                if (id != null) {
+                    values.values().put(TireUsageColumns._ID, id);
+                }
+
+                operations.add(ContentProviderOperation.newInsert(values.uri())
+                    .withValues(values.values())
+                    .build());
+            }
+        }
+
+        return operations;
+    }
 }

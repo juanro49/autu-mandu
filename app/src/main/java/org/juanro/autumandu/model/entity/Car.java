@@ -31,6 +31,8 @@ public class Car implements ICar {
     @ColumnInfo(name = "buying_price")
     private double buyingprice = 0;
 
+    @ColumnInfo(name = "num_tires")
+    private int numTires = 4;
     /*@ColumnInfo(name = "make")
     private String make;
 
@@ -49,12 +51,13 @@ public class Car implements ICar {
     public Car() {}
 
     @Ignore
-    public Car(@NonNull String name, int color, int initialMileage, Date suspension, double buyingPrice/*, Date buyingDate, String make, String model, String licensePlate, int year*/) {
+    public Car(@NonNull String name, int color, int initialMileage, Date suspension, double buyingprice, int numTires/*, Date buyingDate, String make, String model, String licensePlate, int year*/) {
         this.setName(name);
         this.setColor(color);
         this.setInitialMileage(initialMileage);
         this.setSuspension(suspension);
-        this.setBuyingprice(buyingPrice);
+        this.setBuyingprice(buyingprice);
+        this.setNumTires(numTires);
         /*this.setBuyingdate(buyingDate);
         this.setMake(make);
         this.setModel(model);
@@ -117,6 +120,17 @@ public class Car implements ICar {
     public void setBuyingprice(double buyingprice)
     {
         this.buyingprice = buyingprice;
+    }
+
+    @Override
+    public int getNumTires()
+    {
+        return numTires;
+    }
+
+    public void setNumTires(int numTires)
+    {
+        this.numTires = numTires;
     }
 
     /*@Override

@@ -285,6 +285,10 @@ public class MainActivity extends AppCompatActivity implements
                 DataDetailOtherFragment.EXTRA_OTHER_TYPE_INCOME);
     }
 
+    public void onFABAddTiresClicked(View fab) {
+        handleFABClick(DataDetailActivity.EXTRA_EDIT_TIRE, -1);
+    }
+
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;

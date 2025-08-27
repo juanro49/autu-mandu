@@ -78,12 +78,26 @@
                 android:hint="@string/hint_initial_mileage"
                 android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
+        <!-- Number of tires -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_num_tires_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edt_initial_mileage_input_layout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_num_tires"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_num_tires"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
         <!-- Buying Price -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_buying_price_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_initial_mileage_input_layout">
+            android:layout_below="@id/edt_num_tires_input_layout">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_buying_price"

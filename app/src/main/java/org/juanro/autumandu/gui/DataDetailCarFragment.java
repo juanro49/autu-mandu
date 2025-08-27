@@ -50,7 +50,6 @@ import org.juanro.autumandu.provider.car.CarCursor;
 import org.juanro.autumandu.provider.car.CarSelection;
 
 public class DataDetailCarFragment extends AbstractDataDetailFragment implements SupportDatePickerDialogFragmentListener {
-    private static final int REQUEST_PICK_COLOR = 1;
     private static final int REQUEST_PICK_SUSPEND_DATE = 2;
 
     private static final String STATE_COLOR = "color";
@@ -60,6 +59,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
     private int color;
     private EditText edtInitialMileage;
     private EditText edtBuyingPrice;
+    private EditText edtNumTires;
     private CheckBox chkSuspend;
     private DateTimeInput edtSuspendDate;
     private SimpleAnimator edtSuspendDateAnimator;
@@ -102,12 +102,14 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
                 color = car.getColor();
                 edtInitialMileage.setText(String.valueOf(car.getInitialMileage()));
                 edtBuyingPrice.setText(String.valueOf(car.getBuyingPrice()));
+                edtNumTires.setText(String.valueOf(car.getNumTires()));
                 chkSuspend.setChecked(car.getSuspendedSince() != null);
                 edtSuspendDate.setDate(car.getSuspendedSince() != null ? car.getSuspendedSince() : new Date());
             } else {
                 color = getResources().getColor(R.color.accent);
                 edtInitialMileage.setText("0");
                 edtBuyingPrice.setText("0");
+                edtNumTires.setText("4");
                 edtSuspendDate.setDate(new Date());
             }
         } else {
@@ -147,6 +149,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         colorIndicator = v.findViewById(R.id.btn_color);
         edtInitialMileage = (EditText) v.findViewById(R.id.edt_initial_mileage);
         edtBuyingPrice = (EditText) v.findViewById(R.id.edt_buying_price);;
+        edtNumTires = (EditText) v.findViewById(R.id.edt_num_tires);
         chkSuspend = (CheckBox) v.findViewById(R.id.chk_suspend);
         edtSuspendDate = new DateTimeInput((EditText) v.findViewById(R.id.edt_suspend_date),
                 DateTimeInput.Mode.DATE);
@@ -199,6 +202,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment implements
         values.putColor(color);
         values.putInitialMileage(getIntegerFromEditText(edtInitialMileage, 0));
         values.putBuyingPrice(getDoubleFromEditText(edtBuyingPrice, 0));
+        values.putNumTires(getIntegerFromEditText(edtNumTires, 4));
         values.putSuspendedSince(chkSuspend.isChecked() ? edtSuspendDate.getDate() : null);
 
         if (isInEditMode()) {

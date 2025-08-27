@@ -18,6 +18,7 @@
 
     <string-array name="data_list_page_titles">
         <item>@string/title_refuelings</item>
+        <item>@string/title_tires</item>
         <item>@string/title_expenditures</item>
         <item>@string/title_income</item>
         <item>@string/title_stations</item>

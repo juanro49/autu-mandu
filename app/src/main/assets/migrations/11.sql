@@ -12,7 +12,3 @@ VALUES ("Default");
 
 ALTER TABLE refueling
     ADD COLUMN station_id INTEGER NOT NULL DEFAULT 1 REFERENCES station (_id) ON DELETE CASCADE;
-
-
-
-

@@ -26,24 +26,19 @@ import android.util.Log;
 
 import org.juanro.autumandu.BuildConfig;
 import org.juanro.autumandu.model.AutuManduDatabase;
-import org.juanro.autumandu.provider.car.CarColumns;
-import org.juanro.autumandu.provider.fueltype.FuelTypeColumns;
-import org.juanro.autumandu.provider.othercost.OtherCostColumns;
-import org.juanro.autumandu.provider.refueling.RefuelingColumns;
-import org.juanro.autumandu.provider.reminder.ReminderColumns;
-import org.juanro.autumandu.provider.station.StationColumns;
 
 @Deprecated
 public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = DataSQLiteOpenHelper.class.getSimpleName();
 
     public static final String DATABASE_FILE_NAME = "data.db";
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 13;
     private static DataSQLiteOpenHelper sInstance;
     private final Context mContext;
     private final DataSQLiteOpenHelperCallbacks mOpenHelperCallbacks;
 
     // @formatter:off
+    /*
     public static final String SQL_CREATE_TABLE_CAR = "CREATE TABLE IF NOT EXISTS "
             + CarColumns.TABLE_NAME + " ( "
             + CarColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -114,7 +109,7 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
             + ReminderColumns.CAR_ID + " INTEGER NOT NULL "
             + ", CONSTRAINT fk_car_id FOREIGN KEY (" + ReminderColumns.CAR_ID + ") REFERENCES car (_id) ON DELETE CASCADE"
             + " );";
-
+     */
     // @formatter:on
 
     /**
@@ -147,6 +142,8 @@ public class DataSQLiteOpenHelper extends SQLiteOpenHelper {
         roomDB.getOtherCostDao().getAll();
         roomDB.getRefuelingDao().getAll();
         roomDB.getReminderDao().getAll();
+        roomDB.getTireDao().getAllTires();
+        roomDB.getTireDao().getAllTireUsages();
 
         String name = roomDB.getOpenHelper().getDatabaseName();
         Log.d(TAG, String.format("Using database at %s via classic content provider.",

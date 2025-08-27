@@ -58,8 +58,8 @@ public class FuelTypePresenterTest {
         Station st1 = new Station("Iberdoex");
         Station st2 = new Station("Campoex");
 
-        Car car1 = new Car("Gasoline Car - "+PECULIARITY, 0, 0, null, 0);
-        Car car2 = new Car("Mixed Car - "+PECULIARITY, 0, 0, null,0);
+        Car car1 = new Car("Gasoline Car - "+PECULIARITY, 0, 0, null, 0, 4);
+        Car car2 = new Car("Mixed Car - "+PECULIARITY, 0, 0, null,0, 4);
 
         long[] ftIds = ftDAO.insert(ft1, ft2, ft3, ft4);
         mFuelType1Id = ftIds[0];

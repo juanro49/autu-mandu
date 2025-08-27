@@ -193,8 +193,13 @@ public class CarSelection extends AbstractSelection<CarSelection> {
         return this;
     }
 
-    public CarSelection BuyingPrice(double... value) {
+    public CarSelection buyingPrice(double... value) {
         addEquals(CarColumns.BUYING_PRICE, toObjectArray(value));
+        return this;
+    }
+
+    public CarSelection numTires(int... value) {
+        addEquals(CarColumns.NUM_TIRES, toObjectArray(value));
         return this;
     }
 

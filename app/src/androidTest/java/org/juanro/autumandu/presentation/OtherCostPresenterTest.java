@@ -42,7 +42,7 @@ public class OtherCostPresenterTest {
         mDB = AutuManduDatabase.getInstance(mContext);
 
         CarDAO carDAO = mDB.getCarDao();
-        car1 = new Car("car1-"+PECULIARITY, Color.BLUE, 0, new Date(), 0);
+        car1 = new Car("car1-"+PECULIARITY, Color.BLUE, 0, new Date(), 0, 4);
         car1.setId(carDAO.insert(car1)[0]);
 
         OtherCostDAO ocDAO = mDB.getOtherCostDao();
