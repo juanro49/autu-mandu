@@ -9,8 +9,8 @@ android {
         applicationId "org.juanro.autumandu"
         minSdkVersion 21
         targetSdk versions.targetSdk
-        versionCode 404
-        versionName "4.0.4"
+        versionCode 500
+        versionName "5.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -85,26 +85,26 @@ dependencies {
     implementation 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
 
     // CSV
-    implementation 'org.apache.commons:commons-csv:1.12.0'
+    implementation 'org.apache.commons:commons-csv:1.14.1'
 
     // Filesystem tools
-    implementation 'androidx.documentfile:documentfile:1.1.0-alpha01'
+    implementation 'androidx.documentfile:documentfile:1.1.0'
 
     // Support, AppCompat
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.4.0-rc01'
-    implementation 'com.google.android.material:material:1.13.0-alpha08'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
-    implementation 'androidx.fragment:fragment:1.8.5'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'com.google.android.material:material:1.14.0-alpha04'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.fragment:fragment:1.8.9'
 
     // Room Persistence
-    implementation 'androidx.room:room-runtime:2.7.0-alpha11'
-    annotationProcessor 'androidx.room:room-compiler:2.7.0-alpha11'
+    implementation 'androidx.room:room-runtime:2.8.0-rc01'
+    annotationProcessor 'androidx.room:room-compiler:2.8.0-rc01'
 
     // WebDAV
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.14'
+    implementation 'com.squareup.okhttp3:okhttp:5.1.0'
 
     // UI Helpers
     implementation 'com.github.clans:fab:1.6.4'
@@ -113,9 +113,9 @@ dependencies {
     implementation 'com.github.Dhaval2404:ColorPicker:2.3'
 
     // Joda-Time for Android
-    implementation 'net.danlew:android.joda:2.13.0'
+    implementation 'net.danlew:android.joda:2.13.1'
 
     // Required for instrumented tests
     androidTestImplementation 'androidx.annotation:annotation:1.9.1'
-    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
 }
