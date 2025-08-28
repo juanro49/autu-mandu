@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Semaphore;
 
+import org.juanro.autumandu.Application;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.provider.DataProvider;
 import org.juanro.autumandu.provider.car.CarColumns;
@@ -180,6 +181,7 @@ public class CSVExportImport {
             throw new CSVImportException(e);
         } finally {
             mImExportSemaphore.release();
+            Application.closeDatabases();
         }
     }
 

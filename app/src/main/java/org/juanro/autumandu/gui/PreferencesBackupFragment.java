@@ -261,9 +261,9 @@ public class PreferencesBackupFragment extends PreferenceFragment implements
                     getString(R.string.alert_backup_overwrite_message),
                     R.string.overwrite, android.R.string.cancel)
                     .show(getFragmentManager(), null);
-        } else if (mBackup.backup()) {
+        } else if (mBackup.backup(true)) {
             Toast.makeText(getActivity(),
-                    getString(R.string.toast_backup_succeeded, mBackup.getBackupDir().getUri().toString()),
+                    getString(R.string.toast_backup_succeeded, mBackup.getBackupDir().getUri()),
                     Toast.LENGTH_SHORT).show();
             setupRestorePreference();
         } else {

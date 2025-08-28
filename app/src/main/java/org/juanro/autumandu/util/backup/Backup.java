@@ -87,7 +87,7 @@ public class Backup {
         if (backupFileExists() || !prefs.getAutoBackupEnabled()) {
             return null;
         } else {
-            boolean rtn = backup();
+            boolean rtn = backup(false);
             if (rtn) {
                 DocumentFile backupDir = getBackupDir();
                 DocumentFile[] allFiles = backupDir.listFiles();
@@ -112,16 +112,29 @@ public class Backup {
      * Trigger a backup.
      * @return Whether the database was backed successfully.
      */
-    public boolean backup() {
+    public boolean backup(boolean replace) {
         Application.closeDatabases();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         DocumentFile backupFile = getBackupDir().createFile("*/*", "cr-" + df.format(new Date()) + ".db");
-        //File backupFile = getBackupFile();
-        //File backupDir = backupFile.getParentFile();
-
         ParcelFileDescriptor pfd = null;
+
+        if (backupFile == null && replace) {
+            DocumentFile file = getBackupDir().findFile("cr-" + df.format(new Date()) + ".db");
+
+            if (file != null && file.isFile()) {
+                file.delete();
+                backupFile = getBackupDir().createFile("*/*", "cr-" + df.format(new Date()) + ".db");
+            }
+        }
+
         try {
-            pfd = resolver.openFileDescriptor(backupFile.getUri(), "w");
+            if (backupFile != null) {
+                pfd = resolver.openFileDescriptor(backupFile.getUri(), "w");
+            }
+            else {
+                Log.e(TAG, "Backup error, can't create file in path: " + getBackupDir().getUri());
+                return false;
+            }
         } catch (FileNotFoundException e) {
             Log.e(TAG, "Backup error " + e.getMessage());
             return false;
@@ -132,9 +145,8 @@ public class Backup {
 
     public boolean backupFileExists() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Uri filePath = Uri.parse(getBackupDir().getUri().toString() + "%2Fcr-" + df.format(new Date()) + ".db");
-        DocumentFile file = DocumentFile.fromSingleUri(mContext, filePath);
-        return file != null ? file.isFile() : false;
+        DocumentFile file = getBackupDir().findFile("cr-" + df.format(new Date()) + ".db");
+        return file != null && file.isFile();
     }
 
     /**

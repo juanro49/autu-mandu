@@ -32,7 +32,6 @@ import java.util.Date;
 import androidx.multidex.MultiDexApplication;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.provider.DataProvider;
-import org.juanro.autumandu.provider.DataSQLiteOpenHelper;
 import org.juanro.autumandu.util.reminder.ReminderEnablerReceiver;
 import org.juanro.autumandu.util.reminder.ReminderService;
 import org.juanro.autumandu.util.sync.Authenticator;
@@ -49,7 +48,6 @@ public class Application extends MultiDexApplication {
         if (instance != null) {
             Log.v(TAG, "Closing Database via abstraction layers.");
             AutuManduDatabase.resetInstance();
-            DataSQLiteOpenHelper.resetInstance();
         }
     }
 

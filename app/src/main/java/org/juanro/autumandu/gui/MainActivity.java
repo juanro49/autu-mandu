@@ -50,6 +50,7 @@ import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.Date;
 
+import org.juanro.autumandu.Application;
 import org.juanro.autumandu.BuildConfig;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
@@ -349,6 +350,8 @@ public class MainActivity extends AppCompatActivity implements
             ContentResolver.removeStatusChangeListener(mSyncHandle);
             mSyncHandle = null;
         }
+
+        Application.closeDatabases();
     }
 
     @Override
