@@ -1,3 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="about_version">Sürüm: %s</string>
+    <string name="about_licenses">Lisanslar</string>
+    <string name="drawer_settings">Ayarlar</string>
+    <string name="drawer_help">Yardım</string>
+    <string name="drawer_open">Navigasyonu aç</string>
+    <string name="drawer_close">Navigasyonu kapat</string>
+    <string name="menu_synchronize">Eşitle</string>
+    <string name="menu_save">Bitti</string>
+    <string name="menu_cancel">İptal</string>
+    <string name="menu_delete">Sil</string>
+    <string name="menu_add_car">Araba ekle</string>
+    <string name="menu_add_fuel_type">Yakıt türü ekle</string>
+    <string name="menu_add_reminder">Hatırlatıcı ekle</string>
+    <string name="menu_show_trend">Trendleri göster</string>
+    <string name="fab_add_tires">Yeni Lastikler</string>
+    <string name="section_advanced">Gelişmiş seçenekler</string>
+    <string name="hint_mileage_optional">Toplam uzaklık (isteğe bağlı)</string>
+    <string name="hint_price">Fiyat</string>
+    <string name="hint_price_total">Toplam fiyat</string>
+    <string name="hint_price_per_unit">Ünite başına fiyat</string>
+    <string name="hint_note_optional">Not (isteğe bağlı)</string>
+    <string name="hint_title">Başlık</string>
+    <string name="hint_name">Ad</string>
+    <string name="hint_date">Tarih</string>
+    <string name="hint_time">Saat</string>
+    <string name="hint_category">Kategori</string>
+    <string name="hint_url">URL</string>
+    <string name="hint_user_name">Kullanıcı adı</string>
+    <string name="hint_password">Şifre</string>
+    <string name="hint_num_tires">Lastik numarası</string>
+    <string name="hint_manufacturer">İmalatçı</string>
+    <string name="hint_model">Model</string>
+    <string name="label_partial">Kısmen</string>
 </resources>
