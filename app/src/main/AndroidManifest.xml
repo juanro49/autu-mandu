@@ -19,9 +19,6 @@
           xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Purpose: backup/restore, CSV export/import -->
-    <uses-permission
-        android:name="android.permission.AUTHENTICATE_ACCOUNTS"
-        android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
@@ -29,6 +26,7 @@
     <!-- Purpose: sync -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" android:maxSdkVersion="22" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
@@ -39,17 +37,18 @@
 
     <application
         android:name="Application"
-        android:allowBackup="true"
-        android:description="@string/app_description"
-        android:fullBackupContent="@xml/backup_scheme"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:description="@string/app_description"
+        android:theme="@style/AppTheme"
+        android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_scheme"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="33">
 
         <activity
             android:name=".gui.MainActivity"
-            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar.NavigationDrawer"
             android:exported="true">
             <intent-filter>
@@ -129,7 +128,5 @@
 
         <!-- For 2018-style testing !-->
         <uses-library android:name="android.test.runner" android:required="false" />
-
     </application>
-
 </manifest>
