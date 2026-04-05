@@ -1,14 +1,15 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
+    compileSdk 36
     namespace 'org.juanro.autumandu'
 
     defaultConfig {
         applicationId "org.juanro.autumandu"
-        minSdkVersion 21
-        targetSdk versions.targetSdk
+        minSdk 23
+        targetSdk 36
         versionCode 500
         versionName "5.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -21,21 +22,16 @@ android {
         }
     }
 
-    signingConfigs {
-        release {
-            keyAlias signing_key_alias
-            keyPassword signing_key_password
-            storeFile file(signing_key_store_file)
-            storePassword signing_key_store_password
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+
+            // No incluir metadatos de Git en el APK final
+            vcsInfo {
+                include = false
+            }
         }
     }
 
@@ -43,31 +39,38 @@ android {
         buildConfig = true
     }
 
-    flavorDimensions "default"
-    productFlavors {
-        foss {
-            dimension "default"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // JVM Toolchain para garantizar consistencia en cualquier entorno
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
         }
     }
 
     lint {
         checkReleaseBuilds false
+        abortOnError false
     }
 
-    packagingOptions {
-        resources {
-            excludes += ['META-INF/LICENSE']
-        }
+    packaging {
+        resources.excludes.addAll([
+                'META-INF/DEPENDENCIES',
+                'META-INF/NOTICE',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/NOTICE.txt',
+                'META-INF/ASL2.0',
+                'META-INF/*.kotlin_module',
+                'META-INF/AL2.0',
+                'META-INF/LGPL2.1'
+        ])
+        // Asegura que las librerías nativas se empaqueten de forma determinista para F-Droid
+        jniLibs.useLegacyPackaging = true
     }
-
-    //compileOptions {
-    //    sourceCompatibility JavaVersion.VERSION_1_8
-    //    targetCompatibility JavaVersion.VERSION_1_8
-    //}
-
-    // 2018 style of testing
-    useLibrary 'android.test.runner'
-    useLibrary 'android.test.base'
 
     dependenciesInfo {
         // Disables dependency metadata when building APKs.
@@ -77,45 +80,45 @@ android {
     }
 }
 
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.outputs.each { output ->
+            output.outputFileName.set("Autu-Mandu_${android.defaultConfig.versionName}.apk")
+        }
+    }
+}
+
 dependencies {
-    // Multidex
-    implementation 'com.android.support:multidex:1.0.3'
-
-    // Charts
-    implementation 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
-
-    // CSV
-    implementation 'org.apache.commons:commons-csv:1.14.1'
-
-    // Filesystem tools
-    implementation 'androidx.documentfile:documentfile:1.1.0'
-
-    // Support, AppCompat
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    // --- AndroidX & Support ---
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
-    implementation 'com.google.android.material:material:1.14.0-alpha04'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'androidx.fragment:fragment:1.8.9'
+    implementation 'androidx.documentfile:documentfile:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-    // Room Persistence
-    implementation 'androidx.room:room-runtime:2.8.0-rc01'
-    annotationProcessor 'androidx.room:room-compiler:2.8.0-rc01'
-
-    // WebDAV
-    implementation 'com.squareup.okhttp3:okhttp:5.1.0'
-
-    // UI Helpers
+    // --- UI & Material Design ---
+    implementation 'com.google.android.material:material:1.13.0'
     implementation 'com.github.clans:fab:1.6.4'
-    implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
-    implementation 'de.psdev.licensesdialog:licensesdialog:2.2.0'
     implementation 'com.github.Dhaval2404:ColorPicker:2.3'
 
-    // Joda-Time for Android
-    implementation 'net.danlew:android.joda:2.13.1'
+    // --- Data & Persistence ---
+    implementation 'androidx.room:room-runtime:2.8.4'
+    annotationProcessor 'androidx.room:room-compiler:2.8.4'
 
-    // Required for instrumented tests
+    // --- Utils & Network ---
+    implementation 'com.squareup.okhttp3:okhttp:5.3.2'
+    implementation 'org.apache.commons:commons-csv:1.14.1'
+    implementation 'net.danlew:android.joda:2.14.1'
+
+    // --- External Charts & UI ---
+    implementation 'com.github.gudatcomputers:hellocharts-android:ba603174d302931c0985afb4e54d597fba28146b'
+    implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
+    implementation 'de.psdev.licensesdialog:licensesdialog:2.2.0'
+
+    // --- Testing ---
     androidTestImplementation 'androidx.annotation:annotation:1.9.1'
     androidTestImplementation 'androidx.test:runner:1.7.0'
 }
