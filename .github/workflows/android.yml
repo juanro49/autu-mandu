@@ -1,4 +1,4 @@
-name: Android CI
+name: Android CI (Dual Build)
 
 on:
   push:
@@ -7,16 +7,16 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
-
+  # 1. Proceso de compilación estándar (Desarrollo)
+  build-standard:
+    name: Standard Build (JDK 21)
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
-    - name: set up JDK 17
+    - name: set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
         cache: gradle
 
@@ -24,3 +24,50 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+
+  # 2. Proceso de F-Droid (Réplica del Buildserver oficial)
+  build-fdroid:
+    name: F-Droid Buildserver Mirror
+    runs-on: ubuntu-latest
+    container:
+      image: registry.gitlab.com/fdroid/fdroidserver:buildserver-trixie
+    
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Prepare Environment (F-Droid Style)
+      run: |
+        apt-get update
+        apt-get install -y openjdk-21-jdk-headless sudo git curl python3-yaml
+        update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+        # Sincronizamos el SDK path con el del servidor de F-Droid
+        ln -s $ANDROID_SDK_ROOT /opt/android-sdk || true
+
+    - name: Download Auditor Tools
+      run: |
+        rm -rf gradlew-fdroid_repo fdroiddata_repo
+        git clone --depth 1 https://gitlab.com/fdroid/gradlew-fdroid.git gradlew-fdroid_repo
+        git clone --depth 1 https://gitlab.com/fdroid/fdroiddata.git fdroiddata_repo
+
+    - name: Run F-Droid Build (Audit Mode)
+      run: ./gradlew-fdroid_repo/gradlew-fdroid :app:assembleRelease
+      env:
+        JAVA_HOME: /usr/lib/jvm/java-21-openjdk-amd64
+        ANDROID_HOME: /opt/android-sdk
+
+    - name: Audit Gradle (Using official fdroiddata tools)
+      run: |
+        # Usamos el script de auditoría del repo oficial fdroid/fdroiddata
+        python3 fdroiddata_repo/tools/audit-gradle.py org.juanro.feedtv
+
+    - name: Cleanup Repos (Always run)
+      if: always()
+      run: |
+        echo "Limpiando repositorios de herramientas de F-Droid..."
+        rm -rf gradlew-fdroid_repo fdroiddata_repo
