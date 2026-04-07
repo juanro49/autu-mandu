@@ -4,18 +4,18 @@ Categories:
 License: Apache-2.0
 AuthorName: Juanro49
 AuthorEmail: juanro49+git@getgoogleoff.me
-WebSite: github.com/juanro49/autu-mandu
-SourceCode: github.com/juanro49/autu-mandu
-IssueTracker: github.com/juanro49/autu-manduissues
+WebSite: https://github.com/juanro49/autu-mandu
+SourceCode: https://github.com/juanro49/autu-mandu
+IssueTracker: https://github.com/juanro49/autu-manduissues
 Translation: https://hosted.weblate.org/projects/autu-mandu/
-Changelog: github.com/juanro49/autu-mandu/releases
+Changelog: https://github.com/juanro49/autu-mandu/releases
 Donate: https://coindrop.to/juanro49
 Liberapay: juanro49
 
 AutoName: Autu Mandu
 
 RepoType: git
-Repo: github.com/juanro49/autu-mandu
+Repo: https://github.com/juanro49/autu-mandu
 Binaries: https://github.com/juanro49/autu-mandu/releases/download/%v/Autu-Mandu_%v.apk
 
 Builds:
