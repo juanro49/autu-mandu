@@ -7,67 +7,102 @@ on:
     branches: [ "master" ]
 
 jobs:
-  # 1. Proceso de compilación estándar (Desarrollo)
+  # --- 1: Compilación Estándar ---
   build-standard:
-    name: Standard Build (JDK 21)
+    name: ✯ Standard Build (Ubuntu)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: gradle
+      - uses: actions/checkout@v4
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
+      - name: Build with Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease
 
-  # 2. Proceso de F-Droid (Réplica del Buildserver oficial)
+      - name: Upload Standard APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: standard-apk
+          path: app/build/outputs/apk/release/*.apk
+
+  # --- 2: Compilación F-Droid ---
   build-fdroid:
-    name: F-Droid Buildserver Mirror
+    name: ✯ F-Droid Build
     runs-on: ubuntu-latest
-    container:
-      image: registry.gitlab.com/fdroid/fdroidserver:buildserver-trixie
-    
-    defaults:
-      run:
-        shell: bash
-
+    container: registry.gitlab.com/fdroid/fdroidserver:buildserver-trixie
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install F-Droid Server Master
+        run: |
+          apt-get update && apt-get install -y --no-install-recommends curl git python3-pip python3-setuptools
+          mkdir -p /opt/fdroidserver
+          curl --silent https://gitlab.com/fdroid/fdroidserver/-/archive/master/fdroidserver-master.tar.gz | tar -xz --directory=/opt/fdroidserver --strip-components=1
+          cd /opt/fdroidserver
+          pip3 install --break-system-packages .
+      - name: Build with F-Droid
+        run: |
+          export LANG=en_US.UTF-8
 
-    - name: Prepare Environment (F-Droid Style)
-      run: |
-        apt-get update
-        apt-get install -y openjdk-21-jdk-headless sudo git curl python3-yaml
-        update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
-        # Sincronizamos el SDK path con el del servidor de F-Droid
-        ln -s $ANDROID_SDK_ROOT /opt/android-sdk || true
+          # 1. Estructura para F-Droid (Copia física completa, incluyendo .git)
+          mkdir -p /tmp/src
+          cp -a . /tmp/src/
+          mkdir -p build/org.juanro.autumandu
+          cp -a /tmp/src/. build/org.juanro.autumandu/
 
-    - name: Download Auditor Tools
-      run: |
-        rm -rf gradlew-fdroid_repo fdroiddata_repo
-        git clone --depth 1 https://gitlab.com/fdroid/gradlew-fdroid.git gradlew-fdroid_repo
-        git clone --depth 1 https://gitlab.com/fdroid/fdroiddata.git fdroiddata_repo
+          # 2. Modificar YAML para el CI (sin Binaries y con commit actual)
+          sed -i '/Binaries:/d' metadata/org.juanro.autumandu.yml
+          sed -i "s/commit: .*/commit: $GITHUB_SHA/" metadata/org.juanro.autumandu.yml
 
-    - name: Run F-Droid Build (Audit Mode)
-      run: ./gradlew-fdroid_repo/gradlew-fdroid :app:assembleRelease
-      env:
-        JAVA_HOME: /usr/lib/jvm/java-21-openjdk-amd64
-        ANDROID_HOME: /opt/android-sdk
+          # 3. Garantizar que F-Droid encuentre el commit localmente
+          git config --global --add safe.directory "*"
+          cd "build/org.juanro.autumandu"
+          git config user.email "ci@fdroid.org"
+          git config user.name "F-Droid CI"
+          git tag -f "$GITHUB_SHA"
 
-    - name: Audit Gradle (Using official fdroiddata tools)
-      run: |
-        # Usamos el script de auditoría del repo oficial fdroid/fdroiddata
-        python3 fdroiddata_repo/tools/audit-gradle.py org.juanro.feedtv
+          # 4. Configuración de entorno y ejecución
+          cd $GITHUB_WORKSPACE
+          ln -s $ANDROID_SDK_ROOT /opt/android-sdk || true
+          echo "sdk_path: /opt/android-sdk" > "config.yml"
+          echo "java_paths: { 21: /usr/lib/jvm/java-21-openjdk-amd64 }" >> "config.yml"
 
-    - name: Cleanup Repos (Always run)
-      if: always()
-      run: |
-        echo "Limpiando repositorios de herramientas de F-Droid..."
-        rm -rf gradlew-fdroid_repo fdroiddata_repo
+          fdroid rewritemeta org.juanro.autumandu
+          fdroid readmeta
+          fdroid build --verbose --on-server --no-tarball org.juanro.autumandu
+        env:
+          ANDROID_HOME: /opt/android-sdk
+      - name: Upload F-Droid APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: fdroid-apk
+          path: unsigned/*.apk
+
+  # --- 3: Comparación ---
+  compare:
+    name: 🔍 Binary Comparison
+    needs: [build-standard, build-fdroid]
+    runs-on: ubuntu-slim
+    steps:
+      - name: Install Diffoscope
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends diffoscope
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: builds
+      - name: Run Comparison
+        run: |
+          STANDARD_APK=$(find builds/standard-apk -name "*.apk" | head -n 1)
+          FDROID_APK=$(find builds/fdroid-apk -name "*.apk" | head -n 1)
+          echo "### Comparando Binarios ###"
+          echo "Estándar: $STANDARD_APK"
+          echo "F-Droid: $FDROID_APK"
+          diffoscope --text-color=always "$STANDARD_APK" "$FDROID_APK" || (echo "¡ERROR: Diferencia binaria detectada!" && exit 1)
+          echo "¡ÉXITO: El commit $GITHUB_SHA es 100% reproducible bit a bit!"
