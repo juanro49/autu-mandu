@@ -4,19 +4,21 @@ in mehreren Dateien verteilt. Um das dazugehörige Auto einer Tankfüllung zu fi
 Id Spalte der cars Tabelle.</p>
 
 <h1>Spalten</h1>
-<big>cars</big>
+<h2>car</h2>
 <p>_id: [int]<br>
 car__name: [string]<br>
 color: [int] In <a href="http://developer.android.com/reference/android/graphics/Color.html">der Android Dokumentation für Color</a> finden Sie detaillierte Informationen darüber, wie der Farbwert berechnet wird.<br>
 initial_mileage: [int] Initialer Kilometerstand, wenn Sie anfangen das Auto mit der App zu benutzen.<br>
-suspended_since: [date]</p>
+suspended_since: [date]<br>
+buying_price: [float] Kaufpreis des Fahrzeugs.<br>
+num_tires: [int] Anzahl der Reifen des Fahrzeugs.</p>
 
-<big>fuel_types</big>
+<h2>fuel_type</h2>
 <p>_id: [int]<br>
 fuel_type__name: [string]<br>
 category: [string]</p>
 
-<big>other_costs</big>
+<h2>other_cost</h2>
 <p>_id: [int]<br>
 car_id: [int] die Id des Autos.<br>
 mileage: [int] der Gesamtkilometerstand.<br>
@@ -28,18 +30,19 @@ date: [date]<br>
 note: [string]<br>
 end_date: [date] Beende die Wiederholungen an diesem Datum.</p>
 
-<big>refuelings</big>
+<h2>refueling</h2>
 <p>_id: [int]<br>
 partial: [bool] (1 oder 0)<br>
 date: [date]<br>
 note: [string]<br>
 volume: [float]<br>
-fuel_type: [int] die Id der Spritart.<br>
+fuel_type_id: [int] die Id der Spritart.<br>
+station_id: [int] die Id der Tankstelle.<br>
 price: [float]<br>
 mileage: [int] der Gesamtkilometerstand.<br>
 car_id: [int] die Id des Autos.</p>
 
-<big>reminders</big>
+<h2>reminder</h2>
 <p>_id: [int]<br>
 title: [string]<br>
 after_time_span_unit: [int] 0 = Tage, 1 = Monate, 2 = Jahre<br>
@@ -50,3 +53,26 @@ start_mileage: [int]<br>
 car_id: [int] die Id des Autos.<br>
 notification_dismissed: [bool] (1 oder 0)<br>
 snoozed_until: [date]</p>
+
+<h2>station</h2>
+<p>_id: [int]<br>
+station__name: [string] Name der Tankstelle.</p>
+
+<h2>tire_list</h2>
+<p>_id: [int]<br>
+buy_date: [date]<br>
+trash_date: [date] Datum, an dem die Reifen entsorgt wurden.<br>
+price: [float]<br>
+quantity: [int]<br>
+manufacturer: [string]<br>
+model: [string]<br>
+note: [string]<br>
+car_id: [int] die Id des Autos.</p>
+
+<h2>tire_usage</h2>
+<p>_id: [int]<br>
+distance_mount: [int] Kilometerstand bei Montage.<br>
+date_mount: [date]<br>
+distance_umount: [int] Kilometerstand bei Demontage.<br>
+date_umount: [date]<br>
+tire_id: [int] die Id des Reifens aus der Tabelle tire_list.</p>

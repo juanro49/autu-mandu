@@ -5,7 +5,7 @@
     nella colonna Id della tabella auto.</p>
 
 <h1>Colonne</h1>
-<big>cars</big>
+<h2>car</h2>
 <p>_id: [int]<br>
     car__name: [string]<br>
     color: [int] Fai riferimento alla <a
@@ -13,14 +13,16 @@
         colori Android</a> per una descrizione più dettagliata su come sono calcolati i valori.<br>
     initial_mileage: [int] Distanza iniziale percorsa dall'auto, quando si inizia ad usare
     l'applicazione.<br>
-    suspended_since: [date]</p>
+    suspended_since: [date]<br>
+    buying_price: [float] Prezzo di acquisto del veicolo.<br>
+    num_tires: [int] Numero di pneumatici del veicolo.</p>
 
-<big>fuel_types</big>
+<h2>fuel_type</h2>
 <p>_id: [int]<br>
     fuel_type__name: [string]<br>
     category: [string]</p>
 
-<big>other_costs</big>
+<h2>other_cost</h2>
 <p>_id: [int]<br>
     car_id: [int] l'identificativo dell'auto.<br>
     mileage: [int] Distanza totale (contachilometri).<br>
@@ -34,18 +36,19 @@
     note: [string]<br>
     end_date: [date] Data di fine ricorrenza.</p>
 
-<big>refuelings</big>
+<h2>refueling</h2>
 <p>_id: [int]<br>
     partial: [bool] (1 o 0)<br>
     date: [date]<br>
     note: [string]<br>
     volume: [float]<br>
-    fuel_type: [int] l'identificativo del tipo di carburante.<br>
+    fuel_type_id: [int] l'identificativo del tipo di carburante.<br>
+    station_id: [int] l'identificativo della stazione di servizio.<br>
     price: [float]<br>
-    mileage: [int] Distanza totale (contachilometir).<br>
+    mileage: [int] Distanza totale (contachilometri).<br>
     car_id: [int] l'identificativo dell'auto.</p>
 
-<big>reminders</big>
+<h2>reminder</h2>
 <p>_id: [int]<br>
     title: [string]<br>
     after_time_span_unit: [int] 0 = giorni, 1 = mesi, 2 = anni<br>
@@ -57,3 +60,26 @@
     car_id: [int] l'identificativo dell'auto.<br>
     notification_dismissed: [bool] (1 o 0)<br>
     snoozed_until: [date]</p>
+
+<h2>station</h2>
+<p>_id: [int]<br>
+    station__name: [string] Nome della stazione di servizio.</p>
+
+<h2>tire_list</h2>
+<p>_id: [int]<br>
+    buy_date: [date]<br>
+    trash_date: [date] Data di smaltimento.<br>
+    price: [float]<br>
+    quantity: [int]<br>
+    manufacturer: [string]<br>
+    model: [string]<br>
+    note: [string]<br>
+    car_id: [int] l'identificativo dell'auto.</p>
+
+<h2>tire_usage</h2>
+<p>_id: [int]<br>
+    distance_mount: [int] Chilometraggio al montaggio.<br>
+    date_mount: [date]<br>
+    distance_umount: [int] Chilometraggio allo smontaggio.<br>
+    date_umount: [date]<br>
+    tire_id: [int] l'identificativo dello pneumatico dalla tabella tire_list.</p>

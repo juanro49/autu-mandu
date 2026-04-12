@@ -4,19 +4,21 @@
 Код авто можно найти в таблице cars в колонке Id.</p>
 
 <h1>Колонки</h1>
-<big>cars</big>
+<h2>car</h2>
 <p>_id: [int]<br>
 car__name: [string]<br>
 color: [int] Подробнее в <a href="http://developer.android.com/reference/android/graphics/Color.html">документации о цветах android</a>, где описано, как вычисляются значения.<br>
-initial_mileage: [int] Начальный пробег авто при доавлении в приложение.<br>
-suspended_since: [date]</p>
+initial_mileage: [int] Начальный пробег авто при добавлении в приложение.<br>
+suspended_since: [date]<br>
+buying_price: [float] Цена покупки автомобиля.<br>
+num_tires: [int] Количество шин автомобиля.</p>
 
-<big>fuel_types</big>
+<h2>fuel_type</h2>
 <p>_id: [int]<br>
 fuel_type__name: [string]<br>
 category: [string]</p>
 
-<big>other_costs</big>
+<h2>other_cost</h2>
 <p>_id: [int]<br>
 car_id: [int] код авто.<br>
 mileage: [int] Общий пробег (одометр).<br>
@@ -28,25 +30,49 @@ date: [date]<br>
 note: [string]<br>
 end_date: [date] Дата окончания повторения.</p>
 
-<big>refuelings</big>
+<h2>refueling</h2>
 <p>_id: [int]<br>
 partial: [bool] (1 или 0)<br>
 date: [date]<br>
 note: [string]<br>
 volume: [float]<br>
-fuel_type: [int] код (Id) типа топлива.<br>
+fuel_type_id: [int] код (Id) типа топлива.<br>
+station_id: [int] код (Id) заправочной станции.<br>
 price: [float]<br>
 mileage: [int] Общий пробег (одометр).<br>
 car_id: [int] код авто.</p>
 
-<big>reminders</big>
+<h2>reminder</h2>
 <p>_id: [int]<br>
 title: [string]<br>
 after_time_span_unit: [int] 0 = дней, 1 = месяцев, 2 = лет<br>
-after_time_span_count: [int] Отрезок времени вместе с with after_time_span_unit. Например: unit = 1 и count = 5 означает через 5 месяцев.<br>
+after_time_span_count: [int] Отрезок времени вместе с after_time_span_unit. Например: unit = 1 и count = 5 означает через 5 месяцев.<br>
 after_distance: [int]<br>
 start_date: [date]<br>
 start_mileage: [int]<br>
 car_id: [int] код авто.<br>
 notification_dismissed: [bool] (1 или 0)<br>
 snoozed_until: [date]</p>
+
+<h2>station</h2>
+<p>_id: [int]<br>
+station__name: [string] Название заправочной станции.</p>
+
+<h2>tire_list</h2>
+<p>_id: [int]<br>
+buy_date: [date]<br>
+trash_date: [date] Дата утилизации шин.<br>
+price: [float]<br>
+quantity: [int]<br>
+manufacturer: [string]<br>
+model: [string]<br>
+note: [string]<br>
+car_id: [int] код авто.</p>
+
+<h2>tire_usage</h2>
+<p>_id: [int]<br>
+distance_mount: [int] Пробег при установке.<br>
+date_mount: [date]<br>
+distance_umount: [int] Пробег при снятии.<br>
+date_umount: [date]<br>
+tire_id: [int] код шины из таблицы tire_list.</p>

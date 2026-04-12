@@ -4,19 +4,21 @@ into multiple files. You can find the car by looking up the value of the car col
 table.</p>
 
 <h1>Columns</h1>
-<big>cars</big>
+<h2>car</h2>
 <p>_id: [int]<br>
 car__name: [string]<br>
 color: [int] Have a look at <a href="http://developer.android.com/reference/android/graphics/Color.html">the android color documentation</a> for a more detailed explanation how the value is calculated.<br>
 initial_mileage: [int] Initial mileage of the car, when it starts to be used in the app.<br>
-suspended_since: [date]</p>
+suspended_since: [date]<br>
+buying_price: [float] Buying price of the car.<br>
+num_tires: [int] Number of tires of the car.</p>
 
-<big>fuel_types</big>
+<h2>fuel_type</h2>
 <p>_id: [int]<br>
 fuel_type__name: [string]<br>
 category: [string]</p>
 
-<big>other_costs</big>
+<h2>other_cost</h2>
 <p>_id: [int]<br>
 car_id: [int] the Id of the car.<br>
 mileage: [int] Total distance (odometer).<br>
@@ -28,18 +30,19 @@ date: [date]<br>
 note: [string]<br>
 end_date: [date] End recurrence on this date.</p>
 
-<big>refuelings</big>
+<h2>refueling</h2>
 <p>_id: [int]<br>
 partial: [bool] (1 or 0)<br>
 date: [date]<br>
 note: [string]<br>
 volume: [float]<br>
-fuel_type: [int] the Id of the fuel type.<br>
+fuel_type_id: [int] the Id of the fuel type.<br>
+station_id: [int] the Id of the station.<br>
 price: [float]<br>
 mileage: [int] Total distance (odometer).<br>
 car_id: [int] the Id of the car.</p>
 
-<big>reminders</big>
+<h2>reminder</h2>
 <p>_id: [int]<br>
 title: [string]<br>
 after_time_span_unit: [int] 0 = days, 1 = months, 2 = years<br>
@@ -50,3 +53,26 @@ start_mileage: [int]<br>
 car_id: [int] the Id of the car.<br>
 notification_dismissed: [bool] (1 or 0)<br>
 snoozed_until: [date]</p>
+
+<h2>station</h2>
+<p>_id: [int]<br>
+station__name: [string] Name of the fuel station.</p>
+
+<h2>tire_list</h2>
+<p>_id: [int]<br>
+buy_date: [date]<br>
+trash_date: [date] Date when the tires were disposed.<br>
+price: [float]<br>
+quantity: [int]<br>
+manufacturer: [string]<br>
+model: [string]<br>
+note: [string]<br>
+car_id: [int] the Id of the car.</p>
+
+<h2>tire_usage</h2>
+<p>_id: [int]<br>
+distance_mount: [int] Mileage when mounted.<br>
+date_mount: [date]<br>
+distance_umount: [int] Mileage when unmounted.<br>
+date_umount: [date]<br>
+tire_id: [int] the Id of the tire from the tire_list table.</p>

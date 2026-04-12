@@ -1,23 +1,25 @@
 <h1>Geral</h1>
 <p>O banco de dados completo é exportado, um arquivo para cada tabela. Isso significa que os dados de um abastecimento
-é separado em vários arquivos. Você pode encontrar o carro procurando o valor da coluna 'car' na coluna Id da tabela 
+é separado em vários arquivos. Você pode encontrar o carro procurando o valor da coluna 'car' na coluna Id da tabela
 'cars'.</p>
 
 <h1>Colunas</h1>
-<big>cars</big>
+<h2>car</h2>
 <p>_id: [int]<br>
 car__name: [string]<br>
 color: [int] Procure na <a href="http://developer.android.com/reference/android/graphics/Color.html">documentação
 de cores do Android</a> para uma explicação mais detalhada de como o valor é calculado.<br>
 initial_mileage: [int] Quilometragem inicial do carro, quando iniciar o uso do aplicativo.<br>
-suspended_since: [date]</p>
+suspended_since: [date]<br>
+buying_price: [float] Preço de compra do veículo.<br>
+num_tires: [int] Número de pneus do veículo.</p>
 
-<big>fuel_types</big>
+<h2>fuel_type</h2>
 <p>_id: [int]<br>
 fuel_type__name: [string]<br>
 category: [string]</p>
 
-<big>other_costs</big>
+<h2>other_cost</h2>
 <p>_id: [int]<br>
 car_id: [int] o Id do carro.<br>
 mileage: [int] Distância total (odômetro).<br>
@@ -29,18 +31,19 @@ date: [date]<br>
 note: [string]<br>
 end_date: [date] Fim da recorrência nesta data.</p>
 
-<big>refuelings</big>
+<h2>refueling</h2>
 <p>_id: [int]<br>
 partial: [bool] (1 ou 0)<br>
 date: [date]<br>
 note: [string]<br>
 volume: [float]<br>
-fuel_type: [int] o Id do tipo de combustível.<br>
+fuel_type_id: [int] o Id do tipo de combustível.<br>
+station_id: [int] o Id da estação de serviço.<br>
 price: [float]<br>
 mileage: [int] Distância total (odômetro).<br>
 car_id: [int] o Id do carro.</p>
 
-<big>reminders</big>
+<h2>reminder</h2>
 <p>_id: [int]<br>
 title: [string]<br>
 after_time_span_unit: [int] 0 = dias, 1 = meses, 2 = anos<br>
@@ -51,3 +54,26 @@ start_mileage: [int]<br>
 car_id: [int] o Id do carro.<br>
 notification_dismissed: [bool] (1 ou 0)<br>
 snoozed_until: [date]</p>
+
+<h2>station</h2>
+<p>_id: [int]<br>
+station__name: [string] Nome da estação de serviço.</p>
+
+<h2>tire_list</h2>
+<p>_id: [int]<br>
+buy_date: [date]<br>
+trash_date: [date] Data de descarte.<br>
+price: [float]<br>
+quantity: [int]<br>
+manufacturer: [string]<br>
+model: [string]<br>
+note: [string]<br>
+car_id: [int] o Id do carro.</p>
+
+<h2>tire_usage</h2>
+<p>_id: [int]<br>
+distance_mount: [int] Quilometragem na montagem.<br>
+date_mount: [date]<br>
+distance_umount: [int] Quilometragem na desmontagem.<br>
+date_umount: [date]<br>
+tire_id: [int] o Id do pneu da tabela tire_list.</p>
