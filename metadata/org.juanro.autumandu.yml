@@ -25,8 +25,6 @@ Builds:
     subdir: app
     gradle:
       - yes
-    rm:
-      - tools
 
 AllowedAPKSigningKeys: 01d83fd1855b65ed94b77cecbf35d237033674e0c61303f2bde02d0efda3f743
 
