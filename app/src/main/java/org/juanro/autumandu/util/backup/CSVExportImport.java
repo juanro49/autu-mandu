@@ -16,12 +16,7 @@
 
 package org.juanro.autumandu.util.backup;
 
-import android.content.ContentProviderOperation;
 import android.content.Context;
-import android.net.Uri;
-import android.os.ParcelFileDescriptor;
-import android.provider.DocumentsContract;
-import android.util.Log;
 
 import androidx.documentfile.provider.DocumentFile;
 
@@ -32,883 +27,587 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.QuoteMode;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Semaphore;
-
 import org.juanro.autumandu.Application;
-import org.juanro.autumandu.Preferences;
-import org.juanro.autumandu.provider.DataProvider;
-import org.juanro.autumandu.provider.car.CarColumns;
-import org.juanro.autumandu.provider.car.CarContentValues;
-import org.juanro.autumandu.provider.car.CarCursor;
-import org.juanro.autumandu.provider.car.CarSelection;
-import org.juanro.autumandu.provider.fueltype.FuelTypeColumns;
-import org.juanro.autumandu.provider.fueltype.FuelTypeContentValues;
-import org.juanro.autumandu.provider.fueltype.FuelTypeCursor;
-import org.juanro.autumandu.provider.fueltype.FuelTypeSelection;
-import org.juanro.autumandu.provider.othercost.OtherCostColumns;
-import org.juanro.autumandu.provider.othercost.OtherCostContentValues;
-import org.juanro.autumandu.provider.othercost.OtherCostCursor;
-import org.juanro.autumandu.provider.othercost.OtherCostSelection;
-import org.juanro.autumandu.provider.refueling.RefuelingColumns;
-import org.juanro.autumandu.provider.refueling.RefuelingContentValues;
-import org.juanro.autumandu.provider.refueling.RefuelingCursor;
-import org.juanro.autumandu.provider.refueling.RefuelingSelection;
-import org.juanro.autumandu.provider.reminder.ReminderColumns;
-import org.juanro.autumandu.provider.reminder.ReminderContentValues;
-import org.juanro.autumandu.provider.reminder.ReminderCursor;
-import org.juanro.autumandu.provider.reminder.ReminderSelection;
-import org.juanro.autumandu.provider.station.StationColumns;
-import org.juanro.autumandu.provider.station.StationContentValues;
-import org.juanro.autumandu.provider.station.StationCursor;
-import org.juanro.autumandu.provider.station.StationSelection;
-import org.juanro.autumandu.provider.tirelist.TireListColumns;
-import org.juanro.autumandu.provider.tirelist.TireListContentValues;
-import org.juanro.autumandu.provider.tirelist.TireListCursor;
-import org.juanro.autumandu.provider.tirelist.TireListSelection;
-import org.juanro.autumandu.provider.tireusage.TireUsageColumns;
-import org.juanro.autumandu.provider.tireusage.TireUsageContentValues;
-import org.juanro.autumandu.provider.tireusage.TireUsageCursor;
-import org.juanro.autumandu.provider.tireusage.TireUsageSelection;
-import org.juanro.autumandu.util.FileCopyUtil;
+import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.entity.Car;
+import org.juanro.autumandu.model.entity.FuelType;
+import org.juanro.autumandu.model.entity.OtherCost;
+import org.juanro.autumandu.model.entity.Refueling;
+import org.juanro.autumandu.model.entity.Reminder;
+import org.juanro.autumandu.model.entity.Station;
+import org.juanro.autumandu.model.entity.TireList;
+import org.juanro.autumandu.model.entity.TireUsage;
 
+/**
+ * Class for exporting and importing data in CSV format.
+ */
 public class CSVExportImport {
-    private static final String LOG_TAG = "CSVExportImport";
     public static final String DIRECTORY = "CSV";
-    private static final String DATE_INVALID_FORMAT_EXC = "A date has an invalid format. Please " +
-        "change either data to match the defined ISO-based date or your phone localization.";
 
-    public Context mContext;
+    // Table names
+    private static final String TABLE_CAR = "car";
+    private static final String TABLE_FUEL_TYPE = "fuel_type";
+    private static final String TABLE_STATION = "station";
+    private static final String TABLE_OTHER_COST = "other_cost";
+    private static final String TABLE_REFUELING = "refueling";
+    private static final String TABLE_REMINDER = "reminder";
+    private static final String TABLE_TIRE_LIST = "tire_list";
+    private static final String TABLE_TIRE_USAGE = "tire_usage";
 
-    private File mExportDir;
+    // Common columns
+    private static final String _ID = "_id";
 
-    private CSVFormat mCSVFormat;
-    private Semaphore mImExportSemaphore;
-    private Preferences prefs;
+    // Car columns
+    private static final String CAR_NAME = "car__name";
+    private static final String CAR_COLOR = "color";
+    private static final String CAR_INITIAL_MILEAGE = "initial_mileage";
+    private static final String CAR_SUSPENDED_SINCE = "suspended_since";
+    private static final String CAR_BUYING_PRICE = "buying_price";
+    private static final String CAR_NUM_TIRES = "num_tires";
+    private static final String[] CAR_ALL_COLUMNS = {_ID, CAR_NAME, CAR_COLOR, CAR_INITIAL_MILEAGE, CAR_SUSPENDED_SINCE, CAR_BUYING_PRICE, CAR_NUM_TIRES};
 
-    private static String[] allTables = {
-        CarColumns.TABLE_NAME,
-        FuelTypeColumns.TABLE_NAME,
-        StationColumns.TABLE_NAME,
-        OtherCostColumns.TABLE_NAME,
-        RefuelingColumns.TABLE_NAME,
-        ReminderColumns.TABLE_NAME,
-        TireListColumns.TABLE_NAME,
-        TireUsageColumns.TABLE_NAME,
-    };
+    // FuelType columns
+    private static final String FUEL_TYPE_NAME = "fuel_type__name";
+    private static final String FUEL_TYPE_CATEGORY = "category";
+    private static final String[] FUEL_TYPE_ALL_COLUMNS = {_ID, FUEL_TYPE_NAME, FUEL_TYPE_CATEGORY};
+
+    // Station columns
+    private static final String STATION_NAME = "station__name";
+    private static final String[] STATION_ALL_COLUMNS = {_ID, STATION_NAME};
+
+    // OtherCost columns
+    private static final String OTHER_COST_TITLE = "title";
+    private static final String OTHER_COST_DATE = "date";
+    private static final String OTHER_COST_MILEAGE = "mileage";
+    private static final String OTHER_COST_PRICE = "price";
+    private static final String OTHER_COST_RECURRENCE_INTERVAL = "recurrence_interval";
+    private static final String OTHER_COST_RECURRENCE_MULTIPLIER = "recurrence_multiplier";
+    private static final String OTHER_COST_END_DATE = "end_date";
+    private static final String OTHER_COST_NOTE = "note";
+    private static final String OTHER_COST_CAR_ID = "car_id";
+    private static final String[] OTHER_COST_ALL_COLUMNS = {_ID, OTHER_COST_TITLE, OTHER_COST_DATE, OTHER_COST_MILEAGE, OTHER_COST_PRICE, OTHER_COST_RECURRENCE_INTERVAL, OTHER_COST_RECURRENCE_MULTIPLIER, OTHER_COST_END_DATE, OTHER_COST_NOTE, OTHER_COST_CAR_ID};
+
+    // Refueling columns
+    private static final String REFUELING_DATE = "date";
+    private static final String REFUELING_MILEAGE = "mileage";
+    private static final String REFUELING_VOLUME = "volume";
+    private static final String REFUELING_PRICE = "price";
+    private static final String REFUELING_PARTIAL = "partial";
+    private static final String REFUELING_NOTE = "note";
+    private static final String REFUELING_FUEL_TYPE_ID = "fuel_type_id";
+    private static final String REFUELING_STATION_ID = "station_id";
+    private static final String REFUELING_CAR_ID = "car_id";
+    private static final String[] REFUELING_ALL_COLUMNS = {_ID, REFUELING_DATE, REFUELING_MILEAGE, REFUELING_VOLUME, REFUELING_PRICE, REFUELING_PARTIAL, REFUELING_NOTE, REFUELING_FUEL_TYPE_ID, REFUELING_STATION_ID, REFUELING_CAR_ID};
+
+    // Reminder columns
+    private static final String REMINDER_TITLE = "title";
+    private static final String REMINDER_AFTER_TIME_SPAN_UNIT = "after_time_span_unit";
+    private static final String REMINDER_AFTER_TIME_SPAN_COUNT = "after_time_span_count";
+    private static final String REMINDER_AFTER_DISTANCE = "after_distance";
+    private static final String REMINDER_START_DATE = "start_date";
+    private static final String REMINDER_START_MILEAGE = "start_mileage";
+    private static final String REMINDER_NOTIFICATION_DISMISSED = "notification_dismissed";
+    private static final String REMINDER_SNOOZED_UNTIL = "snoozed_until";
+    private static final String REMINDER_CAR_ID = "car_id";
+    private static final String[] REMINDER_ALL_COLUMNS = {_ID, REMINDER_TITLE, REMINDER_AFTER_TIME_SPAN_UNIT, REMINDER_AFTER_TIME_SPAN_COUNT, REMINDER_AFTER_DISTANCE, REMINDER_START_DATE, REMINDER_START_MILEAGE, REMINDER_NOTIFICATION_DISMISSED, REMINDER_SNOOZED_UNTIL, REMINDER_CAR_ID};
+
+    // TireList columns
+    private static final String TIRE_LIST_BUY_DATE = "buy_date";
+    private static final String TIRE_LIST_TRASH_DATE = "trash_date";
+    private static final String TIRE_LIST_PRICE = "price";
+    private static final String TIRE_LIST_QUANTITY = "quantity";
+    private static final String TIRE_LIST_MANUFACTURER = "manufacturer";
+    private static final String TIRE_LIST_MODEL = "model";
+    private static final String TIRE_LIST_NOTE = "note";
+    private static final String TIRE_LIST_CAR_ID = "car_id";
+    private static final String[] TIRE_LIST_ALL_COLUMNS = {_ID, TIRE_LIST_BUY_DATE, TIRE_LIST_TRASH_DATE, TIRE_LIST_PRICE, TIRE_LIST_QUANTITY, TIRE_LIST_MANUFACTURER, TIRE_LIST_MODEL, TIRE_LIST_NOTE, TIRE_LIST_CAR_ID};
+
+    // TireUsage columns
+    private static final String TIRE_USAGE_DISTANCE_MOUNT = "distance_mount";
+    private static final String TIRE_USAGE_DATE_MOUNT = "date_mount";
+    private static final String TIRE_USAGE_DISTANCE_UMOUNT = "distance_umount";
+    private static final String TIRE_USAGE_DATE_UMOUNT = "date_umount";
+    private static final String TIRE_USAGE_TIRE_ID = "tire_id";
+    private static final String[] TIRE_USAGE_ALL_COLUMNS = {_ID, TIRE_USAGE_DISTANCE_MOUNT, TIRE_USAGE_DATE_MOUNT, TIRE_USAGE_DISTANCE_UMOUNT, TIRE_USAGE_DATE_UMOUNT, TIRE_USAGE_TIRE_ID};
+
+    private final Context context;
+    private DocumentFile exportDir;
+    private final CSVFormat csvFormat;
+    private final Semaphore imExportSemaphore = new Semaphore(1);
+
+    public void init() {
+        DocumentFile dir = new Backup(context).getBackupDir();
+        if (dir != null && dir.isDirectory()) {
+            var csvDir = dir.findFile(DIRECTORY);
+            if (csvDir == null) {
+                dir = dir.createDirectory(DIRECTORY);
+            } else {
+                dir = csvDir;
+            }
+        } else {
+            dir = null;
+        }
+        this.exportDir = dir;
+    }
 
     public CSVExportImport(Context context) {
-        mContext = context;
-        prefs = new Preferences(context);
-        File mExternalStorageDir = new File(prefs.getDefaultBackupPath());
-        mExportDir = new File(mExternalStorageDir, DIRECTORY);
+        this.context = context;
+        init();
 
-        mCSVFormat = CSVFormat.DEFAULT
-                .withQuoteMode(QuoteMode.MINIMAL)
-                .withDelimiter(',')
-                .withIgnoreEmptyLines()
-                .withIgnoreSurroundingSpaces()
-                .withIgnoreHeaderCase()
-                .withHeader()
-                .withTrim();
+        this.csvFormat = CSVFormat.Builder.create()
+                .setQuoteMode(QuoteMode.MINIMAL)
+                .setDelimiter(',')
+                .setIgnoreEmptyLines(true)
+                .setIgnoreSurroundingSpaces(true)
+                .setIgnoreHeaderCase(true)
+                .setHeader()
+                .setTrim(true)
+                .get();
+    }
 
-        mImExportSemaphore = new Semaphore(1);
+    public boolean anyExportFileExist() {
+        if (exportDir == null) return false;
+        return exportDir.findFile(TABLE_CAR + ".csv") != null ||
+                exportDir.findFile(TABLE_FUEL_TYPE + ".csv") != null ||
+                exportDir.findFile(TABLE_STATION + ".csv") != null ||
+                exportDir.findFile(TABLE_OTHER_COST + ".csv") != null ||
+                exportDir.findFile(TABLE_REFUELING + ".csv") != null ||
+                exportDir.findFile(TABLE_REMINDER + ".csv") != null ||
+                exportDir.findFile(TABLE_TIRE_LIST + ".csv") != null ||
+                exportDir.findFile(TABLE_TIRE_USAGE + ".csv") != null;
+    }
+
+    public boolean allExportFilesExist() {
+        if (exportDir == null) return false;
+        return exportDir.findFile(TABLE_CAR + ".csv") != null &&
+                exportDir.findFile(TABLE_FUEL_TYPE + ".csv") != null &&
+                exportDir.findFile(TABLE_STATION + ".csv") != null &&
+                exportDir.findFile(TABLE_OTHER_COST + ".csv") != null &&
+                exportDir.findFile(TABLE_REFUELING + ".csv") != null &&
+                exportDir.findFile(TABLE_REMINDER + ".csv") != null &&
+                exportDir.findFile(TABLE_TIRE_LIST + ".csv") != null &&
+                exportDir.findFile(TABLE_TIRE_USAGE + ".csv") != null;
     }
 
     public void export() throws CSVImportException {
         try {
-            mImExportSemaphore.acquire();
+            imExportSemaphore.acquire();
         } catch (InterruptedException e) {
             throw new CSVImportException("Another import or export is already running.");
         }
 
         try {
-            if (!mExportDir.isDirectory()) {
-                if (!mExportDir.mkdir()) {
-                    throw new CSVImportException("Could not create export directory.");
-                }
+            if (exportDir == null || !exportDir.isDirectory()) {
+                throw new CSVImportException("Could not access export directory.");
             }
 
-            exportCars();
-            exportFuelTypes();
-            exportStations();
-            exportOtherCosts();
-            exportRefuelings();
-            exportReminders();
-            exportTireList();
-            exportTireUsages();
-
-            if (!prefs.getDefaultBackupPath().equals(prefs.getBackupPath()))
-            {
-                Uri externalChildDocumentsUri = DocumentsContract.buildChildDocumentsUriUsingTree(Uri.parse(prefs.getBackupPath()), DocumentsContract.getTreeDocumentId(Uri.parse(prefs.getBackupPath())));
-                DocumentFile internalDir = DocumentFile.fromFile(mExportDir);
-                DocumentFile[] internalFiles = internalDir.listFiles();
-                DocumentFile externalDir = DocumentFile.fromTreeUri(mContext, externalChildDocumentsUri);
-
-                for (DocumentFile file: internalFiles) {
-                    Uri doc = Uri.parse(externalDir.getUri() + "%2F" + file.getName());
-                    DocumentFile externalFile = DocumentFile.fromSingleUri(mContext, doc);
-                    boolean fileExists = externalDir.findFile(file.getName()) != null;
-
-                    if (fileExists)
-                    {
-                        externalFile.delete();
-                    }
-
-                    externalDir.createFile(file.getType(), file.getName());
-
-                    try {
-                        ParcelFileDescriptor pfdIn = mContext.getContentResolver().openFileDescriptor(file.getUri(), "r");
-                        ParcelFileDescriptor pfdOut = mContext.getContentResolver().openFileDescriptor(externalFile.getUri(), "rw");
-
-                        FileCopyUtil.copyFile(pfdIn, pfdOut);
-                    } catch (FileNotFoundException e) {
-                        Log.e("CSVExportException", "External backup error " + e.getMessage());
-                    }
-                }
-            }
+            var db = AutuManduDatabase.getInstance(context);
+            exportCars(db);
+            exportFuelTypes(db);
+            exportStations(db);
+            exportOtherCosts(db);
+            exportRefuelings(db);
+            exportReminders(db);
+            exportTireList(db);
+            exportTireUsages(db);
 
         } catch (CSVImportException e) {
             throw e;
         } catch (Exception e) {
             throw new CSVImportException(e);
         } finally {
-            mImExportSemaphore.release();
-            Application.closeDatabases();
+            imExportSemaphore.release();
         }
     }
 
-    private void exportCars() throws IOException {
-        CSVPrinter csv = new CSVPrinter(
-                new PrintWriter(new File(mExportDir, CarColumns.TABLE_NAME + ".csv")),
-                mCSVFormat);
-        csv.printRecord((Object[]) CarColumns.ALL_COLUMNS);
-
-        CarCursor car = new CarSelection().query(mContext.getContentResolver());
-        while (car.moveToNext()) {
-            csv.printRecord(
-                    car.getId(),
-                    car.getName(),
-                    car.getColor(),
-                    car.getInitialMileage(),
-                    CSVConvert.toString(car.getSuspendedSince()),
-                    car.getBuyingPrice(),
-                    car.getNumTires()/*,
-                    car.getMake(),
-                    car.getModel(),
-                    car.getYear(),
-                    car.getLicensePlate(),
-                    CSVConvert.toString(car.getBuyingDate())*/);
-        }
-
-        csv.close();
-    }
-
-    private void exportFuelTypes() throws IOException {
-        CSVPrinter csv = new CSVPrinter(
-                new PrintWriter(new File(mExportDir, FuelTypeColumns.TABLE_NAME + ".csv")),
-                mCSVFormat);
-        csv.printRecord((Object[]) FuelTypeColumns.ALL_COLUMNS);
-
-        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver());
-        while (fuelType.moveToNext()) {
-            csv.printRecord(
-                    fuelType.getId(),
-                    fuelType.getName(),
-                    fuelType.getCategory());
-        }
-
-        csv.close();
-    }
-
-    private void exportStations() throws IOException {
-        CSVPrinter csv = new CSVPrinter(
-            new PrintWriter(new File(mExportDir, StationColumns.TABLE_NAME + ".csv")),
-            mCSVFormat);
-        csv.printRecord((Object[]) StationColumns.ALL_COLUMNS);
-
-        StationCursor station = new StationSelection().query(mContext.getContentResolver());
-        long id = -1;
-        while (station.moveToNext()) {
-            if(id != station.getId()) {
+    private void exportCars(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_CAR + ".csv", CAR_ALL_COLUMNS, csv -> {
+            var cars = db.getCarDao().getAll();
+            for (var car : cars) {
                 csv.printRecord(
-                    station.getId(),
-                    station.getName());
+                        car.getId(),
+                        car.getName(),
+                        car.getColor(),
+                        car.getInitialMileage(),
+                        CSVConvert.toString(car.getSuspendedSince()),
+                        CSVConvert.toString(car.getBuyingPrice()),
+                        car.getNumTires());
             }
-            id = station.getId();
-        }
-
-        csv.close();
+        });
     }
 
-    private void exportOtherCosts() throws IOException {
-        CSVPrinter csv = new CSVPrinter(
-                new PrintWriter(new File(mExportDir, OtherCostColumns.TABLE_NAME + ".csv")),
-                mCSVFormat);
-        csv.printRecord((Object[]) OtherCostColumns.ALL_COLUMNS);
-
-        OtherCostCursor otherCost = new OtherCostSelection().query(mContext.getContentResolver());
-        while (otherCost.moveToNext()) {
-            csv.printRecord(
-                    otherCost.getId(),
-                    otherCost.getTitle(),
-                    CSVConvert.toString(otherCost.getDate()),
-                    otherCost.getMileage(),
-                    CSVConvert.toString(otherCost.getPrice()),
-                    CSVConvert.toString(otherCost.getRecurrenceInterval()),
-                    otherCost.getRecurrenceMultiplier(),
-                    CSVConvert.toString(otherCost.getEndDate()),
-                    otherCost.getNote(),
-                    otherCost.getCarId());
-        }
-
-        csv.close();
-    }
-
-    private void exportRefuelings() throws IOException {
-        CSVPrinter csv = new CSVPrinter(
-                new PrintWriter(new File(mExportDir, RefuelingColumns.TABLE_NAME + ".csv")),
-                mCSVFormat);
-        csv.printRecord((Object[]) RefuelingColumns.ALL_COLUMNS);
-
-        RefuelingCursor refueling = new RefuelingSelection().query(mContext.getContentResolver());
-        while (refueling.moveToNext()) {
-            csv.printRecord(
-                    refueling.getId(),
-                    CSVConvert.toString(refueling.getDate()),
-                    refueling.getMileage(),
-                    CSVConvert.toString(refueling.getVolume()),
-                    CSVConvert.toString(refueling.getPrice()),
-                    refueling.getPartial(),
-                    refueling.getNote(),
-                    refueling.getFuelTypeId(),
-                    refueling.getStationId(),
-                    refueling.getCarId());
-        }
-
-        csv.close();
-    }
-
-    private void exportReminders() throws IOException {
-        CSVPrinter csv = new CSVPrinter(
-                new PrintWriter(new File(mExportDir, ReminderColumns.TABLE_NAME + ".csv")),
-                mCSVFormat);
-        csv.printRecord((Object[]) ReminderColumns.ALL_COLUMNS);
-
-        ReminderCursor reminder = new ReminderSelection().query(mContext.getContentResolver());
-        while (reminder.moveToNext()) {
-            csv.printRecord(
-                    reminder.getId(),
-                    reminder.getTitle(),
-                    CSVConvert.toString(reminder.getAfterTimeSpanUnit()),
-                    reminder.getAfterTimeSpanCount(),
-                    reminder.getAfterDistance(),
-                    CSVConvert.toString(reminder.getStartDate()),
-                    reminder.getStartMileage(),
-                    reminder.getNotificationDismissed(),
-                    CSVConvert.toString(reminder.getSnoozedUntil()),
-                    reminder.getCarId());
-        }
-
-        csv.close();
-    }
-
-    private void exportTireList() throws IOException {
-        CSVPrinter csv = new CSVPrinter(
-            new PrintWriter(new File(mExportDir, TireListColumns.TABLE_NAME + ".csv")),
-            mCSVFormat);
-        csv.printRecord((Object[]) TireListColumns.ALL_COLUMNS);
-
-        TireListCursor tireList = new TireListSelection().query(mContext.getContentResolver());
-        while (tireList.moveToNext()) {
-            csv.printRecord(
-                tireList.getId(),
-                CSVConvert.toString(tireList.getBuyDate()),
-                CSVConvert.toString(tireList.getTrashDate()),
-                CSVConvert.toString(tireList.getPrice()),
-                tireList.getQuantity(),
-                tireList.getManufacturer(),
-                tireList.getModel(),
-                tireList.getNote(),
-                tireList.getCarId());
-        }
-
-        csv.close();
-    }
-
-    private void exportTireUsages() throws IOException {
-        CSVPrinter csv = new CSVPrinter(
-            new PrintWriter(new File(mExportDir, TireUsageColumns.TABLE_NAME + ".csv")),
-            mCSVFormat);
-        csv.printRecord((Object[]) TireUsageColumns.ALL_COLUMNS);
-
-        TireUsageCursor tireUsage = new TireUsageSelection().query(mContext.getContentResolver());
-        while (tireUsage.moveToNext()) {
-            csv.printRecord(
-                tireUsage.getId(),
-                tireUsage.getDistanceMount(),
-                CSVConvert.toString(tireUsage.getDateMount()),
-                tireUsage.getDistanceUmount(),
-                CSVConvert.toString(tireUsage.getDateUmount()),
-                tireUsage.getTireId());
-        }
-
-        csv.close();
-    }
-
-    public boolean allExportFilesExist() {
-        for (String table : allTables) {
-            File file = new File(mExportDir, table + ".csv");
-            if (!file.isFile()) {
-                if (!prefs.getDefaultBackupPath().equals(prefs.getBackupPath()))
-                {
-                    copyExportFilesToAppStorage();
-                }
-
-                return false;
+    private void exportFuelTypes(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_FUEL_TYPE + ".csv", FUEL_TYPE_ALL_COLUMNS, csv -> {
+            var fuelTypes = db.getFuelTypeDao().getAll();
+            for (var fuelType : fuelTypes) {
+                csv.printRecord(
+                        fuelType.getId(),
+                        fuelType.getName(),
+                        fuelType.getCategory());
             }
-        }
-
-        return true;
+        });
     }
 
-    public void copyExportFilesToAppStorage()
-    {
-        Uri path = Uri.parse(prefs.getBackupPath());
-        DocumentFile externalDir = DocumentFile.fromTreeUri(mContext, path);
-        DocumentFile[] externalFiles = externalDir.listFiles();
-        DocumentFile internalDir = null;
-
-        if (!mExportDir.isDirectory()) {
-            if (!mExportDir.mkdir()) {
-                File mExternalStorageDir = new File(prefs.getDefaultBackupPath());
-                mExportDir = new File(mExternalStorageDir, DIRECTORY);
+    private void exportStations(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_STATION + ".csv", STATION_ALL_COLUMNS, csv -> {
+            var stations = db.getStationDao().getAll();
+            for (var station : stations) {
+                csv.printRecord(
+                        station.getId(),
+                        station.getName());
             }
-        }
-
-        internalDir = DocumentFile.fromFile(mExportDir);
-
-        for (DocumentFile file: externalFiles) {
-            if(file.getName().endsWith(".csv")) {
-                DocumentFile internalFile = internalDir.createFile("*/*", file.getName());
-
-                try {
-                    ParcelFileDescriptor pfdIn = mContext.getContentResolver().openFileDescriptor(file.getUri(), "r");
-                    ParcelFileDescriptor pfdOut = mContext.getContentResolver().openFileDescriptor(internalFile.getUri(), "rw");
-
-                    FileCopyUtil.copyFile(pfdIn, pfdOut);
-                } catch (FileNotFoundException e) {
-                    Log.e("CSVExportException", "External backup error " + e.getMessage());
-                }
-            }
-        }
+        });
     }
 
-    public boolean anyExportFileExist() {
-        for (String table : allTables) {
-            File file = new File(mExportDir, table + ".csv");
-            if (file.isFile()) {
-                return true;
+    private void exportOtherCosts(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_OTHER_COST + ".csv", OTHER_COST_ALL_COLUMNS, csv -> {
+            var otherCosts = db.getOtherCostDao().getAll();
+            for (var otherCost : otherCosts) {
+                csv.printRecord(
+                        otherCost.getId(),
+                        otherCost.getTitle(),
+                        CSVConvert.toString(otherCost.getDate()),
+                        otherCost.getMileage(),
+                        CSVConvert.toString(otherCost.getPrice()),
+                        CSVConvert.toString(otherCost.getRecurrenceInterval()),
+                        otherCost.getRecurrenceMultiplier(),
+                        CSVConvert.toString(otherCost.getEndDate()),
+                        otherCost.getNote(),
+                        otherCost.getCarId());
             }
-        }
-
-        return false;
+        });
     }
 
-    private boolean filesUseSemicolon() {
-        File carFile = new File(mExportDir, "car.csv");
+    private void exportRefuelings(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_REFUELING + ".csv", REFUELING_ALL_COLUMNS, csv -> {
+            var refuelings = db.getRefuelingDao().getAll();
+            for (var refueling : refuelings) {
+                csv.printRecord(
+                        refueling.getId(),
+                        CSVConvert.toString(refueling.getDate()),
+                        refueling.getMileage(),
+                        CSVConvert.toString(refueling.getVolume()),
+                        CSVConvert.toString(refueling.getPrice()),
+                        refueling.isPartial(),
+                        refueling.getNote(),
+                        refueling.getFuelTypeId(),
+                        refueling.getStationId(),
+                        refueling.getCarId());
+            }
+        });
+    }
+
+    private void exportReminders(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_REMINDER + ".csv", REMINDER_ALL_COLUMNS, csv -> {
+            var reminders = db.getReminderDao().getAll();
+            for (var reminder : reminders) {
+                csv.printRecord(
+                        reminder.getId(),
+                        reminder.getTitle(),
+                        CSVConvert.toString(reminder.getAfterTimeSpanUnit()),
+                        reminder.getAfterTimeSpanCount(),
+                        reminder.getAfterDistance(),
+                        CSVConvert.toString(reminder.getStartDate()),
+                        reminder.getStartMileage(),
+                        reminder.isNotificationDismissed(),
+                        CSVConvert.toString(reminder.getSnoozedUntil()),
+                        reminder.getCarId());
+            }
+        });
+    }
+
+    private void exportTireList(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_TIRE_LIST + ".csv", TIRE_LIST_ALL_COLUMNS, csv -> {
+            var tires = db.getTireDao().getAllTireLists();
+            for (var tire : tires) {
+                csv.printRecord(
+                        tire.getId(),
+                        CSVConvert.toString(tire.getBuyDate()),
+                        CSVConvert.toString(tire.getTrashDate()),
+                        CSVConvert.toString(tire.getPrice()),
+                        tire.getQuantity(),
+                        tire.getManufacturer(),
+                        tire.getModel(),
+                        tire.getNote(),
+                        tire.getCarId());
+            }
+        });
+    }
+
+    private void exportTireUsages(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_TIRE_USAGE + ".csv", TIRE_USAGE_ALL_COLUMNS, csv -> {
+            var usages = db.getTireDao().getAllTireUsages();
+            for (var usage : usages) {
+                csv.printRecord(
+                        usage.getId(),
+                        usage.getDistanceMount(),
+                        CSVConvert.toString(usage.getDateMount()),
+                        usage.getDistanceUmount(),
+                        CSVConvert.toString(usage.getDateUmount()),
+                        usage.getTireId());
+            }
+        });
+    }
+
+    private DocumentFile getOrCreateFile(String name) throws IOException {
+        var file = exportDir.findFile(name);
+        if (file == null) {
+            file = exportDir.createFile("text/csv", name);
+        }
+        if (file == null) {
+            throw new IOException("Could not create file: " + name);
+        }
+        return file;
+    }
+
+    public void importData() throws CSVImportException {
         try {
-            BufferedReader bufCarFile = new BufferedReader(new FileReader(carFile));
-            String line = "";
-            while (line.isEmpty()) {
-                line = bufCarFile.readLine();
-            }
-            bufCarFile.close();
-            String[] splitBySemicolon = line.split(";");
-            return (splitBySemicolon.length >= 4);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Could not determine whether files are using semicolon as " +
-                "delimiter. Continuing to import.");
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public void import_() throws CSVImportException {
-        try {
-            mImExportSemaphore.acquire();
+            imExportSemaphore.acquire();
         } catch (InterruptedException e) {
             throw new CSVImportException("Another import or export is already running.");
         }
 
-        boolean semicolonDelimiter = false;
         try {
-            if (!allExportFilesExist()) {
-                throw new CSVImportException("Some import files are missing.");
+            var tempFormat = csvFormat;
+            try {
+                tempFormat = findDelimiter(tempFormat);
+            } catch (IOException e) {
+                throw new CSVImportException("Error determining CSV delimiter.");
             }
+            final var importFormat = tempFormat;
 
-            semicolonDelimiter = filesUseSemicolon();
-            if (semicolonDelimiter) {
-                this.mCSVFormat = this.mCSVFormat.withDelimiter(';');
-            }
+            var db = AutuManduDatabase.getInstance(context);
+            db.runInTransaction(() -> {
+                try {
+                    db.clearAllTables();
 
-            ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-            operations.addAll(importCars());
-            operations.addAll(importFuelTypes());
-            operations.addAll(importStations());
-            operations.addAll(importOtherCosts());
-            operations.addAll(importRefuelings());
-            operations.addAll(importReminders());
-            operations.addAll(importTireList());
-            operations.addAll(importTireUsages());
+                    importCars(db, importFormat);
+                    importFuelTypes(db, importFormat);
+                    importStations(db, importFormat);
+                    importOtherCosts(db, importFormat);
+                    importRefuelings(db, importFormat);
+                    importReminders(db, importFormat);
+                    importTireList(db, importFormat);
+                    importTireUsages(db, importFormat);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-            mContext.getContentResolver().applyBatch(DataProvider.AUTHORITY, operations);
         } catch (CSVImportException e) {
             throw e;
         } catch (Exception e) {
+            var cause = e.getCause();
+            if (cause instanceof IOException) {
+                throw new CSVImportException(cause);
+            }
             throw new CSVImportException(e);
         } finally {
-            if (semicolonDelimiter) {
-                this.mCSVFormat = this.mCSVFormat.withDelimiter(',');
-            }
-            mImExportSemaphore.release();
+            imExportSemaphore.release();
         }
     }
 
-    private ArrayList<ContentProviderOperation> importCars() throws IOException, CSVImportException {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-
-        CSVParser csv = CSVParser.parse(
-                new File(mExportDir, CarColumns.TABLE_NAME + ".csv"),
-                Charset.defaultCharset(),
-                mCSVFormat);
-
-        for (CSVRecord record : csv) {
-            Long id = CSVConvert.toLong(record.get(CarColumns._ID));
-
-            CarContentValues values = new CarContentValues();
-            values.putName(record.get(CarColumns.NAME));
-            //noinspection ConstantConditions
-            values.putColor(CSVConvert.toInteger(record.get(CarColumns.COLOR)));
-            //noinspection ConstantConditions
-            values.putInitialMileage(CSVConvert.toInteger(record.get(CarColumns.INITIAL_MILEAGE)));
-            Date suspensionDate = CSVConvert.toDate(record.get(CarColumns.SUSPENDED_SINCE));
-            if (!record.get(CarColumns.SUSPENDED_SINCE).isEmpty() && suspensionDate == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putSuspendedSince(suspensionDate);
-            //noinspection ConstantConditions
-            values.putBuyingPrice(CSVConvert.toFloat(record.get(CarColumns.BUYING_PRICE)));
-            values.putNumTires(CSVConvert.toInteger(record.get(CarColumns.NUM_TIRES)));
-            /*values.putMake(record.get(CarColumns.MAKE));
-            values.putModel(record.get(CarColumns.MODEL));
-            //noinspection ConstantConditions
-            values.putYear(CSVConvert.toInteger(record.get(CarColumns.YEAR)));
-            values.putLicensePlate(record.get(CarColumns.LICENSE_PLATE));
-            Date buyingDate = CSVConvert.toDate(record.get(CarColumns.BUYING_DATE));
-            if (!record.get(CarColumns.BUYING_DATE).isEmpty() && buyingDate == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putBuyingDate(buyingDate);*/
-
-            boolean updated = false;
-            if (id != null) {
-                CarSelection selection = new CarSelection().id(id);
-                CarCursor car = selection.query(mContext.getContentResolver());
-                if (car.getCount() > 0) {
-                    operations.add(ContentProviderOperation.newUpdate(values.uri())
-                            .withSelection(selection.sel(), selection.args())
-                            .withValues(values.values())
-                            .build());
-                    updated = true;
-                }
-            }
-
-            if (!updated) {
-                if (id != null) {
-                    values.values().put(CarColumns._ID, id);
-                }
-
-                operations.add(ContentProviderOperation.newInsert(values.uri())
-                        .withValues(values.values())
-                        .build());
-            }
+    private CSVFormat findDelimiter(CSVFormat format) throws IOException {
+        if (exportDir == null) return format;
+        var carFile = exportDir.findFile(TABLE_CAR + ".csv");
+        if (carFile == null) {
+            return format;
         }
 
-        return operations;
+        try (var in = context.getContentResolver().openInputStream(carFile.getUri())) {
+            if (in == null) return format;
+            try (var reader = new BufferedReader(new InputStreamReader(in))) {
+                var header = reader.readLine();
+                if (header != null && header.contains(";")) {
+                    return CSVFormat.Builder.create(format).setDelimiter(';').get();
+                }
+            }
+        }
+        return CSVFormat.Builder.create(format).setDelimiter(',').get();
     }
 
-    private ArrayList<ContentProviderOperation> importFuelTypes() throws IOException {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-
-        CSVParser csv = CSVParser.parse(
-                new File(mExportDir, FuelTypeColumns.TABLE_NAME + ".csv"),
-                Charset.defaultCharset(),
-                mCSVFormat);
-
-        for (CSVRecord record : csv) {
-            Long id = CSVConvert.toLong(record.get(FuelTypeColumns._ID));
-
-            FuelTypeContentValues values = new FuelTypeContentValues();
-            values.putName(record.get(FuelTypeColumns.NAME));
-            values.putCategory(record.get(FuelTypeColumns.CATEGORY));
-
-            boolean updated = false;
-            if (id != null) {
-                FuelTypeSelection selection = new FuelTypeSelection().id(id);
-                FuelTypeCursor fuelType = selection.query(mContext.getContentResolver());
-                if (fuelType.getCount() > 0) {
-                    operations.add(ContentProviderOperation.newUpdate(values.uri())
-                            .withSelection(selection.sel(), selection.args())
-                            .withValues(values.values())
-                            .build());
-                    updated = true;
-                }
-            }
-
-            if (!updated) {
-                if (id != null) {
-                    values.values().put(FuelTypeColumns._ID, id);
-                }
-
-                operations.add(ContentProviderOperation.newInsert(values.uri())
-                        .withValues(values.values())
-                        .build());
-            }
-        }
-
-        return operations;
+    private void importCars(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_CAR + ".csv", format, record -> {
+            var car = new Car();
+            car.setId(CSVConvert.toLong(record.get(_ID)));
+            car.setName(record.get(CAR_NAME));
+            var color = CSVConvert.toInteger(record.get(CAR_COLOR));
+            car.setColor(color != null ? color : 0);
+            var initMileage = CSVConvert.toInteger(record.get(CAR_INITIAL_MILEAGE));
+            car.setInitialMileage(initMileage != null ? initMileage : 0);
+            car.setSuspendedSince(CSVConvert.toDate(record.get(CAR_SUSPENDED_SINCE)));
+            var price = CSVConvert.toFloat(record.get(CAR_BUYING_PRICE));
+            car.setBuyingPrice(price != null ? price.doubleValue() : 0.0);
+            var tires = CSVConvert.toInteger(record.get(CAR_NUM_TIRES));
+            car.setNumTires(tires != null ? tires : 4);
+            db.getCarDao().insert(car);
+        });
     }
 
-    private ArrayList<ContentProviderOperation> importStations() throws IOException {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-
-        CSVParser csv = CSVParser.parse(
-            new File(mExportDir, StationColumns.TABLE_NAME + ".csv"),
-            Charset.defaultCharset(),
-            mCSVFormat);
-
-        for (CSVRecord record : csv) {
-            Long id = CSVConvert.toLong(record.get(StationColumns._ID));
-
-            StationContentValues values = new StationContentValues();
-            values.putName(record.get(StationColumns.NAME));
-
-            boolean updated = false;
-            if (id != null) {
-                StationSelection selection = new StationSelection().id(id);
-                StationCursor station = selection.query(mContext.getContentResolver());
-                if (station.getCount() > 0) {
-                    operations.add(ContentProviderOperation.newUpdate(values.uri())
-                        .withSelection(selection.sel(), selection.args())
-                        .withValues(values.values())
-                        .build());
-                    updated = true;
-                }
-            }
-
-            if (!updated) {
-                if (id != null) {
-                    values.values().put(StationColumns._ID, id);
-                }
-
-                operations.add(ContentProviderOperation.newInsert(values.uri())
-                    .withValues(values.values())
-                    .build());
-            }
-        }
-
-        return operations;
+    private void importFuelTypes(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_FUEL_TYPE + ".csv", format, record -> {
+            var fuelType = new FuelType();
+            fuelType.setId(CSVConvert.toLong(record.get(_ID)));
+            fuelType.setName(record.get(FUEL_TYPE_NAME));
+            fuelType.setCategory(record.get(FUEL_TYPE_CATEGORY));
+            db.getFuelTypeDao().insert(fuelType);
+        });
     }
 
-    private ArrayList<ContentProviderOperation> importOtherCosts() throws IOException, CSVImportException {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-
-        CSVParser csv = CSVParser.parse(
-                new File(mExportDir, OtherCostColumns.TABLE_NAME + ".csv"),
-                Charset.defaultCharset(),
-                mCSVFormat);
-
-        for (CSVRecord record : csv) {
-            Long id = CSVConvert.toLong(record.get(OtherCostColumns._ID));
-
-            OtherCostContentValues values = new OtherCostContentValues();
-            values.putTitle(record.get(OtherCostColumns.TITLE));
-            //noinspection ConstantConditions
-            Date date = CSVConvert.toDate(record.get(OtherCostColumns.DATE));
-            if (date == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putDate(date);
-            values.putMileage(CSVConvert.toInteger(record.get(OtherCostColumns.MILEAGE)));
-            //noinspection ConstantConditions
-            values.putPrice(CSVConvert.toFloat(record.get(OtherCostColumns.PRICE)));
-            //noinspection ConstantConditions
-            values.putRecurrenceInterval(CSVConvert.toRecurrenceInterval(record.get(OtherCostColumns.RECURRENCE_INTERVAL)));
-            //noinspection ConstantConditions
-            values.putRecurrenceMultiplier(CSVConvert.toInteger(record.get(OtherCostColumns.RECURRENCE_MULTIPLIER)));
-            Date endDate = CSVConvert.toDate(record.get(OtherCostColumns.END_DATE));
-            if (!record.get(OtherCostColumns.END_DATE).isEmpty() && endDate == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putEndDate(endDate);
-            values.putNote(record.get(OtherCostColumns.NOTE));
-            //noinspection ConstantConditions
-            values.putCarId(CSVConvert.toLong(record.get(OtherCostColumns.CAR_ID)));
-
-            boolean updated = false;
-            if (id != null) {
-                OtherCostSelection selection = new OtherCostSelection().id(id);
-                OtherCostCursor otherCost = selection.query(mContext.getContentResolver());
-                if (otherCost.getCount() > 0) {
-                    operations.add(ContentProviderOperation.newUpdate(values.uri())
-                            .withSelection(selection.sel(), selection.args())
-                            .withValues(values.values())
-                            .build());
-                    updated = true;
-                }
-            }
-
-            if (!updated) {
-                if (id != null) {
-                    values.values().put(OtherCostColumns._ID, id);
-                }
-
-                operations.add(ContentProviderOperation.newInsert(values.uri())
-                        .withValues(values.values())
-                        .build());
-            }
-        }
-
-        return operations;
+    private void importStations(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_STATION + ".csv", format, record -> {
+            var station = new Station();
+            station.setId(CSVConvert.toLong(record.get(_ID)));
+            station.setName(record.get(STATION_NAME));
+            db.getStationDao().insert(station);
+        });
     }
 
-    private ArrayList<ContentProviderOperation> importRefuelings() throws IOException, CSVImportException {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-
-        CSVParser csv = CSVParser.parse(
-                new File(mExportDir, RefuelingColumns.TABLE_NAME + ".csv"),
-                Charset.defaultCharset(),
-                mCSVFormat);
-
-        for (CSVRecord record : csv) {
-            Long id = CSVConvert.toLong(record.get(RefuelingColumns._ID));
-
-            RefuelingContentValues values = new RefuelingContentValues();
-            //noinspection ConstantConditions
-            Date date = CSVConvert.toDate(record.get(RefuelingColumns.DATE));
-            if (date == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putDate(date);
-            //noinspection ConstantConditions
-            values.putMileage(CSVConvert.toInteger(record.get(RefuelingColumns.MILEAGE)));
-            //noinspection ConstantConditions
-            values.putVolume(CSVConvert.toFloat(record.get(RefuelingColumns.VOLUME)));
-            //noinspection ConstantConditions
-            values.putPrice(CSVConvert.toFloat(record.get(RefuelingColumns.PRICE)));
-            //noinspection ConstantConditions
-            values.putPartial(CSVConvert.toBoolean(record.get(RefuelingColumns.PARTIAL)));
-            values.putNote(record.get(RefuelingColumns.NOTE));
-            //noinspection ConstantConditions
-            values.putFuelTypeId(CSVConvert.toLong(record.get(RefuelingColumns.FUEL_TYPE_ID)));
-            //noinspection ConstantConditions
-            values.putStationId(CSVConvert.toLong(record.get(RefuelingColumns.STATION_ID)));
-            //noinspection ConstantConditions
-            values.putCarId(CSVConvert.toLong(record.get(RefuelingColumns.CAR_ID)));
-
-            boolean updated = false;
-            if (id != null) {
-                RefuelingSelection selection = new RefuelingSelection().id(id);
-                RefuelingCursor refueling = selection.query(mContext.getContentResolver());
-                if (refueling.getCount() > 0) {
-                    operations.add(ContentProviderOperation.newUpdate(values.uri())
-                            .withSelection(selection.sel(), selection.args())
-                            .withValues(values.values())
-                            .build());
-                    updated = true;
-                }
-            }
-
-            if (!updated) {
-                if (id != null) {
-                    values.values().put(RefuelingColumns._ID, id);
-                }
-
-                operations.add(ContentProviderOperation.newInsert(values.uri())
-                        .withValues(values.values())
-                        .build());
-            }
-        }
-
-        return operations;
+    private void importOtherCosts(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_OTHER_COST + ".csv", format, record -> {
+            var otherCost = new OtherCost();
+            otherCost.setId(CSVConvert.toLong(record.get(_ID)));
+            otherCost.setTitle(record.get(OTHER_COST_TITLE));
+            var date = CSVConvert.toDate(record.get(OTHER_COST_DATE));
+            otherCost.setDate(date != null ? date : new Date());
+            otherCost.setMileage(CSVConvert.toInteger(record.get(OTHER_COST_MILEAGE)));
+            var price = CSVConvert.toFloat(record.get(OTHER_COST_PRICE));
+            otherCost.setPrice(price != null ? price : 0f);
+            var interval = CSVConvert.toRecurrenceInterval(record.get(OTHER_COST_RECURRENCE_INTERVAL));
+            otherCost.setRecurrenceInterval(interval != null ? interval : org.juanro.autumandu.model.entity.helper.RecurrenceInterval.ONCE);
+            var mult = CSVConvert.toInteger(record.get(OTHER_COST_RECURRENCE_MULTIPLIER));
+            otherCost.setRecurrenceMultiplier(mult != null ? mult : 0);
+            otherCost.setEndDate(CSVConvert.toDate(record.get(OTHER_COST_END_DATE)));
+            otherCost.setNote(record.get(OTHER_COST_NOTE));
+            var carId = CSVConvert.toLong(record.get(OTHER_COST_CAR_ID));
+            otherCost.setCarId(carId != null ? carId : 0L);
+            db.getOtherCostDao().insert(otherCost);
+        });
     }
 
-    private ArrayList<ContentProviderOperation> importReminders() throws IOException {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-        CSVParser csv = CSVParser.parse(
-                new File(mExportDir, ReminderColumns.TABLE_NAME + ".csv"),
-                Charset.defaultCharset(),
-                mCSVFormat);
-
-        for (CSVRecord record : csv) {
-            Long id = CSVConvert.toLong(record.get(ReminderColumns._ID));
-
-            ReminderContentValues values = new ReminderContentValues();
-            values.putTitle(record.get(ReminderColumns.TITLE));
-            values.putAfterTimeSpanUnit(CSVConvert.toTimeSpanUnit(record.get(ReminderColumns.AFTER_TIME_SPAN_UNIT)));
-            values.putAfterTimeSpanCount(CSVConvert.toInteger(record.get(ReminderColumns.AFTER_TIME_SPAN_COUNT)));
-            values.putAfterDistance(CSVConvert.toInteger(record.get(ReminderColumns.AFTER_DISTANCE)));
-            //noinspection ConstantConditions
-            values.putStartDate(CSVConvert.toDate(record.get(ReminderColumns.START_DATE)));
-            //noinspection ConstantConditions
-            values.putStartMileage(CSVConvert.toInteger(record.get(ReminderColumns.START_MILEAGE)));
-            //noinspection ConstantConditions
-            values.putNotificationDismissed(CSVConvert.toBoolean(record.get(ReminderColumns.NOTIFICATION_DISMISSED)));
-            values.putSnoozedUntil(CSVConvert.toDate(record.get(ReminderColumns.SNOOZED_UNTIL)));
-            //noinspection ConstantConditions
-            values.putCarId(CSVConvert.toLong(record.get(ReminderColumns.CAR_ID)));
-
-            boolean updated = false;
-            if (id != null) {
-                ReminderSelection selection = new ReminderSelection().id(id);
-                ReminderCursor reminder = selection.query(mContext.getContentResolver());
-                if (reminder.getCount() > 0) {
-                    operations.add(ContentProviderOperation.newUpdate(values.uri())
-                            .withSelection(selection.sel(), selection.args())
-                            .withValues(values.values())
-                            .build());
-                    updated = true;
-                }
-            }
-
-            if (!updated) {
-                if (id != null) {
-                    values.values().put(ReminderColumns._ID, id);
-                }
-
-                operations.add(ContentProviderOperation.newInsert(values.uri())
-                        .withValues(values.values())
-                        .build());
-            }
-        }
-
-        return operations;
+    private void importRefuelings(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_REFUELING + ".csv", format, record -> {
+            var refueling = new Refueling();
+            refueling.setId(CSVConvert.toLong(record.get(_ID)));
+            var date = CSVConvert.toDate(record.get(REFUELING_DATE));
+            refueling.setDate(date != null ? date : new Date());
+            var mileage = CSVConvert.toInteger(record.get(REFUELING_MILEAGE));
+            refueling.setMileage(mileage != null ? mileage : 0);
+            var volume = CSVConvert.toFloat(record.get(REFUELING_VOLUME));
+            refueling.setVolume(volume != null ? volume : 0f);
+            var price = CSVConvert.toFloat(record.get(REFUELING_PRICE));
+            refueling.setPrice(price != null ? price : 0f);
+            var partial = CSVConvert.toBoolean(record.get(REFUELING_PARTIAL));
+            refueling.setPartial(partial != null ? partial : false);
+            refueling.setNote(record.get(REFUELING_NOTE));
+            var fuelId = CSVConvert.toLong(record.get(REFUELING_FUEL_TYPE_ID));
+            refueling.setFuelTypeId(fuelId != null ? fuelId : 0L);
+            var stationId = CSVConvert.toLong(record.get(REFUELING_STATION_ID));
+            refueling.setStationId(stationId != null ? stationId : 0L);
+            var carId = CSVConvert.toLong(record.get(REFUELING_CAR_ID));
+            refueling.setCarId(carId != null ? carId : 0L);
+            db.getRefuelingDao().insert(refueling);
+        });
     }
 
-    private ArrayList<ContentProviderOperation> importTireList() throws IOException, CSVImportException {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
-
-        CSVParser csv = CSVParser.parse(
-            new File(mExportDir, TireListColumns.TABLE_NAME + ".csv"),
-            Charset.defaultCharset(),
-            mCSVFormat);
-
-        for (CSVRecord record : csv) {
-            Long id = CSVConvert.toLong(record.get(TireListColumns._ID));
-
-            TireListContentValues values = new TireListContentValues();
-            values.putManufacturer(record.get(TireListColumns.MANUFACTURER));
-            values.putModel(record.get(TireListColumns.MODEL));
-            Date buyDate = CSVConvert.toDate(record.get(TireListColumns.BUY_DATE));
-            if (buyDate == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putBuyDate(buyDate);
-            values.putQuantity(CSVConvert.toInteger(record.get(TireListColumns.QUANTITY)));
-            values.putPrice(CSVConvert.toFloat(record.get(TireListColumns.PRICE)));
-            Date trashDate = CSVConvert.toDate(record.get(TireListColumns.TRASH_DATE));
-            if (!record.get(TireListColumns.TRASH_DATE).isEmpty() && trashDate == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putTrashDate(trashDate);
-            values.putNote(record.get(TireListColumns.NOTE));
-            values.putCarId(CSVConvert.toLong(record.get(TireListColumns.CAR_ID)));
-
-            boolean updated = false;
-            if (id != null) {
-                TireListSelection selection = new TireListSelection().id(id);
-                TireListCursor tireList = selection.query(mContext.getContentResolver());
-                if (tireList.getCount() > 0) {
-                    operations.add(ContentProviderOperation.newUpdate(values.uri())
-                        .withSelection(selection.sel(), selection.args())
-                        .withValues(values.values())
-                        .build());
-                    updated = true;
-                }
-            }
-
-            if (!updated) {
-                if (id != null) {
-                    values.values().put(TireListColumns._ID, id);
-                }
-
-                operations.add(ContentProviderOperation.newInsert(values.uri())
-                    .withValues(values.values())
-                    .build());
-            }
-        }
-
-        return operations;
+    private void importReminders(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_REMINDER + ".csv", format, record -> {
+            var reminder = new Reminder();
+            reminder.setId(CSVConvert.toLong(record.get(_ID)));
+            reminder.setTitle(record.get(REMINDER_TITLE));
+            reminder.setAfterTimeSpanUnit(CSVConvert.toTimeSpanUnit(record.get(REMINDER_AFTER_TIME_SPAN_UNIT)));
+            reminder.setAfterTimeSpanCount(CSVConvert.toInteger(record.get(REMINDER_AFTER_TIME_SPAN_COUNT)));
+            reminder.setAfterDistance(CSVConvert.toInteger(record.get(REMINDER_AFTER_DISTANCE)));
+            var startDate = CSVConvert.toDate(record.get(REMINDER_START_DATE));
+            reminder.setStartDate(startDate != null ? startDate : new Date());
+            var startMileage = CSVConvert.toInteger(record.get(REMINDER_START_MILEAGE));
+            reminder.setStartMileage(startMileage != null ? startMileage : 0);
+            var dismissed = CSVConvert.toBoolean(record.get(REMINDER_NOTIFICATION_DISMISSED));
+            reminder.setNotificationDismissed(dismissed != null ? dismissed : false);
+            reminder.setSnoozedUntil(CSVConvert.toDate(record.get(REMINDER_SNOOZED_UNTIL)));
+            var carId = CSVConvert.toLong(record.get(REMINDER_CAR_ID));
+            reminder.setCarId(carId != null ? carId : 0L);
+            db.getReminderDao().insert(reminder);
+        });
     }
 
-    private ArrayList<ContentProviderOperation> importTireUsages() throws IOException, CSVImportException {
-        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
+    private void importTireList(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_TIRE_LIST + ".csv", format, record -> {
+            var tireList = new TireList();
+            tireList.setId(CSVConvert.toLong(record.get(_ID)));
+            var buyDate = CSVConvert.toDate(record.get(TIRE_LIST_BUY_DATE));
+            tireList.setBuyDate(buyDate != null ? buyDate : new Date());
+            tireList.setTrashDate(CSVConvert.toDate(record.get(TIRE_LIST_TRASH_DATE)));
+            var price = CSVConvert.toFloat(record.get(TIRE_LIST_PRICE));
+            tireList.setPrice(price != null ? price : 0f);
+            var quantity = CSVConvert.toInteger(record.get(TIRE_LIST_QUANTITY));
+            tireList.setQuantity(quantity != null ? quantity : 0);
+            tireList.setManufacturer(record.get(TIRE_LIST_MANUFACTURER));
+            tireList.setModel(record.get(TIRE_LIST_MODEL));
+            tireList.setNote(record.get(TIRE_LIST_NOTE));
+            var carId = CSVConvert.toLong(record.get(TIRE_LIST_CAR_ID));
+            tireList.setCarId(carId != null ? carId : 0L);
+            db.getTireDao().insert(tireList);
+        });
+    }
 
-        CSVParser csv = CSVParser.parse(
-            new File(mExportDir, TireUsageColumns.TABLE_NAME + ".csv"),
-            Charset.defaultCharset(),
-            mCSVFormat);
+    private void importTireUsages(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_TIRE_USAGE + ".csv", format, record -> {
+            var tireUsage = new TireUsage();
+            tireUsage.setId(CSVConvert.toLong(record.get(_ID)));
+            var mountDist = CSVConvert.toInteger(record.get(TIRE_USAGE_DISTANCE_MOUNT));
+            tireUsage.setDistanceMount(mountDist != null ? mountDist : 0);
+            var mountDate = CSVConvert.toDate(record.get(TIRE_USAGE_DATE_MOUNT));
+            tireUsage.setDateMount(mountDate != null ? mountDate : new Date());
+            var umountDist = CSVConvert.toInteger(record.get(TIRE_USAGE_DISTANCE_UMOUNT));
+            tireUsage.setDistanceUmount(umountDist != null ? umountDist : 0);
+            tireUsage.setDateUmount(CSVConvert.toDate(record.get(TIRE_USAGE_DATE_UMOUNT)));
+            var tireId = CSVConvert.toLong(record.get(TIRE_USAGE_TIRE_ID));
+            tireUsage.setTireId(tireId != null ? tireId : 0L);
+            db.getTireDao().insert(tireUsage);
+        });
+    }
 
-        for (CSVRecord record : csv) {
-            Long id = CSVConvert.toLong(record.get(TireUsageColumns._ID));
+    @FunctionalInterface
+    private interface ExportAction {
+        void export(CSVPrinter csv) throws IOException;
+    }
 
-            TireUsageContentValues values = new TireUsageContentValues();
-            values.putDistanceMount(CSVConvert.toInteger(record.get(TireUsageColumns.DISTANCE_MOUNT)));
-            Date dateMount = CSVConvert.toDate(record.get(TireUsageColumns.DATE_MOUNT));
-            if (dateMount == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putDateMount(dateMount);
-            values.putDistanceUmount(CSVConvert.toInteger(record.get(TireUsageColumns.DISTANCE_UMOUNT)));
-            Date dateUmount = CSVConvert.toDate(record.get(TireUsageColumns.DATE_UMOUNT));
-            if (!record.get(TireUsageColumns.DATE_UMOUNT).isEmpty() && dateUmount == null) {
-                throw new CSVImportException(DATE_INVALID_FORMAT_EXC);
-            }
-            values.putDateUmount(dateUmount);
-            values.putTireId(CSVConvert.toLong(record.get(TireUsageColumns.TIRE_ID)));
+    @FunctionalInterface
+    private interface ImportAction {
+        void importRecord(CSVRecord record) throws IOException;
+    }
 
-            boolean updated = false;
-            if (id != null) {
-                TireUsageSelection selection = new TireUsageSelection().id(id);
-                TireUsageCursor tireUsage = selection.query(mContext.getContentResolver());
-                if (tireUsage.getCount() > 0) {
-                    operations.add(ContentProviderOperation.newUpdate(values.uri())
-                        .withSelection(selection.sel(), selection.args())
-                        .withValues(values.values())
-                        .build());
-                    updated = true;
-                }
-            }
-
-            if (!updated) {
-                if (id != null) {
-                    values.values().put(TireUsageColumns._ID, id);
-                }
-
-                operations.add(ContentProviderOperation.newInsert(values.uri())
-                    .withValues(values.values())
-                    .build());
+    private void doExport(String fileName, String[] columns, ExportAction action) throws IOException {
+        var file = getOrCreateFile(fileName);
+        try (var out = context.getContentResolver().openOutputStream(file.getUri())) {
+            if (out == null) throw new IOException("Could not open output stream for " + fileName);
+            try (var writer = new PrintWriter(out);
+                 var csv = new CSVPrinter(writer, csvFormat)) {
+                csv.printRecord((Object[]) columns);
+                action.export(csv);
             }
         }
+    }
 
-        return operations;
+    private void doImport(String fileName, CSVFormat format, ImportAction action) throws IOException {
+        if (exportDir == null) return;
+        var file = exportDir.findFile(fileName);
+        if (file == null) return;
+
+        try (var in = context.getContentResolver().openInputStream(file.getUri())) {
+            if (in == null) throw new IOException("Could not open input stream for " + fileName);
+            try (var reader = new InputStreamReader(in);
+                 var parser = CSVParser.parse(reader, format)) {
+                for (var record : parser) {
+                    action.importRecord(record);
+                }
+            }
+        }
     }
 }

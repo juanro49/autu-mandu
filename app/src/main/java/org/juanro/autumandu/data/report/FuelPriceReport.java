@@ -17,42 +17,36 @@
 package org.juanro.autumandu.data.report;
 
 import android.content.Context;
-import android.database.Cursor;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import lecho.lib.hellocharts.util.ChartUtils;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
-import org.juanro.autumandu.provider.fueltype.FuelTypeColumns;
-import org.juanro.autumandu.provider.fueltype.FuelTypeCursor;
-import org.juanro.autumandu.provider.fueltype.FuelTypeSelection;
-import org.juanro.autumandu.provider.refueling.RefuelingColumns;
-import org.juanro.autumandu.provider.refueling.RefuelingCursor;
-import org.juanro.autumandu.provider.refueling.RefuelingSelection;
+import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.entity.FuelType;
+import org.juanro.autumandu.model.entity.Refueling;
 
 public class FuelPriceReport extends AbstractReport {
     private class ReportChartData extends AbstractReportChartLineData {
-        private Cursor mCursor;
         private double mMax, mMin, mAverage;
 
-        public ReportChartData(Context context, FuelTypeCursor fuelType, int color) {
+        public ReportChartData(Context context, FuelType fuelType, int color, List<Refueling> refuelings) {
             super(context, fuelType.getName(), color);
 
-            RefuelingCursor refueling = new RefuelingSelection()
-                    .fuelTypeId(fuelType.getId())
-                    .query(mContext.getContentResolver(), RefuelingColumns.ALL_COLUMNS, RefuelingColumns.DATE);
-            mCursor = refueling;
             mMax = Double.MIN_VALUE;
             mMin = Double.MAX_VALUE;
             mAverage = 0;
             int count = 0;
-            while (refueling.moveToNext()) {
-                if (refueling.getPrice() == 0.0f) {
+
+            for (Refueling refueling : refuelings) {
+                if (refueling.getPrice() == 0.0f || refueling.getVolume() == 0.0f) {
                     continue;
                 }
 
@@ -72,7 +66,9 @@ public class FuelPriceReport extends AbstractReport {
                         false);
             }
 
-            mAverage /= count;
+            if (count > 0) {
+                mAverage /= count;
+            }
         }
 
         public double getAverage() {
@@ -86,13 +82,9 @@ public class FuelPriceReport extends AbstractReport {
         public double getMin() {
             return mMin;
         }
-
-        public Cursor[] getUsedCursors() {
-            return new Cursor[]{mCursor};
-        }
     }
 
-    private ArrayList<AbstractReportChartData> mReportChartData;
+    private final List<AbstractReportChartData> mReportChartData = new ArrayList<>();
     private String mUnit;
     private DateFormat mDateFormat;
 
@@ -107,7 +99,7 @@ public class FuelPriceReport extends AbstractReport {
 
     @Override
     protected String formatYValue(float value, int chartOption) {
-        return String.format("%.2f", value);
+        return String.format(Locale.getDefault(), "%.3f", value);
     }
 
     @Override
@@ -126,46 +118,46 @@ public class FuelPriceReport extends AbstractReport {
     }
 
     @Override
-    protected Cursor[] onUpdate() {
+    protected void onUpdate() {
+        mReportChartData.clear();
         Preferences prefs = new Preferences(mContext);
         mUnit = String.format("%s/%s", prefs.getUnitCurrency(), prefs.getUnitVolume());
         mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
 
-        ArrayList<Cursor> cursors = new ArrayList<>();
+        AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
+        List<FuelType> fuelTypes = db.getFuelTypeDao().getAll();
 
-        FuelTypeCursor fuelType = new FuelTypeSelection().query(mContext.getContentResolver(), null,
-                FuelTypeColumns.NAME + " COLLATE UNICODE");
-        cursors.add(fuelType);
+        // Bulk load all refuelings and group by fuelTypeId (N+1 avoidance)
+        Map<Long, List<Refueling>> refuelingsByFuelType = db.getRefuelingDao().getAll()
+                .stream().collect(Collectors.groupingBy(Refueling::getFuelTypeId));
 
         int[] colors = ChartUtils.COLORS;
         int currentColor = 0;
 
-        mReportChartData = new ArrayList<>();
-        while (fuelType.moveToNext()) {
-            int color = colors[currentColor];
-            ReportChartData data = new ReportChartData(mContext, fuelType, color);
-            cursors.addAll(Arrays.asList(data.getUsedCursors()));
+        for (FuelType fuelType : fuelTypes) {
+            Long fuelTypeIdObj = fuelType.getId();
+            if (fuelTypeIdObj == null) continue;
+            long fuelTypeId = fuelTypeIdObj;
+
+            List<Refueling> fuelTypeRefuelings = refuelingsByFuelType.get(fuelTypeId);
+            if (fuelTypeRefuelings == null) fuelTypeRefuelings = Collections.emptyList();
+
+            int color = colors[currentColor % colors.length];
+            ReportChartData data = new ReportChartData(mContext, fuelType, color, fuelTypeRefuelings);
+
             if (!data.isEmpty()) {
                 mReportChartData.add(data);
 
                 Section section = addDataSection(fuelType.getName(), color);
-                section.addItem(new Item(mContext
-                        .getString(R.string.report_highest), String.format(Locale.getDefault(),
-                        "%.3f %s", data.getMax(), mUnit)));
-                section.addItem(new Item(mContext
-                        .getString(R.string.report_lowest), String.format(Locale.getDefault(),
-                        "%.3f %s", data.getMin(), mUnit)));
-                section.addItem(new Item(mContext
-                        .getString(R.string.report_average), String.format(Locale.getDefault(),
-                        "%.3f %s", data.getAverage(), mUnit)));
+                section.addItem(new Item(mContext.getString(R.string.report_highest),
+                        String.format(Locale.getDefault(), "%.3f %s", data.getMax(), mUnit)));
+                section.addItem(new Item(mContext.getString(R.string.report_lowest),
+                        String.format(Locale.getDefault(), "%.3f %s", data.getMin(), mUnit)));
+                section.addItem(new Item(mContext.getString(R.string.report_average),
+                        String.format(Locale.getDefault(), "%.3f %s", data.getAverage(), mUnit)));
 
                 currentColor++;
-                if (currentColor >= colors.length) {
-                    currentColor = 0;
-                }
             }
         }
-
-        return cursors.toArray(new Cursor[cursors.size()]);
     }
 }

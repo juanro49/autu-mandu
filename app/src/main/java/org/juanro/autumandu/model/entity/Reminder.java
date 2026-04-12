@@ -3,15 +3,18 @@ package org.juanro.autumandu.model.entity;
 import java.util.Date;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import org.juanro.autumandu.model.IReminder;
 import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
 
-@Entity(tableName = "reminder", foreignKeys = {
+@Entity(tableName = "reminder", indices = {
+        @Index("car_id")
+}, foreignKeys = {
         @ForeignKey(
                 childColumns = { "car_id" },
                 parentColumns = { "_id" },
@@ -19,7 +22,7 @@ import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
                 onDelete = ForeignKey.CASCADE
         )
 })
-public class Reminder implements IReminder {
+public class Reminder {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     private Long id;
@@ -29,12 +32,15 @@ public class Reminder implements IReminder {
     private String title = "";
 
     @ColumnInfo(name = "after_time_span_unit")
+    @Nullable
     private TimeSpanUnit afterTimeSpanUnit;
 
     @ColumnInfo(name = "after_time_span_count")
+    @Nullable
     private Integer afterTimeSpanCount;
 
     @ColumnInfo(name = "after_distance")
+    @Nullable
     private Integer afterDistance;
 
     @NonNull
@@ -48,29 +54,31 @@ public class Reminder implements IReminder {
     private boolean notificationDismissed;
 
     @ColumnInfo(name = "snoozed_until")
+    @Nullable
     private Date snoozedUntil;
 
     @ColumnInfo(name = "car_id")
     private long carId;
 
-    public Reminder() {}
-
-    @Ignore
-    public Reminder(long carId, @NonNull String title, TimeSpanUnit afterTimeSpanUnit,
-                    Integer afterTimeSpanCount, Integer afterDistance, @NonNull Date startDate,
-                    int startMileage, boolean notificationDismissed, Date snoozedUntil) {
-        this.setCarId(carId);
-        this.setTitle(title);
-        this.setAfterTimeSpanUnit(afterTimeSpanUnit);
-        this.setAfterTimeSpanCount(afterTimeSpanCount);
-        this.setAfterDistance(afterDistance);
-        this.setStartDate(startDate);
-        this.setStartMileage(startMileage);
-        this.setNotificationDismissed(notificationDismissed);
-        this.setSnoozedUntil(snoozedUntil);
+    public Reminder() {
     }
 
-    @Override
+    @Ignore
+    public Reminder(long carId, @NonNull String title, @Nullable TimeSpanUnit afterTimeSpanUnit,
+                    @Nullable Integer afterTimeSpanCount, @Nullable Integer afterDistance,
+                    @NonNull Date startDate, int startMileage, boolean notificationDismissed,
+                    @Nullable Date snoozedUntil) {
+        this.carId = carId;
+        this.title = title;
+        this.afterTimeSpanUnit = afterTimeSpanUnit;
+        this.afterTimeSpanCount = afterTimeSpanCount;
+        this.afterDistance = afterDistance;
+        this.startDate = startDate;
+        this.startMileage = startMileage;
+        this.notificationDismissed = notificationDismissed;
+        this.snoozedUntil = snoozedUntil;
+    }
+
     public Long getId() {
         return id;
     }
@@ -80,7 +88,6 @@ public class Reminder implements IReminder {
     }
 
     @NonNull
-    @Override
     public String getTitle() {
         return title;
     }
@@ -89,35 +96,34 @@ public class Reminder implements IReminder {
         this.title = title;
     }
 
-    @Override
+    @Nullable
     public TimeSpanUnit getAfterTimeSpanUnit() {
         return afterTimeSpanUnit;
     }
 
-    public void setAfterTimeSpanUnit(TimeSpanUnit afterTimeSpanUnit) {
+    public void setAfterTimeSpanUnit(@Nullable TimeSpanUnit afterTimeSpanUnit) {
         this.afterTimeSpanUnit = afterTimeSpanUnit;
     }
 
-    @Override
+    @Nullable
     public Integer getAfterTimeSpanCount() {
         return afterTimeSpanCount;
     }
 
-    public void setAfterTimeSpanCount(Integer afterTimeSpanCount) {
+    public void setAfterTimeSpanCount(@Nullable Integer afterTimeSpanCount) {
         this.afterTimeSpanCount = afterTimeSpanCount;
     }
 
-    @Override
+    @Nullable
     public Integer getAfterDistance() {
         return afterDistance;
     }
 
-    public void setAfterDistance(Integer distance) {
+    public void setAfterDistance(@Nullable Integer distance) {
         this.afterDistance = distance;
     }
 
     @NonNull
-    @Override
     public Date getStartDate() {
         return startDate;
     }
@@ -126,7 +132,6 @@ public class Reminder implements IReminder {
         this.startDate = startDate;
     }
 
-    @Override
     public int getStartMileage() {
         return startMileage;
     }
@@ -135,8 +140,7 @@ public class Reminder implements IReminder {
         this.startMileage = startMileage;
     }
 
-    @Override
-    public boolean getNotificationDismissed() {
+    public boolean isNotificationDismissed() {
         return notificationDismissed;
     }
 
@@ -144,16 +148,15 @@ public class Reminder implements IReminder {
         this.notificationDismissed = notificationDismissed;
     }
 
-    @Override
+    @Nullable
     public Date getSnoozedUntil() {
         return snoozedUntil;
     }
 
-    public void setSnoozedUntil(Date snoozedUntil) {
+    public void setSnoozedUntil(@Nullable Date snoozedUntil) {
         this.snoozedUntil = snoozedUntil;
     }
 
-    @Override
     public long getCarId() {
         return carId;
     }

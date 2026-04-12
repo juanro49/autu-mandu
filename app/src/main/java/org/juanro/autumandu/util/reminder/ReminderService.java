@@ -16,16 +16,20 @@
 
 package org.juanro.autumandu.util.reminder;
 
-import android.app.IntentService;
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
 import android.text.TextUtils;
 
@@ -37,15 +41,17 @@ import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.query.ReminderQueries;
 import org.juanro.autumandu.gui.MainActivity;
-import org.juanro.autumandu.gui.PreferencesActivity;
-import org.juanro.autumandu.gui.PreferencesRemindersFragment;
-import org.juanro.autumandu.presentation.CarPresenter;
-import org.juanro.autumandu.provider.reminder.ReminderColumns;
-import org.juanro.autumandu.provider.reminder.ReminderContentValues;
-import org.juanro.autumandu.provider.reminder.ReminderCursor;
-import org.juanro.autumandu.provider.reminder.ReminderSelection;
+import org.juanro.autumandu.gui.pref.PreferencesActivity;
+import org.juanro.autumandu.gui.pref.PreferencesRemindersFragment;
+import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dto.ReminderWithCar;
+import org.juanro.autumandu.model.entity.Reminder;
+import org.juanro.autumandu.util.MileageUtil;
 
-public class ReminderService extends IntentService {
+/**
+ * Service for handling reminders and showing notifications.
+ */
+public class ReminderService {
     public static final String ACTION_UPDATE_NOTIFICATION = "org.juanro.autumandu.util.reminder.ReminderService.UPDATE_NOTIFICATION";
     public static final String ACTION_MARK_REMINDERS_DONE = "org.juanro.autumandu.util.reminder.ReminderService.MARK_REMINDERS_DONE";
     public static final String ACTION_DISMISS_REMINDERS = "org.juanro.autumandu.util.reminder.ReminderService.DISMISS_REMINDERS";
@@ -56,142 +62,137 @@ public class ReminderService extends IntentService {
     private static final int NOTIFICATION_ID = 1;
     private static final String NOTIFICATION_CHANNEL_ID = "reminders";
 
-    public ReminderService() {
-        super("Reminder Service");
+    private ReminderService() {
+        // Utility class
     }
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        String action = intent.getAction();
-        if (action == null) {
-            return;
-        }
-
-        long[] reminderIds = intent.getLongArrayExtra(EXTRA_REMINDER_IDS);
-
-        switch (action) {
-            case ACTION_UPDATE_NOTIFICATION:
-                updateNotification(this);
-                break;
-            case ACTION_MARK_REMINDERS_DONE:
-                markRemindersDone(this, reminderIds);
-                break;
-            case ACTION_DISMISS_REMINDERS:
-                dismissReminders(this, reminderIds);
-                break;
-            case ACTION_SNOOZE_REMINDERS:
-                snoozeReminders(this, reminderIds);
-                break;
-        }
-    }
-
+    /**
+     * Creates a PendingIntent for a Broadcast to handle reminder actions.
+     */
     public static PendingIntent getPendingIntent(Context context, String action, long... reminderIds) {
-        Intent intent = new Intent(context, ReminderService.class);
+        var intent = new Intent(context, ReminderActionReceiver.class);
         intent.setAction(action);
         intent.putExtra(ReminderService.EXTRA_REMINDER_IDS, reminderIds);
-        return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT |  PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getBroadcast(context, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     public static void updateNotification(Context context) {
-        NotificationManager notificationManager = (NotificationManager) context
-                .getSystemService(Context.NOTIFICATION_SERVICE);
+        var notificationManager = NotificationManagerCompat.from(context);
+        long[] dueIds = getDueReminderIds(context);
 
-        List<Long> dueReminderIds = new ArrayList<>();
-        ReminderCursor reminder = new ReminderSelection().query(context.getContentResolver(), ReminderColumns.ALL_COLUMNS);
-        ReminderQueries queries = new ReminderQueries(context, reminder);
-        while (reminder.moveToNext()) {
-            // Filter dismissed notifications
-            if (reminder.getNotificationDismissed()) {
-                continue;
-            }
-
-            // Filter snoozed notifications
-            if (queries.isSnoozed()) {
-                continue;
-            }
-
-            if (queries.isDue()) {
-                dueReminderIds.add(reminder.getId());
-            }
-        }
-
-        long[] ids = new long[dueReminderIds.size()];
-        for (int i = 0; i < dueReminderIds.size(); i++) {
-            ids[i] = dueReminderIds.get(i);
-        }
-
-        if (dueReminderIds.size() > 0) {
+        if (dueIds.length > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notificationManager.createNotificationChannel(buildNotificationChannel(context));
+                var systemManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                if (systemManager != null) {
+                    systemManager.createNotificationChannel(buildNotificationChannel(context));
+                }
             }
 
-            notificationManager.notify(NOTIFICATION_ID, buildNotification(context, ids));
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                notificationManager.notify(NOTIFICATION_ID, buildNotification(context, dueIds));
+            }
         } else {
             notificationManager.cancel(NOTIFICATION_ID);
         }
     }
 
-    public static void markRemindersDone(Context context, long... reminderIds) {
-        Date now = new Date();
-        CarPresenter carPresenter = CarPresenter.getInstance(context);
+    @NonNull
+    private static long[] getDueReminderIds(Context context) {
+        var db = AutuManduDatabase.getInstance(context);
+        var reminders = db.getReminderDao().getAllWithCar();
+        var dueReminderIdsList = new ArrayList<Long>();
 
-        ReminderCursor reminder = new ReminderSelection().id(reminderIds).query(context.getContentResolver());
-        while (reminder.moveToNext()) {
-            ReminderContentValues values = new ReminderContentValues();
-            values.putStartDate(now);
-            values.putStartMileage(carPresenter.getLatestMileage(reminder.getCarId()));
-            values.putSnoozedUntilNull();
-            values.putNotificationDismissed(false);
-            values.update(context.getContentResolver(), new ReminderSelection().id(reminder.getId()));
+        for (var reminder : reminders) {
+            var queries = new ReminderQueries(context, reminder);
+            if (reminder.reminder().isNotificationDismissed() || queries.isSnoozed()) {
+                continue;
+            }
+
+            if (queries.isDue()) {
+                dueReminderIdsList.add(reminder.reminder().getId());
+            }
+        }
+
+        var ids = new long[dueReminderIdsList.size()];
+        for (int i = 0; i < dueReminderIdsList.size(); i++) {
+            ids[i] = dueReminderIdsList.get(i);
+        }
+        return ids;
+    }
+
+    public static void markRemindersDone(Context context, long... reminderIds) {
+        var now = new Date();
+        var db = AutuManduDatabase.getInstance(context);
+
+        for (long id : reminderIds) {
+            var reminder = db.getReminderDao().getById(id);
+            if (reminder != null) {
+                reminder.setStartDate(now);
+                reminder.setStartMileage(MileageUtil.getLatestMileage(context, reminder.getCarId()));
+                reminder.setSnoozedUntil(null);
+                reminder.setNotificationDismissed(false);
+                db.getReminderDao().update(reminder);
+            }
         }
 
         updateNotification(context);
     }
 
     public static void dismissReminders(Context context, long... reminderIds) {
+        var db = AutuManduDatabase.getInstance(context);
         for (long id : reminderIds) {
-            ReminderContentValues values = new ReminderContentValues();
-            values.putNotificationDismissed(true);
-            values.update(context.getContentResolver(), new ReminderSelection().id(id));
+            var reminder = db.getReminderDao().getById(id);
+            if (reminder != null) {
+                reminder.setNotificationDismissed(true);
+                db.getReminderDao().update(reminder);
+            }
         }
 
         updateNotification(context);
     }
 
     public static void snoozeReminders(Context context, long... reminderIds) {
-        Preferences prefs = new Preferences(context);
+        var preferences = new Preferences(context);
+        var db = AutuManduDatabase.getInstance(context);
 
-        Date now = new Date();
-        Date snoozedUntil = prefs.getReminderSnoozeDuration().addTo(now);
+        var now = new Date();
+        var snoozedUntil = preferences.getReminderSnoozeDuration().addTo(now);
 
         for (long id : reminderIds) {
-            ReminderContentValues values = new ReminderContentValues();
-            values.putSnoozedUntil(snoozedUntil);
-            values.update(context.getContentResolver(), new ReminderSelection().id(id));
+            var reminder = db.getReminderDao().getById(id);
+            if (reminder != null) {
+                reminder.setSnoozedUntil(snoozedUntil);
+                db.getReminderDao().update(reminder);
+            }
         }
 
         updateNotification(context);
     }
 
     private static Notification buildNotification(Context context, long... reminderIds) {
-        ReminderCursor reminder = new ReminderSelection().id(reminderIds).query(context.getContentResolver());
+        var db = AutuManduDatabase.getInstance(context);
+        var reminders = new ArrayList<ReminderWithCar>();
+        for (long id : reminderIds) {
+            reminders.add(db.getReminderDao().getByIdWithCar(id));
+        }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+        var builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_c_notification_24dp)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
 
         // Content intent
-        Intent contentIntent = new Intent(context, PreferencesActivity.class);
+        var contentIntent = new Intent(context, PreferencesActivity.class);
         contentIntent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT,
                 PreferencesRemindersFragment.class.getName());
         contentIntent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT_TITLE,
                 R.string.pref_title_header_reminders);
 
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context)
+        var stackBuilder = TaskStackBuilder.create(context)
                 .addNextIntentWithParentStack(new Intent(context, MainActivity.class))
                 .addNextIntent(contentIntent);
-        PendingIntent pendingContentIntent = stackBuilder.getPendingIntent(0,
+        var pendingContentIntent = stackBuilder.getPendingIntent(0,
             PendingIntent.FLAG_UPDATE_CURRENT |  PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingContentIntent);
 
@@ -199,13 +200,13 @@ public class ReminderService extends IntentService {
         builder.setDeleteIntent(getPendingIntent(context, ACTION_DISMISS_REMINDERS, reminderIds));
 
         // Specific layouts for one and many reminders
-        if (reminder.getCount() == 1) {
-            reminder.moveToNext();
+        if (reminders.size() == 1) {
+            var reminder = reminders.get(0);
 
             builder
                     .setContentTitle(context.getString(R.string.notification_reminder_title_single,
-                            reminder.getTitle()))
-                    .setContentText(reminder.getCarName())
+                            reminder.reminder().getTitle()))
+                    .setContentText(reminder.carName())
                     .addAction(R.drawable.ic_check_24dp,
                             context.getString(R.string.notification_reminder_action_done),
                             getPendingIntent(context, ACTION_MARK_REMINDERS_DONE, reminderIds))
@@ -213,22 +214,22 @@ public class ReminderService extends IntentService {
                             context.getString(R.string.notification_reminder_action_snooze),
                             getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds));
         } else {
-            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+            var inboxStyle = new NotificationCompat.InboxStyle();
             inboxStyle.setBigContentTitle(context.getString(
                     R.string.notification_reminder_title_multiple));
 
-            List<String> reminderTitles = new ArrayList<>(reminder.getCount());
-            while (reminder.moveToNext()) {
-                reminderTitles.add(reminder.getTitle());
-                inboxStyle.addLine(String.format("%s (%s)", reminder.getTitle(),
-                        reminder.getCarName()));
+            var reminderTitles = new ArrayList<String>(reminders.size());
+            for (var reminder : reminders) {
+                reminderTitles.add(reminder.reminder().getTitle());
+                inboxStyle.addLine(String.format("%s (%s)", reminder.reminder().getTitle(),
+                        reminder.carName()));
             }
 
             builder
                     .setContentTitle(context.getString(
                             R.string.notification_reminder_title_multiple))
                     .setContentText(TextUtils.join(", ", reminderTitles))
-                    .setNumber(reminder.getCount())
+                    .setNumber(reminders.size())
                     .setStyle(inboxStyle)
                     .addAction(R.drawable.ic_snooze_24dp,
                             context.getString(R.string.notification_reminder_action_snooze_all),
@@ -240,11 +241,9 @@ public class ReminderService extends IntentService {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private static NotificationChannel buildNotificationChannel(Context context) {
-        NotificationChannel notificationChannel = new NotificationChannel(
+        return new NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
                 context.getString(R.string.notification_reminder_channel),
                 NotificationManager.IMPORTANCE_LOW);
-
-        return notificationChannel;
     }
 }

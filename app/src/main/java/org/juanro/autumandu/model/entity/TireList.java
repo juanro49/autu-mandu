@@ -16,17 +16,19 @@
 package org.juanro.autumandu.model.entity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
-
-import org.juanro.autumandu.model.ITireList;
 
 import java.util.Date;
 
-@Entity(tableName = "tire_list", foreignKeys = {
+@Entity(tableName = "tire_list", indices = {
+    @Index("car_id")
+}, foreignKeys = {
     @ForeignKey(
         parentColumns = { "_id" },
         childColumns = { "car_id" },
@@ -34,7 +36,7 @@ import java.util.Date;
         onDelete = ForeignKey.CASCADE
     ),
 })
-public class TireList implements ITireList {
+public class TireList {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     private Long id;
@@ -44,6 +46,7 @@ public class TireList implements ITireList {
     private Date buyDate = new Date();
 
     @ColumnInfo(name = "trash_date")
+    @Nullable
     private Date trashDate;
 
     @ColumnInfo(name = "price")
@@ -67,25 +70,22 @@ public class TireList implements ITireList {
     @ColumnInfo(name = "car_id")
     private long carId;
 
-    public TireList()
-    {
+    public TireList() {
     }
 
     @Ignore
-    public TireList(long carId, @NonNull Date buyDate, Date trashDate, float price, int quantity,
-                    @NonNull String manufacturer, @NonNull String model, @NonNull String note)
-    {
-        this.setCarId(carId);
-        this.setBuyDate(buyDate);
-        this.setTrashDate(trashDate);
-        this.setPrice(price);
-        this.setQuantity(quantity);
-        this.setManufacturer(manufacturer);
-        this.setModel(model);
-        this.setNote(note);
+    public TireList(long carId, @NonNull Date buyDate, @Nullable Date trashDate, float price, int quantity,
+                    @NonNull String manufacturer, @NonNull String model, @NonNull String note) {
+        this.carId = carId;
+        this.buyDate = buyDate;
+        this.trashDate = trashDate;
+        this.price = price;
+        this.quantity = quantity;
+        this.manufacturer = manufacturer;
+        this.model = model;
+        this.note = note;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -103,11 +103,12 @@ public class TireList implements ITireList {
         this.buyDate = buyDate;
     }
 
+    @Nullable
     public Date getTrashDate() {
         return trashDate;
     }
 
-    public void setTrashDate(Date trashDate) {
+    public void setTrashDate(@Nullable Date trashDate) {
         this.trashDate = trashDate;
     }
 
@@ -154,7 +155,6 @@ public class TireList implements ITireList {
         this.note = note;
     }
 
-    @Override
     public long getCarId() {
         return carId;
     }

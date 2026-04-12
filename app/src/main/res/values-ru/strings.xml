@@ -81,7 +81,7 @@
     <string name="description_reminder_status_due">Установлено</string>
     <string name="description_reminder_status_due_snoozed">Установлено, отложено до %s</string>
     <string name="description_reminder_status_due_dismissed">Установлено без уведомления</string>
-    <string name="description_reminder_status_distance_and_time">Установлено на %1$ или %2$</string>
+    <string name="description_reminder_status_distance_and_time">Установлено на %1$s или %2$s</string>
     <string name="description_reminder_status_distance">Установлено на %s</string>
     <string name="description_reminder_status_time">Установлено на %s</string>
     <string name="description_webdav_url">Пожалуйста укажите URL к папке на вашем WebDAV сервере. Autu Mandu будет записывать в эту папку. Данные вне папки не будут изменены.</string>

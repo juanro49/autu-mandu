@@ -16,18 +16,31 @@
 package org.juanro.autumandu.gui.util;
 
 import android.os.Handler;
+import android.os.Looper;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.clans.fab.FloatingActionMenu;
 
+/**
+ * Utility class to show/hide a FloatingActionMenu based on RecyclerView scrolling.
+ */
 public class FloatingActionButtonRevealer {
     private static final int SCROLL_OFFSET = 4;
+    private static final int SHOW_DELAY_MS = 300;
 
-    public static void setup(final FloatingActionMenu fab, final RecyclerView list) {
+    /**
+     * Sets up the FloatingActionMenu to hide/show based on the scroll direction of the RecyclerView.
+     *
+     * @param fab  The FloatingActionMenu to reveal/hide.
+     * @param list The RecyclerView whose scroll events will trigger the reveal/hide.
+     */
+    public static void setup(@NonNull final FloatingActionMenu fab, @NonNull final RecyclerView list) {
         showDelayed(fab);
         list.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (Math.abs(dy) > SCROLL_OFFSET) {
                     if (dy > 0) {
@@ -40,8 +53,17 @@ public class FloatingActionButtonRevealer {
         });
     }
 
-    private static void showDelayed(final FloatingActionMenu fab) {
+    /**
+     * Shows the FAB with a slight delay, useful for initial screen transitions.
+     *
+     * @param fab The FloatingActionMenu to show.
+     */
+    private static void showDelayed(@NonNull final FloatingActionMenu fab) {
         fab.hideMenuButton(false);
-        new Handler().postDelayed(() -> fab.showMenuButton(true), 300);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (fab.isAttachedToWindow()) {
+                fab.showMenuButton(true);
+            }
+        }, SHOW_DELAY_MS);
     }
 }

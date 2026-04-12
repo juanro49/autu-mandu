@@ -14,26 +14,26 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
-    <header
-        android:fragment="org.juanro.autumandu.gui.PreferencesGeneralFragment"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:fragment="org.juanro.autumandu.gui.pref.PreferencesGeneralFragment"
         android:title="@string/pref_title_header_general" />
-    <header
-        android:fragment="org.juanro.autumandu.gui.PreferencesCarsFragment"
+    <Preference
+        android:fragment="org.juanro.autumandu.gui.pref.PreferencesCarsFragment"
         android:title="@string/pref_title_header_cars" />
-    <header
-        android:fragment="org.juanro.autumandu.gui.PreferencesFuelTypesFragment"
+    <Preference
+        android:fragment="org.juanro.autumandu.gui.pref.PreferencesFuelTypesFragment"
         android:title="@string/pref_title_header_fuel_types" />
-    <header
-        android:fragment="org.juanro.autumandu.gui.PreferencesStationsFragment"
+    <Preference
+        android:fragment="org.juanro.autumandu.gui.pref.PreferencesStationsFragment"
         android:title="@string/pref_title_header_stations" />
-    <header
-        android:fragment="org.juanro.autumandu.gui.PreferencesRemindersFragment"
+    <Preference
+        android:fragment="org.juanro.autumandu.gui.pref.PreferencesRemindersFragment"
         android:title="@string/pref_title_header_reminders" />
-    <header
-        android:fragment="org.juanro.autumandu.gui.PreferencesBackupFragment"
+    <Preference
+        android:fragment="org.juanro.autumandu.gui.pref.PreferencesBackupFragment"
         android:title="@string/pref_title_header_backup" />
-    <header
-        android:fragment="org.juanro.autumandu.gui.PreferencesAboutFragment"
+    <Preference
+        android:fragment="org.juanro.autumandu.gui.pref.PreferencesAboutFragment"
         android:title="@string/pref_title_header_about" />
-</preference-headers>
+</PreferenceScreen>

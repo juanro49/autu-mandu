@@ -1,0 +1,1 @@
+-- Archivo para nivelar versiones, ya que los .sql hasta ahora iban una versión por detrás de la versión de la BBDD

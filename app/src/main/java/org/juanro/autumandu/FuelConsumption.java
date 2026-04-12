@@ -17,33 +17,32 @@
 package org.juanro.autumandu;
 
 import android.content.Context;
+import androidx.annotation.NonNull;
+import java.util.Locale;
 
+/**
+ * Utility class for fuel consumption calculations.
+ */
 public class FuelConsumption {
     private Type consumptionType;
     private String unitVolume;
     private String unitDistance;
-    private Preferences preferences;
+    private final Preferences preferences;
 
     public FuelConsumption(Context context) {
         this.preferences = new Preferences(context);
         reload();
     }
 
-    public static Type findConsumptionType(int id) {
-        if (id == Type.DIST_FOR_VOL.id)
-            return Type.DIST_FOR_VOL;
-        return Type.VOL_FOR_DIST;
-    }
-
     public void reload() {
         int id = preferences.getUnitFuelConsumption();
-        this.setConsumptionType(id);
+        this.consumptionType = Type.fromId(id);
         this.unitVolume = preferences.getUnitVolume();
         this.unitDistance = preferences.getUnitDistance();
     }
 
     public void setConsumptionType(int id) {
-        this.consumptionType = FuelConsumption.findConsumptionType(id);
+        this.consumptionType = Type.fromId(id);
     }
 
     public void setUnitVolume(String unitVolume) {
@@ -55,11 +54,10 @@ public class FuelConsumption {
     }
 
     public float computeFuelConsumption(Type consumptionType, float volume, float distance) {
-        if (consumptionType == Type.DIST_FOR_VOL) {
-            return distance / volume;
-        } else {
-            return (float) (100.0 * volume / distance);
-        }
+        return switch (consumptionType) {
+            case DIST_FOR_VOL -> distance / volume;
+            case VOL_FOR_DIST -> (float) (100.0 * volume / distance);
+        };
     }
 
     public float computeFuelConsumption(float volume, float distance) {
@@ -67,30 +65,28 @@ public class FuelConsumption {
     }
 
     public String getUnitLabel(Type consumptionType) {
-        if (consumptionType == Type.DIST_FOR_VOL) {
-            return String.format("%s/%s", this.unitDistance, this.unitVolume);
-        } else {
-            return String
-                    .format("%s/100%s", this.unitVolume, this.unitDistance);
-        }
+        return switch (consumptionType) {
+            case DIST_FOR_VOL -> String.format(Locale.US, "%s/%s", unitDistance, unitVolume);
+            case VOL_FOR_DIST -> String.format(Locale.US, "%s/100%s", unitVolume, unitDistance);
+        };
     }
 
     public String getUnitLabel() {
-        return this.getUnitLabel(this.consumptionType);
+        return getUnitLabel(this.consumptionType);
     }
 
     public String[] getUnitsEntries() {
-        String[] list = new String[2];
-        list[0] = this.getUnitLabel(Type.VOL_FOR_DIST);
-        list[1] = this.getUnitLabel(Type.DIST_FOR_VOL);
-        return list;
+        return new String[]{
+                getUnitLabel(Type.VOL_FOR_DIST),
+                getUnitLabel(Type.DIST_FOR_VOL)
+        };
     }
 
     public String[] getUnitsEntryValues() {
-        String[] list = new String[2];
-        list[0] = String.valueOf(Type.VOL_FOR_DIST.id);
-        list[1] = String.valueOf(Type.DIST_FOR_VOL.id);
-        return list;
+        return new String[]{
+                String.valueOf(Type.VOL_FOR_DIST.id),
+                String.valueOf(Type.DIST_FOR_VOL.id)
+        };
     }
 
     public enum Type {
@@ -100,6 +96,11 @@ public class FuelConsumption {
 
         Type(int id) {
             this.id = id;
+        }
+
+        @NonNull
+        public static Type fromId(int id) {
+            return id == 1 ? DIST_FOR_VOL : VOL_FOR_DIST;
         }
     }
 }

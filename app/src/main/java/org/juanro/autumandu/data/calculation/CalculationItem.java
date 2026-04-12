@@ -16,31 +16,11 @@
 
 package org.juanro.autumandu.data.calculation;
 
-public class CalculationItem {
-    private String name;
-    private double value;
-    private int color;
-
+/**
+ * Represents a single result item of a calculation.
+ */
+public record CalculationItem(String name, double value, int color) {
     public CalculationItem(String name, double value) {
         this(name, value, 0);
-    }
-
-    public CalculationItem(String name, double value, int color) {
-        super();
-        this.name = name;
-        this.value = value;
-        this.color = color;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public int getColor() {
-        return color;
     }
 }

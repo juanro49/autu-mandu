@@ -17,48 +17,18 @@
 package org.juanro.autumandu.data.calculation;
 
 import android.content.Context;
-import android.database.ContentObserver;
-import android.os.Build;
-import android.os.Handler;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Base class for all calculations.
+ * Handles data lifecycle and provides a thread-safe entry point for calculations.
+ */
 public abstract class AbstractCalculation {
-    public final class ForceLoadContentObserver extends ContentObserver {
-        public ForceLoadContentObserver() {
-            super(new Handler());
-        }
 
-        @Override
-        public boolean deliverSelfNotifications() {
-            return true;
-        }
+    protected final Context mContext;
+    private volatile boolean mDataChanged = true;
 
-        @Override
-        public void onChange(boolean selfChange) {
-            contentChanged();
-        }
-    }
-
-    protected Context mContext;
-    private ForceLoadContentObserver mInternalObserver;
-    private List<ContentObserver> mPublicObservers;
-    private boolean mDataChanged;
-
-    public AbstractCalculation(Context context) {
-        mContext = context;
-        mInternalObserver = new ForceLoadContentObserver();
-        mPublicObservers = new ArrayList<>();
-        mDataChanged = true;
-    }
-
-    public void registerContentObserver(ContentObserver observer) {
-        mPublicObservers.add(observer);
-    }
-
-    public void unregisterContentObserver(ContentObserver observer) {
-        mPublicObservers.remove(observer);
+    protected AbstractCalculation(Context context) {
+        mContext = context.getApplicationContext();
     }
 
     public abstract String getName();
@@ -69,27 +39,38 @@ public abstract class AbstractCalculation {
 
     public abstract boolean hasColors();
 
-    public CalculationItem[] calculate(double input) {
+    /**
+     * Performs the calculation.
+     * Note: This performs database operations, so it MUST be called from a background thread.
+     * @param input The input value for the calculation.
+     * @return An array of results.
+     */
+    public synchronized CalculationItem[] calculate(double input) {
         if (mDataChanged) {
-            onLoadData(mInternalObserver);
+            onLoadData();
+            mDataChanged = false;
         }
 
         return onCalculate(input);
     }
 
-    protected abstract void onLoadData(ContentObserver observer);
-
-    protected abstract CalculationItem[] onCalculate(double input);
-
-    private void contentChanged() {
+    /**
+     * Marks the data as changed, so it will be reloaded on the next calculation.
+     */
+    public void notifyDataChanged() {
         mDataChanged = true;
-
-        for (ContentObserver observer : mPublicObservers) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                observer.dispatchChange(false, null);
-            }else {
-                observer.dispatchChange(false);
-            }
-        }
     }
+
+    /**
+     * Loads the required data from the database.
+     * Implementations should optimize this to avoid N+1 query problems.
+     */
+    protected abstract void onLoadData();
+
+    /**
+     * Performs the actual mathematical calculation based on pre-loaded data.
+     * @param input The user input.
+     * @return Result items.
+     */
+    protected abstract CalculationItem[] onCalculate(double input);
 }

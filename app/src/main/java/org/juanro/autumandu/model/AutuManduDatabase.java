@@ -3,10 +3,9 @@ package org.juanro.autumandu.model;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.InputStreamReader;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -16,13 +15,13 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
-import org.juanro.autumandu.model.dao.CarDAO;
-import org.juanro.autumandu.model.dao.FuelTypeDAO;
-import org.juanro.autumandu.model.dao.OtherCostDAO;
-import org.juanro.autumandu.model.dao.RefuelingDAO;
-import org.juanro.autumandu.model.dao.ReminderDAO;
-import org.juanro.autumandu.model.dao.StationDAO;
-import org.juanro.autumandu.model.dao.TireDAO;
+import org.juanro.autumandu.model.dao.CarDao;
+import org.juanro.autumandu.model.dao.FuelTypeDao;
+import org.juanro.autumandu.model.dao.OtherCostDao;
+import org.juanro.autumandu.model.dao.RefuelingDao;
+import org.juanro.autumandu.model.dao.ReminderDao;
+import org.juanro.autumandu.model.dao.StationDao;
+import org.juanro.autumandu.model.dao.TireDao;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.OtherCost;
@@ -32,26 +31,26 @@ import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.model.entity.TireList;
 import org.juanro.autumandu.model.entity.TireUsage;
 import org.juanro.autumandu.model.entity.helper.SQLTypeConverters;
-import org.juanro.autumandu.provider.DataSQLiteOpenHelper;
-
-import static org.juanro.autumandu.provider.DataSQLiteOpenHelper.DATABASE_FILE_NAME;
 
 @Database(
     entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class, Station.class, TireList.class, TireUsage.class},
-    version = 13
+    version = 14
 )
 @TypeConverters({SQLTypeConverters.class})
 public abstract class AutuManduDatabase extends RoomDatabase {
-    public abstract CarDAO getCarDao();
-    public abstract FuelTypeDAO getFuelTypeDao();
-    public abstract OtherCostDAO getOtherCostDao();
-    public abstract RefuelingDAO getRefuelingDao();
-    public abstract ReminderDAO getReminderDao();
-    public abstract StationDAO getStationDao();
-    public abstract TireDAO getTireDao();
+    public static final String DATABASE_NAME = "data.db";
 
-    private static AutuManduDatabase sInstance;
-    private static final String DB_NAME = DATABASE_FILE_NAME;
+    public abstract CarDao getCarDao();
+    public abstract FuelTypeDao getFuelTypeDao();
+    public abstract OtherCostDao getOtherCostDao();
+    public abstract RefuelingDao getRefuelingDao();
+    public abstract ReminderDao getReminderDao();
+    public abstract StationDao getStationDao();
+    public abstract TireDao getTireDao();
+
+    public static final java.util.concurrent.Executor DB_EXECUTOR = java.util.concurrent.Executors.newSingleThreadExecutor();
+
+    private static volatile AutuManduDatabase sInstance;
     private static final String LOG_TAG = "AutuManduDatabase";
 
     /**
@@ -59,97 +58,84 @@ public abstract class AutuManduDatabase extends RoomDatabase {
      * @param context A Context inside the Database should be used.
      * @return The instance of the Database.
      */
-    public static synchronized AutuManduDatabase getInstance(Context context) {
+    public static AutuManduDatabase getInstance(Context context) {
         if (sInstance == null) {
-            sInstance = Room.databaseBuilder(context, AutuManduDatabase.class, DB_NAME).
-                    allowMainThreadQueries().
-                    addMigrations(
-                        new AssetFileBasedMigration(context, 2),
-                        new AssetFileBasedMigration(context, 3),
-                        new AssetFileBasedMigration(context, 4),
-                        new AssetFileBasedMigration(context, 5),
-                        new AssetFileBasedMigration(context, 6),
-                        new AssetFileBasedMigration(context, 7),
-                        new AssetFileBasedMigration(context, 8),
-                        new AssetFileBasedMigration(context, 9),
-                        new AssetFileBasedMigration(context, 10),
-                        new AssetFileBasedMigration(context, 11),
-                        new AssetFileBasedMigration(context, 12),
-                        new Migration(12, 13) {
-                            @Override
-                            public void migrate(@NonNull SupportSQLiteDatabase database) {
-                                // Do nothing, just migrate to room.
-                                // Empty Migration creates the master table and does a sanity check.
-                                Log.i(LOG_TAG, String.format(Locale.US,
-                                    "Migrating to new version 13."));
-                                new AssetFileBasedMigration(context, 12).migrate(database);
-                                Log.i(LOG_TAG, String.format(Locale.US,
-                                    "Migrated to new version 13."));
-                            }
-                        }).
-                    build();
+            synchronized (AutuManduDatabase.class) {
+                if (sInstance == null) {
+                    var appContext = context.getApplicationContext();
+                    var builder = Room.databaseBuilder(
+                            appContext, AutuManduDatabase.class, DATABASE_NAME);
+
+                    builder.addMigrations(
+                            new AssetFileBasedMigration(appContext, 2),
+                            new AssetFileBasedMigration(appContext, 3),
+                            new AssetFileBasedMigration(appContext, 4),
+                            new AssetFileBasedMigration(appContext, 5),
+                            new AssetFileBasedMigration(appContext, 6),
+                            new AssetFileBasedMigration(appContext, 7),
+                            new AssetFileBasedMigration(appContext, 8),
+                            new AssetFileBasedMigration(appContext, 9),
+                            new AssetFileBasedMigration(appContext, 10),
+                            new AssetFileBasedMigration(appContext, 11),
+                            new AssetFileBasedMigration(appContext, 12),
+                            new AssetFileBasedMigration(appContext, 13),
+                            new AssetFileBasedMigration(appContext, 14)
+                    );
+
+                    sInstance = builder.build();
+                }
+            }
         }
         return sInstance;
     }
 
     public static void resetInstance() {
-        // We need to call back legacy.
-        DataSQLiteOpenHelper.resetInstance();
-        if (sInstance != null) {
-            sInstance.close();
-            sInstance = null;
+        synchronized (AutuManduDatabase.class) {
+            if (sInstance != null) {
+                sInstance.close();
+                sInstance = null;
+            }
         }
     }
 
     private static class AssetFileBasedMigration extends Migration {
 
-        private int mNewVersion;
-        private Context mContext;
+        private final int newVersion;
+        private final Context context;
 
         AssetFileBasedMigration(Context context, int newVersion) {
             super(newVersion - 1, newVersion);
-            this.mNewVersion = newVersion;
-            this.mContext = context;
+            this.newVersion = newVersion;
+            this.context = context;
         }
 
-        @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.beginTransaction();
-            try {
-                InputStream migrationInput = mContext.getAssets().open(String.format(Locale.US,
-                        "migrations/%d.sql", mNewVersion));
-                byte[] binaryMigration = new byte[migrationInput.available()];
-                migrationInput.read(binaryMigration);
-                migrationInput.close();
+            Log.i(LOG_TAG, String.format(Locale.US, "Migrating database to version %d...", newVersion));
+            try (var reader = new BufferedReader(new InputStreamReader(
+                    context.getAssets().open(String.format(Locale.US, "migrations/%d.sql", newVersion))))) {
 
-                for (String preparedStatement: prepareSqlStatements(new String(binaryMigration))) {
-                    database.execSQL(preparedStatement);
+                var statement = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    var trimmedLine = line.trim();
+                    if (trimmedLine.isEmpty() || trimmedLine.startsWith("--")) {
+                        continue;
+                    }
+
+                    statement.append(line);
+                    if (trimmedLine.endsWith(";")) {
+                        database.execSQL(statement.toString());
+                        statement.setLength(0);
+                    } else {
+                        statement.append(" ");
+                    }
                 }
-                database.setTransactionSuccessful();
-
-                Log.i(LOG_TAG, String.format(Locale.US,
-                    "Migrated to new version %d.", mNewVersion));
+                Log.i(LOG_TAG, String.format(Locale.US, "Migration to version %d completed successfully.", newVersion));
             } catch (IOException e) {
-                Log.e(LOG_TAG, String.format(Locale.US,
-                        "File based Migration failed for new version %d.", mNewVersion));
-                e.printStackTrace();
+                Log.e(LOG_TAG, String.format(Locale.US, "Error during migration to version %d.", newVersion), e);
+                throw new RuntimeException("Critical error during database migration", e);
             }
-            database.endTransaction();
-        }
-
-        private static List<String> prepareSqlStatements(String rawSql) {
-            rawSql = rawSql.replaceAll("[\r\n]", " ");
-            String[] rawCommands = rawSql.split(";");
-
-            List<String> commands = new LinkedList<>();
-            for (int i = 0; i < rawCommands.length; i++) {
-                rawCommands[i] = rawCommands[i].trim();
-                if (rawCommands[i].length() > 0) {
-                    commands.add(rawCommands[i]);
-                }
-            }
-            return commands;
         }
     }
 }

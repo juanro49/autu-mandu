@@ -18,37 +18,66 @@ package org.juanro.autumandu.gui.util;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+/**
+ * Optimized DividerItemDecoration that correctly handles item offsets and
+ * avoids drawing a divider after the last item in the list.
+ */
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
     private static final int[] ATTRS = new int[]{android.R.attr.listDivider};
 
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     public DividerItemDecoration(Context context) {
-        final TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS);
-        mDivider = styledAttributes.getDrawable(0);
-        styledAttributes.recycle();
+        try (TypedArray styledAttributes = context.obtainStyledAttributes(ATTRS)) {
+            mDivider = styledAttributes.getDrawable(0);
+        }
     }
 
     @Override
-    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+    public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        if (mDivider == null) return;
+
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
 
         int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View child = parent.getChildAt(i);
+            int position = parent.getChildAdapterPosition(child);
 
-            RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+            // Don't draw divider for the last item in the adapter
+            if (position != RecyclerView.NO_POSITION && position < state.getItemCount() - 1) {
+                RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 
-            int top = child.getBottom() + params.bottomMargin;
-            int bottom = top + mDivider.getIntrinsicHeight();
+                int top = child.getBottom() + params.bottomMargin;
+                int bottom = top + mDivider.getIntrinsicHeight();
 
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(c);
+                mDivider.setBounds(left, top, right, bottom);
+                mDivider.draw(c);
+            }
+        }
+    }
+
+    @Override
+    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        if (mDivider == null) {
+            outRect.set(0, 0, 0, 0);
+            return;
+        }
+
+        int position = parent.getChildAdapterPosition(view);
+        // Add offset only if it's not the last item
+        if (position != RecyclerView.NO_POSITION && position < state.getItemCount() - 1) {
+            outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
+        } else {
+            outRect.set(0, 0, 0, 0);
         }
     }
 }

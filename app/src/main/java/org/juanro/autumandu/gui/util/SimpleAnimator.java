@@ -30,18 +30,20 @@ import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+
 public class SimpleAnimator {
     public enum Property {
         Height, Weight
     }
 
-    private Context context;
-    private View view;
-    private Property property;
-    private int duration;
+    private final Context context;
+    private final View view;
+    private final Property property;
+    private final int duration;
 
     private float origWeight;
-    private int origHeight;
+    private final int origHeight;
     private int origHeightMeasured;
 
     public SimpleAnimator(Context context, View view, Property property) {
@@ -86,12 +88,9 @@ public class SimpleAnimator {
             if (to == ViewGroup.LayoutParams.WRAP_CONTENT
                     || to == ViewGroup.LayoutParams.MATCH_PARENT) {
                 to = origHeightMeasured;
-                attachRunnable(animator, null, new Runnable() {
-                    @Override
-                    public void run() {
-                        view.getLayoutParams().height = origHeight;
-                        view.requestLayout();
-                    }
+                attachRunnable(animator, null, () -> {
+                    view.getLayoutParams().height = origHeight;
+                    view.requestLayout();
                 });
             }
 
@@ -160,25 +159,25 @@ public class SimpleAnimator {
         if (onStart != null || onEnd != null) {
             animator.addListener(new AnimatorListener() {
                 @Override
-                public void onAnimationStart(Animator animation) {
+                public void onAnimationStart(@NonNull Animator animation) {
                     if (onStart != null) {
                         onStart.run();
                     }
                 }
 
                 @Override
-                public void onAnimationRepeat(Animator animation) {
+                public void onAnimationRepeat(@NonNull Animator animation) {
                 }
 
                 @Override
-                public void onAnimationEnd(Animator animation) {
+                public void onAnimationEnd(@NonNull Animator animation) {
                     if (onEnd != null) {
                         onEnd.run();
                     }
                 }
 
                 @Override
-                public void onAnimationCancel(Animator animation) {
+                public void onAnimationCancel(@NonNull Animator animation) {
                 }
             });
         }

@@ -18,8 +18,10 @@ package org.juanro.autumandu.data.report;
 import android.content.Context;
 import android.graphics.Color;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.PointValue;
@@ -41,7 +43,7 @@ public abstract class AbstractReportChartLineData extends AbstractReportChartDat
         }
     }
 
-    private List<Float> mMarkPoints = new ArrayList<>();
+    private final Set<Float> mMarkPoints = new HashSet<>();
 
     public AbstractReportChartLineData(Context context, String name, int color) {
         super(context, name, color);
@@ -51,22 +53,16 @@ public abstract class AbstractReportChartLineData extends AbstractReportChartDat
         int markColor = Color.argb(63, Color.red(getColor()), Color.green(getColor()),
                 Color.blue(getColor()));
 
-        List<PointValue> points = new ArrayList<>(size());
-        for (int i = 0; i < size(); i++) {
-            Float x = getXValues().get(i);
-            Float y = getYValues().get(i);
-
-            PointValueWithTooltip point = new PointValueWithTooltip(x, y);
-            if (getTooltips().size() > i) {
-                point.setTooltip(getTooltips().get(i));
-            }
-
-            if (mMarkPoints.contains(x)) {
-                point.setColor(markColor);
-            }
-
-            points.add(point);
-        }
+        List<PointValue> points = mDataPoints.stream()
+                .map(p -> {
+                    PointValueWithTooltip point = new PointValueWithTooltip(p.x, p.y);
+                    point.setTooltip(p.tooltip);
+                    if (mMarkPoints.contains(p.x)) {
+                        point.setColor(markColor);
+                    }
+                    return (PointValue) point;
+                })
+                .collect(Collectors.toList());
 
         Line line = new Line(points);
         line.setColor(getColor());
@@ -81,8 +77,9 @@ public abstract class AbstractReportChartLineData extends AbstractReportChartDat
     }
 
     protected void set(int index, Float x, Float y, String tooltip, boolean marked) {
-        Float oldX = getXValues().get(index);
-        mMarkPoints.remove(oldX);
+        if (index >= 0 && index < mDataPoints.size()) {
+            mMarkPoints.remove(mDataPoints.get(index).x);
+        }
 
         super.set(index, x, y, tooltip);
         if (marked) {

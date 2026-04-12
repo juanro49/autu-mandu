@@ -16,33 +16,36 @@
 
 package org.juanro.autumandu.gui.util;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
+
+import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
+import org.juanro.autumandu.gui.dialog.TimePickerDialogFragment;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.juanro.autumandu.gui.dialog.SupportDatePickerDialogFragment;
-import org.juanro.autumandu.gui.dialog.SupportTimePickerDialogFragment;
-
 public class DateTimeInput {
     public enum Mode {
         DATE, TIME
     }
 
-    private EditText mParent;
-    private Mode mMode;
-    private DateFormat mFormat;
+    private final EditText mParent;
+    private final Mode mMode;
+    private final DateFormat mFormat;
 
-    public DateTimeInput(EditText parent, Mode mode) {
+    public DateTimeInput(@NonNull EditText parent, Mode mode) {
         mParent = parent;
         mMode = mode;
 
-        if(mode == Mode.DATE) {
+        if (mode == Mode.DATE) {
             mParent.setInputType(InputType.TYPE_CLASS_DATETIME |
                     InputType.TYPE_DATETIME_VARIATION_DATE);
             mFormat = android.text.format.DateFormat.getDateFormat(mParent.getContext());
@@ -53,37 +56,39 @@ public class DateTimeInput {
         }
     }
 
-    public void applyOnClickListener(final Fragment targetFragment, final int requestCode,
+    public void applyOnClickListener(final int requestCode,
                                      final FragmentManager fragmentManager) {
         mParent.setFocusable(false);
         mParent.setFocusableInTouchMode(false);
 
         mParent.setOnClickListener(v -> {
-            if(mMode == Mode.DATE) {
-                SupportDatePickerDialogFragment
-                        .newInstance(targetFragment, requestCode, getDate())
+            if (mMode == Mode.DATE) {
+                DatePickerDialogFragment
+                        .newInstance(requestCode, getDate() != null ? getDate() : new Date())
                         .show(fragmentManager, null);
             } else {
-                SupportTimePickerDialogFragment
-                        .newInstance(targetFragment, requestCode, getDate())
+                TimePickerDialogFragment
+                        .newInstance(requestCode, getDate() != null ? getDate() : new Date())
                         .show(fragmentManager, null);
             }
         });
     }
 
+    @Nullable
     public Date getDate() {
-        if (mParent.getText().toString().isEmpty()) {
+        String text = mParent.getText().toString();
+        if (TextUtils.isEmpty(text)) {
             return null;
         } else {
             try {
-                return mFormat.parse(mParent.getText().toString());
+                return mFormat.parse(text);
             } catch (ParseException e) {
-                return new Date();
+                return null;
             }
         }
     }
 
-    public void setDate(Date date) {
+    public void setDate(@Nullable Date date) {
         if (date == null) {
             mParent.setText("");
         } else {

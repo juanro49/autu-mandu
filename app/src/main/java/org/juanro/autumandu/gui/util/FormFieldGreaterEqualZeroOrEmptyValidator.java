@@ -16,6 +16,7 @@
 
 package org.juanro.autumandu.gui.util;
 
+import android.text.TextUtils;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
@@ -23,6 +24,10 @@ import java.text.ParseException;
 
 import org.juanro.autumandu.R;
 
+/**
+ * Validator that checks if a field is either empty or contains a number greater than or equal to zero.
+ * Optimized for API 25 compatibility and localized number parsing.
+ */
 public class FormFieldGreaterEqualZeroOrEmptyValidator extends AbstractFormFieldValidator {
     public FormFieldGreaterEqualZeroOrEmptyValidator(TextView field) {
         super(field);
@@ -36,25 +41,23 @@ public class FormFieldGreaterEqualZeroOrEmptyValidator extends AbstractFormField
     @Override
     protected boolean isValid() {
         String textValue = fields[0].getText().toString();
-        if (textValue.isEmpty()) {
+
+        // Use TextUtils.isEmpty for API 25 compatibility
+        if (TextUtils.isEmpty(textValue)) {
             return true;
         }
 
         try {
             double number = Double.parseDouble(textValue);
-            if (number < 0) {
-                return false;
-            }
+            return number >= 0;
         } catch (NumberFormatException e) {
             try {
+                // Fallback to localized number parsing
                 Number number = NumberFormat.getNumberInstance().parse(textValue);
-                return ((double) number >= 0);
+                return number != null && number.doubleValue() >= 0;
             } catch (ParseException f) {
                 return false;
             }
         }
-
-        return true;
     }
-
 }

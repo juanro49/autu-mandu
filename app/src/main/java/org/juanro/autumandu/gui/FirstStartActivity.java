@@ -18,32 +18,45 @@ package org.juanro.autumandu.gui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
 import org.juanro.autumandu.R;
-import org.juanro.autumandu.presentation.CarPresenter;
+import org.juanro.autumandu.gui.pref.PreferencesActivity;
+import org.juanro.autumandu.gui.pref.PreferencesBackupFragment;
+import org.juanro.autumandu.viewmodel.MainViewModel;
 
 public class FirstStartActivity extends AppCompatActivity {
+    private final ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                // The MainViewModel is used here because it already provides a LiveData
+                // for the car count, which is exactly what we need to check if a car
+                // has been created.
+                MainViewModel viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+                viewModel.getCarCount().observe(this, count -> {
+                    if (count != null && count > 0) {
+                        setResult(RESULT_OK);
+                        finish();
+                    }
+                });
+            }
+    );
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_start);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (CarPresenter.getInstance(getApplicationContext()).getCount() > 0) {
-            setResult(RESULT_OK);
-            finish();
-        }
-    }
-
     public void onCreateCarClick(View v) {
         Intent intent = new Intent(this, DataDetailActivity.class);
         intent.putExtra(DataDetailActivity.EXTRA_EDIT, DataDetailActivity.EXTRA_EDIT_CAR);
-
-        startActivityForResult(intent, 0);
+        mStartForResult.launch(intent);
     }
 
     public void onSetupSyncClick(View v) {
@@ -52,7 +65,6 @@ public class FirstStartActivity extends AppCompatActivity {
                 PreferencesBackupFragment.class.getName());
         intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT_TITLE,
                 R.string.pref_title_header_backup);
-
-        startActivityForResult(intent, 0);
+        mStartForResult.launch(intent);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jan Kühle
+ * Copyright 2026 Jan Kühle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,22 @@
  */
 package org.juanro.autumandu.util.webdav;
 
+import androidx.annotation.NonNull;
+
 import java.security.cert.X509Certificate;
 
+/**
+ * Exception thrown when a WebDAV certificate is not trusted.
+ */
 public class UntrustedCertificateException extends Exception {
-    private X509Certificate mCertificate;
+    private final X509Certificate certificate;
 
-    public UntrustedCertificateException(X509Certificate certificate) {
-        mCertificate = certificate;
+    public UntrustedCertificateException(@NonNull X509Certificate certificate) {
+        this.certificate = certificate;
     }
 
+    @NonNull
     public X509Certificate getCertificate() {
-        return mCertificate;
+        return certificate;
     }
 }

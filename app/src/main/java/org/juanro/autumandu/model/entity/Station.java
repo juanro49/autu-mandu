@@ -20,10 +20,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import org.juanro.autumandu.model.IStation;
 
 @Entity(tableName = "station")
-public class Station implements IStation {
+public class Station {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     private Long id;
@@ -32,15 +31,14 @@ public class Station implements IStation {
     @ColumnInfo(name = "station__name")
     private String name = "";
 
-    public Station(){
+    public Station() {
     }
 
     @Ignore
     public Station(@NonNull String name) {
-        this.setName(name);
+        this.name = name;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -50,7 +48,6 @@ public class Station implements IStation {
     }
 
     @NonNull
-    @Override
     public String getName() {
         return name;
     }

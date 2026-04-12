@@ -15,19 +15,22 @@
  */
 package org.juanro.autumandu.util.sync;
 
+/**
+ * Exception thrown when an error occurs while parsing sync data.
+ * Optimized for clarity and removing unused constructors.
+ */
 public class SyncParseException extends Exception {
-    private static final String MESSAGE = "Unrecoverable error.";
-    private static final String MESSAGE_FORMAT = "Unrecoverable error: %s";
+    private static final String DEFAULT_MESSAGE = "Unrecoverable error during sync parsing.";
 
     public SyncParseException() {
-        super(MESSAGE);
-    }
-
-    public SyncParseException(Throwable cause) {
-        super(String.format(MESSAGE_FORMAT, cause.getMessage()), cause);
+        super(DEFAULT_MESSAGE);
     }
 
     public SyncParseException(String message) {
-        super(String.format(MESSAGE_FORMAT, message));
+        super(message);
+    }
+
+    public SyncParseException(Throwable cause) {
+        super(DEFAULT_MESSAGE, cause);
     }
 }

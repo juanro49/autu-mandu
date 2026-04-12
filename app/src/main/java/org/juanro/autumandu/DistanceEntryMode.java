@@ -15,13 +15,39 @@
  */
 package org.juanro.autumandu;
 
+import androidx.annotation.NonNull;
+
+/**
+ * Modes for entering distances.
+ */
 public enum DistanceEntryMode {
-    TRIP(R.string.distance_entry_mode_trip),
-    TOTAL(R.string.distance_entry_mode_total);
+    TRIP(0, R.string.distance_entry_mode_trip),
+    TOTAL(1, R.string.distance_entry_mode_total);
 
-    public final int nameResourceId;
+    private final int id;
+    private final int nameResourceId;
 
-    DistanceEntryMode(int nameResourceId) {
+    DistanceEntryMode(int id, int nameResourceId) {
+        this.id = id;
         this.nameResourceId = nameResourceId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getNameResourceId() {
+        return nameResourceId;
+    }
+
+    /**
+     * Resolves the mode from its ID.
+     */
+    @NonNull
+    public static DistanceEntryMode fromId(int id) {
+        return switch (id) {
+            case 1 -> TOTAL;
+            default -> TRIP;
+        };
     }
 }

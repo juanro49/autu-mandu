@@ -16,9 +16,10 @@
 
 package org.juanro.autumandu.gui.util;
 
-import org.juanro.autumandu.R;
-
+import android.text.TextUtils;
 import android.widget.TextView;
+
+import org.juanro.autumandu.R;
 
 public class FormFieldNotEmptyValidator extends AbstractFormFieldValidator {
     public FormFieldNotEmptyValidator(TextView field) {
@@ -26,12 +27,13 @@ public class FormFieldNotEmptyValidator extends AbstractFormFieldValidator {
     }
 
     @Override
-    public int getMessage() {
+    protected int getMessage() {
         return R.string.validate_error_not_empty;
     }
 
     @Override
-    public boolean isValid() {
-        return !fields[0].getText().toString().trim().isEmpty();
+    protected boolean isValid() {
+        String value = fields[0].getText().toString();
+        return !TextUtils.isEmpty(value) && !TextUtils.isEmpty(value.trim());
     }
 }

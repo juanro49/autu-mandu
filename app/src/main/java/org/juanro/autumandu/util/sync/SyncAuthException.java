@@ -15,14 +15,17 @@
  */
 package org.juanro.autumandu.util.sync;
 
+/**
+ * Exception thrown when sync authentication fails.
+ */
 public class SyncAuthException extends Exception {
-    private static final String MESSAGE = "Saved account is not authorized anymore.";
+    private static final String DEFAULT_MESSAGE = "Saved account is not authorized anymore.";
 
     public SyncAuthException() {
-        super(MESSAGE);
+        super(DEFAULT_MESSAGE);
     }
 
-    public SyncAuthException(Throwable cause) {
-        super(MESSAGE, cause);
+    public SyncAuthException(String message) {
+        super(message);
     }
 }

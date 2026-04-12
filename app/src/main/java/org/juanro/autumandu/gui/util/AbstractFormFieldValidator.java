@@ -17,13 +17,18 @@
 package org.juanro.autumandu.gui.util;
 
 import android.content.Context;
-import com.google.android.material.textfield.TextInputLayout;
+import android.view.View;
 import android.view.ViewParent;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputLayout;
+
+/**
+ * Base class for form field validation.
+ */
 public abstract class AbstractFormFieldValidator {
-    protected Context context;
-    protected TextView[] fields;
+    protected final Context context;
+    protected final TextView[] fields;
 
     public AbstractFormFieldValidator(TextView field) {
         this.context = field.getContext();
@@ -41,14 +46,14 @@ public abstract class AbstractFormFieldValidator {
 
         for (TextView field : fields) {
             if (!valid) {
-                String error = (String) field.getError();
-                if (error == null) {
-                    error = "";
+                CharSequence currentError = getError(field);
+                String newError = context.getString(getMessage());
+                String error;
+                if (currentError == null || currentError.length() == 0) {
+                    error = newError;
                 } else {
-                    error += "\n\n";
+                    error = currentError + "\n\n" + newError;
                 }
-
-                error += context.getString(getMessage());
 
                 setError(field, error);
             }
@@ -59,14 +64,39 @@ public abstract class AbstractFormFieldValidator {
 
     protected abstract int getMessage();
 
+    /**
+     * Validation logic. Subclasses implement this to check the field's validity.
+     * Note: For data-driven validations, ensure DAOs from Room are used.
+     */
     protected abstract boolean isValid();
 
-    private static void setError(TextView field, String error) {
-        ViewParent parent = field.getParent().getParent();
-        if (parent instanceof TextInputLayout) {
-            ((TextInputLayout) parent).setError(error);
+    private CharSequence getError(TextView field) {
+        TextInputLayout layout = getTextInputLayout(field);
+        if (layout != null) {
+            return layout.getError();
+        } else {
+            return field.getError();
+        }
+    }
+
+    private void setError(TextView field, String error) {
+        TextInputLayout layout = getTextInputLayout(field);
+        if (layout != null) {
+            layout.setError(error);
+            layout.setErrorEnabled(error != null);
         } else {
             field.setError(error);
         }
+    }
+
+    private TextInputLayout getTextInputLayout(TextView field) {
+        ViewParent parent = field.getParent();
+        while (parent instanceof View) {
+            if (parent instanceof TextInputLayout) {
+                return (TextInputLayout) parent;
+            }
+            parent = parent.getParent();
+        }
+        return null;
     }
 }

@@ -16,10 +16,18 @@
 
 package org.juanro.autumandu.gui.util;
 
-import org.juanro.autumandu.R;
-
+import android.text.TextUtils;
 import android.widget.TextView;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
+
+import org.juanro.autumandu.R;
+
+/**
+ * Validator that checks if a field contains a number greater than zero.
+ * Optimized for API 25 compatibility and localized number parsing.
+ */
 public class FormFieldGreaterZeroValidator extends AbstractFormFieldValidator {
     public FormFieldGreaterZeroValidator(TextView field) {
         super(field);
@@ -32,16 +40,22 @@ public class FormFieldGreaterZeroValidator extends AbstractFormFieldValidator {
 
     @Override
     protected boolean isValid() {
-        try {
-            double number = Double.parseDouble(fields[0].getText().toString());
-            if (number <= 0) {
-                return false;
-            }
-        } catch (NumberFormatException e) {
+        String textValue = fields[0].getText().toString();
+        if (TextUtils.isEmpty(textValue)) {
             return false;
         }
 
-        return true;
+        try {
+            double number = Double.parseDouble(textValue);
+            return number > 0;
+        } catch (NumberFormatException e) {
+            try {
+                // Fallback to localized number parsing
+                Number number = NumberFormat.getNumberInstance().parse(textValue);
+                return number != null && number.doubleValue() > 0;
+            } catch (ParseException f) {
+                return false;
+            }
+        }
     }
-
 }

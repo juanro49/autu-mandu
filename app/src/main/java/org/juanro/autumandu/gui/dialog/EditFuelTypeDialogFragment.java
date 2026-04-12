@@ -16,105 +16,128 @@
 
 package org.juanro.autumandu.gui.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.juanro.autumandu.R;
-import org.juanro.autumandu.presentation.FuelTypePresenter;
 import org.juanro.autumandu.gui.util.AbstractFormFieldValidator;
 import org.juanro.autumandu.gui.util.FormFieldNotEmptyValidator;
 import org.juanro.autumandu.gui.util.FormValidator;
-import org.juanro.autumandu.provider.fueltype.FuelTypeContentValues;
-import org.juanro.autumandu.provider.fueltype.FuelTypeCursor;
-import org.juanro.autumandu.provider.fueltype.FuelTypeSelection;
+import org.juanro.autumandu.model.entity.FuelType;
+import org.juanro.autumandu.viewmodel.FuelTypesViewModel;
 
 public class EditFuelTypeDialogFragment extends DialogFragment {
-    public interface EditFuelTypeDialogFragmentListener {
-        void onDialogNegativeClick(int requestCode);
+    public static final String REQUEST_KEY = "org.juanro.autumandu.EDIT_FUEL_TYPE_REQUEST";
+    public static final String RESULT_ACTION = "action";
+    public static final String RESULT_REQUEST_CODE = "request_code";
 
-        void onDialogPositiveClick(int requestCode);
-    }
+    public static final int ACTION_POSITIVE = 1;
+    public static final int ACTION_NEGATIVE = 2;
 
-    public static EditFuelTypeDialogFragment newInstance(Fragment parent, int requestCode, long fuelTypeId) {
+    private static final String ARG_FUEL_TYPE_ID = "fuel_type_id";
+    private static final String ARG_REQUEST_CODE = "request_code";
+
+    public static EditFuelTypeDialogFragment newInstance(int requestCode, long fuelTypeId) {
         EditFuelTypeDialogFragment f = new EditFuelTypeDialogFragment();
-        f.setTargetFragment(parent, requestCode);
 
         Bundle args = new Bundle();
-        args.putLong("fuel_type_id", fuelTypeId);
+        args.putLong(ARG_FUEL_TYPE_ID, fuelTypeId);
+        args.putInt(ARG_REQUEST_CODE, requestCode);
         f.setArguments(args);
 
         return f;
     }
 
     private Set<String> mOtherFuelTypeNames;
-    private FuelTypeCursor mFuelType;
+    private FuelType mFuelType;
     private EditText mEdtName;
     private AutoCompleteTextView mEdtCategory;
+    private FuelTypesViewModel mViewModel;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        long currentFuelTypeId = getArguments().getLong("fuel_type_id", 0);
-        int currentFuelTypePos = -1;
-
+        long currentFuelTypeId = getArguments() != null ? getArguments().getLong(ARG_FUEL_TYPE_ID, 0) : 0;
         mOtherFuelTypeNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
-        FuelTypeCursor fuelType = new FuelTypeSelection().query(getActivity().getContentResolver());
-        while (fuelType.moveToNext()) {
-            if (currentFuelTypeId == fuelType.getId()) {
-                currentFuelTypePos = fuelType.getPosition();
-            } else {
-                mOtherFuelTypeNames.add(fuelType.getName());
-            }
-        }
+        mViewModel = new ViewModelProvider(this).get(FuelTypesViewModel.class);
 
-        if (currentFuelTypePos > -1) {
-            fuelType.moveToPosition(currentFuelTypePos);
-            mFuelType = fuelType;
-        }
+        mViewModel.getFuelTypes().observe(this, fuelTypes -> {
+            mOtherFuelTypeNames.clear();
+            Set<String> categories = new HashSet<>();
+            for (FuelType fuelType : fuelTypes) {
+                if (currentFuelTypeId == fuelType.getId()) {
+                    mFuelType = fuelType;
+                    if (mEdtName != null && mEdtName.getText().length() == 0) {
+                        mEdtName.setText(mFuelType.getName());
+                    }
+                    if (mEdtCategory != null && mEdtCategory.getText().length() == 0) {
+                        mEdtCategory.setText(mFuelType.getCategory());
+                    }
+                } else {
+                    mOtherFuelTypeNames.add(fuelType.getName());
+                }
+                categories.add(fuelType.getCategory());
+            }
+
+            if (mEdtCategory != null) {
+                String[] categoryArray = categories.toArray(new String[0]);
+                mEdtCategory.setAdapter(new ArrayAdapter<>(requireContext(),
+                        android.R.layout.simple_dropdown_item_1line,
+                        categoryArray));
+            }
+        });
     }
 
+    @NonNull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final Dialog dialog = new Dialog(getActivity());
-        dialog.setContentView(R.layout.dialog_fuel_type);
-        dialog.setTitle(mFuelType == null
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        final Dialog dialog = new Dialog(requireActivity());
+        @SuppressLint("InflateParams")
+        View view = getLayoutInflater().inflate(R.layout.dialog_fuel_type, null);
+        dialog.setContentView(view);
+
+        mEdtName = view.findViewById(R.id.edt_name);
+        mEdtCategory = view.findViewById(R.id.edt_category);
+
+        long currentFuelTypeId = getArguments() != null ? getArguments().getLong(ARG_FUEL_TYPE_ID, 0) : 0;
+        dialog.setTitle(currentFuelTypeId == 0
                 ? R.string.title_add_fuel_type
                 : R.string.title_edit_fuel_type);
-
-        mEdtName = dialog.findViewById(R.id.edt_name);
-        mEdtCategory = dialog.findViewById(R.id.edt_category);
-        mEdtCategory.setAdapter(new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_dropdown_item_1line,
-                FuelTypePresenter.getInstance(getActivity()).getAllCategories()));
 
         if (savedInstanceState != null) {
             mEdtName.setText(savedInstanceState.getString("name"));
             mEdtCategory.setText(savedInstanceState.getString("category"));
-        } else if (mFuelType != null) {
-            mEdtName.setText(mFuelType.getName());
-            mEdtCategory.setText(mFuelType.getCategory());
         }
 
-        dialog.findViewById(R.id.btn_ok).setOnClickListener(v -> {
+        Button btnOk = view.findViewById(R.id.btn_ok);
+        btnOk.setOnClickListener(v -> {
             if (save()) {
+                sendResult(ACTION_POSITIVE);
                 dialog.dismiss();
-                getListener().onDialogPositiveClick(getTargetRequestCode());
             }
         });
-        dialog.findViewById(R.id.btn_cancel).setOnClickListener(v -> {
+
+        Button btnCancel = view.findViewById(R.id.btn_cancel);
+        btnCancel.setOnClickListener(v -> {
+            sendResult(ACTION_NEGATIVE);
             dialog.dismiss();
-            getListener().onDialogNegativeClick(getTargetRequestCode());
         });
 
         return dialog;
@@ -122,12 +145,20 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putString("name", mEdtName.getText().toString());
-        outState.putString("category", mEdtCategory.getText().toString());
+        super.onSaveInstanceState(outState);
+        if (mEdtName != null) {
+            outState.putString("name", mEdtName.getText().toString());
+        }
+        if (mEdtCategory != null) {
+            outState.putString("category", mEdtCategory.getText().toString());
+        }
     }
 
-    private EditFuelTypeDialogFragmentListener getListener() {
-        return (EditFuelTypeDialogFragmentListener) getTargetFragment();
+    private void sendResult(int action) {
+        Bundle result = new Bundle();
+        result.putInt(RESULT_ACTION, action);
+        result.putInt(RESULT_REQUEST_CODE, getArguments() != null ? getArguments().getInt(ARG_REQUEST_CODE) : 0);
+        getParentFragmentManager().setFragmentResult(REQUEST_KEY, result);
     }
 
     private boolean save() {
@@ -148,17 +179,17 @@ public class EditFuelTypeDialogFragment extends DialogFragment {
         validator.add(new FormFieldNotEmptyValidator(mEdtCategory));
 
         if (validator.validate()) {
-            FuelTypeContentValues values = new FuelTypeContentValues();
-            values.putName(mEdtName.getText().toString());
-            values.putCategory(mEdtCategory.getText().toString());
-
             if (mFuelType == null) {
-                values.insert(getActivity().getContentResolver());
+                FuelType fuelType = new FuelType(
+                        mEdtName.getText().toString(),
+                        mEdtCategory.getText().toString()
+                );
+                mViewModel.saveFuelType(fuelType);
             } else {
-                FuelTypeSelection where = new FuelTypeSelection().id(mFuelType.getId());
-                values.update(getActivity().getContentResolver(), where);
+                mFuelType.setName(mEdtName.getText().toString());
+                mFuelType.setCategory(mEdtCategory.getText().toString());
+                mViewModel.saveFuelType(mFuelType);
             }
-
             return true;
         } else {
             return false;

@@ -15,19 +15,13 @@
  */
 package org.juanro.autumandu.util.sync;
 
+/**
+ * Exception thrown when a network or I/O error occurs during sync.
+ */
 public class SyncIoException extends Exception {
-    private static final String MESSAGE = "Network error.";
-    private static final String MESSAGE_FORMAT = "Network error: %s";
-
-    public SyncIoException() {
-        super(MESSAGE);
-    }
+    private static final String MESSAGE_PREFIX = "Network error: ";
 
     public SyncIoException(Throwable cause) {
-        super(String.format(MESSAGE_FORMAT, cause.getMessage()), cause);
-    }
-
-    public SyncIoException(String message) {
-        super(String.format(MESSAGE_FORMAT, message));
+        super(MESSAGE_PREFIX + cause.getMessage(), cause);
     }
 }

@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,17 +27,22 @@ import okhttp3.Route;
 import okio.Buffer;
 import okio.ByteString;
 
+/**
+ * Modernized Authenticator supporting both Basic and Digest schemes.
+ */
 public class BasicDigestAuthenticator implements Authenticator {
-    private static final String TAG = "BasicDigestAuthenticato";
+    private static final String TAG = "BasicDigestAuthenticator";
 
     protected static final String
             HEADER_AUTHENTICATE = "WWW-Authenticate",
             HEADER_AUTHORIZATION = "Authorization";
 
-    final String host, username, password;
+    private final String host;
+    private final String username;
+    private final String password;
 
-    final String clientNonce;
-    AtomicInteger nonceCount = new AtomicInteger(1);
+    private final String clientNonce;
+    private final AtomicInteger nonceCount = new AtomicInteger(1);
 
     public BasicDigestAuthenticator(String host, String username, String password) {
         this.host = host;
@@ -48,7 +53,7 @@ public class BasicDigestAuthenticator implements Authenticator {
     }
 
     @Override
-    public Request authenticate(Route route, Response response) throws IOException {
+    public Request authenticate(Route route, @NonNull Response response) {
         Request request = response.request();
 
         if (host != null && !request.url().host().equalsIgnoreCase(host)) {
@@ -62,27 +67,25 @@ public class BasicDigestAuthenticator implements Authenticator {
 
         HttpUtils.AuthScheme basicAuth = null, digestAuth = null;
         List<String> headers = response.headers(HEADER_AUTHENTICATE);
-        for (HttpUtils.AuthScheme scheme : HttpUtils.parseWwwAuthenticate(headers.toArray(new String[headers.size()])))
-            if ("Basic".equalsIgnoreCase(scheme.name))
+
+        for (HttpUtils.AuthScheme scheme : HttpUtils.parseWwwAuthenticate(headers.toArray(new String[0]))) {
+            if ("Basic".equalsIgnoreCase(scheme.name)) {
                 basicAuth = scheme;
-            else if ("Digest".equalsIgnoreCase(scheme.name))
+            } else if ("Digest".equalsIgnoreCase(scheme.name)) {
                 digestAuth = scheme;
+            }
+        }
 
         // we MUST prefer Digest auth [https://tools.ietf.org/html/rfc2617#section-4.6]
         if (digestAuth != null) {
-            // Digest auth
-
-            if (triedBefore && !"true".equalsIgnoreCase(digestAuth.params.get("stale")))
-                // credentials didn't work last time, and they won't work now -> stop here
+            if (triedBefore && !"true".equalsIgnoreCase(digestAuth.params.get("stale"))) {
                 return null;
-
+            }
             return authorizationRequest(request, digestAuth);
-
         } else if (basicAuth != null) {
-            // Basic auth
-            if (triedBefore)    // credentials didn't work last time, and they won't work now -> stop here
+            if (triedBefore) {
                 return null;
-
+            }
             return request.newBuilder()
                     .header(HEADER_AUTHORIZATION, Credentials.basic(username, password))
                     .build();
@@ -90,40 +93,39 @@ public class BasicDigestAuthenticator implements Authenticator {
             Log.w(TAG, "No supported authentication scheme");
         }
 
-        // no supported auth scheme
         return null;
     }
 
     protected Request authorizationRequest(Request request, HttpUtils.AuthScheme digest) {
-        String realm = digest.params.get("realm"),
-                opaque = digest.params.get("opaque"),
-                nonce = digest.params.get("nonce");
+        String realm = digest.params.get("realm");
+        String opaque = digest.params.get("opaque");
+        String nonce = digest.params.get("nonce");
+
+        if (realm == null || nonce == null) {
+            return null;
+        }
 
         Algorithm algorithm = Algorithm.determine(digest.params.get("algorithm"));
         Protection qop = Protection.selectFrom(digest.params.get("qop"));
 
-        // build response parameters
-        String response = null;
-
-        List<String> params = new LinkedList<>();
+        List<String> params = new ArrayList<>();
         params.add("username=" + quotedString(username));
-        if (realm != null)
-            params.add("realm=" + quotedString(realm));
-        else
-            return null;
-        if (nonce != null)
-            params.add("nonce=" + quotedString(nonce));
-        else
-            return null;
-        if (opaque != null)
-            params.add("opaque=" + quotedString(opaque));
+        params.add("realm=" + quotedString(realm));
+        params.add("nonce=" + quotedString(nonce));
 
-        if (algorithm != null)
+        if (opaque != null) {
+            params.add("opaque=" + quotedString(opaque));
+        }
+
+        if (algorithm != null) {
             params.add("algorithm=" + quotedString(algorithm.name));
+        }
 
         final String method = request.method();
         final String digestURI = request.url().encodedPath();
         params.add("uri=" + quotedString(digestURI));
+
+        String responseValue = null;
 
         if (qop != null) {
             params.add("qop=" + qop.name);
@@ -134,41 +136,44 @@ public class BasicDigestAuthenticator implements Authenticator {
             params.add("nc=" + ncValue);
 
             String a1 = null;
-            if (algorithm == Algorithm.MD5)
+            if (algorithm == Algorithm.MD5) {
                 a1 = username + ":" + realm + ":" + password;
-            else if (algorithm == Algorithm.MD5_SESSION)
+            } else if (algorithm == Algorithm.MD5_SESSION) {
                 a1 = h(username + ":" + realm + ":" + password) + ":" + nonce + ":" + clientNonce;
+            }
 
             String a2 = null;
-            if (qop == Protection.Auth)
+            if (qop == Protection.Auth) {
                 a2 = method + ":" + digestURI;
-            else if (qop == Protection.AuthInt)
+            } else if (qop == Protection.AuthInt) {
                 try {
                     RequestBody body = request.body();
                     a2 = method + ":" + digestURI + ":" + (body != null ? h(body) : h(""));
                 } catch (IOException e) {
                     Log.w(TAG, "Couldn't get entity-body for hash calculation");
                 }
+            }
 
-            if (a1 != null && a2 != null)
-                response = kd(h(a1), nonce + ":" + ncValue + ":" + clientNonce + ":" + qop.name + ":" + h(a2));
-
+            if (a1 != null && a2 != null) {
+                responseValue = kd(h(a1), nonce + ":" + ncValue + ":" + clientNonce + ":" + qop.name + ":" + h(a2));
+            }
         } else {
             // legacy (backwards compatibility with RFC 2069)
             if (algorithm == Algorithm.MD5) {
-                String a1 = username + ":" + realm + ":" + password,
-                        a2 = method + ":" + digestURI;
-                response = kd(h(a1), nonce + ":" + h(a2));
+                String a1 = username + ":" + realm + ":" + password;
+                String a2 = method + ":" + digestURI;
+                responseValue = kd(h(a1), nonce + ":" + h(a2));
             }
         }
 
-        if (response != null) {
-            params.add("response=" + quotedString(response));
+        if (responseValue != null) {
+            params.add("response=" + quotedString(responseValue));
             return request.newBuilder()
                     .header(HEADER_AUTHORIZATION, "Digest " + TextUtils.join(", ", params))
                     .build();
-        } else
-            return null;
+        }
+
+        return null;
     }
 
     protected String quotedString(String s) {
@@ -189,7 +194,6 @@ public class BasicDigestAuthenticator implements Authenticator {
         return h(secret + ":" + data);
     }
 
-
     protected enum Algorithm {
         MD5("MD5"),
         MD5_SESSION("MD5-sess");
@@ -201,19 +205,20 @@ public class BasicDigestAuthenticator implements Authenticator {
         }
 
         static Algorithm determine(String paramValue) {
-            if (paramValue == null || Algorithm.MD5.name.equalsIgnoreCase(paramValue))
+            if (paramValue == null || Algorithm.MD5.name.equalsIgnoreCase(paramValue)) {
                 return Algorithm.MD5;
-            else if (Algorithm.MD5_SESSION.name.equals(paramValue))
+            } else if (Algorithm.MD5_SESSION.name.equals(paramValue)) {
                 return Algorithm.MD5_SESSION;
-            else
+            } else {
                 Log.w(TAG, "Ignoring unknown hash algorithm: " + paramValue);
+            }
             return null;
         }
     }
 
-    protected enum Protection {    // quality of protection:
-        Auth("auth"),              // authentication only
-        AuthInt("auth-int");       // authentication with integrity protection
+    protected enum Protection {
+        Auth("auth"),
+        AuthInt("auth-int");
 
         public final String name;
 
@@ -223,22 +228,20 @@ public class BasicDigestAuthenticator implements Authenticator {
 
         static Protection selectFrom(String paramValue) {
             if (paramValue != null) {
-                boolean qopAuth = false,
-                        qopAuthInt = false;
-                for (String qop : paramValue.split(","))
-                    if ("auth".equals(qop))
+                boolean qopAuth = false;
+                boolean qopAuthInt = false;
+                for (String qop : paramValue.split(",")) {
+                    if ("auth".equals(qop.trim())) {
                         qopAuth = true;
-                    else if ("auth-int".equals(qop))
+                    } else if ("auth-int".equals(qop.trim())) {
                         qopAuthInt = true;
+                    }
+                }
 
-                // prefer auth-int as it provides more protection
-                if (qopAuthInt)
-                    return AuthInt;
-                else if (qopAuth)
-                    return Auth;
+                if (qopAuthInt) return AuthInt;
+                if (qopAuth) return Auth;
             }
             return null;
         }
     }
-
 }

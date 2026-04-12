@@ -16,17 +16,19 @@
 package org.juanro.autumandu.model.entity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
-
-import org.juanro.autumandu.model.ITireUsage;
 
 import java.util.Date;
 
-@Entity(tableName = "tire_usage", foreignKeys = {
+@Entity(tableName = "tire_usage", indices = {
+    @Index("tire_id")
+}, foreignKeys = {
     @ForeignKey(
         parentColumns = { "_id" },
         childColumns = { "tire_id" },
@@ -34,10 +36,11 @@ import java.util.Date;
         onDelete = ForeignKey.CASCADE
     ),
 })
-public class TireUsage implements ITireUsage {
+public class TireUsage {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     private Long id;
+
     @ColumnInfo(name = "distance_mount")
     private int distanceMount;
 
@@ -49,26 +52,24 @@ public class TireUsage implements ITireUsage {
     private int distanceUmount;
 
     @ColumnInfo(name = "date_umount")
+    @Nullable
     private Date dateUmount;
 
     @ColumnInfo(name = "tire_id")
     private long tireId;
 
-    public TireUsage()
-    {
+    public TireUsage() {
     }
 
     @Ignore
-    public TireUsage(int distanceMount, @NonNull  Date dateMount, int distanceUmount, Date dateUmount, long tireId)
-    {
-        this.setDistanceMount(distanceMount);
-        this.setDateMount(dateMount);
-        this.setDistanceUmount(distanceUmount);
-        this.setDateUmount(dateUmount);
-        this.setTireId(tireId);
+    public TireUsage(int distanceMount, @NonNull Date dateMount, int distanceUmount, @Nullable Date dateUmount, long tireId) {
+        this.distanceMount = distanceMount;
+        this.dateMount = dateMount;
+        this.distanceUmount = distanceUmount;
+        this.dateUmount = dateUmount;
+        this.tireId = tireId;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -102,11 +103,12 @@ public class TireUsage implements ITireUsage {
         this.distanceUmount = distanceUmount;
     }
 
+    @Nullable
     public Date getDateUmount() {
         return dateUmount;
     }
 
-    public void setDateUmount(Date dateUmount) {
+    public void setDateUmount(@Nullable Date dateUmount) {
         this.dateUmount = dateUmount;
     }
 

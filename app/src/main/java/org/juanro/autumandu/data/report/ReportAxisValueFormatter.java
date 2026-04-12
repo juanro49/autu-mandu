@@ -15,10 +15,21 @@
  */
 package org.juanro.autumandu.data.report;
 
+import androidx.annotation.NonNull;
+
 import lecho.lib.hellocharts.formatter.AxisValueFormatter;
 import lecho.lib.hellocharts.model.AxisValue;
 
+/**
+ * Base class for axis value formatters with optimized label copying.
+ */
 public abstract class ReportAxisValueFormatter implements AxisValueFormatter {
+
+    /**
+     * Formats the given value as a string.
+     * @param value The value to format.
+     * @return The formatted string.
+     */
     public abstract String format(float value);
 
     @Override
@@ -31,11 +42,15 @@ public abstract class ReportAxisValueFormatter implements AxisValueFormatter {
         return copyLabelToFormattedValue(format(value), formattedValue);
     }
 
-    private int copyLabelToFormattedValue(String label, char[] formattedValue) {
-        char[] charLabel = label.toCharArray();
-        int length = Math.min(charLabel.length, formattedValue.length);
+    /**
+     * Copies the label into the formattedValue array without creating intermediate char arrays.
+     * This optimization reduces GC pressure during chart rendering.
+     */
+    private int copyLabelToFormattedValue(@NonNull String label, char[] formattedValue) {
+        int length = Math.min(label.length(), formattedValue.length);
 
-        System.arraycopy(charLabel, 0, formattedValue, formattedValue.length - length, length);
+        // Use getChars for zero-allocation copying of characters.
+        label.getChars(0, length, formattedValue, formattedValue.length - length);
 
         return length;
     }

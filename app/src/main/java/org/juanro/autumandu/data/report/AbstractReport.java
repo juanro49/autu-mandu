@@ -17,9 +17,8 @@
 package org.juanro.autumandu.data.report;
 
 import android.content.Context;
-import android.database.ContentObserver;
-import android.database.Cursor;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 
 import java.lang.reflect.Constructor;
@@ -42,12 +41,14 @@ import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.entity.Refueling;
 
 public abstract class AbstractReport {
     private static final String TAG = "AbstractReport";
 
     public abstract static class AbstractListItem implements Comparable<AbstractListItem> {
-        protected String mLabel;
+        protected final String mLabel;
 
         public AbstractListItem(String label) {
             mLabel = label;
@@ -59,7 +60,7 @@ public abstract class AbstractReport {
     }
 
     public static class Item extends AbstractListItem {
-        private String mValue;
+        private final String mValue;
 
         public Item(String label, String value) {
             super(label);
@@ -81,9 +82,9 @@ public abstract class AbstractReport {
     }
 
     public static class Section extends AbstractListItem {
-        private int mColor;
-        private int mOrder;
-        private ArrayList<Item> mItems;
+        private final int mColor;
+        private final int mOrder;
+        private final List<Item> mItems;
 
         public Section(String label, int color) {
             this(label, color, 0);
@@ -107,7 +108,7 @@ public abstract class AbstractReport {
             } else {
                 Section otherSection = (Section) another;
                 if (mOrder != otherSection.getOrder()) {
-                    return Integer.valueOf(mOrder).compareTo(otherSection.getOrder());
+                    return Integer.compare(mOrder, otherSection.getOrder());
                 } else {
                     return mLabel.compareTo(another.getLabel());
                 }
@@ -116,28 +117,19 @@ public abstract class AbstractReport {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
             Section other = (Section) obj;
-            if (mColor != other.mColor)
-                return false;
-            if (mItems == null) {
-                if (other.mItems != null)
-                    return false;
-            } else if (!mItems.equals(other.mItems))
-                return false;
-            return mOrder == other.mOrder;
+            return mColor == other.mColor &&
+                    mOrder == other.mOrder &&
+                    mItems.equals(other.mItems);
         }
 
         public int getColor() {
             return mColor;
         }
 
-        public ArrayList<Item> getItems() {
+        public List<Item> getItems() {
             return mItems;
         }
 
@@ -147,11 +139,9 @@ public abstract class AbstractReport {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + mColor;
-            result = prime * result + ((mItems == null) ? 0 : mItems.hashCode());
-            result = prime * result + mOrder;
+            int result = mColor;
+            result = 31 * result + mOrder;
+            result = 31 * result + mItems.hashCode();
             return result;
         }
     }
@@ -170,14 +160,12 @@ public abstract class AbstractReport {
         return null;
     }
 
-    protected Context mContext;
-    private ArrayList<AbstractListItem> mData = new ArrayList<>();
-    private Cursor[] mUsedCursors;
-
+    protected final Context mContext;
+    private final List<AbstractListItem> mData = new ArrayList<>();
     private boolean mInitialized = false;
 
     public AbstractReport(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
     }
 
     public abstract int[] getAvailableChartOptions();
@@ -261,16 +249,24 @@ public abstract class AbstractReport {
             for (Line line : lines) {
                 List<PointValue> points = line.getValues();
                 for (PointValue point : points) {
-                    point.set(xValueMap.get(point.getX()), point.getY());
+                    Integer index = xValueMap.get(point.getX());
+                    if (index != null) {
+                        point.set(index, point.getY());
+                    }
                 }
             }
 
             // Change X axis value formatter to first convert index back to real value.
-            final Float[] xValueReverseMap = xValues.toArray(new Float[xValues.size()]);
+            final Float[] xValueReverseMap = xValues.toArray(new Float[0]);
             xAxisFormatter = new ReportAxisValueFormatter() {
                 @Override
                 public String format(float value) {
-                    return formatXValue(xValueReverseMap[(int) value], options.getChartOption());
+                    int index = (int) value;
+                    if (index >= 0 && index < xValueReverseMap.length) {
+                        return formatXValue(xValueReverseMap[index], options.getChartOption());
+                    } else {
+                        return "";
+                    }
                 }
             };
         }
@@ -280,12 +276,12 @@ public abstract class AbstractReport {
 
         ComboLineColumnChartData data = new ComboLineColumnChartData(columnChartData, lineChartData);
         data.setAxisXBottom(new Axis()
-                .setTextColor(mContext.getResources().getColor(R.color.secondary_text))
+                .setTextColor(ContextCompat.getColor(mContext, R.color.secondary_text))
                 .setFormatter(xAxisFormatter)
                 .setMaxLabelChars(8));
         data.setAxisYLeft(new Axis()
-                .setLineColor(mContext.getResources().getColor(R.color.divider))
-                .setTextColor(mContext.getResources().getColor(R.color.secondary_text))
+                .setLineColor(ContextCompat.getColor(mContext, R.color.divider))
+                .setTextColor(ContextCompat.getColor(mContext, R.color.secondary_text))
                 .setHasLines(true)
                 .setFormatter(yAxisFormatter)
                 .setMaxLabelChars(4));
@@ -301,7 +297,7 @@ public abstract class AbstractReport {
         Collections.sort(mData);
 
         if (flat) {
-            ArrayList<AbstractListItem> items = new ArrayList<>();
+            List<AbstractListItem> items = new ArrayList<>();
             for (AbstractListItem item : mData) {
                 items.add(item);
                 if (item instanceof Section) {
@@ -315,16 +311,25 @@ public abstract class AbstractReport {
         }
     }
 
-    public void registerContentObserver(ContentObserver observer) {
-        for (Cursor c : mUsedCursors) {
-            c.registerContentObserver(observer);
-        }
-    }
-
-    public void update() {
+    /**
+     * Updates the report with the newest data.
+     * Note: This performs database operations, so it should be called from a background thread.
+     */
+    public synchronized void update() {
         mInitialized = false;
         mData.clear();
-        mUsedCursors = onUpdate();
+
+        // Set base date for precision improvement (Issue #83).
+        // Use the date of the very first refueling as Day 0.
+        AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
+        Refueling firstRefueling = db.getRefuelingDao().getFirst();
+        if (firstRefueling != null) {
+            ReportDateHelper.setBaseDate(firstRefueling.getDate());
+        } else {
+            ReportDateHelper.setBaseDate(null);
+        }
+
+        onUpdate();
         mInitialized = true;
     }
 
@@ -346,10 +351,7 @@ public abstract class AbstractReport {
 
     /**
      * Is called as a result of {@link #update()} and should perform all operations to
-     * update the report with the newest data.
-     *
-     * @return The cursors used in the process. These will be used to register a content
-     * observer on them, so the caller can get noticed of any changes.
+     * update the report with the newest data from the database.
      */
-    protected abstract Cursor[] onUpdate();
+    protected abstract void onUpdate();
 }

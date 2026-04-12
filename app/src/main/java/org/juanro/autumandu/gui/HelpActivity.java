@@ -16,7 +16,6 @@
 
 package org.juanro.autumandu.gui;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -25,35 +24,69 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.util.AbstractPreferenceActivity;
 import org.juanro.autumandu.util.Assets;
 
-public class HelpActivity extends AbstractPreferenceActivity {
+public class HelpActivity extends AbstractPreferenceActivity implements
+        PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_wrapper, new HelpHeadersFragment())
+                    .commit();
+        }
+    }
+
     @Override
     protected int getTitleResourceId() {
         return R.string.title_help;
     }
 
     @Override
-    protected int getHeadersResourceId() {
-        return R.xml.help_headers;
+    public boolean onPreferenceStartFragment(@NonNull PreferenceFragmentCompat caller, @NonNull Preference pref) {
+        final String fragmentClassName = pref.getFragment();
+        if (fragmentClassName == null) {
+            return false;
+        }
+
+        final Bundle args = pref.getExtras();
+        final Fragment fragment = getSupportFragmentManager().getFragmentFactory().instantiate(
+                getClassLoader(),
+                fragmentClassName);
+        fragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_wrapper, fragment)
+                .addToBackStack(null)
+                .commit();
+
+        if (pref.getTitle() != null) {
+            setTitle(pref.getTitle());
+        }
+
+        return true;
     }
 
-    @Override
-    protected Class[] getFragmentClasses() {
-        return new Class[]{
-                GettingStartedFragment.class,
-                FuelTypesFragment.class,
-                TipsFragment.class,
-                CalculationsFragment.class,
-                CSVFragment.class
-        };
-    }
-
-    private static abstract class HelpFragment extends Fragment {
+    public static class HelpHeadersFragment extends PreferenceFragmentCompat {
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
+            setPreferencesFromResource(R.xml.help_preferences, rootKey);
+        }
+    }
+
+    public abstract static class HelpFragment extends Fragment {
+        @Override
+        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.fragment_help_detail, container, false);
             TextView text = v.findViewById(android.R.id.text1);
@@ -63,7 +96,7 @@ public class HelpActivity extends AbstractPreferenceActivity {
                     "%s/%s.html",
                     getString(R.string.help_folder_name),
                     getHelpId());
-            Spanned html = Assets.getHtml(getActivity(), assetPath);
+            Spanned html = Assets.getHtml(requireContext(), assetPath);
 
             text.setText(html);
 

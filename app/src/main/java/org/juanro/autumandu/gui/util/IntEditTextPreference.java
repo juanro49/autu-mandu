@@ -1,24 +1,32 @@
 package org.juanro.autumandu.gui.util;
 
 import android.content.Context;
-import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.preference.EditTextPreference;
+
 /**
- * Source: https://stackoverflow.com/a/3755608
+ * Source: <a href="https://stackoverflow.com/a/3755608">https://stackoverflow.com/a/3755608</a>
  * This Preference allows to save integers directly.
+ * Migrated to androidx.preference for modern compatibility.
  */
 public class IntEditTextPreference extends EditTextPreference {
-    public IntEditTextPreference(Context context) {
+    public IntEditTextPreference(@NonNull Context context) {
         super(context);
     }
 
-    public IntEditTextPreference(Context context, AttributeSet attrs) {
+    public IntEditTextPreference(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public IntEditTextPreference(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+    public IntEditTextPreference(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    public IntEditTextPreference(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
     }
 
     @Override
@@ -28,6 +36,6 @@ public class IntEditTextPreference extends EditTextPreference {
 
     @Override
     protected boolean persistString(String value) {
-        return persistInt(Integer.valueOf(value));
+        return persistInt(Integer.parseInt(value));
     }
 }

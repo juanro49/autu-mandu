@@ -15,6 +15,39 @@
  */
 package org.juanro.autumandu.gui.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Utility class for fragment-related operations.
+ * Includes thread-safe fragment animation control.
+ */
 public class FragmentUtils {
-    public static int DISABLE_FRAGMENT_ANIMATIONS = 0;
+    /**
+     * Counter to disable fragment animations.
+     * Use AtomicInteger to ensure thread safety when multiple fragments or threads
+     * are manipulating the animation state.
+     */
+    private static final AtomicInteger disableFragmentAnimations = new AtomicInteger(0);
+
+    /**
+     * Increments the counter to disable animations.
+     */
+    public static void disableAnimations() {
+        disableFragmentAnimations.incrementAndGet();
+    }
+
+    /**
+     * Checks if animations should be disabled and decrements the counter if so.
+     * @return true if animations were disabled and the counter was decremented.
+     */
+    public static boolean shouldDisableAndDecrement() {
+        int current;
+        do {
+            current = disableFragmentAnimations.get();
+            if (current <= 0) {
+                return false;
+            }
+        } while (!disableFragmentAnimations.compareAndSet(current, current - 1));
+        return true;
+    }
 }

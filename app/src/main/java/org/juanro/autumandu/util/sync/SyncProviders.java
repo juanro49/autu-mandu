@@ -33,10 +33,16 @@ import java.util.ArrayList;
 import org.juanro.autumandu.Application;
 import org.juanro.autumandu.R;
 
+/**
+ * Utility class for managing registered synchronization providers.
+ */
 public class SyncProviders {
     private static final String TAG = "SyncProviders";
     private static AbstractSyncProvider[] sSyncProviders = null;
 
+    /**
+     * Returns all registered sync providers.
+     */
     public static AbstractSyncProvider[] getSyncProviders(Context context) {
         if (sSyncProviders == null) {
             String[] classes = getRegisteredSyncProviderClassNames(context);
@@ -50,9 +56,12 @@ public class SyncProviders {
         return sSyncProviders;
     }
 
+    /**
+     * Returns a sync provider by its ID.
+     */
     public static AbstractSyncProvider getSyncProviderById(Context context, long id) {
         for (AbstractSyncProvider provider : getSyncProviders(context)) {
-            if (provider.getId() == id) {
+            if (provider != null && provider.getId() == id) {
                 return provider;
             }
         }
@@ -60,17 +69,30 @@ public class SyncProviders {
         return null;
     }
 
+    /**
+     * Returns the sync provider associated with an account.
+     */
     public static AbstractSyncProvider getSyncProviderByAccount(Context context, Account account) {
         AccountManager accountManager = AccountManager.get(Application.getContext());
+        String providerIdStr = accountManager.getUserData(account, Authenticator.KEY_SYNC_PROVIDER);
+        if (providerIdStr == null) return null;
 
-        long providerId = Long.parseLong(accountManager.getUserData(account,
-                Authenticator.KEY_SYNC_PROVIDER));
-        return getSyncProviderById(context, providerId);
+        try {
+            long providerId = Long.parseLong(providerIdStr);
+            return getSyncProviderById(context, providerId);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
+    /**
+     * Returns the settings for a sync provider account.
+     */
     public static JSONObject getSyncProviderSettings(Account account) {
         AccountManager accountManager = AccountManager.get(Application.getContext());
         String settings = accountManager.getUserData(account, Authenticator.KEY_SYNC_PROVIDER_SETTINGS);
+        if (settings == null) return null;
+
         try {
             return new JSONObject(settings);
         } catch (Exception e) {
@@ -78,44 +100,34 @@ public class SyncProviders {
         }
     }
 
-    public static void setSyncProviderSettings(Account account, JSONObject settings) {
-        AccountManager accountManager = AccountManager.get(Application.getContext());
-        if (settings != null) {
-            accountManager.setUserData(account, Authenticator.KEY_SYNC_PROVIDER_SETTINGS, settings.toString());
-        } else {
-            accountManager.setUserData(account, Authenticator.KEY_SYNC_PROVIDER_SETTINGS, null);
-        }
-    }
-
     private static String[] getRegisteredSyncProviderClassNames(Context context) {
         ArrayList<String> items = new ArrayList<>();
         XmlPullParser xpp = context.getResources().getXml(R.xml.sync_providers);
         try {
-            while (xpp.getEventType() != XmlPullParser.END_DOCUMENT) {
-                if (xpp.getEventType() == XmlPullParser.START_TAG) {
-                    if (xpp.getName().equals("sync-provider")) {
-                        items.add(xpp.getAttributeValue(0));
-                    }
+            int eventType = xpp.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_TAG && "sync-provider".equals(xpp.getName())) {
+                    items.add(xpp.getAttributeValue(null, "class"));
                 }
-
-                xpp.next();
+                eventType = xpp.next();
             }
         } catch (XmlPullParserException | IOException e) {
             Log.e(TAG, "Error parsing sync_providers.xml file.", e);
         }
 
-        return items.toArray(new String[items.size()]);
+        return items.toArray(new String[0]);
     }
 
     @SuppressWarnings("unchecked")
     private static AbstractSyncProvider newAbstractSyncProviderInstance(String className) {
+        if (className == null) return null;
         try {
             Class<? extends AbstractSyncProvider> clazz = (Class<? extends AbstractSyncProvider>) Class.forName(className);
             Constructor<? extends AbstractSyncProvider> constructor = clazz.getConstructor();
             return constructor.newInstance();
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException |
                 InstantiationException | InvocationTargetException | IllegalAccessException e) {
-            Log.e(TAG, "Error creating sync provider.", e);
+            Log.e(TAG, "Error creating sync provider: " + className, e);
             return null;
         }
     }

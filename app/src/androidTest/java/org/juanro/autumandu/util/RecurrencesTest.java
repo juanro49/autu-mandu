@@ -27,7 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import androidx.test.filters.SmallTest;
-import org.juanro.autumandu.provider.othercost.RecurrenceInterval;
+import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
 
 import static org.junit.Assert.*;
 

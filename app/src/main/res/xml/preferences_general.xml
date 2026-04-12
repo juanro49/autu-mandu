@@ -16,8 +16,8 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory android:title="@string/pref_title_category_behavior" >
-        <PreferenceScreen
-            android:fragment="org.juanro.autumandu.gui.PreferencesReportOrderFragment"
+        <Preference
+            android:fragment="org.juanro.autumandu.gui.pref.PreferencesReportOrderFragment"
             android:key="behavior_report_order"
             android:title="@string/pref_title_header_report_order" />
         <ListPreference

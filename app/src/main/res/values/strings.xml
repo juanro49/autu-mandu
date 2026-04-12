@@ -147,6 +147,7 @@
     <string name="alert_delete_reminder_message">This reminder will be deleted.</string>
     <string name="alert_delete_reminders_message">The %d selected reminders will be deleted.</string>
     <string name="alert_delete_tire_message">The %d selected tire set will be deleted.</string>
+    <string name="alert_invalid_distance">The unmount distance must be greater than or equal to the mount distance.</string>
     <string name="alert_mount_umount_message">The selected tire set will be mounted/umounted.</string>
     <string name="alert_cannot_delete_last_car">One car cannot be deleted.</string>
     <string name="alert_cannot_delete_fuel_type">Cannot delete fuel type, because it is used by at least one refueling or fuel tank.</string>
@@ -344,4 +345,6 @@
             color: #607d8b;
         }
     </string>
+    <string name="title_select_color">Select Color</string>
+    <string name="validate_error_empty">Field cannot be empty</string>
 </resources>

@@ -1,14 +1,14 @@
 package org.juanro.autumandu.model.entity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import org.juanro.autumandu.model.IFuelType;
 
 @Entity(tableName = "fuel_type")
-public class FuelType implements IFuelType {
+public class FuelType {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     private Long id;
@@ -18,18 +18,18 @@ public class FuelType implements IFuelType {
     private String name = "";
 
     @ColumnInfo(name = "category")
+    @Nullable
     private String category;
 
-    public FuelType(){
+    public FuelType() {
     }
 
     @Ignore
-    public FuelType(@NonNull String name, String category) {
-        this.setName(name);
-        this.setCategory(category);
+    public FuelType(@NonNull String name, @Nullable String category) {
+        this.name = name;
+        this.category = category;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -39,7 +39,6 @@ public class FuelType implements IFuelType {
     }
 
     @NonNull
-    @Override
     public String getName() {
         return name;
     }
@@ -48,12 +47,12 @@ public class FuelType implements IFuelType {
         this.name = name;
     }
 
-    @Override
+    @Nullable
     public String getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(@Nullable String category) {
         this.category = category;
     }
 }

@@ -3,14 +3,18 @@ package org.juanro.autumandu.model.entity;
 import java.util.Date;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import org.juanro.autumandu.model.IOtherCost;
 import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
 
-@Entity(tableName = "other_cost", foreignKeys = {
+@Entity(tableName = "other_cost", indices = {
+        @Index("car_id")
+}, foreignKeys = {
         @ForeignKey(
                 childColumns = { "car_id" },
                 parentColumns = { "_id" },
@@ -18,7 +22,7 @@ import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
                 onDelete = ForeignKey.CASCADE
         )
 })
-public class OtherCost implements IOtherCost {
+public class OtherCost {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     private Long id;
@@ -32,6 +36,7 @@ public class OtherCost implements IOtherCost {
     private Date date = new Date();
 
     @ColumnInfo(name = "mileage")
+    @Nullable
     private Integer mileage;
 
     @ColumnInfo(name = "price")
@@ -39,12 +44,13 @@ public class OtherCost implements IOtherCost {
 
     @NonNull
     @ColumnInfo(name = "recurrence_interval")
-    private RecurrenceInterval recurrenceInterval = RecurrenceInterval.values()[0];
+    private RecurrenceInterval recurrenceInterval = RecurrenceInterval.ONCE;
 
     @ColumnInfo(name = "recurrence_multiplier")
     private int recurrenceMultiplier;
 
     @ColumnInfo(name = "end_date")
+    @Nullable
     private Date endDate;
 
     @NonNull
@@ -54,23 +60,24 @@ public class OtherCost implements IOtherCost {
     @ColumnInfo(name = "car_id")
     private long carId;
 
-    public OtherCost() {}
-
-    public OtherCost(@NonNull String title, long carId, @NonNull Date date, Integer mileage,
-                     float price, @NonNull RecurrenceInterval recurrenceInterval,
-                     int recurrenceMultiplier, Date endDate, @NonNull String note) {
-        this.setTitle(title);
-        this.setCarId(carId);
-        this.setDate(date);
-        this.setMileage(mileage);
-        this.setPrice(price);
-        this.setRecurrenceInterval(recurrenceInterval);
-        this.setRecurrenceMultiplier(recurrenceMultiplier);
-        this.setEndDate(endDate);
-        this.setNote(note);
+    public OtherCost() {
     }
 
-    @Override
+    @Ignore
+    public OtherCost(@NonNull String title, long carId, @NonNull Date date, @Nullable Integer mileage,
+                     float price, @NonNull RecurrenceInterval recurrenceInterval,
+                     int recurrenceMultiplier, @Nullable Date endDate, @NonNull String note) {
+        this.title = title;
+        this.carId = carId;
+        this.date = date;
+        this.mileage = mileage;
+        this.price = price;
+        this.recurrenceInterval = recurrenceInterval;
+        this.recurrenceMultiplier = recurrenceMultiplier;
+        this.endDate = endDate;
+        this.note = note;
+    }
+
     public Long getId() {
         return id;
     }
@@ -80,7 +87,6 @@ public class OtherCost implements IOtherCost {
     }
 
     @NonNull
-    @Override
     public String getTitle() {
         return title;
     }
@@ -90,7 +96,6 @@ public class OtherCost implements IOtherCost {
     }
 
     @NonNull
-    @Override
     public Date getDate() {
         return date;
     }
@@ -99,16 +104,15 @@ public class OtherCost implements IOtherCost {
         this.date = date;
     }
 
-    @Override
+    @Nullable
     public Integer getMileage() {
         return mileage;
     }
 
-    public void setMileage(Integer mileage) {
+    public void setMileage(@Nullable Integer mileage) {
         this.mileage = mileage;
     }
 
-    @Override
     public float getPrice() {
         return price;
     }
@@ -118,7 +122,6 @@ public class OtherCost implements IOtherCost {
     }
 
     @NonNull
-    @Override
     public RecurrenceInterval getRecurrenceInterval() {
         return recurrenceInterval;
     }
@@ -127,7 +130,6 @@ public class OtherCost implements IOtherCost {
         this.recurrenceInterval = recurrenceInterval;
     }
 
-    @Override
     public int getRecurrenceMultiplier() {
         return recurrenceMultiplier;
     }
@@ -136,17 +138,16 @@ public class OtherCost implements IOtherCost {
         this.recurrenceMultiplier = recurrenceMultiplier;
     }
 
-    @Override
+    @Nullable
     public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(@Nullable Date endDate) {
         this.endDate = endDate;
     }
 
     @NonNull
-    @Override
     public String getNote() {
         return note;
     }
@@ -155,7 +156,6 @@ public class OtherCost implements IOtherCost {
         this.note = note;
     }
 
-    @Override
     public long getCarId() {
         return carId;
     }

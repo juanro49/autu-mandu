@@ -17,23 +17,34 @@ package org.juanro.autumandu.data.report;
 
 import android.content.Context;
 import android.graphics.DashPathEffect;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.List;
 
 import lecho.lib.hellocharts.model.Line;
 import org.juanro.autumandu.R;
 
 /**
- * Uses simple moving average to calculate a accurate trend line.
+ * Uses simple moving average to calculate an accurate trend line.
  */
-class TrendReportChartData extends AbstractReportChartLineData {
-    public TrendReportChartData(Context context, String name, int color, Float[] parentXValues, Float[] parentYValues) {
+public class TrendReportChartData extends AbstractReportChartLineData {
+
+    public TrendReportChartData(@NonNull Context context, @NonNull String name, int color,
+                               @Nullable List<AbstractReportChartData.DataPoint> dataPoints) {
         super(context, context.getString(R.string.report_trend_label, name), color);
+
+        if (dataPoints == null || dataPoints.isEmpty()) {
+            return;
+        }
 
         // Use higher order when more entries are available to calculate a
         // more accurate trend.
+        int size = dataPoints.size();
         int order;
-        if (parentXValues.length > 7) {
+        if (size > 7) {
             order = 5;
-        } else if (parentXValues.length > 3) {
+        } else if (size > 3) {
             order = 3;
         } else {
             // It doesn't make sense to display a trend line with order 1
@@ -43,26 +54,27 @@ class TrendReportChartData extends AbstractReportChartLineData {
 
         int k = (order - 1) / 2;
 
-        for (int t = k; t < parentXValues.length - k; t++) {
-            float x = parentXValues[t];
+        for (int t = k; t < size - k; t++) {
+            float x = dataPoints.get(t).x;
 
             // y_t = (y_t-k + y_t-k+1 + ... + y_t + ... + y_t+k-1 + y_t+k) / order
-            float y = 0;
+            float sumY = 0;
             for (int i = t - k; i <= t + k; i++) {
-                y += parentYValues[i];
+                sumY += dataPoints.get(i).y;
             }
 
-            y /= order;
-
+            float y = sumY / order;
             add(x, y, null, false);
         }
     }
 
+    @NonNull
     @Override
     public Line getLine() {
         Line line = super.getLine();
         line.setHasPoints(false);
         line.setStrokeWidth(1);
+        // Dash pattern: 20px dash, 20px gap.
         line.setPathEffect(new DashPathEffect(new float[]{20, 20}, 0));
         return line;
     }

@@ -13,64 +13,81 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.juanro.autumandu.data.query;
 
 import android.content.Context;
 
 import java.util.Date;
 
-import org.juanro.autumandu.presentation.CarPresenter;
-import org.juanro.autumandu.provider.reminder.ReminderCursor;
+import org.juanro.autumandu.model.dto.ReminderWithCar;
+import org.juanro.autumandu.util.MileageUtil;
 import org.juanro.autumandu.util.TimeSpan;
 
+/**
+ * Provides complex queries for reminders that involve logic beyond simple database access.
+ */
 public class ReminderQueries {
-    private Context mContext;
-    private ReminderCursor mReminder;
+    private final Context context;
+    private final ReminderWithCar reminderWithCar;
 
-    public ReminderQueries(Context context, ReminderCursor reminder) {
-        mContext = context;
-        mReminder = reminder;
+    public ReminderQueries(Context context, ReminderWithCar reminder) {
+        this.context = context.getApplicationContext();
+        this.reminderWithCar = reminder;
     }
 
+    /**
+     * Calculates the remaining distance until the reminder is due.
+     * @return Distance to due, or null if no distance-based reminder is set.
+     */
     public Integer getDistanceToDue() {
-        if (mReminder.getAfterDistance() != null) {
-            int latestMileage = CarPresenter.getInstance(mContext).getLatestMileage(mReminder.getCarId());
-            return mReminder.getStartMileage() + mReminder.getAfterDistance() - latestMileage;
+        var reminder = reminderWithCar.reminder();
+        if (reminder.getAfterDistance() != null) {
+            int latestMileage = MileageUtil.getLatestMileage(context, reminder.getCarId());
+            return reminder.getStartMileage() + reminder.getAfterDistance() - latestMileage;
         } else {
             return null;
         }
     }
 
+    /**
+     * Calculates the remaining time until the reminder is due.
+     * @return Time in milliseconds to due, or null if no time-based reminder is set.
+     */
     public Long getTimeToDue() {
-        if (mReminder.getAfterTimeSpanUnit() != null) {
+        var reminder = reminderWithCar.reminder();
+        if (reminder.getAfterTimeSpanUnit() != null) {
             long now = new Date().getTime();
-            TimeSpan span = new TimeSpan(mReminder.getAfterTimeSpanUnit(),
-                    mReminder.getAfterTimeSpanCount() == null ? 1 : mReminder.getAfterTimeSpanCount());
+            var span = new TimeSpan(reminder.getAfterTimeSpanUnit(),
+                    reminder.getAfterTimeSpanCount() == null ? 1 : reminder.getAfterTimeSpanCount());
 
-            return span.addTo(mReminder.getStartDate()).getTime() - now;
+            return span.addTo(reminder.getStartDate()).getTime() - now;
         } else {
             return null;
         }
     }
 
+    /**
+     * Checks if the reminder is currently snoozed.
+     * @return true if snoozed, false otherwise.
+     */
     public boolean isSnoozed() {
+        var reminder = reminderWithCar.reminder();
         long now = new Date().getTime();
-        return mReminder.getSnoozedUntil() != null && mReminder.getSnoozedUntil().getTime() >= now;
+        return reminder.getSnoozedUntil() != null && reminder.getSnoozedUntil().getTime() >= now;
     }
 
+    /**
+     * Checks if the reminder is due (distance or time exceeded).
+     * @return true if due, false otherwise.
+     */
     public boolean isDue() {
-        if (mReminder.getAfterDistance() != null) {
-            if (getDistanceToDue() <= 0) {
-                return true;
-            }
+        var distanceToDue = getDistanceToDue();
+        if (distanceToDue != null && distanceToDue <= 0) {
+            return true;
         }
 
-        if (mReminder.getAfterTimeSpanUnit() != null) {
-            if (getTimeToDue() <= 0) {
-                return true;
-            }
-        }
-
-        return false;
+        var timeToDue = getTimeToDue();
+        return timeToDue != null && timeToDue <= 0;
     }
 }

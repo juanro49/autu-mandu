@@ -16,29 +16,39 @@
 package org.juanro.autumandu.gui.util;
 
 import android.content.Context;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import com.google.android.material.snackbar.Snackbar;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.github.clans.fab.FloatingActionMenu;
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.material.snackbar.Snackbar;
+
+@SuppressWarnings("unused")
 public class FloatingActionMenuBehavior extends CoordinatorLayout.Behavior<FloatingActionMenu> {
+
+    @SuppressWarnings("unused")
     public FloatingActionMenuBehavior() {
         super();
     }
 
+    @SuppressWarnings("unused")
     public FloatingActionMenuBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
-    public boolean layoutDependsOn(CoordinatorLayout parent, FloatingActionMenu child, View dependency) {
+    @SuppressWarnings("RestrictedApi")
+    public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull FloatingActionMenu child, @NonNull View dependency) {
+        // We depend on any snackbar being shown.
+        // Using getTag() or other methods instead of internal SnackbarLayout if necessary,
+        // but typically checking against Snackbar.SnackbarLayout is enough for basic behavior.
         return dependency instanceof Snackbar.SnackbarLayout;
     }
 
     @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, FloatingActionMenu child, View dependency) {
+    public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, @NonNull FloatingActionMenu child, @NonNull View dependency) {
         float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight());
         child.setTranslationY(translationY);
         return true;

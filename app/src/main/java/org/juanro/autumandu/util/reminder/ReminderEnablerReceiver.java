@@ -16,28 +16,26 @@
 
 package org.juanro.autumandu.util.reminder;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import org.joda.time.DateTime;
-
+/**
+ * Receiver to re-schedule reminder updates after a device reboot.
+ * Migrated from AlarmManager to WorkManager (ReminderWorker).
+ */
 public class ReminderEnablerReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        scheduleAlarms(context);
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            ReminderWorker.schedulePeriodicUpdate(context);
+        }
     }
 
+    /**
+     * Initial setup for reminders, typically called once after the app starts.
+     */
     public static void scheduleAlarms(Context context) {
-        PendingIntent pendingIntent = ReminderService.getPendingIntent(context,
-                ReminderService.ACTION_UPDATE_NOTIFICATION, PendingIntent.FLAG_IMMUTABLE);
-
-        DateTime startTime = new DateTime().withTime(9, 0, 0, 0);
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC, startTime.getMillis(),
-                AlarmManager.INTERVAL_DAY, pendingIntent);
+        ReminderWorker.schedulePeriodicUpdate(context);
     }
 }

@@ -37,20 +37,16 @@ public class FormFieldGreaterEqualZeroValidator extends AbstractFormFieldValidat
     protected boolean isValid() {
         String textValue = fields[0].getText().toString();
         try {
-            double number = Double.parseDouble(fields[0].getText().toString());
-            if (number < 0) {
-                return false;
-            }
+            double number = Double.parseDouble(textValue);
+            return number >= 0;
         } catch (NumberFormatException e) {
             try {
                 Number number = NumberFormat.getNumberInstance().parse(textValue);
-                return ((double) number >= 0);
+                return number != null && number.doubleValue() >= 0;
             } catch (ParseException f) {
                 return false;
             }
         }
-
-        return true;
     }
 
 }

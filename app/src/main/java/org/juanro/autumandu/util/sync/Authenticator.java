@@ -20,20 +20,23 @@ import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
-import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import org.juanro.autumandu.gui.AuthenticatorAddAccountActivity;
 
+/**
+ * Modernized account authenticator.
+ * Optimized to remove unnecessary exceptions and improve immutability.
+ */
 public class Authenticator extends AbstractAccountAuthenticator {
     public static final String ACCOUNT_TYPE = "org.juanro.autumandu.sync";
     public static final String AUTH_TOKEN_TYPE = "Default";
     public static final String KEY_SYNC_PROVIDER = ACCOUNT_TYPE + ".provider";
     public static final String KEY_SYNC_PROVIDER_SETTINGS = ACCOUNT_TYPE + ".provider.settings";
 
-    private Context mContext;
+    private final Context mContext;
 
     public Authenticator(Context context) {
         super(context);
@@ -46,22 +49,25 @@ public class Authenticator extends AbstractAccountAuthenticator {
     }
 
     @Override
-    public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
+    public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) {
         AccountManager accountManager = AccountManager.get(mContext);
         if (accountManager.getAccountsByType(ACCOUNT_TYPE).length > 0) {
-            return null;
+            Bundle result = new Bundle();
+            result.putInt(AccountManager.KEY_ERROR_CODE, AccountManager.ERROR_CODE_BAD_REQUEST);
+            result.putString(AccountManager.KEY_ERROR_MESSAGE, "Only one account is supported.");
+            return result;
         }
 
         return createAuthenticatorAddAccountActivityIntentBundle(response);
     }
 
     @Override
-    public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account, Bundle options) throws NetworkErrorException {
+    public Bundle confirmCredentials(AccountAuthenticatorResponse response, Account account, Bundle options) {
         return null;
     }
 
     @Override
-    public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
+    public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) {
         AccountManager accountManager = AccountManager.get(mContext);
         String authToken = accountManager.peekAuthToken(account, authTokenType);
 
@@ -78,12 +84,12 @@ public class Authenticator extends AbstractAccountAuthenticator {
     }
 
     @Override
-    public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
+    public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account, String[] features) throws NetworkErrorException {
+    public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account, String[] features) {
         throw new UnsupportedOperationException();
     }
 

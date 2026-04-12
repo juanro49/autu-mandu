@@ -17,88 +17,62 @@ package org.juanro.autumandu.util;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import org.joda.time.DateTime;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.juanro.autumandu.R;
-import org.juanro.autumandu.provider.reminder.TimeSpanUnit;
+import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
 
-public class TimeSpan {
-    private static final double MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
+/**
+ * Represents a span of time.
+ */
+public record TimeSpan(TimeSpanUnit unit, int count) {
+    private static final double MILLIS_PER_DAY = 1000 * 60 * 60 * 24.0;
     private static final double MILLIS_PER_MONTH = MILLIS_PER_DAY * 30;
     private static final double MILLIS_PER_YEAR = MILLIS_PER_DAY * 365;
     private static final float DEVIATION = 0.9f;
 
-    private TimeSpanUnit mUnit;
-    private int mCount;
-
-    public TimeSpan(TimeSpanUnit unit, int count) {
-        mUnit = unit;
-        mCount = count;
-    }
-
-    public TimeSpanUnit getUnit() {
-        return mUnit;
-    }
-
-    public int getCount() {
-        return mCount;
-    }
-
     public Date addTo(Date date) {
-        DateTime dateTime = new DateTime(date);
-        switch (mUnit) {
-            case DAY:
-                return dateTime.plusDays(mCount).toDate();
-            case MONTH:
-                return dateTime.plusMonths(mCount).toDate();
-            case YEAR:
-                return dateTime.plusYears(mCount).toDate();
-        }
-
-        return date;
+        var dateTime = new DateTime(date);
+        return switch (unit) {
+            case DAY -> dateTime.plusDays(count).toDate();
+            case MONTH -> dateTime.plusMonths(count).toDate();
+            case YEAR -> dateTime.plusYears(count).toDate();
+        };
     }
 
-    public Date subtractFrom(Date date) {
-        DateTime dateTime = new DateTime(date);
-        switch (mUnit) {
-            case DAY:
-                return dateTime.minusDays(mCount).toDate();
-            case MONTH:
-                return dateTime.minusMonths(mCount).toDate();
-            case YEAR:
-                return dateTime.minusYears(mCount).toDate();
-        }
-
-        return date;
-    }
-
+    @NonNull
     @Override
     public String toString() {
-        return String.format("%d %s", mCount, mUnit.toString());
+        return String.format(Locale.US, "%d %s", count, unit.toString());
     }
 
     public String toLocalizedString(Context context) {
         String[] timeSpanUnits = context.getResources().getStringArray(R.array.time_units);
-        return String.format("%s %s", mCount, timeSpanUnits[mUnit.ordinal()]);
+        return String.format(context.getResources().getConfiguration().getLocales().get(0),
+                "%s %s", count, timeSpanUnits[unit.getId()]);
     }
 
     public static TimeSpan fromMillis(long millis) {
-        millis = Math.abs(millis);
-        if (millis >= (MILLIS_PER_YEAR * DEVIATION)) {
-            int count = (int) Math.round(millis / MILLIS_PER_YEAR);
+        long absMillis = Math.abs(millis);
+        if (absMillis >= (MILLIS_PER_YEAR * DEVIATION)) {
+            int count = (int) Math.round(absMillis / MILLIS_PER_YEAR);
             return new TimeSpan(TimeSpanUnit.YEAR, count);
-        } else if (millis >= (MILLIS_PER_MONTH * DEVIATION)) {
-            int count = (int) Math.round(millis / MILLIS_PER_MONTH);
+        } else if (absMillis >= (MILLIS_PER_MONTH * DEVIATION)) {
+            int count = (int) Math.round(absMillis / MILLIS_PER_MONTH);
             return new TimeSpan(TimeSpanUnit.MONTH, count);
         } else {
-            int count = (int) Math.round(millis / MILLIS_PER_DAY);
+            int count = (int) Math.round(absMillis / MILLIS_PER_DAY);
             return new TimeSpan(TimeSpanUnit.DAY, count);
         }
     }
 
     public static TimeSpan fromString(String str, TimeSpan defaultValue) {
+        if (str == null) return defaultValue;
         String[] parts = str.split(" ");
         if (parts.length != 2) {
             return defaultValue;

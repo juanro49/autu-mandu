@@ -18,27 +18,36 @@ package org.juanro.autumandu.util;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.net.Uri;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import org.joda.time.DateTime;
 
-import java.util.Date;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.juanro.autumandu.Application;
-import org.juanro.autumandu.provider.car.CarColumns;
-import org.juanro.autumandu.provider.car.CarContentValues;
-import org.juanro.autumandu.provider.fueltype.FuelTypeContentValues;
-import org.juanro.autumandu.provider.othercost.OtherCostContentValues;
-import org.juanro.autumandu.provider.othercost.RecurrenceInterval;
-import org.juanro.autumandu.provider.refueling.RefuelingContentValues;
-import org.juanro.autumandu.provider.station.StationContentValues;
-import org.juanro.autumandu.provider.tirelist.TireListContentValues;
+import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.entity.Car;
+import org.juanro.autumandu.model.entity.FuelType;
+import org.juanro.autumandu.model.entity.OtherCost;
+import org.juanro.autumandu.model.entity.Refueling;
+import org.juanro.autumandu.model.entity.Station;
+import org.juanro.autumandu.model.entity.TireList;
+import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
 
-public class DemoData {
-    private static final CharSequence MENU_TITLE_CREATE = "Create demo data";
-    private static final CharSequence MENU_TITLE_REMOVE = "Remove demo data";
+/**
+ * Utility class to populate the database with demo data.
+ */
+@SuppressWarnings("SameParameterValue")
+public final class DemoData {
+    private static final String MENU_TITLE_CREATE = "Create demo data";
+    private static final String MENU_TITLE_REMOVE = "Remove demo data";
+    private static final Executor DB_EXECUTOR = Executors.newSingleThreadExecutor();
+
+    private DemoData() {
+        // Utility class
+    }
 
     public static void createMenuItem(Menu menu) {
         menu.add(MENU_TITLE_CREATE);
@@ -46,10 +55,13 @@ public class DemoData {
     }
 
     public static boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getTitle().equals(MENU_TITLE_CREATE)) {
+        CharSequence title = item.getTitle();
+        if (title == null) return false;
+
+        if (MENU_TITLE_CREATE.contentEquals(title)) {
             addDemoData();
             return true;
-        } else if (item.getTitle().equals(MENU_TITLE_REMOVE)) {
+        } else if (MENU_TITLE_REMOVE.contentEquals(title)) {
             removeDemoData();
             return true;
         }
@@ -58,189 +70,187 @@ public class DemoData {
     }
 
     public static void addDemoData() {
-        Context context = Application.getContext();
+        DB_EXECUTOR.execute(() -> {
+            Context context = Application.getContext();
+            AutuManduDatabase db = AutuManduDatabase.getInstance(context);
 
-        long super95 = createFuelType(context, "Super 95", "Benzin");
-        long superE10 = createFuelType(context, "Super E10", "Benzin");
-        long lpg = createFuelType(context, "LPG", "Gas");
+            long super95 = createFuelType(db, "Super 95", "Benzin");
+            long superE10 = createFuelType(db, "Super E10", "Benzin");
+            long lpg = createFuelType(db, "LPG", "Gas");
 
-        long stationId =  createStation(context, "Iberdoex");
+            long stationId = createStation(db, "Iberdoex");
 
-        // Fiat Punto
+            // Fiat Punto
+            long punto = createCar(db, "Fiat Punto", Color.BLUE);
 
-        long punto = createCar(context, "Fiat Punto", Color.BLUE, "Fiat", "Punto", 2023, "0000ABC", new Date());
+            int puntoCount = 50;
+            DateTime puntoDate = DateTime.now().minusMonths(puntoCount / 2).withSecondOfMinute(0).withMillisOfSecond(0);
+            int puntoMileage = 15000;
 
-        int puntoCount = 50;
-        DateTime puntoDate = DateTime.now().minusMonths(puntoCount / 2).withSecondOfMinute(0).withMillisOfSecond(0);
-        int puntoMileage = 15000;
+            createOtherCost(db, "Rechtes Abblendlicht", puntoDate.plusDays(randInt(50, 100)), null,
+                    121009, 10, RecurrenceInterval.ONCE, 1, "", punto);
+            createOtherCost(db, "Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1,
+                    "", punto);
 
-        createOtherCost(context, "Rechtes Abblendlicht", puntoDate.plusDays(randInt(50, 100)), null,
-                121009, 10, RecurrenceInterval.ONCE, 1, "", punto);
-        createOtherCost(context, "Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1,
-                "", punto);
+            createTire(db, puntoDate, null, 50, 4, "Insa Turbo", "Eco Evolution", "", punto);
 
-        createTire(context, puntoDate, null, 50, 4, "Insa Turbo", "Eco Evolution", "", punto);
+            for (int i = 0; i < puntoCount; i++) {
+                puntoDate = puntoDate.plusDays(randInt(12, 18));
+                puntoMileage += randInt(570, 620);
+                float volume = randFloat(43, 48);
+                boolean partial = false;
+                if (randBooleanTrueInOneOutOf(6)) {
+                    volume -= randFloat(20, 40);
+                    partial = true;
+                }
 
-        for (int i = 0; i < puntoCount; i++) {
-            puntoDate = puntoDate.plusDays(randInt(12, 18));
-            puntoMileage += randInt(570, 620);
-            float volume = randFloat(43, 48);
-            boolean partial = false;
-            if (randBooleanTrueInOneOutOf(6)) {
-                volume -= randFloat(20, 40);
-                partial = true;
+                float price = volume * randFloat(140, 160) / 100;
+                long fuelType = randBooleanTrueInOneOutOf(4) ? superE10 : super95;
+
+                if (!randBooleanTrueInOneOutOf(15)) {
+                    createRefueling(db, puntoDate, puntoMileage, volume, price, partial, "",
+                            fuelType, stationId, punto);
+                }
             }
 
-            float price = volume * randFloat(140, 160) / 100;
-            long fuelType = super95;
-            if (randBooleanTrueInOneOutOf(4)) {
-                fuelType = superE10;
+            // Opel Astra
+            long astra = createCar(db, "Opel Astra", Color.RED);
+
+            int astraCountSuper95 = 30;
+            int astraCountLpg = 30;
+            DateTime astraDateSuper95 = DateTime.now().minusMonths(astraCountSuper95 / 3).withSecondOfMinute(0).withMillisOfSecond(0);
+            DateTime astraDateLpg = DateTime.now().minusMonths(astraCountSuper95 / 3).withSecondOfMinute(0).withMillisOfSecond(0);
+            int astraMileageSuper95 = 120000;
+            int astraMileageLpg = 120000;
+
+            createOtherCost(db, "Steuern", astraDateSuper95, null, -1, 250, RecurrenceInterval.YEAR, 1,
+                    "", astra);
+            createOtherCost(db, "Versicherung", astraDateSuper95, null, -1, 40, RecurrenceInterval.MONTH,
+                    1, "", astra);
+
+            createTire(db, astraDateSuper95, null, 50, 4, "Insa Turbo", "All Season 4", "", astra);
+
+            for (int i = 0; i < astraCountSuper95; i++) {
+                astraDateSuper95 = astraDateSuper95.plusDays(randInt(8, 13));
+                astraMileageSuper95 += randInt(570, 620);
+                float volume = randFloat(55, 60);
+                boolean partial = false;
+                if (randBooleanTrueInOneOutOf(6)) {
+                    volume -= randFloat(20, 40);
+                    partial = true;
+                }
+
+                float price = volume * randFloat(140, 160) / 100;
+
+                if (!randBooleanTrueInOneOutOf(15)) {
+                    createRefueling(db, astraDateSuper95, astraMileageSuper95, volume, price, partial, "",
+                            super95, stationId, astra);
+                }
             }
 
-            if (!randBooleanTrueInOneOutOf(15)) {
-                createRefueling(context, puntoDate, puntoMileage, volume, price, partial, "",
-                        fuelType, stationId, punto);
+            for (int i = 0; i < astraCountLpg; i++) {
+                astraDateLpg = astraDateLpg.plusDays(randInt(8, 13));
+                astraMileageLpg += randInt(570, 620);
+                float volume = randFloat(25, 30);
+                boolean partial = false;
+                if (randBooleanTrueInOneOutOf(6)) {
+                    volume -= randFloat(10, 20);
+                    partial = true;
+                }
+
+                float price = volume * randFloat(85, 105) / 100;
+
+                if (!randBooleanTrueInOneOutOf(15)) {
+                    createRefueling(db, astraDateLpg, astraMileageLpg, volume, price, partial, "",
+                            lpg, stationId, astra);
+                }
             }
-        }
-
-        // Opel Astra
-
-        long astra = createCar(context, "Opel Astra", Color.RED, "Opel", "Astra", 2010, "9999XYZ", new Date());
-
-        int astraCountSuper95 = 30;
-        int astraCountLpg = 30;
-        DateTime astraDateSuper95 = DateTime.now().minusMonths(astraCountSuper95 / 3).withSecondOfMinute(0).withMillisOfSecond(0);
-        DateTime astraDateLpg = DateTime.now().minusMonths(astraCountSuper95 / 3).withSecondOfMinute(0).withMillisOfSecond(0);
-        int astraMileageSuper95 = 120000;
-        int astraMileageLpg = 120000;
-
-        createOtherCost(context, "Steuern", astraDateSuper95, null, -1, 250, RecurrenceInterval.YEAR, 1,
-                "", astra);
-        createOtherCost(context, "Versicherung", astraDateSuper95, null, -1, 40, RecurrenceInterval.MONTH,
-                1, "", astra);
-
-        createTire(context, astraDateSuper95, null, 50, 4, "Insa Turbo", "All Season 4", "", astra);
-
-        for (int i = 0; i < astraCountSuper95; i++) {
-            astraDateSuper95 = astraDateSuper95.plusDays(randInt(8, 13));
-            astraMileageSuper95 += randInt(570, 620);
-            float volume = randFloat(55, 60);
-            boolean partial = false;
-            if (randBooleanTrueInOneOutOf(6)) {
-                volume -= randFloat(20, 40);
-                partial = true;
-            }
-
-            float price = volume * randFloat(140, 160) / 100;
-
-            if (!randBooleanTrueInOneOutOf(15)) {
-                createRefueling(context, astraDateSuper95, astraMileageSuper95, volume, price, partial, "",
-                        super95, stationId, astra);
-            }
-        }
-
-        for (int i = 0; i < astraCountLpg; i++) {
-            astraDateLpg = astraDateLpg.plusDays(randInt(8, 13));
-            astraMileageLpg += randInt(570, 620);
-            float volume = randFloat(25, 30);
-            boolean partial = false;
-            if (randBooleanTrueInOneOutOf(6)) {
-                volume -= randFloat(10, 20);
-                partial = true;
-            }
-
-            float price = volume * randFloat(85, 105) / 100;
-
-            if (!randBooleanTrueInOneOutOf(15)) {
-                createRefueling(context, astraDateLpg, astraMileageLpg, volume, price, partial, "",
-                        lpg, stationId, astra);
-            }
-        }
+        });
     }
 
     public static void removeDemoData() {
-        Context context = Application.getContext();
-
-        context.getContentResolver().delete(CarColumns.CONTENT_URI, null, null);
+        DB_EXECUTOR.execute(() -> {
+            AutuManduDatabase db = AutuManduDatabase.getInstance(Application.getContext());
+            db.runInTransaction(() -> {
+                for (Car car : db.getCarDao().getAll()) {
+                    db.getCarDao().delete(car);
+                }
+            });
+        });
     }
 
-    private static long createCar(Context context, String name, int color, String make, String model, int year, String licensePlate, Date buyingDate) {
-        return getIdFromUri(new CarContentValues()
-                .putName(name)
-                .putColor(color)
-                .putInitialMileage(0)
-                .putBuyingPrice(0)
-                .putNumTires(4)
-                /*.putMake(make)
-                .putModel(model)
-                .putYear(year)
-                .putLicensePlate(licensePlate)
-                .putBuyingDate(buyingDate)*/
-                .insert(context.getContentResolver()));
+    private static long createCar(AutuManduDatabase db, String name, int color) {
+        Car car = new Car();
+        car.setName(name);
+        car.setColor(color);
+        car.setInitialMileage(0);
+        car.setBuyingPrice(0);
+        car.setNumTires(4);
+        return db.getCarDao().insert(car)[0];
     }
 
-    private static long createFuelType(Context context, String name, String category) {
-        return getIdFromUri(new FuelTypeContentValues()
-                .putName(name)
-                .putCategory(category)
-                .insert(context.getContentResolver()));
+    private static long createFuelType(AutuManduDatabase db, String name, String category) {
+        FuelType fuelType = new FuelType();
+        fuelType.setName(name);
+        fuelType.setCategory(category);
+        return db.getFuelTypeDao().insert(fuelType)[0];
     }
 
-    private static long createStation(Context context, String name) {
-        return getIdFromUri(new StationContentValues()
-            .putName(name)
-            .insert(context.getContentResolver()));
+    private static long createStation(AutuManduDatabase db, String name) {
+        Station station = new Station();
+        station.setName(name);
+        return db.getStationDao().insert(station)[0];
     }
 
-    private static long createRefueling(Context context, DateTime date, int mileage, float volume,
+    private static void createRefueling(AutuManduDatabase db, DateTime date, int mileage, float volume,
                                         float price, boolean partial, String note, long fuelTypeId,
                                         long stationId, long carId) {
-        // Has a chance of 10% to fail. This emulates, that the user forgot to enter the refueling.
-        if (Math.random() > 0.95) {
-            return -1;
-        }
+        if (Math.random() > 0.95) return;
 
-        return getIdFromUri(new RefuelingContentValues()
-                .putDate(date.toDate())
-                .putMileage(mileage)
-                .putVolume(volume)
-                .putPrice(price)
-                .putPartial(partial)
-                .putNote(note)
-                .putFuelTypeId(fuelTypeId)
-                .putStationId(stationId)
-                .putCarId(carId)
-                .insert(context.getContentResolver()));
+        Refueling refueling = new Refueling();
+        refueling.setDate(date.toDate());
+        refueling.setMileage(mileage);
+        refueling.setVolume(volume);
+        refueling.setPrice(price);
+        refueling.setPartial(partial);
+        refueling.setNote(note);
+        refueling.setFuelTypeId(fuelTypeId);
+        refueling.setStationId(stationId);
+        refueling.setCarId(carId);
+
+        db.getRefuelingDao().insert(refueling);
     }
 
-    private static long createOtherCost(Context context, String title, DateTime date,
+    private static void createOtherCost(AutuManduDatabase db, String title, DateTime date,
                                         DateTime endDate, int mileage, float price,
                                         RecurrenceInterval recurrenceInterval,
                                         int recurrenceMultiplier, String note, long carId) {
-        return getIdFromUri(new OtherCostContentValues()
-                .putTitle(title)
-                .putDate(date.toDate())
-                .putEndDate(endDate == null ? null : endDate.toDate())
-                .putMileage(mileage)
-                .putPrice(price)
-                .putRecurrenceInterval(recurrenceInterval)
-                .putRecurrenceMultiplier(recurrenceMultiplier)
-                .putNote(note)
-                .putCarId(carId)
-                .insert(context.getContentResolver()));
+        OtherCost otherCost = new OtherCost();
+        otherCost.setTitle(title);
+        otherCost.setDate(date.toDate());
+        otherCost.setEndDate(endDate == null ? null : endDate.toDate());
+        otherCost.setMileage(mileage);
+        otherCost.setPrice(price);
+        otherCost.setRecurrenceInterval(recurrenceInterval);
+        otherCost.setRecurrenceMultiplier(recurrenceMultiplier);
+        otherCost.setNote(note);
+        otherCost.setCarId(carId);
+
+        db.getOtherCostDao().insert(otherCost);
     }
 
-    private static long createTire(Context context, DateTime buyDate, DateTime trashDate, float price, int quantity, String manufacturer, String model, String note, long carId) {
-        return getIdFromUri(new TireListContentValues()
-            .putBuyDate(buyDate.toDate())
-            .putTrashDate(trashDate == null ? null : trashDate.toDate())
-            .putPrice(price)
-            .putQuantity(quantity)
-            .putManufacturer(manufacturer)
-            .putModel(model)
-            .putNote(note)
-            .putCarId(carId)
-            .insert(context.getContentResolver()));
+    private static void createTire(AutuManduDatabase db, DateTime buyDate, DateTime trashDate, float price, int quantity, String manufacturer, String model, String note, long carId) {
+        TireList tireList = new TireList();
+        tireList.setBuyDate(buyDate.toDate());
+        tireList.setTrashDate(trashDate == null ? null : trashDate.toDate());
+        tireList.setPrice(price);
+        tireList.setQuantity(quantity);
+        tireList.setManufacturer(manufacturer);
+        tireList.setModel(model);
+        tireList.setNote(note);
+        tireList.setCarId(carId);
+
+        db.getTireDao().insert(tireList);
     }
 
     private static int randInt(int min, int max) {
@@ -253,10 +263,5 @@ public class DemoData {
 
     private static boolean randBooleanTrueInOneOutOf(int x) {
         return randInt(0, x) == 0;
-    }
-
-    private static long getIdFromUri(Uri uri) {
-        String lastPart = uri.getLastPathSegment();
-        return Long.parseLong(lastPart);
     }
 }

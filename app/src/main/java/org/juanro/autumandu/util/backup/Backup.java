@@ -26,7 +26,6 @@ import android.util.Log;
 import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,27 +36,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 import org.juanro.autumandu.Application;
 import org.juanro.autumandu.Preferences;
-import org.juanro.autumandu.provider.DataSQLiteOpenHelper;
+import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.util.FileCopyUtil;
 
+/**
+ * Class for managing database backups and restores.
+ * Optimized for Room persistence.
+ */
 public class Backup {
     private static final String INTERNAL_BACKUP = "rescue.db";
     private static final String TAG = "Backup";
 
-    private File dbFile;
-    private Preferences prefs;
-    private ContentResolver resolver;
-    private Context mContext;
+    private final File dbFile;
+    private final Preferences prefs;
+    private final ContentResolver resolver;
+    private final Context mContext;
 
     public Backup(Context context) {
-        prefs = new Preferences(context);
-        dbFile = new File(DataSQLiteOpenHelper.getInstance(context).getReadableDatabase().getPath());
-        mContext = context;
-        resolver = context.getContentResolver();
+        this.prefs = new Preferences(context);
+        this.dbFile = context.getDatabasePath(AutuManduDatabase.DATABASE_NAME);
+        this.mContext = context;
+        this.resolver = context.getContentResolver();
     }
 
     /**
@@ -65,15 +67,16 @@ public class Backup {
      */
     public DocumentFile getBackupDir() {
         DocumentFile backupDir = null;
+        String backupPath = prefs.getBackupPath();
 
-        if (prefs.getBackupPath().startsWith("/"))
-        {
-            backupDir = DocumentFile.fromFile(new File(prefs.getBackupPath()));
-        }
-        else
-        {
-            Uri backupDirUri = DocumentsContract.buildChildDocumentsUriUsingTree(Uri.parse(prefs.getBackupPath()), DocumentsContract.getTreeDocumentId(Uri.parse(prefs.getBackupPath())));
-            backupDir = DocumentFile.fromTreeUri(mContext, backupDirUri);
+        try {
+            if (backupPath.startsWith("content://")) {
+                backupDir = DocumentFile.fromTreeUri(mContext, Uri.parse(backupPath));
+            } else {
+                backupDir = DocumentFile.fromFile(new File(backupPath));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting backup directory", e);
         }
 
         return backupDir;
@@ -81,7 +84,7 @@ public class Backup {
 
     /**
      * Do an automatically triggered backup, if necessary.
-     * @return true or false corresponding to {@link #backup()} or null, if no backup needed.
+     * @return true or false corresponding to {@link #backup(boolean)} or null, if no backup needed.
      */
     public Boolean autoBackup() {
         if (backupFileExists() || !prefs.getAutoBackupEnabled()) {
@@ -90,18 +93,27 @@ public class Backup {
             boolean rtn = backup(false);
             if (rtn) {
                 DocumentFile backupDir = getBackupDir();
-                DocumentFile[] allFiles = backupDir.listFiles();
-                ArrayList<String> backupFiles = new ArrayList<String>();
+                if (backupDir != null) {
+                    DocumentFile[] allFiles = backupDir.listFiles();
+                    ArrayList<String> backupFiles = new ArrayList<>();
 
-                for (final DocumentFile file: allFiles) {
-                    if (file.getName().matches("cr-[0-9]+-[0-9]+-[0-9]+\\.db")) {
-                        backupFiles.add(file.getName());
+                    for (final DocumentFile file : allFiles) {
+                        String name = file.getName();
+                        if (name != null && name.matches("cr-[0-9]+-[0-9]+-[0-9]+\\.db")) {
+                            backupFiles.add(name);
+                        }
                     }
-                }
-                Arrays.sort(backupFiles.toArray());
-                for (int deletionIndex = backupFiles.size() - prefs.getAutoBackupRetention() - 1;
-                     deletionIndex >= 0; deletionIndex--) {
-                    Objects.requireNonNull(backupDir.findFile(backupFiles.get(deletionIndex))).delete();
+
+                    Object[] filesArray = backupFiles.toArray();
+                    Arrays.sort(filesArray);
+
+                    for (int deletionIndex = backupFiles.size() - prefs.getAutoBackupRetention() - 1;
+                         deletionIndex >= 0; deletionIndex--) {
+                        DocumentFile fileToDelete = backupDir.findFile((String) filesArray[deletionIndex]);
+                        if (fileToDelete != null) {
+                            fileToDelete.delete();
+                        }
+                    }
                 }
             }
             return rtn;
@@ -113,39 +125,44 @@ public class Backup {
      * @return Whether the database was backed successfully.
      */
     public boolean backup(boolean replace) {
+        // Crucial for Room: Close all connections to flush WAL/SHM files to the main DB file.
         Application.closeDatabases();
+
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        DocumentFile backupFile = getBackupDir().createFile("*/*", "cr-" + df.format(new Date()) + ".db");
-        ParcelFileDescriptor pfd = null;
+        String fileName = "cr-" + df.format(new Date()) + ".db";
+        DocumentFile backupDir = getBackupDir();
+
+        if (backupDir == null) return false;
+
+        DocumentFile backupFile = backupDir.createFile("*/*", fileName);
 
         if (backupFile == null && replace) {
-            DocumentFile file = getBackupDir().findFile("cr-" + df.format(new Date()) + ".db");
-
+            DocumentFile file = backupDir.findFile(fileName);
             if (file != null && file.isFile()) {
                 file.delete();
-                backupFile = getBackupDir().createFile("*/*", "cr-" + df.format(new Date()) + ".db");
+                backupFile = backupDir.createFile("*/*", fileName);
             }
         }
 
-        try {
-            if (backupFile != null) {
-                pfd = resolver.openFileDescriptor(backupFile.getUri(), "w");
-            }
-            else {
-                Log.e(TAG, "Backup error, can't create file in path: " + getBackupDir().getUri());
-                return false;
-            }
-        } catch (FileNotFoundException e) {
-            Log.e(TAG, "Backup error " + e.getMessage());
+        if (backupFile == null) {
+            Log.e(TAG, "Backup error, can't create file in path: " + backupDir.getUri());
             return false;
         }
 
-        return FileCopyUtil.copyFile(dbFile, pfd);
+        try (ParcelFileDescriptor pfd = resolver.openFileDescriptor(backupFile.getUri(), "w")) {
+            return FileCopyUtil.copyFile(dbFile, pfd);
+        } catch (IOException e) {
+            Log.e(TAG, "Backup error: " + e.getMessage());
+            return false;
+        }
     }
 
     public boolean backupFileExists() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        DocumentFile file = getBackupDir().findFile("cr-" + df.format(new Date()) + ".db");
+        DocumentFile backupDir = getBackupDir();
+        if (backupDir == null) return false;
+
+        DocumentFile file = backupDir.findFile("cr-" + df.format(new Date()) + ".db");
         return file != null && file.isFile();
     }
 
@@ -155,12 +172,14 @@ public class Backup {
      * @return Whether the restore succeed.
      */
     public boolean restore(Uri backup) {
+        // Crucial for Room: Close all connections before overwriting the file.
         Application.closeDatabases();
+
         File internalBackupFile = new File(dbFile.getParent(), INTERNAL_BACKUP);
         if (FileCopyUtil.copyFile(dbFile, internalBackupFile)) {
-            try {
-                InputStream backupSource = resolver.openInputStream(backup);
-                OutputStream backupTarget = new FileOutputStream(dbFile);
+            try (InputStream backupSource = resolver.openInputStream(backup);
+                 OutputStream backupTarget = new FileOutputStream(dbFile)) {
+
                 if (FileCopyUtil.copyFile(backupSource, backupTarget)) {
                     if (checkBackupSanity()) {
                         return true;
@@ -185,7 +204,8 @@ public class Backup {
      */
     private boolean checkBackupSanity() {
         try {
-            DataSQLiteOpenHelper.getInstance(Application.getContext());
+            // Attempt to open the database via Room to verify its integrity.
+            AutuManduDatabase.getInstance(Application.getContext()).getOpenHelper().getReadableDatabase();
             return true;
         } catch (Exception e) {
             Application.closeDatabases();

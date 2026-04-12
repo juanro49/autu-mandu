@@ -18,37 +18,48 @@ package org.juanro.autumandu.data.report;
 
 import android.content.Context;
 import android.graphics.Color;
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class AbstractReportChartData {
-    private Context mContext;
-    private String mName;
-    private int mColor;
+    public static class DataPoint implements Comparable<DataPoint> {
+        public float x;
+        public float y;
+        public String tooltip;
 
-    private ArrayList<Float> mXValues = new ArrayList<>();
-    private ArrayList<Float> mYValues = new ArrayList<>();
-    private ArrayList<String> mTooltips = new ArrayList<>();
+        public DataPoint(float x, float y, String tooltip) {
+            this.x = x;
+            this.y = y;
+            this.tooltip = tooltip;
+        }
 
-    private float[] mColorTransformationCache = new float[3];
+        @Override
+        public int compareTo(@NonNull DataPoint other) {
+            return Float.compare(this.x, other.x);
+        }
+    }
+
+    protected final Context mContext;
+    protected final String mName;
+    protected final int mColor;
+    protected final List<DataPoint> mDataPoints = new ArrayList<>();
 
     public AbstractReportChartData(Context context, String name, int color) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         mName = name;
         mColor = color;
     }
 
     public final OverallTrendReportChartData createOverallTrendData() {
-        Float[] xArray = mXValues.toArray(new Float[mXValues.size()]);
-        Float[] yArray = mYValues.toArray(new Float[mYValues.size()]);
-        return new OverallTrendReportChartData(mContext, mName, getTrendColor(), xArray, yArray);
+        return new OverallTrendReportChartData(mContext, mName, getTrendColor(), mDataPoints);
     }
 
     public final TrendReportChartData createTrendData() {
-        Float[] xArray = mXValues.toArray(new Float[mXValues.size()]);
-        Float[] yArray = mYValues.toArray(new Float[mYValues.size()]);
-        return new TrendReportChartData(mContext, mName, getTrendColor(), xArray, yArray);
+        return new TrendReportChartData(mContext, mName, getTrendColor(), mDataPoints);
     }
 
     public int getColor() {
@@ -59,66 +70,45 @@ public abstract class AbstractReportChartData {
         return mName;
     }
 
-    public ArrayList<String> getTooltips() {
-        return mTooltips;
+    public List<String> getTooltips() {
+        return mDataPoints.stream().map(p -> p.tooltip).collect(Collectors.toList());
     }
 
     public final List<Float> getXValues() {
-        return mXValues;
+        return mDataPoints.stream().map(p -> p.x).collect(Collectors.toList());
     }
 
-    public ArrayList<Float> getYValues() {
-        return mYValues;
+    public List<Float> getYValues() {
+        return mDataPoints.stream().map(p -> p.y).collect(Collectors.toList());
     }
 
     public final boolean isEmpty() {
-        return mXValues.size() == 0;
+        return mDataPoints.isEmpty();
     }
 
     public final int size() {
-        return mXValues.size();
+        return mDataPoints.size();
     }
 
     public final void sort() {
-        int lenD = size();
-        int inc = lenD / 2;
-        while (inc > 0) {
-            for (int i = inc; i < lenD; i++) {
-                Float tmp = mXValues.get(i);
-                Float tmpY = mYValues.get(i);
-                String tmpT = mTooltips.get(i);
-
-                int j = i;
-                while (j >= inc && mXValues.get(j - inc) > tmp) {
-                    mXValues.set(j, mXValues.get(j - inc));
-                    mYValues.set(j, mYValues.get(j - inc));
-                    mTooltips.set(j, mTooltips.get(j - inc));
-                    j = j - inc;
-                }
-
-                mXValues.set(j, tmp);
-                mYValues.set(j, tmpY);
-                mTooltips.set(j, tmpT);
-            }
-
-            inc = inc / 2;
-        }
+        Collections.sort(mDataPoints);
     }
 
     protected void add(Float x, Float y, String tooltip) {
-        mXValues.add(x);
-        mYValues.add(y);
-        mTooltips.add(tooltip);
+        mDataPoints.add(new DataPoint(x, y, tooltip));
     }
 
     protected int indexOf(Float x) {
-        return mXValues.indexOf(x);
+        for (int i = 0; i < mDataPoints.size(); i++) {
+            if (mDataPoints.get(i).x == x) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     protected void set(int index, Float x, Float y, String tooltip) {
-        mXValues.set(index, x);
-        mYValues.set(index, y);
-        mTooltips.set(index, tooltip);
+        mDataPoints.set(index, new DataPoint(x, y, tooltip));
     }
 
     /**
@@ -128,13 +118,13 @@ public abstract class AbstractReportChartData {
      * @return the color for trend lines
      */
     private int getTrendColor() {
-        Color.colorToHSV(this.mColor, mColorTransformationCache);
-        if (mColorTransformationCache[1] > 0.5) {
-            mColorTransformationCache[1] -= 0.5;
+        float[] hsv = new float[3];
+        Color.colorToHSV(this.mColor, hsv);
+        if (hsv[1] > 0.5f) {
+            hsv[1] -= 0.5f;
         } else {
-            mColorTransformationCache[1] += 0.5;
+            hsv[1] += 0.5f;
         }
-
-        return Color.HSVToColor(mColorTransformationCache);
+        return Color.HSVToColor(hsv);
     }
 }

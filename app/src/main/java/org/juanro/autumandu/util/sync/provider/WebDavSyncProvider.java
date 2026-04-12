@@ -18,7 +18,9 @@ package org.juanro.autumandu.util.sync.provider;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import androidx.activity.result.ActivityResultLauncher;
 import android.content.Intent;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Log;
 
@@ -36,6 +38,8 @@ import org.juanro.autumandu.gui.AuthenticatorAddAccountActivity;
 import org.juanro.autumandu.gui.dialog.SetupWebDavSyncDialogActivity;
 import org.juanro.autumandu.util.FileCopyUtil;
 import org.juanro.autumandu.util.sync.AbstractSyncProvider;
+import org.juanro.autumandu.util.sync.AuthenticationFinishedListener;
+import org.juanro.autumandu.util.sync.Authenticator;
 import org.juanro.autumandu.util.sync.SyncAuthException;
 import org.juanro.autumandu.util.sync.SyncIoException;
 import org.juanro.autumandu.util.sync.SyncParseException;
@@ -44,12 +48,14 @@ import org.juanro.autumandu.util.webdav.HttpException;
 import org.juanro.autumandu.util.webdav.InvalidCertificateException;
 import org.juanro.autumandu.util.webdav.WebDavClient;
 
+/**
+ * WebDAV sync provider implementation.
+ */
 public class WebDavSyncProvider extends AbstractSyncProvider {
     public static final String KEY_WEB_DAV_URL = "webDavUrl";
     public static final String KEY_WEB_DAV_CERTIFICATE = "webDavCertificate";
 
     private static final String TAG = "WebDavSyncProvider";
-    private static final int REQUEST_SETUP = 1000;
 
     private WebDavClient mWebDavClient;
 
@@ -63,6 +69,7 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
         return R.drawable.ic_c_sync_webdav_64dp;
     }
 
+    @NonNull
     @Override
     public String getName() {
         return "WebDAV";
@@ -92,38 +99,45 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
     }
 
     @Override
-    public void startAuthentication(AuthenticatorAddAccountActivity activity) {
+    public void startAuthentication(@NonNull AuthenticatorAddAccountActivity activity, @NonNull ActivityResultLauncher<Intent> launcher) {
         Intent setupIntent = new Intent(activity, SetupWebDavSyncDialogActivity.class);
-        activity.startActivityForResult(setupIntent, REQUEST_SETUP);
+        launcher.launch(setupIntent);
     }
 
-    @Override
-    public void continueAuthentication(AuthenticatorAddAccountActivity activity, int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_SETUP)
-            if (resultCode == Activity.RESULT_OK && data != null) {
-                String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-                String password = data.getStringExtra(AccountManager.KEY_PASSWORD);
-                String url = data.getStringExtra(KEY_WEB_DAV_URL);
-                X509Certificate certificate = (X509Certificate) data.getSerializableExtra(KEY_WEB_DAV_CERTIFICATE);
+    /**
+     * Static helper to process the result of the authentication activity.
+     */
+    public static void handleAuthenticationResult(@NonNull AuthenticationFinishedListener listener, int resultCode, @Nullable Intent data) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+            String password = data.getStringExtra(AccountManager.KEY_PASSWORD);
+            String url = data.getStringExtra(KEY_WEB_DAV_URL);
+            X509Certificate certificate = (X509Certificate) data.getSerializableExtra(KEY_WEB_DAV_CERTIFICATE);
 
-                JSONObject settings = new JSONObject();
-                try {
-                    settings.put(KEY_WEB_DAV_URL, url);
-                    if (certificate != null) {
-                        settings.put(KEY_WEB_DAV_CERTIFICATE, CertificateHelper.toString(certificate));
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Could not store url and certificate in settings JSONObject", e);
+            JSONObject settings = new JSONObject();
+            try {
+                settings.put(KEY_WEB_DAV_URL, url);
+                if (certificate != null) {
+                    settings.put(KEY_WEB_DAV_CERTIFICATE, CertificateHelper.toString(certificate));
                 }
-
-                activity.onAuthenticationResult(accountName, password, null, settings);
-            } else {
-                activity.onAuthenticationResult(null, null, null, null);
+            } catch (Exception e) {
+                Log.e(TAG, "Could not store url and certificate in settings JSONObject", e);
             }
+
+            if (accountName != null) {
+                listener.onAuthenticationFinished(new Account(accountName, Authenticator.ACCOUNT_TYPE), password, null, settings);
+            } else {
+                listener.onAuthenticationFinished(null, null, null, null);
+            }
+        } else {
+            listener.onAuthenticationFinished(null, null, null, null);
+        }
     }
 
+    @Nullable
     @Override
     public String getRemoteFileRev() throws SyncAuthException, SyncIoException, SyncParseException {
+        if (mWebDavClient == null) return null;
         File localFile = getLocalFile();
         try {
             Date lastModified = mWebDavClient.getLastModified(localFile.getName());
@@ -141,8 +155,10 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
         }
     }
 
+    @Nullable
     @Override
     public String uploadFile() throws SyncAuthException, SyncIoException, SyncParseException {
+        if (mWebDavClient == null) return null;
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
 
@@ -170,6 +186,7 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
 
     @Override
     public void downloadFile() throws SyncAuthException, SyncIoException, SyncParseException {
+        if (mWebDavClient == null) return;
         File localFile = getLocalFile();
         File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
 

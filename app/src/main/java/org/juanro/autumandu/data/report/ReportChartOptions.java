@@ -15,10 +15,23 @@
  */
 package org.juanro.autumandu.data.report;
 
+/**
+ * Encapsulates the configuration options for a report chart.
+ */
 public class ReportChartOptions {
-    private boolean mShowTrend = false;
-    private boolean mShowOverallTrend = false;
-    private int mChartOption = 0;
+    private boolean mShowTrend;
+    private boolean mShowOverallTrend;
+    private int mChartOption;
+
+    public ReportChartOptions() {
+        this(false, false, 0);
+    }
+
+    public ReportChartOptions(boolean showTrend, boolean showOverallTrend, int chartOption) {
+        mShowTrend = showTrend;
+        mShowOverallTrend = showOverallTrend;
+        mChartOption = chartOption;
+    }
 
     public int getChartOption() {
         return mChartOption;

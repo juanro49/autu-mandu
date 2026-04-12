@@ -19,6 +19,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Base64;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -29,24 +32,48 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.util.SortedSet;
+import java.util.Collection;
+import java.util.List;
 import java.util.TreeSet;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import okhttp3.internal.tls.OkHostnameVerifier;
+/**
+ * Utility class for handling X509 certificates in WebDAV sync.
+ */
+public final class CertificateHelper {
+    private static final String TAG = "CertificateHelper";
 
-public class CertificateHelper {
-    public String getShortDescription(X509Certificate certificate, Context context) {
+    private CertificateHelper() {
+        // Utility class
+    }
+
+    /**
+     * Returns a human-readable description of the certificate.
+     */
+    @NonNull
+    public static String getShortDescription(@NonNull X509Certificate certificate, @NonNull Context context) {
         java.text.DateFormat dateFormat = DateFormat.getMediumDateFormat(context);
-        X500PrincipalHelper sujectHelper = new X500PrincipalHelper(certificate.getSubjectX500Principal());
-        String subject = sujectHelper.getCN();
+        X500PrincipalHelper subjectHelper = new X500PrincipalHelper(certificate.getSubjectX500Principal());
+        String subject = subjectHelper.getCN();
 
-        SortedSet<String> subjectAltNames = new TreeSet<>();
-        subjectAltNames.addAll(OkHostnameVerifier.INSTANCE.allSubjectAltNames(certificate));
+        TreeSet<String> subjectAltNames = new TreeSet<>();
+        try {
+            Collection<List<?>> altNames = certificate.getSubjectAlternativeNames();
+            if (altNames != null) {
+                for (List<?> list : altNames) {
+                    if (list.size() >= 2 && list.get(1) instanceof String name) {
+                        subjectAltNames.add(name);
+                    }
+                }
+            }
+        } catch (CertificateParsingException e) {
+            Log.w(TAG, "Error parsing subject alternative names", e);
+        }
 
         X500PrincipalHelper issuerHelper = new X500PrincipalHelper(certificate.getIssuerX500Principal());
         String issuer = issuerHelper.getCN();
@@ -55,26 +82,35 @@ public class CertificateHelper {
         String validFrom = dateFormat.format(certificate.getNotBefore());
         String validUntil = dateFormat.format(certificate.getNotAfter());
 
-        return "Subject: " + subject +
-                "\nAlt. names: " + TextUtils.join(", ", subjectAltNames) +
-                "\nSerialnumber: " + serialNumber +
-                "\nIssuer: " + issuer +
-                "\nValid: " + validFrom + " - " + validUntil;
+        return String.format("Subject: %s\nAlt. names: %s\nSerialnumber: %s\nIssuer: %s\nValid: %s - %s",
+                subject, TextUtils.join(", ", subjectAltNames), serialNumber, issuer, validFrom, validUntil);
     }
 
-    public static String toString(X509Certificate certificate) throws CertificateEncodingException {
+    /**
+     * Serializes a certificate to a PEM-encoded string.
+     */
+    @NonNull
+    public static String toString(@NonNull X509Certificate certificate) throws CertificateEncodingException {
         String header = "-----BEGIN CERTIFICATE-----\n";
         String cert = Base64.encodeToString(certificate.getEncoded(), Base64.DEFAULT);
         String footer = "-----END CERTIFICATE-----";
         return header + cert + footer;
     }
 
-    public static X509Certificate fromString(String certificate) throws CertificateException {
+    /**
+     * Deserializes a certificate from a PEM-encoded string.
+     */
+    @NonNull
+    public static X509Certificate fromString(@NonNull String certificate) throws CertificateException {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(certificate.getBytes()));
     }
 
-    public static SSLSocketFactory createSocketFactory(X509Certificate certificate) throws InvalidCertificateException {
+    /**
+     * Creates an SSLSocketFactory that trusts the specified certificate.
+     */
+    @NonNull
+    public static SSLSocketFactory createSocketFactory(@NonNull X509Certificate certificate) throws InvalidCertificateException {
         try {
             // Create a KeyStore containing our trusted CAs
             String keyStoreType = KeyStore.getDefaultType();

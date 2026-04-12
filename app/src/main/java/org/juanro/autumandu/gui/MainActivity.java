@@ -18,27 +18,9 @@ package org.juanro.autumandu.gui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SyncInfo;
-import android.content.SyncStatusObserver;
 import android.content.res.Configuration;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import com.google.android.material.navigation.NavigationView;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.MenuItemCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -46,25 +28,50 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import android.util.Log;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.material.navigation.NavigationView;
 
-import java.util.Date;
-
-import org.juanro.autumandu.Application;
 import org.juanro.autumandu.BuildConfig;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
-import org.juanro.autumandu.gui.util.AutoBackupTask;
+import org.juanro.autumandu.gui.fragment.AbstractDataDetailFragment;
+import org.juanro.autumandu.gui.fragment.CalculatorFragment;
+import org.juanro.autumandu.gui.fragment.DataDetailOtherFragment;
+import org.juanro.autumandu.gui.fragment.DataFragment;
+import org.juanro.autumandu.gui.fragment.ReportFragment;
+import org.juanro.autumandu.gui.pref.PreferencesActivity;
+import org.juanro.autumandu.util.backup.AutoBackupWorker;
 import org.juanro.autumandu.gui.util.NewRefuelingSnackbar;
-import org.juanro.autumandu.presentation.CarPresenter;
-import org.juanro.autumandu.provider.DataProvider;
-import org.juanro.autumandu.provider.car.CarColumns;
-import org.juanro.autumandu.provider.car.CarCursor;
-import org.juanro.autumandu.provider.car.CarSelection;
+import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.util.DemoData;
+import org.juanro.autumandu.util.reminder.ReminderWorker;
 import org.juanro.autumandu.util.sync.AbstractSyncProvider;
 import org.juanro.autumandu.util.sync.Authenticator;
+import org.juanro.autumandu.util.sync.SyncManager;
 import org.juanro.autumandu.util.sync.SyncProviders;
+import org.juanro.autumandu.viewmodel.MainViewModel;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener {
@@ -72,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements
         boolean onBackPressed();
     }
 
-    private static final int REQUEST_FIRST_START = 10;
     private static final int REQUEST_FROM_DRAWER = 20;
     private static final int REQUEST_ADD_DATA = 30;
 
@@ -88,62 +94,115 @@ public class MainActivity extends AppCompatActivity implements
     private Fragment mCurrentFragment;
     private int mCurrentNavItemIndex;
 
-    private SyncStatusObserver mSyncStatusObserver;
-    private Object mSyncHandle;
+    private MainViewModel mViewModel;
+
     private MenuItem mSyncMenuItem;
+    private List<WorkInfo> mOnceWorkInfos;
+    private List<WorkInfo> mPeriodicWorkInfos;
+
+    private final ActivityResultLauncher<Intent> mFirstStartLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_CANCELED) {
+                    finish();
+                } else {
+                    mViewModel.getCars().removeObservers(this);
+                    mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
+                }
+            }
+    );
+
+    private final ActivityResultLauncher<Intent> mAddDataLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                mViewModel.getCars().removeObservers(this);
+                mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
+                if (result.getResultCode() == RESULT_OK && result.getData() != null && mCurrentFragment != null) {
+                    long newId = result.getData().getLongExtra(DataDetailActivity.EXTRA_NEW_ID, 0);
+                    View view = mCurrentFragment.getView();
+                    if (newId > 0 && view != null) {
+                        NewRefuelingSnackbar.show(view, newId);
+                    }
+                }
+            }
+    );
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
         mTitle = mDrawerTitle = getTitle();
         if (savedInstanceState != null) {
             setTitle(savedInstanceState.getCharSequence(STATE_TITLE, mTitle));
         }
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mDrawerLayout.setStatusBarBackground(R.color.primary_dark);
 
-        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mNavigationView = findViewById(R.id.navigation_view);
         mNavigationViewTop = mNavigationView.inflateHeaderView(R.layout.navigation_view_main_top);
         mNavigationView.setNavigationItemSelectedListener(this);
-        updateNavigationViewMenu();
-        setSupportActionBar((Toolbar) null);
+        mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
 
-        mSyncStatusObserver = new SyncStatusObserver() {
-            @Override
-            public void onStatusChanged(int which) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateSyncMenuItem();
-                    }
+        WorkManager wm = WorkManager.getInstance(this);
+        wm.getWorkInfosForUniqueWorkLiveData(SyncManager.SYNC_WORK_NAME_ONCE)
+                .observe(this, workInfos -> {
+                    mOnceWorkInfos = workInfos;
+                    updateSyncMenuItem();
                 });
+        wm.getWorkInfosForUniqueWorkLiveData(SyncManager.SYNC_WORK_NAME_PERIODIC)
+                .observe(this, workInfos -> {
+                    mPeriodicWorkInfos = workInfos;
+                    updateSyncMenuItem();
+                });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (closeFABMenu()) {
+                    return;
+                }
+
+                if (mCurrentFragment instanceof BackPressedListener) {
+                    if (((BackPressedListener) mCurrentFragment).onBackPressed()) {
+                        return;
+                    }
+                }
+
+                if (mCurrentFragment != null
+                        && mCurrentFragment.getChildFragmentManager().getBackStackEntryCount() > 0) {
+                    mCurrentFragment.getChildFragmentManager().popBackStack();
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                    setEnabled(true);
+                }
             }
-        };
-
-        // Initialize the first page of the navigation drawer.
-        int navItemIndex = 0;
-        if (savedInstanceState != null) {
-            navItemIndex = savedInstanceState.getInt(STATE_NAV_ITEM_INDEX, 0);
-        }
-
-        MenuItem item = mNavigationView.getMenu().getItem(navItemIndex);
-        mNavigationView.getMenu().performIdentifierAction(item.getItemId(), 0);
+        });
 
         // When there is no car, show the first start activity.
-        if (CarPresenter.getInstance(getApplicationContext()).getCount() == 0) {
-            Intent intent = new Intent(this, FirstStartActivity.class);
-            startActivityForResult(intent, REQUEST_FIRST_START);
-        }
+        mViewModel.getCarCount().observe(this, count -> {
+            if (count != null && count == 0) {
+                Intent intent = new Intent(this, FirstStartActivity.class);
+                mFirstStartLauncher.launch(intent);
+            }
+        });
+
+        // Update reminders and schedule periodic update
+        ReminderWorker.enqueueUpdate(this);
+        ReminderWorker.schedulePeriodicUpdate(this);
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
+        if (mDrawerToggle != null) {
+            mDrawerToggle.syncState();
+        }
     }
 
     @Override
@@ -151,78 +210,45 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
 
         // Refresh synchronization status
-        mSyncStatusObserver.onStatusChanged(0);
+        updateSyncMenuItem();
 
-        // Watch for synchronization status changes
-        mSyncHandle = ContentResolver.addStatusChangeListener(
-                ContentResolver.SYNC_OBSERVER_TYPE_PENDING |
-                        ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE,
-                mSyncStatusObserver);
-
-        new AutoBackupTask(this).execute();
+        AutoBackupWorker.enqueue(this);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_FIRST_START && resultCode == RESULT_CANCELED)
+        if (requestCode == REQUEST_FROM_DRAWER)
         {
-            finish();
-        } else
+            invalidateOptionsMenu();
+        }
+
+        // Cars could have been changed, so the drawer has to be updated.
+        mViewModel.getCars().removeObservers(this);
+        mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
+
+        // If a new refueling has been added, show Snackbar with details.
+        if (requestCode % REQUEST_ADD_DATA == DataDetailActivity.EXTRA_EDIT_REFUELING
+            && resultCode == RESULT_OK
+            && data != null
+            && mCurrentFragment != null)
         {
-            // Rebuild the menu, so a change in the show_car_menu option will take effect.
-            if (requestCode == REQUEST_FROM_DRAWER)
+            long newId = data.getLongExtra(DataDetailActivity.EXTRA_NEW_ID, 0);
+            View view = mCurrentFragment.getView();
+            if (newId > 0 && view != null)
             {
-                invalidateOptionsMenu();
-            }
-
-            // Cars could have been changed, so the drawer has to be updated.
-            updateNavigationViewMenu();
-
-            // If a new refueling has been added, show Snackbar with details.
-            if (requestCode % REQUEST_ADD_DATA == DataDetailActivity.EXTRA_EDIT_REFUELING
-                && resultCode == RESULT_OK
-                && data != null
-                && mCurrentFragment != null)
-            {
-                long newId = data.getLongExtra(DataDetailActivity.EXTRA_NEW_ID, 0);
-                View view = mCurrentFragment.getView();
-                if (newId > 0 && view != null)
-                {
-                    NewRefuelingSnackbar.show(view, newId);
-                }
+                NewRefuelingSnackbar.show(view, newId);
             }
         }
     }
 
     @Override
-    public void onBackPressed() {
-        if (closeFABMenu()) {
-            return;
-        }
-
-        if (mCurrentFragment != null && mCurrentFragment instanceof BackPressedListener) {
-            if (((BackPressedListener) mCurrentFragment).onBackPressed()) {
-                return;
-            }
-        }
-
-        // Currently the back stack of child fragment does not pop, when
-        // pressing the back button. This works around the issue.
-        // Bug report: http://code.google.com/p/android/issues/detail?id=40323
-        if (mCurrentFragment != null
-                && mCurrentFragment.getChildFragmentManager().getBackStackEntryCount() > 0) {
-            mCurrentFragment.getChildFragmentManager().popBackStack();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        if (mDrawerToggle != null) {
+            mDrawerToggle.onConfigurationChanged(newConfig);
+        }
     }
 
     @Override
@@ -232,10 +258,8 @@ public class MainActivity extends AppCompatActivity implements
         mSyncMenuItem = menu.findItem(R.id.menu_synchronize);
 
         Account account = getCurrentSyncAccount();
-        if (account == null) {
-            mSyncMenuItem.setVisible(false);
-        } else {
-            mSyncMenuItem.setVisible(true);
+        if (mSyncMenuItem != null) {
+            mSyncMenuItem.setVisible(account != null);
         }
 
         if (BuildConfig.DEBUG) {
@@ -246,29 +270,25 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event.
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
-        switch (item.getItemId()) {
-            case R.id.menu_synchronize:
-                Account account = getCurrentSyncAccount();
-                Bundle settingsBundle = new Bundle();
-                settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                ContentResolver.requestSync(account, DataProvider.AUTHORITY, settingsBundle);
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_synchronize) {
+            SyncManager.runSyncOnce(this);
+            return true;
+        } else {
+            if (item.getIntent() != null) {
+                mAddDataLauncher.launch(item.getIntent());
                 return true;
-            default:
-                if (item.getIntent() != null) {
-                    startActivityForResult(item.getIntent(), REQUEST_ADD_DATA);
-                    return true;
-                } else {
-                    return (BuildConfig.DEBUG && DemoData.onOptionsItemSelected(item))
-                            || super.onOptionsItemSelected(item);
-                }
+            } else {
+                return (BuildConfig.DEBUG && DemoData.onOptionsItemSelected(item))
+                        || super.onOptionsItemSelected(item);
+            }
         }
     }
 
@@ -302,12 +322,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void setSupportActionBar(@Nullable Toolbar toolbar) {
-        // All child fragments need to have a toolbar in their layout because of this bug:
-        // https://code.google.com/p/android/issues/detail?id=78496
-        // https://code.google.com/p/android/issues/detail?id=185736
-        if (toolbar != null) {
-            super.setSupportActionBar(toolbar);
-        }
+        super.setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -319,53 +334,48 @@ public class MainActivity extends AppCompatActivity implements
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar,
                 R.string.drawer_open, R.string.drawer_close) {
             public void onDrawerOpened(View drawerView) {
-                ActionBar actionBar = getSupportActionBar();
-                if (actionBar != null) {
-                    mTitle = actionBar.getTitle();
-                    actionBar.setTitle(mDrawerTitle);
+                ActionBar ab = getSupportActionBar();
+                if (ab != null) {
+                    mTitle = ab.getTitle();
+                    ab.setTitle(mDrawerTitle);
                 }
 
                 invalidateOptionsMenu();
             }
 
             public void onDrawerClosed(View view) {
-                ActionBar actionBar = getSupportActionBar();
-                if (actionBar != null) {
-                    actionBar.setTitle(mTitle);
+                ActionBar ab = getSupportActionBar();
+                if (ab != null) {
+                    ab.setTitle(mTitle);
                 }
 
                 invalidateOptionsMenu();
             }
         };
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        if (mSyncHandle != null) {
-            ContentResolver.removeStatusChangeListener(mSyncHandle);
-            mSyncHandle = null;
-        }
-
-        Application.closeDatabases();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putCharSequence(STATE_TITLE, mTitle);
         outState.putInt(STATE_NAV_ITEM_INDEX, mCurrentNavItemIndex);
         super.onSaveInstanceState(outState);
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem menuItem) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         mDrawerLayout.closeDrawer(mNavigationView);
 
         Intent intent = menuItem.getIntent();
+        if (intent == null) return false;
+
         String fragment = intent.getStringExtra("fragment");
         Bundle arguments = intent.getBundleExtra("arguments");
         if (fragment != null) {
@@ -373,7 +383,7 @@ public class MainActivity extends AppCompatActivity implements
                 mCurrentFragment = (Fragment) Class.forName(fragment).newInstance();
                 mCurrentFragment.setArguments(arguments);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e("MainActivity", "Error instantiating fragment", e);
             }
 
             Menu menu = mNavigationView.getMenu();
@@ -389,16 +399,37 @@ public class MainActivity extends AppCompatActivity implements
             fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
 
             setTitle(menuItem.getTitle());
+
+            // Update ActionBar icon
+            updateActionBarIcon();
             return true;
         } else {
+            if (intent.getComponent() != null &&
+                    (intent.getComponent().getClassName().equals(PreferencesActivity.class.getName()) ||
+                     intent.getComponent().getClassName().equals(HelpActivity.class.getName()))) {
+                startActivity(intent);
+                return true;
+            }
             return false;
         }
     }
 
-    private void updateNavigationViewMenu() {
+    private void updateActionBarIcon() {
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            boolean isHome = (mCurrentFragment instanceof ReportFragment || mCurrentFragment instanceof DataFragment);
+            if (mDrawerToggle != null) {
+                mDrawerToggle.setDrawerIndicatorEnabled(isHome);
+            }
+            ab.setDisplayHomeAsUpEnabled(!isHome);
+            ab.setHomeButtonEnabled(!isHome);
+        }
+    }
+
+    private void updateNavigationViewMenu(List<Car> cars) {
         // Profile section on top of drawer
-        ImageView topImage = (ImageView) mNavigationViewTop.findViewById(android.R.id.icon1);
-        TextView topText = (TextView) mNavigationViewTop.findViewById(android.R.id.text1);
+        ImageView topImage = mNavigationViewTop.findViewById(android.R.id.icon1);
+        TextView topText = mNavigationViewTop.findViewById(android.R.id.text1);
         Account account = getCurrentSyncAccount();
         if (account == null) {
             topImage.setVisibility(View.GONE);
@@ -412,9 +443,6 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         // Data menu items
-        CarCursor car = new CarSelection().query(this.getContentResolver(),
-                CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
-
         Menu menu = mNavigationView.getMenu();
         menu.clear();
 
@@ -424,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements
         menu.add(groupId, itemId++, Menu.NONE, R.string.drawer_reports)
                 .setIcon(R.drawable.ic_c_report_24dp)
                 .setIntent(new Intent().putExtra("fragment", ReportFragment.class.getName()));
-        while (car.moveToNext()) {
+        for (Car car : cars) {
             Bundle args = new Bundle();
             args.putLong(DataFragment.EXTRA_CAR_ID, car.getId());
 
@@ -443,6 +471,11 @@ public class MainActivity extends AppCompatActivity implements
         menu.add(R.string.drawer_help).setIntent(new Intent(this, HelpActivity.class));
 
         menu.setGroupCheckable(groupId, true, true);
+
+        // Initialize the first page of the navigation drawer only if no fragment is currently shown.
+        if (mCurrentFragment == null) {
+            mNavigationView.getMenu().performIdentifierAction(Menu.FIRST, 0);
+        }
     }
 
     private Intent getDetailActivityIntent(int edit, long carId, int otherType) {
@@ -457,28 +490,38 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateSyncMenuItem() {
-        Account account = getCurrentSyncAccount();
-
         boolean isSyncInProgress = false;
-        for (SyncInfo syncInfo : ContentResolver.getCurrentSyncs()) {
-            if (syncInfo.account.equals(account) &&
-                    syncInfo.authority.equals(DataProvider.AUTHORITY)) {
-                isSyncInProgress = true;
+
+        if (mOnceWorkInfos != null) {
+            for (WorkInfo workInfo : mOnceWorkInfos) {
+                if (workInfo.getState() == WorkInfo.State.RUNNING || workInfo.getState() == WorkInfo.State.ENQUEUED) {
+                    isSyncInProgress = true;
+                    break;
+                }
+            }
+        }
+
+        if (!isSyncInProgress && mPeriodicWorkInfos != null) {
+            for (WorkInfo workInfo : mPeriodicWorkInfos) {
+                if (workInfo.getState() == WorkInfo.State.RUNNING) {
+                    isSyncInProgress = true;
+                    break;
+                }
             }
         }
 
         if (isSyncInProgress) {
             if (mSyncMenuItem != null) {
-                MenuItemCompat.setActionView(mSyncMenuItem,
-                        R.layout.actionbar_indeterminate_progress);
+                mSyncMenuItem.setActionView(R.layout.actionbar_indeterminate_progress);
             }
         } else {
             if (mSyncMenuItem != null) {
-                MenuItemCompat.setActionView(mSyncMenuItem, null);
+                mSyncMenuItem.setActionView(null);
             }
 
             // Cars could have changed, so we need to update navigation drawer.
-            updateNavigationViewMenu();
+            mViewModel.getCars().removeObservers(this);
+            mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
         }
     }
 
@@ -493,7 +536,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private boolean closeFABMenu() {
-        FloatingActionMenu floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fab);
+        FloatingActionMenu floatingActionMenu = findViewById(R.id.fab);
         if (floatingActionMenu != null && floatingActionMenu.isOpened()) {
             floatingActionMenu.close(true);
             return true;
@@ -506,49 +549,38 @@ public class MainActivity extends AppCompatActivity implements
         closeFABMenu();
 
         Preferences prefs = new Preferences(this);
-        CarCursor car = new CarSelection().suspendedSince((Date) null).query(getContentResolver(),
-                CarColumns.ALL_COLUMNS, CarColumns.NAME + " COLLATE UNICODE");
+        // Usamos observeForever y removeObserver para asegurar que el clic sea una acción única
+        // y no acumule observadores que disparen múltiples diálogos.
+        androidx.lifecycle.Observer<List<Car>> observer = new androidx.lifecycle.Observer<List<Car>>() {
+            @Override
+            public void onChanged(List<Car> cars) {
+                mViewModel.getNotSuspendedCars().removeObserver(this);
+                if (cars == null || cars.isEmpty()) return;
 
-        if (car.getCount() == 1 || !prefs.isShowCarMenu()) {
-            Intent intent = getDetailActivityIntent(edit, prefs.getDefaultCar(), otherType);
-            startActivityForResult(intent, REQUEST_ADD_DATA + edit);
-        } else {
-            final long[] carIds = new long[car.getCount()];
-            final String[] carNames = new String[car.getCount()];
-            while (car.moveToNext()) {
-                carIds[car.getPosition()] = car.getId();
-                carNames[car.getPosition()] = car.getName();
+                if (cars.size() == 1 || !prefs.isShowCarMenu()) {
+                    long carId = cars.size() == 1 ? cars.get(0).getId() : prefs.getDefaultCar();
+                    Intent intent = getDetailActivityIntent(edit, carId, otherType);
+                    mAddDataLauncher.launch(intent);
+                } else {
+                    final long[] carIds = new long[cars.size()];
+                    final String[] carNames = new String[cars.size()];
+                    for (int i = 0; i < cars.size(); i++) {
+                        Car car = cars.get(i);
+                        carIds[i] = car.getId();
+                        carNames[i] = car.getName();
+                    }
+
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setItems(carNames, (dialog, which) -> {
+                                Intent intent = getDetailActivityIntent(edit, carIds[which], otherType);
+                                mAddDataLauncher.launch(intent);
+                            })
+                            .create()
+                            .show();
+                }
             }
-
-            new AlertDialog.Builder(this)
-                    .setItems(carNames, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = getDetailActivityIntent(edit, carIds[which], otherType);
-                            startActivityForResult(intent, REQUEST_ADD_DATA + edit);
-                        }
-                    })
-                    .create()
-                    .show();
-        }
+        };
+        mViewModel.getNotSuspendedCars().observeForever(observer);
     }
 
-    public static void setSupportActionBar(Fragment fragment) {
-        Activity activity = fragment.getActivity();
-        if (!(activity instanceof AppCompatActivity) || fragment.getView() == null) {
-            return;
-        }
-
-        Toolbar toolbar = (Toolbar) fragment.getView().findViewById(R.id.toolbar);
-        ((AppCompatActivity) activity).setSupportActionBar(toolbar);
-    }
-
-    public static ActionBar getSupportActionBar(Fragment fragment) {
-        Activity activity = fragment.getActivity();
-        if (activity instanceof AppCompatActivity) {
-            return ((AppCompatActivity) activity).getSupportActionBar();
-        }
-
-        return null;
-    }
 }

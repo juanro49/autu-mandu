@@ -16,70 +16,70 @@
 
 package org.juanro.autumandu.gui.dialog;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 
 public class MessageDialogFragment extends DialogFragment {
-    public interface MessageDialogFragmentListener {
-        void onDialogNegativeClick(int requestCode);
+    public static final String REQUEST_KEY = "org.juanro.autumandu.MESSAGE_DIALOG_REQUEST";
+    public static final String RESULT_ACTION = "action";
+    public static final String RESULT_REQUEST_CODE = "request_code";
 
-        void onDialogPositiveClick(int requestCode);
-    }
+    public static final int ACTION_POSITIVE = 1;
+    public static final int ACTION_NEGATIVE = 2;
 
-    public static MessageDialogFragment newInstance(Fragment parent,
-                                                    int requestCode, Integer title, String message, int positive,
+    private static final String ARG_MESSAGE = "message";
+    private static final String ARG_POSITIVE = "positive";
+    private static final String ARG_TITLE = "title";
+    private static final String ARG_NEGATIVE = "negative";
+    private static final String ARG_REQUEST_CODE = "request_code";
+
+    public static MessageDialogFragment newInstance(int requestCode, Integer title, String message, int positive,
                                                     Integer negative) {
         MessageDialogFragment f = new MessageDialogFragment();
-        f.setTargetFragment(parent, requestCode);
 
         Bundle args = new Bundle();
-        args.putString("message", message);
-        args.putInt("positive", positive);
+        args.putString(ARG_MESSAGE, message);
+        args.putInt(ARG_POSITIVE, positive);
+        args.putInt(ARG_REQUEST_CODE, requestCode);
         if (title != null) {
-            args.putInt("title", title);
+            args.putInt(ARG_TITLE, title);
         }
         if (negative != null) {
-            args.putInt("negative", negative);
+            args.putInt(ARG_NEGATIVE, negative);
         }
 
         f.setArguments(args);
         return f;
     }
 
-    private MessageDialogFragmentListener mDefaultListener = new MessageDialogFragmentListener() {
-        @Override
-        public void onDialogPositiveClick(int requestCode) {
-        }
-
-        @Override
-        public void onDialogNegativeClick(int requestCode) {
-        }
-    };
-
+    @NonNull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Bundle args = getArguments();
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Bundle args = requireArguments();
+        int requestCode = args.getInt(ARG_REQUEST_CODE);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(args.getString("message"));
-        builder.setPositiveButton(args.getInt("positive"),
-                (dialog, which) -> getListener().onDialogPositiveClick(getTargetRequestCode()));
-        if (args.containsKey("title")) {
-            builder.setTitle(args.getInt("title"));
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setMessage(args.getString(ARG_MESSAGE));
+        builder.setPositiveButton(args.getInt(ARG_POSITIVE), (dialog, which) -> sendResult(ACTION_POSITIVE, requestCode));
+
+        if (args.containsKey(ARG_TITLE)) {
+            builder.setTitle(args.getInt(ARG_TITLE));
         }
-        if (args.containsKey("negative")) {
-            builder.setNegativeButton(args.getInt("negative"),
-                    (dialog, which) -> getListener().onDialogNegativeClick(getTargetRequestCode()));
+        if (args.containsKey(ARG_NEGATIVE)) {
+            builder.setNegativeButton(args.getInt(ARG_NEGATIVE), (dialog, which) -> sendResult(ACTION_NEGATIVE, requestCode));
         }
 
         return builder.create();
     }
 
-    private MessageDialogFragmentListener getListener() {
-        Fragment f = getTargetFragment();
-        return f != null ? (MessageDialogFragmentListener) f : mDefaultListener;
+    private void sendResult(int action, int requestCode) {
+        Bundle result = new Bundle();
+        result.putInt(RESULT_ACTION, action);
+        result.putInt(RESULT_REQUEST_CODE, requestCode);
+        getParentFragmentManager().setFragmentResult(REQUEST_KEY, result);
     }
 }

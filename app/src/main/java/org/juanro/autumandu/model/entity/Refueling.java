@@ -7,10 +7,14 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import org.juanro.autumandu.model.IRefueling;
 
-@Entity(tableName = "refueling", foreignKeys = {
+@Entity(tableName = "refueling", indices = {
+        @Index("fuel_type_id"),
+        @Index("station_id"),
+        @Index("car_id")
+}, foreignKeys = {
         @ForeignKey(
                 parentColumns = { "_id" },
                 childColumns = { "fuel_type_id" },
@@ -18,10 +22,10 @@ import org.juanro.autumandu.model.IRefueling;
                 onDelete = ForeignKey.CASCADE
         ),
         @ForeignKey(
-            parentColumns = { "_id" },
-            childColumns = { "station_id" },
-            entity = Station.class,
-            onDelete = ForeignKey.CASCADE
+                parentColumns = { "_id" },
+                childColumns = { "station_id" },
+                entity = Station.class,
+                onDelete = ForeignKey.CASCADE
         ),
         @ForeignKey(
                 parentColumns = { "_id" },
@@ -30,7 +34,7 @@ import org.juanro.autumandu.model.IRefueling;
                 onDelete = ForeignKey.CASCADE
         ),
 })
-public class Refueling implements IRefueling {
+public class Refueling {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     private Long id;
@@ -64,23 +68,23 @@ public class Refueling implements IRefueling {
     @ColumnInfo(name = "car_id")
     private long carId;
 
-    public Refueling() {}
+    public Refueling() {
+    }
 
     @Ignore
     public Refueling(long carId, long fuelTypeId, long stationId, @NonNull Date date, int mileage, float volume,
                      float price, boolean partial, @NonNull String note) {
-        this.setCarId(carId);
-        this.setFuelTypeId(fuelTypeId);
-        this.setStationId(stationId);
-        this.setDate(date);
-        this.setMileage(mileage);
-        this.setVolume(volume);
-        this.setPrice(price);
-        this.setPartial(partial);
-        this.setNote(note);
+        this.carId = carId;
+        this.fuelTypeId = fuelTypeId;
+        this.stationId = stationId;
+        this.date = date;
+        this.mileage = mileage;
+        this.volume = volume;
+        this.price = price;
+        this.partial = partial;
+        this.note = note;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -90,7 +94,6 @@ public class Refueling implements IRefueling {
     }
 
     @NonNull
-    @Override
     public Date getDate() {
         return date;
     }
@@ -99,7 +102,6 @@ public class Refueling implements IRefueling {
         this.date = date;
     }
 
-    @Override
     public int getMileage() {
         return mileage;
     }
@@ -108,7 +110,6 @@ public class Refueling implements IRefueling {
         this.mileage = mileage;
     }
 
-    @Override
     public float getVolume() {
         return volume;
     }
@@ -117,7 +118,6 @@ public class Refueling implements IRefueling {
         this.volume = volume;
     }
 
-    @Override
     public float getPrice() {
         return price;
     }
@@ -126,8 +126,7 @@ public class Refueling implements IRefueling {
         this.price = price;
     }
 
-    @Override
-    public boolean getPartial() {
+    public boolean isPartial() {
         return partial;
     }
 
@@ -136,7 +135,6 @@ public class Refueling implements IRefueling {
     }
 
     @NonNull
-    @Override
     public String getNote() {
         return note;
     }
@@ -145,7 +143,6 @@ public class Refueling implements IRefueling {
         this.note = note;
     }
 
-    @Override
     public long getFuelTypeId() {
         return fuelTypeId;
     }
@@ -154,7 +151,6 @@ public class Refueling implements IRefueling {
         this.fuelTypeId = fuelTypeId;
     }
 
-    @Override
     public long getCarId() {
         return carId;
     }
@@ -163,14 +159,11 @@ public class Refueling implements IRefueling {
         this.carId = carId;
     }
 
-    @Override
-    public long getStationId()
-    {
+    public long getStationId() {
         return stationId;
     }
 
-    public void setStationId(long stationId)
-    {
+    public void setStationId(long stationId) {
         this.stationId = stationId;
     }
 }

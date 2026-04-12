@@ -3,14 +3,14 @@ package org.juanro.autumandu.model.entity;
 import java.util.Date;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import org.juanro.autumandu.model.ICar;
 
 @Entity(tableName = "car")
-public class Car implements ICar {
+public class Car {
     @ColumnInfo(name = "_id")
     @PrimaryKey(autoGenerate = true)
     private Long id;
@@ -26,46 +26,26 @@ public class Car implements ICar {
     private String name = "";
 
     @ColumnInfo(name = "suspended_since")
-    private Date suspension;
+    private Date suspendedSince;
 
     @ColumnInfo(name = "buying_price")
-    private double buyingprice = 0;
+    private double buyingPrice = 0;
 
     @ColumnInfo(name = "num_tires")
     private int numTires = 4;
-    /*@ColumnInfo(name = "make")
-    private String make;
-
-    @ColumnInfo(name = "model")
-    private String model;
-
-    @ColumnInfo(name = "year")
-    private int year;
-
-    @ColumnInfo(name = "license_plate")
-    private String licensePlate;
-
-    @ColumnInfo(name = "buying_date")
-    private Date buyingdate;*/
 
     public Car() {}
 
     @Ignore
-    public Car(@NonNull String name, int color, int initialMileage, Date suspension, double buyingprice, int numTires/*, Date buyingDate, String make, String model, String licensePlate, int year*/) {
-        this.setName(name);
-        this.setColor(color);
-        this.setInitialMileage(initialMileage);
-        this.setSuspension(suspension);
-        this.setBuyingprice(buyingprice);
-        this.setNumTires(numTires);
-        /*this.setBuyingdate(buyingDate);
-        this.setMake(make);
-        this.setModel(model);
-        this.setLicensePlate(licensePlate);
-        this.setYear(year);*/
+    public Car(@NonNull String name, int color, int initialMileage, @Nullable Date suspendedSince, double buyingPrice, int numTires) {
+        this.name = name;
+        this.color = color;
+        this.initialMileage = initialMileage;
+        this.suspendedSince = suspendedSince;
+        this.buyingPrice = buyingPrice;
+        this.numTires = numTires;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -74,7 +54,6 @@ public class Car implements ICar {
         this.id = id;
     }
 
-    @Override
     public int getColor() {
         return color;
     }
@@ -83,7 +62,6 @@ public class Car implements ICar {
         this.color = color;
     }
 
-    @Override
     public int getInitialMileage() {
         return initialMileage;
     }
@@ -93,7 +71,6 @@ public class Car implements ICar {
     }
 
     @NonNull
-    @Override
     public String getName() {
         return name;
     }
@@ -102,89 +79,28 @@ public class Car implements ICar {
         this.name = name;
     }
 
-    @Override
-    public Date getSuspension() {
-        return suspension;
+    @Nullable
+    public Date getSuspendedSince() {
+        return suspendedSince;
     }
 
-    public void setSuspension(Date suspension) {
-        this.suspension = suspension;
+    public void setSuspendedSince(@Nullable Date suspendedSince) {
+        this.suspendedSince = suspendedSince;
     }
 
-    @Override
-    public double getBuyingprice()
-    {
-        return buyingprice;
+    public double getBuyingPrice() {
+        return buyingPrice;
     }
 
-    public void setBuyingprice(double buyingprice)
-    {
-        this.buyingprice = buyingprice;
+    public void setBuyingPrice(double buyingPrice) {
+        this.buyingPrice = buyingPrice;
     }
 
-    @Override
-    public int getNumTires()
-    {
+    public int getNumTires() {
         return numTires;
     }
 
-    public void setNumTires(int numTires)
-    {
+    public void setNumTires(int numTires) {
         this.numTires = numTires;
     }
-
-    /*@Override
-    public String getMake()
-    {
-        return make;
-    }
-
-    public void setMake(String make)
-    {
-        this.make = make;
-    }
-
-    @Override
-    public String getModel()
-    {
-        return model;
-    }
-
-    public void setModel(String model)
-    {
-        this.model = model;
-    }
-
-    @Override
-    public int getYear()
-    {
-        return year;
-    }
-
-    public void setYear(int year)
-    {
-        this.year = year;
-    }
-
-    @Override
-    public String getLicensePlate()
-    {
-        return licensePlate;
-    }
-
-    public void setLicensePlate(String licensePlate)
-    {
-        this.licensePlate = licensePlate;
-    }
-
-    @Override
-    public Date getBuyingdate()
-    {
-        return buyingdate;
-    }
-
-    public void setBuyingdate(Date buyingdate)
-    {
-        this.buyingdate = buyingdate;
-    }*/
 }

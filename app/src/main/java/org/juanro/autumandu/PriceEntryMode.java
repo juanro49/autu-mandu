@@ -15,14 +15,42 @@
  */
 package org.juanro.autumandu;
 
+import androidx.annotation.NonNull;
+
+/**
+ * Modes for entering refueling prices.
+ */
 public enum PriceEntryMode {
-    PER_UNIT_AND_VOLUME(R.string.price_entry_mode_per_unit_and_volume),
-    PER_UNIT_AND_TOTAL(R.string.price_entry_mode_per_unit_and_total),
-    TOTAL_AND_VOLUME(R.string.price_entry_mode_total_and_volume);
+    PER_UNIT_AND_VOLUME(0, R.string.price_entry_mode_per_unit_and_volume),
+    PER_UNIT_AND_TOTAL(1, R.string.price_entry_mode_per_unit_and_total),
+    TOTAL_AND_VOLUME(2, R.string.price_entry_mode_total_and_volume);
 
-    public final int nameResourceId;
+    private final int id;
+    private final int nameResourceId;
 
-    PriceEntryMode(int nameResourceId) {
+    PriceEntryMode(int id, int nameResourceId) {
+        this.id = id;
         this.nameResourceId = nameResourceId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getNameResourceId() {
+        return nameResourceId;
+    }
+
+    /**
+     * Resolves the mode from its ID.
+     * Uses Java 21 Switch Expression for cleaner logic.
+     */
+    @NonNull
+    public static PriceEntryMode fromId(int id) {
+        return switch (id) {
+            case 1 -> PER_UNIT_AND_TOTAL;
+            case 2 -> TOTAL_AND_VOLUME;
+            default -> PER_UNIT_AND_VOLUME;
+        };
     }
 }

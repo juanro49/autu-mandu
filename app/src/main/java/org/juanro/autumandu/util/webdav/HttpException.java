@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jan Kühle
+ * Copyright 2026 Jan Kühle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,46 +15,54 @@
  */
 package org.juanro.autumandu.util.webdav;
 
-import android.annotation.SuppressLint;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * Modernized exception for WebDAV HTTP errors.
+ * Compatible with Android API 25+.
+ */
 public class HttpException extends Exception {
-    private int mCode;
+    private final int code;
 
-    public HttpException(Response response) {
+    public HttpException(@NonNull Response response) {
         this(response.request(), response.code(), response.message(), null);
     }
 
-    public HttpException(Request request, IOException exception) {
-        this(request, -1, "Connection failed: " + exception.getMessage(), exception);
+    public HttpException(@NonNull Request request, @NonNull IOException exception) {
+        this(request, -1, String.format(Locale.ROOT, "Connection failed: %s", exception.getMessage()), exception);
     }
 
-    public HttpException(Request request, Exception responseParseException) {
-        this(request, -2, "Invalid response: " + responseParseException.getMessage(), responseParseException);
+    public HttpException(@NonNull Request request, @NonNull Exception responseParseException) {
+        this(request, -2, String.format(Locale.ROOT, "Invalid response: %s", responseParseException.getMessage()), responseParseException);
     }
 
-    @SuppressLint("DefaultLocale")
-    public HttpException(Request request, int code, String message, Exception innerException) {
-        super(String.format(
-                "Error connecting to the WebDAV server: %d %s. Was trying to execute request: %s %s",
-                code, message, request.method(), request.url().toString()),
+    public HttpException(@NonNull Request request, int code, @NonNull String message, @Nullable Exception innerException) {
+        super(String.format(Locale.ROOT, "Error connecting to the WebDAV server: %d %s. Was trying to execute request: %s %s",
+                        code, message, request.method(), request.url()),
                 innerException);
-        mCode = code;
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
     }
 
     public boolean isNetworkIssue() {
-        return mCode == -1;
+        return code == -1;
     }
 
     public boolean isUnauthorized() {
-        return mCode == 401;
+        return code == 401;
     }
 
     public boolean isNotFound() {
-        return mCode == 404;
+        return code == 404;
     }
 }

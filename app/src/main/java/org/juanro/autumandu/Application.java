@@ -16,119 +16,59 @@
 
 package org.juanro.autumandu;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.ContentObserver;
-import android.net.Uri;
-import android.os.Handler;
 import android.util.Log;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import java.util.Date;
-
-import androidx.multidex.MultiDexApplication;
 import org.juanro.autumandu.model.AutuManduDatabase;
-import org.juanro.autumandu.provider.DataProvider;
 import org.juanro.autumandu.util.reminder.ReminderEnablerReceiver;
-import org.juanro.autumandu.util.reminder.ReminderService;
 import org.juanro.autumandu.util.sync.Authenticator;
+import org.juanro.autumandu.util.sync.SyncManager;
 
-public class Application extends MultiDexApplication {
+/**
+ * Main application class.
+ */
+public class Application extends android.app.Application {
     private static final String TAG = "Application";
     private static Application instance;
-
-    public static Context getContext() {
-        return instance;
-    }
-
-    public static void closeDatabases() {
-        if (instance != null) {
-            Log.v(TAG, "Closing Database via abstraction layers.");
-            AutuManduDatabase.resetInstance();
-        }
-    }
-
-    private AccountManager mAccountManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
 
-        mAccountManager = AccountManager.get(this);
-
+        // Initialize Joda-Time. Manual init is deprecated as it's handled by a ContentProvider,
+        // but keeping it here with suppression ensures it's ready for early access components.
+        //noinspection deprecation
         JodaTimeAndroid.init(this);
 
+        // Schedule alarms for reminders
         ReminderEnablerReceiver.scheduleAlarms(this);
 
-        upgradeOldSyncServiceToNewSyncAdapterWithAccounts();
-        setupDataChangeObserver();
-    }
-
-    private void upgradeOldSyncServiceToNewSyncAdapterWithAccounts() {
-        Preferences prefs = new Preferences(this);
-
-        String syncProvider = prefs.getDeprecatedSynchronizationProvider();
-        if (syncProvider != null) {
-            long syncProviderId = 0;
-            Account account = null;
-            String authToken = null;
-            if (syncProvider.equals("org.juanro.autumandu.util.backup.DropboxSynchronizationProvider")) {
-                syncProviderId = 1;
-                account = new Account(prefs.getDeprecatedDropboxAccount(), Authenticator.ACCOUNT_TYPE);
-                authToken = prefs.getDeprecatedDropboxAccessToken();
-
-                prefs.setSyncLocalFileRev(prefs.getDeprecatedDropboxLocalRev());
-            } else if (syncProvider.equals("org.juanro.autumandu.util.backup.GoogleDriveSynchronizationProvider")) {
-                syncProviderId = 2;
-                account = new Account(prefs.getDeprecatedGoogleDriveAccount(), Authenticator.ACCOUNT_TYPE);
-                authToken = null;
-
-                Date modifiedDate = prefs.getDeprecatedGoogleDriveLocalModifiedDate();
-                String rev = modifiedDate != null ? String.valueOf(modifiedDate.getTime()) : null;
-                prefs.setSyncLocalFileRev(rev);
-            }
-
-            if (account != null) {
-                mAccountManager.addAccountExplicitly(account, null, null);
-                mAccountManager.setAuthToken(account, Authenticator.AUTH_TOKEN_TYPE, authToken);
-                mAccountManager.setUserData(account, Authenticator.KEY_SYNC_PROVIDER,
-                        String.valueOf(syncProviderId));
-            }
-
-            prefs.removeDeprecatedSyncSettings();
+        // Check for sync accounts and schedule periodic sync if necessary
+        var accountManager = AccountManager.get(this);
+        var accounts = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        if (accounts.length > 0) {
+            SyncManager.schedulePeriodicSync(this);
         }
     }
 
-    private void setupDataChangeObserver() {
-        ContentObserver contentObserver = new ContentObserver(new Handler()) {
-            @Override
-            public boolean deliverSelfNotifications() {
-                return true;
-            }
-
-            @Override
-            public void onChange(boolean selfChange) {
-                onChange(selfChange, null);
-            }
-
-            @Override
-            public void onChange(boolean selfChange, Uri uri) {
-                updateReminders();
-            }
-        };
-
-        ContentResolver contentResolver = getContentResolver();
-        contentResolver.registerContentObserver(Uri.parse(DataProvider.CONTENT_URI_BASE), true,
-                contentObserver);
+    /**
+     * @return the global application context.
+     */
+    public static Context getContext() {
+        return instance;
     }
 
-    private void updateReminders() {
-        if (BuildConfig.DEBUG) Log.d(TAG, "updateReminders");
-
-        ReminderService.updateNotification(instance);
+    /**
+     * Resets the database singleton instances (Room).
+     */
+    public static void closeDatabases() {
+        if (instance != null) {
+            Log.v(TAG, "Closing Database via Room abstraction.");
+            AutuManduDatabase.resetInstance();
+        }
     }
 }

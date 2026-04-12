@@ -18,256 +18,231 @@ package org.juanro.autumandu;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.io.File;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.juanro.autumandu.data.report.AbstractReport;
 import org.juanro.autumandu.data.report.CostsReport;
 import org.juanro.autumandu.data.report.FuelConsumptionReport;
 import org.juanro.autumandu.data.report.FuelPriceReport;
 import org.juanro.autumandu.data.report.MileageReport;
-import org.juanro.autumandu.provider.car.CarColumns;
-import org.juanro.autumandu.provider.car.CarCursor;
-import org.juanro.autumandu.provider.car.CarSelection;
-import org.juanro.autumandu.provider.reminder.TimeSpanUnit;
+import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
 import org.juanro.autumandu.util.TimeSpan;
 
+/**
+ * Utility class for managing application preferences.
+ */
 public class Preferences {
     private static final String TAG = "Preferences";
 
-    private Context mContext;
-    private SharedPreferences mPrefs;
+    // Preference Keys
+    private static final String KEY_DEFAULT_CAR = "behavior_default_car";
+    private static final String KEY_DISTANCE_ENTRY_MODE = "behavior_distance_entry_mode";
+    private static final String KEY_PRICE_ENTRY_MODE = "behavior_price_entry_mode";
+    private static final String KEY_SYNC_LOCAL_FILE_REV = "sync_local_file_rev";
+    private static final String KEY_REPORT_ORDER = "behavior_report_order";
+    private static final String KEY_REMINDER_SNOOZE_DURATION = "behavior_reminder_snooze_duration";
+    private static final String KEY_UNIT_CURRENCY = "unit_currency";
+    private static final String KEY_UNIT_DISTANCE = "unit_distance";
+    private static final String KEY_UNIT_VOLUME = "unit_volume";
+    private static final String KEY_UNIT_FUEL_CONSUMPTION = "unit_fuel_consumption";
+    private static final String KEY_AUTO_GUESS_MISSING_DATA = "behavior_auto_guess_missing_data";
+    private static final String KEY_SHOW_CAR_MENU = "behavior_show_car_menu";
+    private static final String KEY_BACKUP_FOLDER = "backup_folder";
+    private static final String KEY_BACKUP_FOLDER_DEFAULT = "backup_folder_default";
+    private static final String KEY_AUTO_BACKUP = "behavior_auto_backup";
+    private static final String KEY_KEEP_BACKUPS = "behaviour_keep_backups";
 
-    public Preferences(Context context) {
-        mContext = context;
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    private final Context context;
+    private final SharedPreferences prefs;
+
+    public Preferences(@NonNull Context context) {
+        this.context = context;
+        this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public long getDefaultCar() {
-        int id = Integer.parseInt(mPrefs.getString("behavior_default_car", "1"));
-
-        CarCursor car = new CarSelection().query(mContext.getContentResolver(), new String[]{CarColumns._ID});
-        if (car.getCount() == 0) {
+        var idStr = prefs.getString(KEY_DEFAULT_CAR, "0");
+        try {
+            return Long.parseLong(Objects.requireNonNullElse(idStr, "0"));
+        } catch (NumberFormatException e) {
             return 0;
         }
-
-        while (car.moveToNext()) {
-            if (car.getId() == id) {
-                return id;
-            }
-        }
-
-        car.moveToFirst();
-        return car.getId();
     }
 
     public DistanceEntryMode getDistanceEntryMode() {
-        String mode = mPrefs.getString("behavior_distance_entry_mode", "TOTAL");
+        var mode = prefs.getString(KEY_DISTANCE_ENTRY_MODE, "TOTAL");
         try {
             return DistanceEntryMode.valueOf(mode);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return DistanceEntryMode.TOTAL;
         }
     }
 
     public PriceEntryMode getPriceEntryMode() {
-        String mode = mPrefs.getString("behavior_price_entry_mode", "TOTAL_AND_VOLUME");
+        var mode = prefs.getString(KEY_PRICE_ENTRY_MODE, "TOTAL_AND_VOLUME");
         try {
             return PriceEntryMode.valueOf(mode);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return PriceEntryMode.TOTAL_AND_VOLUME;
         }
     }
 
+    @Nullable
     public String getSyncLocalFileRev() {
-        return mPrefs.getString("sync_local_file_rev", null);
+        return prefs.getString(KEY_SYNC_LOCAL_FILE_REV, null);
     }
 
-    public void setSyncLocalFileRev(String rev) {
-        Editor edit = mPrefs.edit();
-        edit.putString("sync_local_file_rev", rev);
-        edit.apply();
+    public void setSyncLocalFileRev(@Nullable String rev) {
+        putString(KEY_SYNC_LOCAL_FILE_REV, rev);
     }
 
     @SuppressWarnings("unchecked")
     public List<Class<? extends AbstractReport>> getReportOrder() {
-        List<Class<? extends AbstractReport>> reports = new ArrayList<>();
-        String reportNames = mPrefs.getString("behavior_report_order", null);
+        var reportNames = prefs.getString(KEY_REPORT_ORDER, null);
         if (reportNames == null) {
-            reports.add(FuelConsumptionReport.class);
-            reports.add(FuelPriceReport.class);
-            reports.add(MileageReport.class);
-            reports.add(CostsReport.class);
-        } else {
-            for (String reportName : reportNames.split(",")) {
-                try {
-                    Class<?> report = Class.forName(reportName);
-                    if (AbstractReport.class.isAssignableFrom(report)) {
-                        reports.add((Class<? extends AbstractReport>) report);
-                    }
-                } catch (Exception e) {
-                    Log.w(TAG, String.format("Error loading report order: %s.", reportName), e);
-                }
-            }
+            return new ArrayList<>(List.of(
+                    FuelConsumptionReport.class,
+                    FuelPriceReport.class,
+                    MileageReport.class,
+                    CostsReport.class
+            ));
         }
 
-        return reports;
+        return Arrays.stream(reportNames.split(","))
+                .map(name -> {
+                    try {
+                        var cls = Class.forName(name);
+                        return AbstractReport.class.isAssignableFrom(cls) ? cls : null;
+                    } catch (Exception e) {
+                        Log.w(TAG, "Error loading report class: " + name);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .map(cls -> (Class<? extends AbstractReport>) cls)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public void setReportOrder(@NonNull List<Class<? extends AbstractReport>> reports) {
+        var names = reports.stream()
+                .map(Class::getName)
+                .collect(Collectors.joining(","));
+        putString(KEY_REPORT_ORDER, names);
     }
 
     public TimeSpan getReminderSnoozeDuration() {
-        String data = mPrefs.getString("behavior_reminder_snooze_duration", "7 DAY");
+        var data = prefs.getString(KEY_REMINDER_SNOOZE_DURATION, "7 DAY");
         return TimeSpan.fromString(data, new TimeSpan(TimeSpanUnit.DAY, 7));
     }
 
     public String getUnitCurrency() {
-        return mPrefs.getString("unit_currency", "EUR");
+        return prefs.getString(KEY_UNIT_CURRENCY, "EUR");
     }
 
     public String getUnitDistance() {
-        return mPrefs.getString("unit_distance", "km");
+        return prefs.getString(KEY_UNIT_DISTANCE, "km");
     }
 
     public String getUnitVolume() {
-        return mPrefs.getString("unit_volume", "l");
+        return prefs.getString(KEY_UNIT_VOLUME, "l");
     }
 
     public int getUnitFuelConsumption() {
-        return Integer.parseInt(mPrefs.getString("unit_fuel_consumption", "0"));
+        var val = prefs.getString(KEY_UNIT_FUEL_CONSUMPTION, "0");
+        return Integer.parseInt(Objects.requireNonNullElse(val, "0"));
     }
 
     public boolean isAutoGuessMissingDataEnabled() {
-        return mPrefs.getBoolean("behavior_auto_guess_missing_data", false);
+        return prefs.getBoolean(KEY_AUTO_GUESS_MISSING_DATA, false);
     }
 
     public boolean isShowCarMenu() {
-        return mPrefs.getBoolean("behavior_show_car_menu", true);
-    }
-
-    public void setReportOrder(List<Class<? extends AbstractReport>> reports) {
-        List<String> reportNames = new ArrayList<>();
-        for (Class<? extends AbstractReport> report : reports) {
-            reportNames.add(report.getName());
-        }
-
-        Editor edit = mPrefs.edit();
-        edit.putString("behavior_report_order", TextUtils.join(",", reportNames));
-        edit.apply();
+        return prefs.getBoolean(KEY_SHOW_CAR_MENU, true);
     }
 
     public String getBackupPath() {
-        final String key = "backup_folder";
-        String savedValue = mPrefs.getString(key, "");
-
-        if (savedValue.isEmpty())
-        {
-            Editor edit = mPrefs.edit();
-            edit.putString(key, mContext.getExternalFilesDir(null).getAbsolutePath());
-            edit.apply();
-            savedValue = mPrefs.getString(key, "");
+        var savedValue = prefs.getString(KEY_BACKUP_FOLDER, "");
+        if (TextUtils.isEmpty(savedValue)) {
+            savedValue = getExternalFilesDirPath();
+            putString(KEY_BACKUP_FOLDER, savedValue);
         }
-
         return savedValue;
     }
 
-    public void setBackupPath(String path)
-    {
-        Editor edit = mPrefs.edit();
-        edit.putString("backup_folder", path);
-        edit.apply();
+    public void setBackupPath(@NonNull String path) {
+        putString(KEY_BACKUP_FOLDER, path);
     }
 
     public String getDefaultBackupPath() {
-        final String key = "backup_folder_default";
-        String savedValue = mPrefs.getString(key, "");
-
-        if (savedValue.isEmpty())
-        {
-            Editor edit = mPrefs.edit();
-            edit.putString(key, mContext.getExternalFilesDir(null).getAbsolutePath());
-            edit.apply();
-            savedValue = mPrefs.getString(key, "");
+        var savedValue = prefs.getString(KEY_BACKUP_FOLDER_DEFAULT, "");
+        if (TextUtils.isEmpty(savedValue)) {
+            savedValue = getExternalFilesDirPath();
+            putString(KEY_BACKUP_FOLDER_DEFAULT, savedValue);
         }
-
         return savedValue;
     }
 
-    public void restoreDefaultBackupPath()
-    {
-        Editor edit = mPrefs.edit();
-        edit.putString("backup_folder", mContext.getExternalFilesDir(null).getAbsolutePath());
-        edit.apply();
+    public void restoreDefaultBackupPath() {
+        putString(KEY_BACKUP_FOLDER, getExternalFilesDirPath());
     }
 
     public boolean getAutoBackupEnabled() {
-        final String key = "behavior_auto_backup";
-        return mPrefs.getBoolean(key, false);
+        return prefs.getBoolean(KEY_AUTO_BACKUP, false);
     }
 
     public int getAutoBackupRetention() {
-        final String key = "behaviour_keep_backups";
-        return mPrefs.getInt(key, 12);
+        return prefs.getInt(KEY_KEEP_BACKUPS, 12);
     }
 
-    // Deprecated Dropbox and Google Drive sync settings
+    private void putString(String key, String value) {
+        prefs.edit().putString(key, value).apply();
+    }
+
+    @NonNull
+    private String getExternalFilesDirPath() {
+        var externalDir = context.getExternalFilesDir(null);
+        return externalDir != null ? externalDir.getAbsolutePath() : "";
+    }
+
+    // Deprecated Sync Settings Logic
 
     @Deprecated
+    @Nullable
     public String getDeprecatedSynchronizationProvider() {
-        return mPrefs.getString("sync_current_provider", null);
-    }
-
-    @Deprecated
-    public String getDeprecatedDropboxAccount() {
-        return mPrefs.getString("sync_dropbox_account", null);
-    }
-
-    @Deprecated
-    public String getDeprecatedDropboxAccessToken() {
-        return mPrefs.getString("sync_dropbox_token", null);
-    }
-
-    @Deprecated
-    public String getDeprecatedDropboxLocalRev() {
-        return mPrefs.getString("sync_dropbox_rev", null);
-    }
-
-    @Deprecated
-    public String getDeprecatedGoogleDriveAccount() {
-        return mPrefs.getString("sync_drive_account", null);
-    }
-
-    @Deprecated
-    public Date getDeprecatedGoogleDriveLocalModifiedDate() {
-        try {
-            long date = mPrefs.getLong("sync_drive_modified_date", -1);
-            if (date == -1) {
-                return null;
-            } else {
-                return new Date(date);
-            }
-        } catch (ClassCastException e) {
-            return null;
-        }
+        return prefs.getString("sync_current_provider", null);
     }
 
     @Deprecated
     public void removeDeprecatedSyncSettings() {
-        Editor edit = mPrefs.edit();
-        edit.remove("sync_dropbox_account");
-        edit.remove("sync_dropbox_token");
-        edit.remove("sync_dropbox_rev");
-        edit.remove("sync_drive_modified_date");
-        edit.remove("sync_drive_account");
-        edit.remove("sync_current_provider");
-        edit.remove("sync_on_change");
-        edit.remove("sync_on_start");
-        edit.apply();
+        prefs.edit()
+                .remove("sync_dropbox_account")
+                .remove("sync_dropbox_token")
+                .remove("sync_dropbox_rev")
+                .remove("sync_drive_modified_date")
+                .remove("sync_drive_account")
+                .remove("sync_current_provider")
+                .remove("sync_on_change")
+                .remove("sync_on_start")
+                .apply();
+    }
+
+    @Deprecated
+    @Nullable
+    public Date getDeprecatedGoogleDriveLocalModifiedDate() {
+        long date = prefs.getLong("sync_drive_modified_date", -1);
+        return (date == -1) ? null : new Date(date);
     }
 }

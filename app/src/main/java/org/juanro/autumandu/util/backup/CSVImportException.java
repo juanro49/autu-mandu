@@ -15,12 +15,24 @@
  */
 package org.juanro.autumandu.util.backup;
 
+import java.io.Serial;
+
+/**
+ * Excepción personalizada para errores durante la exportación o importación de CSV.
+ */
 public class CSVImportException extends Exception {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     public CSVImportException(String message) {
         super(message);
     }
 
-    public CSVImportException(Exception inner) {
-        super(inner.getMessage(), inner);
+    public CSVImportException(Throwable cause) {
+        super(cause);
+    }
+
+    public CSVImportException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

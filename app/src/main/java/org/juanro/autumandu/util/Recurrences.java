@@ -23,9 +23,17 @@ import org.joda.time.Years;
 
 import java.util.Date;
 
-import org.juanro.autumandu.provider.othercost.RecurrenceInterval;
+import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
 
-public class Recurrences {
+/**
+ * Utility class for calculating recurrences of events.
+ */
+public final class Recurrences {
+
+    private Recurrences() {
+        // Utility class
+    }
+
     /**
      * Calculates the recurrences up to now.
      *
@@ -49,7 +57,7 @@ public class Recurrences {
      */
     public static int getRecurrencesSince(RecurrenceInterval interval, int multiplier, Date start,
                                           Date from) {
-        Date now = new Date();
+        var now = new Date();
         return getRecurrencesBetween(interval, multiplier, start, now, from, now);
     }
 
@@ -81,101 +89,72 @@ public class Recurrences {
      */
     public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start,
                                             Date end, Date from, Date to) {
-        DateTime startDateTime = new DateTime(start);
-        DateTime endDateTime = new DateTime(end);
-        DateTime fromDateTime = new DateTime(from);
-        DateTime toDateTime = new DateTime(to);
+        var startDt = new DateTime(start);
+        var endDt = new DateTime(end);
+        var fromDt = new DateTime(from);
+        var toDt = new DateTime(to);
 
-        if (startDateTime.isAfter(endDateTime) || toDateTime.isBefore(fromDateTime)) {
+        if (startDt.isAfter(endDt) || toDt.isBefore(fromDt)) {
             return 0;
         }
 
-        if (toDateTime.isBefore(endDateTime)) {
-            endDateTime = toDateTime;
-        }
+        final var finalEndDt = toDt.isBefore(endDt) ? toDt : endDt;
 
-        int count = 0;
-        switch (interval) {
-            case ONCE:
-                if ((fromDateTime.isBefore(startDateTime) || startDateTime.isEqual(fromDateTime)) &&
-                        (endDateTime.isAfter(startDateTime) || endDateTime.isEqual(startDateTime))) {
-                    count = 1;
-                }
+        return switch (interval) {
+            case ONCE -> ((fromDt.isBefore(startDt) || startDt.isEqual(fromDt)) &&
+                    (finalEndDt.isAfter(startDt) || finalEndDt.isEqual(startDt))) ? 1 : 0;
 
-                break;
-            case DAY:
-                if (fromDateTime.isAfter(startDateTime)) {
-                    int intervalsBetween = Days.daysBetween(startDateTime, fromDateTime).getDays() /
-                            multiplier;
-                    if (fromDateTime.isAfter(startDateTime.
-                            plusDays(intervalsBetween * multiplier))) {
+            case DAY -> {
+                var currentStart = startDt;
+                if (fromDt.isAfter(currentStart)) {
+                    int intervalsBetween = Days.daysBetween(currentStart, fromDt).getDays() / multiplier;
+                    if (fromDt.isAfter(currentStart.plusDays(intervalsBetween * multiplier))) {
                         intervalsBetween++;
                     }
-
-                    startDateTime = startDateTime.plusDays(intervalsBetween * multiplier);
+                    currentStart = currentStart.plusDays(intervalsBetween * multiplier);
                 }
+                yield (currentStart.isBefore(finalEndDt) || currentStart.isEqual(finalEndDt))
+                        ? Days.daysBetween(currentStart, finalEndDt).getDays() / multiplier + 1 : 0;
+            }
 
-                if (startDateTime.isBefore(endDateTime) || startDateTime.equals(endDateTime)) {
-                    count = Days.daysBetween(startDateTime, endDateTime).getDays() / multiplier + 1;
-                }
-
-                break;
-            case MONTH:
-                if (fromDateTime.isAfter(startDateTime)) {
-                    int intervalsBetween = Months.monthsBetween(startDateTime, fromDateTime).
-                            getMonths() / multiplier;
-                    if (fromDateTime.isAfter(startDateTime.
-                            plusMonths(intervalsBetween * multiplier))) {
+            case MONTH -> {
+                var currentStart = startDt;
+                if (fromDt.isAfter(currentStart)) {
+                    int intervalsBetween = Months.monthsBetween(currentStart, fromDt).getMonths() / multiplier;
+                    if (fromDt.isAfter(currentStart.plusMonths(intervalsBetween * multiplier))) {
                         intervalsBetween++;
                     }
-
-                    startDateTime = startDateTime.plusMonths(intervalsBetween * multiplier);
+                    currentStart = currentStart.plusMonths(intervalsBetween * multiplier);
                 }
+                yield (currentStart.isBefore(finalEndDt) || currentStart.isEqual(finalEndDt))
+                        ? Months.monthsBetween(currentStart, finalEndDt).getMonths() / multiplier + 1 : 0;
+            }
 
-                if (startDateTime.isBefore(endDateTime) || startDateTime.equals(endDateTime)) {
-                    count = Months.monthsBetween(startDateTime, endDateTime).getMonths() /
-                            multiplier + 1;
-                }
-
-                break;
-            case QUARTER:
-                if (fromDateTime.isAfter(startDateTime)) {
-                    int intervalsBetween = Months.monthsBetween(startDateTime, fromDateTime).
-                            getMonths() / (3 * multiplier);
-                    if (fromDateTime.isAfter(startDateTime.
-                            plusMonths(intervalsBetween * 3 * multiplier))) {
+            case QUARTER -> {
+                var currentStart = startDt;
+                if (fromDt.isAfter(currentStart)) {
+                    int intervalsBetween = Months.monthsBetween(currentStart, fromDt).getMonths() / (3 * multiplier);
+                    if (fromDt.isAfter(currentStart.plusMonths(intervalsBetween * 3 * multiplier))) {
                         intervalsBetween++;
                     }
-
-                    startDateTime = startDateTime.plusMonths(intervalsBetween * 3 * multiplier);
+                    currentStart = currentStart.plusMonths(intervalsBetween * 3 * multiplier);
                 }
+                yield (currentStart.isBefore(finalEndDt) || currentStart.isEqual(finalEndDt))
+                        ? (Months.monthsBetween(currentStart, finalEndDt).getMonths() / 3) / multiplier + 1 : 0;
+            }
 
-                if (startDateTime.isBefore(endDateTime) || startDateTime.equals(endDateTime)) {
-                    int quarters = Months.monthsBetween(startDateTime, endDateTime).getMonths() / 3;
-                    count = quarters / multiplier + 1;
-                }
-
-                break;
-            case YEAR:
-                if (fromDateTime.isAfter(startDateTime)) {
-                    int intervalsBetween = Years.yearsBetween(startDateTime, fromDateTime).
-                            getYears() / multiplier;
-                    if (fromDateTime.isAfter(startDateTime.
-                            plusYears(intervalsBetween * multiplier))) {
+            case YEAR -> {
+                var currentStart = startDt;
+                if (fromDt.isAfter(currentStart)) {
+                    int intervalsBetween = Years.yearsBetween(currentStart, fromDt).getYears() / multiplier;
+                    if (fromDt.isAfter(currentStart.plusYears(intervalsBetween * multiplier))) {
                         intervalsBetween++;
                     }
-
-                    startDateTime = startDateTime.plusYears(intervalsBetween * multiplier);
+                    currentStart = currentStart.plusYears(intervalsBetween * multiplier);
                 }
-
-                if (startDateTime.isBefore(endDateTime) || startDateTime.equals(endDateTime)) {
-                    count = Years.yearsBetween(startDateTime, endDateTime).getYears() / multiplier +
-                            1;
-                }
-
-                break;
-        }
-
-        return count;
+                yield (currentStart.isBefore(finalEndDt) || currentStart.isEqual(finalEndDt))
+                        ? Years.yearsBetween(currentStart, finalEndDt).getYears() / multiplier + 1 : 0;
+            }
+        };
     }
 }

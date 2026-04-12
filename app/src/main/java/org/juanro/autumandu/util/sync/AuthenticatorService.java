@@ -20,12 +20,22 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+/**
+ * Service that exposes the custom Authenticator to the Android system.
+ * Optimized for lazy initialization and modern Android standards.
+ */
 public class AuthenticatorService extends Service {
+    private static final Object lock = new Object();
     private Authenticator mAuthenticator;
 
     @Override
     public void onCreate() {
-        mAuthenticator = new Authenticator(this);
+        super.onCreate();
+        synchronized (lock) {
+            if (mAuthenticator == null) {
+                mAuthenticator = new Authenticator(this);
+            }
+        }
     }
 
     @Override
