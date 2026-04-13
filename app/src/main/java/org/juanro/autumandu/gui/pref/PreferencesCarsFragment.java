@@ -71,6 +71,11 @@ public class PreferencesCarsFragment extends ListFragment implements
         }
 
         @Override
+        public boolean hasStableIds() {
+            return true;
+        }
+
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             CarViewHolder holder;
             if (convertView == null) {
@@ -183,14 +188,6 @@ public class PreferencesCarsFragment extends ListFragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getParentFragmentManager().setFragmentResultListener(MessageDialogFragment.REQUEST_KEY, this, (requestKey, bundle) -> {
-            var action = bundle.getInt(MessageDialogFragment.RESULT_ACTION);
-            var requestCode = bundle.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
-            if (action == MessageDialogFragment.ACTION_POSITIVE && requestCode == DELETE_REQUEST_CODE) {
-                onDialogPositiveClick();
-            }
-        });
     }
 
     @Override
@@ -207,6 +204,15 @@ public class PreferencesCarsFragment extends ListFragment implements
         setListAdapter(carAdapter);
 
         viewModel.getCars().observe(getViewLifecycleOwner(), cars -> carAdapter.setCars(cars));
+
+        getParentFragmentManager().setFragmentResultListener(
+                MessageDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
+                    int requestCode = result.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
+                    int action = result.getInt(MessageDialogFragment.RESULT_ACTION);
+                    if (requestCode == DELETE_REQUEST_CODE && action == MessageDialogFragment.ACTION_POSITIVE) {
+                        onDialogPositiveClick();
+                    }
+                });
     }
 
     @Override

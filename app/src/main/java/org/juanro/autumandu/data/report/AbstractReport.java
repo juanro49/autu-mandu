@@ -38,6 +38,7 @@ import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.ComboLineColumnChartData;
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PieChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import org.juanro.autumandu.R;
@@ -171,6 +172,10 @@ public abstract class AbstractReport {
     public abstract int[] getAvailableChartOptions();
 
     public abstract String getTitle();
+
+    public PieChartData getPieChartData() {
+        return null;
+    }
 
     public ComboLineColumnChartData getChartData(final ReportChartOptions options) {
         if (!mInitialized) {

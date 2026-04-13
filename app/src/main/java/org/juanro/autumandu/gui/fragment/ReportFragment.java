@@ -62,6 +62,7 @@ import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.view.ComboLineColumnChartView;
+import lecho.lib.hellocharts.view.PieChartView;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.report.AbstractReport;
 import org.juanro.autumandu.data.report.AbstractReportChartColumnData;
@@ -91,6 +92,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
     private class ReportHolder extends RecyclerView.ViewHolder {
         private final TextView txtTitle;
         private final ComboLineColumnChartView chart;
+        private final PieChartView chartPie;
         private final View chartNotEnoughData;
         private final ViewGroup details;
 
@@ -113,6 +115,10 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             chart.setValueTouchEnabled(false);
             chart.setOnClickListener(v -> showFullScreenChart(report, chart));
 
+            chartPie = itemView.findViewById(R.id.chart_pie);
+            chartPie.setChartRotationEnabled(true);
+            chartPie.setValueTouchEnabled(true);
+
             chartNotEnoughData = itemView.findViewById(R.id.chart_not_enough_data);
 
             details = itemView.findViewById(R.id.details);
@@ -126,6 +132,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             new Thread(() -> {
                 var options = loadReportChartOptions(itemView.getContext(), report);
                 var data = report.getChartData(options);
+                var pieData = report.getPieChartData();
                 var reportData = report.getData(true);
 
                 itemView.post(() -> {
@@ -133,12 +140,23 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                         return;
                     }
 
-                    chart.setComboLineColumnChartData(data);
-                    applyViewport(chart, true);
+                    boolean enoughData;
+                    if (pieData != null) {
+                        chartPie.setPieChartData(pieData);
+                        chartPie.setVisibility(View.VISIBLE);
+                        chart.setVisibility(View.GONE);
+                        enoughData = !pieData.getValues().isEmpty();
+                    } else {
+                        chart.setComboLineColumnChartData(data);
+                        applyViewport(chart, true);
+                        chartPie.setVisibility(View.GONE);
+                        chart.setVisibility(View.VISIBLE);
+                        enoughData = data != null && (!data.getLineChartData().getLines().isEmpty() ||
+                                !data.getColumnChartData().getColumns().isEmpty());
+                    }
 
-                    var enoughData = data != null && (!data.getLineChartData().getLines().isEmpty() ||
-                            !data.getColumnChartData().getColumns().isEmpty());
-                    chart.setVisibility(enoughData ? View.VISIBLE : View.GONE);
+                    chart.setVisibility(enoughData && pieData == null ? View.VISIBLE : View.GONE);
+                    chartPie.setVisibility(enoughData && pieData != null ? View.VISIBLE : View.GONE);
                     chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
 
                     details.removeAllViews();

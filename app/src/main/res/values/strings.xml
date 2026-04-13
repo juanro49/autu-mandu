@@ -186,6 +186,14 @@
     <string name="report_title_fuel_price">Fuel price</string>
     <string name="report_title_mileage">Mileage</string>
     <string name="report_title_costs">Costs</string>
+    <string name="report_title_overall_costs">Overall costs</string>
+    <string name="report_overall_costs_fuel">Fuel</string>
+    <string name="report_overall_costs_bills">Bills</string>
+    <string name="report_overall_costs_tires">Tires</string>
+    <string name="report_overall_costs_investment">Investment</string>
+    <string name="report_overall_costs_income">Income</string>
+    <string name="report_recorded_mileage">Recorded mileage</string>
+    <string name="report_total_volume">Total volume</string>
     <string name="report_trend_label">%s (Trend)</string>
     <string name="report_overall_trend_label">%s (Overall trend)</string>
     <string name="report_graph_month_history">Month History</string>
@@ -205,6 +213,7 @@
     <string name="report_toast_fuel_consumption">%1$s: %2$.2f %3$s of %4$s on %5$s</string>
     <string name="report_toast_fuel_price">%1$.3f %2$s for %3$s on %4$s</string>
     <string name="report_toast_mileage">"%1$s: %2$d %3$s on %4$s"</string>
+    <string name="report_total_mileage">Total mileage</string>
     <string name="report_toast_mileage_month">"%1$s: %2$.0f %3$s in %4$s"</string>
     <string name="report_toast_costs">%1$s: %2$.0f %3$s in %4$s</string>
     <string name="report_toast_guessed">Guessed to balance missing refuelings.</string>

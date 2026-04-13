@@ -182,6 +182,14 @@ public class FuelConsumptionReport extends AbstractReport {
                 section.addItem(new Item(mContext.getString(R.string.report_average), String.format(Locale.getDefault(),
                         "%.2f %s", carData.getAverageConsumption(), mUnit)));
 
+                // Total volume metric
+                float totalVolume = 0;
+                for (BalancedRefueling refueling : balancedRefuelings) {
+                    totalVolume += refueling.getVolume();
+                }
+                section.addItem(new Item(mContext.getString(R.string.report_total_volume),
+                        String.format(Locale.getDefault(), "%.2f %s", totalVolume, prefsForGuess.getUnitVolume())));
+
                 sectionAdded = true;
             }
 

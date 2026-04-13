@@ -249,14 +249,6 @@ public class PreferencesRemindersFragment extends ListFragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getParentFragmentManager().setFragmentResultListener(MessageDialogFragment.REQUEST_KEY, this, (requestKey, bundle) -> {
-            var action = bundle.getInt(MessageDialogFragment.RESULT_ACTION);
-            var requestCode = bundle.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
-            if (action == MessageDialogFragment.ACTION_POSITIVE && requestCode == REQUEST_DELETE) {
-                onDialogPositiveClick();
-            }
-        });
     }
 
     @Override
@@ -273,6 +265,15 @@ public class PreferencesRemindersFragment extends ListFragment implements
         setListAdapter(reminderAdapter);
 
         viewModel.getReminders().observe(getViewLifecycleOwner(), reminders -> reminderAdapter.setItems(reminders));
+
+        getParentFragmentManager().setFragmentResultListener(
+                MessageDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
+                    int requestCode = result.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
+                    int action = result.getInt(MessageDialogFragment.RESULT_ACTION);
+                    if (requestCode == REQUEST_DELETE && action == MessageDialogFragment.ACTION_POSITIVE) {
+                        onDialogPositiveClick();
+                    }
+                });
     }
 
     @Override

@@ -265,6 +265,24 @@ public class MileageReport extends AbstractReport {
             if (!carDataPerMonth.isEmpty()) {
                 reportDataPerMonth.add(carDataPerMonth);
             }
+
+            // Odometer and Recorded distance stats
+            int latestMileage = db.getCarDao().getLatestMileage(carId);
+            Integer earliestMileage = db.getCarDao().getEarliestMileage(carId);
+            int recordedMileage = earliestMileage != null ? latestMileage - earliestMileage : 0;
+
+            Section section;
+            if (car.getSuspendedSince() != null) {
+                section = addDataSection(String.format("%s [%s]", car.getName(),
+                        mContext.getString(R.string.suspended)), car.getColor(), 1);
+            } else {
+                section = addDataSection(car.getName(), car.getColor());
+            }
+
+            section.addItem(new Item(mContext.getString(R.string.report_total_mileage),
+                    String.format(Locale.getDefault(), "%d %s", latestMileage, mUnit)));
+            section.addItem(new Item(mContext.getString(R.string.report_recorded_mileage),
+                    String.format(Locale.getDefault(), "%d %s", recordedMileage, mUnit)));
         }
     }
 }

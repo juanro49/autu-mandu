@@ -174,19 +174,6 @@ public class PreferencesStationsFragment extends ListFragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Registro de listener para MessageDialogFragment y EditStationDialogFragment
-        getParentFragmentManager().setFragmentResultListener(MessageDialogFragment.REQUEST_KEY, this, (requestKey, bundle) -> {
-            if (bundle.getInt(MessageDialogFragment.RESULT_ACTION) == MessageDialogFragment.ACTION_POSITIVE) {
-                onDialogPositiveClick(bundle.getInt(MessageDialogFragment.RESULT_REQUEST_CODE));
-            }
-        });
-
-        getParentFragmentManager().setFragmentResultListener(EditStationDialogFragment.REQUEST_KEY, this, (requestKey, bundle) -> {
-            if (bundle.getInt(EditStationDialogFragment.RESULT_ACTION) == EditStationDialogFragment.ACTION_POSITIVE) {
-                onDialogPositiveClick(bundle.getInt(EditStationDialogFragment.RESULT_REQUEST_CODE));
-            }
-        });
     }
 
     @Override
@@ -203,6 +190,21 @@ public class PreferencesStationsFragment extends ListFragment implements
         setListAdapter(mListAdapter);
 
         mViewModel.getStations().observe(getViewLifecycleOwner(), stations -> mListAdapter.setStations(stations));
+
+        getParentFragmentManager().setFragmentResultListener(
+                MessageDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
+                    int requestCode = result.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
+                    int action = result.getInt(MessageDialogFragment.RESULT_ACTION);
+                    if (requestCode == REQUEST_DELETE && action == MessageDialogFragment.ACTION_POSITIVE) {
+                        onDialogPositiveClick(requestCode);
+                    }
+                });
+
+        getParentFragmentManager().setFragmentResultListener(EditStationDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, bundle) -> {
+            if (bundle.getInt(EditStationDialogFragment.RESULT_ACTION) == EditStationDialogFragment.ACTION_POSITIVE) {
+                onDialogPositiveClick(bundle.getInt(EditStationDialogFragment.RESULT_REQUEST_CODE));
+            }
+        });
     }
 
     @Override

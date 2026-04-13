@@ -179,6 +179,14 @@
     <string name="report_title_fuel_price">Precio de combustible</string>
     <string name="report_title_mileage">Kilometraje</string>
     <string name="report_title_costs">Gastos</string>
+    <string name="report_title_overall_costs">Gastos generales</string>
+    <string name="report_overall_costs_fuel">Combustible</string>
+    <string name="report_overall_costs_bills">Facturas</string>
+    <string name="report_overall_costs_tires">Neumáticos</string>
+    <string name="report_overall_costs_investment">Inversión</string>
+    <string name="report_overall_costs_income">Ingresos</string>
+    <string name="report_recorded_mileage">Kilometraje registrado</string>
+    <string name="report_total_volume">Volumen total</string>
     <string name="report_trend_label">%s (Tendencia)</string>
     <string name="report_overall_trend_label">%s (Tendencia general)</string>
     <string name="report_graph_month_history">Historial Mensual</string>
@@ -197,6 +205,7 @@
     <string name="report_toast_fuel_consumption">%1$s: %2$.2f %3$s de %4$s el %5$s</string>
     <string name="report_toast_fuel_price">%1$.3f %2$s por %3$s el %4$s</string>
     <string name="report_toast_mileage">"%1$s: %2$d %3$s el %4$s"</string>
+    <string name="report_total_mileage">Kilometraje total</string>
     <string name="report_toast_mileage_month">"%1$s: %2$.0f %3$s en %4$s"</string>
     <string name="report_toast_costs">%1$s: %2$.0f %3$s en %4$s</string>
     <string name="report_toast_guessed">Estimado para compensar recargas sin registro.</string>

@@ -37,6 +37,7 @@ import org.juanro.autumandu.data.report.CostsReport;
 import org.juanro.autumandu.data.report.FuelConsumptionReport;
 import org.juanro.autumandu.data.report.FuelPriceReport;
 import org.juanro.autumandu.data.report.MileageReport;
+import org.juanro.autumandu.data.report.OverallCostsReport;
 import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
 import org.juanro.autumandu.util.TimeSpan;
 
@@ -116,7 +117,8 @@ public class Preferences {
                     FuelConsumptionReport.class,
                     FuelPriceReport.class,
                     MileageReport.class,
-                    CostsReport.class
+                    CostsReport.class,
+                    OverallCostsReport.class
             ));
         }
 

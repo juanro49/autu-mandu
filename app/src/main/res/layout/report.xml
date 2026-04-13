@@ -84,6 +84,13 @@
                     android:layout_height="220dp"
                     android:layout_margin="8dp"/>
 
+                <lecho.lib.hellocharts.view.PieChartView
+                    android:id="@+id/chart_pie"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:layout_margin="8dp"
+                    android:visibility="gone"/>
+
                 <include
                     android:id="@+id/chart_not_enough_data"
                     layout="@layout/report_not_enough_data"

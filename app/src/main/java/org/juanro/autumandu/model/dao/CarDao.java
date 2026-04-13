@@ -65,6 +65,15 @@ public interface CarDao {
             ")")
     int getLatestMileage(long carId);
 
+    @Query("SELECT MIN(mileage) FROM (" +
+            "SELECT initial_mileage AS mileage FROM car WHERE _id = :carId " +
+            "UNION SELECT mileage FROM refueling WHERE car_id = :carId AND mileage > 0 " +
+            "UNION SELECT mileage FROM other_cost WHERE car_id = :carId AND mileage > 0 " +
+            "UNION SELECT distance_mount FROM tire_usage tu JOIN tire_list tl ON tu.tire_id = tl._id WHERE tl.car_id = :carId AND distance_mount > 0 " +
+            "UNION SELECT distance_umount FROM tire_usage tu JOIN tire_list tl ON tu.tire_id = tl._id WHERE tl.car_id = :carId AND distance_umount > 0" +
+            ")")
+    Integer getEarliestMileage(long carId);
+
     @Query("SELECT MAX(mileage) FROM (" +
             "SELECT initial_mileage AS mileage FROM car WHERE _id = :carId " +
             "UNION SELECT mileage FROM refueling WHERE car_id = :carId " +

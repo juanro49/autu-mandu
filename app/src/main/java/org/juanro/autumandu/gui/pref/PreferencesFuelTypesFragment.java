@@ -182,19 +182,6 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Registro de listener para MessageDialogFragment y EditFuelTypeDialogFragment
-        getParentFragmentManager().setFragmentResultListener(MessageDialogFragment.REQUEST_KEY, this, (requestKey, bundle) -> {
-            if (bundle.getInt(MessageDialogFragment.RESULT_ACTION) == MessageDialogFragment.ACTION_POSITIVE) {
-                onDialogPositiveClick(bundle.getInt(MessageDialogFragment.RESULT_REQUEST_CODE));
-            }
-        });
-
-        getParentFragmentManager().setFragmentResultListener(EditFuelTypeDialogFragment.REQUEST_KEY, this, (requestKey, bundle) -> {
-            if (bundle.getInt(EditFuelTypeDialogFragment.RESULT_ACTION) == EditFuelTypeDialogFragment.ACTION_POSITIVE) {
-                onDialogPositiveClick(bundle.getInt(EditFuelTypeDialogFragment.RESULT_REQUEST_CODE));
-            }
-        });
     }
 
     @Override
@@ -211,6 +198,21 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
         setListAdapter(mListAdapter);
 
         mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), fuelTypes -> mListAdapter.setFuelTypes(fuelTypes));
+
+        getParentFragmentManager().setFragmentResultListener(
+                MessageDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
+                    int requestCode = result.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
+                    int action = result.getInt(MessageDialogFragment.RESULT_ACTION);
+                    if (requestCode == REQUEST_DELETE && action == MessageDialogFragment.ACTION_POSITIVE) {
+                        onDialogPositiveClick(requestCode);
+                    }
+                });
+
+        getParentFragmentManager().setFragmentResultListener(EditFuelTypeDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, bundle) -> {
+            if (bundle.getInt(EditFuelTypeDialogFragment.RESULT_ACTION) == EditFuelTypeDialogFragment.ACTION_POSITIVE) {
+                onDialogPositiveClick(bundle.getInt(EditFuelTypeDialogFragment.RESULT_REQUEST_CODE));
+            }
+        });
     }
 
     @Override
