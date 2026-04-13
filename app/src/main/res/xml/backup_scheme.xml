@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 <full-backup-content>
-    <include domain="database" path="data.db"/>
-    <include domain="sharedpref" path="org.juanro.autumandu_preferences.xml"/>
-    <include domain="sharedpref" path="org.juanro.autumandu.gui.ReportFragment.xml"/>
+    <!-- Incluir todas las bases de datos (Android 6.0 a 11) -->
+    <include domain="database" path="."/>
+    <!-- Incluir todas las preferencias compartidas -->
+    <include domain="sharedpref" path="."/>
 </full-backup-content>

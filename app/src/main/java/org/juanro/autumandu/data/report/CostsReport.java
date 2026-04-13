@@ -250,20 +250,7 @@ public class CostsReport extends AbstractReport {
                             otherCost.getRecurrenceMultiplier(),
                             otherCost.getDate());
 
-                    // Calculamos recurrencias desde el inicio del gasto hasta ahora,
-                    // y le restamos las que hubo antes de que empezara el "último año".
-                    int totalRecurrences = Recurrences.getRecurrencesSince(
-                            otherCost.getRecurrenceInterval(),
-                            otherCost.getRecurrenceMultiplier(),
-                            otherCost.getDate());
-                    int recurrencesBeforeLastYear = Recurrences.getRecurrencesSince(
-                            otherCost.getRecurrenceInterval(),
-                            otherCost.getRecurrenceMultiplier(),
-                            otherCost.getDate(),
-                            lastYearDate.toDate());
-
                     // Si el gasto empezó hace menos de un año, recurrencesBeforeLastYear será 0 o similar
-                    // Depende de la implementación de Recurrences, pero lo más fiable es:
                     // Vamos a simplificarlo a lo que Recurrences espera:
                     recurrencesInLastYear = Recurrences.getRecurrencesBetween(
                             otherCost.getRecurrenceInterval(),

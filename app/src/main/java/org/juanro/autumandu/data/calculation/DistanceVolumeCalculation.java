@@ -21,6 +21,7 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -86,7 +87,7 @@ public class DistanceVolumeCalculation extends AbstractCalculation {
         Map<Long, List<RefuelingWithDetails>> refuelingsByCar = allRefuelings.stream()
                 .collect(Collectors.groupingBy(RefuelingWithDetails::carId));
         Map<Long, String> fuelTypeToCategory = db.getFuelTypeDao().getAll().stream()
-                .collect(Collectors.toMap(FuelType::getId, FuelType::getCategory, (existing, replacement) -> existing));
+                .collect(Collectors.toMap(FuelType::getId, ft -> Objects.toString(ft.getCategory(), ""), (existing, replacement) -> existing));
 
         for (Car car : cars) {
             List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(car.getId());

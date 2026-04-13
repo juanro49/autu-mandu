@@ -39,7 +39,6 @@ import org.juanro.autumandu.gui.dialog.EditStationDialogFragment;
 import org.juanro.autumandu.gui.dialog.MessageDialogFragment;
 import org.juanro.autumandu.gui.util.AbstractPreferenceActivity;
 import org.juanro.autumandu.model.dto.StationWithVolume;
-import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.viewmodel.StationsViewModel;
 
 import java.util.ArrayList;

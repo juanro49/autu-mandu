@@ -132,7 +132,7 @@ public class BalancedRefueling {
             return refuelings;
         }
 
-        // Validate mileages (from v2)
+        // Validate mileages
         boolean allValid = areRefuelingsValid(refuelings);
 
         // Guess missing refuelings if requested and all current refuelings have valid mileages.

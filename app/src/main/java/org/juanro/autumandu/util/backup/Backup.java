@@ -20,7 +20,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
-import android.provider.DocumentsContract;
 import android.util.Log;
 
 import androidx.documentfile.provider.DocumentFile;
@@ -30,12 +29,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.juanro.autumandu.Application;
 import org.juanro.autumandu.Preferences;
@@ -54,6 +53,7 @@ public class Backup {
     private final Preferences prefs;
     private final ContentResolver resolver;
     private final Context mContext;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
     public Backup(Context context) {
         this.prefs = new Preferences(context);
@@ -89,35 +89,40 @@ public class Backup {
     public Boolean autoBackup() {
         if (backupFileExists() || !prefs.getAutoBackupEnabled()) {
             return null;
-        } else {
-            boolean rtn = backup(false);
-            if (rtn) {
-                DocumentFile backupDir = getBackupDir();
-                if (backupDir != null) {
-                    DocumentFile[] allFiles = backupDir.listFiles();
-                    ArrayList<String> backupFiles = new ArrayList<>();
+        }
 
-                    for (final DocumentFile file : allFiles) {
-                        String name = file.getName();
-                        if (name != null && name.matches("cr-[0-9]+-[0-9]+-[0-9]+\\.db")) {
-                            backupFiles.add(name);
-                        }
+        boolean success = backup(false);
+        if (success) {
+            DocumentFile backupDir = getBackupDir();
+            if (backupDir != null) {
+                DocumentFile[] allFiles = backupDir.listFiles();
+
+                // Filtrar archivos que coinciden con el patrón cr-yyyy-MM-dd.db
+                List<DocumentFile> backupFiles = new ArrayList<>();
+                for (DocumentFile file : allFiles) {
+                    String name = file.getName();
+                    if (name != null && name.matches("cr-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.db")) {
+                        backupFiles.add(file);
                     }
+                }
 
-                    Object[] filesArray = backupFiles.toArray();
-                    Arrays.sort(filesArray);
+                // Ordenar por nombre (que al ser yyyy-MM-dd coincide con fecha)
+                backupFiles.sort((f1, f2) -> {
+                    String n1 = Objects.toString(f1.getName(), "");
+                    String n2 = Objects.toString(f2.getName(), "");
+                    return n1.compareTo(n2);
+                });
 
-                    for (int deletionIndex = backupFiles.size() - prefs.getAutoBackupRetention() - 1;
-                         deletionIndex >= 0; deletionIndex--) {
-                        DocumentFile fileToDelete = backupDir.findFile((String) filesArray[deletionIndex]);
-                        if (fileToDelete != null) {
-                            fileToDelete.delete();
-                        }
+                // Borrar los más antiguos si superan la retención
+                int retention = prefs.getAutoBackupRetention();
+                if (backupFiles.size() > retention) {
+                    for (int i = 0; i < backupFiles.size() - retention; i++) {
+                        backupFiles.get(i).delete();
                     }
                 }
             }
-            return rtn;
         }
+        return success;
     }
 
     /**
@@ -128,8 +133,7 @@ public class Backup {
         // Crucial for Room: Close all connections to flush WAL/SHM files to the main DB file.
         Application.closeDatabases();
 
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String fileName = "cr-" + df.format(new Date()) + ".db";
+        String fileName = "cr-" + dateFormat.format(new Date()) + ".db";
         DocumentFile backupDir = getBackupDir();
 
         if (backupDir == null) return false;
@@ -150,6 +154,10 @@ public class Backup {
         }
 
         try (ParcelFileDescriptor pfd = resolver.openFileDescriptor(backupFile.getUri(), "w")) {
+            if (pfd == null) {
+                Log.e(TAG, "Could not open ParcelFileDescriptor for " + backupFile.getUri());
+                return false;
+            }
             return FileCopyUtil.copyFile(dbFile, pfd);
         } catch (IOException e) {
             Log.e(TAG, "Backup error: " + e.getMessage());
@@ -158,11 +166,11 @@ public class Backup {
     }
 
     public boolean backupFileExists() {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         DocumentFile backupDir = getBackupDir();
         if (backupDir == null) return false;
 
-        DocumentFile file = backupDir.findFile("cr-" + df.format(new Date()) + ".db");
+        String fileName = "cr-" + dateFormat.format(new Date()) + ".db";
+        DocumentFile file = backupDir.findFile(fileName);
         return file != null && file.isFile();
     }
 
@@ -180,14 +188,14 @@ public class Backup {
             try (InputStream backupSource = resolver.openInputStream(backup);
                  OutputStream backupTarget = new FileOutputStream(dbFile)) {
 
-                if (FileCopyUtil.copyFile(backupSource, backupTarget)) {
+                if (backupSource != null && FileCopyUtil.copyFile(backupSource, backupTarget)) {
                     if (checkBackupSanity()) {
                         return true;
                     } else {
                         throw new IOException("Backup is insane.");
                     }
                 }
-                throw new IOException("Copying failed.");
+                throw new IOException("Copying failed or backup source is null.");
             } catch (IOException e) {
                 Log.w(TAG, "Need to restore internally, got Exception.", e);
                 FileCopyUtil.copyFile(internalBackupFile, dbFile);

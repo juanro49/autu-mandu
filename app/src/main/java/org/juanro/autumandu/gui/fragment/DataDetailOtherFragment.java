@@ -78,7 +78,6 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
     private SimpleAnimator chkEndDateAnimator;
     private SimpleAnimator edtEndDateAnimator;
     private DateTimeInput edtEndDate;
-    private TextInputLayout edtEndDateInputLayout;
     private EditText edtNote;
     private Spinner spnCar;
 
@@ -204,7 +203,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         chkEndDate = v.findViewById(R.id.chk_end_date);
         chkEndDateAnimator = new SimpleAnimator(getActivity(), chkEndDate, SimpleAnimator.Property.Height);
         edtEndDate = new DateTimeInput(v.findViewById(R.id.edt_end_date), DateTimeInput.Mode.DATE);
-        edtEndDateInputLayout = v.findViewById(R.id.edt_end_date_input_layout);
+        TextInputLayout edtEndDateInputLayout = v.findViewById(R.id.edt_end_date_input_layout);
         edtEndDateAnimator = new SimpleAnimator(getActivity(), edtEndDateInputLayout, SimpleAnimator.Property.Height);
         edtNote = v.findViewById(R.id.edt_note);
         spnCar = v.findViewById(R.id.spn_car);

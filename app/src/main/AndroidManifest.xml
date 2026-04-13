@@ -19,9 +19,8 @@
           xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Purpose: backup/restore, CSV export/import -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
 
     <!-- Purpose: sync -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="22" />
@@ -29,11 +28,8 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- Purpose: notifications (Android 13+) -->
+    <!-- Purpose: reminders notifications (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
-    <!-- Purpose: setup reminder service, so reminders work after reboot -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name="Application"
@@ -43,7 +39,10 @@
         android:theme="@style/AppTheme"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_scheme"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:localeConfig="@xml/locales_config"
         android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
 
@@ -64,10 +63,24 @@
             android:name=".gui.pref.PreferencesActivity"
             android:label="@string/title_settings"
             android:parentActivityName=".gui.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".gui.MainActivity"/>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="text/csv" />
+                <data android:mimeType="text/comma-separated-values" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.db" />
+                <data android:pathPattern=".*\\.csv" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".gui.HelpActivity"
@@ -102,14 +115,5 @@
             android:name=".util.reminder.ReminderActionReceiver"
             android:exported="false"/>
 
-        <receiver android:name=".util.reminder.ReminderEnablerReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
-
-        <!-- For 2018-style testing !-->
-        <uses-library android:name="android.test.runner" android:required="false" />
     </application>
 </manifest>

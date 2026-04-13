@@ -16,6 +16,8 @@
 
 package org.juanro.autumandu.gui.pref;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -38,8 +40,24 @@ public class PreferencesActivity extends AbstractPreferenceActivity implements
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {
-            String fragmentClassName = getIntent().getStringExtra(EXTRA_SHOW_FRAGMENT);
-            int titleRes = getIntent().getIntExtra(EXTRA_SHOW_FRAGMENT_TITLE, 0);
+            Intent intent = getIntent();
+            String fragmentClassName = intent.getStringExtra(EXTRA_SHOW_FRAGMENT);
+            int titleRes = intent.getIntExtra(EXTRA_SHOW_FRAGMENT_TITLE, 0);
+            Uri csvUri = null;
+            Uri dbUri = null;
+
+            // Check if we were started to view a file
+            if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
+                fragmentClassName = PreferencesBackupFragment.class.getName();
+                titleRes = R.string.pref_title_backup;
+                Uri dataUri = intent.getData();
+                String path = dataUri.getPath();
+                if (path != null && path.endsWith(".db")) {
+                    dbUri = dataUri;
+                } else {
+                    csvUri = dataUri;
+                }
+            }
 
             Fragment fragment;
             if (fragmentClassName != null) {
@@ -47,6 +65,15 @@ public class PreferencesActivity extends AbstractPreferenceActivity implements
                         getClassLoader(), fragmentClassName);
                 if (titleRes != 0) {
                     setTitle(titleRes);
+                }
+                if (csvUri != null) {
+                    Bundle args = new Bundle();
+                    args.putParcelable(PreferencesBackupFragment.EXTRA_IMPORT_CSV_URI, csvUri);
+                    fragment.setArguments(args);
+                } else if (dbUri != null) {
+                    Bundle args = new Bundle();
+                    args.putParcelable(PreferencesBackupFragment.EXTRA_RESTORE_DB_URI, dbUri);
+                    fragment.setArguments(args);
                 }
             } else {
                 fragment = new PreferencesHeadersFragment();

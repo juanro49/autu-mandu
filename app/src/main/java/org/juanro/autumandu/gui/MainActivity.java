@@ -437,7 +437,9 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             AbstractSyncProvider syncProvider = SyncProviders.getSyncProviderByAccount(this, account);
             topImage.setVisibility(View.VISIBLE);
-            topImage.setImageResource(syncProvider.getIcon());
+            if (syncProvider != null) {
+                topImage.setImageResource(syncProvider.getIcon());
+            }
             topText.setVisibility(View.VISIBLE);
             topText.setText(account.name);
         }
@@ -551,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements
         Preferences prefs = new Preferences(this);
         // Usamos observeForever y removeObserver para asegurar que el clic sea una acción única
         // y no acumule observadores que disparen múltiples diálogos.
-        androidx.lifecycle.Observer<List<Car>> observer = new androidx.lifecycle.Observer<List<Car>>() {
+        androidx.lifecycle.Observer<List<Car>> observer = new androidx.lifecycle.Observer<>() {
             @Override
             public void onChanged(List<Car> cars) {
                 mViewModel.getNotSuspendedCars().removeObserver(this);

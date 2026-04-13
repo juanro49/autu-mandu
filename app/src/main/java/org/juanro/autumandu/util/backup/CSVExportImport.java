@@ -32,7 +32,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.concurrent.Semaphore;
-import org.juanro.autumandu.Application;
+
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelType;

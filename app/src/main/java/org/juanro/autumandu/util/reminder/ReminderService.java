@@ -35,7 +35,6 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
@@ -45,7 +44,6 @@ import org.juanro.autumandu.gui.pref.PreferencesActivity;
 import org.juanro.autumandu.gui.pref.PreferencesRemindersFragment;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.dto.ReminderWithCar;
-import org.juanro.autumandu.model.entity.Reminder;
 import org.juanro.autumandu.util.MileageUtil;
 
 /**

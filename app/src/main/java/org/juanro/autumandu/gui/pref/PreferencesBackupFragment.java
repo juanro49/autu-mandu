@@ -54,6 +54,9 @@ import java.io.IOException;
 public class PreferencesBackupFragment extends PreferenceFragmentCompat {
     private static final String TAG = "PreferencesBackupFragme";
 
+    public static final String EXTRA_IMPORT_CSV_URI = "import_csv_uri";
+    public static final String EXTRA_RESTORE_DB_URI = "restore_db_uri";
+
     private static final int REQUEST_BACKUP_OVERWRITE = 12;
     private static final int REQUEST_RESTORE = 13;
     private static final int REQUEST_EXPORT_CSV_OVERWRITE = 14;
@@ -194,6 +197,34 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
                 onDialogPositiveClick(requestCode);
             }
         });
+
+        // Handle CSV import from Intent
+        if (getArguments() != null && getArguments().containsKey(EXTRA_IMPORT_CSV_URI)) {
+            Uri csvUri = getArguments().getParcelable(EXTRA_IMPORT_CSV_URI);
+            if (csvUri != null) {
+                // Clear the argument so it doesn't trigger again on rotation
+                getArguments().remove(EXTRA_IMPORT_CSV_URI);
+
+                // Show a specific warning for external CSV files
+                MessageDialogFragment.newInstance(0, R.string.alert_import_csv_title,
+                        getString(R.string.alert_import_csv_message) + "\n\n" +
+                        getString(R.string.pref_summary_import_csv_no_data, CSVExportImport.DIRECTORY),
+                        android.R.string.ok, null).show(
+                        getParentFragmentManager(), null);
+            }
+        }
+
+        // Handle DB restore from Intent
+        if (getArguments() != null && getArguments().containsKey(EXTRA_RESTORE_DB_URI)) {
+            Uri dbUri = getArguments().getParcelable(EXTRA_RESTORE_DB_URI);
+            if (dbUri != null) {
+                // Clear the argument so it doesn't trigger again on rotation
+                getArguments().remove(EXTRA_RESTORE_DB_URI);
+
+                // Trigger restore directly (doRestoreFinal already handles the UI and safety)
+                doRestoreFinal(dbUri);
+            }
+        }
     }
 
     private void onDialogPositiveClick(int requestCode) {
