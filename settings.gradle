@@ -5,13 +5,16 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        // JitPack solo para librerías de GitHub (hellocharts, fab, etc.)
+        // JitPack solo para librerías de GitHub (fab, etc.)
         maven { url "https://jitpack.io" }
     }
 }

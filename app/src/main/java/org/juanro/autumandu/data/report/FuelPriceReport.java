@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lecho.lib.hellocharts.util.ChartUtils;
+import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.AutuManduDatabase;
@@ -93,12 +93,12 @@ public class FuelPriceReport extends AbstractReport {
     }
 
     @Override
-    protected String formatXValue(float value, int chartOption) {
+    public String formatXValue(float value, int chartOption) {
         return mDateFormat.format(ReportDateHelper.toDate(value));
     }
 
     @Override
-    protected String formatYValue(float value, int chartOption) {
+    public String formatYValue(float value, int chartOption) {
         return String.format(Locale.getDefault(), "%.3f", value);
     }
 
@@ -113,7 +113,7 @@ public class FuelPriceReport extends AbstractReport {
     }
 
     @Override
-    protected List<AbstractReportChartData> getRawChartData(int chartOption) {
+    public List<AbstractReportChartData> getRawChartData(int chartOption) {
         return mReportChartData;
     }
 
@@ -131,7 +131,7 @@ public class FuelPriceReport extends AbstractReport {
         Map<Long, List<Refueling>> refuelingsByFuelType = db.getRefuelingDao().getAll()
                 .stream().collect(Collectors.groupingBy(Refueling::getFuelTypeId));
 
-        int[] colors = ChartUtils.COLORS;
+        int[] colors = KubitChartBridge.getColors(mContext);
         int currentColor = 0;
 
         for (FuelType fuelType : fuelTypes) {

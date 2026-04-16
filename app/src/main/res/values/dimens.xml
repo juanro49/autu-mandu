@@ -15,7 +15,59 @@
   ~ limitations under the License.
   -->
 <resources>
-
     <dimen name="fab_margin">16dp</dimen>
 
+    <!-- General Report Layout -->
+    <dimen name="report_card_padding">8dp</dimen>
+    <dimen name="report_chart_margin">8dp</dimen>
+    <dimen name="report_row_padding">4dp</dimen>
+    <dimen name="report_row_text_size_small">14sp</dimen>
+    <dimen name="report_row_section_margin_top">10dp</dimen>
+    <dimen name="report_row_section_text_size">12sp</dimen>
+    <dimen name="report_elevation">2dp</dimen>
+    <dimen name="min_touch_target_size">48dp</dimen>
+
+    <!-- Chart Dimensions -->
+    <dimen name="chart_height">220dp</dimen>
+    <dimen name="chart_canvas_height">205dp</dimen>
+    <dimen name="chart_axis_padding_start">25dp</dimen>
+    <dimen name="chart_axis_padding_bottom">15dp</dimen>
+    <dimen name="chart_label_padding">12dp</dimen>
+    <dimen name="chart_axis_label_width">20dp</dimen>
+    <dimen name="chart_axis_label_height">25dp</dimen>
+
+    <!-- Calculator Chart Specific -->
+    <dimen name="chart_calculator_x_step">100dp</dimen>
+    <dimen name="chart_calculator_axis_padding_start">55dp</dimen>
+    <dimen name="chart_calculator_label_width">55dp</dimen>
+    <dimen name="chart_calculator_label_height">45dp</dimen>
+
+    <!-- Calculator Layout -->
+    <dimen name="calculator_margin">16dp</dimen>
+    <dimen name="calculator_card_padding">8dp</dimen>
+    <dimen name="calculator_chart_card_padding">16dp</dimen>
+    <dimen name="calculator_input_height">48dp</dimen>
+    <dimen name="calculator_max_width">488dp</dimen>
+    <dimen name="calculator_unit_margin_end">8dp</dimen>
+    <dimen name="calculator_unit_text_size">16sp</dimen>
+
+    <!-- Pie/Donut Specific -->
+    <dimen name="chart_pie_size">130dp</dimen>
+    <dimen name="chart_donut_thickness">30dp</dimen>
+    <dimen name="chart_legend_dot_size">8dp</dimen>
+    <dimen name="chart_legend_dot_spacing">6dp</dimen>
+    <dimen name="chart_legend_row_spacing">4dp</dimen>
+    <dimen name="chart_legend_col_spacing">12dp</dimen>
+
+    <!-- Column Specific -->
+    <dimen name="chart_bar_thickness">36dp</dimen>
+    <dimen name="chart_column_x_step">48dp</dimen>
+    <dimen name="chart_selection_panel_height">32dp</dimen>
+
+    <!-- Line Specific -->
+    <dimen name="chart_line_point_radius">3.5dp</dimen>
+    <dimen name="chart_line_thickness">5.5dp</dimen>
+    <dimen name="chart_line_trend_thickness">3.5dp</dimen>
+    <dimen name="chart_line_popup_padding">10dp</dimen>
+    <dimen name="chart_line_x_step_base">1.8dp</dimen>
 </resources>

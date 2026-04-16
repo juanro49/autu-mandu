@@ -356,4 +356,12 @@
     </string>
     <string name="title_select_color">Select Color</string>
     <string name="validate_error_empty">Field cannot be empty</string>
+    <string name="report_chart_option_donut">Donut</string>
+    <string name="report_chart_option_pie">Pie</string>
+    <string name="chart_content_description_column">Stacked column chart</string>
+    <string name="chart_content_description_line">Trend line chart</string>
+    <string name="chart_content_description_pie">Pie chart</string>
+    <string name="chart_content_description_donut">Donut chart</string>
+    <string name="chart_content_description_segment">%1$s: %2$s</string>
+    <string name="chart_label_total">Total</string>
 </resources>

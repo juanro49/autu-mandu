@@ -35,14 +35,14 @@
             android:layout_height="match_parent"
             android:baselineAligned="false"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="@dimen/calculator_margin">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                app:cardBackgroundColor="#000"
-                app:contentPadding="8dp">
+                app:cardBackgroundColor="@color/black"
+                app:contentPadding="@dimen/calculator_card_padding">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -52,7 +52,8 @@
                     <Spinner
                         android:id="@+id/spn_options"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"/>
+                        android:layout_height="@dimen/calculator_input_height"
+                        android:contentDescription="@string/hint_volume"/>
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -61,8 +62,12 @@
                         <EditText
                             android:id="@+id/edt_input"
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:inputType="number">
+                            android:layout_height="@dimen/calculator_input_height"
+                            android:maxWidth="@dimen/calculator_max_width"
+                            android:layout_gravity="center_horizontal"
+                            android:inputType="number"
+                            android:hint="@string/hint_volume"
+                            android:autofillHints="none">
 
                             <requestFocus/>
                         </EditText>
@@ -72,9 +77,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="end|center_vertical"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginRight="8dp"
-                            android:textSize="16sp"/>
+                            android:layout_marginEnd="@dimen/calculator_unit_margin_end"
+                            android:textSize="@dimen/calculator_unit_text_size"/>
                     </FrameLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -83,14 +87,13 @@
                 android:id="@+id/chart_holder"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="@dimen/calculator_margin"
                 android:layout_weight="3"
-                app:cardBackgroundColor="#000"
-                app:contentPadding="16dp">
+                app:cardBackgroundColor="@color/black"
+                app:contentPadding="@dimen/calculator_chart_card_padding">
 
-                <lecho.lib.hellocharts.view.ColumnChartView
-                    android:id="@+id/chart"
+                <FrameLayout
+                    android:id="@+id/chart_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
             </androidx.cardview.widget.CardView>

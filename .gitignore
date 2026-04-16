@@ -7,3 +7,4 @@ build
 *.iws
 local.properties
 Thumbs.db
+.kotlin

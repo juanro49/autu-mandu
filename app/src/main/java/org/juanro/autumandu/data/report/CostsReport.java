@@ -67,20 +67,20 @@ public class CostsReport extends AbstractReport {
         }
 
         public void add(DateTime date, float costs) {
-            float dateValue;
+            float x;
             if (mOption == GRAPH_OPTION_MONTH) {
-                dateValue = date.getYear() * 100 + date.getMonthOfYear();
+                x = date.getYear() * 12 + date.getMonthOfYear() - 1;
             } else {
-                dateValue = date.getYear() * 100 + 1;
+                x = date.getYear();
             }
 
-            int index = indexOf(dateValue);
+            int index = indexOf(x);
             if (index == -1) {
-                add(dateValue, costs, makeTooltip(costs, dateValue));
+                add(x, costs, makeTooltip(costs, x));
             } else {
                 DataPoint dp = mDataPoints.get(index);
                 dp.y += costs;
-                dp.tooltip = makeTooltip(dp.y, dateValue);
+                dp.tooltip = makeTooltip(dp.y, x);
             }
         }
 
@@ -106,16 +106,24 @@ public class CostsReport extends AbstractReport {
     }
 
     @Override
-    protected String formatXValue(float value, int chartOption) {
-        int dateValue = (int) value;
-        int year = dateValue / 100;
-        int month = dateValue % 100;
-        DateTime date = new DateTime(year, month, 1, 0, 0);
-        return date.toString(mXLabelFormat[chartOption]);
+    public String formatXValue(float value, int chartOption) {
+        try {
+            if (chartOption == GRAPH_OPTION_MONTH) {
+                int dateValue = (int) value;
+                int year = dateValue / 12;
+                int month = (dateValue % 12) + 1;
+                DateTime date = new DateTime(year, month, 1, 0, 0);
+                return date.toString(mXLabelFormat[chartOption]);
+            } else {
+                return String.valueOf((int) value);
+            }
+        } catch (Exception e) {
+            return String.valueOf((int) value);
+        }
     }
 
     @Override
-    protected String formatYValue(float value, int chartOption) {
+    public String formatYValue(float value, int chartOption) {
         return String.format(Locale.getDefault(), "%.0f", value);
     }
 
@@ -133,7 +141,7 @@ public class CostsReport extends AbstractReport {
     }
 
     @Override
-    protected List<AbstractReportChartData> getRawChartData(int chartOption) {
+    public List<AbstractReportChartData> getRawChartData(int chartOption) {
         List<AbstractReportChartData> data = new ArrayList<>(mCostsPerMonth.size());
         for (ReportChartData carData : (chartOption == GRAPH_OPTION_MONTH ? mCostsPerMonth : mCostsPerYear).values()) {
             if (!carData.isEmpty()) {
@@ -150,7 +158,7 @@ public class CostsReport extends AbstractReport {
         mCostsPerMonth.clear();
         mCostsPerYear.clear();
 
-        // Settings, which are based on the screen size.
+        // Ajustes basados en el tamaño de la pantalla.
         String monthFormat = "MMM yyyy";
         String yearFormat = "yyyy";
         if (mContext.getResources().getConfiguration().smallestScreenWidthDp > 480) {
@@ -161,7 +169,7 @@ public class CostsReport extends AbstractReport {
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
 
-        // Bulk load all data to optimize performance (N+1 avoidance)
+        // Carga masiva de todos los datos para optimizar el rendimiento (evitar N+1)
         List<Car> cars = db.getCarDao().getAll();
         Map<Long, List<RefuelingWithDetails>> refuelingsByCar = db.getRefuelingDao().getAllWithDetails()
                 .stream().collect(Collectors.groupingBy(RefuelingWithDetails::carId));
@@ -195,7 +203,7 @@ public class CostsReport extends AbstractReport {
             DateTime startDate = new DateTime();
             DateTime endDate = (car.getSuspendedSince() != null) ? new DateTime(car.getSuspendedSince()) : new DateTime();
 
-            // Use balancer on pre-loaded refuelings
+            // Usar el balanceador en los repostajes precargados
             List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
             if (carRefuelings == null) carRefuelings = Collections.emptyList();
 
@@ -285,7 +293,7 @@ public class CostsReport extends AbstractReport {
                     monthReportData.add(date, otherCost.getPrice());
                     yearReportData.add(date, otherCost.getPrice());
                     switch (otherCost.getRecurrenceInterval()) {
-                        case ONCE -> date = DateTime.now().plusYears(100); // Terminate loop
+                        case ONCE -> date = DateTime.now().plusYears(100); // Terminar el bucle
                         case DAY -> date = date.plusDays(otherCost.getRecurrenceMultiplier());
                         case MONTH -> date = date.plusMonths(otherCost.getRecurrenceMultiplier());
                         case QUARTER -> date = date.plusMonths(otherCost.getRecurrenceMultiplier() * 3);
@@ -321,7 +329,7 @@ public class CostsReport extends AbstractReport {
                 }
             }
 
-            // Calculate averages
+            // Calcular promedios
             Seconds elapsedSeconds = Seconds.secondsBetween(startDate, endDate);
             double costsPerSecond = totalCosts / Math.max(1, elapsedSeconds.getSeconds());
 

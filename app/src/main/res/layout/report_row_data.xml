@@ -19,14 +19,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="4dp">
+    android:padding="@dimen/report_row_padding">
     <TextView
         android:id="@android:id/text1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="start"
-        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="@dimen/report_row_text_size_small"
         android:textAppearance="?android:attr/textAppearanceSmall"
         tools:text="Average"/>
     <TextView
@@ -35,7 +37,9 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:gravity="end"
-        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="@dimen/report_row_text_size_small"
         android:textAppearance="?android:attr/textAppearanceSmall"
         tools:text="7,23 l/100km"/>
 </LinearLayout>

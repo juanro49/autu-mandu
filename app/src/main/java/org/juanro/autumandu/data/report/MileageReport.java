@@ -97,7 +97,7 @@ public class MileageReport extends AbstractReport {
             for (BalancedRefueling refueling : refuelings) {
                 if (lastRefuelingMileage > -1) {
                     DateTime date = new DateTime(refueling.getDate());
-                    float x = date.getYear() * 100 + date.getMonthOfYear();
+                    float x = date.getYear() * 12 + date.getMonthOfYear() - 1;
                     float y = refueling.getMileage() - lastRefuelingMileage;
 
                     int xIndex = indexOf(x);
@@ -134,11 +134,11 @@ public class MileageReport extends AbstractReport {
     }
 
     @Override
-    protected String formatXValue(float value, int chartOption) {
+    public String formatXValue(float value, int chartOption) {
         if (chartOption == GRAPH_OPTION_PER_MONTH) {
             int dateValue = (int) value;
-            int year = dateValue / 100;
-            int month = dateValue % 100;
+            int year = dateValue / 12;
+            int month = (dateValue % 12) + 1;
             DateTime date = new DateTime(year, month, 1, 0, 0);
             return date.toString(mMonthLabelFormat);
         } else {
@@ -147,7 +147,7 @@ public class MileageReport extends AbstractReport {
     }
 
     @Override
-    protected String formatYValue(float value, int chartOption) {
+    public String formatYValue(float value, int chartOption) {
         int rounded = (int) (value + .5);
         if (rounded >= 1000) {
             return String.format(Locale.getDefault(), "%dk", rounded / 1000);
@@ -171,7 +171,7 @@ public class MileageReport extends AbstractReport {
     }
 
     @Override
-    protected List<AbstractReportChartData> getRawChartData(int chartOption) {
+    public List<AbstractReportChartData> getRawChartData(int chartOption) {
         if (chartOption == GRAPH_OPTION_ACCUMULATED) {
             return reportDataAccumulated;
         } else if (chartOption == GRAPH_OPTION_PER_REFUELING) {

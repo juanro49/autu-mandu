@@ -15,36 +15,40 @@
   limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:card_view="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card_view:cardBackgroundColor="#000">
+        app:cardBackgroundColor="@color/black">
 
         <FrameLayout
+            android:id="@+id/report_content_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp">
+            android:layout_height="wrap_content">
 
+            <!-- 'details' va primero para que 'main' se dibuje encima y lo oculte al colapsar -->
             <LinearLayout
                 android:id="@+id/details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-9999dp"
-                android:orientation="vertical"/>
+                android:background="@color/black"
+                android:orientation="vertical"
+                android:padding="@dimen/report_card_padding"
+                android:visibility="invisible" />
 
             <LinearLayout
                 android:id="@+id/main"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#000"
+                android:background="@color/black"
+                android:elevation="@dimen/report_elevation"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:padding="@dimen/report_card_padding">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -54,49 +58,54 @@
                     <TextView
                         android:id="@+id/txt_title"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="@dimen/min_touch_target_size"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
-                        android:singleLine="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:maxLines="1"
+                        android:ellipsize="end"
                         android:textAppearance="?android:attr/textAppearanceLarge"
-                        tools:text="John Doe"/>
+                        tools:text="Report Title" />
 
                     <ImageButton
                         android:id="@+id/btn_report_details"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="?android:attr/selectableItemBackground"
+                        style="@style/Widget.AppCompat.ImageButton"
+                        android:layout_width="@dimen/min_touch_target_size"
+                        android:layout_height="@dimen/min_touch_target_size"
+                        android:minWidth="@dimen/min_touch_target_size"
+                        android:minHeight="@dimen/min_touch_target_size"
+                        android:background="?attr/selectableItemBackground"
                         android:contentDescription="@string/graph_details_desc"
-                        android:src="@drawable/ic_info_24dp"/>
+                        android:src="@drawable/ic_info_24dp"
+                        app:tint="?android:attr/textColorPrimary" />
 
                     <ImageButton
                         android:id="@+id/btn_report_options"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="?android:attr/selectableItemBackground"
+                        style="@style/Widget.AppCompat.ImageButton"
+                        android:layout_width="@dimen/min_touch_target_size"
+                        android:layout_height="@dimen/min_touch_target_size"
+                        android:minWidth="@dimen/min_touch_target_size"
+                        android:minHeight="@dimen/min_touch_target_size"
+                        android:background="?attr/selectableItemBackground"
                         android:contentDescription="@string/graph_options_desc"
-                        android:src="@drawable/ic_more_vert_24dp"/>
+                        android:src="@drawable/ic_more_vert_24dp"
+                        app:tint="?android:attr/textColorPrimary" />
                 </LinearLayout>
 
-                <lecho.lib.hellocharts.view.ComboLineColumnChartView
-                    android:id="@+id/chart"
+                <FrameLayout
+                    android:id="@+id/chart_container"
                     android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:layout_margin="8dp"/>
-
-                <lecho.lib.hellocharts.view.PieChartView
-                    android:id="@+id/chart_pie"
-                    android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:layout_margin="8dp"
-                    android:visibility="gone"/>
+                    android:layout_height="@dimen/chart_height"
+                    android:layout_margin="@dimen/report_chart_margin" />
 
                 <include
                     android:id="@+id/chart_not_enough_data"
                     layout="@layout/report_not_enough_data"
                     android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:layout_margin="8dp"/>
+                    android:layout_height="@dimen/chart_height"
+                    android:layout_margin="@dimen/report_chart_margin" />
             </LinearLayout>
         </FrameLayout>
     </androidx.cardview.widget.CardView>

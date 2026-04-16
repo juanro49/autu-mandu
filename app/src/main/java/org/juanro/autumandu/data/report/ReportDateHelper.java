@@ -20,7 +20,7 @@ import java.util.Date;
 
 /**
  * Utility class to convert between {@link Date} and {@code float}.
- * The chart library (HelloCharts) supports only float values. In order to fit timestamps in the
+ * The chart library (Kubit) supports only float values. In order to fit timestamps in the
  * charts without losing too much precision, we convert the dates to a "days since base date" format.
  * 1. The integer part represents the days since the base date (usually the first record).
  * 2. The decimal part represents the time of day (fraction of 24h).
@@ -29,7 +29,7 @@ import java.util.Date;
  *
  * @see <a href="https://bitbucket.org/frigus02/car-report/issues/83">Issue #83 for more details</a>
  */
-class ReportDateHelper {
+public class ReportDateHelper {
     private static final float SECONDS_PER_DAY = 86400.0f;
     private static final float MILLIS_PER_SECOND = 1000.0f;
 
@@ -39,7 +39,7 @@ class ReportDateHelper {
      * Sets the base date to be used as Day 0 for all subsequent conversions.
      * @param baseDate The date that will represent 0.0f.
      */
-    static void setBaseDate(Date baseDate) {
+    public static void setBaseDate(Date baseDate) {
         mBaseTime = baseDate != null ? baseDate.getTime() : 0;
     }
 
@@ -49,7 +49,7 @@ class ReportDateHelper {
      * @param date The date to convert.
      * @return Float representation (days since base date).
      */
-    static float toFloat(@NonNull Date date) {
+    public static float toFloat(@NonNull Date date) {
         return ((date.getTime() - mBaseTime) / MILLIS_PER_SECOND) / SECONDS_PER_DAY;
     }
 
@@ -59,8 +59,7 @@ class ReportDateHelper {
      * @param date Float representation (days since base date).
      * @return The corresponding Date object.
      */
-    @NonNull
-    static Date toDate(float date) {
+    public static @NonNull Date toDate(float date) {
         return new Date((long) (date * SECONDS_PER_DAY * MILLIS_PER_SECOND) + mBaseTime);
     }
 }

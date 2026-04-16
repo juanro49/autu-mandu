@@ -27,29 +27,20 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.AxisValue;
-import lecho.lib.hellocharts.model.Column;
-import lecho.lib.hellocharts.model.ColumnChartData;
-import lecho.lib.hellocharts.model.SubcolumnValue;
-import lecho.lib.hellocharts.util.ChartUtils;
-import lecho.lib.hellocharts.view.ColumnChartView;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.calculation.AbstractCalculation;
 import org.juanro.autumandu.data.calculation.CalculationItem;
+import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
 import org.juanro.autumandu.viewmodel.CalculatorViewModel;
 
 public class CalculatorFragment extends Fragment {
@@ -59,7 +50,7 @@ public class CalculatorFragment extends Fragment {
     private EditText edtInput;
     private TextView txtUnit;
     private View chartHolder;
-    private ColumnChartView chart;
+    private FrameLayout chartContainer;
 
     private CalculatorViewModel viewModel;
     private AbstractCalculation selectedCalculation;
@@ -85,7 +76,7 @@ public class CalculatorFragment extends Fragment {
         edtInput = view.findViewById(R.id.edt_input);
         txtUnit = view.findViewById(R.id.txt_unit);
         chartHolder = view.findViewById(R.id.chart_holder);
-        chart = view.findViewById(R.id.chart);
+        chartContainer = view.findViewById(R.id.chart_container);
 
         var options = new ArrayAdapter<String>(requireActivity(),
                 android.R.layout.simple_spinner_dropdown_item);
@@ -125,8 +116,6 @@ public class CalculatorFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
-
-        chart.setInteractive(false);
 
         viewModel.getResults().observe(getViewLifecycleOwner(), this::updateChart);
     }
@@ -168,35 +157,11 @@ public class CalculatorFragment extends Fragment {
         }
 
         chartHolder.setVisibility(View.VISIBLE);
-        var columns = new ArrayList<Column>(items.length);
-        var axisValues = new ArrayList<AxisValue>(items.length);
-        var colors = ChartUtils.COLORS;
-        var colorIndex = -1;
-
-        for (var i = 0; i < items.length; i++) {
-            var value = (float) items[i].value();
-            var color = selectedCalculation.hasColors()
-                    ? items[i].color()
-                    : colors[++colorIndex % colors.length];
-            var label = String.format(Locale.getDefault(), "%.2f %s", value, selectedCalculation.getOutputUnit());
-
-            var subcolumnValues = new ArrayList<SubcolumnValue>(1);
-            subcolumnValues.add(new SubcolumnValue(value, color).setLabel(label));
-            columns.add(new Column(subcolumnValues).setHasLabels(true));
-
-            axisValues.add(new AxisValue(i).setLabel(items[i].name()));
-        }
-
-        var data = new ColumnChartData(columns);
-        data.setAxisXBottom(new Axis()
-                .setTextColor(ContextCompat.getColor(requireContext(), R.color.secondary_text))
-                .setValues(axisValues));
-        data.setAxisYLeft(new Axis()
-                .setLineColor(ContextCompat.getColor(requireContext(), R.color.divider))
-                .setTextColor(ContextCompat.getColor(requireContext(), R.color.secondary_text))
-                .setHasLines(true)
-                .setMaxLabelChars(4));
-
-        chart.setColumnChartData(data);
+        chartContainer.removeAllViews();
+        chartContainer.addView(KubitChartBridge.createCalculatorChart(
+                requireContext(),
+                items,
+                selectedCalculation.getOutputUnit()
+        ));
     }
 }

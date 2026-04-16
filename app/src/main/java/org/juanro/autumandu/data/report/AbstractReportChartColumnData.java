@@ -17,42 +17,8 @@ package org.juanro.autumandu.data.report;
 
 import android.content.Context;
 
-import lecho.lib.hellocharts.model.SubcolumnValue;
-
 public abstract class AbstractReportChartColumnData extends AbstractReportChartData {
-    public static class SubcolumnValueWithTooltip extends SubcolumnValue {
-        private String mTooltip;
-
-        public SubcolumnValueWithTooltip(float value, int color) {
-            super(value, color);
-        }
-
-        public String getTooltip() {
-            return mTooltip;
-        }
-
-        public void setTooltip(String tooltip) {
-            mTooltip = tooltip;
-        }
-    }
-
     public AbstractReportChartColumnData(Context context, String name, int color) {
         super(context, name, color);
-    }
-
-    public SubcolumnValue getSubcolumnValue(Float x) {
-        int index = indexOf(x);
-        if (index > -1) {
-            Float y = getYValues().get(index);
-
-            SubcolumnValueWithTooltip value = new SubcolumnValueWithTooltip(y, getColor());
-            if (getTooltips().size() > index) {
-                value.setTooltip(getTooltips().get(index));
-            }
-
-            return value;
-        } else {
-            return null;
-        }
     }
 }

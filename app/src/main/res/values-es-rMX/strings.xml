@@ -327,4 +327,12 @@
     <string name="pref_summary_restore_backup_location">Restaurar ruta predeterminada donde se almacenan copias de seguridad.</string>
     <string name="tire_state_mounted">Montada</string>
     <string name="tire_state_trashed">Desechada</string>
+    <string name="report_chart_option_donut">Donut</string>
+    <string name="report_chart_option_pie">Tarta</string>
+    <string name="chart_content_description_column">Gráfico de columnas apiladas</string>
+    <string name="chart_content_description_line">Gráfico de líneas de tendencia</string>
+    <string name="chart_content_description_pie">Gráfico de tarta</string>
+    <string name="chart_content_description_donut">Gráfico de donut</string>
+    <string name="chart_content_description_segment">%1$s: %2$s</string>
+    <string name="chart_label_total">Total</string>
 </resources>

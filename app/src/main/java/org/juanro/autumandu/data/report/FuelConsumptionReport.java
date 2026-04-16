@@ -105,12 +105,12 @@ public class FuelConsumptionReport extends AbstractReport {
     }
 
     @Override
-    protected String formatXValue(float value, int chartOption) {
+    public String formatXValue(float value, int chartOption) {
         return mDateFormat.format(ReportDateHelper.toDate(value));
     }
 
     @Override
-    protected String formatYValue(float value, int chartOption) {
+    public String formatYValue(float value, int chartOption) {
         return String.format(Locale.getDefault(), "%.2f", value);
     }
 
@@ -125,7 +125,7 @@ public class FuelConsumptionReport extends AbstractReport {
     }
 
     @Override
-    protected List<AbstractReportChartData> getRawChartData(int chartOption) {
+    public List<AbstractReportChartData> getRawChartData(int chartOption) {
         return reportData;
     }
 

@@ -16,57 +16,15 @@
 package org.juanro.autumandu.data.report;
 
 import android.content.Context;
-import android.graphics.Color;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.PointValue;
 
 public abstract class AbstractReportChartLineData extends AbstractReportChartData {
-    public static class PointValueWithTooltip extends PointValue {
-        private String mTooltip;
-
-        public PointValueWithTooltip(float x, float y) {
-            super(x, y);
-        }
-
-        public String getTooltip() {
-            return mTooltip;
-        }
-
-        public void setTooltip(String tooltip) {
-            mTooltip = tooltip;
-        }
-    }
-
     private final Set<Float> mMarkPoints = new HashSet<>();
 
     public AbstractReportChartLineData(Context context, String name, int color) {
         super(context, name, color);
-    }
-
-    public Line getLine() {
-        int markColor = Color.argb(63, Color.red(getColor()), Color.green(getColor()),
-                Color.blue(getColor()));
-
-        List<PointValue> points = mDataPoints.stream()
-                .map(p -> {
-                    PointValueWithTooltip point = new PointValueWithTooltip(p.x, p.y);
-                    point.setTooltip(p.tooltip);
-                    if (mMarkPoints.contains(p.x)) {
-                        point.setColor(markColor);
-                    }
-                    return (PointValue) point;
-                })
-                .collect(Collectors.toList());
-
-        Line line = new Line(points);
-        line.setColor(getColor());
-        return line;
     }
 
     protected void add(Float x, Float y, String tooltip, boolean marked) {
@@ -85,5 +43,9 @@ public abstract class AbstractReportChartLineData extends AbstractReportChartDat
         if (marked) {
             mMarkPoints.add(x);
         }
+    }
+
+    public boolean isMarked(Float x) {
+        return mMarkPoints.contains(x);
     }
 }

@@ -21,7 +21,6 @@ import android.graphics.Color;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,20 +61,16 @@ public abstract class AbstractReportChartData {
         return new TrendReportChartData(mContext, mName, getTrendColor(), mDataPoints);
     }
 
+    public List<DataPoint> getDataPoints() {
+        return mDataPoints;
+    }
+
     public int getColor() {
         return mColor;
     }
 
     public String getName() {
         return mName;
-    }
-
-    public List<String> getTooltips() {
-        return mDataPoints.stream().map(p -> p.tooltip).collect(Collectors.toList());
-    }
-
-    public final List<Float> getXValues() {
-        return mDataPoints.stream().map(p -> p.x).collect(Collectors.toList());
     }
 
     public List<Float> getYValues() {
@@ -88,10 +83,6 @@ public abstract class AbstractReportChartData {
 
     public final int size() {
         return mDataPoints.size();
-    }
-
-    public final void sort() {
-        Collections.sort(mDataPoints);
     }
 
     protected void add(Float x, Float y, String tooltip) {

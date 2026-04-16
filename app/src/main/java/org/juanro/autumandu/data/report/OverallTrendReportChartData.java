@@ -16,13 +16,11 @@
 package org.juanro.autumandu.data.report;
 
 import android.content.Context;
-import android.graphics.DashPathEffect;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
 
-import lecho.lib.hellocharts.model.Line;
 import org.juanro.autumandu.R;
 
 /**
@@ -71,14 +69,5 @@ public class OverallTrendReportChartData extends AbstractReportChartLineData {
                     beta0 + (beta1 * lastX),
                     null, false);
         }
-    }
-
-    @Override
-    public Line getLine() {
-        Line line = super.getLine();
-        line.setHasPoints(false);
-        line.setStrokeWidth(1);
-        line.setPathEffect(new DashPathEffect(new float[]{20, 20}, 0));
-        return line;
     }
 }

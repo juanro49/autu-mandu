@@ -18,8 +18,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@android:id/text1"
     style="@style/section_header"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:textSize="12sp"
+    android:layout_marginTop="@dimen/report_row_section_margin_top"
+    android:textSize="@dimen/report_row_section_text_size"
     tools:text="Audi A3 (Benzin)" />

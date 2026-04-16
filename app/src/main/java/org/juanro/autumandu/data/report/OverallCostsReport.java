@@ -28,11 +28,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import androidx.core.content.ContextCompat;
-
-import lecho.lib.hellocharts.model.ComboLineColumnChartData;
-import lecho.lib.hellocharts.model.PieChartData;
-import lecho.lib.hellocharts.model.SliceValue;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.AutuManduDatabase;
@@ -46,8 +41,6 @@ import org.juanro.autumandu.util.Recurrences;
 public class OverallCostsReport extends AbstractReport {
 
     private final List<AbstractReportChartData> mChartData = new ArrayList<>();
-    private String mUnit;
-    private String mDistanceUnit;
 
     public OverallCostsReport(Context context) {
         super(context);
@@ -55,7 +48,10 @@ public class OverallCostsReport extends AbstractReport {
 
     @Override
     public int[] getAvailableChartOptions() {
-        return new int[0];
+        return new int[]{
+                R.string.report_chart_option_donut,
+                R.string.report_chart_option_pie
+        };
     }
 
     @Override
@@ -64,66 +60,25 @@ public class OverallCostsReport extends AbstractReport {
     }
 
     @Override
-    protected String formatXValue(float value, int chartOption) {
+    public String formatXValue(float value, int chartOption) {
         return "";
     }
 
     @Override
-    protected String formatYValue(float value, int chartOption) {
+    public String formatYValue(float value, int chartOption) {
         return String.format(Locale.getDefault(), "%.1f%%", value);
     }
 
     @Override
-    public PieChartData getPieChartData() {
-        List<SliceValue> values = new ArrayList<>();
-
-        // Colores por defecto para las categorías
-        int[] categoryColors = {
-                ContextCompat.getColor(mContext, R.color.accent),
-                ContextCompat.getColor(mContext, R.color.primary),
-                ContextCompat.getColor(mContext, R.color.primary_dark),
-                ContextCompat.getColor(mContext, R.color.secondary_text),
-                ContextCompat.getColor(mContext, R.color.divider)
-        };
-
-        for (int i = 0; i < mChartData.size(); i++) {
-            AbstractReportChartData data = mChartData.get(i);
-            int carColor = data.getColor();
-
-            for (int j = 0; j < data.size(); j++) {
-                AbstractReportChartData.DataPoint point = data.mDataPoints.get(j);
-                if (point.y > 0) {
-                    int color = mChartData.size() == 1 ? categoryColors[j % categoryColors.length] : carColor;
-
-                    SliceValue sliceValue = new SliceValue(point.y, color);
-                    sliceValue.setLabel(data.getName() + " - " + point.tooltip + ": " + String.format(Locale.getDefault(), "%.1f%%", point.y));
-                    values.add(sliceValue);
-                }
-            }
-        }
-
-        PieChartData pieChartData = new PieChartData(values);
-        pieChartData.setHasLabels(true);
-        pieChartData.setHasLabelsOnlyForSelected(false);
-        pieChartData.setHasLabelsOutside(true);
-        return pieChartData;
-    }
-
-    @Override
-    public ComboLineColumnChartData getChartData(final ReportChartOptions options) {
-        return super.getChartData(options);
-    }
-
-    @Override
-    protected List<AbstractReportChartData> getRawChartData(int chartOption) {
+    public List<AbstractReportChartData> getRawChartData(int chartOption) {
         return mChartData;
     }
 
     @Override
     protected void onUpdate() {
         Preferences prefs = new Preferences(mContext);
-        mUnit = prefs.getUnitCurrency();
-        mDistanceUnit = prefs.getUnitDistance();
+        String mUnit = prefs.getUnitCurrency();
+        String mDistanceUnit = prefs.getUnitDistance();
         mChartData.clear();
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);

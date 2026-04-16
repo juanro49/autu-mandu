@@ -29,8 +29,16 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.snackbar.Snackbar;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,33 +50,20 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.PopupMenu;
-import android.widget.TextView;
-
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.List;
 
-import lecho.lib.hellocharts.listener.ComboLineColumnChartOnValueSelectListener;
-import lecho.lib.hellocharts.model.ComboLineColumnChartData;
-import lecho.lib.hellocharts.model.PointValue;
-import lecho.lib.hellocharts.model.SubcolumnValue;
-import lecho.lib.hellocharts.model.Viewport;
-import lecho.lib.hellocharts.view.ComboLineColumnChartView;
-import lecho.lib.hellocharts.view.PieChartView;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.report.AbstractReport;
-import org.juanro.autumandu.data.report.AbstractReportChartColumnData;
-import org.juanro.autumandu.data.report.AbstractReportChartLineData;
+import org.juanro.autumandu.data.report.FuelConsumptionReport;
+import org.juanro.autumandu.data.report.FuelPriceReport;
+import org.juanro.autumandu.data.report.MileageReport;
+import org.juanro.autumandu.data.report.OverallCostsReport;
 import org.juanro.autumandu.data.report.ReportChartOptions;
 import org.juanro.autumandu.gui.MainActivity.BackPressedListener;
+import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
 import org.juanro.autumandu.gui.util.FloatingActionButtonRevealer;
 import org.juanro.autumandu.viewmodel.ReportViewModel;
 
@@ -76,24 +71,22 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         BackPressedListener {
 
     private ReportAdapter reportAdapter;
+    private AbstractReport currentMenuReport;
 
     private AppBarLayout appBarLayout;
-    private AbstractReport currentMenuReport;
-    private ViewGroup currentMenuReportView;
-
-    private ComboLineColumnChartView fullScreenChart;
+    private FrameLayout fullScreenChart;
     private View fullScreenChartHolder;
     private Animator fullScreenChartAnimator;
-    private ComboLineColumnChartView currentFullScreenChart;
+    private View currentFullScreenOriginView;
     private Rect currentFullScreenStartBounds;
     private float currentFullScreenStartScaleX;
     private float currentFullScreenStartScaleY;
 
     private class ReportHolder extends RecyclerView.ViewHolder {
         private final TextView txtTitle;
-        private final ComboLineColumnChartView chart;
-        private final PieChartView chartPie;
+        private final FrameLayout chartContainer;
         private final View chartNotEnoughData;
+        private final View main;
         private final ViewGroup details;
 
         private AbstractReport report;
@@ -101,7 +94,10 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         public ReportHolder(View itemView) {
             super(itemView);
 
+            chartContainer = itemView.findViewById(R.id.chart_container);
+
             txtTitle = itemView.findViewById(R.id.txt_title);
+            txtTitle.setOnClickListener(v -> showFullScreenChart(report, chartContainer));
 
             View btnReportDetails = itemView.findViewById(R.id.btn_report_details);
             btnReportDetails.setOnClickListener(ReportFragment.this::toggleReportDetails);
@@ -109,19 +105,16 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             View btnReportOptions = itemView.findViewById(R.id.btn_report_options);
             btnReportOptions.setOnClickListener(v -> showReportOptions(report, v));
 
-            chart = itemView.findViewById(R.id.chart);
-            chart.setZoomEnabled(false);
-            chart.setScrollEnabled(false);
-            chart.setValueTouchEnabled(false);
-            chart.setOnClickListener(v -> showFullScreenChart(report, chart));
-
-            chartPie = itemView.findViewById(R.id.chart_pie);
-            chartPie.setChartRotationEnabled(true);
-            chartPie.setValueTouchEnabled(true);
-
             chartNotEnoughData = itemView.findViewById(R.id.chart_not_enough_data);
-
+            main = itemView.findViewById(R.id.main);
             details = itemView.findViewById(R.id.details);
+        }
+
+        private void removePreviousKubitChart() {
+            View previous = chartContainer.findViewById(R.id.kubit_chart_view);
+            if (previous != null) {
+                chartContainer.removeView(previous);
+            }
         }
 
         public void bind(AbstractReport report) {
@@ -131,34 +124,36 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
             new Thread(() -> {
                 var options = loadReportChartOptions(itemView.getContext(), report);
-                var data = report.getChartData(options);
-                var pieData = report.getPieChartData();
                 var reportData = report.getData(true);
+                var rawData = report.getRawChartData(options.getChartOption());
 
                 itemView.post(() -> {
                     if (this.report != report) {
                         return;
                     }
 
-                    boolean enoughData;
-                    if (pieData != null) {
-                        chartPie.setPieChartData(pieData);
-                        chartPie.setVisibility(View.VISIBLE);
-                        chart.setVisibility(View.GONE);
-                        enoughData = !pieData.getValues().isEmpty();
-                    } else {
-                        chart.setComboLineColumnChartData(data);
-                        applyViewport(chart, true);
-                        chartPie.setVisibility(View.GONE);
-                        chart.setVisibility(View.VISIBLE);
-                        enoughData = data != null && (!data.getLineChartData().getLines().isEmpty() ||
-                                !data.getColumnChartData().getColumns().isEmpty());
+                    boolean enoughData = !rawData.isEmpty();
+                    if (enoughData) {
+                        removePreviousKubitChart();
+                        View kubitView;
+                        if (report instanceof OverallCostsReport) {
+                            kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
+                        } else if (report instanceof FuelConsumptionReport ||
+                                report instanceof FuelPriceReport ||
+                                (report instanceof MileageReport && options.getChartOption() != 2)) {
+                            kubitView = KubitChartBridge.createLineChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+                        } else {
+                            kubitView = KubitChartBridge.createColumnChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+                        }
+
+                        chartContainer.addView(kubitView);
                     }
 
-                    chart.setVisibility(enoughData && pieData == null ? View.VISIBLE : View.GONE);
-                    chartPie.setVisibility(enoughData && pieData != null ? View.VISIBLE : View.GONE);
                     chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
+                    chartContainer.setVisibility(enoughData ? View.VISIBLE : View.GONE);
 
+                    // Resetear visibilidad al iniciar la carga para evitar problemas de reciclaje
+                    details.setVisibility(View.INVISIBLE);
                     details.removeAllViews();
                     for (var item : reportData) {
                         var rowView = View.inflate(details.getContext(),
@@ -182,6 +177,17 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
                         details.addView(rowView);
                     }
+
+                    // Esperar a que el layout se complete para tener las alturas reales
+                    details.post(() -> {
+                        if (this.report != report) {
+                            return;
+                        }
+                        var detailsParams = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
+                        // Iniciar en posición "Oculta" (detrás de main)
+                        detailsParams.topMargin = enoughData ? (main.getHeight() - details.getHeight()) : 0;
+                        details.requestLayout();
+                    });
                 });
             }).start();
         }
@@ -257,11 +263,10 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
     @Override
     public boolean onBackPressed() {
-        if (currentFullScreenChart != null) {
+        if (currentFullScreenOriginView != null) {
             hideFullScreenChart();
             return true;
         }
-
         return false;
     }
 
@@ -284,32 +289,10 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         FloatingActionButtonRevealer.setup(fab, recyclerView);
 
         fullScreenChart = v.findViewById(R.id.full_screen_chart);
-        fullScreenChart.setOnValueTouchListener(new ComboLineColumnChartOnValueSelectListener() {
-            @Override
-            public void onColumnValueSelected(int columnIndex, int subcolumnIndex, SubcolumnValue value) {
-                if (value instanceof AbstractReportChartColumnData.SubcolumnValueWithTooltip subcolumnValueWithTooltip) {
-                    var tooltip = subcolumnValueWithTooltip.getTooltip();
-                    Snackbar.make(v, tooltip, Snackbar.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onPointValueSelected(int lineIndex, int pointIndex, PointValue value) {
-                if (value instanceof AbstractReportChartLineData.PointValueWithTooltip pointValueWithTooltip) {
-                    var tooltip = pointValueWithTooltip.getTooltip();
-                    Snackbar.make(v, tooltip, Snackbar.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onValueDeselected() {
-            }
-        });
-
         fullScreenChartHolder = v.findViewById(R.id.full_screen_chart_holder);
 
         var btnCloseFullScreen = v.findViewById(R.id.btn_close_full_screen);
-        btnCloseFullScreen.setOnClickListener(v1 -> hideFullScreenChart());
+        btnCloseFullScreen.setOnClickListener(view -> hideFullScreenChart());
 
         ReportViewModel viewModel = new ViewModelProvider(this).get(ReportViewModel.class);
         viewModel.getReports().observe(getViewLifecycleOwner(), reports -> reportAdapter.setItems(reports));
@@ -335,53 +318,12 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         }
 
         saveReportChartOptions(requireContext(), currentMenuReport, options);
-        var chart = (ComboLineColumnChartView) currentMenuReportView
-                .findViewById(R.id.chart);
-        chart.setComboLineColumnChartData(currentMenuReport.getChartData(options));
-        applyViewport(chart, true);
+        reportAdapter.notifyDataSetChanged();
 
         return true;
     }
 
-    private void hideFullScreenChart() {
-        if (fullScreenChartAnimator != null) {
-            fullScreenChartAnimator.cancel();
-        }
-
-        // Animate the four positioning/sizing properties in parallel, back to
-        // their original values.
-        var set = new AnimatorSet();
-        set.play(
-                ObjectAnimator.ofFloat(fullScreenChartHolder, View.X,
-                        currentFullScreenStartBounds.left))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.Y,
-                        currentFullScreenStartBounds.top))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_X,
-                        currentFullScreenStartScaleX))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_Y,
-                        currentFullScreenStartScaleY));
-        set.setDuration(getResources().getInteger(
-                android.R.integer.config_longAnimTime));
-        set.setInterpolator(new DecelerateInterpolator());
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                appBarLayout.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                currentFullScreenChart.setVisibility(View.VISIBLE);
-                currentFullScreenChart = null;
-                fullScreenChartHolder.setVisibility(View.GONE);
-                fullScreenChartAnimator = null;
-            }
-        });
-        set.start();
-        fullScreenChartAnimator = set;
-    }
-
-    private void showFullScreenChart(AbstractReport report, ComboLineColumnChartView v) {
+    private void showFullScreenChart(AbstractReport report, View v) {
         if (getView() == null) {
             return;
         }
@@ -390,53 +332,52 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             fullScreenChartAnimator.cancel();
         }
 
-        currentFullScreenChart = v;
+        currentFullScreenOriginView = v;
 
         var options = loadReportChartOptions(requireContext(), report);
-        fullScreenChart.setComboLineColumnChartData(report.getChartData(options));
-        applyViewport(fullScreenChart, false);
+        var rawData = report.getRawChartData(options.getChartOption());
 
-        // Calculate translation start and end point and scales.
+        fullScreenChart.removeAllViews();
+        View kubitView;
+        if (report instanceof OverallCostsReport) {
+            kubitView = KubitChartBridge.createPieChart(requireContext(), report, rawData, options.getChartOption());
+        } else if (report instanceof FuelConsumptionReport ||
+                report instanceof FuelPriceReport ||
+                (report instanceof MileageReport && options.getChartOption() != 2)) {
+            kubitView = KubitChartBridge.createLineChart(requireContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend(), true);
+        } else {
+            kubitView = KubitChartBridge.createColumnChart(requireContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend(), true);
+        }
+        fullScreenChart.addView(kubitView);
+
         currentFullScreenStartBounds = new Rect();
         final var finalBounds = new Rect();
         final var globalOffset = new Point();
 
-        currentFullScreenChart.getGlobalVisibleRect(currentFullScreenStartBounds);
+        currentFullScreenOriginView.getGlobalVisibleRect(currentFullScreenStartBounds);
         getView().getGlobalVisibleRect(finalBounds, globalOffset);
         currentFullScreenStartBounds.offset(-globalOffset.x, -globalOffset.y);
         finalBounds.offset(-globalOffset.x, -globalOffset.y);
 
-        currentFullScreenStartScaleX = (float) currentFullScreenStartBounds
-                .width() / finalBounds.width();
-        currentFullScreenStartScaleY = (float) currentFullScreenStartBounds
-                .height() / finalBounds.height();
+        currentFullScreenStartScaleX = (float) currentFullScreenStartBounds.width() / finalBounds.width();
+        currentFullScreenStartScaleY = (float) currentFullScreenStartBounds.height() / finalBounds.height();
 
-        // Hide the small chart and show the zoomed-in view. When the animation
-        // begins, it will position the zoomed-in view in the place of the small
-        // chart.
-        currentFullScreenChart.setVisibility(View.INVISIBLE);
+        currentFullScreenOriginView.setVisibility(View.INVISIBLE);
         fullScreenChartHolder.setVisibility(View.VISIBLE);
 
-        // Set the pivot point for SCALE_X and SCALE_Y transformations to the
-        // top-left corner of the zoomed-in view (the default is the center of
-        // the view).
         fullScreenChartHolder.setPivotX(0f);
         fullScreenChartHolder.setPivotY(0f);
 
-        // Construct and run the parallel animation of the four translation and
-        // scale properties (X, Y, SCALE_X, and SCALE_Y).
         var set = new AnimatorSet();
-        set.play(
-                ObjectAnimator.ofFloat(fullScreenChartHolder, View.X,
-                        currentFullScreenStartBounds.left, finalBounds.left))
+        set.play(ObjectAnimator.ofFloat(fullScreenChartHolder, View.X,
+                currentFullScreenStartBounds.left, finalBounds.left))
                 .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.Y,
                         currentFullScreenStartBounds.top, finalBounds.top))
                 .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_X,
                         currentFullScreenStartScaleX, 1f))
                 .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_Y,
                         currentFullScreenStartScaleY, 1f));
-        set.setDuration(getResources().getInteger(
-                android.R.integer.config_longAnimTime));
+        set.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
         set.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -448,26 +389,76 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         fullScreenChartAnimator = set;
     }
 
+    private void hideFullScreenChart() {
+        if (fullScreenChartAnimator != null) {
+            fullScreenChartAnimator.cancel();
+        }
+
+        var set = new AnimatorSet();
+        set.play(ObjectAnimator.ofFloat(fullScreenChartHolder, View.X,
+                currentFullScreenStartBounds.left))
+                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.Y,
+                        currentFullScreenStartBounds.top))
+                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_X,
+                        currentFullScreenStartScaleX))
+                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_Y,
+                        currentFullScreenStartScaleY));
+        set.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
+        set.setInterpolator(new DecelerateInterpolator());
+        set.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                appBarLayout.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                currentFullScreenOriginView.setVisibility(View.VISIBLE);
+                currentFullScreenOriginView = null;
+                fullScreenChartHolder.setVisibility(View.GONE);
+                fullScreenChartAnimator = null;
+                fullScreenChart.removeAllViews();
+            }
+        });
+        set.start();
+        fullScreenChartAnimator = set;
+    }
+
     private void toggleReportDetails(View v) {
-        var card = (ViewGroup) v.getParent().getParent().getParent();
+        View container = v;
+        while (container != null && container.getId() != R.id.report_content_container) {
+            container = (View) container.getParent();
+        }
 
-        final var main = card.findViewById(R.id.main);
-        final var details = card.findViewById(R.id.details);
-        final var detailsParams = (ViewGroup.MarginLayoutParams) details
-                .getLayoutParams();
+        if (container == null) {
+            return;
+        }
 
-        var from = detailsParams.topMargin == main.getHeight() ? main
-                .getHeight() : (main.getHeight() - details.getHeight());
-        var to = detailsParams.topMargin == main.getHeight() ? (main
-                .getHeight() - details.getHeight()) : main.getHeight();
+        final var main = container.findViewById(R.id.main);
+        final var details = container.findViewById(R.id.details);
+        final var detailsParams = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
+
+        var from = detailsParams.topMargin;
+        var to = (from >= main.getHeight()) ? (main.getHeight() - details.getHeight()) : main.getHeight();
 
         var animator = new ValueAnimator();
-        animator.setDuration(getResources().getInteger(
-                android.R.integer.config_longAnimTime));
+        animator.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
         animator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                details.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (detailsParams.topMargin <= main.getHeight() - details.getHeight()) {
+                    details.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
         animator.addUpdateListener(animation -> {
-            detailsParams.topMargin = (Integer) animation
-                    .getAnimatedValue();
+            detailsParams.topMargin = (Integer) animation.getAnimatedValue();
             details.requestLayout();
         });
         animator.start();
@@ -475,7 +466,6 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
     private void showReportOptions(AbstractReport report, View v) {
         currentMenuReport = report;
-        currentMenuReportView = (ViewGroup) v.getParent().getParent().getParent();
         var options = loadReportChartOptions(requireContext(), report);
 
         var popup = new PopupMenu(getActivity(), v);
@@ -483,17 +473,20 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         popup.setOnMenuItemClickListener(this);
 
         var menu = popup.getMenu();
-        menu.findItem(R.id.menu_show_trend).setChecked(options.isShowTrend());
-        menu.findItem(R.id.menu_show_overall_trend).setChecked(options.isShowOverallTrend());
+        if (report instanceof OverallCostsReport) {
+            menu.removeItem(R.id.menu_show_trend);
+            menu.removeItem(R.id.menu_show_overall_trend);
+        } else {
+            menu.findItem(R.id.menu_show_trend).setChecked(options.isShowTrend());
+            menu.findItem(R.id.menu_show_overall_trend).setChecked(options.isShowOverallTrend());
+        }
 
         var graphOptions = report.getAvailableChartOptions();
         if (graphOptions.length >= 2) {
             for (var i = 0; i < graphOptions.length; i++) {
-                var item = menu.add(R.id.group_graph, Menu.NONE, i,
-                        graphOptions[i]);
+                var item = menu.add(R.id.group_graph, Menu.NONE, i, graphOptions[i]);
                 item.setChecked(i == options.getChartOption());
             }
-
             menu.setGroupCheckable(R.id.group_graph, true, true);
         }
 
@@ -501,8 +494,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
     }
 
     private static ReportChartOptions loadReportChartOptions(Context context, AbstractReport report) {
-        var prefs = context.getSharedPreferences(ReportFragment.class.getName(),
-                Context.MODE_PRIVATE);
+        var prefs = context.getSharedPreferences(ReportFragment.class.getName(), Context.MODE_PRIVATE);
         var reportName = report.getClass().getSimpleName();
 
         var options = new ReportChartOptions();
@@ -514,38 +506,12 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
     }
 
     private static void saveReportChartOptions(Context context, AbstractReport report, ReportChartOptions options) {
-        var prefsEdit = context.getSharedPreferences(
-                ReportFragment.class.getName(), Context.MODE_PRIVATE).edit();
+        var prefsEdit = context.getSharedPreferences(ReportFragment.class.getName(), Context.MODE_PRIVATE).edit();
         var reportName = report.getClass().getSimpleName();
 
         prefsEdit.putBoolean(reportName + "_show_trend", options.isShowTrend());
         prefsEdit.putBoolean(reportName + "_show_overall_trend", options.isShowOverallTrend());
         prefsEdit.putInt(reportName + "_current_chart_option", options.getChartOption());
         prefsEdit.apply();
-    }
-
-    /**
-     * Apply viewport to see only the last 3 columns / last 10 points
-     *
-     * @param chart The chart view.
-     * @param fix   Should the user be able to change the viewport.
-     */
-    private static void applyViewport(ComboLineColumnChartView chart, boolean fix) {
-        var data = (ComboLineColumnChartData) chart.getChartData();
-
-        var leftValue = Math.max(0, data.getColumnChartData().getColumns().size() - 3 - .5f);
-        for (var line : data.getLineChartData().getLines()) {
-            if (!line.getValues().isEmpty()) {
-                var i = Math.max(0, line.getValues().size() - 10);
-                leftValue = Math.max(leftValue, line.getValues().get(i).getX());
-            }
-        }
-
-        var tempViewport = new Viewport(chart.getMaximumViewport());
-        tempViewport.left = leftValue;
-        chart.setCurrentViewport(tempViewport);
-        if (fix) {
-            chart.setMaximumViewport(tempViewport);
-        }
     }
 }
