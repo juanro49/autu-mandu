@@ -77,4 +77,8 @@
     <dimen name="chart_line_trend_thickness">3.5dp</dimen>
     <dimen name="chart_line_popup_padding">10dp</dimen>
     <dimen name="chart_line_x_step_base">1.8dp</dimen>
+
+    <!-- Color Picker Dialog -->
+    <dimen name="color_picker_circle_size">48dp</dimen>
+    <dimen name="color_picker_circle_margin">4dp</dimen>
 </resources>

@@ -112,7 +112,6 @@ dependencies {
 
     // --- UI & Material Design ---
     implementation 'com.google.android.material:material:1.14.0-beta01'
-    implementation 'com.github.Dhaval2404:ColorPicker:2.3'
 
     // --- Data & Persistence ---
     implementation 'androidx.room:room-runtime:2.8.4'

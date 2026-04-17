@@ -20,14 +20,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.view.Gravity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog;
-import com.github.dhaval2404.colorpicker.model.ColorShape;
-import com.github.dhaval2404.colorpicker.model.ColorSwatch;
+import android.content.res.ColorStateList;
+import android.widget.ScrollView;
 
 import java.util.Date;
 
@@ -58,18 +62,68 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
         colorPreview = view.findViewById(R.id.btn_color);
         chkSuspended = view.findViewById(R.id.chk_suspend);
 
-        colorPreview.setOnClickListener(v -> new MaterialColorPickerDialog.Builder(requireContext())
+        colorPreview.setOnClickListener(v -> {
+            int[] colors = {
+                getResources().getColor(R.color.red, null), getResources().getColor(R.color.pink, null),
+                getResources().getColor(R.color.purple, null), getResources().getColor(R.color.deep_purple, null),
+                getResources().getColor(R.color.indigo, null), getResources().getColor(R.color.blue, null),
+                getResources().getColor(R.color.light_blue, null), getResources().getColor(R.color.cyan, null),
+                getResources().getColor(R.color.teal, null), getResources().getColor(R.color.green, null),
+                getResources().getColor(R.color.light_green, null), getResources().getColor(R.color.lime, null),
+                getResources().getColor(R.color.yellow, null), getResources().getColor(R.color.amber, null),
+                getResources().getColor(R.color.orange, null), getResources().getColor(R.color.deep_orange, null),
+                getResources().getColor(R.color.brown, null), getResources().getColor(R.color.grey, null),
+                getResources().getColor(R.color.dark_grey, null), getResources().getColor(R.color.blue_grey, null),
+                getResources().getColor(R.color.white, null), getResources().getColor(R.color.black, null)
+            };
+
+            // 1. Crear el contenedor primero
+            LinearLayoutCompat container = new LinearLayoutCompat(requireContext());
+            container.setOrientation(LinearLayoutCompat.VERTICAL);
+            container.setPadding(32, 32, 32, 32);
+
+            // 2. Usar un ScrollView para manejar el scroll
+            ScrollView scrollView = new ScrollView(requireContext());
+            scrollView.addView(container);
+
+            // 3. Crear el diálogo
+            final AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.title_select_color)
-                .setColorShape(ColorShape.CIRCLE)
-                .setColorSwatch(ColorSwatch._500)
-                .setDefaultColor(car != null ? car.getColor() : R.color.primary)
-                .setColorListener((color, colorHex) -> {
-                    if (car != null) {
-                        car.setColor(color);
-                    }
-                    androidx.core.view.ViewCompat.setBackgroundTintList(colorPreview, android.content.res.ColorStateList.valueOf(color));
-                })
-                .show());
+                .setView(scrollView)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
+
+            int itemsPerRow = 6;
+            LinearLayoutCompat currentRow = null;
+
+            for (int i = 0; i < colors.length; i++) {
+                if (i % itemsPerRow == 0) {
+                    currentRow = new LinearLayoutCompat(requireContext());
+                    currentRow.setOrientation(LinearLayoutCompat.HORIZONTAL);
+                    currentRow.setGravity(Gravity.CENTER);
+                    container.addView(currentRow);
+                }
+
+                CardView card = new CardView(requireContext());
+                int size = (int) getResources().getDimension(R.dimen.color_picker_circle_size);
+                int margin = (int) getResources().getDimension(R.dimen.color_picker_circle_margin);
+                LinearLayoutCompat.LayoutParams cardParams = new LinearLayoutCompat.LayoutParams(size, size);
+                cardParams.setMargins(margin, margin, margin, margin);
+                card.setLayoutParams(cardParams);
+                card.setRadius(size / 2f);
+                card.setCardElevation(4f);
+                card.setCardBackgroundColor(colors[i]);
+
+                final int color = colors[i];
+                card.setOnClickListener(v1 -> {
+                    if (car != null) car.setColor(color);
+                    ViewCompat.setBackgroundTintList(colorPreview, ColorStateList.valueOf(color));
+                    dialog.dismiss();
+                });
+                currentRow.addView(card);
+            }
+            dialog.show();
+        });
     }
 
     @Override
@@ -83,7 +137,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
                 edtInitialMileage.setText(String.valueOf(car.getInitialMileage()));
                 edtNumTires.setText(String.valueOf(car.getNumTires()));
                 edtBuyingPrice.setText(String.valueOf(car.getBuyingPrice()));
-                androidx.core.view.ViewCompat.setBackgroundTintList(colorPreview, android.content.res.ColorStateList.valueOf(car.getColor()));
+                ViewCompat.setBackgroundTintList(colorPreview, ColorStateList.valueOf(car.getColor()));
                 chkSuspended.setChecked(car.getSuspendedSince() != null);
             }
         });
@@ -125,7 +179,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
     protected long save() {
         if (car == null) {
             car = new Car();
-            car.setColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.primary));
+            car.setColor(ContextCompat.getColor(requireContext(), R.color.primary));
         }
 
         car.setName(edtName.getText().toString());
