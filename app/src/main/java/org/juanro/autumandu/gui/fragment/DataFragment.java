@@ -35,18 +35,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.github.clans.fab.FloatingActionMenu;
-
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.gui.DataDetailActivity;
+import org.juanro.autumandu.gui.MainActivity;
 import org.juanro.autumandu.gui.pref.PreferencesActivity;
 import org.juanro.autumandu.gui.pref.PreferencesStationsFragment;
+import org.juanro.autumandu.gui.util.FabSpeedDialHelper;
 import org.juanro.autumandu.gui.util.FloatingActionButtonRevealer;
 import org.juanro.autumandu.gui.util.FragmentUtils;
-import org.juanro.autumandu.gui.DataDetailActivity;
 
 public class DataFragment extends Fragment implements DataListCallback,
-        AbstractDataDetailFragment.OnItemActionListener {
+        AbstractDataDetailFragment.OnItemActionListener, MainActivity.BackPressedListener {
     private class DataListBackStackListener implements OnBackStackChangedListener {
         private boolean skipNextIfPop = false;
 
@@ -155,7 +155,7 @@ public class DataFragment extends Fragment implements DataListCallback,
     private TextView txtNoEntrySelected;
     private long carId;
     private DataListBackStackListener backStackListener;
-    private FloatingActionMenu fab;
+    private FabSpeedDialHelper fabHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -195,7 +195,10 @@ public class DataFragment extends Fragment implements DataListCallback,
 
         twoPane = v.findViewById(R.id.detail) != null;
 
-        fab = v.findViewById(R.id.fab);
+        View fabContainer = v.findViewById(R.id.fab_container);
+        if (fabContainer != null) {
+            fabHelper = new FabSpeedDialHelper(fabContainer);
+        }
 
         return v;
     }
@@ -204,6 +207,15 @@ public class DataFragment extends Fragment implements DataListCallback,
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(view.findViewById(R.id.toolbar));
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (fabHelper != null && fabHelper.isExpanded()) {
+            fabHelper.close();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -223,7 +235,9 @@ public class DataFragment extends Fragment implements DataListCallback,
 
     @Override
     public void onViewCreated(@NonNull RecyclerView recyclerView) {
-        FloatingActionButtonRevealer.setup(fab, recyclerView);
+        if (fabHelper != null) {
+            FloatingActionButtonRevealer.setup(fabHelper, recyclerView);
+        }
     }
 
     @Override

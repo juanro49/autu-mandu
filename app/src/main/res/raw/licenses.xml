@@ -28,27 +28,21 @@
         <license>Apache Software License 2.0</license>
     </notice>
     <notice>
-        <name>Dropbox Core SDK for Java 6+</name>
-        <url>https://github.com/dropbox/dropbox-sdk-java</url>
-        <copyright>Copyright (c) 2015 Dropbox Inc., http://www.dropbox.com/</copyright>
-        <license>MIT License</license>
-    </notice>
-    <notice>
         <name>OkHttp</name>
         <url>http://square.github.io/okhttp/</url>
         <copyright>Copyright 2016 Square, Inc.</copyright>
         <license>Apache Software License 2.0</license>
     </notice>
     <notice>
-        <name>AOSP color picker</name>
-        <url>https://github.com/JordanRobinson/android-color-picker</url>
-        <copyright>Copyright 2015 Jordan Robinson</copyright>
-        <license>MIT License</license>
+        <name>ColorPicker</name>
+        <url>https://github.com/Dhaval2404/ColorPicker</url>
+        <copyright>Copyright 2020 Dhaval Patel</copyright>
+        <license>Apache Software License 2.0</license>
     </notice>
     <notice>
-        <name>FloatingActionButton</name>
-        <url>https://github.com/Clans/FloatingActionButton</url>
-        <copyright>Copyright 2015 Dmytro Tarianyk</copyright>
+        <name>Material Components for Android</name>
+        <url>https://github.com/material-components/material-components-android</url>
+        <copyright>Copyright (c) 2024 The Android Open Source Project</copyright>
         <license>Apache Software License 2.0</license>
     </notice>
     <notice>
@@ -60,7 +54,19 @@
     <notice>
         <name>joda-time-android</name>
         <url>https://github.com/dlew/joda-time-android</url>
-        <copyright>Copyright 2001-2010 Stephen Colebourne</copyright>
+        <copyright>Copyright 2014 Dan Lew</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Apache Commons CSV</name>
+        <url>https://commons.apache.org/proper/commons-csv/</url>
+        <copyright>Copyright 2005-2024 The Apache Software Foundation</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>LicensesDialog</name>
+        <url>https://psdev.de/LicensesDialog/</url>
+        <copyright>Copyright 2013-2023 Philip Schiffer</copyright>
         <license>Apache Software License 2.0</license>
     </notice>
 </notices>

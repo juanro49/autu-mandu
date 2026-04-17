@@ -21,8 +21,6 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.clans.fab.FloatingActionMenu;
-
 /**
  * Utility class to show/hide a FloatingActionMenu based on RecyclerView scrolling.
  */
@@ -33,21 +31,17 @@ public class FloatingActionButtonRevealer {
     /**
      * Sets up the FloatingActionMenu to hide/show based on the scroll direction of the RecyclerView.
      *
-     * @param fab  The FloatingActionMenu to reveal/hide.
+     * @param fabHelper  The FabSpeedDialHelper to reveal/hide.
      * @param list The RecyclerView whose scroll events will trigger the reveal/hide.
      */
-    public static void setup(@NonNull final FloatingActionMenu fab, @NonNull final RecyclerView list) {
-        showDelayed(fab);
+    public static void setup(@NonNull final FabSpeedDialHelper fabHelper, @NonNull final RecyclerView list) {
+        showDelayed(fabHelper);
         list.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (Math.abs(dy) > SCROLL_OFFSET) {
-                    if (dy > 0) {
-                        fab.hideMenuButton(true);
-                    } else {
-                        fab.showMenuButton(true);
-                    }
+                    fabHelper.setVisible(dy <= 0);
                 }
             }
         });
@@ -56,14 +50,10 @@ public class FloatingActionButtonRevealer {
     /**
      * Shows the FAB with a slight delay, useful for initial screen transitions.
      *
-     * @param fab The FloatingActionMenu to show.
+     * @param fabHelper The FabSpeedDialHelper to show.
      */
-    private static void showDelayed(@NonNull final FloatingActionMenu fab) {
-        fab.hideMenuButton(false);
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (fab.isAttachedToWindow()) {
-                fab.showMenuButton(true);
-            }
-        }, SHOW_DELAY_MS);
+    private static void showDelayed(@NonNull final FabSpeedDialHelper fabHelper) {
+        fabHelper.setVisible(false);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> fabHelper.setVisible(true), SHOW_DELAY_MS);
     }
 }

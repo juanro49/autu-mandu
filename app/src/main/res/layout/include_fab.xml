@@ -14,65 +14,206 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<com.github.clans.fab.FloatingActionMenu
-    android:id="@+id/fab"
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fab_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="bottom|end"
-    android:padding="@dimen/fab_margin"
-    android:contentDescription="@string/drawer_calculator"
-    app:layout_behavior="org.juanro.autumandu.gui.util.FloatingActionMenuBehavior"
-    app:menu_backgroundColor="#aa000000"
-    app:menu_colorNormal="@color/button_accent"
-    app:menu_colorPressed="@color/button_accent_pressed"
-    app:menu_colorRipple="@color/ripple"
-    app:menu_icon="@drawable/ic_add_24dp"
-    app:menu_openDirection="up">
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
-    <com.github.clans.fab.FloatingActionButton
+    <!-- Overlay background -->
+    <View
+        android:id="@+id/fab_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#aa000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="@string/fab_close_overlay"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Main FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onFABAddTiresClicked"
-        android:src="@drawable/ic_c_tire_24dp"
-        app:fab_colorNormal="@color/button_accent"
-        app:fab_colorPressed="@color/button_accent_pressed"
-        app:fab_colorRipple="@color/ripple"
-        app:fab_label="@string/fab_add_tires"
-        app:fab_size="mini"/>
+        android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/fab_expand"
+        app:srcCompat="@drawable/ic_add_24dp"
+        app:backgroundTint="@color/button_accent"
+        app:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.github.clans.fab.FloatingActionButton
+    <!-- Mini FABs and Labels Container -->
+    <LinearLayout
+        android:id="@+id/fab_mini_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onFABAddOtherIncomeClicked"
-        android:src="@drawable/ic_c_other_24dp"
-        app:fab_colorNormal="@color/button_accent"
-        app:fab_colorPressed="@color/button_accent_pressed"
-        app:fab_colorRipple="@color/ripple"
-        app:fab_label="@string/fab_add_other_income"
-        app:fab_size="mini"/>
+        android:layout_marginBottom="@dimen/fab_mini_margin"
+        android:layout_marginEnd="24dp"
+        android:gravity="end"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/fab_main"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <com.github.clans.fab.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onFABAddOtherExpenditureClicked"
-        android:src="@drawable/ic_c_other_24dp"
-        app:fab_colorNormal="@color/button_accent"
-        app:fab_colorPressed="@color/button_accent_pressed"
-        app:fab_colorRipple="@color/ripple"
-        app:fab_label="@string/fab_add_other_expenditure"
-        app:fab_size="mini"/>
+        <!-- Refueling -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fab_mini_margin"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-    <com.github.clans.fab.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onFABAddRefuelingClicked"
-        android:src="@drawable/ic_c_refueling_24dp"
-        app:fab_colorNormal="@color/button_accent"
-        app:fab_colorPressed="@color/button_accent_pressed"
-        app:fab_colorRipple="@color/ripple"
-        app:fab_label="@string/fab_add_refueling"
-        app:fab_size="mini"/>
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_label_margin"
+                android:importantForAccessibility="no"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="@dimen/fab_label_corner_radius"
+                app:cardElevation="@dimen/fab_label_elevation">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
+                    android:paddingVertical="@dimen/fab_label_padding_vertical"
+                    android:text="@string/fab_add_refueling"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/fab_label_text_size" />
+            </com.google.android.material.card.MaterialCardView>
 
-</com.github.clans.fab.FloatingActionMenu>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_refueling"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/fab_add_refueling"
+                android:accessibilityTraversalBefore="@id/fab_main"
+                app:fabSize="mini"
+                app:srcCompat="@drawable/ic_c_refueling_24dp"
+                app:backgroundTint="@color/button_accent"
+                app:tint="@android:color/white" />
+        </LinearLayout>
+
+        <!-- Other Expenditure -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fab_mini_margin"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_label_margin"
+                android:importantForAccessibility="no"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="@dimen/fab_label_corner_radius"
+                app:cardElevation="@dimen/fab_label_elevation">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
+                    android:paddingVertical="@dimen/fab_label_padding_vertical"
+                    android:text="@string/fab_add_other_expenditure"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/fab_label_text_size" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_other_expenditure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/fab_add_other_expenditure"
+                android:accessibilityTraversalBefore="@id/fab_add_refueling"
+                app:fabSize="mini"
+                app:srcCompat="@drawable/ic_c_other_24dp"
+                app:backgroundTint="@color/button_accent"
+                app:tint="@android:color/white" />
+        </LinearLayout>
+
+        <!-- Other Income -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fab_mini_margin"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_label_margin"
+                android:importantForAccessibility="no"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="@dimen/fab_label_corner_radius"
+                app:cardElevation="@dimen/fab_label_elevation">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
+                    android:paddingVertical="@dimen/fab_label_padding_vertical"
+                    android:text="@string/fab_add_other_income"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/fab_label_text_size" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_other_income"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/fab_add_other_income"
+                android:accessibilityTraversalBefore="@id/fab_add_other_expenditure"
+                app:fabSize="mini"
+                app:srcCompat="@drawable/ic_c_other_24dp"
+                app:backgroundTint="@color/button_accent"
+                app:tint="@android:color/white" />
+        </LinearLayout>
+
+        <!-- Tires -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fab_mini_margin"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_label_margin"
+                android:importantForAccessibility="no"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="@dimen/fab_label_corner_radius"
+                app:cardElevation="@dimen/fab_label_elevation">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
+                    android:paddingVertical="@dimen/fab_label_padding_vertical"
+                    android:text="@string/fab_add_tires"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/fab_label_text_size" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_tires"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/fab_add_tires"
+                android:accessibilityTraversalBefore="@id/fab_add_other_income"
+                app:fabSize="mini"
+                app:srcCompat="@drawable/ic_c_tire_24dp"
+                app:backgroundTint="@color/button_accent"
+                app:tint="@android:color/white" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

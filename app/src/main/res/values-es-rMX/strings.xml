@@ -40,6 +40,9 @@
     <string name="fab_add_other_expenditure">Otros gastos</string>
     <string name="fab_add_other_income">Otros ingresos</string>
     <string name="fab_add_tires">Nuevos neumáticos</string>
+    <string name="fab_expand">Expandir opciones de añadir</string>
+    <string name="fab_collapse">Contraer opciones de añadir</string>
+    <string name="fab_close_overlay">Cerrar opciones</string>
     <string name="section_suspend">Suspender</string>
     <string name="section_advanced">Ajustes avanzados</string>
     <string name="hint_mileage_optional">Distancia total (opcional)</string>

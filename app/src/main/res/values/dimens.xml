@@ -16,6 +16,13 @@
   -->
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_mini_margin">8dp</dimen>
+    <dimen name="fab_label_margin">8dp</dimen>
+    <dimen name="fab_label_padding_vertical">4dp</dimen>
+    <dimen name="fab_label_padding_horizontal">8dp</dimen>
+    <dimen name="fab_label_text_size">14sp</dimen>
+    <dimen name="fab_label_elevation">2dp</dimen>
+    <dimen name="fab_label_corner_radius">4dp</dimen>
 
     <!-- General Report Layout -->
     <dimen name="report_card_padding">8dp</dimen>

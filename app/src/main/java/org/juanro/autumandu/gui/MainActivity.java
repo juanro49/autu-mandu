@@ -48,7 +48,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.navigation.NavigationView;
 
 import org.juanro.autumandu.BuildConfig;
@@ -61,6 +60,7 @@ import org.juanro.autumandu.gui.fragment.DataFragment;
 import org.juanro.autumandu.gui.fragment.ReportFragment;
 import org.juanro.autumandu.gui.pref.PreferencesActivity;
 import org.juanro.autumandu.util.backup.AutoBackupWorker;
+import org.juanro.autumandu.gui.util.FabSpeedDialHelper;
 import org.juanro.autumandu.gui.util.NewRefuelingSnackbar;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.util.DemoData;
@@ -545,10 +545,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private boolean closeFABMenu() {
-        FloatingActionMenu floatingActionMenu = findViewById(R.id.fab);
-        if (floatingActionMenu != null && floatingActionMenu.isOpened()) {
-            floatingActionMenu.close(true);
-            return true;
+        View fabContainer = findViewById(R.id.fab_container);
+        if (fabContainer != null) {
+            FabSpeedDialHelper helper = new FabSpeedDialHelper(fabContainer);
+            if (helper.isExpanded()) {
+                helper.close();
+                return true;
+            }
         }
 
         return false;

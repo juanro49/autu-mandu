@@ -42,6 +42,9 @@
     <string name="fab_add_other_expenditure">Other expenditure</string>
     <string name="fab_add_other_income">Other income</string>
     <string name="fab_add_tires">New Tires</string>
+    <string name="fab_expand">Expand add options</string>
+    <string name="fab_collapse">Collapse add options</string>
+    <string name="fab_close_overlay">Close options</string>
     <string name="section_suspend">Suspend</string>
     <string name="section_advanced">Advanced options</string>
     <string name="hint_mileage_optional">Total distance (optional)</string>

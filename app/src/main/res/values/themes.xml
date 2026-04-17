@@ -16,7 +16,7 @@
   -->
 <resources>
 
-    <style name="AppTheme.Base" parent="Theme.AppCompat">
+    <style name="AppTheme.Base" parent="Theme.MaterialComponents.DayNight.Bridge">
         <item name="detailsElementLayoutWidth">match_parent</item>
         <item name="detailsElementBackground">@android:color/transparent</item>
 
@@ -47,7 +47,7 @@
     <style name="AppTheme.NoActionBar.NavigationDrawer">
     </style>
 
-    <style name="AppTheme.Dialog" parent="Theme.AppCompat.Dialog">
+    <style name="AppTheme.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog.Bridge">
         <item name="android:background">@color/background</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>

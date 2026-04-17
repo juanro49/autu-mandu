@@ -50,7 +50,6 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.List;
@@ -66,6 +65,7 @@ import org.juanro.autumandu.data.report.OverallCostsReport;
 import org.juanro.autumandu.data.report.ReportChartOptions;
 import org.juanro.autumandu.gui.MainActivity.BackPressedListener;
 import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
+import org.juanro.autumandu.gui.util.FabSpeedDialHelper;
 import org.juanro.autumandu.gui.util.FloatingActionButtonRevealer;
 import org.juanro.autumandu.viewmodel.ReportViewModel;
 
@@ -312,8 +312,11 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         recyclerView.setAdapter(reportAdapter);
         recyclerView.addItemDecoration(new ReportItemDecoration());
 
-        var fab = (FloatingActionMenu) v.findViewById(R.id.fab);
-        FloatingActionButtonRevealer.setup(fab, recyclerView);
+        View fabContainer = v.findViewById(R.id.fab_container);
+        if (fabContainer != null) {
+            FabSpeedDialHelper fabHelper = new FabSpeedDialHelper(fabContainer);
+            FloatingActionButtonRevealer.setup(fabHelper, recyclerView);
+        }
 
         fullScreenChart = v.findViewById(R.id.full_screen_chart);
         fullScreenChartHolder = v.findViewById(R.id.full_screen_chart_holder);

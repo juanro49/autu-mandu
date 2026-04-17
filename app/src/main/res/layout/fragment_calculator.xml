@@ -95,6 +95,4 @@
 
     </LinearLayout>
 
-    <include layout="@layout/include_fab"/>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
