@@ -42,11 +42,6 @@ android {
         compose true
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
-        freeCompilerArgs += ["-Xskip-prerelease-check"]
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21

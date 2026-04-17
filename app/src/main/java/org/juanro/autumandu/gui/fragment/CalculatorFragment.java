@@ -151,7 +151,7 @@ public class CalculatorFragment extends Fragment {
     }
 
     private void updateChart(CalculationItem[] items) {
-        if (items == null || items.length == 0 || !isAdded()) {
+        if (items == null || items.length == 0 || !isAdded() || selectedCalculation == null) {
             chartHolder.setVisibility(View.INVISIBLE);
             return;
         }

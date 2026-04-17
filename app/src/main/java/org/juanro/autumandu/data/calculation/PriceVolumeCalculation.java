@@ -26,6 +26,7 @@ import java.util.stream.IntStream;
 
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Refueling;
@@ -40,6 +41,7 @@ public class PriceVolumeCalculation extends AbstractCalculation {
     private final Direction mDirection;
     protected List<String> mNames;
     protected List<Double> mAvgFuelPrices;
+    protected List<Integer> mColors;
 
     public PriceVolumeCalculation(Context context, Direction direction) {
         super(context);
@@ -67,14 +69,11 @@ public class PriceVolumeCalculation extends AbstractCalculation {
     }
 
     @Override
-    public boolean hasColors() {
-        return false;
-    }
-
-    @Override
     protected void onLoadData() {
         mNames = new ArrayList<>();
         mAvgFuelPrices = new ArrayList<>();
+        mColors = new ArrayList<>();
+        int[] palette = KubitChartBridge.getColors(mContext);
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
         List<FuelType> fuelTypes = db.getFuelTypeDao().getAll();
@@ -82,7 +81,10 @@ public class PriceVolumeCalculation extends AbstractCalculation {
                 .stream()
                 .collect(Collectors.groupingBy(Refueling::getFuelTypeId));
 
-        for (FuelType fuelType : fuelTypes) {
+        // Asignamos colores a los tipos de combustible basándonos en su posición global
+        // para que coincidan con los reportes de precios
+        for (int i = 0; i < fuelTypes.size(); i++) {
+            FuelType fuelType = fuelTypes.get(i);
             List<Refueling> refuelings = refuelingsByFuelType.get(fuelType.getId());
             if (refuelings != null && !refuelings.isEmpty()) {
                 double avgFuelPrice = refuelings.stream()
@@ -94,6 +96,7 @@ public class PriceVolumeCalculation extends AbstractCalculation {
                 if (avgFuelPrice > 0) {
                     mNames.add(fuelType.getName());
                     mAvgFuelPrices.add(avgFuelPrice);
+                    mColors.add(palette[i % palette.length]);
                 }
             }
         }
@@ -106,7 +109,7 @@ public class PriceVolumeCalculation extends AbstractCalculation {
                     double result = mDirection == Direction.PRICE_TO_VOLUME
                             ? input / mAvgFuelPrices.get(i)
                             : input * mAvgFuelPrices.get(i);
-                    return new CalculationItem(mNames.get(i), result);
+                    return new CalculationItem(mNames.get(i), result, mColors.get(i));
                 })
                 .toArray(CalculationItem[]::new);
     }

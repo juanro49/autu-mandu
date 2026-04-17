@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.entity.Refueling;
@@ -147,9 +148,18 @@ public abstract class AbstractReport {
 
     protected final Context mContext;
     private final List<AbstractListItem> mData = new ArrayList<>();
+    protected final Map<Integer, List<AbstractReportChartData>> mCachedChartData = new java.util.HashMap<>();
+    private boolean mUpdated = false;
 
     public AbstractReport(Context context) {
         mContext = context.getApplicationContext();
+    }
+
+    public void invalidate() {
+        synchronized (mData) {
+            mUpdated = false;
+            mCachedChartData.clear();
+        }
     }
 
     public abstract int[] getAvailableChartOptions();
@@ -161,11 +171,15 @@ public abstract class AbstractReport {
     }
 
     public List<AbstractListItem> getData(boolean flat) {
-        Collections.sort(mData);
+        List<AbstractListItem> dataCopy;
+        synchronized (mData) {
+            Collections.sort(mData);
+            dataCopy = new ArrayList<>(mData);
+        }
 
         if (flat) {
             List<AbstractListItem> items = new ArrayList<>();
-            for (AbstractListItem item : mData) {
+            for (AbstractListItem item : dataCopy) {
                 items.add(item);
                 if (item instanceof Section) {
                     items.addAll(((Section) item).getItems());
@@ -174,7 +188,7 @@ public abstract class AbstractReport {
 
             return items;
         } else {
-            return mData;
+            return dataCopy;
         }
     }
 
@@ -182,20 +196,24 @@ public abstract class AbstractReport {
      * Updates the report with the newest data.
      * Note: This performs database operations, so it should be called from a background thread.
      */
-    public synchronized void update() {
-        mData.clear();
+    public void update() {
+        synchronized (mData) {
+            if (mUpdated) return;
+            mData.clear();
 
-        // Set base date for precision improvement (Issue #83).
-        // Use the date of the very first refueling as Day 0.
-        AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
-        Refueling firstRefueling = db.getRefuelingDao().getFirst();
-        if (firstRefueling != null) {
-            ReportDateHelper.setBaseDate(firstRefueling.getDate());
-        } else {
-            ReportDateHelper.setBaseDate(null);
+            // Set base date for precision improvement (Issue #83).
+            // Use the date of the very first refueling as Day 0.
+            AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
+            Refueling firstRefueling = db.getRefuelingDao().getFirst();
+            if (firstRefueling != null) {
+                ReportDateHelper.setBaseDate(firstRefueling.getDate());
+            } else {
+                ReportDateHelper.setBaseDate(null);
+            }
+
+            onUpdate();
+            mUpdated = true;
         }
-
-        onUpdate();
     }
 
     protected Section addDataSection(String label, int color) {
@@ -203,9 +221,11 @@ public abstract class AbstractReport {
     }
 
     protected Section addDataSection(String label, int color, int order) {
-        Section section = new Section(label, color, order);
-        mData.add(section);
-        return section;
+        synchronized (mData) {
+            Section section = new Section(label, color, order);
+            mData.add(section);
+            return section;
+        }
     }
 
     public abstract String formatXValue(float value, int chartOption);

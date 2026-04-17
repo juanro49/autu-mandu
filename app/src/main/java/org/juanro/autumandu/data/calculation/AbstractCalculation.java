@@ -37,8 +37,6 @@ public abstract class AbstractCalculation {
 
     public abstract String getOutputUnit();
 
-    public abstract boolean hasColors();
-
     /**
      * Performs the calculation.
      * Note: This performs database operations, so it MUST be called from a background thread.

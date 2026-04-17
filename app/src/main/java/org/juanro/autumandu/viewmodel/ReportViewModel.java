@@ -34,6 +34,7 @@ import java.util.concurrent.Executors;
 
 public class ReportViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<AbstractReport>> mReports = new MediatorLiveData<>();
+    private final List<AbstractReport> mCachedReports = new ArrayList<>();
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private final Preferences mPrefs;
 
@@ -42,30 +43,43 @@ public class ReportViewModel extends AndroidViewModel {
         mPrefs = new Preferences(application);
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(application);
-        // Observamos cambios en coches para actualizar informes
-        mReports.addSource(db.getCarDao().getAllLiveData(), cars -> updateReports());
-        // También observamos cambios en repostajes ya que afectan a casi todos los informes
-        mReports.addSource(db.getRefuelingDao().getWithDetailsForCarLiveData(-1), refueling -> updateReports());
+        // Observamos todas las fuentes de datos que afectan a los informes
+        mReports.addSource(db.getCarDao().getAllLiveData(), cars -> invalidateAndRefresh());
+        mReports.addSource(db.getRefuelingDao().getWithDetailsForCarLiveData(-1), refueling -> invalidateAndRefresh());
+        mReports.addSource(db.getOtherCostDao().getAllLiveData(), otherCosts -> invalidateAndRefresh());
+        mReports.addSource(db.getTireDao().getAllTireListsLiveData(), tires -> invalidateAndRefresh());
 
-        updateReports();
+        refreshReports();
+    }
+
+    private void invalidateAndRefresh() {
+        for (AbstractReport report : mCachedReports) {
+            report.invalidate();
+        }
+        refreshReports();
     }
 
     public LiveData<List<AbstractReport>> getReports() {
         return mReports;
     }
 
-    public void updateReports() {
+    public void refreshReports() {
         mExecutor.execute(() -> {
-            List<AbstractReport> reports = new ArrayList<>();
             List<Class<? extends AbstractReport>> reportClasses = mPrefs.getReportOrder();
-            for (Class<? extends AbstractReport> reportClass : reportClasses) {
-                AbstractReport report = AbstractReport.newInstance(reportClass, getApplication());
-                if (report != null) {
-                    report.update();
-                    reports.add(report);
+
+            // Si el orden o la cantidad ha cambiado, reconstruimos la lista base
+            if (mCachedReports.size() != reportClasses.size()) {
+                mCachedReports.clear();
+                for (Class<? extends AbstractReport> reportClass : reportClasses) {
+                    AbstractReport report = AbstractReport.newInstance(reportClass, getApplication());
+                    if (report != null) {
+                        mCachedReports.add(report);
+                    }
                 }
             }
-            mReports.postValue(reports);
+
+            // Publicamos la lista de instancias persistentes
+            mReports.postValue(new ArrayList<>(mCachedReports));
         });
     }
 

@@ -142,13 +142,20 @@ public class CostsReport extends AbstractReport {
 
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
-        List<AbstractReportChartData> data = new ArrayList<>(mCostsPerMonth.size());
-        for (ReportChartData carData : (chartOption == GRAPH_OPTION_MONTH ? mCostsPerMonth : mCostsPerYear).values()) {
-            if (!carData.isEmpty()) {
-                data.add(carData);
+        synchronized (mCachedChartData) {
+            if (mCachedChartData.containsKey(chartOption)) {
+                return mCachedChartData.get(chartOption);
             }
+
+            List<AbstractReportChartData> data = new ArrayList<>();
+            for (ReportChartData carData : (chartOption == GRAPH_OPTION_MONTH ? mCostsPerMonth : mCostsPerYear).values()) {
+                if (!carData.isEmpty()) {
+                    data.add(carData);
+                }
+            }
+            mCachedChartData.put(chartOption, data);
+            return data;
         }
-        return data;
     }
 
     @Override

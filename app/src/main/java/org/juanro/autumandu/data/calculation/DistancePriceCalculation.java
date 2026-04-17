@@ -81,11 +81,6 @@ public class DistancePriceCalculation extends AbstractCalculation {
     }
 
     @Override
-    public boolean hasColors() {
-        return true;
-    }
-
-    @Override
     protected void onLoadData() {
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
         List<Car> cars = db.getCarDao().getAll();

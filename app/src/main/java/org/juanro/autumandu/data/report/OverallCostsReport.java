@@ -49,8 +49,8 @@ public class OverallCostsReport extends AbstractReport {
     @Override
     public int[] getAvailableChartOptions() {
         return new int[]{
-                R.string.report_chart_option_donut,
-                R.string.report_chart_option_pie
+                R.string.report_chart_option_pie,
+                R.string.report_chart_option_donut
         };
     }
 
@@ -71,7 +71,14 @@ public class OverallCostsReport extends AbstractReport {
 
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
-        return mChartData;
+        synchronized (mCachedChartData) {
+            if (mCachedChartData.containsKey(chartOption)) {
+                return mCachedChartData.get(chartOption);
+            }
+            List<AbstractReportChartData> data = new ArrayList<>(mChartData);
+            mCachedChartData.put(chartOption, data);
+            return data;
+        }
     }
 
     @Override
@@ -90,6 +97,12 @@ public class OverallCostsReport extends AbstractReport {
                 .stream().collect(Collectors.groupingBy(OtherCost::getCarId));
         Map<Long, List<TireList>> tiresByCar = db.getTireDao().getAllTireLists()
                 .stream().collect(Collectors.groupingBy(TireList::getCarId));
+
+        double globalFuelCosts = 0;
+        double globalBillsCosts = 0;
+        double globalTiresCosts = 0;
+        double globalInvestmentCosts = 0;
+        double globalIncomeTotal = 0;
 
         for (Car car : cars) {
             Long carIdObj = car.getId();
@@ -149,6 +162,12 @@ public class OverallCostsReport extends AbstractReport {
                     tiresCosts += tireList.getPrice();
                 }
             }
+
+            globalFuelCosts += fuelCosts;
+            globalBillsCosts += billsCosts;
+            globalTiresCosts += tiresCosts;
+            globalInvestmentCosts += investmentCosts;
+            globalIncomeTotal += incomeTotal;
 
             double totalCosts = fuelCosts + billsCosts + tiresCosts + investmentCosts;
             if (totalCosts == 0 && balancedRefuelings.isEmpty()) {
@@ -226,18 +245,18 @@ public class OverallCostsReport extends AbstractReport {
                     mContext.getString(R.string.report_price, tiresCosts / days, mUnit)));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
                     mContext.getString(R.string.report_price, investmentCosts / days, mUnit)));
+        }
 
-            // Add categorical data to chart
-            ReportChartData carChartData = new ReportChartData(mContext, car.getName(), car.getColor());
-            double totalForChart = totalCosts + incomeTotal;
-            if (totalForChart > 0) {
-                carChartData.add(0f, (float) (fuelCosts / totalForChart * 100), mContext.getString(R.string.report_overall_costs_fuel));
-                carChartData.add(1f, (float) (billsCosts / totalForChart * 100), mContext.getString(R.string.report_overall_costs_bills));
-                carChartData.add(2f, (float) (tiresCosts / totalForChart * 100), mContext.getString(R.string.report_overall_costs_tires));
-                carChartData.add(3f, (float) (investmentCosts / totalForChart * 100), mContext.getString(R.string.report_overall_costs_investment));
-                carChartData.add(4f, (float) (incomeTotal / totalForChart * 100), mContext.getString(R.string.report_overall_costs_income));
-            }
-            mChartData.add(carChartData);
+        // Add categorical data to chart based on global totals
+        ReportChartData globalChartData = new ReportChartData(mContext, mContext.getString(R.string.report_title_overall_costs), -1);
+        double globalTotal = globalFuelCosts + globalBillsCosts + globalTiresCosts + globalInvestmentCosts + globalIncomeTotal;
+        if (globalTotal > 0) {
+            globalChartData.add(0f, (float) (globalFuelCosts / globalTotal * 100), mContext.getString(R.string.report_overall_costs_fuel));
+            globalChartData.add(1f, (float) (globalBillsCosts / globalTotal * 100), mContext.getString(R.string.report_overall_costs_bills));
+            globalChartData.add(2f, (float) (globalTiresCosts / globalTotal * 100), mContext.getString(R.string.report_overall_costs_tires));
+            globalChartData.add(3f, (float) (globalInvestmentCosts / globalTotal * 100), mContext.getString(R.string.report_overall_costs_investment));
+            globalChartData.add(4f, (float) (globalIncomeTotal / globalTotal * 100), mContext.getString(R.string.report_overall_costs_income));
+            mChartData.add(globalChartData);
         }
     }
 

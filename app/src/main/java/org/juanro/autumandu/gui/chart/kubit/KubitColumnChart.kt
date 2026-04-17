@@ -171,7 +171,13 @@ fun KubitColumnChart(
 
             // Secuencial: De lo más negativo a 0, luego de 0 a lo más positivo
             val finalSegments = (negSegments.asReversed() + posSegments).map { segment ->
-                if (selectedSegment != null && selectedSegment != segment) {
+                val isSelected = selectedSegment?.let { sel ->
+                    sel.label == segment.label &&
+                            sel.minValue == segment.minValue &&
+                            sel.maxValue == segment.maxValue
+                } ?: false
+
+                if (selectedSegment != null && !isSelected) {
                     segment.copy(color = segment.color.copy(alpha = 0.4f))
                 } else {
                     segment

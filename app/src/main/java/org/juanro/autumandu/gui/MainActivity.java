@@ -137,6 +137,8 @@ public class MainActivity extends AppCompatActivity implements
         mTitle = mDrawerTitle = getTitle();
         if (savedInstanceState != null) {
             setTitle(savedInstanceState.getCharSequence(STATE_TITLE, mTitle));
+            mCurrentNavItemIndex = savedInstanceState.getInt(STATE_NAV_ITEM_INDEX, -1);
+            mCurrentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
         }
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
@@ -477,6 +479,11 @@ public class MainActivity extends AppCompatActivity implements
         // Initialize the first page of the navigation drawer only if no fragment is currently shown.
         if (mCurrentFragment == null) {
             mNavigationView.getMenu().performIdentifierAction(Menu.FIRST, 0);
+        } else {
+            // Restore selection in NavigationView
+            if (mCurrentNavItemIndex >= 0 && mCurrentNavItemIndex < mNavigationView.getMenu().size()) {
+                mNavigationView.getMenu().getItem(mCurrentNavItemIndex).setChecked(true);
+            }
         }
     }
 

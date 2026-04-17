@@ -126,7 +126,14 @@ public class FuelConsumptionReport extends AbstractReport {
 
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
-        return reportData;
+        synchronized (mCachedChartData) {
+            if (mCachedChartData.containsKey(chartOption)) {
+                return mCachedChartData.get(chartOption);
+            }
+            List<AbstractReportChartData> data = new ArrayList<>(reportData);
+            mCachedChartData.put(chartOption, data);
+            return data;
+        }
     }
 
     @Override

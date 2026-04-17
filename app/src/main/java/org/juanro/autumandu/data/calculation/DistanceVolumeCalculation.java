@@ -71,11 +71,6 @@ public class DistanceVolumeCalculation extends AbstractCalculation {
     }
 
     @Override
-    public boolean hasColors() {
-        return true;
-    }
-
-    @Override
     protected void onLoadData() {
         mNames = new ArrayList<>();
         mAvgConsumptions = new ArrayList<>();

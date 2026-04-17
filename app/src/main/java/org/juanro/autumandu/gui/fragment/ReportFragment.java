@@ -54,6 +54,8 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.report.AbstractReport;
@@ -69,6 +71,8 @@ import org.juanro.autumandu.viewmodel.ReportViewModel;
 
 public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClickListener,
         BackPressedListener {
+
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private ReportAdapter reportAdapter;
     private AbstractReport currentMenuReport;
@@ -119,77 +123,100 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
         public void bind(AbstractReport report) {
             this.report = report;
-
             txtTitle.setText(report.getTitle());
 
-            new Thread(() -> {
+            // Reset visual para evitar que se vea el layout vacío durante la carga
+            chartContainer.setVisibility(View.INVISIBLE);
+            chartNotEnoughData.setVisibility(View.GONE);
+            details.setVisibility(View.GONE); // GONE para seguridad total
+
+            EXECUTOR.execute(() -> {
+                report.update();
                 var options = loadReportChartOptions(itemView.getContext(), report);
                 var reportData = report.getData(true);
                 var rawData = report.getRawChartData(options.getChartOption());
+                boolean enoughData = !rawData.isEmpty();
 
                 itemView.post(() -> {
-                    if (this.report != report) {
-                        return;
-                    }
+                    if (this.report != report) return;
 
-                    boolean enoughData = !rawData.isEmpty();
-                    if (enoughData) {
-                        removePreviousKubitChart();
-                        View kubitView;
-                        if (report instanceof OverallCostsReport) {
-                            kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
-                        } else if (report instanceof FuelConsumptionReport ||
-                                report instanceof FuelPriceReport ||
-                                (report instanceof MileageReport && options.getChartOption() != 2)) {
-                            kubitView = KubitChartBridge.createLineChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
-                        } else {
-                            kubitView = KubitChartBridge.createColumnChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+                    // 1. Renderizar detalles primero
+                    int currentChildCount = details.getChildCount();
+                    int requiredCount = reportData.size();
+
+                    for (int i = 0; i < Math.max(currentChildCount, requiredCount); i++) {
+                        if (i >= requiredCount) {
+                            details.getChildAt(i).setVisibility(View.GONE);
+                            continue;
                         }
 
-                        chartContainer.addView(kubitView);
-                    }
+                        var item = reportData.get(i);
+                        boolean isSection = item instanceof AbstractReport.Section;
+                        int layout = isSection ? R.layout.report_row_section : R.layout.report_row_data;
 
-                    chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
-                    chartContainer.setVisibility(enoughData ? View.VISIBLE : View.GONE);
+                        View rowView = i < currentChildCount ? details.getChildAt(i) : null;
+                        boolean needsInflate = rowView == null || (isSection != (rowView instanceof TextView));
 
-                    // Resetear visibilidad al iniciar la carga para evitar problemas de reciclaje
-                    details.setVisibility(View.INVISIBLE);
-                    details.removeAllViews();
-                    for (var item : reportData) {
-                        var rowView = View.inflate(details.getContext(),
-                                item instanceof AbstractReport.Section
-                                        ? R.layout.report_row_section
-                                        : R.layout.report_row_data, null);
+                        if (needsInflate) {
+                            if (rowView != null) details.removeViewAt(i);
+                            rowView = LayoutInflater.from(details.getContext()).inflate(layout, details, false);
+                            details.addView(rowView, i);
+                        } else {
+                            rowView.setVisibility(View.VISIBLE);
+                        }
+
+                        DetailViewHolder vh = (DetailViewHolder) rowView.getTag();
+                        if (vh == null) {
+                            vh = new DetailViewHolder(rowView);
+                            rowView.setTag(vh);
+                        }
 
                         if (item instanceof AbstractReport.Section section) {
-                            var text = (TextView) rowView;
-
-                            text.setText(section.getLabel());
-                            text.setTextColor(section.getColor());
-                            var drawableBottom = (GradientDrawable) text
-                                    .getCompoundDrawables()[3];
-                            drawableBottom.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
+                            vh.label.setText(section.getLabel());
+                            vh.label.setTextColor(section.getColor());
+                            if (vh.sectionDrawable != null) {
+                                vh.sectionDrawable.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
+                            }
                         } else {
-                            ((TextView) rowView.findViewById(android.R.id.text1)).setText(item.getLabel());
-                            ((TextView) rowView.findViewById(android.R.id.text2))
-                                    .setText(((AbstractReport.Item) item).getValue());
+                            var dataItem = (AbstractReport.Item) item;
+                            vh.label.setText(dataItem.getLabel());
+                            if (vh.value != null) vh.value.setText(dataItem.getValue());
                         }
-
-                        details.addView(rowView);
                     }
 
-                    // Esperar a que el layout se complete para tener las alturas reales
+                    // Estado inicial cerrado (asegurar que esté detrás de 'main')
                     details.post(() -> {
-                        if (this.report != report) {
-                            return;
-                        }
+                        if (this.report != report) return;
                         var detailsParams = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
-                        // Iniciar en posición "Oculta" (detrás de main)
                         detailsParams.topMargin = enoughData ? (main.getHeight() - details.getHeight()) : 0;
                         details.requestLayout();
                     });
+
+                    // 2. Renderizar gráfico después
+                    itemView.post(() -> {
+                        if (this.report != report) return;
+
+                        removePreviousKubitChart();
+                        if (enoughData) {
+                            View kubitView;
+                            if (report instanceof OverallCostsReport) {
+                                kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
+                            } else if (report instanceof FuelConsumptionReport ||
+                                    report instanceof FuelPriceReport ||
+                                    (report instanceof MileageReport && options.getChartOption() != 2)) {
+                                kubitView = KubitChartBridge.createLineChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+                            } else {
+                                kubitView = KubitChartBridge.createColumnChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+                            }
+                            kubitView.setId(R.id.kubit_chart_view);
+                            chartContainer.addView(kubitView);
+                        }
+
+                        chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
+                        chartContainer.setVisibility(enoughData ? View.VISIBLE : View.GONE);
+                    });
                 });
-            }).start();
+            });
         }
     }
 
@@ -318,7 +345,14 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         }
 
         saveReportChartOptions(requireContext(), currentMenuReport, options);
-        reportAdapter.notifyDataSetChanged();
+
+        // Solo notificamos el cambio para el reporte afectado para evitar recargar todo
+        int index = reportAdapter.getCurrentList().indexOf(currentMenuReport);
+        if (index != -1) {
+            reportAdapter.notifyItemChanged(index);
+        } else {
+            reportAdapter.notifyDataSetChanged();
+        }
 
         return true;
     }
@@ -513,5 +547,24 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         prefsEdit.putBoolean(reportName + "_show_overall_trend", options.isShowOverallTrend());
         prefsEdit.putInt(reportName + "_current_chart_option", options.getChartOption());
         prefsEdit.apply();
+    }
+
+    private static class DetailViewHolder {
+        final TextView label;
+        @Nullable
+        final TextView value;
+        @Nullable
+        final GradientDrawable sectionDrawable;
+
+        DetailViewHolder(View v) {
+            label = v.findViewById(android.R.id.text1);
+            value = v.findViewById(android.R.id.text2);
+            var drawables = label.getCompoundDrawables();
+            if (drawables.length > 3 && drawables[3] instanceof GradientDrawable gd) {
+                sectionDrawable = gd;
+            } else {
+                sectionDrawable = null;
+            }
+        }
     }
 }

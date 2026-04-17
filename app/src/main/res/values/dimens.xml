@@ -28,7 +28,7 @@
     <dimen name="min_touch_target_size">48dp</dimen>
 
     <!-- Chart Dimensions -->
-    <dimen name="chart_height">220dp</dimen>
+    <dimen name="chart_height">260dp</dimen>
     <dimen name="chart_canvas_height">205dp</dimen>
     <dimen name="chart_axis_padding_start">25dp</dimen>
     <dimen name="chart_axis_padding_bottom">15dp</dimen>
@@ -52,7 +52,7 @@
     <dimen name="calculator_unit_text_size">16sp</dimen>
 
     <!-- Pie/Donut Specific -->
-    <dimen name="chart_pie_size">130dp</dimen>
+    <dimen name="chart_pie_size">160dp</dimen>
     <dimen name="chart_donut_thickness">30dp</dimen>
     <dimen name="chart_legend_dot_size">8dp</dimen>
     <dimen name="chart_legend_dot_spacing">6dp</dimen>
