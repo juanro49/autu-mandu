@@ -24,19 +24,20 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.selection.ItemDetailsLookup;
+import androidx.recyclerview.selection.ItemKeyProvider;
+import androidx.recyclerview.selection.SelectionTracker;
+import androidx.recyclerview.selection.StorageStrategy;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
-import com.bignerdranch.android.multiselector.MultiSelector;
-import com.bignerdranch.android.multiselector.SwappingHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,14 +52,14 @@ public abstract class AbstractDataListFragment<T> extends
     public static final boolean EXTRA_ACTIVATE_ON_CLICK_DEFAULT = false;
     public static final String EXTRA_CAR_ID = "car_id";
 
-    private static final String STATE_SELECTED_ITEMS = "selected_items";
+    private static final String STATE_SELECTION = "selection_state";
     private static final int REQUEST_DELETE = 0;
 
     protected long carId;
 
     private DataAdapter listAdapter;
-    private final MultiSelector multiSelector = new MultiSelector();
-    private final DataModalMultiSelector modalMultiSelector = new DataModalMultiSelector(multiSelector);
+    private SelectionTracker<Long> selectionTracker;
+    private ActionMode actionMode;
     private DataListCallback dataListCallback;
     private boolean activateOnClick = EXTRA_ACTIVATE_ON_CLICK_DEFAULT;
 
@@ -87,8 +88,6 @@ public abstract class AbstractDataListFragment<T> extends
                     EXTRA_ACTIVATE_ON_CLICK_DEFAULT);
             carId = args.getLong(EXTRA_CAR_ID);
         }
-
-        multiSelector.setSelectable(activateOnClick);
     }
 
     @Nullable
@@ -107,36 +106,60 @@ public abstract class AbstractDataListFragment<T> extends
         list.setAdapter(listAdapter);
         dataListCallback.onViewCreated(list);
 
-        getLiveData().observe(getViewLifecycleOwner(), data -> {
-            listAdapter.setData(data);
-            if (multiSelector.getSelectedPositions().size() == 1) {
-                var pos = multiSelector.getSelectedPositions().get(0);
-                dataListCallback.onItemSelected(getExtraEdit(), listAdapter.getItemId(pos));
+        selectionTracker = new SelectionTracker.Builder<>(
+                "data-selection-" + carId,
+                list,
+                new DataKeyProvider(),
+                new DataItemDetailsLookup(list),
+                StorageStrategy.createLongStorage())
+                .build();
+
+        selectionTracker.addObserver(new SelectionTracker.SelectionObserver<>() {
+            @Override
+            public void onSelectionChanged() {
+                if (selectionTracker.hasSelection() && actionMode == null) {
+                    var activity = (AppCompatActivity) getActivity();
+                    if (activity != null) {
+                        actionMode = activity.startSupportActionMode(new ActionModeCallback());
+                    }
+                } else if (!selectionTracker.hasSelection() && actionMode != null) {
+                    actionMode.finish();
+                }
+
+                if (actionMode != null) {
+                    var count = selectionTracker.getSelection().size();
+                    actionMode.setTitle(String.format(getString(R.string.cab_title_selected), count));
+                }
+
+                if (activateOnClick && selectionTracker.getSelection().size() == 1) {
+                    long id = selectionTracker.getSelection().iterator().next();
+                    dataListCallback.onItemSelected(getExtraEdit(), id);
+                }
             }
         });
 
+        getLiveData().observe(getViewLifecycleOwner(), listAdapter::setData);
+
         if (savedInstanceState != null) {
-            var savedSelections = savedInstanceState.getBundle(STATE_SELECTED_ITEMS);
-            if (savedSelections != null) {
-                multiSelector.restoreSelectionStates(savedSelections);
-            }
+            selectionTracker.onRestoreInstanceState(savedInstanceState.getBundle(STATE_SELECTION));
         }
 
         getChildFragmentManager().setFragmentResultListener(MessageDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
             var action = result.getInt(MessageDialogFragment.RESULT_ACTION);
             var requestCode = result.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
             if (action == MessageDialogFragment.ACTION_POSITIVE && requestCode == REQUEST_DELETE) {
-                var positions = new ArrayList<>(multiSelector.getSelectedPositions());
                 var idsToDelete = new ArrayList<Long>();
-                for (var position : positions) {
-                    idsToDelete.add(listAdapter.getItemId(position));
+                for (var id : selectionTracker.getSelection()) {
+                    idsToDelete.add(id);
                 }
 
                 for (var id : idsToDelete) {
                     deleteItem(id);
                 }
 
-                modalMultiSelector.finish();
+                if (actionMode != null) {
+                    actionMode.finish();
+                }
             }
         });
 
@@ -146,22 +169,30 @@ public abstract class AbstractDataListFragment<T> extends
     @Override
     public void onPause() {
         super.onPause();
-        modalMultiSelector.finish();
+        if (actionMode != null) {
+            actionMode.finish();
+        }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putBundle(STATE_SELECTED_ITEMS, multiSelector.saveSelectionStates());
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        if (selectionTracker != null) {
+            var selectionBundle = new Bundle();
+            selectionTracker.onSaveInstanceState(selectionBundle);
+            outState.putBundle(STATE_SELECTION, selectionBundle);
+        }
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void unselectItem(boolean finishActionMode) {
-        if (finishActionMode) {
-            modalMultiSelector.finish();
+        if (finishActionMode && actionMode != null) {
+            actionMode.finish();
         }
 
-        multiSelector.clearSelections();
+        if (selectionTracker != null) {
+            selectionTracker.clearSelection();
+        }
     }
 
     protected abstract int getAlertDeleteManyMessage();
@@ -178,15 +209,17 @@ public abstract class AbstractDataListFragment<T> extends
 
     protected abstract LiveData<List<T>> getLiveData();
 
-    private abstract class AbstractDataViewHolder extends SwappingHolder {
+    private abstract static class AbstractDataViewHolder extends RecyclerView.ViewHolder {
         public AbstractDataViewHolder(View itemView) {
-            super(itemView, multiSelector);
+            super(itemView);
         }
 
-        public abstract void bind(SparseArray<String> item);
+        public abstract void bind(SparseArray<String> item, boolean isSelected);
+
+        public abstract ItemDetailsLookup.ItemDetails<Long> getItemDetails();
     }
 
-    private class DataViewHolder extends AbstractDataViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    private class DataViewHolder extends AbstractDataViewHolder implements View.OnClickListener {
         private final int[] fields = {R.id.title, R.id.subtitle, R.id.date,
                 R.id.data1, R.id.data1_calculated, R.id.data2,
                 R.id.data2_calculated, R.id.data3, R.id.data3_calculated};
@@ -205,11 +238,12 @@ public abstract class AbstractDataListFragment<T> extends
             dataInvalid = itemView.findViewById(R.id.data_invalid);
 
             itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
         }
 
         @Override
-        public void bind(SparseArray<String> item) {
+        public void bind(SparseArray<String> item, boolean isSelected) {
+            itemView.setActivated(isSelected);
+
             for (var field : fields) {
                 var textView = textViews.get(field);
                 var value = item.get(field);
@@ -231,32 +265,26 @@ public abstract class AbstractDataListFragment<T> extends
         }
 
         @Override
-        public void onClick(View v) {
-            var id = listAdapter.getItemId(getBindingAdapterPosition());
-            if (multiSelector.tapSelection(this)) {
-                // Selection is on, so tapSelection() toggled item selection.
-                if (modalMultiSelector.isActive()) {
-                    modalMultiSelector.notifyMultiSelectionChanged();
-                } else {
-                    multiSelector.clearSelections();
-                    multiSelector.setSelected(this, true);
-                    dataListCallback.onItemSelected(getExtraEdit(), id);
+        public ItemDetailsLookup.ItemDetails<Long> getItemDetails() {
+            return new ItemDetailsLookup.ItemDetails<>() {
+                @Override
+                public int getPosition() {
+                    return getBindingAdapterPosition();
                 }
-            } else {
-                // Selection is off; handle normal item click here.
-                dataListCallback.onItemSelected(getExtraEdit(), id);
-            }
+
+                @Override
+                public Long getSelectionKey() {
+                    return listAdapter.getItemId(getBindingAdapterPosition());
+                }
+            };
         }
 
         @Override
-        public boolean onLongClick(View v) {
-            var activity = (AppCompatActivity) getActivity();
-            if (activity != null) {
-                activity.startSupportActionMode(modalMultiSelector);
+        public void onClick(View v) {
+            if (!selectionTracker.hasSelection()) {
+                var id = listAdapter.getItemId(getBindingAdapterPosition());
+                dataListCallback.onItemSelected(getExtraEdit(), id);
             }
-            multiSelector.setSelected(this, true);
-            modalMultiSelector.notifyMultiSelectionChanged();
-            return true;
         }
     }
 
@@ -270,8 +298,24 @@ public abstract class AbstractDataListFragment<T> extends
         }
 
         @Override
-        public void bind(SparseArray<String> item) {
+        public void bind(SparseArray<String> item, boolean isSelected) {
+            itemView.setActivated(isSelected);
             title.setText(item.get(R.id.title));
+        }
+
+        @Override
+        public ItemDetailsLookup.ItemDetails<Long> getItemDetails() {
+            return new ItemDetailsLookup.ItemDetails<>() {
+                @Override
+                public int getPosition() {
+                    return getBindingAdapterPosition();
+                }
+
+                @Override
+                public Long getSelectionKey() {
+                    return listAdapter.getItemId(getBindingAdapterPosition());
+                }
+            };
         }
     }
 
@@ -301,7 +345,8 @@ public abstract class AbstractDataListFragment<T> extends
             if (data != null && position < data.size()) {
                 var item = data.get(position);
                 var itemData = getItemData(item);
-                holder.bind(itemData);
+                boolean isSelected = selectionTracker != null && selectionTracker.isSelected(getItemId(position));
+                holder.bind(itemData, isSelected);
             }
         }
 
@@ -315,7 +360,7 @@ public abstract class AbstractDataListFragment<T> extends
             if (data != null && position < data.size()) {
                 return AbstractDataListFragment.this.getItemId(data.get(position));
             } else {
-                return 0;
+                return RecyclerView.NO_ID;
             }
         }
 
@@ -328,17 +373,70 @@ public abstract class AbstractDataListFragment<T> extends
             }
         }
 
-        public void setData(List<T> data) {
-            this.data = data;
+        public void setData(List<T> newData) {
+            this.data = newData;
             notifyDataSetChanged();
+        }
+
+        public int getPosition(long key) {
+            for (int i = 0; i < data.size(); i++) {
+                if (getItemId(i) == key) {
+                    return i;
+                }
+            }
+            return RecyclerView.NO_POSITION;
         }
     }
 
-    private class DataModalMultiSelector extends ModalMultiSelectorCallback {
-        private ActionMode actionMode;
+    private class DataKeyProvider extends ItemKeyProvider<Long> {
+        public DataKeyProvider() {
+            super(SCOPE_MAPPED);
+        }
 
-        public DataModalMultiSelector(MultiSelector multiSelector) {
-            super(multiSelector);
+        @Nullable
+        @Override
+        public Long getKey(int position) {
+            return listAdapter.getItemId(position);
+        }
+
+        @Override
+        public int getPosition(@NonNull Long key) {
+            return listAdapter.getPosition(key);
+        }
+    }
+
+    private static class DataItemDetailsLookup extends ItemDetailsLookup<Long> {
+        private final RecyclerView recyclerView;
+
+        public DataItemDetailsLookup(RecyclerView recyclerView) {
+            this.recyclerView = recyclerView;
+        }
+
+        @Nullable
+        @Override
+        public ItemDetails<Long> getItemDetails(@NonNull MotionEvent e) {
+            View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
+            if (view != null) {
+                RecyclerView.ViewHolder holder = recyclerView.getChildViewHolder(view);
+            if (holder instanceof AbstractDataViewHolder abstractDataViewHolder) {
+                return abstractDataViewHolder.getItemDetails();
+            }
+            }
+            return null;
+        }
+    }
+
+    private class ActionModeCallback implements ActionMode.Callback {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            dataListCallback.onItemUnselected();
+            mode.getMenuInflater().inflate(R.menu.view_data_cab, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
         }
 
         @Override
@@ -346,7 +444,7 @@ public abstract class AbstractDataListFragment<T> extends
             var itemId = item.getItemId();
             if (itemId == R.id.menu_delete) {
                 var message = String.format(getString(getAlertDeleteManyMessage()),
-                        multiSelector.getSelectedPositions().size());
+                        selectionTracker.getSelection().size());
                 MessageDialogFragment.newInstance(
                         REQUEST_DELETE, R.string.alert_delete_title, message,
                         android.R.string.yes, android.R.string.no).show(
@@ -357,38 +455,9 @@ public abstract class AbstractDataListFragment<T> extends
         }
 
         @Override
-        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            super.onCreateActionMode(actionMode, menu);
-
-            this.actionMode = actionMode;
-            dataListCallback.onItemUnselected();
-
-            actionMode.getMenuInflater().inflate(R.menu.view_data_cab, menu);
-
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode actionMode) {
-            super.onDestroyActionMode(actionMode);
-            this.actionMode = null;
-            multiSelector.clearSelections();
-            multiSelector.setSelectable(activateOnClick);
-        }
-
-        public void notifyMultiSelectionChanged() {
-            var count = multiSelector.getSelectedPositions().size();
-            actionMode.setTitle(String.format(getString(R.string.cab_title_selected), count));
-        }
-
-        public void finish() {
-            if (actionMode != null) {
-                actionMode.finish();
-            }
-        }
-
-        public boolean isActive() {
-            return actionMode != null;
+        public void onDestroyActionMode(ActionMode mode) {
+            selectionTracker.clearSelection();
+            actionMode = null;
         }
     }
 }

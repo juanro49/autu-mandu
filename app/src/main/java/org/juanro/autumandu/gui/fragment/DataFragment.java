@@ -18,17 +18,16 @@ package org.juanro.autumandu.gui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentManager.OnBackStackChangedListener;
-import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager.widget.ViewPager.SimpleOnPageChangeListener;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,8 +55,8 @@ public class DataFragment extends Fragment implements DataListCallback,
             if (isPop && !skipNextIfPop) {
                 setNoEntrySelectedTextVisible(true);
                 for (var childFragment : getChildFragmentManager().getFragments()) {
-                    if (childFragment instanceof DataListListener) {
-                        ((DataListListener) childFragment).unselectItem(false);
+                    if (childFragment instanceof DataListListener dataListListener) {
+                        dataListListener.unselectItem(false);
                     }
                 }
             } else if (!isPop) {
@@ -72,15 +71,15 @@ public class DataFragment extends Fragment implements DataListCallback,
         }
     }
 
-    private class DataListOnPageChangeListener extends SimpleOnPageChangeListener {
+    private class DataListOnPageChangeListener extends ViewPager2.OnPageChangeCallback {
         @Override
         public void onPageSelected(int position) {
             onItemUnselected();
 
             var fragments = getChildFragmentManager().getFragments();
             for (var childFragment : fragments) {
-                if (childFragment instanceof DataListListener) {
-                    ((DataListListener) childFragment).unselectItem(true);
+                if (childFragment instanceof DataListListener dataListListener) {
+                    dataListListener.unselectItem(true);
                 }
             }
 
@@ -96,22 +95,22 @@ public class DataFragment extends Fragment implements DataListCallback,
         }
     }
 
-    private class DataListPagerAdapter extends FragmentStatePagerAdapter {
+    private class DataListPagerAdapter extends FragmentStateAdapter {
         private final String[] titles;
 
-        public DataListPagerAdapter(FragmentManager fm) {
-            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        public DataListPagerAdapter(Fragment fragment) {
+            super(fragment);
             titles = getResources().getStringArray(R.array.data_list_page_titles);
         }
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return titles.length;
         }
 
         @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             AbstractDataListFragment<?> fragment = switch (position) {
                 case 0 -> new DataListRefuelingFragment();
                 case 1 -> new DataListTireFragment();
@@ -137,15 +136,8 @@ public class DataFragment extends Fragment implements DataListCallback,
             return args;
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
+        public String getTitle(int position) {
             return titles[position];
-        }
-
-        @Override
-        public void restoreState(Parcelable state, ClassLoader loader) {
-            // Do nothing here! This is a fix for a NullPointerException described here:
-            // http://stackoverflow.com/questions/18642890/
         }
     }
 
@@ -175,18 +167,18 @@ public class DataFragment extends Fragment implements DataListCallback,
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         var v = inflater.inflate(R.layout.fragment_data, container, false);
 
-        var pagerAdapter = new DataListPagerAdapter(getChildFragmentManager());
+        var pagerAdapter = new DataListPagerAdapter(this);
 
-        var pager = (ViewPager) v.findViewById(R.id.pager);
+        var pager = (ViewPager2) v.findViewById(R.id.pager);
         pager.setAdapter(pagerAdapter);
-        pager.addOnPageChangeListener(new DataListOnPageChangeListener());
+        pager.registerOnPageChangeCallback(new DataListOnPageChangeListener());
 
         var tabs = (TabLayout) v.findViewById(R.id.tab_layout);
-        tabs.setupWithViewPager(pager);
+        new TabLayoutMediator(tabs, pager, (tab, position) -> tab.setText(pagerAdapter.getTitle(position))).attach();
 
         txtNoEntrySelected = v.findViewById(R.id.txt_no_entry_selected);
         if (getChildFragmentManager().findFragmentById(R.id.detail) != null) {

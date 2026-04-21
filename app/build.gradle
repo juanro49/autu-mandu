@@ -5,16 +5,16 @@ plugins {
 }
 
 android {
-    compileSdk 37
-    namespace 'org.juanro.autumandu'
+    compileSdk = 37
+    namespace = 'org.juanro.autumandu'
 
     defaultConfig {
-        applicationId "org.juanro.autumandu"
-        minSdk 26
-        targetSdk 37
-        versionCode 500
-        versionName "5.0.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        applicationId = "org.juanro.autumandu"
+        minSdk = 26
+        targetSdk = 37
+        versionCode = 500
+        versionName = "5.0.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -25,8 +25,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             // No incluir metadatos de Git en el APK final
@@ -38,13 +38,14 @@ android {
 
     buildFeatures {
         buildConfig = true
-        compose true
+        compose = true
         resValues = true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_21
-        targetCompatibility JavaVersion.VERSION_21
+        coreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     // JVM Toolchain para garantizar consistencia en cualquier entorno
@@ -55,8 +56,8 @@ android {
     }
 
     lint {
-        checkReleaseBuilds false
-        abortOnError false
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 
     packaging {
@@ -104,6 +105,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.recyclerview:recyclerview-selection:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'androidx.fragment:fragment:1.8.9'
     implementation 'androidx.documentfile:documentfile:1.1.0'
@@ -124,7 +126,6 @@ dependencies {
 
     // --- External Charts & UI ---
     implementation 'com.kubit-lab:charts:0.2.1'
-    implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
     implementation 'com.mikepenz:aboutlibraries-core:14.0.1'
     implementation 'com.mikepenz:aboutlibraries:14.0.1'
 

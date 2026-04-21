@@ -52,16 +52,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/primary"
+                        android:contentDescription="@string/data_categories_desc"
                         app:tabMode="scrollable"/>
 
-                    <androidx.viewpager.widget.ViewPager
+                    <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/pager"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
                 </LinearLayout>
 
                 <include layout="@layout/include_fab"/>
-
             </FrameLayout>
 
             <FrameLayout
@@ -77,12 +77,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:drawableTop="@drawable/ic_c_refueling_128dp"
+                    app:drawableTopCompat="@drawable/ic_c_refueling_128dp"
                     android:text="@string/edit_message_no_entry_selected"
                     android:textAppearance="?android:attr/textAppearanceLarge"/>
             </FrameLayout>
         </LinearLayout>
-
     </LinearLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

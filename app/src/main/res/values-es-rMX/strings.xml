@@ -285,6 +285,7 @@
     <string name="price_entry_mode_total_and_volume">Precio total &amp; volumen</string>
     <string name="missing_refueling">Recarga sin registro</string>
     <string name="invalid_data">Este registro contiene información inválida. Modifica el registro y guardalo para mostrar el error detallado.</string>
+    <string name="data_categories_desc">Categorías de datos del vehículo</string>
     <string name="graph_details_desc">Detalles de la gráfica</string>
     <string name="graph_options_desc">Ajustes de la gráfica</string>
     <string name="graph_close_full_screen_desc">Cerrar gráfica de pantalla completa</string>
