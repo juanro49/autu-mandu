@@ -19,8 +19,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import org.joda.time.DateTime;
-
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Locale;
 
@@ -37,12 +37,13 @@ public record TimeSpan(TimeSpanUnit unit, int count) {
     private static final float DEVIATION = 0.9f;
 
     public Date addTo(Date date) {
-        var dateTime = new DateTime(date);
-        return switch (unit) {
-            case DAY -> dateTime.plusDays(count).toDate();
-            case MONTH -> dateTime.plusMonths(count).toDate();
-            case YEAR -> dateTime.plusYears(count).toDate();
+        ZonedDateTime dateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        ZonedDateTime result = switch (unit) {
+            case DAY -> dateTime.plusDays(count);
+            case MONTH -> dateTime.plusMonths(count);
+            case YEAR -> dateTime.plusYears(count);
         };
+        return Date.from(result.toInstant());
     }
 
     @NonNull

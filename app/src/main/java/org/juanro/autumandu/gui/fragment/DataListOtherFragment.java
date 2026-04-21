@@ -22,8 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.text.format.DateFormat;
 import android.util.SparseArray;
 
-import org.joda.time.DateTime;
-
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -100,7 +99,7 @@ public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
         data.put(R.id.data3, repeatIntervals[otherCost.getRecurrenceInterval().ordinal()]);
         if (!otherCost.getRecurrenceInterval().equals(RecurrenceInterval.ONCE)) {
             int recurrences;
-            if (otherCost.getEndDate() == null || new DateTime(otherCost.getEndDate()).isAfterNow()) {
+            if (otherCost.getEndDate() == null || otherCost.getEndDate().after(new Date())) {
                 recurrences = Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(),
                         otherCost.getRecurrenceMultiplier(), otherCost.getDate());
             } else {

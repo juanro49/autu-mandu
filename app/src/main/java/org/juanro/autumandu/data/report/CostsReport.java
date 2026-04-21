@@ -19,11 +19,14 @@ package org.juanro.autumandu.data.report;
 import android.content.Context;
 import android.text.format.DateFormat;
 
-import org.joda.time.DateTime;
-import org.joda.time.Seconds;
-
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,10 +69,10 @@ public class CostsReport extends AbstractReport {
             mOption = option;
         }
 
-        public void add(DateTime date, float costs) {
+        public void add(ZonedDateTime date, float costs) {
             float x;
             if (mOption == GRAPH_OPTION_MONTH) {
-                x = date.getYear() * 12 + date.getMonthOfYear() - 1;
+                x = date.getYear() * 12 + date.getMonthValue() - 1;
             } else {
                 x = date.getYear();
             }
@@ -112,8 +115,8 @@ public class CostsReport extends AbstractReport {
                 int dateValue = (int) value;
                 int year = dateValue / 12;
                 int month = (dateValue % 12) + 1;
-                DateTime date = new DateTime(year, month, 1, 0, 0);
-                return date.toString(mXLabelFormat[chartOption]);
+                LocalDate date = LocalDate.of(year, month, 1);
+                return date.format(DateTimeFormatter.ofPattern(mXLabelFormat[chartOption]));
             } else {
                 return String.valueOf((int) value);
             }
@@ -207,8 +210,10 @@ public class CostsReport extends AbstractReport {
 
             final int startMileage = car.getInitialMileage();
             int endMileage = Integer.MIN_VALUE;
-            DateTime startDate = new DateTime();
-            DateTime endDate = (car.getSuspendedSince() != null) ? new DateTime(car.getSuspendedSince()) : new DateTime();
+            ZonedDateTime startDate = ZonedDateTime.now();
+            ZonedDateTime endDate = (car.getSuspendedSince() != null) ?
+                    ZonedDateTime.ofInstant(car.getSuspendedSince().toInstant(), ZoneId.systemDefault()) :
+                    ZonedDateTime.now();
 
             // Usar el balanceador en los repostajes precargados
             List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
@@ -231,8 +236,8 @@ public class CostsReport extends AbstractReport {
             double totalCosts = 0;
             double costsWithinYear = 0;
 
-            DateTime now = DateTime.now();
-            DateTime lastYearDate = now.minusYears(1);
+            ZonedDateTime now = ZonedDateTime.now();
+            ZonedDateTime lastYearDate = now.minusYears(1);
 
             for (BalancedRefueling refueling : refuelings) {
                 if (refueling.getPrice() == 0.0f) {
@@ -240,7 +245,7 @@ public class CostsReport extends AbstractReport {
                 }
                 totalCosts += refueling.getPrice();
 
-                DateTime date = new DateTime(refueling.getDate());
+                ZonedDateTime date = ZonedDateTime.ofInstant(refueling.getDate().toInstant(), ZoneId.systemDefault());
                 monthReportData.add(date, refueling.getPrice());
                 yearReportData.add(date, refueling.getPrice());
 
@@ -259,21 +264,19 @@ public class CostsReport extends AbstractReport {
                 int recurrencesInLastYear;
 
                 if (otherCost.getEndDate() == null ||
-                        new DateTime(otherCost.getEndDate()).isAfterNow()) {
+                        otherCost.getEndDate().after(new Date())) {
                     recurrences = Recurrences.getRecurrencesSince(
                             otherCost.getRecurrenceInterval(),
                             otherCost.getRecurrenceMultiplier(),
                             otherCost.getDate());
 
-                    // Si el gasto empezó hace menos de un año, recurrencesBeforeLastYear será 0 o similar
-                    // Vamos a simplificarlo a lo que Recurrences espera:
                     recurrencesInLastYear = Recurrences.getRecurrencesBetween(
                             otherCost.getRecurrenceInterval(),
                             otherCost.getRecurrenceMultiplier(),
                             otherCost.getDate(),
-                            now.toDate(),
-                            lastYearDate.toDate(),
-                            now.toDate());
+                            Date.from(now.toInstant()),
+                            Date.from(lastYearDate.toInstant()),
+                            Date.from(now.toInstant()));
                 } else {
                     recurrences = Recurrences.getRecurrencesBetween(
                             otherCost.getRecurrenceInterval(),
@@ -285,22 +288,22 @@ public class CostsReport extends AbstractReport {
                             otherCost.getRecurrenceMultiplier(),
                             otherCost.getDate(),
                             otherCost.getEndDate(),
-                            lastYearDate.toDate(),
+                            Date.from(lastYearDate.toInstant()),
                             otherCost.getEndDate());
                 }
 
                 totalCosts += otherCost.getPrice() * recurrences;
                 costsWithinYear += otherCost.getPrice() * recurrencesInLastYear;
 
-                DateTime date = new DateTime(otherCost.getDate());
-                DateTime recurrenceEndDate = (otherCost.getEndDate() != null && endDate.isAfter(otherCost.getEndDate().getTime()))
-                        ? new DateTime(otherCost.getEndDate()) : endDate;
+                ZonedDateTime date = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
+                ZonedDateTime recurrenceEndDate = (otherCost.getEndDate() != null && endDate.isAfter(ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault())))
+                        ? ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault()) : endDate;
 
                 while (date.isBefore(recurrenceEndDate)) {
                     monthReportData.add(date, otherCost.getPrice());
                     yearReportData.add(date, otherCost.getPrice());
                     switch (otherCost.getRecurrenceInterval()) {
-                        case ONCE -> date = DateTime.now().plusYears(100); // Terminar el bucle
+                        case ONCE -> date = ZonedDateTime.now().plusYears(100); // Terminar el bucle
                         case DAY -> date = date.plusDays(otherCost.getRecurrenceMultiplier());
                         case MONTH -> date = date.plusMonths(otherCost.getRecurrenceMultiplier());
                         case QUARTER -> date = date.plusMonths(otherCost.getRecurrenceMultiplier() * 3);
@@ -312,8 +315,8 @@ public class CostsReport extends AbstractReport {
                     endMileage = Math.max(endMileage, otherCost.getMileage());
                 }
 
-                if (startDate.isAfter(otherCost.getDate().getTime())) {
-                    startDate = new DateTime(otherCost.getDate());
+                if (startDate.isAfter(ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault()))) {
+                    startDate = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
                 }
             }
 
@@ -323,7 +326,7 @@ public class CostsReport extends AbstractReport {
                 }
                 totalCosts += tireList.getPrice();
 
-                DateTime date = new DateTime(tireList.getBuyDate());
+                ZonedDateTime date = ZonedDateTime.ofInstant(tireList.getBuyDate().toInstant(), ZoneId.systemDefault());
                 monthReportData.add(date, tireList.getPrice());
                 yearReportData.add(date, tireList.getPrice());
 
@@ -337,21 +340,21 @@ public class CostsReport extends AbstractReport {
             }
 
             // Calcular promedios
-            Seconds elapsedSeconds = Seconds.secondsBetween(startDate, endDate);
-            double costsPerSecond = totalCosts / Math.max(1, elapsedSeconds.getSeconds());
+            long elapsedSeconds = ChronoUnit.SECONDS.between(startDate, endDate);
+            double costsPerSecond = totalCosts / Math.max(1L, elapsedSeconds);
 
             section.addItem(new Item("Ø " + mContext.getString(R.string.report_day),
-                    mContext.getString((elapsedSeconds.getSeconds() > DAY_SECONDS ?
+                    mContext.getString((elapsedSeconds > DAY_SECONDS ?
                                     R.string.report_price : R.string.report_price_estimated),
                             costsPerSecond * DAY_SECONDS, mUnit)));
 
             section.addItem(new Item("Ø " + mContext.getString(R.string.report_month),
-                    mContext.getString((elapsedSeconds.getSeconds() > MONTH_SECONDS ?
+                    mContext.getString((elapsedSeconds > MONTH_SECONDS ?
                                     R.string.report_price : R.string.report_price_estimated),
                             costsPerSecond * MONTH_SECONDS, mUnit)));
 
             section.addItem(new Item("Ø " + mContext.getString(R.string.report_year),
-                    mContext.getString((elapsedSeconds.getSeconds() > YEAR_SECONDS ?
+                    mContext.getString((elapsedSeconds > YEAR_SECONDS ?
                                     R.string.report_price : R.string.report_price_estimated),
                             costsPerSecond * YEAR_SECONDS, mUnit)));
 
@@ -363,7 +366,7 @@ public class CostsReport extends AbstractReport {
                     mContext.getString(R.string.report_price, costsWithinYear, mUnit)));
 
             section.addItem(new Item(mContext.getString(R.string.report_since,
-                    DateFormat.getDateFormat(mContext).format(startDate.toDate())),
+                    DateFormat.getDateFormat(mContext).format(Date.from(startDate.toInstant()))),
                     mContext.getString(R.string.report_price, totalCosts, mUnit)));
         }
     }

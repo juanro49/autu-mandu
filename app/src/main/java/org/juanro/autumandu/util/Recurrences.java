@@ -16,11 +16,9 @@
 
 package org.juanro.autumandu.util;
 
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.Months;
-import org.joda.time.Years;
-
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
@@ -84,76 +82,76 @@ public final class Recurrences {
      * @param start      The beginning of the recurring event.
      * @param end        The end of the recurring event.
      * @param from       The beginning of the time frame.
-     * @param to         The end of the time frame.
+     * @param to         ...
      * @return The count of the recurrences.
      */
     public static int getRecurrencesBetween(RecurrenceInterval interval, int multiplier, Date start,
                                             Date end, Date from, Date to) {
-        var startDt = new DateTime(start);
-        var endDt = new DateTime(end);
-        var fromDt = new DateTime(from);
-        var toDt = new DateTime(to);
+        ZonedDateTime startDt = ZonedDateTime.ofInstant(start.toInstant(), ZoneId.systemDefault());
+        ZonedDateTime endDt = ZonedDateTime.ofInstant(end.toInstant(), ZoneId.systemDefault());
+        ZonedDateTime fromDt = ZonedDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault());
+        ZonedDateTime toDt = ZonedDateTime.ofInstant(to.toInstant(), ZoneId.systemDefault());
 
         if (startDt.isAfter(endDt) || toDt.isBefore(fromDt)) {
             return 0;
         }
 
-        final var finalEndDt = toDt.isBefore(endDt) ? toDt : endDt;
+        final ZonedDateTime finalEndDt = toDt.isBefore(endDt) ? toDt : endDt;
 
         return switch (interval) {
             case ONCE -> ((fromDt.isBefore(startDt) || startDt.isEqual(fromDt)) &&
                     (finalEndDt.isAfter(startDt) || finalEndDt.isEqual(startDt))) ? 1 : 0;
 
             case DAY -> {
-                var currentStart = startDt;
+                ZonedDateTime currentStart = startDt;
                 if (fromDt.isAfter(currentStart)) {
-                    int intervalsBetween = Days.daysBetween(currentStart, fromDt).getDays() / multiplier;
+                    long intervalsBetween = ChronoUnit.DAYS.between(currentStart, fromDt) / multiplier;
                     if (fromDt.isAfter(currentStart.plusDays(intervalsBetween * multiplier))) {
                         intervalsBetween++;
                     }
                     currentStart = currentStart.plusDays(intervalsBetween * multiplier);
                 }
                 yield (currentStart.isBefore(finalEndDt) || currentStart.isEqual(finalEndDt))
-                        ? Days.daysBetween(currentStart, finalEndDt).getDays() / multiplier + 1 : 0;
+                        ? (int) (ChronoUnit.DAYS.between(currentStart, finalEndDt) / multiplier + 1) : 0;
             }
 
             case MONTH -> {
-                var currentStart = startDt;
+                ZonedDateTime currentStart = startDt;
                 if (fromDt.isAfter(currentStart)) {
-                    int intervalsBetween = Months.monthsBetween(currentStart, fromDt).getMonths() / multiplier;
+                    long intervalsBetween = ChronoUnit.MONTHS.between(currentStart, fromDt) / multiplier;
                     if (fromDt.isAfter(currentStart.plusMonths(intervalsBetween * multiplier))) {
                         intervalsBetween++;
                     }
                     currentStart = currentStart.plusMonths(intervalsBetween * multiplier);
                 }
                 yield (currentStart.isBefore(finalEndDt) || currentStart.isEqual(finalEndDt))
-                        ? Months.monthsBetween(currentStart, finalEndDt).getMonths() / multiplier + 1 : 0;
+                        ? (int) (ChronoUnit.MONTHS.between(currentStart, finalEndDt) / multiplier + 1) : 0;
             }
 
             case QUARTER -> {
-                var currentStart = startDt;
+                ZonedDateTime currentStart = startDt;
                 if (fromDt.isAfter(currentStart)) {
-                    int intervalsBetween = Months.monthsBetween(currentStart, fromDt).getMonths() / (3 * multiplier);
+                    long intervalsBetween = ChronoUnit.MONTHS.between(currentStart, fromDt) / (3L * multiplier);
                     if (fromDt.isAfter(currentStart.plusMonths(intervalsBetween * 3 * multiplier))) {
                         intervalsBetween++;
                     }
                     currentStart = currentStart.plusMonths(intervalsBetween * 3 * multiplier);
                 }
                 yield (currentStart.isBefore(finalEndDt) || currentStart.isEqual(finalEndDt))
-                        ? (Months.monthsBetween(currentStart, finalEndDt).getMonths() / 3) / multiplier + 1 : 0;
+                        ? (int) ((ChronoUnit.MONTHS.between(currentStart, finalEndDt) / 3) / multiplier + 1) : 0;
             }
 
             case YEAR -> {
-                var currentStart = startDt;
+                ZonedDateTime currentStart = startDt;
                 if (fromDt.isAfter(currentStart)) {
-                    int intervalsBetween = Years.yearsBetween(currentStart, fromDt).getYears() / multiplier;
+                    long intervalsBetween = ChronoUnit.YEARS.between(currentStart, fromDt) / multiplier;
                     if (fromDt.isAfter(currentStart.plusYears(intervalsBetween * multiplier))) {
                         intervalsBetween++;
                     }
                     currentStart = currentStart.plusYears(intervalsBetween * multiplier);
                 }
                 yield (currentStart.isBefore(finalEndDt) || currentStart.isEqual(finalEndDt))
-                        ? Years.yearsBetween(currentStart, finalEndDt).getYears() / multiplier + 1 : 0;
+                        ? (int) (ChronoUnit.YEARS.between(currentStart, finalEndDt) / multiplier + 1) : 0;
             }
         };
     }

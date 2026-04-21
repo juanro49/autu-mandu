@@ -18,8 +18,10 @@ package org.juanro.autumandu.data.report;
 
 import android.content.Context;
 
-import org.joda.time.DateTime;
-
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,8 +98,8 @@ public class MileageReport extends AbstractReport {
             int lastRefuelingMileage = -1;
             for (BalancedRefueling refueling : refuelings) {
                 if (lastRefuelingMileage > -1) {
-                    DateTime date = new DateTime(refueling.getDate());
-                    float x = date.getYear() * 12 + date.getMonthOfYear() - 1;
+                    ZonedDateTime date = ZonedDateTime.ofInstant(refueling.getDate().toInstant(), ZoneId.systemDefault());
+                    float x = date.getYear() * 12 + date.getMonthValue() - 1;
                     float y = refueling.getMileage() - lastRefuelingMileage;
 
                     int xIndex = indexOf(x);
@@ -139,8 +141,8 @@ public class MileageReport extends AbstractReport {
             int dateValue = (int) value;
             int year = dateValue / 12;
             int month = (dateValue % 12) + 1;
-            DateTime date = new DateTime(year, month, 1, 0, 0);
-            return date.toString(mMonthLabelFormat);
+            LocalDate date = LocalDate.of(year, month, 1);
+            return date.format(DateTimeFormatter.ofPattern(mMonthLabelFormat));
         } else {
             return mDateFormat.format(ReportDateHelper.toDate(value));
         }

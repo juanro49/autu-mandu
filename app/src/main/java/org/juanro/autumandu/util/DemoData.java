@@ -21,8 +21,8 @@ import android.graphics.Color;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.joda.time.DateTime;
-
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -84,7 +84,7 @@ public final class DemoData {
             long punto = createCar(db, "Fiat Punto", Color.BLUE);
 
             int puntoCount = 50;
-            DateTime puntoDate = DateTime.now().minusMonths(puntoCount / 2).withSecondOfMinute(0).withMillisOfSecond(0);
+            ZonedDateTime puntoDate = ZonedDateTime.now().minusMonths(puntoCount / 2).withSecond(0).withNano(0);
             int puntoMileage = 15000;
 
             createOtherCost(db, "Rechtes Abblendlicht", puntoDate.plusDays(randInt(50, 100)), null,
@@ -117,9 +117,8 @@ public final class DemoData {
             long astra = createCar(db, "Opel Astra", Color.RED);
 
             int astraCountSuper95 = 30;
-            int astraCountLpg = 30;
-            DateTime astraDateSuper95 = DateTime.now().minusMonths(astraCountSuper95 / 3).withSecondOfMinute(0).withMillisOfSecond(0);
-            DateTime astraDateLpg = DateTime.now().minusMonths(astraCountSuper95 / 3).withSecondOfMinute(0).withMillisOfSecond(0);
+            ZonedDateTime astraDateSuper95 = ZonedDateTime.now().minusMonths(astraCountSuper95 / 3).withSecond(0).withNano(0);
+            ZonedDateTime astraDateLpg = ZonedDateTime.now().minusMonths(astraCountSuper95 / 3).withSecond(0).withNano(0);
             int astraMileageSuper95 = 120000;
             int astraMileageLpg = 120000;
 
@@ -148,7 +147,7 @@ public final class DemoData {
                 }
             }
 
-            for (int i = 0; i < astraCountLpg; i++) {
+            for (int i = 0; i < astraCountSuper95; i++) { // Reuse count for simplicity
                 astraDateLpg = astraDateLpg.plusDays(randInt(8, 13));
                 astraMileageLpg += randInt(570, 620);
                 float volume = randFloat(25, 30);
@@ -202,13 +201,13 @@ public final class DemoData {
         return db.getStationDao().insert(station)[0];
     }
 
-    private static void createRefueling(AutuManduDatabase db, DateTime date, int mileage, float volume,
+    private static void createRefueling(AutuManduDatabase db, ZonedDateTime date, int mileage, float volume,
                                         float price, boolean partial, String note, long fuelTypeId,
                                         long stationId, long carId) {
         if (Math.random() > 0.95) return;
 
         Refueling refueling = new Refueling();
-        refueling.setDate(date.toDate());
+        refueling.setDate(Date.from(date.toInstant()));
         refueling.setMileage(mileage);
         refueling.setVolume(volume);
         refueling.setPrice(price);
@@ -221,14 +220,14 @@ public final class DemoData {
         db.getRefuelingDao().insert(refueling);
     }
 
-    private static void createOtherCost(AutuManduDatabase db, String title, DateTime date,
-                                        DateTime endDate, int mileage, float price,
+    private static void createOtherCost(AutuManduDatabase db, String title, ZonedDateTime date,
+                                        ZonedDateTime endDate, int mileage, float price,
                                         RecurrenceInterval recurrenceInterval,
                                         int recurrenceMultiplier, String note, long carId) {
         OtherCost otherCost = new OtherCost();
         otherCost.setTitle(title);
-        otherCost.setDate(date.toDate());
-        otherCost.setEndDate(endDate == null ? null : endDate.toDate());
+        otherCost.setDate(Date.from(date.toInstant()));
+        otherCost.setEndDate(endDate == null ? null : Date.from(endDate.toInstant()));
         otherCost.setMileage(mileage);
         otherCost.setPrice(price);
         otherCost.setRecurrenceInterval(recurrenceInterval);
@@ -239,10 +238,10 @@ public final class DemoData {
         db.getOtherCostDao().insert(otherCost);
     }
 
-    private static void createTire(AutuManduDatabase db, DateTime buyDate, DateTime trashDate, float price, int quantity, String manufacturer, String model, String note, long carId) {
+    private static void createTire(AutuManduDatabase db, ZonedDateTime buyDate, ZonedDateTime trashDate, float price, int quantity, String manufacturer, String model, String note, long carId) {
         TireList tireList = new TireList();
-        tireList.setBuyDate(buyDate.toDate());
-        tireList.setTrashDate(trashDate == null ? null : trashDate.toDate());
+        tireList.setBuyDate(Date.from(buyDate.toInstant()));
+        tireList.setTrashDate(trashDate == null ? null : Date.from(trashDate.toInstant()));
         tireList.setPrice(price);
         tireList.setQuantity(quantity);
         tireList.setManufacturer(manufacturer);

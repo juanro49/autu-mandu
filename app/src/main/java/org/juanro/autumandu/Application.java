@@ -20,8 +20,6 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.util.reminder.ReminderEnablerReceiver;
 import org.juanro.autumandu.util.sync.Authenticator;
@@ -38,11 +36,6 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-
-        // Initialize Joda-Time. Manual init is deprecated as it's handled by a ContentProvider,
-        // but keeping it here with suppression ensures it's ready for early access components.
-        //noinspection deprecation
-        JodaTimeAndroid.init(this);
 
         // Schedule alarms for reminders
         ReminderEnablerReceiver.scheduleAlarms(this);

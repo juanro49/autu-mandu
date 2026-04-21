@@ -18,8 +18,9 @@ package org.juanro.autumandu.data.report;
 
 import android.content.Context;
 
-import org.joda.time.DateTime;
-
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -135,7 +136,7 @@ public class OverallCostsReport extends AbstractReport {
             if (otherCosts != null) {
                 for (OtherCost otherCost : otherCosts) {
                     int recurrences;
-                    if (otherCost.getEndDate() == null || new DateTime(otherCost.getEndDate()).isAfterNow()) {
+                    if (otherCost.getEndDate() == null || otherCost.getEndDate().after(new Date())) {
                         recurrences = Recurrences.getRecurrencesSince(
                                 otherCost.getRecurrenceInterval(),
                                 otherCost.getRecurrenceMultiplier(),
@@ -188,12 +189,14 @@ public class OverallCostsReport extends AbstractReport {
 
             // Efficiency metrics - Cost per Distance
             int endMileage = car.getInitialMileage();
-            DateTime startDate = new DateTime(car.getSuspendedSince() != null ? car.getSuspendedSince() : new Date()); // Default to now if not suspended
+            ZonedDateTime startDate = (car.getSuspendedSince() != null) ?
+                    ZonedDateTime.ofInstant(car.getSuspendedSince().toInstant(), ZoneId.systemDefault()) :
+                    ZonedDateTime.now();
 
             if (!balancedRefuelings.isEmpty()) {
                 endMileage = Math.max(endMileage, balancedRefuelings.get(balancedRefuelings.size() - 1).getMileage());
-                if (balancedRefuelings.get(0).getDate().getTime() < startDate.getMillis()) {
-                    startDate = new DateTime(balancedRefuelings.get(0).getDate());
+                if (balancedRefuelings.get(0).getDate().getTime() < startDate.toInstant().toEpochMilli()) {
+                    startDate = ZonedDateTime.ofInstant(balancedRefuelings.get(0).getDate().toInstant(), ZoneId.systemDefault());
                 }
             }
 
@@ -202,8 +205,8 @@ public class OverallCostsReport extends AbstractReport {
                     if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
                         endMileage = Math.max(endMileage, otherCost.getMileage());
                     }
-                    if (otherCost.getDate().getTime() < startDate.getMillis()) {
-                        startDate = new DateTime(otherCost.getDate());
+                    if (otherCost.getDate().getTime() < startDate.toInstant().toEpochMilli()) {
+                        startDate = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
                     }
                 }
             }
@@ -223,7 +226,7 @@ public class OverallCostsReport extends AbstractReport {
             }
 
             // Cost per Time
-            long days = Math.max(1, (DateTime.now().getMillis() - startDate.getMillis()) / (24 * 60 * 60 * 1000));
+            long days = Math.max(1, ChronoUnit.DAYS.between(startDate, ZonedDateTime.now()));
             section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mContext.getString(R.string.report_month),
                     mContext.getString(R.string.report_price, totalCosts / days * 30.4375, mUnit)));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
