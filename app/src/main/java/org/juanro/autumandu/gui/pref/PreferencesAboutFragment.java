@@ -26,7 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import de.psdev.licensesdialog.LicensesDialog;
+import com.mikepenz.aboutlibraries.LibsBuilder;
 import org.juanro.autumandu.BuildConfig;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.util.Assets;
@@ -46,14 +46,10 @@ public class PreferencesAboutFragment extends Fragment {
                 .setText(Assets.getHtml(requireContext(), "thanks.html"));
 
         root.findViewById(R.id.btn_licenses).setOnClickListener(v ->
-                new LicensesDialog.Builder(requireContext())
-                        .setTitle(R.string.about_licenses)
-                        .setNoticesCssStyle(R.string.about_licenses_styles)
-                        .setCloseText(android.R.string.ok)
-                        .setNotices(R.raw.licenses)
-                        .setIncludeOwnLicense(true)
-                        .build()
-                        .show());
+                new LibsBuilder()
+                        .withActivityTitle(getString(R.string.about_licenses))
+                        .withSearchEnabled(true)
+                        .start(requireContext()));
 
         return root;
     }

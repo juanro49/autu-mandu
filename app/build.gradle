@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.compose'
+    id 'com.mikepenz.aboutlibraries.plugin'
 }
 
 android {
@@ -124,7 +125,8 @@ dependencies {
     // --- External Charts & UI ---
     implementation 'com.kubit-lab:charts:0.2.1'
     implementation 'com.bignerdranch.android:recyclerview-multiselect:0.2'
-    implementation 'de.psdev.licensesdialog:licensesdialog:2.2.0'
+    implementation 'com.mikepenz:aboutlibraries-core:14.0.1'
+    implementation 'com.mikepenz:aboutlibraries:14.0.1'
 
     // --- Testing ---
     androidTestImplementation 'androidx.annotation:annotation:1.10.0'
