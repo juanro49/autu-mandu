@@ -14,221 +14,356 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-    <RelativeLayout
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/padding_medium">
+
         <!-- Manufacturer -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_manufacturer_input_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <AutoCompleteTextView
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_manufacturer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/edt_manufacturer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_manufacturer" />
+                android:background="@null"
+                android:inputType="text"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:padding="@dimen/padding_medium"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Model -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_model_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_manufacturer_input_layout">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_manufacturer_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_model"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_model" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Quantity -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_quantity_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_model_input_layout">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_model_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_quantity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_num_tires"
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Price -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_price_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_quantity_input_layout">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_quantity_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_price"
                 android:inputType="number|numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Note -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_note_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_price_input_layout">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_price_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_note"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_note_optional"
                 android:inputType="text|textMultiLine" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Date -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_date_input_layout"
-            android:layout_width="wrap_content"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_note_input_layout"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/edt_time_input_layout"
-            android:layout_toStartOf="@+id/edt_time_input_layout">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toStartOf="@+id/edt_time_input_layout"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_note_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_date" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Time -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_time_input_layout"
-            android:layout_width="wrap_content"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="@dimen/input_field_width_medium"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/edt_date_input_layout"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp">
+            android:layout_marginStart="@dimen/margin_medium"
+            app:layout_constraintBottom_toBottomOf="@+id/edt_date_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/edt_date_input_layout"
+            app:layout_constraintTop_toTopOf="@+id/edt_date_input_layout">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_time"
-                android:layout_width="150dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_time" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Section: Advanced -->
         <TextView
-            style="@style/AppWidget.SectionHeader"
             android:id="@+id/txt_section_advanced"
-            android:layout_width="match_parent"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_time_input_layout"
-            android:text="@string/section_advanced" />
+            android:text="@string/section_advanced"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_date_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
         <!-- Mount options -->
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/chk_mount"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_below="@id/txt_section_advanced"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp"
-            android:text="@string/label_mount_tire" />
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            android:text="@string/label_mount_tire"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_advanced"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_mount_distance_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/chk_mount"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp">
+            android:layout_marginTop="@dimen/spacing_tiny"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chk_mount"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_mount_distance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_mount_distance"
                 android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_mount_date_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_mount_distance_input_layout"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_mount_distance_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_mount_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_mount_date" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Umount options -->
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/chk_umount"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_below="@id/edt_mount_date_input_layout"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp"
-            android:text="@string/label_umount_tire" />
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/label_umount_tire"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_mount_date_input_layout"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_umount_distance_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/chk_umount"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp">
+            android:layout_marginTop="@dimen/spacing_tiny"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chk_umount"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_umount_distance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_umount_distance"
                 android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_umount_date_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_umount_distance_input_layout"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_umount_distance_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_umount_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_umount_date" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Trash Date Options -->
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/chk_trash_date"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_below="@id/edt_umount_date_input_layout"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp"
-            android:text="@string/label_set_trash_date" />
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/label_set_trash_date"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_umount_date_input_layout"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_trash_date_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/chk_trash_date"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp">
+            android:layout_marginTop="@dimen/spacing_tiny"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chk_trash_date"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_trash_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_trash_date" />
         </com.google.android.material.textfield.TextInputLayout>
-        <!-- Car -->
+
+        <!-- Car Label -->
         <TextView
-            style="@style/AppWidget.FloatingSpinnerLabel"
             android:id="@+id/txt_label_car"
-            android:layout_width="match_parent"
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_trash_date_input_layout"
-            android:text="@string/label_car" />
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/label_car"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_trash_date_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
         <Spinner
             android:id="@+id/spn_car"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_below="@id/txt_label_car" />
-    </RelativeLayout>
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_label_car"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

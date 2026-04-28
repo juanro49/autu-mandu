@@ -26,10 +26,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:fitsSystemWindows="true"
+            android:background="?attr/colorSurfaceContainer"
+            app:titleTextColor="?attr/colorOnSurface"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -51,8 +55,11 @@
                         android:id="@+id/tab_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/primary"
+                        android:background="?attr/colorSurfaceContainer"
                         android:contentDescription="@string/data_categories_desc"
+                        app:tabTextColor="?attr/colorOnSurfaceVariant"
+                        app:tabSelectedTextColor="?attr/colorPrimary"
+                        app:tabIndicatorColor="?attr/colorPrimary"
                         app:tabMode="scrollable"/>
 
                     <androidx.viewpager2.widget.ViewPager2
@@ -69,7 +76,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="3"
-                android:background="?attr/detailsElementBackground"
+                android:background="?attr/colorSurface"
                 tools:ignore="InconsistentLayout">
 
                 <TextView
@@ -79,7 +86,8 @@
                     android:layout_gravity="center"
                     app:drawableTopCompat="@drawable/ic_c_refueling_128dp"
                     android:text="@string/edit_message_no_entry_selected"
-                    android:textAppearance="?android:attr/textAppearanceLarge"/>
+                    android:textAppearance="?attr/textAppearanceHeadlineMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"/>
             </FrameLayout>
         </LinearLayout>
     </LinearLayout>

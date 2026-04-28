@@ -26,12 +26,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.LinearLayoutCompat;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.ViewModelProvider;
 import android.content.res.ColorStateList;
 import android.widget.ScrollView;
+
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.color.MaterialColors;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Date;
 
@@ -87,13 +89,13 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
             scrollView.addView(container);
 
             // 3. Crear el diálogo
-            final AlertDialog dialog = new AlertDialog.Builder(requireContext())
+            final AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.title_select_color)
                 .setView(scrollView)
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
 
-            int itemsPerRow = 6;
+            int itemsPerRow = getResources().getInteger(R.integer.color_picker_colors_per_row);
             LinearLayoutCompat currentRow = null;
 
             for (int i = 0; i < colors.length; i++) {
@@ -104,7 +106,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
                     container.addView(currentRow);
                 }
 
-                CardView card = new CardView(requireContext());
+                MaterialCardView card = new MaterialCardView(requireContext());
                 int size = (int) getResources().getDimension(R.dimen.color_picker_circle_size);
                 int margin = (int) getResources().getDimension(R.dimen.color_picker_circle_margin);
                 LinearLayoutCompat.LayoutParams cardParams = new LinearLayoutCompat.LayoutParams(size, size);
@@ -179,7 +181,7 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
     protected long save() {
         if (car == null) {
             car = new Car();
-            car.setColor(ContextCompat.getColor(requireContext(), R.color.primary));
+            car.setColor(MaterialColors.getColor(requireContext(), R.attr.colorPrimary, 0));
         }
 
         car.setName(edtName.getText().toString());

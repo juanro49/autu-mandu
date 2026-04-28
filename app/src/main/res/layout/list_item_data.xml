@@ -14,18 +14,16 @@
   See the License for the specific language governing permissions and
   limitations under the License..
 -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_list_item"
     android:baselineAligned="false"
     android:orientation="vertical"
-    android:paddingBottom="8dp"
-    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+    android:paddingVertical="@dimen/padding_small"
     android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-    android:paddingTop="8dp">
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,7 +43,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceListItem"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface"
                 tools:text="Refueling" />
 
             <TextView
@@ -54,32 +53,35 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/title"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="-5dp"
+                android:layout_marginTop="@dimen/spacing_small"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 tools:text="Super 95" />
-
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/subtitle"
-                android:layout_alignParentStart="true"
-                android:layout_marginTop="-3dp"
-                android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                tools:text="28.12.15" />
 
             <TextView
                 android:id="@+id/station"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/date"
+                android:layout_below="@id/subtitle"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="-1dp"
+                android:layout_marginTop="@dimen/spacing_small"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 tools:text="Iberdoex" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/station"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="@dimen/spacing_small"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="28.12.15" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -94,10 +96,11 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:background="@drawable/bg_list_item_data_calculated"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
+                android:paddingHorizontal="@dimen/spacing_tiny"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmallInverse"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnTertiary"
+                android:gravity="end"
                 tools:ignore="RelativeOverlap"
                 tools:text="+ 625 km" />
 
@@ -107,12 +110,13 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/data1_calculated"
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="@dimen/spacing_small"
                 android:background="@drawable/bg_list_item_data_calculated"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
+                android:paddingHorizontal="@dimen/spacing_tiny"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmallInverse"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnTertiary"
+                android:gravity="end"
                 tools:text="1,229 EUR/l" />
 
             <TextView
@@ -121,12 +125,13 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/data2_calculated"
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="@dimen/spacing_small"
                 android:background="@drawable/bg_list_item_data_calculated"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
+                android:paddingHorizontal="@dimen/spacing_tiny"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmallInverse"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnTertiary"
+                android:gravity="end"
                 tools:text="7,94 l/100km" />
 
             <TextView
@@ -136,7 +141,7 @@
                 android:layout_alignBaseline="@id/data1_calculated"
                 android:layout_alignParentStart="true"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textAppearance="?attr/textAppearanceBodySmall"
                 tools:text="150536 km" />
 
             <TextView
@@ -146,7 +151,7 @@
                 android:layout_alignBaseline="@id/data2_calculated"
                 android:layout_alignParentStart="true"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textAppearance="?attr/textAppearanceBodySmall"
                 tools:text="61,00 EUR" />
 
             <TextView
@@ -156,16 +161,16 @@
                 android:layout_alignBaseline="@id/data3_calculated"
                 android:layout_alignParentStart="true"
                 android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textAppearance="?attr/textAppearanceBodySmall"
                 tools:text="49,63 l" />
         </RelativeLayout>
     </LinearLayout>
 
     <TextView
         android:id="@+id/data_invalid"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/invalid_data"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/error_text" />
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/colorError" />
 </LinearLayout>

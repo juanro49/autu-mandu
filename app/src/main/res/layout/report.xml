@@ -14,17 +14,21 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/black">
+        android:layout_marginHorizontal="@dimen/spacing_small"
+        android:layout_marginVertical="@dimen/spacing_tiny"
+        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+        app:cardCornerRadius="@dimen/spacing_medium">
 
         <FrameLayout
             android:id="@+id/report_content_container"
@@ -36,7 +40,7 @@
                 android:id="@+id/details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/black"
+                android:background="?attr/colorSurfaceContainer"
                 android:orientation="vertical"
                 android:padding="@dimen/report_card_padding"
                 android:visibility="invisible" />
@@ -45,8 +49,7 @@
                 android:id="@+id/main"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/black"
-                android:elevation="@dimen/report_elevation"
+                android:background="?attr/colorSurfaceContainer"
                 android:orientation="vertical"
                 android:padding="@dimen/report_card_padding">
 
@@ -66,7 +69,8 @@
                         android:focusable="true"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSurface"
                         tools:text="Report Title" />
 
                     <ImageButton
@@ -74,31 +78,37 @@
                         style="@style/Widget.AppCompat.ImageButton"
                         android:layout_width="@dimen/min_touch_target_size"
                         android:layout_height="@dimen/min_touch_target_size"
-                        android:minWidth="@dimen/min_touch_target_size"
-                        android:minHeight="@dimen/min_touch_target_size"
                         android:background="?attr/selectableItemBackground"
                         android:contentDescription="@string/graph_details_desc"
                         android:src="@drawable/ic_info_24dp"
-                        app:tint="?android:attr/textColorPrimary" />
+                        app:tint="?attr/colorOnSurfaceVariant" />
 
                     <ImageButton
                         android:id="@+id/btn_report_options"
                         style="@style/Widget.AppCompat.ImageButton"
                         android:layout_width="@dimen/min_touch_target_size"
                         android:layout_height="@dimen/min_touch_target_size"
-                        android:minWidth="@dimen/min_touch_target_size"
-                        android:minHeight="@dimen/min_touch_target_size"
                         android:background="?attr/selectableItemBackground"
                         android:contentDescription="@string/graph_options_desc"
                         android:src="@drawable/ic_more_vert_24dp"
-                        app:tint="?android:attr/textColorPrimary" />
+                        app:tint="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
 
                 <FrameLayout
                     android:id="@+id/chart_container"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/chart_height"
-                    android:layout_margin="@dimen/report_chart_margin" />
+                    android:layout_margin="@dimen/report_chart_margin">
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/chart_loading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:indeterminate="true"
+                        android:visibility="gone"
+                        app:indicatorSize="@dimen/chart_loading_indicator_size" />
+                </FrameLayout>
 
                 <include
                     android:id="@+id/chart_not_enough_data"
@@ -108,5 +118,5 @@
                     android:layout_margin="@dimen/report_chart_margin" />
             </LinearLayout>
         </FrameLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

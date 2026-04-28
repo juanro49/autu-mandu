@@ -295,6 +295,7 @@
     <string name="calc_option_price_to_distance">Price (%1$s) to Distance (%2$s)</string>
     <string name="calc_option_distance_to_fuel_price">Distance (%1$s) to Fuel Price (%2$s)</string>
     <string name="calc_option_fuel_price_to_distance">Fuel Price (%1$s) to Distance (%2$s)</string>
+    <string name="calc_label_options">Calculation options</string>
     <string name="notification_reminder_channel">Reminders</string>
     <string name="notification_reminder_title_single">Reminder: %s</string>
     <string name="notification_reminder_title_multiple">Multiple reminders</string>
@@ -368,4 +369,11 @@
     <string name="chart_content_description_donut">Donut chart</string>
     <string name="chart_content_description_segment">%1$s: %2$s</string>
     <string name="chart_label_total">Total</string>
+    <string name="pref_title_category_ui">Interface</string>
+    <string name="pref_title_theme">App theme</string>
+    <string name="pref_title_dynamic_color">Dynamic color (Material You)</string>
+    <string name="pref_summary_dynamic_color">Use colors from your wallpaper (Android 12+)</string>
+    <string name="pref_theme_light">Light</string>
+    <string name="pref_theme_dark">Dark</string>
+    <string name="pref_theme_system">System default</string>
 </resources>

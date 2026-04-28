@@ -15,83 +15,87 @@
   ~ limitations under the License.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/activatedBackgroundIndicator"
-    android:descendantFocusability="blocksDescendants"
-    android:orientation="horizontal" >
+    android:background="@drawable/bg_list_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
+
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-        android:paddingRight="?android:attr/listPreferredItemPaddingRight"
-        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:layout_weight="1"
+        android:paddingVertical="@dimen/padding_small">
+
         <TextView
             android:id="@+id/txt_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/txt_after_distance"
             android:layout_toStartOf="@+id/txt_after_distance"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceListItem" />
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorOnSurface" />
+
         <TextView
             android:id="@+id/txt_car"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/txt_title"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/txt_after_time"
             android:layout_toStartOf="@+id/txt_after_time"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
         <TextView
             android:id="@+id/txt_after_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/txt_title"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
         <TextView
             android:id="@+id/txt_after_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/txt_car"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
         <TextView
             android:id="@+id/txt_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/txt_car"
-            android:layout_marginTop="8dp"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_marginTop="@dimen/spacing_tiny"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBodySmall" />
     </RelativeLayout>
+
     <ImageButton
         android:id="@+id/btn_done"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center_vertical"
+        android:layout_width="@dimen/min_touch_target_size"
+        android:layout_height="@dimen/min_touch_target_size"
         android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="@string/notification_reminder_action_done"
         android:src="@drawable/ic_check_24dp"
-        android:contentDescription="@string/notification_reminder_action_done" />
+        app:tint="?attr/colorPrimary" />
+
     <ImageButton
         android:id="@+id/btn_snooze"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center_vertical"
+        android:layout_width="@dimen/min_touch_target_size"
+        android:layout_height="@dimen/min_touch_target_size"
         android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="@string/notification_reminder_action_snooze"
         android:src="@drawable/ic_snooze_24dp"
-        android:contentDescription="@string/notification_reminder_action_snooze" />
+        app:tint="?attr/colorOnSurfaceVariant" />
 </LinearLayout>

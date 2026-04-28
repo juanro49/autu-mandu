@@ -30,17 +30,19 @@ import android.widget.TextView;
 
 import android.util.Log;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -70,6 +72,8 @@ import org.juanro.autumandu.util.sync.Authenticator;
 import org.juanro.autumandu.util.sync.SyncManager;
 import org.juanro.autumandu.util.sync.SyncProviders;
 import org.juanro.autumandu.viewmodel.MainViewModel;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 
@@ -129,8 +133,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.content_frame), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
@@ -142,10 +153,9 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerLayout.setStatusBarBackground(R.color.primary_dark);
 
         mNavigationView = findViewById(R.id.navigation_view);
+
         mNavigationViewTop = mNavigationView.inflateHeaderView(R.layout.navigation_view_main_top);
         mNavigationView.setNavigationItemSelectedListener(this);
         mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
@@ -315,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
+        super.setTitle(title);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -324,6 +335,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void setSupportActionBar(@Nullable Toolbar toolbar) {
+        if (mDrawerToggle != null) {
+            mDrawerLayout.removeDrawerListener(mDrawerToggle);
+        }
+
         super.setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -338,7 +353,10 @@ public class MainActivity extends AppCompatActivity implements
             public void onDrawerOpened(View drawerView) {
                 ActionBar ab = getSupportActionBar();
                 if (ab != null) {
-                    mTitle = ab.getTitle();
+                    CharSequence currentTitle = ab.getTitle();
+                    if (currentTitle != null && !currentTitle.equals(mDrawerTitle)) {
+                        mTitle = currentTitle;
+                    }
                     ab.setTitle(mDrawerTitle);
                 }
 
@@ -482,7 +500,11 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             // Restore selection in NavigationView
             if (mCurrentNavItemIndex >= 0 && mCurrentNavItemIndex < mNavigationView.getMenu().size()) {
-                mNavigationView.getMenu().getItem(mCurrentNavItemIndex).setChecked(true);
+                MenuItem item = mNavigationView.getMenu().getItem(mCurrentNavItemIndex);
+                item.setChecked(true);
+                if (mTitle == null || mTitle.equals(mDrawerTitle)) {
+                    setTitle(item.getTitle());
+                }
             }
         }
     }
@@ -582,7 +604,7 @@ public class MainActivity extends AppCompatActivity implements
                         carNames[i] = car.getName();
                     }
 
-                    new AlertDialog.Builder(MainActivity.this)
+                    new MaterialAlertDialogBuilder(MainActivity.this)
                             .setItems(carNames, (dialog, which) -> {
                                 Intent intent = getDetailActivityIntent(edit, carIds[which], otherType);
                                 mAddDataLauncher.launch(intent);

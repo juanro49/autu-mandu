@@ -19,7 +19,6 @@ package org.juanro.autumandu.gui;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,7 +30,12 @@ import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,8 +100,15 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticator_add_account);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         // Manual setup for AccountAuthenticatorResponse as we no longer extend AccountAuthenticatorActivity
         mAccountAuthenticatorResponse = getIntent().getParcelableExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
@@ -107,7 +118,6 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
 
         mRecyclerView = findViewById(R.id.sync_provider_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mRecyclerView.setAdapter(new SyncProviderAdapter());
 
         mProgressView = findViewById(android.R.id.progress);
@@ -326,7 +336,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(
-                    android.R.layout.simple_list_item_1, parent, false);
+                    R.layout.list_item_sync_provider, parent, false);
             return new ViewHolder(view);
         }
 
@@ -334,8 +344,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             AbstractSyncProvider provider = mProviders[position];
             holder.text1.setText(provider.getName());
-            holder.text1.setCompoundDrawablesWithIntrinsicBounds(provider.getIcon(), 0, 0, 0);
-            holder.text1.setCompoundDrawablePadding(16);
+            holder.icon.setImageResource(provider.getIcon());
             holder.itemView.setOnClickListener(v -> {
                 mSelectedSyncProvider = provider;
                 try {
@@ -356,10 +365,12 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
 
         static class ViewHolder extends RecyclerView.ViewHolder {
             final TextView text1;
+            final android.widget.ImageView icon;
 
             ViewHolder(View itemView) {
                 super(itemView);
                 text1 = itemView.findViewById(android.R.id.text1);
+                icon = itemView.findViewById(R.id.icon);
             }
         }
     }

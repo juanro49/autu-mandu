@@ -14,6 +14,6 @@
   ~ limitations under the License.
   -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/primary_light" android:state_checked="true" />
-    <item android:color="@color/primary_text" />
+    <item android:color="?attr/colorPrimary" android:state_checked="true" />
+    <item android:color="?attr/colorOnSurfaceVariant" />
 </selector>

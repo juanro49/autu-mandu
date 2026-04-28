@@ -17,6 +17,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fab_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -28,7 +29,7 @@
         android:id="@+id/fab_overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#aa000000"
+        android:background="@color/scrim"
         android:visibility="gone"
         android:clickable="true"
         android:focusable="true"
@@ -45,9 +46,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:contentDescription="@string/fab_expand"
+        tools:ignore="UnresolvableCustomView"
         app:srcCompat="@drawable/ic_add_24dp"
-        app:backgroundTint="@color/button_accent"
-        app:tint="@android:color/white"
+        app:backgroundTint="?attr/colorSecondaryContainer"
+        app:tint="?attr/colorOnSecondaryContainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -57,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/fab_mini_margin"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="@dimen/margin_large"
         android:gravity="end"
         android:orientation="vertical"
         android:visibility="gone"
@@ -77,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/fab_label_margin"
                 android:importantForAccessibility="no"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="@dimen/fab_label_corner_radius"
                 app:cardElevation="@dimen/fab_label_elevation">
                 <TextView
@@ -86,7 +88,7 @@
                     android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
                     android:paddingVertical="@dimen/fab_label_padding_vertical"
                     android:text="@string/fab_add_refueling"
-                    android:textColor="@android:color/black"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="@dimen/fab_label_text_size" />
             </com.google.android.material.card.MaterialCardView>
 
@@ -96,10 +98,11 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/fab_add_refueling"
                 android:accessibilityTraversalBefore="@id/fab_main"
+                tools:ignore="UnresolvableCustomView"
                 app:fabSize="mini"
                 app:srcCompat="@drawable/ic_c_refueling_24dp"
-                app:backgroundTint="@color/button_accent"
-                app:tint="@android:color/white" />
+                app:backgroundTint="?attr/colorSecondaryContainer"
+                app:tint="?attr/colorOnSecondaryContainer" />
         </LinearLayout>
 
         <!-- Other Expenditure -->
@@ -115,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/fab_label_margin"
                 android:importantForAccessibility="no"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="@dimen/fab_label_corner_radius"
                 app:cardElevation="@dimen/fab_label_elevation">
                 <TextView
@@ -124,7 +127,7 @@
                     android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
                     android:paddingVertical="@dimen/fab_label_padding_vertical"
                     android:text="@string/fab_add_other_expenditure"
-                    android:textColor="@android:color/black"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="@dimen/fab_label_text_size" />
             </com.google.android.material.card.MaterialCardView>
 
@@ -134,10 +137,11 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/fab_add_other_expenditure"
                 android:accessibilityTraversalBefore="@id/fab_add_refueling"
+                tools:ignore="UnresolvableCustomView"
                 app:fabSize="mini"
                 app:srcCompat="@drawable/ic_c_other_24dp"
-                app:backgroundTint="@color/button_accent"
-                app:tint="@android:color/white" />
+                app:backgroundTint="?attr/colorSecondaryContainer"
+                app:tint="?attr/colorOnSecondaryContainer" />
         </LinearLayout>
 
         <!-- Other Income -->
@@ -153,7 +157,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/fab_label_margin"
                 android:importantForAccessibility="no"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="@dimen/fab_label_corner_radius"
                 app:cardElevation="@dimen/fab_label_elevation">
                 <TextView
@@ -162,7 +166,7 @@
                     android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
                     android:paddingVertical="@dimen/fab_label_padding_vertical"
                     android:text="@string/fab_add_other_income"
-                    android:textColor="@android:color/black"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="@dimen/fab_label_text_size" />
             </com.google.android.material.card.MaterialCardView>
 
@@ -172,10 +176,11 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/fab_add_other_income"
                 android:accessibilityTraversalBefore="@id/fab_add_other_expenditure"
+                tools:ignore="UnresolvableCustomView"
                 app:fabSize="mini"
                 app:srcCompat="@drawable/ic_c_other_24dp"
-                app:backgroundTint="@color/button_accent"
-                app:tint="@android:color/white" />
+                app:backgroundTint="?attr/colorSecondaryContainer"
+                app:tint="?attr/colorOnSecondaryContainer" />
         </LinearLayout>
 
         <!-- Tires -->
@@ -191,7 +196,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/fab_label_margin"
                 android:importantForAccessibility="no"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="@dimen/fab_label_corner_radius"
                 app:cardElevation="@dimen/fab_label_elevation">
                 <TextView
@@ -200,7 +205,7 @@
                     android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
                     android:paddingVertical="@dimen/fab_label_padding_vertical"
                     android:text="@string/fab_add_tires"
-                    android:textColor="@android:color/black"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="@dimen/fab_label_text_size" />
             </com.google.android.material.card.MaterialCardView>
 
@@ -210,10 +215,11 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/fab_add_tires"
                 android:accessibilityTraversalBefore="@id/fab_add_other_income"
+                tools:ignore="UnresolvableCustomView"
                 app:fabSize="mini"
                 app:srcCompat="@drawable/ic_c_tire_24dp"
-                app:backgroundTint="@color/button_accent"
-                app:tint="@android:color/white" />
+                app:backgroundTint="?attr/colorSecondaryContainer"
+                app:tint="?attr/colorOnSecondaryContainer" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,45 +16,73 @@
   -->
 <resources>
 
-    <style name="AppTheme.Base" parent="Theme.MaterialComponents.DayNight.Bridge">
+    <!-- Base application theme. -->
+    <style name="AppTheme.Base" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Main Color Scheme -->
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorOnPrimary">@color/onPrimary_light</item>
+        <item name="colorPrimaryContainer">@color/primaryContainer_light</item>
+        <item name="colorOnPrimaryContainer">@color/onPrimaryContainer_light</item>
+
+        <item name="colorSecondary">@color/secondary_light</item>
+        <item name="colorOnSecondary">@color/onSecondary_light</item>
+        <item name="colorSecondaryContainer">@color/secondaryContainer_light</item>
+        <item name="colorOnSecondaryContainer">@color/onSecondaryContainer_light</item>
+
+        <item name="colorTertiary">@color/tertiary_light</item>
+        <item name="colorOnTertiary">@color/onTertiary_light</item>
+        <item name="colorTertiaryContainer">@color/tertiaryContainer_light</item>
+        <item name="colorOnTertiaryContainer">@color/onTertiaryContainer_light</item>
+
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="colorOnSurface">@color/onSurface_light</item>
+        <item name="colorSurfaceVariant">@color/surfaceVariant_light</item>
+        <item name="colorOnSurfaceVariant">@color/onSurfaceVariant_light</item>
+        <item name="colorSurfaceContainer">@color/surfaceVariant_light</item>
+        <item name="colorSurfaceContainerLow">@color/background_light</item>
+        <item name="colorSurfaceContainerHigh">@color/surfaceVariant_light</item>
+
+        <item name="colorError">@color/error_light</item>
+        <item name="colorOnError">@color/onError_light</item>
+        <item name="colorErrorContainer">@color/errorContainer_light</item>
+        <item name="colorOnErrorContainer">@color/onErrorContainer_light</item>
+
+        <item name="colorOutline">@color/outline_light</item>
+        <item name="colorOutlineVariant">@color/outline_light</item>
+
+        <!-- Expressive Shapes -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.AutuMandu.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AutuMandu.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AutuMandu.LargeComponent</item>
+
+        <!-- System UI -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+
+        <!-- Custom attributes -->
         <item name="detailsElementLayoutWidth">match_parent</item>
         <item name="detailsElementBackground">@android:color/transparent</item>
-
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="colorControlNormal">@color/primary_text</item>
-        <item name="colorControlActivated">@color/accent</item>
-        <item name="colorControlHighlight">@color/ripple</item>
     </style>
 
     <style name="AppTheme" parent="AppTheme.Base">
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionModeOverlay">true</item>
-
-        <item name="toolbarStyle">@style/AppWidget.Toolbar</item>
-
-        <!-- Support library compatibility -->
+    <!-- Theme for Activities without an ActionBar (handled by Toolbar in layout) -->
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="windowActionModeOverlay">true</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.NavigationDrawer">
+    <style name="AppTheme.NoActionBar.NavigationDrawer" parent="AppTheme.NoActionBar">
     </style>
 
-    <style name="AppTheme.Dialog" parent="Theme.MaterialComponents.DayNight.Dialog.Bridge">
-        <item name="android:background">@color/background</item>
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="colorControlNormal">@color/primary_text</item>
-        <item name="colorControlActivated">@color/accent</item>
-        <item name="colorControlHighlight">@color/ripple</item>
+    <!-- Dialog theme -->
+    <style name="AppTheme.Dialog" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorSecondary">@color/accent</item>
     </style>
 
 </resources>

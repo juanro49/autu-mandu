@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 Juanro49
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+
+    <style name="AppTheme.Base" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Main Color Scheme -->
+        <item name="colorPrimary">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/onPrimary_dark</item>
+        <item name="colorPrimaryContainer">@color/primaryContainer_dark</item>
+        <item name="colorOnPrimaryContainer">@color/onPrimaryContainer_dark</item>
+
+        <item name="colorSecondary">@color/secondary_dark</item>
+        <item name="colorOnSecondary">@color/onSecondary_dark</item>
+        <item name="colorSecondaryContainer">@color/secondaryContainer_dark</item>
+        <item name="colorOnSecondaryContainer">@color/onSecondaryContainer_dark</item>
+
+        <item name="colorTertiary">@color/tertiary_dark</item>
+        <item name="colorOnTertiary">@color/onTertiary_dark</item>
+        <item name="colorTertiaryContainer">@color/tertiaryContainer_dark</item>
+        <item name="colorOnTertiaryContainer">@color/onTertiaryContainer_dark</item>
+
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="colorSurface">@color/surface_dark</item>
+        <item name="colorOnSurface">@color/onSurface_dark</item>
+        <item name="colorSurfaceVariant">@color/surfaceVariant_dark</item>
+        <item name="colorOnSurfaceVariant">@color/onSurfaceVariant_dark</item>
+        <item name="colorSurfaceContainer">@color/surfaceVariant_dark</item>
+        <item name="colorSurfaceContainerLow">@color/background_dark</item>
+        <item name="colorSurfaceContainerHigh">@color/surfaceVariant_dark</item>
+
+        <item name="colorError">@color/error_dark</item>
+        <item name="colorOnError">@color/onError_dark</item>
+        <item name="colorErrorContainer">@color/errorContainer_dark</item>
+        <item name="colorOnErrorContainer">@color/onErrorContainer_dark</item>
+
+        <item name="colorOutline">@color/outline_dark</item>
+        <item name="colorOutlineVariant">@color/outline_dark</item>
+
+        <!-- Expressive Shapes -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.AutuMandu.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AutuMandu.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AutuMandu.LargeComponent</item>
+
+        <!-- System UI -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- Custom attributes -->
+        <item name="detailsElementLayoutWidth">match_parent</item>
+        <item name="detailsElementBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme" parent="AppTheme.Base">
+    </style>
+
+    <!-- Theme for Activities without an ActionBar (handled by Toolbar in layout) -->
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.NavigationDrawer" parent="AppTheme.NoActionBar">
+    </style>
+
+    <!-- Dialog theme -->
+    <style name="AppTheme.Dialog" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorPrimary">@color/primary_dark</item>
+        <item name="colorSecondary">@color/accent</item>
+    </style>
+
+</resources>

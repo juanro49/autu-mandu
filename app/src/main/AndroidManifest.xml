@@ -22,9 +22,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
 
     <!-- Purpose: sync -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" android:maxSdkVersion="22" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" android:maxSdkVersion="22" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- Purpose: reminders notifications (Android 13+) -->
@@ -56,17 +53,17 @@
         </activity>
         <activity
             android:name=".gui.FirstStartActivity"
-            android:label="@string/title_first_start"/>
-        <activity android:name=".gui.DataDetailActivity"/>
+            android:label="@string/title_first_start"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".gui.DataDetailActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".gui.pref.PreferencesActivity"
             android:label="@string/title_settings"
             android:parentActivityName=".gui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".gui.MainActivity"/>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -86,14 +83,12 @@
             android:label="@string/title_help"
             android:parentActivityName=".gui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".gui.MainActivity"/>
         </activity>
         <activity
             android:name=".gui.AuthenticatorAddAccountActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/AppTheme.Dialog"/>
+            android:theme="@style/AppTheme.Dialog"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".gui.dialog.SetupWebDavSyncDialogActivity"
             android:excludeFromRecents="true"

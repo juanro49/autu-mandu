@@ -33,9 +33,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.google.android.material.color.MaterialColors;
 
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
@@ -140,7 +141,7 @@ public class PreferencesRemindersFragment extends ListFragment implements
                         unitDistance));
                 holder.afterDistance.setVisibility(View.VISIBLE);
             } else {
-                holder.afterDistance.setVisibility(View.INVISIBLE);
+                holder.afterDistance.setVisibility(View.GONE);
             }
 
             if (item.reminder().getAfterTimeSpanUnit() != null) {
@@ -149,11 +150,11 @@ public class PreferencesRemindersFragment extends ListFragment implements
                 holder.afterTime.setText(span.toLocalizedString(requireContext()));
                 holder.afterTime.setVisibility(View.VISIBLE);
             } else {
-                holder.afterTime.setVisibility(View.INVISIBLE);
+                holder.afterTime.setVisibility(View.GONE);
             }
 
             if (item.isDue()) {
-                holder.status.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent));
+                holder.status.setTextColor(MaterialColors.getColor(holder.status, R.attr.colorError));
                 if (item.reminder().isNotificationDismissed()) {
                     holder.status.setText(R.string.description_reminder_status_due_dismissed);
                 } else if (item.isSnoozed() && item.reminder().getSnoozedUntil() != null) {
@@ -164,7 +165,7 @@ public class PreferencesRemindersFragment extends ListFragment implements
                     holder.status.setText(R.string.description_reminder_status_due);
                 }
             } else {
-                holder.status.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondary_text));
+                holder.status.setTextColor(MaterialColors.getColor(holder.status, R.attr.colorOnSurfaceVariant));
                 if (item.reminder().getAfterDistance() != null && item.reminder().getAfterTimeSpanUnit() != null) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_distance_and_time,

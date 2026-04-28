@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright 2015 Jan Kühle
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,40 +15,44 @@
   ~ limitations under the License.
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:background="?attr/colorSurface">
 
     <!-- List of sync providers -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/sync_provider_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="16dp"
-        android:paddingTop="16dp"/>
+        android:paddingVertical="@dimen/padding_medium"
+        android:clipToPadding="false" />
 
     <!-- Progress indicator -->
     <LinearLayout
         android:id="@android:id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="@dimen/padding_medium">
 
-        <ProgressBar
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"/>
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:indicatorSize="@dimen/min_touch_target_size" />
 
         <TextView
             android:id="@+id/progress_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:text="@string/alert_sync_finishing_authentication"/>
+            android:layout_marginStart="@dimen/spacing_small"
+            android:text="@string/alert_sync_finishing_authentication"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
     </LinearLayout>
 
     <!-- First sync question: upload or download -->
@@ -55,47 +60,40 @@
         android:id="@+id/first_sync"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="@string/alert_sync_first_sync_message"/>
+            android:padding="@dimen/padding_medium"
+            android:text="@string/alert_sync_first_sync_message"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
 
         <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:divider="?android:attr/dividerHorizontal"
-            android:dividerPadding="0dp"
-            android:showDividers="beginning">
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/padding_small">
 
-            <LinearLayout
-                style="?android:attr/buttonBarStyle"
-                android:layout_width="match_parent"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/first_sync_btn_upload"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                tools:ignore="UselessParent">
+                android:layout_marginEnd="@dimen/spacing_small"
+                android:maxWidth="@dimen/button_max_width"
+                android:text="@string/alert_sync_first_sync_upload" />
 
-                <Button
-                    android:id="@+id/first_sync_btn_upload"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/alert_sync_first_sync_upload"/>
-
-                <Button
-                    android:id="@+id/first_sync_btn_download"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/alert_sync_first_sync_download"/>
-            </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/first_sync_btn_download"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/button_max_width"
+                android:text="@string/alert_sync_first_sync_download" />
         </LinearLayout>
     </LinearLayout>
 
@@ -104,50 +102,42 @@
         android:id="@+id/first_sync_error"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="@string/alert_sync_first_sync_error"/>
+            android:padding="@dimen/padding_medium"
+            android:text="@string/alert_sync_first_sync_error"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorError" />
 
         <TextView
             android:id="@+id/first_sync_error_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:paddingBottom="16dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            tools:text="404 Not found"/>
+            android:paddingHorizontal="@dimen/padding_medium"
+            android:paddingBottom="@dimen/padding_medium"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            tools:text="404 Not found" />
 
         <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:divider="?android:attr/dividerHorizontal"
-            android:dividerPadding="0dp"
-            android:showDividers="beginning">
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/padding_small">
 
-            <LinearLayout
-                style="?android:attr/buttonBarStyle"
-                android:layout_width="match_parent"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/first_sync_error_btn_ok"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                tools:ignore="UselessParent">
-
-                <Button
-                    android:id="@+id/first_sync_error_btn_ok"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@android:string/ok"/>
-            </LinearLayout>
+                android:maxWidth="@dimen/button_max_width"
+                android:text="@android:string/ok" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

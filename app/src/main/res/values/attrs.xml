@@ -20,4 +20,9 @@
         <enum name="wrap_content" value="-2" />
     </attr>
     <attr name="detailsElementBackground" format="reference" />
+
+    <!-- Material Attributes to ensure they are in the app's R file -->
+    <attr name="colorPrimary" format="reference|color" />
+    <attr name="colorError" format="reference|color" />
+    <attr name="colorOnSurfaceVariant" format="reference|color" />
 </resources>

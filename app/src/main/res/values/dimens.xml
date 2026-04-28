@@ -15,6 +15,14 @@
   ~ limitations under the License.
   -->
 <resources>
+    <!-- Layout Spacing -->
+    <dimen name="spacing_tiny">4dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="spacing_huge">32dp</dimen>
+
+    <!-- Component Specific -->
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="fab_mini_margin">8dp</dimen>
     <dimen name="fab_label_margin">8dp</dimen>
@@ -23,6 +31,12 @@
     <dimen name="fab_label_text_size">14sp</dimen>
     <dimen name="fab_label_elevation">2dp</dimen>
     <dimen name="fab_label_corner_radius">4dp</dimen>
+
+    <!-- Navigation Drawer -->
+    <dimen name="nav_header_height">158dp</dimen>
+    <dimen name="nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_icon_size">64dp</dimen>
+    <dimen name="nav_drawer_width">320dp</dimen>
 
     <!-- General Report Layout -->
     <dimen name="report_card_padding">8dp</dimen>
@@ -75,10 +89,36 @@
     <dimen name="chart_line_point_radius">3.5dp</dimen>
     <dimen name="chart_line_thickness">5.5dp</dimen>
     <dimen name="chart_line_trend_thickness">3.5dp</dimen>
-    <dimen name="chart_line_popup_padding">10dp</dimen>
+    <dimen name="chart_line_padding_medium">10dp</dimen>
     <dimen name="chart_line_x_step_base">1.8dp</dimen>
 
     <!-- Color Picker Dialog -->
     <dimen name="color_picker_circle_size">48dp</dimen>
     <dimen name="color_picker_circle_margin">4dp</dimen>
+    <dimen name="color_indicator_size">40dp</dimen>
+    <dimen name="input_field_height_outlined">56dp</dimen>
+    <dimen name="chart_loading_indicator_size">32dp</dimen>
+    <dimen name="input_field_max_width">488dp</dimen>
+    <dimen name="button_max_width">320dp</dimen>
+
+    <!-- Corner Radio (Material 3 Expressive) -->
+    <dimen name="corner_small">8dp</dimen>
+    <dimen name="corner_medium">16dp</dimen>
+    <dimen name="corner_large">28dp</dimen>
+    <dimen name="corner_extra_large">48dp</dimen>
+
+    <!-- General UI -->
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_huge">32dp</dimen>
+    <dimen name="input_field_height">48dp</dimen>
+    <dimen name="input_field_width_medium">150dp</dimen>
+
+    <!-- Logo/Icons -->
+    <dimen name="app_logo_size">96dp</dimen>
+    <dimen name="icon_size_small">24dp</dimen>
+    <dimen name="icon_size_medium">32dp</dimen>
 </resources>

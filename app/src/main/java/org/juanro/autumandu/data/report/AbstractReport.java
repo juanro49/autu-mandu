@@ -155,6 +155,12 @@ public abstract class AbstractReport {
         mContext = context.getApplicationContext();
     }
 
+    public boolean isUpdated() {
+        synchronized (mData) {
+            return mUpdated;
+        }
+    }
+
     public void invalidate() {
         synchronized (mData) {
             mUpdated = false;

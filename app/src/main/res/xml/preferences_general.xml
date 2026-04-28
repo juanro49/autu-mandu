@@ -14,7 +14,22 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/pref_title_category_ui">
+        <ListPreference
+            android:defaultValue="system"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:key="ui_theme"
+            android:title="@string/pref_title_theme" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="ui_dynamic_color"
+            android:summary="@string/pref_summary_dynamic_color"
+            android:title="@string/pref_title_dynamic_color"
+            app:isPreferenceVisible="true" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_behavior" >
         <Preference
             android:fragment="org.juanro.autumandu.gui.pref.PreferencesReportOrderFragment"

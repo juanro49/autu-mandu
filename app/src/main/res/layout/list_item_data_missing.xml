@@ -20,9 +20,8 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bg_list_item"
     android:gravity="center"
-    android:paddingBottom="8dp"
-    android:paddingStart="?android:attr/listPreferredItemPaddingLeft"
-    android:paddingEnd="?android:attr/listPreferredItemPaddingRight"
-    android:paddingTop="8dp"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:textColor="@android:color/secondary_text_dark" />
+    android:paddingVertical="@dimen/padding_small"
+    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+    android:textAppearance="?attr/textAppearanceBodySmall"
+    android:textColor="?attr/colorOnSurfaceVariant" />

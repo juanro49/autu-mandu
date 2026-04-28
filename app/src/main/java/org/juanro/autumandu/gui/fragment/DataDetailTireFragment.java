@@ -139,11 +139,11 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
             edtTrashDate.setDate(new Date());
             edtMountDate.setDate(new Date());
             edtUmountDate.setDate(new Date());
-            chkMount.setVisibility(View.INVISIBLE);
+            chkMount.setVisibility(View.GONE);
             chkMountAnimator.hide();
-            chkUmount.setVisibility(View.INVISIBLE);
+            chkUmount.setVisibility(View.GONE);
             chkUmountAnimator.hide();
-            chkTrashDate.setVisibility(View.INVISIBLE);
+            chkTrashDate.setVisibility(View.GONE);
             chkTrashDateAnimator.hide();
 
             mInitialCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
@@ -168,8 +168,8 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
                 edtNote.setText(tireList.getNote());
 
                 if (tireList.getTrashDate() != null) {
-                    chkMount.setVisibility(View.INVISIBLE);
-                    chkUmount.setVisibility(View.INVISIBLE);
+                    chkMount.setVisibility(View.GONE);
+                    chkUmount.setVisibility(View.GONE);
                     chkMountAnimator.hide();
                     chkUmountAnimator.hide();
                     chkTrashDate.setChecked(true);
@@ -190,12 +190,12 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
 
             viewModel.isTireMounted().observe(getViewLifecycleOwner(), isMounted -> {
                 if (isMounted) {
-                    chkMount.setVisibility(View.INVISIBLE);
-                    chkTrashDate.setVisibility(View.INVISIBLE);
+                    chkMount.setVisibility(View.GONE);
+                    chkTrashDate.setVisibility(View.GONE);
                     chkMountAnimator.hide();
                     chkTrashDateAnimator.hide();
                 } else {
-                    chkUmount.setVisibility(View.INVISIBLE);
+                    chkUmount.setVisibility(View.GONE);
                     chkUmountAnimator.hide();
                 }
             });
@@ -221,20 +221,25 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
         });
 
         if (!chkMount.isChecked()) {
+            edtMountDistanceInputLayout.setVisibility(View.GONE);
             edtMountDistanceInputLayout.getLayoutParams().height = 0;
             edtMountDistanceInputLayout.setAlpha(0);
+            edtMountDateInputLayout.setVisibility(View.GONE);
             edtMountDateInputLayout.getLayoutParams().height = 0;
             edtMountDateInputLayout.setAlpha(0);
         }
 
         if (!chkUmount.isChecked()) {
+            edtUmountDistanceInputLayout.setVisibility(View.GONE);
             edtUmountDistanceInputLayout.getLayoutParams().height = 0;
             edtUmountDistanceInputLayout.setAlpha(0);
+            edtUmountDateInputLayout.setVisibility(View.GONE);
             edtUmountDateInputLayout.getLayoutParams().height = 0;
             edtUmountDateInputLayout.setAlpha(0);
         }
 
         if (!chkTrashDate.isChecked()) {
+            edtTrashDateInputLayout.setVisibility(View.GONE);
             edtTrashDateInputLayout.getLayoutParams().height = 0;
             edtTrashDateInputLayout.setAlpha(0);
         }

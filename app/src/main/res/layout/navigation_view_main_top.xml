@@ -18,30 +18,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="8dp">
+    android:paddingBottom="@dimen/padding_small">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="158dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:layout_height="@dimen/nav_header_height"
+        android:paddingStart="@dimen/padding_medium"
+        android:paddingEnd="@dimen/padding_medium"
         android:background="@drawable/bg_drawer_top"
         tools:ignore="UselessParent">
         <ImageView
             android:id="@android:id/icon1"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
             android:layout_above="@android:id/text1"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="@dimen/nav_header_vertical_spacing"
+            android:importantForAccessibility="no"
             tools:ignore="ContentDescription" />
         <TextView
             android:id="@android:id/text1"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="@dimen/min_touch_target_size"
             android:layout_alignParentBottom="true"
             android:gravity="center_vertical"
-            android:fontFamily="@string/font_fontFamily_medium"
-            android:textStyle="@integer/font_textStyle_medium"
-            android:textSize="14sp"
-            tools:ignore="UnusedAttribute" />
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="?attr/colorOnPrimary" />
     </RelativeLayout>
 </LinearLayout>

@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.gui.MainActivity;
 
 /**
  * Helper class to manage the Speed Dial FAB behavior using official Material Components.
@@ -50,7 +51,8 @@ public class FabSpeedDialHelper {
         View refueling = miniContainer.findViewById(R.id.fab_add_refueling);
         if (refueling != null) {
             refueling.setOnClickListener(v -> {
-                if (mainFab.getContext() instanceof org.juanro.autumandu.gui.MainActivity activity) {
+                MainActivity activity = getMainActivity();
+                if (activity != null) {
                     activity.onFABAddRefuelingClicked(v);
                 }
             });
@@ -59,7 +61,8 @@ public class FabSpeedDialHelper {
         View otherExpenditure = miniContainer.findViewById(R.id.fab_add_other_expenditure);
         if (otherExpenditure != null) {
             otherExpenditure.setOnClickListener(v -> {
-                if (mainFab.getContext() instanceof org.juanro.autumandu.gui.MainActivity activity) {
+                MainActivity activity = getMainActivity();
+                if (activity != null) {
                     activity.onFABAddOtherExpenditureClicked(v);
                 }
             });
@@ -68,7 +71,8 @@ public class FabSpeedDialHelper {
         View otherIncome = miniContainer.findViewById(R.id.fab_add_other_income);
         if (otherIncome != null) {
             otherIncome.setOnClickListener(v -> {
-                if (mainFab.getContext() instanceof org.juanro.autumandu.gui.MainActivity activity) {
+                MainActivity activity = getMainActivity();
+                if (activity != null) {
                     activity.onFABAddOtherIncomeClicked(v);
                 }
             });
@@ -77,11 +81,23 @@ public class FabSpeedDialHelper {
         View tires = miniContainer.findViewById(R.id.fab_add_tires);
         if (tires != null) {
             tires.setOnClickListener(v -> {
-                if (mainFab.getContext() instanceof org.juanro.autumandu.gui.MainActivity activity) {
+                MainActivity activity = getMainActivity();
+                if (activity != null) {
                     activity.onFABAddTiresClicked(v);
                 }
             });
         }
+    }
+
+    private MainActivity getMainActivity() {
+        android.content.Context ctx = mainFab.getContext();
+        while (ctx instanceof android.content.ContextWrapper) {
+            if (ctx instanceof MainActivity) {
+                return (MainActivity) ctx;
+            }
+            ctx = ((android.content.ContextWrapper) ctx).getBaseContext();
+        }
+        return null;
     }
 
     public void toggle() {

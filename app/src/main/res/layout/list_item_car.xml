@@ -15,35 +15,40 @@
   ~ limitations under the License.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/activatedBackgroundIndicator"
-    android:descendantFocusability="blocksDescendants"
-    android:orientation="horizontal" >
-    <TwoLineListItem
+    android:background="@drawable/bg_list_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
+
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="?android:attr/listPreferredItemPaddingLeft"
-        android:layout_marginStart="?android:attr/listPreferredItemPaddingStart"
         android:layout_weight="1"
-        android:mode="twoLine" >
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/padding_small">
+
         <TextView
             android:id="@android:id/text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorOnSurface" />
+
         <TextView
             android:id="@android:id/text2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@android:id/text1"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </TwoLineListItem>
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
+
     <View
         android:id="@android:id/custom"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="10dp"
+        android:layout_width="@dimen/color_indicator_size"
+        android:layout_height="@dimen/color_indicator_size"
+        android:layout_margin="@dimen/spacing_small"
         android:background="@drawable/bg_color_indicator" />
 </LinearLayout>

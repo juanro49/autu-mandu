@@ -20,8 +20,9 @@ import android.app.Dialog;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class MessageDialogFragment extends DialogFragment {
     public static final String REQUEST_KEY = "org.juanro.autumandu.MESSAGE_DIALOG_REQUEST";
@@ -62,7 +63,7 @@ public class MessageDialogFragment extends DialogFragment {
         Bundle args = requireArguments();
         int requestCode = args.getInt(ARG_REQUEST_CODE);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity());
         builder.setMessage(args.getString(ARG_MESSAGE));
         builder.setPositiveButton(args.getInt(ARG_POSITIVE), (dialog, which) -> sendResult(ACTION_POSITIVE, requestCode));
 

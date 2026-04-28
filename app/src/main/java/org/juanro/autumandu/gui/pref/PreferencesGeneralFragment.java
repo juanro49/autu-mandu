@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
@@ -83,9 +84,30 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
                 FuelConsumption fuelConsumption = new FuelConsumption(requireContext());
                 fuelConsumption.setConsumptionType(Integer.parseInt(newValue.toString()));
                 updateFuelConsumptionField(fuelConsumption, (ListPreference) preference);
+            } else if (prefKey.equals("ui_theme")) {
+                String theme = newValue.toString();
+                switch (theme) {
+                    case "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    case "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    default -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                }
+                updateThemeSummary((ListPreference) preference, theme);
+            } else if (prefKey.equals("ui_dynamic_color")) {
+                requireActivity().recreate();
             }
 
             return true;
+        }
+
+        private void updateThemeSummary(ListPreference preference, String value) {
+            String[] values = getResources().getStringArray(R.array.theme_values);
+            String[] entries = getResources().getStringArray(R.array.theme_entries);
+            for (int i = 0; i < values.length; i++) {
+                if (values[i].equals(value)) {
+                    preference.setSummary(entries[i]);
+                    break;
+                }
+            }
         }
 
         public void updateFuelConsumptionField(FuelConsumption fuelConsumption) {
@@ -140,6 +162,19 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
 
         // Unit Distance
         setupSimplePreference("unit_distance", prefs.getUnitDistance());
+
+        // UI Theme
+        ListPreference themePref = findPreference("ui_theme");
+        if (themePref != null) {
+            onPreferenceChangeListener.updateThemeSummary(themePref, prefs.getTheme());
+            themePref.setOnPreferenceChangeListener(onPreferenceChangeListener);
+        }
+
+        // UI Dynamic Color
+        Preference dynamicColorPref = findPreference("ui_dynamic_color");
+        if (dynamicColorPref != null) {
+            dynamicColorPref.setOnPreferenceChangeListener(onPreferenceChangeListener);
+        }
 
         // Unit fuel consumption
         ListPreference fieldFuelConsumption = findPreference("unit_fuel_consumption");

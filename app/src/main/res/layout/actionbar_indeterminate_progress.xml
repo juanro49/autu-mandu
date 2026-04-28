@@ -15,10 +15,12 @@
   ~ limitations under the License.
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="56dp"
-    android:layout_height="match_parent" >
-    <ProgressBar
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="center" />
+    android:layout_width="@dimen/input_field_height_outlined"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:layout_width="@dimen/spacing_large"
+        android:layout_height="@dimen/spacing_large"
+        android:layout_gravity="center"
+        android:indeterminate="true" />
 </FrameLayout>

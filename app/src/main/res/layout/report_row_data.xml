@@ -14,32 +14,34 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="@dimen/report_row_padding">
+    android:paddingHorizontal="@dimen/report_row_padding"
+    android:paddingVertical="@dimen/spacing_tiny">
     <TextView
         android:id="@android:id/text1"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="start"
         android:maxLines="1"
         android:ellipsize="end"
-        android:textSize="@dimen/report_row_text_size_small"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/colorOnSurfaceVariant"
         tools:text="Average"/>
     <TextView
         android:id="@android:id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
         android:gravity="end"
         android:maxLines="1"
         android:ellipsize="end"
-        android:textSize="@dimen/report_row_text_size_small"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/colorOnSurface"
+        android:textStyle="bold"
         tools:text="7,23 l/100km"/>
 </LinearLayout>

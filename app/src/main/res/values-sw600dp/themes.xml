@@ -18,7 +18,7 @@
 
     <style name="AppTheme" parent="AppTheme.Base">
         <item name="detailsElementLayoutWidth">600dp</item>
-        <item name="detailsElementBackground">?android:attr/detailsElementBackground</item>
+        <item name="detailsElementBackground">?attr/colorSurface</item>
     </style>
 
 </resources>

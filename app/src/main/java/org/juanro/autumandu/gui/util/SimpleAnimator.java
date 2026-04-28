@@ -79,6 +79,7 @@ public class SimpleAnimator {
     }
 
     public void show(Runnable onStart, Runnable onEnd) {
+        view.setVisibility(View.VISIBLE);
         AnimatorSet animator = (AnimatorSet) createAnimator(R.animator.show, onStart, onEnd);
 
         ValueAnimator valueAnimator = (ValueAnimator) animator.getChildAnimations().get(0);
@@ -108,7 +109,12 @@ public class SimpleAnimator {
     }
 
     public void hide(Runnable onStart, Runnable onEnd) {
-        AnimatorSet animator = (AnimatorSet) createAnimator(R.animator.hide, onStart, onEnd);
+        AnimatorSet animator = (AnimatorSet) createAnimator(R.animator.hide, onStart, () -> {
+            view.setVisibility(View.GONE);
+            if (onEnd != null) {
+                onEnd.run();
+            }
+        });
 
         ValueAnimator valueAnimator = (ValueAnimator) animator.getChildAnimations().get(0);
         if (property == Property.Height) {

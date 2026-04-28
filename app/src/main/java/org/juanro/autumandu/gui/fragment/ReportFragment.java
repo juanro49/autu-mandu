@@ -53,6 +53,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -92,6 +93,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         private final View chartNotEnoughData;
         private final View main;
         private final ViewGroup details;
+        private final View chartLoading;
 
         private AbstractReport report;
 
@@ -99,6 +101,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             super(itemView);
 
             chartContainer = itemView.findViewById(R.id.chart_container);
+            chartLoading = itemView.findViewById(R.id.chart_loading);
 
             txtTitle = itemView.findViewById(R.id.txt_title);
             txtTitle.setOnClickListener(v -> showFullScreenChart(report, chartContainer));
@@ -125,10 +128,15 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             this.report = report;
             txtTitle.setText(report.getTitle());
 
-            // Reset visual para evitar que se vea el layout vacío durante la carga
-            chartContainer.setVisibility(View.INVISIBLE);
+            // 1. Limpieza y estado compacto inicial (Sin detalles visibles)
+            removePreviousKubitChart();
+            details.setVisibility(View.GONE); // Siempre GONE para que la card sea compacta al inicio
             chartNotEnoughData.setVisibility(View.GONE);
-            details.setVisibility(View.GONE); // GONE para seguridad total
+
+            chartContainer.setVisibility(View.VISIBLE);
+            chartLoading.setAlpha(1f);
+            chartLoading.setVisibility(View.VISIBLE);
+            chartLoading.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
             EXECUTOR.execute(() -> {
                 report.update();
@@ -137,26 +145,49 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                 var rawData = report.getRawChartData(options.getChartOption());
                 boolean enoughData = !rawData.isEmpty();
 
+                // 2. Actualizar UI escalonadamente para máxima fluidez
                 itemView.post(() -> {
                     if (this.report != report) return;
 
-                    // 1. Renderizar detalles primero
-                    int currentChildCount = details.getChildCount();
-                    int requiredCount = reportData.size();
+                    // Fase A: Renderizar gráfico (Compose es lo más pesado)
+                    if (enoughData) {
+                        View kubitView;
+                        if (report instanceof OverallCostsReport) {
+                            kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
+                        } else if (report instanceof FuelConsumptionReport ||
+                                report instanceof FuelPriceReport ||
+                                (report instanceof MileageReport && options.getChartOption() != 2)) {
+                            kubitView = KubitChartBridge.createLineChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+                        } else {
+                            kubitView = KubitChartBridge.createColumnChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+                        }
+                        kubitView.setId(R.id.kubit_chart_view);
+                        kubitView.setAlpha(0f);
+                        chartContainer.addView(kubitView);
+                        kubitView.animate().alpha(1f).setDuration(400).start();
+                    }
 
-                    for (int i = 0; i < Math.max(currentChildCount, requiredCount); i++) {
-                        if (i >= requiredCount) {
-                            details.getChildAt(i).setVisibility(View.GONE);
+                    chartLoading.animate().alpha(0f).setDuration(200).withEndAction(() -> {
+                        chartLoading.setVisibility(View.GONE);
+                        chartLoading.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }).start();
+
+                    chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
+
+                    // Fase B: Preparar detalles para el futuro (sin mostrarlos)
+                    int currentCount = details.getChildCount();
+                    int targetCount = reportData.size();
+
+                    for (int i = 0; i < Math.max(currentCount, targetCount); i++) {
+                        if (i >= targetCount) {
+                            if (i < details.getChildCount()) details.getChildAt(i).setVisibility(View.GONE);
                             continue;
                         }
-
                         var item = reportData.get(i);
                         boolean isSection = item instanceof AbstractReport.Section;
                         int layout = isSection ? R.layout.report_row_section : R.layout.report_row_data;
-
-                        View rowView = i < currentChildCount ? details.getChildAt(i) : null;
+                        View rowView = i < currentCount ? details.getChildAt(i) : null;
                         boolean needsInflate = rowView == null || (isSection != (rowView instanceof TextView));
-
                         if (needsInflate) {
                             if (rowView != null) details.removeViewAt(i);
                             rowView = LayoutInflater.from(details.getContext()).inflate(layout, details, false);
@@ -164,19 +195,15 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                         } else {
                             rowView.setVisibility(View.VISIBLE);
                         }
-
                         DetailViewHolder vh = (DetailViewHolder) rowView.getTag();
                         if (vh == null) {
                             vh = new DetailViewHolder(rowView);
                             rowView.setTag(vh);
                         }
-
                         if (item instanceof AbstractReport.Section section) {
                             vh.label.setText(section.getLabel());
                             vh.label.setTextColor(section.getColor());
-                            if (vh.sectionDrawable != null) {
-                                vh.sectionDrawable.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
-                            }
+                            if (vh.sectionDrawable != null) vh.sectionDrawable.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
                         } else {
                             var dataItem = (AbstractReport.Item) item;
                             vh.label.setText(dataItem.getLabel());
@@ -184,40 +211,18 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                         }
                     }
 
-                    // Estado inicial cerrado (asegurar que esté detrás de 'main')
-                    details.post(() -> {
-                        if (this.report != report) return;
-                        var detailsParams = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
-                        detailsParams.topMargin = enoughData ? (main.getHeight() - details.getHeight()) : 0;
-                        details.requestLayout();
-                    });
-
-                    // 2. Renderizar gráfico después
-                    itemView.post(() -> {
-                        if (this.report != report) return;
-
-                        removePreviousKubitChart();
-                        if (enoughData) {
-                            View kubitView;
-                            if (report instanceof OverallCostsReport) {
-                                kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
-                            } else if (report instanceof FuelConsumptionReport ||
-                                    report instanceof FuelPriceReport ||
-                                    (report instanceof MileageReport && options.getChartOption() != 2)) {
-                                kubitView = KubitChartBridge.createLineChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
-                            } else {
-                                kubitView = KubitChartBridge.createColumnChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
-                            }
-                            kubitView.setId(R.id.kubit_chart_view);
-                            chartContainer.addView(kubitView);
-                        }
-
-                        chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
-                        chartContainer.setVisibility(enoughData ? View.VISIBLE : View.GONE);
-                    });
+                    // Configurar posición del panel de detalles (detrás de main)
+                    var params = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
+                    params.topMargin = main.getHeight(); // Oculto completamente
+                    details.requestLayout();
                 });
+
+                try { Thread.sleep(250); } catch (InterruptedException ignored) {}
             });
         }
+
+
+
     }
 
     private class ReportAdapter extends ListAdapter<AbstractReport, ReportHolder> {
@@ -230,9 +235,8 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
                 @Override
                 public boolean areContentsTheSame(@NonNull AbstractReport oldItem, @NonNull AbstractReport newItem) {
-                    // This is a bit simplified, but since reports are recalculated,
-                    // we usually want to rebind.
-                    return false;
+                    // Evita re-bindear si es la misma instancia y ya está actualizada
+                    return Objects.equals(oldItem, newItem) && oldItem.isUpdated();
                 }
             });
         }
@@ -311,6 +315,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         reportAdapter = new ReportAdapter();
         recyclerView.setAdapter(reportAdapter);
         recyclerView.addItemDecoration(new ReportItemDecoration());
+        recyclerView.setItemAnimator(null);
 
         View fabContainer = v.findViewById(R.id.fab_container);
         if (fabContainer != null) {
@@ -349,12 +354,18 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
         saveReportChartOptions(requireContext(), currentMenuReport, options);
 
-        // Solo notificamos el cambio para el reporte afectado para evitar recargar todo
         int index = reportAdapter.getCurrentList().indexOf(currentMenuReport);
         if (index != -1) {
             reportAdapter.notifyItemChanged(index);
         } else {
-            reportAdapter.notifyDataSetChanged();
+            // Fallback para asegurar la actualización si la instancia ha cambiado
+            List<AbstractReport> currentList = reportAdapter.getCurrentList();
+            for (int i = 0; i < currentList.size(); i++) {
+                if (currentList.get(i).getClass().equals(currentMenuReport.getClass())) {
+                    reportAdapter.notifyItemChanged(i);
+                    break;
+                }
+            }
         }
 
         return true;

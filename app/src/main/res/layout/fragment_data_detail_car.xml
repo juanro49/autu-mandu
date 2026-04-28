@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright 2013 Jan Kühle
+  Copyright 2012 Jan Kühle
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -14,136 +14,198 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/padding_medium">
+
         <!-- Name -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_name_input_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_name"
                 android:inputType="text"
-                android:singleLine="true"/>
+                android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Color -->
         <LinearLayout
             android:id="@+id/layout_color"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_name_input_layout"
+            android:layout_marginTop="@dimen/margin_small"
             android:background="?android:attr/selectableItemBackground"
-            android:orientation="horizontal">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/spacing_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_name_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start|center_vertical"
                 android:layout_weight="1"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
                 android:text="@string/label_color_in_reports"
-                android:textSize="16sp"/>
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnSurface" />
 
             <View
                 android:id="@+id/btn_color"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="4dp"
-                android:background="@drawable/bg_color_indicator"/>
+                android:layout_width="@dimen/color_indicator_size"
+                android:layout_height="@dimen/color_indicator_size"
+                android:layout_margin="@dimen/spacing_tiny"
+                android:background="@drawable/bg_color_indicator" />
         </LinearLayout>
+
         <!-- Initial Mileage -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_initial_mileage_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/layout_color">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_color"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_initial_mileage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_initial_mileage"
-                android:inputType="number"/>
+                android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Number of tires -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_num_tires_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_initial_mileage_input_layout">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_initial_mileage_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_num_tires"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_num_tires"
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Buying Price -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_buying_price_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_num_tires_input_layout">
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_num_tires_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_buying_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:hint="@string/hint_buying_price"
                 android:inputType="number|numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>
-        <!-- Suspend -->
+
+        <!-- Suspend Header -->
         <TextView
             android:id="@+id/txt_section_suspend"
             style="@style/AppWidget.SectionHeader"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/edt_buying_price_input_layout"
-            android:text="@string/section_suspend"/>
+            android:text="@string/section_suspend"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_buying_price_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
 
         <TextView
             android:id="@+id/txt_description_suspend"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txt_section_suspend"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/margin_small"
             android:text="@string/description_suspend"
-            android:textAppearance="?android:attr/textAppearanceSmall"/>
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_suspend"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/chk_suspend"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_below="@id/txt_description_suspend"
-            android:text="@string/label_suspend"/>
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            android:text="@string/label_suspend"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_description_suspend"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_suspend_date_input_layout"
-            android:layout_width="match_parent"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/chk_suspend"
-            android:layout_marginLeft="36dp"
-            android:layout_marginStart="36dp">
+            android:layout_marginStart="@dimen/margin_huge"
+            android:layout_marginTop="@dimen/spacing_tiny"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chk_suspend"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_suspend_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_suspend_date"/>
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
+                android:hint="@string/hint_suspend_date" />
         </com.google.android.material.textfield.TextInputLayout>
-    </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

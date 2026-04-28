@@ -88,6 +88,7 @@ public class DataListRefuelingFragment extends AbstractDataListFragment<Balanced
         data.put(R.id.title, getString(R.string.edit_title_refueling));
         data.put(R.id.subtitle, refueling.getFuelTypeName());
         data.put(R.id.date, dateFormat.format(refueling.getDate()));
+        data.put(R.id.station, refueling.getStationName());
 
         data.put(R.id.data1, String.format(Locale.getDefault(), "%d %s", mileage, unitDistance));
 

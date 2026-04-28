@@ -16,11 +16,25 @@
 package org.juanro.autumandu.gui.chart.kubit
 
 import android.content.Context
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.core.content.ContextCompat
+import org.juanro.autumandu.Preferences
 import org.juanro.autumandu.R
 import org.juanro.autumandu.data.calculation.CalculationItem
 import org.juanro.autumandu.data.report.AbstractReport
@@ -57,7 +71,7 @@ object KubitChartBridge {
             id = R.id.kubit_chart_view
             isSaveEnabled = false
             setContent {
-                DisableSaveableState {
+                AutuManduChartTheme {
                     KubitLineChart(
                         rawData = finalData,
                         yAxisLabel = { report.formatYValue(it, chartOption) },
@@ -85,7 +99,7 @@ object KubitChartBridge {
             id = R.id.kubit_chart_view
             isSaveEnabled = false
             setContent {
-                DisableSaveableState {
+                AutuManduChartTheme {
                     KubitColumnChart(
                         rawData = finalData,
                         yAxisLabel = { report.formatYValue(it, chartOption) },
@@ -129,7 +143,7 @@ object KubitChartBridge {
             id = R.id.kubit_chart_view
             isSaveEnabled = false
             setContent {
-                DisableSaveableState {
+                AutuManduChartTheme {
                     KubitPieChart(
                         rawData = rawData,
                         chartOption = chartOption,
@@ -157,7 +171,7 @@ object KubitChartBridge {
         return ComposeView(context).apply {
             id = R.id.kubit_chart_view
             setContent {
-                DisableSaveableState {
+                AutuManduChartTheme {
                     KubitColumnChart(
                         rawData = rawData,
                         yAxisLabel = { String.format(Locale.getDefault(), "%.2f %s", it, outputUnit) },
@@ -172,6 +186,81 @@ object KubitChartBridge {
             }
         }
     }
+}
+
+@Composable
+fun AutuManduChartTheme(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    val preferences = remember { Preferences(context) }
+    val isDark = isSystemInDarkTheme()
+    val dynamicColor = preferences.isDynamicColorEnabled
+
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        isDark -> darkColorScheme(
+            primary = colorResource(R.color.primary_dark),
+            onPrimary = colorResource(R.color.onPrimary_dark),
+            primaryContainer = colorResource(R.color.primaryContainer_dark),
+            onPrimaryContainer = colorResource(R.color.onPrimaryContainer_dark),
+            secondary = colorResource(R.color.secondary_dark),
+            onSecondary = colorResource(R.color.onSecondary_dark),
+            secondaryContainer = colorResource(R.color.secondaryContainer_dark),
+            onSecondaryContainer = colorResource(R.color.onSecondaryContainer_dark),
+            tertiary = colorResource(R.color.tertiary_dark),
+            onTertiary = colorResource(R.color.onTertiary_dark),
+            tertiaryContainer = colorResource(R.color.tertiaryContainer_dark),
+            onTertiaryContainer = colorResource(R.color.onTertiaryContainer_dark),
+            error = colorResource(R.color.error_dark),
+            onError = colorResource(R.color.onError_dark),
+            errorContainer = colorResource(R.color.errorContainer_dark),
+            onErrorContainer = colorResource(R.color.onErrorContainer_dark),
+            background = colorResource(R.color.background_dark),
+            onBackground = colorResource(R.color.onBackground_dark),
+            surface = colorResource(R.color.surface_dark),
+            onSurface = colorResource(R.color.onSurface_dark),
+            surfaceVariant = colorResource(R.color.surfaceVariant_dark),
+            onSurfaceVariant = colorResource(R.color.onSurfaceVariant_dark),
+            outline = colorResource(R.color.outline_dark)
+        )
+        else -> lightColorScheme(
+            primary = colorResource(R.color.primary_light),
+            onPrimary = colorResource(R.color.onPrimary_light),
+            primaryContainer = colorResource(R.color.primaryContainer_light),
+            onPrimaryContainer = colorResource(R.color.onPrimaryContainer_light),
+            secondary = colorResource(R.color.secondary_light),
+            onSecondary = colorResource(R.color.onSecondary_light),
+            secondaryContainer = colorResource(R.color.secondaryContainer_light),
+            onSecondaryContainer = colorResource(R.color.onSecondaryContainer_light),
+            tertiary = colorResource(R.color.tertiary_light),
+            onTertiary = colorResource(R.color.onTertiary_light),
+            tertiaryContainer = colorResource(R.color.tertiaryContainer_light),
+            onTertiaryContainer = colorResource(R.color.onTertiaryContainer_light),
+            error = colorResource(R.color.error_light),
+            onError = colorResource(R.color.onError_light),
+            errorContainer = colorResource(R.color.errorContainer_light),
+            onErrorContainer = colorResource(R.color.onErrorContainer_light),
+            background = colorResource(R.color.background_light),
+            onBackground = colorResource(R.color.onBackground_light),
+            surface = colorResource(R.color.surface_light),
+            onSurface = colorResource(R.color.onSurface_light),
+            surfaceVariant = colorResource(R.color.surfaceVariant_light),
+            onSurfaceVariant = colorResource(R.color.onSurfaceVariant_light),
+            outline = colorResource(R.color.outline_light)
+        )
+    }
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        shapes = Shapes(
+            small = RoundedCornerShape(dimensionResource(R.dimen.corner_small)),
+            medium = RoundedCornerShape(dimensionResource(R.dimen.corner_medium)),
+            large = RoundedCornerShape(dimensionResource(R.dimen.corner_large)),
+            extraLarge = RoundedCornerShape(dimensionResource(R.dimen.corner_extra_large))
+        ),
+        content = content
+    )
 }
 
 @Composable

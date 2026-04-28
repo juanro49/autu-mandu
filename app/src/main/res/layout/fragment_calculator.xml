@@ -25,58 +25,74 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:fitsSystemWindows="true"
+            android:background="?attr/colorSurfaceContainer"
+            app:titleTextColor="?attr/colorOnSurface"/>
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/calculator_margin"
-            app:cardBackgroundColor="@color/black"
-            app:contentPadding="@dimen/calculator_card_padding">
+            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            app:cardCornerRadius="@dimen/spacing_medium">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="@dimen/calculator_card_padding">
 
                 <Spinner
                     android:id="@+id/spn_options"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/calculator_input_height"
-                    android:contentDescription="@string/hint_volume"/>
+                    android:contentDescription="@string/calc_label_options"/>
 
-                <FrameLayout
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/edt_input_layout"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:maxWidth="@dimen/input_field_max_width"
+                    android:layout_gravity="center_horizontal"
+                    app:suffixText="">
 
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edt_input"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/calculator_input_height"
-                        android:maxWidth="@dimen/calculator_max_width"
+                        android:layout_height="wrap_content"
+                        android:maxWidth="@dimen/input_field_max_width"
                         android:layout_gravity="center_horizontal"
                         android:inputType="number"
                         android:hint="@string/hint_volume"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textColorHint="?attr/colorOnSurfaceVariant"
                         android:autofillHints="none">
-
                         <requestFocus/>
-                    </EditText>
+                    </com.google.android.material.textfield.TextInputEditText>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                    <TextView
-                        android:id="@+id/txt_unit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginEnd="@dimen/calculator_unit_margin_end"
-                        android:textSize="@dimen/calculator_unit_text_size"/>
-                </FrameLayout>
+                <!-- Unit text is now handled by TextInputLayout suffix if possible,
+                     but we'll keep the TextView for now if the code expects it -->
+                <TextView
+                    android:id="@+id/txt_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="@dimen/spacing_tiny"
+                    android:layout_marginEnd="@dimen/calculator_unit_margin_end"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"/>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/chart_holder"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -84,14 +100,15 @@
             android:layout_marginStart="@dimen/calculator_margin"
             android:layout_marginEnd="@dimen/calculator_margin"
             android:layout_weight="1"
-            app:cardBackgroundColor="@color/black"
-            app:contentPadding="@dimen/calculator_chart_card_padding">
+            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            app:cardCornerRadius="@dimen/spacing_medium">
 
             <FrameLayout
                 android:id="@+id/chart_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-        </androidx.cardview.widget.CardView>
+                android:layout_height="match_parent"
+                android:padding="@dimen/calculator_chart_card_padding"/>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 

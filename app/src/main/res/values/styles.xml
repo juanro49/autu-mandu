@@ -16,41 +16,33 @@
 -->
 <resources>
 
-    <style name="section_header" parent="android:Widget.DeviceDefault.TextView">
+    <style name="section_header" parent="android:Widget.TextView">
         <item name="android:drawableBottom">@drawable/section_header</item>
         <item name="android:drawablePadding">4dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:paddingLeft">4dp</item>
+        <item name="android:layout_marginTop">@dimen/spacing_small</item>
+        <item name="android:paddingStart">4dp</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="AppWidget.SectionHeader" parent="android:Widget.DeviceDefault.TextView">
-        <item name="android:layout_marginTop">32dp</item>
-        <item name="android:layout_marginBottom">16dp</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    <style name="AppWidget.SectionHeader" parent="android:Widget.TextView">
+        <item name="android:layout_marginTop">@dimen/spacing_huge</item>
+        <item name="android:layout_marginBottom">@dimen/spacing_medium</item>
+        <item name="android:textAppearance">?attr/textAppearanceTitleLarge</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
-    <style name="AppWidget.FloatingSpinnerLabel" parent="android:Widget.DeviceDefault.TextView">
-        <item name="android:textColor">?android:attr/textColorHint</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:layout_marginLeft">4dp</item>
+    <style name="AppWidget.FloatingSpinnerLabel" parent="android:Widget.TextView">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
         <item name="android:layout_marginStart">4dp</item>
     </style>
 
-    <style name="AppWidget.Toolbar" parent="@style/Widget.AppCompat.Toolbar">
-        <item name="android:background">?attr/colorPrimary</item>
+    <style name="AppWidget.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">?attr/colorSurfaceContainer</item>
         <item name="navigationIcon">?attr/homeAsUpIndicator</item>
-    </style>
-
-    <style name="AppWidget.MaterializedHoloActionBar" parent="android:Widget.DeviceDefault.ActionBar">
-        <item name="android:background">@color/primary</item>
-        <item name="android:displayOptions">homeAsUp|showTitle</item>
-
-        <!-- Support library compatibility -->
-        <item name="background">@color/primary</item>
-        <item name="displayOptions">homeAsUp|showTitle</item>
+        <item name="titleTextColor">?attr/colorOnSurface</item>
     </style>
 
 </resources>

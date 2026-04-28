@@ -220,7 +220,7 @@ public abstract class AbstractDataListFragment<T> extends
     }
 
     private class DataViewHolder extends AbstractDataViewHolder implements View.OnClickListener {
-        private final int[] fields = {R.id.title, R.id.subtitle, R.id.date,
+        private final int[] fields = {R.id.title, R.id.subtitle, R.id.date, R.id.station,
                 R.id.data1, R.id.data1_calculated, R.id.data2,
                 R.id.data2_calculated, R.id.data3, R.id.data3_calculated};
         private final SparseArray<TextView> textViews;
@@ -250,7 +250,7 @@ public abstract class AbstractDataListFragment<T> extends
                 if (value != null) {
                     textView.setText(value);
                     textView.setVisibility(View.VISIBLE);
-                } else if (field == R.id.subtitle) {
+                } else if (field == R.id.subtitle || field == R.id.station) {
                     textView.setVisibility(View.GONE);
                 } else {
                     textView.setVisibility(View.INVISIBLE);

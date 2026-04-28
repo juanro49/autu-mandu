@@ -18,6 +18,7 @@ package org.juanro.autumandu.gui.chart.kubit
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -88,6 +89,9 @@ fun KubitColumnChart(
     if (rawData.isEmpty() || rawData.all { it.dataPoints.isEmpty() }) return
 
     DisableSaveableState {
+        val isDark = isSystemInDarkTheme()
+        val textColor = if (isDark) Color.White else Color.Black
+
         var selectedSegment by remember { mutableStateOf<BarChartSegmentData?>(null) }
 
     // Separar barras de tendencias
@@ -208,11 +212,11 @@ fun KubitColumnChart(
         )
     }.filter { it.dataPoints.isNotEmpty() }.toPersistentList()
 
-    val labelStyle = remember { TextStyle(color = Color.White.copy(alpha = 0.5f), fontSize = 9.sp) }
-    val gridStyle = remember {
+    val labelStyle = remember(textColor) { TextStyle(color = textColor.copy(alpha = 0.5f), fontSize = 9.sp) }
+    val gridStyle = remember(isDark) {
         AxisStepStyle.dashed(
             strokeWidth = 1.dp,
-            strokeColor = Color.White.copy(alpha = 0.1f),
+            strokeColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.1f),
             dashLength = 4.dp,
             gapLength = 4.dp,
             phase = 0.dp
@@ -288,7 +292,7 @@ fun KubitColumnChart(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color.Black.copy(alpha = 0.6f))
+                            .background((if (isDark) Color.Black else Color.White).copy(alpha = 0.8f))
                             .padding(horizontal = 12.dp, vertical = 4.dp)
                     ) {
                         val value = if (currentSegment.minValue < 0.0) {
@@ -299,7 +303,7 @@ fun KubitColumnChart(
 
                         Text(
                             text = "${currentSegment.label}: ${yAxisLabel(value.toFloat())}",
-                            color = Color.White,
+                            color = textColor,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold
                         )

@@ -64,6 +64,8 @@ public class Preferences {
     private static final String KEY_BACKUP_FOLDER_DEFAULT = "backup_folder_default";
     private static final String KEY_AUTO_BACKUP = "behavior_auto_backup";
     private static final String KEY_KEEP_BACKUPS = "behaviour_keep_backups";
+    private static final String KEY_THEME = "ui_theme";
+    private static final String KEY_DYNAMIC_COLOR = "ui_dynamic_color";
 
     private final Context context;
     private final SharedPreferences prefs;
@@ -206,6 +208,14 @@ public class Preferences {
 
     public int getAutoBackupRetention() {
         return prefs.getInt(KEY_KEEP_BACKUPS, 12);
+    }
+
+    public String getTheme() {
+        return prefs.getString(KEY_THEME, "system");
+    }
+
+    public boolean isDynamicColorEnabled() {
+        return prefs.getBoolean(KEY_DYNAMIC_COLOR, true);
     }
 
     private void putString(String key, String value) {

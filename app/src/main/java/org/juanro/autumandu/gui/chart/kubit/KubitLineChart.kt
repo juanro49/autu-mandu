@@ -16,6 +16,7 @@
 package org.juanro.autumandu.gui.chart.kubit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -77,6 +78,9 @@ fun KubitLineChart(
     if (rawData.isEmpty() || rawData.all { it.dataPoints.isEmpty() }) return
 
     DisableSaveableState {
+        val isDark = isSystemInDarkTheme()
+        val textColor = if (isDark) Color.White else Color.Black
+
         var minX = Float.MAX_VALUE
         var maxX = -Float.MAX_VALUE
         var minY = Float.MAX_VALUE
@@ -129,7 +133,7 @@ fun KubitLineChart(
                         dp.y,
                         intersectionNode = if (isTrend) null else IntersectionPoint(
                             radius = dimensionResource(id = R.dimen.chart_line_point_radius),
-                            color = if (isMarked) Color.White else lineColor
+                            color = if (isMarked) textColor else lineColor
                         )
                     )
                 },
@@ -138,22 +142,22 @@ fun KubitLineChart(
                 } else {
                     LineStyle(color = lineColor, width = 5.5f)
                 },
-                selectionHighlightPoint = SelectionHighlightPoint(color = Color.White),
+                selectionHighlightPoint = SelectionHighlightPoint(color = textColor),
                 selectionHighlightPopUp = SelectionHighlightPopUp(
-                    backgroundColor = Color.Black.copy(alpha = 0.5f),
-                    labelColor = Color.White,
+                    backgroundColor = (if (isDark) Color.Black else Color.White).copy(alpha = 0.8f),
+                    labelColor = textColor,
                     labelSize = 10.sp,
-                    paddingBetweenPopUpAndPoint = dimensionResource(id = R.dimen.chart_line_popup_padding),
+                    paddingBetweenPopUpAndPoint = dimensionResource(id = R.dimen.chart_line_padding_medium),
                     popUpLabel = { _, y -> yAxisLabel(y) }
                 )
             )
         }.filter { it.dataPoints.isNotEmpty() }.toPersistentList()
 
-        val labelStyle = remember { TextStyle(color = Color.White.copy(alpha = 0.5f), fontSize = 9.sp) }
-        val gridStyle = remember {
+        val labelStyle = remember(textColor) { TextStyle(color = textColor.copy(alpha = 0.5f), fontSize = 9.sp) }
+        val gridStyle = remember(isDark) {
             AxisStepStyle.dashed(
                 strokeWidth = 1.dp,
-                strokeColor = Color.White.copy(alpha = 0.1f),
+                strokeColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.1f),
                 dashLength = 4.dp,
                 gapLength = 4.dp,
                 phase = 0.dp
