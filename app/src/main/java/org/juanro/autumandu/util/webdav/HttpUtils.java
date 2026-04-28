@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  * Utility class for HTTP protocol handling.
  */
 public final class HttpUtils {
-    private static final Pattern AUTH_SCHEME_WITH_PARAM = Pattern.compile("^([^ \"]+) +(.*)$");
+    private static final Pattern AUTH_SCHEME_WITH_PARAM = Pattern.compile("^([^ \"]++) ++(.*)$");
 
     private HttpUtils() {
         // Utility class

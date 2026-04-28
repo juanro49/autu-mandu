@@ -72,23 +72,7 @@ public class WebDavClient {
         }
 
         if (trustedCertificate != null) {
-            @SuppressLint("CustomX509TrustManager")
-            X509TrustManager trustManager = new X509TrustManager() {
-                @Override
-                @SuppressLint("TrustAllX509TrustManager")
-                public void checkClientTrusted(X509Certificate[] chain, String authType) {}
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) throws java.security.cert.CertificateException {
-                    if (chain == null || chain.length == 0 || !chain[0].equals(trustedCertificate)) {
-                        throw new java.security.cert.CertificateException("Certificate not trusted");
-                    }
-                }
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[]{trustedCertificate};
-                }
-            };
-
+            X509TrustManager trustManager = CertificateHelper.createTrustManager(trustedCertificate);
             builder.sslSocketFactory(CertificateHelper.createSocketFactory(trustedCertificate), trustManager);
             builder.hostnameVerifier((hostname, session) -> {
                 try {

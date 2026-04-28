@@ -30,7 +30,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import org.juanro.autumandu.Application;
+import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.R;
 
 /**
@@ -73,7 +73,7 @@ public class SyncProviders {
      * Returns the sync provider associated with an account.
      */
     public static AbstractSyncProvider getSyncProviderByAccount(Context context, Account account) {
-        AccountManager accountManager = AccountManager.get(Application.getContext());
+        AccountManager accountManager = AccountManager.get(AutuManduApplication.getContext());
         String providerIdStr = accountManager.getUserData(account, Authenticator.KEY_SYNC_PROVIDER);
         if (providerIdStr == null) return null;
 
@@ -89,7 +89,7 @@ public class SyncProviders {
      * Returns the settings for a sync provider account.
      */
     public static JSONObject getSyncProviderSettings(Account account) {
-        AccountManager accountManager = AccountManager.get(Application.getContext());
+        AccountManager accountManager = AccountManager.get(AutuManduApplication.getContext());
         String settings = accountManager.getUserData(account, Authenticator.KEY_SYNC_PROVIDER_SETTINGS);
         if (settings == null) return null;
 

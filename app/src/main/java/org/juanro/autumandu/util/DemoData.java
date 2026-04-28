@@ -21,12 +21,13 @@ import android.graphics.Color;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.security.SecureRandom;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.juanro.autumandu.Application;
+import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelType;
@@ -44,6 +45,7 @@ public final class DemoData {
     private static final String MENU_TITLE_CREATE = "Create demo data";
     private static final String MENU_TITLE_REMOVE = "Remove demo data";
     private static final Executor DB_EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private DemoData() {
         // Utility class
@@ -71,7 +73,7 @@ public final class DemoData {
 
     public static void addDemoData() {
         DB_EXECUTOR.execute(() -> {
-            Context context = Application.getContext();
+            Context context = AutuManduApplication.getContext();
             AutuManduDatabase db = AutuManduDatabase.getInstance(context);
 
             long super95 = createFuelType(db, "Super 95", "Benzin");
@@ -169,7 +171,7 @@ public final class DemoData {
 
     public static void removeDemoData() {
         DB_EXECUTOR.execute(() -> {
-            AutuManduDatabase db = AutuManduDatabase.getInstance(Application.getContext());
+            AutuManduDatabase db = AutuManduDatabase.getInstance(AutuManduApplication.getContext());
             db.runInTransaction(() -> {
                 for (Car car : db.getCarDao().getAll()) {
                     db.getCarDao().delete(car);
@@ -204,7 +206,7 @@ public final class DemoData {
     private static void createRefueling(AutuManduDatabase db, ZonedDateTime date, int mileage, float volume,
                                         float price, boolean partial, String note, long fuelTypeId,
                                         long stationId, long carId) {
-        if (Math.random() > 0.95) return;
+        if (RANDOM.nextDouble() > 0.95) return;
 
         Refueling refueling = new Refueling();
         refueling.setDate(Date.from(date.toInstant()));
@@ -253,7 +255,7 @@ public final class DemoData {
     }
 
     private static int randInt(int min, int max) {
-        return min + (int) (Math.random() * ((max - min) + 1));
+        return min + RANDOM.nextInt((max - min) + 1);
     }
 
     private static float randFloat(int min, int max) {

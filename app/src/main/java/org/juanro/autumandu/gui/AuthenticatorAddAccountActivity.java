@@ -48,7 +48,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.juanro.autumandu.Application;
+import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.util.sync.AbstractSyncProvider;
 import org.juanro.autumandu.util.sync.AuthenticationFinishedListener;
@@ -243,7 +243,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         mExecutor.execute(() -> {
             try {
                 String remoteRev;
-                Application.closeDatabases();
+                AutuManduApplication.closeDatabases();
                 if (download) {
                     mSelectedSyncProvider.downloadFile();
                     remoteRev = mSelectedSyncProvider.getRemoteFileRev();

@@ -55,6 +55,7 @@ public class ReminderActionReceiver extends BroadcastReceiver {
                 ReminderWorker.enqueueAction(context, ReminderWorker.ACTION_SNOOZE, reminderIds);
             case ReminderService.ACTION_UPDATE_NOTIFICATION ->
                 ReminderWorker.enqueueUpdate(context);
+            default -> Log.w(TAG, "Unknown action: " + action);
         }
     }
 }

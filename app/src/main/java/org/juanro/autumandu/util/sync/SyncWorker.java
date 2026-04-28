@@ -26,7 +26,7 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import org.json.JSONObject;
-import org.juanro.autumandu.Application;
+import org.juanro.autumandu.AutuManduApplication;
 
 import java.util.Objects;
 
@@ -79,7 +79,7 @@ public class SyncWorker extends Worker {
                 }
             } else if (localRev == null) {
                 // Remote exists but local has no record: download
-                Application.closeDatabases();
+                AutuManduApplication.closeDatabases();
                 syncProvider.downloadFile();
                 syncProvider.setLocalFileRev(remoteRev);
             } else {

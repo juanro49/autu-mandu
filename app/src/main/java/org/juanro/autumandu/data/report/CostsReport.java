@@ -72,9 +72,9 @@ public class CostsReport extends AbstractReport {
         public void add(ZonedDateTime date, float costs) {
             float x;
             if (mOption == GRAPH_OPTION_MONTH) {
-                x = date.getYear() * 12 + date.getMonthValue() - 1;
+                x = (float) (date.getYear() * 12 + date.getMonthValue() - 1);
             } else {
-                x = date.getYear();
+                x = (float) date.getYear();
             }
 
             int index = indexOf(x);
@@ -306,7 +306,7 @@ public class CostsReport extends AbstractReport {
                         case ONCE -> date = ZonedDateTime.now().plusYears(100); // Terminar el bucle
                         case DAY -> date = date.plusDays(otherCost.getRecurrenceMultiplier());
                         case MONTH -> date = date.plusMonths(otherCost.getRecurrenceMultiplier());
-                        case QUARTER -> date = date.plusMonths(otherCost.getRecurrenceMultiplier() * 3);
+                        case QUARTER -> date = date.plusMonths(otherCost.getRecurrenceMultiplier() * 3L);
                         case YEAR -> date = date.plusYears(otherCost.getRecurrenceMultiplier());
                     }
                 }

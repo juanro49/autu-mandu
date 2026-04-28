@@ -27,7 +27,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 
-import org.juanro.autumandu.Application;
+import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.gui.AuthenticatorAddAccountActivity;
 import org.juanro.autumandu.model.AutuManduDatabase;
@@ -66,14 +66,14 @@ public abstract class AbstractSyncProvider {
      */
     @Nullable
     public String getLocalFileRev() {
-        return new Preferences(Application.getContext()).getSyncLocalFileRev();
+        return new Preferences(AutuManduApplication.getContext()).getSyncLocalFileRev();
     }
 
     /**
      * Updates the local file revision in preferences.
      */
     public void setLocalFileRev(@Nullable String rev) {
-        new Preferences(Application.getContext()).setSyncLocalFileRev(rev);
+        new Preferences(AutuManduApplication.getContext()).setSyncLocalFileRev(rev);
     }
 
     /**
@@ -99,6 +99,6 @@ public abstract class AbstractSyncProvider {
      */
     @NonNull
     protected File getLocalFile() {
-        return Application.getContext().getDatabasePath(AutuManduDatabase.DATABASE_NAME);
+        return AutuManduApplication.getContext().getDatabasePath(AutuManduDatabase.DATABASE_NAME);
     }
 }

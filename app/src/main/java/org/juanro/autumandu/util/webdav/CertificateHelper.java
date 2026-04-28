@@ -41,6 +41,7 @@ import java.util.TreeSet;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Utility class for handling X509 certificates in WebDAV sync.
@@ -107,28 +108,38 @@ public final class CertificateHelper {
     }
 
     /**
-     * Creates an SSLSocketFactory that trusts the specified certificate.
+     * Creates an X509TrustManager that trusts the specified certificate.
      */
     @NonNull
-    public static SSLSocketFactory createSocketFactory(@NonNull X509Certificate certificate) throws InvalidCertificateException {
+    public static X509TrustManager createTrustManager(@NonNull X509Certificate certificate) throws InvalidCertificateException {
         try {
-            // Create a KeyStore containing our trusted CAs
             String keyStoreType = KeyStore.getDefaultType();
             KeyStore keyStore = KeyStore.getInstance(keyStoreType);
             keyStore.load(null, null);
             keyStore.setCertificateEntry("ca", certificate);
 
-            // Create a TrustManager that trusts the CAs in our KeyStore
             String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
             tmf.init(keyStore);
 
-            // Create an SSLContext that uses our TrustManager
+            return (X509TrustManager) tmf.getTrustManagers()[0];
+        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
+            throw new InvalidCertificateException(certificate, e);
+        }
+    }
+
+    /**
+     * Creates an SSLSocketFactory that trusts the specified certificate.
+     */
+    @NonNull
+    public static SSLSocketFactory createSocketFactory(@NonNull X509Certificate certificate) throws InvalidCertificateException {
+        try {
+            X509TrustManager trustManager = createTrustManager(certificate);
             final SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, tmf.getTrustManagers(), null);
+            context.init(null, new javax.net.ssl.TrustManager[]{trustManager}, null);
 
             return context.getSocketFactory();
-        } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException | KeyManagementException e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new InvalidCertificateException(certificate, e);
         }
     }

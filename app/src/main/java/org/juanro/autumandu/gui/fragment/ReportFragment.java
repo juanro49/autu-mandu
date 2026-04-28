@@ -217,7 +217,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                     details.requestLayout();
                 });
 
-                try { Thread.sleep(250); } catch (InterruptedException ignored) {}
+                try { Thread.sleep(250); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
             });
         }
 

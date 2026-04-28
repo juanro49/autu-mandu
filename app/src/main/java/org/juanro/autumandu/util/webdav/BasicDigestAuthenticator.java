@@ -118,7 +118,7 @@ public class BasicDigestAuthenticator implements Authenticator {
         }
 
         if (algorithm != null) {
-            params.add("algorithm=" + quotedString(algorithm.name));
+            params.add("algorithm=" + quotedString(algorithm.value));
         }
 
         final String method = request.method();
@@ -128,7 +128,7 @@ public class BasicDigestAuthenticator implements Authenticator {
         String responseValue = null;
 
         if (qop != null) {
-            params.add("qop=" + qop.name);
+            params.add("qop=" + qop.value);
             params.add("cnonce=" + quotedString(clientNonce));
 
             int nc = nonceCount.getAndIncrement();
@@ -155,7 +155,7 @@ public class BasicDigestAuthenticator implements Authenticator {
             }
 
             if (a1 != null && a2 != null) {
-                responseValue = kd(h(a1), nonce + ":" + ncValue + ":" + clientNonce + ":" + qop.name + ":" + h(a2));
+                responseValue = kd(h(a1), nonce + ":" + ncValue + ":" + clientNonce + ":" + qop.value + ":" + h(a2));
             }
         } else {
             // legacy (backwards compatibility with RFC 2069)
@@ -198,16 +198,16 @@ public class BasicDigestAuthenticator implements Authenticator {
         MD5("MD5"),
         MD5_SESSION("MD5-sess");
 
-        public final String name;
+        public final String value;
 
-        Algorithm(String name) {
-            this.name = name;
+        Algorithm(String value) {
+            this.value = value;
         }
 
         static Algorithm determine(String paramValue) {
-            if (paramValue == null || Algorithm.MD5.name.equalsIgnoreCase(paramValue)) {
+            if (paramValue == null || Algorithm.MD5.value.equalsIgnoreCase(paramValue)) {
                 return Algorithm.MD5;
-            } else if (Algorithm.MD5_SESSION.name.equals(paramValue)) {
+            } else if (Algorithm.MD5_SESSION.value.equals(paramValue)) {
                 return Algorithm.MD5_SESSION;
             } else {
                 Log.w(TAG, "Ignoring unknown hash algorithm: " + paramValue);
@@ -220,10 +220,10 @@ public class BasicDigestAuthenticator implements Authenticator {
         Auth("auth"),
         AuthInt("auth-int");
 
-        public final String name;
+        public final String value;
 
-        Protection(String name) {
-            this.name = name;
+        Protection(String value) {
+            this.value = value;
         }
 
         static Protection selectFrom(String paramValue) {

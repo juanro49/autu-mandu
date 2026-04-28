@@ -116,7 +116,7 @@ public abstract class AbstractDataDetailFragment extends Fragment {
                         saveAsync();
                     }
                     return true;
-                } else if (id == R.id.menu_cancel) {
+                } else if (id == R.id.menu_cancel || id == android.R.id.home) {
                     mOnItemActionListener.onItemCanceled();
                     return true;
                 } else if (id == R.id.menu_delete) {
@@ -128,9 +128,6 @@ public abstract class AbstractDataDetailFragment extends Fragment {
                             R.string.alert_delete_title,
                             message, android.R.string.yes,
                             android.R.string.no).show(getParentFragmentManager(), null);
-                    return true;
-                } else if (id == android.R.id.home) {
-                    mOnItemActionListener.onItemCanceled();
                     return true;
                 }
                 return false;

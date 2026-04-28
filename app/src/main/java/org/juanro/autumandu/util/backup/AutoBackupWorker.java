@@ -57,15 +57,16 @@ public class AutoBackupWorker extends Worker {
             var backup = new Backup(context);
             final var result = backup.autoBackup();
 
-            if (result != null) {
+            if (result.isPresent()) {
+                final boolean success = result.get();
                 // Toasts must be shown on the main thread
                 new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(context, (result ? R.string.toast_auto_backup_succeeded :
+                        Toast.makeText(context, (success ? R.string.toast_auto_backup_succeeded :
                                 R.string.toast_auto_backup_failed), Toast.LENGTH_SHORT).show()
                 );
             }
 
-            return result != null && result ? Result.success() : Result.failure();
+            return result.isPresent() && result.get() ? Result.success() : Result.failure();
         } catch (Exception e) {
             Log.e(TAG, "Error during automatic backup: " + e.getMessage(), e);
             return Result.failure();

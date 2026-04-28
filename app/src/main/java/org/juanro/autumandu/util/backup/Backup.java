@@ -35,8 +35,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
-import org.juanro.autumandu.Application;
+import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.util.FileCopyUtil;
@@ -84,11 +85,12 @@ public class Backup {
 
     /**
      * Do an automatically triggered backup, if necessary.
-     * @return true or false corresponding to {@link #backup(boolean)} or null, if no backup needed.
+     * @return an Optional containing true or false corresponding to {@link #backup(boolean)},
+     * or an empty Optional if no backup needed.
      */
-    public Boolean autoBackup() {
+    public Optional<Boolean> autoBackup() {
         if (backupFileExists() || !prefs.getAutoBackupEnabled()) {
-            return null;
+            return Optional.empty();
         }
 
         boolean success = backup(false);
@@ -101,7 +103,7 @@ public class Backup {
                 List<DocumentFile> backupFiles = new ArrayList<>();
                 for (DocumentFile file : allFiles) {
                     String name = file.getName();
-                    if (name != null && name.matches("cr-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.db")) {
+                    if (name != null && name.matches("cr-\\d{4}-\\d{2}-\\d{2}\\.db")) {
                         backupFiles.add(file);
                     }
                 }
@@ -122,7 +124,7 @@ public class Backup {
                 }
             }
         }
-        return success;
+        return Optional.of(success);
     }
 
     /**
@@ -131,7 +133,7 @@ public class Backup {
      */
     public boolean backup(boolean replace) {
         // Crucial for Room: Close all connections to flush WAL/SHM files to the main DB file.
-        Application.closeDatabases();
+        AutuManduApplication.closeDatabases();
 
         String fileName = "cr-" + dateFormat.format(new Date()) + ".db";
         DocumentFile backupDir = getBackupDir();
@@ -181,7 +183,7 @@ public class Backup {
      */
     public boolean restore(Uri backup) {
         // Crucial for Room: Close all connections before overwriting the file.
-        Application.closeDatabases();
+        AutuManduApplication.closeDatabases();
 
         File internalBackupFile = new File(dbFile.getParent(), INTERNAL_BACKUP);
         if (FileCopyUtil.copyFile(dbFile, internalBackupFile)) {
@@ -213,10 +215,10 @@ public class Backup {
     private boolean checkBackupSanity() {
         try {
             // Attempt to open the database via Room to verify its integrity.
-            AutuManduDatabase.getInstance(Application.getContext()).getOpenHelper().getReadableDatabase();
+            AutuManduDatabase.getInstance(AutuManduApplication.getContext()).getOpenHelper().getReadableDatabase();
             return true;
         } catch (Exception e) {
-            Application.closeDatabases();
+            AutuManduApplication.closeDatabases();
             Log.e(TAG, "Database is broken.", e);
             return false;
         }

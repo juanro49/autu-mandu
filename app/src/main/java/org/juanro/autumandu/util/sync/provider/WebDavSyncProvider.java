@@ -32,7 +32,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
-import org.juanro.autumandu.Application;
+import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.AuthenticatorAddAccountActivity;
 import org.juanro.autumandu.gui.dialog.SetupWebDavSyncDialogActivity;
@@ -160,7 +160,7 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
     public String uploadFile() throws SyncAuthException, SyncIoException, SyncParseException {
         if (mWebDavClient == null) return null;
         File localFile = getLocalFile();
-        File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
+        File tempFile = new File(AutuManduApplication.getContext().getCacheDir(), getClass().getSimpleName());
 
         try {
             if (!FileCopyUtil.copyFile(localFile, tempFile)) {
@@ -188,7 +188,7 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
     public void downloadFile() throws SyncAuthException, SyncIoException, SyncParseException {
         if (mWebDavClient == null) return;
         File localFile = getLocalFile();
-        File tempFile = new File(Application.getContext().getCacheDir(), getClass().getSimpleName());
+        File tempFile = new File(AutuManduApplication.getContext().getCacheDir(), getClass().getSimpleName());
 
         try {
             mWebDavClient.download(localFile.getName(), tempFile);
