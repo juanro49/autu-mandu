@@ -92,8 +92,8 @@ public class FabSpeedDialHelper {
     private MainActivity getMainActivity() {
         android.content.Context ctx = mainFab.getContext();
         while (ctx instanceof android.content.ContextWrapper) {
-            if (ctx instanceof MainActivity) {
-                return (MainActivity) ctx;
+            if (ctx instanceof MainActivity mainActivity) {
+                return mainActivity;
             }
             ctx = ((android.content.ContextWrapper) ctx).getBaseContext();
         }

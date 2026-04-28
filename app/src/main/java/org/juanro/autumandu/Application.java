@@ -65,15 +65,25 @@ public class Application extends android.app.Application implements SharedPrefer
                 activities.add(activity);
             }
             @Override
-            public void onActivityStarted(@NonNull Activity activity) {}
+            public void onActivityStarted(@NonNull Activity activity) {
+                // Not needed
+            }
             @Override
-            public void onActivityResumed(@NonNull Activity activity) {}
+            public void onActivityResumed(@NonNull Activity activity) {
+                // Not needed
+            }
             @Override
-            public void onActivityPaused(@NonNull Activity activity) {}
+            public void onActivityPaused(@NonNull Activity activity) {
+                // Not needed
+            }
             @Override
-            public void onActivityStopped(@NonNull Activity activity) {}
+            public void onActivityStopped(@NonNull Activity activity) {
+                // Not needed
+            }
             @Override
-            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+                // Not needed
+            }
             @Override
             public void onActivityDestroyed(@NonNull Activity activity) {
                 activities.remove(activity);

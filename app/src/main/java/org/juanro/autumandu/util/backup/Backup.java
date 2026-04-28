@@ -101,7 +101,7 @@ public class Backup {
                 List<DocumentFile> backupFiles = new ArrayList<>();
                 for (DocumentFile file : allFiles) {
                     String name = file.getName();
-                    if (name != null && name.matches("cr-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.db")) {
+                    if (name != null && name.matches("cr-\\d{4}-\\d{2}-\\d{2}\\.db")) {
                         backupFiles.add(file);
                     }
                 }
