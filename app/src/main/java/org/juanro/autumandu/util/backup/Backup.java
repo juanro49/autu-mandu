@@ -95,36 +95,39 @@ public class Backup {
 
         boolean success = backup(false);
         if (success) {
-            DocumentFile backupDir = getBackupDir();
-            if (backupDir != null) {
-                DocumentFile[] allFiles = backupDir.listFiles();
+            deleteOldBackups(getBackupDir());
+        }
+        return Optional.of(success);
+    }
 
-                // Filtrar archivos que coinciden con el patrón cr-yyyy-MM-dd.db
-                List<DocumentFile> backupFiles = new ArrayList<>();
-                for (DocumentFile file : allFiles) {
-                    String name = file.getName();
-                    if (name != null && name.matches("cr-\\d{4}-\\d{2}-\\d{2}\\.db")) {
-                        backupFiles.add(file);
-                    }
+    private void deleteOldBackups(DocumentFile backupDir) {
+        if (backupDir != null) {
+            DocumentFile[] allFiles = backupDir.listFiles();
+
+            // Filtrar archivos que coinciden con el patrón cr-yyyy-MM-dd.db
+            List<DocumentFile> backupFiles = new ArrayList<>();
+            for (DocumentFile file : allFiles) {
+                String name = file.getName();
+                if (name != null && name.matches("cr-\\d{4}-\\d{2}-\\d{2}\\.db")) {
+                    backupFiles.add(file);
                 }
+            }
 
-                // Ordenar por nombre (que al ser yyyy-MM-dd coincide con fecha)
-                backupFiles.sort((f1, f2) -> {
-                    String n1 = Objects.toString(f1.getName(), "");
-                    String n2 = Objects.toString(f2.getName(), "");
-                    return n1.compareTo(n2);
-                });
+            // Ordenar por nombre (que al ser yyyy-MM-dd coincide con fecha)
+            backupFiles.sort((f1, f2) -> {
+                String n1 = Objects.toString(f1.getName(), "");
+                String n2 = Objects.toString(f2.getName(), "");
+                return n1.compareTo(n2);
+            });
 
-                // Borrar los más antiguos si superan la retención
-                int retention = prefs.getAutoBackupRetention();
-                if (backupFiles.size() > retention) {
-                    for (int i = 0; i < backupFiles.size() - retention; i++) {
-                        backupFiles.get(i).delete();
-                    }
+            // Borrar los más antiguos si superan la retención
+            int retention = prefs.getAutoBackupRetention();
+            if (backupFiles.size() > retention) {
+                for (int i = 0; i < backupFiles.size() - retention; i++) {
+                    backupFiles.get(i).delete();
                 }
             }
         }
-        return Optional.of(success);
     }
 
     /**

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 
 import org.juanro.autumandu.util.Calculator;
 
@@ -188,18 +187,21 @@ public class BalancedRefueling {
         int lastFullRefueling = -1;
         long nextId = Long.MAX_VALUE / 2;
 
-        for (int i = 0; i < refuelings.size(); i++) {
+        int i = 0;
+        while (i < refuelings.size()) {
             BalancedRefueling refueling = refuelings.get(i);
             if (lastFullRefueling < 0) {
                 if (!refueling.isPartial()) {
                     lastFullRefueling = i;
                 }
+                i++;
                 continue;
             }
 
             distance += refueling.getMileage() - refuelings.get(i - 1).getMileage();
-            volume += refuelings.get(i).getVolume();
+            volume += refueling.getVolume();
             if (refueling.isPartial()) {
+                i++;
                 continue;
             }
 
@@ -286,13 +288,14 @@ public class BalancedRefueling {
             distance = 0;
             volume = 0;
             lastFullRefueling = i;
+            i++;
         }
 
         return refuelings;
     }
 
     private static int getBalancedAverageDistanceOfFullRefuelings(List<BalancedRefueling> refuelings) {
-        Vector<Integer> allDistances = new Vector<>();
+        List<Integer> allDistances = new ArrayList<>();
         for (int i = 1; i < refuelings.size(); i++) {
             if (!refuelings.get(i).isPartial() && !refuelings.get(i - 1).isPartial()) {
                 allDistances.add(refuelings.get(i).getMileage() - refuelings.get(i - 1).getMileage());
@@ -331,7 +334,7 @@ public class BalancedRefueling {
     }
 
     private static float getBalancedAverageVolumeOfFullRefuelings(List<BalancedRefueling> refuelings) {
-        Vector<Float> allVolumes = new Vector<>();
+        List<Float> allVolumes = new ArrayList<>();
         for (int i = 1; i < refuelings.size(); i++) {
             if (!refuelings.get(i).isPartial() && !refuelings.get(i - 1).isPartial()) {
                 allVolumes.add(refuelings.get(i).getVolume());

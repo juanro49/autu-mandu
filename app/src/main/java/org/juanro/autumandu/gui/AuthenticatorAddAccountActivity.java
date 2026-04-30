@@ -256,30 +256,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
                     if (isFinishing() || isDestroyed()) return;
 
                     SyncManager.schedulePeriodicSync(AuthenticatorAddAccountActivity.this);
-
-                    // Add account to AccountManager
-                    AccountManager accountManager = AccountManager.get(AuthenticatorAddAccountActivity.this);
-                    boolean accountAdded = accountManager.addAccountExplicitly(mAuthenticatedAccount, mAuthenticatedAccountPassword, null);
-                    if (accountAdded) {
-                        // Add provider and settings as user data
-                        accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER, String.valueOf(mSelectedSyncProvider.getId()));
-                        if (mAuthenticatedAccountSettings != null) {
-                            accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER_SETTINGS, mAuthenticatedAccountSettings.toString());
-                        }
-                    }
-
-                    // Create result bundle for AccountManager
-                    Bundle result = new Bundle();
-                    result.putString(AccountManager.KEY_ACCOUNT_NAME, mAuthenticatedAccount.name);
-                    result.putString(AccountManager.KEY_ACCOUNT_TYPE, mAuthenticatedAccount.type);
-                    result.putString(AccountManager.KEY_PASSWORD, mAuthenticatedAccountPassword);
-                    if (mAuthenticatedAccountAuthToken != null) {
-                        result.putString(AccountManager.KEY_AUTHTOKEN, mAuthenticatedAccountAuthToken);
-                        accountManager.setAuthToken(mAuthenticatedAccount, Authenticator.AUTH_TOKEN_TYPE, mAuthenticatedAccountAuthToken);
-                    }
-
-                    setAccountAuthenticatorResult(result);
-                    setResult(Activity.RESULT_OK);
+                    addAccountToManager();
 
                     if (download) {
                         // Restart the app to ensure all ViewModels and LiveDatas are recreated with the new database.
@@ -298,6 +275,32 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
                 });
             }
         });
+    }
+
+    private void addAccountToManager() {
+        // Add account to AccountManager
+        AccountManager accountManager = AccountManager.get(AuthenticatorAddAccountActivity.this);
+        boolean accountAdded = accountManager.addAccountExplicitly(mAuthenticatedAccount, mAuthenticatedAccountPassword, null);
+        if (accountAdded) {
+            // Add provider and settings as user data
+            accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER, String.valueOf(mSelectedSyncProvider.getId()));
+            if (mAuthenticatedAccountSettings != null) {
+                accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER_SETTINGS, mAuthenticatedAccountSettings.toString());
+            }
+        }
+
+        // Create result bundle for AccountManager
+        Bundle result = new Bundle();
+        result.putString(AccountManager.KEY_ACCOUNT_NAME, mAuthenticatedAccount.name);
+        result.putString(AccountManager.KEY_ACCOUNT_TYPE, mAuthenticatedAccount.type);
+        result.putString(AccountManager.KEY_PASSWORD, mAuthenticatedAccountPassword);
+        if (mAuthenticatedAccountAuthToken != null) {
+            result.putString(AccountManager.KEY_AUTHTOKEN, mAuthenticatedAccountAuthToken);
+            accountManager.setAuthToken(mAuthenticatedAccount, Authenticator.AUTH_TOKEN_TYPE, mAuthenticatedAccountAuthToken);
+        }
+
+        setAccountAuthenticatorResult(result);
+        setResult(Activity.RESULT_OK);
     }
 
     private void handleFirstSyncError(Exception e) {

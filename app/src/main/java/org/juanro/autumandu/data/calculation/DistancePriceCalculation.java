@@ -95,39 +95,40 @@ public class DistancePriceCalculation extends AbstractCalculation {
         mColors = new ArrayList<>(cars.size());
 
         for (Car car : cars) {
-            List<RefuelingWithDetails> carRefuelings = refuelingsByCar.getOrDefault(car.getId(), Collections.emptyList());
-            Preferences prefsForGuess = new Preferences(mContext);
-            List<BalancedRefueling> balanced = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+            processCarData(car, refuelingsByCar.getOrDefault(car.getId(), Collections.emptyList()),
+                    otherCostsByCar.getOrDefault(car.getId(), Collections.emptyList()));
+        }
+    }
 
-            double refuelingCosts = balanced.stream().mapToDouble(BalancedRefueling::getPrice).sum();
-            int refuelingMaxMileage = balanced.stream().mapToInt(BalancedRefueling::getMileage).max().orElse(Integer.MIN_VALUE);
+    private void processCarData(Car car, List<RefuelingWithDetails> carRefuelings, List<OtherCost> otherCosts) {
+        Preferences prefsForGuess = new Preferences(mContext);
+        List<BalancedRefueling> balanced = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
 
-            double otherCostsSum = 0;
-            int otherCostsMaxMileage = Integer.MIN_VALUE;
-            if (mIncludeOtherCosts) {
-                List<OtherCost> otherCosts = otherCostsByCar.get(car.getId());
-                if (otherCosts != null) {
-                    for (OtherCost otherCost : otherCosts) {
-                        int recurrences = (otherCost.getEndDate() == null)
-                                ? Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(), otherCost.getRecurrenceMultiplier(), otherCost.getDate())
-                                : Recurrences.getRecurrencesBetween(otherCost.getRecurrenceInterval(), otherCost.getRecurrenceMultiplier(), otherCost.getDate(), otherCost.getEndDate());
-                        otherCostsSum += otherCost.getPrice() * recurrences;
-                        if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                            otherCostsMaxMileage = Math.max(otherCostsMaxMileage, otherCost.getMileage());
-                        }
-                    }
+        double refuelingCosts = balanced.stream().mapToDouble(BalancedRefueling::getPrice).sum();
+        int refuelingMaxMileage = balanced.stream().mapToInt(BalancedRefueling::getMileage).max().orElse(Integer.MIN_VALUE);
+
+        double otherCostsSum = 0;
+        int otherCostsMaxMileage = Integer.MIN_VALUE;
+        if (mIncludeOtherCosts) {
+            for (OtherCost otherCost : otherCosts) {
+                int recurrences = (otherCost.getEndDate() == null)
+                        ? Recurrences.getRecurrencesSince(otherCost.getRecurrenceInterval(), otherCost.getRecurrenceMultiplier(), otherCost.getDate())
+                        : Recurrences.getRecurrencesBetween(otherCost.getRecurrenceInterval(), otherCost.getRecurrenceMultiplier(), otherCost.getDate(), otherCost.getEndDate());
+                otherCostsSum += otherCost.getPrice() * recurrences;
+                if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
+                    otherCostsMaxMileage = Math.max(otherCostsMaxMileage, otherCost.getMileage());
                 }
             }
+        }
 
-            double totalCosts = refuelingCosts + otherCostsSum;
-            int endMileage = Math.max(refuelingMaxMileage, otherCostsMaxMileage);
-            int startMileage = car.getInitialMileage();
+        double totalCosts = refuelingCosts + otherCostsSum;
+        int endMileage = Math.max(refuelingMaxMileage, otherCostsMaxMileage);
+        int startMileage = car.getInitialMileage();
 
-            if (totalCosts > 0 && startMileage > -1 && endMileage > startMileage) {
-                mNames.add(car.getName());
-                mAvgDistancePrices.add(totalCosts / (endMileage - startMileage));
-                mColors.add(car.getColor());
-            }
+        if (totalCosts > 0 && startMileage > -1 && endMileage > startMileage) {
+            mNames.add(car.getName());
+            mAvgDistancePrices.add(totalCosts / (endMileage - startMileage));
+            mColors.add(car.getColor());
         }
     }
 
