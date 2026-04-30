@@ -48,6 +48,7 @@ import org.juanro.autumandu.model.entity.TireUsage;
  */
 public class CSVExportImport {
     public static final String DIRECTORY = "CSV";
+    private static final String FILE_EXTENSION = ".csv";
 
     // Table names
     private static final String TABLE_CAR = "car";
@@ -172,26 +173,26 @@ public class CSVExportImport {
 
     public boolean anyExportFileExist() {
         if (exportDir == null) return false;
-        return exportDir.findFile(TABLE_CAR + ".csv") != null ||
-                exportDir.findFile(TABLE_FUEL_TYPE + ".csv") != null ||
-                exportDir.findFile(TABLE_STATION + ".csv") != null ||
-                exportDir.findFile(TABLE_OTHER_COST + ".csv") != null ||
-                exportDir.findFile(TABLE_REFUELING + ".csv") != null ||
-                exportDir.findFile(TABLE_REMINDER + ".csv") != null ||
-                exportDir.findFile(TABLE_TIRE_LIST + ".csv") != null ||
-                exportDir.findFile(TABLE_TIRE_USAGE + ".csv") != null;
+        return exportDir.findFile(TABLE_CAR + FILE_EXTENSION) != null ||
+                exportDir.findFile(TABLE_FUEL_TYPE + FILE_EXTENSION) != null ||
+                exportDir.findFile(TABLE_STATION + FILE_EXTENSION) != null ||
+                exportDir.findFile(TABLE_OTHER_COST + FILE_EXTENSION) != null ||
+                exportDir.findFile(TABLE_REFUELING + FILE_EXTENSION) != null ||
+                exportDir.findFile(TABLE_REMINDER + FILE_EXTENSION) != null ||
+                exportDir.findFile(TABLE_TIRE_LIST + FILE_EXTENSION) != null ||
+                exportDir.findFile(TABLE_TIRE_USAGE + FILE_EXTENSION) != null;
     }
 
     public boolean allExportFilesExist() {
         if (exportDir == null) return false;
-        return exportDir.findFile(TABLE_CAR + ".csv") != null &&
-                exportDir.findFile(TABLE_FUEL_TYPE + ".csv") != null &&
-                exportDir.findFile(TABLE_STATION + ".csv") != null &&
-                exportDir.findFile(TABLE_OTHER_COST + ".csv") != null &&
-                exportDir.findFile(TABLE_REFUELING + ".csv") != null &&
-                exportDir.findFile(TABLE_REMINDER + ".csv") != null &&
-                exportDir.findFile(TABLE_TIRE_LIST + ".csv") != null &&
-                exportDir.findFile(TABLE_TIRE_USAGE + ".csv") != null;
+        return exportDir.findFile(TABLE_CAR + FILE_EXTENSION) != null &&
+                exportDir.findFile(TABLE_FUEL_TYPE + FILE_EXTENSION) != null &&
+                exportDir.findFile(TABLE_STATION + FILE_EXTENSION) != null &&
+                exportDir.findFile(TABLE_OTHER_COST + FILE_EXTENSION) != null &&
+                exportDir.findFile(TABLE_REFUELING + FILE_EXTENSION) != null &&
+                exportDir.findFile(TABLE_REMINDER + FILE_EXTENSION) != null &&
+                exportDir.findFile(TABLE_TIRE_LIST + FILE_EXTENSION) != null &&
+                exportDir.findFile(TABLE_TIRE_USAGE + FILE_EXTENSION) != null;
     }
 
     public void export() throws CSVImportException {
@@ -226,7 +227,7 @@ public class CSVExportImport {
     }
 
     private void exportCars(AutuManduDatabase db) throws IOException {
-        doExport(TABLE_CAR + ".csv", CAR_ALL_COLUMNS, csv -> {
+        doExport(TABLE_CAR + FILE_EXTENSION, CAR_ALL_COLUMNS, csv -> {
             var cars = db.getCarDao().getAll();
             for (var car : cars) {
                 csv.printRecord(
@@ -242,7 +243,7 @@ public class CSVExportImport {
     }
 
     private void exportFuelTypes(AutuManduDatabase db) throws IOException {
-        doExport(TABLE_FUEL_TYPE + ".csv", FUEL_TYPE_ALL_COLUMNS, csv -> {
+        doExport(TABLE_FUEL_TYPE + FILE_EXTENSION, FUEL_TYPE_ALL_COLUMNS, csv -> {
             var fuelTypes = db.getFuelTypeDao().getAll();
             for (var fuelType : fuelTypes) {
                 csv.printRecord(
@@ -254,7 +255,7 @@ public class CSVExportImport {
     }
 
     private void exportStations(AutuManduDatabase db) throws IOException {
-        doExport(TABLE_STATION + ".csv", STATION_ALL_COLUMNS, csv -> {
+        doExport(TABLE_STATION + FILE_EXTENSION, STATION_ALL_COLUMNS, csv -> {
             var stations = db.getStationDao().getAll();
             for (var station : stations) {
                 csv.printRecord(
@@ -265,7 +266,7 @@ public class CSVExportImport {
     }
 
     private void exportOtherCosts(AutuManduDatabase db) throws IOException {
-        doExport(TABLE_OTHER_COST + ".csv", OTHER_COST_ALL_COLUMNS, csv -> {
+        doExport(TABLE_OTHER_COST + FILE_EXTENSION, OTHER_COST_ALL_COLUMNS, csv -> {
             var otherCosts = db.getOtherCostDao().getAll();
             for (var otherCost : otherCosts) {
                 csv.printRecord(
@@ -284,7 +285,7 @@ public class CSVExportImport {
     }
 
     private void exportRefuelings(AutuManduDatabase db) throws IOException {
-        doExport(TABLE_REFUELING + ".csv", REFUELING_ALL_COLUMNS, csv -> {
+        doExport(TABLE_REFUELING + FILE_EXTENSION, REFUELING_ALL_COLUMNS, csv -> {
             var refuelings = db.getRefuelingDao().getAll();
             for (var refueling : refuelings) {
                 csv.printRecord(
@@ -303,7 +304,7 @@ public class CSVExportImport {
     }
 
     private void exportReminders(AutuManduDatabase db) throws IOException {
-        doExport(TABLE_REMINDER + ".csv", REMINDER_ALL_COLUMNS, csv -> {
+        doExport(TABLE_REMINDER + FILE_EXTENSION, REMINDER_ALL_COLUMNS, csv -> {
             var reminders = db.getReminderDao().getAll();
             for (var reminder : reminders) {
                 csv.printRecord(
@@ -322,7 +323,7 @@ public class CSVExportImport {
     }
 
     private void exportTireList(AutuManduDatabase db) throws IOException {
-        doExport(TABLE_TIRE_LIST + ".csv", TIRE_LIST_ALL_COLUMNS, csv -> {
+        doExport(TABLE_TIRE_LIST + FILE_EXTENSION, TIRE_LIST_ALL_COLUMNS, csv -> {
             var tires = db.getTireDao().getAllTireLists();
             for (var tire : tires) {
                 csv.printRecord(
@@ -340,7 +341,7 @@ public class CSVExportImport {
     }
 
     private void exportTireUsages(AutuManduDatabase db) throws IOException {
-        doExport(TABLE_TIRE_USAGE + ".csv", TIRE_USAGE_ALL_COLUMNS, csv -> {
+        doExport(TABLE_TIRE_USAGE + FILE_EXTENSION, TIRE_USAGE_ALL_COLUMNS, csv -> {
             var usages = db.getTireDao().getAllTireUsages();
             for (var usage : usages) {
                 csv.printRecord(
@@ -414,7 +415,7 @@ public class CSVExportImport {
 
     private CSVFormat findDelimiter(CSVFormat format) throws IOException {
         if (exportDir == null) return format;
-        var carFile = exportDir.findFile(TABLE_CAR + ".csv");
+        var carFile = exportDir.findFile(TABLE_CAR + FILE_EXTENSION);
         if (carFile == null) {
             return format;
         }
@@ -432,7 +433,7 @@ public class CSVExportImport {
     }
 
     private void importCars(AutuManduDatabase db, CSVFormat format) throws IOException {
-        doImport(TABLE_CAR + ".csv", format, record -> {
+        doImport(TABLE_CAR + FILE_EXTENSION, format, record -> {
             var car = new Car();
             car.setId(CSVConvert.toLong(record.get(_ID)));
             car.setName(record.get(CAR_NAME));
@@ -450,7 +451,7 @@ public class CSVExportImport {
     }
 
     private void importFuelTypes(AutuManduDatabase db, CSVFormat format) throws IOException {
-        doImport(TABLE_FUEL_TYPE + ".csv", format, record -> {
+        doImport(TABLE_FUEL_TYPE + FILE_EXTENSION, format, record -> {
             var fuelType = new FuelType();
             fuelType.setId(CSVConvert.toLong(record.get(_ID)));
             fuelType.setName(record.get(FUEL_TYPE_NAME));
@@ -460,7 +461,7 @@ public class CSVExportImport {
     }
 
     private void importStations(AutuManduDatabase db, CSVFormat format) throws IOException {
-        doImport(TABLE_STATION + ".csv", format, record -> {
+        doImport(TABLE_STATION + FILE_EXTENSION, format, record -> {
             var station = new Station();
             station.setId(CSVConvert.toLong(record.get(_ID)));
             station.setName(record.get(STATION_NAME));
@@ -469,7 +470,7 @@ public class CSVExportImport {
     }
 
     private void importOtherCosts(AutuManduDatabase db, CSVFormat format) throws IOException {
-        doImport(TABLE_OTHER_COST + ".csv", format, record -> {
+        doImport(TABLE_OTHER_COST + FILE_EXTENSION, format, record -> {
             var otherCost = new OtherCost();
             otherCost.setId(CSVConvert.toLong(record.get(_ID)));
             otherCost.setTitle(record.get(OTHER_COST_TITLE));
@@ -491,7 +492,7 @@ public class CSVExportImport {
     }
 
     private void importRefuelings(AutuManduDatabase db, CSVFormat format) throws IOException {
-        doImport(TABLE_REFUELING + ".csv", format, record -> {
+        doImport(TABLE_REFUELING + FILE_EXTENSION, format, record -> {
             var refueling = new Refueling();
             refueling.setId(CSVConvert.toLong(record.get(_ID)));
             var date = CSVConvert.toDate(record.get(REFUELING_DATE));
@@ -516,7 +517,7 @@ public class CSVExportImport {
     }
 
     private void importReminders(AutuManduDatabase db, CSVFormat format) throws IOException {
-        doImport(TABLE_REMINDER + ".csv", format, record -> {
+        doImport(TABLE_REMINDER + FILE_EXTENSION, format, record -> {
             var reminder = new Reminder();
             reminder.setId(CSVConvert.toLong(record.get(_ID)));
             reminder.setTitle(record.get(REMINDER_TITLE));
@@ -537,7 +538,7 @@ public class CSVExportImport {
     }
 
     private void importTireList(AutuManduDatabase db, CSVFormat format) throws IOException {
-        doImport(TABLE_TIRE_LIST + ".csv", format, record -> {
+        doImport(TABLE_TIRE_LIST + FILE_EXTENSION, format, record -> {
             var tireList = new TireList();
             tireList.setId(CSVConvert.toLong(record.get(_ID)));
             var buyDate = CSVConvert.toDate(record.get(TIRE_LIST_BUY_DATE));
@@ -557,7 +558,7 @@ public class CSVExportImport {
     }
 
     private void importTireUsages(AutuManduDatabase db, CSVFormat format) throws IOException {
-        doImport(TABLE_TIRE_USAGE + ".csv", format, record -> {
+        doImport(TABLE_TIRE_USAGE + FILE_EXTENSION, format, record -> {
             var tireUsage = new TireUsage();
             tireUsage.setId(CSVConvert.toLong(record.get(_ID)));
             var mountDist = CSVConvert.toInteger(record.get(TIRE_USAGE_DISTANCE_MOUNT));

@@ -39,6 +39,8 @@ import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.util.Calculator;
 
 public class MileageReport extends AbstractReport {
+    private static final String DISTANCE_FORMAT = "%d %s";
+
     private class ReportChartDataAccumulated extends AbstractReportChartLineData {
         public ReportChartDataAccumulated(Context context, Car car, List<BalancedRefueling> refuelings) {
             super(context, car.getName(), car.getColor());
@@ -99,8 +101,8 @@ public class MileageReport extends AbstractReport {
             for (BalancedRefueling refueling : refuelings) {
                 if (lastRefuelingMileage > -1) {
                     ZonedDateTime date = ZonedDateTime.ofInstant(refueling.getDate().toInstant(), ZoneId.systemDefault());
-                    float x = (float) (date.getYear() * 12 + date.getMonthValue() - 1);
-                    float y = (float) (refueling.getMileage() - lastRefuelingMileage);
+                    float x = date.getYear() * 12 + date.getMonthValue() - 1;
+                    float y = refueling.getMileage() - lastRefuelingMileage;
 
                     int xIndex = indexOf(x);
                     if (xIndex == -1) {
@@ -264,11 +266,11 @@ public class MileageReport extends AbstractReport {
 
                     Float[] carYValues = carDataPerRefueling.getYValues().toArray(new Float[0]);
                     section.addItem(new Item(mContext.getString(R.string.report_highest),
-                            String.format(Locale.getDefault(), "%d %s", (int) Calculator.max(carYValues), mUnit)));
+                            String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.max(carYValues), mUnit)));
                     section.addItem(new Item(mContext.getString(R.string.report_lowest),
-                            String.format(Locale.getDefault(), "%d %s", (int) Calculator.min(carYValues), mUnit)));
+                            String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.min(carYValues), mUnit)));
                     section.addItem(new Item(mContext.getString(R.string.report_average),
-                            String.format(Locale.getDefault(), "%d %s", (int) Calculator.avg(carYValues), mUnit)));
+                            String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.avg(carYValues), mUnit)));
                 }
             }
 
@@ -292,9 +294,9 @@ public class MileageReport extends AbstractReport {
             }
 
             section.addItem(new Item(mContext.getString(R.string.report_total_mileage),
-                    String.format(Locale.getDefault(), "%d %s", latestMileage, mUnit)));
+                    String.format(Locale.getDefault(), DISTANCE_FORMAT, latestMileage, mUnit)));
             section.addItem(new Item(mContext.getString(R.string.report_recorded_mileage),
-                    String.format(Locale.getDefault(), "%d %s", recordedMileage, mUnit)));
+                    String.format(Locale.getDefault(), DISTANCE_FORMAT, recordedMileage, mUnit)));
         }
     }
 }

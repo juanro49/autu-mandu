@@ -46,6 +46,8 @@ import org.juanro.autumandu.gui.util.FragmentUtils;
 
 public class DataFragment extends Fragment implements DataListCallback,
         AbstractDataDetailFragment.OnItemActionListener, MainActivity.BackPressedListener {
+    private static final String BACK_STACK_DETAIL = "detail";
+
     private class DataListBackStackListener implements OnBackStackChangedListener {
         private boolean skipNextIfPop = false;
 
@@ -279,18 +281,18 @@ public class DataFragment extends Fragment implements DataListCallback,
             FragmentUtils.disableAnimations();
         }
 
-        fm.popBackStack("detail", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fm.popBackStack(BACK_STACK_DETAIL, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         fm.beginTransaction()
                 .replace(R.id.detail, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack("detail")
+                .addToBackStack(BACK_STACK_DETAIL)
                 .commit();
     }
 
     @Override
     public void onItemUnselected() {
-        getChildFragmentManager().popBackStack("detail", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getChildFragmentManager().popBackStack(BACK_STACK_DETAIL, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     private void setNoEntrySelectedTextVisible(boolean visible) {

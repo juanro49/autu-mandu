@@ -23,6 +23,7 @@ public class FormValidator {
     private final List<AbstractFormFieldValidator> fieldValidators = new ArrayList<>();
 
     public FormValidator() {
+        // Constructor for adding field validators
     }
 
     public void add(AbstractFormFieldValidator fieldValidator) {

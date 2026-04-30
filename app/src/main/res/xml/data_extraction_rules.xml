@@ -20,9 +20,6 @@
         <include domain="database" path="."/>
         <!-- Incluir todas las preferencias compartidas -->
         <include domain="sharedpref" path="."/>
-
-        <!-- Excluir archivos que no deben salir del dispositivo (ej. tokens de sesión si los hubiera) -->
-        <!-- <exclude domain="sharedpref" path="device_specific_prefs.xml"/> -->
     </cloud-backup>
 
     <device-transfer>

@@ -188,6 +188,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
 
             @Override
             public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Not used
             }
         });
 
@@ -221,6 +222,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
 
             @Override
             public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Not used
             }
         });
 
@@ -350,5 +352,6 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
 
     @Override
     protected void delete() {
+        // Not used, using deleteAsync()
     }
 }

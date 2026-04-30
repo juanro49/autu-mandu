@@ -34,7 +34,7 @@ import androidx.annotation.NonNull;
 
 public class SimpleAnimator {
     public enum Property {
-        Height, Weight
+        HEIGHT, WEIGHT
     }
 
     private final Context context;
@@ -59,7 +59,7 @@ public class SimpleAnimator {
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (params instanceof LinearLayout.LayoutParams) {
             origWeight = ((LinearLayout.LayoutParams) params).weight;
-        } else if (property == Property.Weight) {
+        } else if (property == Property.WEIGHT) {
             throw new IllegalArgumentException("You can only animate weight property in linear " +
                     "layouts.");
         }
@@ -83,7 +83,7 @@ public class SimpleAnimator {
         AnimatorSet animator = (AnimatorSet) createAnimator(R.animator.show, onStart, onEnd);
 
         ValueAnimator valueAnimator = (ValueAnimator) animator.getChildAnimations().get(0);
-        if (property == Property.Height) {
+        if (property == Property.HEIGHT) {
             int from = view.getLayoutParams().height;
             int to = origHeight;
             if (to == ViewGroup.LayoutParams.WRAP_CONTENT
@@ -117,7 +117,7 @@ public class SimpleAnimator {
         });
 
         ValueAnimator valueAnimator = (ValueAnimator) animator.getChildAnimations().get(0);
-        if (property == Property.Height) {
+        if (property == Property.HEIGHT) {
             int from = view.getLayoutParams().height;
             if (from == ViewGroup.LayoutParams.WRAP_CONTENT
                     || from == ViewGroup.LayoutParams.MATCH_PARENT) {
@@ -173,6 +173,7 @@ public class SimpleAnimator {
 
                 @Override
                 public void onAnimationRepeat(@NonNull Animator animation) {
+                    // Not used
                 }
 
                 @Override
@@ -184,6 +185,7 @@ public class SimpleAnimator {
 
                 @Override
                 public void onAnimationCancel(@NonNull Animator animation) {
+                    // Not used
                 }
             });
         }

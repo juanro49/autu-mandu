@@ -36,6 +36,7 @@ import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.util.Calculator;
 
 public class FuelConsumptionReport extends AbstractReport {
+    private static final String CONSUMPTION_FORMAT = "%.2f %s";
 
     private class ReportChartData extends AbstractReportChartLineData {
         private final double mAvgConsumption;
@@ -183,11 +184,11 @@ public class FuelConsumptionReport extends AbstractReport {
                 Section section = addDataSection(car, category);
                 Float[] yValues = carData.getYValues().toArray(new Float[0]);
                 section.addItem(new Item(mContext.getString(R.string.report_highest), String.format(Locale.getDefault(),
-                        "%.2f %s", Calculator.max(yValues), mUnit)));
+                        CONSUMPTION_FORMAT, Calculator.max(yValues), mUnit)));
                 section.addItem(new Item(mContext.getString(R.string.report_lowest), String.format(Locale.getDefault(),
-                        "%.2f %s", Calculator.min(yValues), mUnit)));
+                        CONSUMPTION_FORMAT, Calculator.min(yValues), mUnit)));
                 section.addItem(new Item(mContext.getString(R.string.report_average), String.format(Locale.getDefault(),
-                        "%.2f %s", carData.getAverageConsumption(), mUnit)));
+                        CONSUMPTION_FORMAT, carData.getAverageConsumption(), mUnit)));
 
                 // Total volume metric
                 float totalVolume = 0;
@@ -195,7 +196,7 @@ public class FuelConsumptionReport extends AbstractReport {
                     totalVolume += refueling.getVolume();
                 }
                 section.addItem(new Item(mContext.getString(R.string.report_total_volume),
-                        String.format(Locale.getDefault(), "%.2f %s", totalVolume, prefsForGuess.getUnitVolume())));
+                        String.format(Locale.getDefault(), CONSUMPTION_FORMAT, totalVolume, prefsForGuess.getUnitVolume())));
 
                 sectionAdded = true;
             }

@@ -32,6 +32,8 @@ import org.juanro.autumandu.gui.DataDetailActivity;
 import org.juanro.autumandu.model.dto.BalancedRefueling;
 
 public class DataListRefuelingFragment extends AbstractDataListFragment<BalancedRefueling> {
+    private static final String DISTANCE_FORMAT = "%d %s";
+    private static final String VOLUME_PRICE_FORMAT = "%.2f %s";
 
     private java.text.DateFormat dateFormat;
     private FuelConsumption fuelConsumption;
@@ -90,20 +92,20 @@ public class DataListRefuelingFragment extends AbstractDataListFragment<Balanced
         data.put(R.id.date, dateFormat.format(refueling.getDate()));
         data.put(R.id.station, refueling.getStationName());
 
-        data.put(R.id.data1, String.format(Locale.getDefault(), "%d %s", mileage, unitDistance));
+        data.put(R.id.data1, String.format(Locale.getDefault(), DISTANCE_FORMAT, mileage, unitDistance));
 
         if (refueling.getMileageDifference() != null) {
-            data.put(R.id.data1_calculated, String.format(Locale.getDefault(), "+%d %s",
+            data.put(R.id.data1_calculated, String.format(Locale.getDefault(), "+" + DISTANCE_FORMAT,
                     refueling.getMileageDifference(), unitDistance));
         }
 
         if (refueling.getConsumption() != null) {
-            data.put(R.id.data3_calculated, String.format(Locale.getDefault(), "%.2f %s",
+            data.put(R.id.data3_calculated, String.format(Locale.getDefault(), VOLUME_PRICE_FORMAT,
                     refueling.getConsumption(), fuelConsumption.getUnitLabel()));
         }
 
         if (refueling.getPrice() != 0.0f) {
-            data.put(R.id.data2, String.format(Locale.getDefault(), "%.2f %s", refueling.getPrice(),
+            data.put(R.id.data2, String.format(Locale.getDefault(), VOLUME_PRICE_FORMAT, refueling.getPrice(),
                     unitCurrency));
             data.put(R.id.data2_calculated, String.format(Locale.getDefault(), "%.3f %s/%s",
                     refueling.getPrice() / volume, unitCurrency, unitVolume));
@@ -111,7 +113,7 @@ public class DataListRefuelingFragment extends AbstractDataListFragment<Balanced
             data.put(R.id.data2, getString(R.string.notice_not_paid));
         }
 
-        data.put(R.id.data3, String.format(Locale.getDefault(), "%.2f %s", volume, unitVolume));
+        data.put(R.id.data3, String.format(Locale.getDefault(), VOLUME_PRICE_FORMAT, volume, unitVolume));
         if (refueling.isPartial()) {
             var label = getString(R.string.label_partial);
             var consumption = data.get(R.id.data3_calculated);

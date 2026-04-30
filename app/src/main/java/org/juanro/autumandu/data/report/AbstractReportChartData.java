@@ -22,7 +22,6 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class AbstractReportChartData {
     public static class DataPoint implements Comparable<DataPoint> {
@@ -74,7 +73,7 @@ public abstract class AbstractReportChartData {
     }
 
     public List<Float> getYValues() {
-        return mDataPoints.stream().map(p -> p.y).collect(Collectors.toList());
+        return mDataPoints.stream().map(p -> p.y).toList();
     }
 
     public final boolean isEmpty() {

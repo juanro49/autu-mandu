@@ -72,9 +72,9 @@ public class CostsReport extends AbstractReport {
         public void add(ZonedDateTime date, float costs) {
             float x;
             if (mOption == GRAPH_OPTION_MONTH) {
-                x = (float) (date.getYear() * 12 + date.getMonthValue() - 1);
+                x = date.getYear() * 12 + date.getMonthValue() - 1;
             } else {
-                x = (float) date.getYear();
+                x = date.getYear();
             }
 
             int index = indexOf(x);
