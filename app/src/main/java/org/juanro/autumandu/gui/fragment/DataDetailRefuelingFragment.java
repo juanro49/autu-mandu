@@ -37,13 +37,9 @@ import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
 import org.juanro.autumandu.gui.dialog.TimePickerDialogFragment;
 import org.juanro.autumandu.gui.util.DateTimeInput;
-import org.juanro.autumandu.gui.util.FormFieldGreaterEqualZeroOrEmptyValidator;
-import org.juanro.autumandu.gui.util.FormFieldGreaterEqualZeroValidator;
-import org.juanro.autumandu.gui.util.FormFieldGreaterZeroValidator;
-import org.juanro.autumandu.gui.util.FormValidator;
+import org.juanro.autumandu.gui.util.RefuelingValidator;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelType;
-import org.juanro.autumandu.model.entity.Refueling;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.util.reminder.ReminderWorker;
 
@@ -80,6 +76,15 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
 
     private org.juanro.autumandu.viewmodel.RefuelingDetailViewModel mViewModel;
 
+    private void selectSpinnerItemById(Spinner spinner, long id) {
+        for (int pos = 0; pos < spinner.getCount(); pos++) {
+            if (spinner.getItemIdAtPosition(pos) == id) {
+                spinner.setSelection(pos);
+                break;
+            }
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,84 +108,38 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
 
             mViewModel.getMostUsedFuelType().observe(getViewLifecycleOwner(), mostUsedFuelType -> {
                 if (mostUsedFuelType != null) {
-                    for (int pos = 0; pos < spnFuelType.getCount(); pos++) {
-                        if (spnFuelType.getItemIdAtPosition(pos) == mostUsedFuelType.getId()) {
-                            spnFuelType.setSelection(pos);
-                            break;
-                        }
-                    }
+                    selectSpinnerItemById(spnFuelType, mostUsedFuelType.getId());
                 }
             });
 
             mViewModel.getMostUsedStation().observe(getViewLifecycleOwner(), mostUsedStation -> {
                 if (mostUsedStation != null) {
-                    for (int pos = 0; pos < spnStation.getCount(); pos++) {
-                        if (spnStation.getItemIdAtPosition(pos) == mostUsedStation.getId()) {
-                            spnStation.setSelection(pos);
-                            break;
-                        }
-                    }
+                    selectSpinnerItemById(spnStation, mostUsedStation.getId());
                 }
             });
         } else {
             mViewModel.getRefueling().observe(getViewLifecycleOwner(), refueling -> {
                 if (refueling == null) return;
 
-                if (mDistanceEntryMode == DistanceEntryMode.TRIP) {
-                    mViewModel.getPreviousRefueling(refueling.carId(), refueling.date(), previousRefueling ->
+                mViewModel.getDisplayMileage(refueling, mDistanceEntryMode, mileage ->
                         requireActivity().runOnUiThread(() -> {
                             if (isAdded()) {
-                                if (previousRefueling != null) {
-                                    edtMileage.setText(String.valueOf(refueling.mileage() - previousRefueling.getMileage()));
-                                } else {
-                                    edtMileage.setText(String.valueOf(refueling.mileage() - refueling.carInitialMileage()));
-                                }
+                                edtMileage.setText(String.valueOf(mileage));
                             }
                         }));
-                } else {
-                    edtMileage.setText(String.valueOf(refueling.mileage()));
-                }
 
                 edtDate.setDate(refueling.date());
                 edtTime.setDate(refueling.date());
                 chkPartial.setChecked(refueling.partial());
                 edtNote.setText(refueling.note());
 
-                for (int pos = 0; pos < spnFuelType.getCount(); pos++) {
-                    if (spnFuelType.getItemIdAtPosition(pos) == refueling.fuelTypeId()) {
-                        spnFuelType.setSelection(pos);
-                        break;
-                    }
-                }
+                selectSpinnerItemById(spnFuelType, refueling.fuelTypeId());
+                selectSpinnerItemById(spnStation, refueling.stationId());
+                selectSpinnerItemById(spnCar, refueling.carId());
 
-                for (int pos = 0; pos < spnStation.getCount(); pos++) {
-                    if (spnStation.getItemIdAtPosition(pos) == refueling.stationId()) {
-                        spnStation.setSelection(pos);
-                        break;
-                    }
-                }
-
-                for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                    if (spnCar.getItemIdAtPosition(pos) == refueling.carId()) {
-                        spnCar.setSelection(pos);
-                        break;
-                    }
-                }
-
-                if (mPriceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME) {
-                    edtVolume.setText(String.valueOf(refueling.volume()));
-                    if (refueling.price() != 0.0f) {
-                        edtPrice.setText(String.valueOf(refueling.price()));
-                    }
-                } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
-                    edtVolume.setText(String.valueOf(refueling.price() / refueling.volume()));
-                    edtPrice.setText(String.valueOf(refueling.price()));
-                } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
-                    edtVolume.setText(String.valueOf(refueling.volume()));
-                    if (refueling.price() != 0.0f) {
-                        edtPrice.setText(String.valueOf(refueling.price() / refueling.volume()));
-                    }
-                }
+                var priceData = mViewModel.getPriceEntryData(refueling, mPriceEntryMode);
+                edtVolume.setText(priceData.volume);
+                edtPrice.setText(priceData.price);
 
                 updateMileageInputWarningVisibility();
             });
@@ -378,12 +337,22 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
                     selectCarId = currentPrefs.getDefaultCar();
                 }
 
-                for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                    if (spnCar.getItemIdAtPosition(pos) == selectCarId) {
-                        spnCar.setSelection(pos);
-                        break;
-                    }
+                selectSpinnerItemById(spnCar, selectCarId);
+            }
+        });
+
+        spnCar.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                if (!isInEditMode()) {
+                    mViewModel.setCarIdForDefaults(id);
                 }
+                updateMileageInputWarningVisibility();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Not used
             }
         });
     }
@@ -391,65 +360,31 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     @Override
     protected boolean validate() {
         final Preferences prefs = new Preferences(requireContext());
-        FormValidator validator = new FormValidator();
-
-        validator.add(new FormFieldGreaterZeroValidator(edtMileage));
-        validator.add(new FormFieldGreaterZeroValidator(edtVolume));
-        if (prefs.getPriceEntryMode() == PriceEntryMode.TOTAL_AND_VOLUME ||
-                prefs.getPriceEntryMode() == PriceEntryMode.PER_UNIT_AND_VOLUME) {
-            validator.add(new FormFieldGreaterEqualZeroOrEmptyValidator(edtPrice));
-        } else {
-            validator.add(new FormFieldGreaterEqualZeroValidator(edtPrice));
-        }
-
-        return validator.validate();
+        return RefuelingValidator.validate(prefs.getPriceEntryMode(), edtMileage, edtVolume, edtPrice);
     }
 
     @Override
     protected void saveAsync() {
-        mViewModel.getPreviousRefueling(spnCar.getSelectedItemId(), DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate()), previousRefueling -> {
-            Refueling refueling;
-            if (isInEditMode()) {
-                refueling = new Refueling();
-                refueling.setId(mId);
-            } else {
-                refueling = new Refueling();
-            }
-
-            int mileage = getIntegerFromEditText(edtMileage, 0);
-            if (previousRefueling != null && mDistanceEntryMode == DistanceEntryMode.TRIP) {
-                mileage += previousRefueling.getMileage();
-            }
-
-            refueling.setDate(DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate()));
-            refueling.setMileage(mileage);
-            refueling.setPartial(chkPartial.isChecked());
-            refueling.setNote(edtNote.getText().toString().trim());
-            refueling.setFuelTypeId(spnFuelType.getSelectedItemId());
-            refueling.setStationId(spnStation.getSelectedItemId());
-            refueling.setCarId(spnCar.getSelectedItemId());
-
-            float volume = (float) getDoubleFromEditText(edtVolume);
-            float price = (float) getDoubleFromEditText(edtPrice);
-            if (mPriceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME) {
-                refueling.setVolume(volume);
-                refueling.setPrice(price);
-            } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
-                refueling.setVolume(price / volume);
-                refueling.setPrice(price);
-            } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
-                refueling.setVolume(volume);
-                refueling.setPrice(volume * price);
-            }
-
-            mViewModel.save(refueling, () ->
-                requireActivity().runOnUiThread(() -> {
+        mViewModel.save(
+                isInEditMode() ? mId : null,
+                getIntegerFromEditText(edtMileage, 0),
+                DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate()),
+                chkPartial.isChecked(),
+                edtNote.getText().toString().trim(),
+                spnFuelType.getSelectedItemId(),
+                spnStation.getSelectedItemId(),
+                spnCar.getSelectedItemId(),
+                (float) getDoubleFromEditText(edtVolume),
+                (float) getDoubleFromEditText(edtPrice),
+                mDistanceEntryMode,
+                mPriceEntryMode,
+                () -> requireActivity().runOnUiThread(() -> {
                     if (isAdded()) {
                         ReminderWorker.enqueueUpdate(requireContext());
-                        mOnItemActionListener.onItemSavedAsync(refueling.getId());
+                        mOnItemActionListener.onItemSavedAsync(mId); // Note: refueling.getId() is not available here, but mId is fine for existing, and for new we might need the new id.
                     }
-                }));
-        });
+                })
+        );
     }
 
     @Override
@@ -482,23 +417,11 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
         final long carId = spnCar.getSelectedItemId();
         final Date date = DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate());
 
-        mViewModel.getPreviousRefueling(carId, date, previousRefueling ->
-            mViewModel.getNextRefueling(carId, date, nextRefueling -> {
-                boolean showWarning;
-                if (mDistanceEntryMode == DistanceEntryMode.TOTAL) {
-                    showWarning = (previousRefueling != null && previousRefueling.getMileage() >= mileage) ||
-                            (nextRefueling != null && nextRefueling.getMileage() <= mileage);
-                } else {
-                    showWarning = previousRefueling != null &&
-                            nextRefueling != null &&
-                            previousRefueling.getMileage() + mileage >= nextRefueling.getMileage();
-                }
-
+        mViewModel.validateMileage(mileage, carId, date, mDistanceEntryMode, showWarning ->
                 requireActivity().runOnUiThread(() -> {
                     if (isAdded()) {
                         txtMileageWarning.setVisibility(showWarning ? View.VISIBLE : View.GONE);
                     }
-                });
-            }));
+                }));
     }
 }

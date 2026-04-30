@@ -24,6 +24,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import org.juanro.autumandu.DistanceEntryMode;
+import org.juanro.autumandu.PriceEntryMode;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.dto.RefuelingWithDetails;
 import org.juanro.autumandu.model.entity.Car;
@@ -85,6 +87,75 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
         return db.getCarDao().getAllLiveData();
     }
 
+    public void getDisplayMileage(RefuelingWithDetails refueling, DistanceEntryMode mode, OnLoadedCallback<Integer> callback) {
+        if (mode == DistanceEntryMode.TOTAL) {
+            callback.onLoaded(refueling.mileage());
+        } else {
+            getPreviousRefueling(refueling.carId(), refueling.date(), previous -> {
+                if (previous != null) {
+                    callback.onLoaded(refueling.mileage() - previous.getMileage());
+                } else {
+                    callback.onLoaded(refueling.mileage() - refueling.carInitialMileage());
+                }
+            });
+        }
+    }
+
+    public void validateMileage(int mileage, long carId, Date date, DistanceEntryMode entryMode, OnLoadedCallback<Boolean> callback) {
+        getPreviousRefueling(carId, date, previousRefueling ->
+                getNextRefueling(carId, date, nextRefueling -> {
+                    boolean showWarning;
+                    if (entryMode == DistanceEntryMode.TOTAL) {
+                        showWarning = (previousRefueling != null && previousRefueling.getMileage() >= mileage) ||
+                                (nextRefueling != null && nextRefueling.getMileage() <= mileage);
+                    } else {
+                        showWarning = previousRefueling != null &&
+                                nextRefueling != null &&
+                                previousRefueling.getMileage() + mileage >= nextRefueling.getMileage();
+                    }
+                    callback.onLoaded(showWarning);
+                }));
+    }
+
+    public void save(Long currentId, int mileageInput, Date date, boolean partial, String note,
+                     long fuelTypeId, long stationId, long carId,
+                     float volumeInput, float priceInput,
+                     DistanceEntryMode distanceEntryMode, PriceEntryMode priceEntryMode,
+                     Runnable onSaved) {
+        getPreviousRefueling(carId, date, previousRefueling -> {
+            Refueling refueling = new Refueling();
+            if (currentId != null && currentId > 0) {
+                refueling.setId(currentId);
+            }
+
+            int mileage = mileageInput;
+            if (previousRefueling != null && distanceEntryMode == DistanceEntryMode.TRIP) {
+                mileage += previousRefueling.getMileage();
+            }
+
+            refueling.setDate(date);
+            refueling.setMileage(mileage);
+            refueling.setPartial(partial);
+            refueling.setNote(note);
+            refueling.setFuelTypeId(fuelTypeId);
+            refueling.setStationId(stationId);
+            refueling.setCarId(carId);
+
+            if (priceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME) {
+                refueling.setVolume(volumeInput);
+                refueling.setPrice(priceInput);
+            } else if (priceEntryMode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
+                refueling.setVolume(priceInput / volumeInput);
+                refueling.setPrice(priceInput);
+            } else if (priceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
+                refueling.setVolume(volumeInput);
+                refueling.setPrice(volumeInput * priceInput);
+            }
+
+            save(refueling, onSaved);
+        });
+    }
+
     public void save(Refueling refueling, Runnable onSaved) {
         DB_EXECUTOR.execute(() -> {
             if (refueling.getId() != null && refueling.getId() > 0) {
@@ -124,5 +195,37 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
 
     public interface OnLoadedCallback<T> {
         void onLoaded(T result);
+    }
+
+    public static class PriceEntryData {
+        public final String volume;
+        public final String price;
+
+        public PriceEntryData(String volume, String price) {
+            this.volume = volume;
+            this.price = price;
+        }
+    }
+
+    public PriceEntryData getPriceEntryData(RefuelingWithDetails refueling, PriceEntryMode mode) {
+        String volumeStr = "";
+        String priceStr = "";
+
+        if (mode == PriceEntryMode.TOTAL_AND_VOLUME) {
+            volumeStr = String.valueOf(refueling.volume());
+            if (refueling.price() != 0.0f) {
+                priceStr = String.valueOf(refueling.price());
+            }
+        } else if (mode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
+            volumeStr = String.valueOf(refueling.price() / refueling.volume());
+            priceStr = String.valueOf(refueling.price());
+        } else if (mode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
+            volumeStr = String.valueOf(refueling.volume());
+            if (refueling.price() != 0.0f) {
+                priceStr = String.valueOf(refueling.price() / refueling.volume());
+            }
+        }
+
+        return new PriceEntryData(volumeStr, priceStr);
     }
 }

@@ -18,16 +18,11 @@ package org.juanro.autumandu.gui.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Point;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -35,7 +30,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -68,6 +62,8 @@ import org.juanro.autumandu.gui.MainActivity.BackPressedListener;
 import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
 import org.juanro.autumandu.gui.util.FabSpeedDialHelper;
 import org.juanro.autumandu.gui.util.FloatingActionButtonRevealer;
+import org.juanro.autumandu.gui.util.ReportDetailBinder;
+import org.juanro.autumandu.gui.util.ReportFullScreenAnimator;
 import org.juanro.autumandu.viewmodel.ReportViewModel;
 
 public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClickListener,
@@ -78,14 +74,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
     private ReportAdapter reportAdapter;
     private AbstractReport currentMenuReport;
 
-    private AppBarLayout appBarLayout;
-    private FrameLayout fullScreenChart;
-    private View fullScreenChartHolder;
-    private Animator fullScreenChartAnimator;
-    private View currentFullScreenOriginView;
-    private Rect currentFullScreenStartBounds;
-    private float currentFullScreenStartScaleX;
-    private float currentFullScreenStartScaleY;
+    private ReportFullScreenAnimator fullScreenAnimator;
 
     private class ReportHolder extends RecyclerView.ViewHolder {
         private final TextView txtTitle;
@@ -175,41 +164,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                     chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
 
                     // Fase B: Preparar detalles para el futuro (sin mostrarlos)
-                    int currentCount = details.getChildCount();
-                    int targetCount = reportData.size();
-
-                    for (int i = 0; i < Math.max(currentCount, targetCount); i++) {
-                        if (i >= targetCount) {
-                            if (i < details.getChildCount()) details.getChildAt(i).setVisibility(View.GONE);
-                            continue;
-                        }
-                        var item = reportData.get(i);
-                        boolean isSection = item instanceof AbstractReport.Section;
-                        int layout = isSection ? R.layout.report_row_section : R.layout.report_row_data;
-                        View rowView = i < currentCount ? details.getChildAt(i) : null;
-                        boolean needsInflate = rowView == null || (isSection != (rowView instanceof TextView));
-                        if (needsInflate) {
-                            if (rowView != null) details.removeViewAt(i);
-                            rowView = LayoutInflater.from(details.getContext()).inflate(layout, details, false);
-                            details.addView(rowView, i);
-                        } else {
-                            rowView.setVisibility(View.VISIBLE);
-                        }
-                        DetailViewHolder vh = (DetailViewHolder) rowView.getTag();
-                        if (vh == null) {
-                            vh = new DetailViewHolder(rowView);
-                            rowView.setTag(vh);
-                        }
-                        if (item instanceof AbstractReport.Section section) {
-                            vh.label.setText(section.getLabel());
-                            vh.label.setTextColor(section.getColor());
-                            if (vh.sectionDrawable != null) vh.sectionDrawable.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
-                        } else {
-                            var dataItem = (AbstractReport.Item) item;
-                            vh.label.setText(dataItem.getLabel());
-                            if (vh.value != null) vh.value.setText(dataItem.getValue());
-                        }
-                    }
+                    ReportDetailBinder.bindDetails(details, reportData);
 
                     // Configurar posición del panel de detalles (detrás de main)
                     var params = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
@@ -294,7 +249,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
     @Override
     public boolean onBackPressed() {
-        if (currentFullScreenOriginView != null) {
+        if (fullScreenAnimator != null && fullScreenAnimator.isVisible()) {
             hideFullScreenChart();
             return true;
         }
@@ -305,7 +260,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final var v = inflater.inflate(R.layout.fragment_report, container, false);
 
-        appBarLayout = v.findViewById(R.id.app_bar_layout);
+        var appBarLayout = (AppBarLayout) v.findViewById(R.id.app_bar_layout);
 
         var recyclerView = (RecyclerView) v.findViewById(R.id.list);
         var orientation = getResources().getConfiguration().orientation;
@@ -323,8 +278,10 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             FloatingActionButtonRevealer.setup(fabHelper, recyclerView);
         }
 
-        fullScreenChart = v.findViewById(R.id.full_screen_chart);
-        fullScreenChartHolder = v.findViewById(R.id.full_screen_chart_holder);
+        var fullScreenChart = (FrameLayout) v.findViewById(R.id.full_screen_chart);
+        var fullScreenChartHolder = v.findViewById(R.id.full_screen_chart_holder);
+
+        fullScreenAnimator = new ReportFullScreenAnimator(appBarLayout, fullScreenChart, fullScreenChartHolder);
 
         var btnCloseFullScreen = v.findViewById(R.id.btn_close_full_screen);
         btnCloseFullScreen.setOnClickListener(view -> hideFullScreenChart());
@@ -376,16 +333,9 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             return;
         }
 
-        if (fullScreenChartAnimator != null) {
-            fullScreenChartAnimator.cancel();
-        }
-
-        currentFullScreenOriginView = v;
-
         var options = loadReportChartOptions(requireContext(), report);
         var rawData = report.getRawChartData(options.getChartOption());
 
-        fullScreenChart.removeAllViews();
         View kubitView;
         if (report instanceof OverallCostsReport) {
             kubitView = KubitChartBridge.createPieChart(requireContext(), report, rawData, options.getChartOption());
@@ -396,80 +346,14 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         } else {
             kubitView = KubitChartBridge.createColumnChart(requireContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend(), true);
         }
-        fullScreenChart.addView(kubitView);
 
-        currentFullScreenStartBounds = new Rect();
-        final var finalBounds = new Rect();
-        final var globalOffset = new Point();
-
-        currentFullScreenOriginView.getGlobalVisibleRect(currentFullScreenStartBounds);
-        getView().getGlobalVisibleRect(finalBounds, globalOffset);
-        currentFullScreenStartBounds.offset(-globalOffset.x, -globalOffset.y);
-        finalBounds.offset(-globalOffset.x, -globalOffset.y);
-
-        currentFullScreenStartScaleX = (float) currentFullScreenStartBounds.width() / finalBounds.width();
-        currentFullScreenStartScaleY = (float) currentFullScreenStartBounds.height() / finalBounds.height();
-
-        currentFullScreenOriginView.setVisibility(View.INVISIBLE);
-        fullScreenChartHolder.setVisibility(View.VISIBLE);
-
-        fullScreenChartHolder.setPivotX(0f);
-        fullScreenChartHolder.setPivotY(0f);
-
-        var set = new AnimatorSet();
-        set.play(ObjectAnimator.ofFloat(fullScreenChartHolder, View.X,
-                currentFullScreenStartBounds.left, finalBounds.left))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.Y,
-                        currentFullScreenStartBounds.top, finalBounds.top))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_X,
-                        currentFullScreenStartScaleX, 1f))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_Y,
-                        currentFullScreenStartScaleY, 1f));
-        set.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                fullScreenChartAnimator = null;
-                appBarLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-        set.start();
-        fullScreenChartAnimator = set;
+        int animationTime = getResources().getInteger(android.R.integer.config_longAnimTime);
+        fullScreenAnimator.show(v, getView(), kubitView, animationTime);
     }
 
     private void hideFullScreenChart() {
-        if (fullScreenChartAnimator != null) {
-            fullScreenChartAnimator.cancel();
-        }
-
-        var set = new AnimatorSet();
-        set.play(ObjectAnimator.ofFloat(fullScreenChartHolder, View.X,
-                currentFullScreenStartBounds.left))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.Y,
-                        currentFullScreenStartBounds.top))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_X,
-                        currentFullScreenStartScaleX))
-                .with(ObjectAnimator.ofFloat(fullScreenChartHolder, View.SCALE_Y,
-                        currentFullScreenStartScaleY));
-        set.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
-        set.setInterpolator(new DecelerateInterpolator());
-        set.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                appBarLayout.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                currentFullScreenOriginView.setVisibility(View.VISIBLE);
-                currentFullScreenOriginView = null;
-                fullScreenChartHolder.setVisibility(View.GONE);
-                fullScreenChartAnimator = null;
-                fullScreenChart.removeAllViews();
-            }
-        });
-        set.start();
-        fullScreenChartAnimator = set;
+        int animationTime = getResources().getInteger(android.R.integer.config_longAnimTime);
+        fullScreenAnimator.hide(animationTime);
     }
 
     private void toggleReportDetails(View v) {
@@ -561,24 +445,5 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         prefsEdit.putBoolean(reportName + "_show_overall_trend", options.isShowOverallTrend());
         prefsEdit.putInt(reportName + "_current_chart_option", options.getChartOption());
         prefsEdit.apply();
-    }
-
-    private static class DetailViewHolder {
-        final TextView label;
-        @Nullable
-        final TextView value;
-        @Nullable
-        final GradientDrawable sectionDrawable;
-
-        DetailViewHolder(View v) {
-            label = v.findViewById(android.R.id.text1);
-            value = v.findViewById(android.R.id.text2);
-            var drawables = label.getCompoundDrawables();
-            if (drawables.length > 3 && drawables[3] instanceof GradientDrawable gd) {
-                sectionDrawable = gd;
-            } else {
-                sectionDrawable = null;
-            }
-        }
     }
 }
