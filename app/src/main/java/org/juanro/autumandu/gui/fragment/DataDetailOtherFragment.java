@@ -201,10 +201,10 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         edtPrice = v.findViewById(R.id.edt_price);
         spnRepeat = v.findViewById(R.id.spn_repeat);
         chkEndDate = v.findViewById(R.id.chk_end_date);
-        chkEndDateAnimator = new SimpleAnimator(getActivity(), chkEndDate, SimpleAnimator.Property.Height);
+        chkEndDateAnimator = new SimpleAnimator(getActivity(), chkEndDate, SimpleAnimator.Property.HEIGHT);
         edtEndDate = new DateTimeInput(v.findViewById(R.id.edt_end_date), DateTimeInput.Mode.DATE);
         TextInputLayout edtEndDateInputLayout = v.findViewById(R.id.edt_end_date_input_layout);
-        edtEndDateAnimator = new SimpleAnimator(getActivity(), edtEndDateInputLayout, SimpleAnimator.Property.Height);
+        edtEndDateAnimator = new SimpleAnimator(getActivity(), edtEndDateInputLayout, SimpleAnimator.Property.HEIGHT);
         edtNote = v.findViewById(R.id.edt_note);
         spnCar = v.findViewById(R.id.spn_car);
 

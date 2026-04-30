@@ -189,185 +189,192 @@ public class CostsReport extends AbstractReport {
                 .stream().collect(Collectors.groupingBy(TireList::getCarId));
 
         for (Car car : cars) {
-            Long carIdObj = car.getId();
-            if (carIdObj == null) continue;
-            long carId = carIdObj;
+            processCar(car, refuelingsByCar, otherCostsByCar, tiresByCar);
+        }
+    }
 
-            Section section;
-            if (car.getSuspendedSince() != null) {
-                section = addDataSection(String.format("%s [%s]", car.getName(),
-                        mContext.getString(R.string.suspended)), car.getColor(), 1);
-            } else {
-                section = addDataSection(car.getName(), car.getColor());
-            }
+    private void processCar(Car car, Map<Long, List<RefuelingWithDetails>> refuelingsByCar,
+                            Map<Long, List<OtherCost>> otherCostsByCar,
+                            Map<Long, List<TireList>> tiresByCar) {
+        Long carIdObj = car.getId();
+        if (carIdObj == null) return;
+        long carId = carIdObj;
 
-            ReportChartData monthReportData = new ReportChartData(mContext, car.getName(),
-                    car.getColor(), GRAPH_OPTION_MONTH);
-            ReportChartData yearReportData = new ReportChartData(mContext, car.getName(),
-                    car.getColor(), GRAPH_OPTION_YEAR);
-            mCostsPerMonth.put(carId, monthReportData);
-            mCostsPerYear.put(carId, yearReportData);
+        Section section;
+        if (car.getSuspendedSince() != null) {
+            section = addDataSection(String.format("%s [%s]", car.getName(),
+                    mContext.getString(R.string.suspended)), car.getColor(), 1);
+        } else {
+            section = addDataSection(car.getName(), car.getColor());
+        }
 
-            final int startMileage = car.getInitialMileage();
-            int endMileage = Integer.MIN_VALUE;
-            ZonedDateTime startDate = ZonedDateTime.now();
-            ZonedDateTime endDate = (car.getSuspendedSince() != null) ?
-                    ZonedDateTime.ofInstant(car.getSuspendedSince().toInstant(), ZoneId.systemDefault()) :
-                    ZonedDateTime.now();
+        ReportChartData monthReportData = new ReportChartData(mContext, car.getName(),
+                car.getColor(), GRAPH_OPTION_MONTH);
+        ReportChartData yearReportData = new ReportChartData(mContext, car.getName(),
+                car.getColor(), GRAPH_OPTION_YEAR);
+        mCostsPerMonth.put(carId, monthReportData);
+        mCostsPerYear.put(carId, yearReportData);
 
-            // Usar el balanceador en los repostajes precargados
-            List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
-            if (carRefuelings == null) carRefuelings = Collections.emptyList();
+        final int startMileage = car.getInitialMileage();
+        int endMileage = Integer.MIN_VALUE;
+        ZonedDateTime startDate = ZonedDateTime.now();
+        ZonedDateTime endDate = (car.getSuspendedSince() != null) ?
+                ZonedDateTime.ofInstant(car.getSuspendedSince().toInstant(), ZoneId.systemDefault()) :
+                ZonedDateTime.now();
 
-            Preferences prefsForGuess = new Preferences(mContext);
-            List<BalancedRefueling> refuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+        // Usar el balanceador en los repostajes precargados
+        List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
+        if (carRefuelings == null) carRefuelings = Collections.emptyList();
 
-            List<OtherCost> otherCosts = otherCostsByCar.get(carId);
-            if (otherCosts == null) otherCosts = Collections.emptyList();
+        Preferences prefsForGuess = new Preferences(mContext);
+        List<BalancedRefueling> refuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
 
-            List<TireList> tireLists = tiresByCar.get(carId);
-            if (tireLists == null) tireLists = Collections.emptyList();
+        List<OtherCost> otherCosts = otherCostsByCar.get(carId);
+        if (otherCosts == null) otherCosts = Collections.emptyList();
 
-            if ((refuelings.size() + otherCosts.size() + tireLists.size()) < 2) {
-                section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
+        List<TireList> tireLists = tiresByCar.get(carId);
+        if (tireLists == null) tireLists = Collections.emptyList();
+
+        if ((refuelings.size() + otherCosts.size() + tireLists.size()) < 2) {
+            section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
+            return;
+        }
+
+        double totalCosts = 0;
+        double costsWithinYear = 0;
+
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime lastYearDate = now.minusYears(1);
+
+        for (BalancedRefueling refueling : refuelings) {
+            if (refueling.getPrice() == 0.0f) {
                 continue;
             }
+            totalCosts += refueling.getPrice();
 
-            double totalCosts = 0;
-            double costsWithinYear = 0;
+            ZonedDateTime date = ZonedDateTime.ofInstant(refueling.getDate().toInstant(), ZoneId.systemDefault());
+            monthReportData.add(date, refueling.getPrice());
+            yearReportData.add(date, refueling.getPrice());
 
-            ZonedDateTime now = ZonedDateTime.now();
-            ZonedDateTime lastYearDate = now.minusYears(1);
-
-            for (BalancedRefueling refueling : refuelings) {
-                if (refueling.getPrice() == 0.0f) {
-                    continue;
-                }
-                totalCosts += refueling.getPrice();
-
-                ZonedDateTime date = ZonedDateTime.ofInstant(refueling.getDate().toInstant(), ZoneId.systemDefault());
-                monthReportData.add(date, refueling.getPrice());
-                yearReportData.add(date, refueling.getPrice());
-
-                if (date.isAfter(lastYearDate) && date.isBefore(now.plusSeconds(1))) {
-                    costsWithinYear += refueling.getPrice();
-                }
-
-                endMileage = Math.max(endMileage, refueling.getMileage());
-                if (startDate.isAfter(date)) {
-                    startDate = date;
-                }
+            if (date.isAfter(lastYearDate) && date.isBefore(now.plusSeconds(1))) {
+                costsWithinYear += refueling.getPrice();
             }
 
-            for (OtherCost otherCost : otherCosts) {
-                int recurrences;
-                int recurrencesInLastYear;
-
-                if (otherCost.getEndDate() == null ||
-                        otherCost.getEndDate().after(new Date())) {
-                    recurrences = Recurrences.getRecurrencesSince(
-                            otherCost.getRecurrenceInterval(),
-                            otherCost.getRecurrenceMultiplier(),
-                            otherCost.getDate());
-
-                    recurrencesInLastYear = Recurrences.getRecurrencesBetween(
-                            otherCost.getRecurrenceInterval(),
-                            otherCost.getRecurrenceMultiplier(),
-                            otherCost.getDate(),
-                            Date.from(now.toInstant()),
-                            Date.from(lastYearDate.toInstant()),
-                            Date.from(now.toInstant()));
-                } else {
-                    recurrences = Recurrences.getRecurrencesBetween(
-                            otherCost.getRecurrenceInterval(),
-                            otherCost.getRecurrenceMultiplier(),
-                            otherCost.getDate(),
-                            otherCost.getEndDate());
-                    recurrencesInLastYear = Recurrences.getRecurrencesBetween(
-                            otherCost.getRecurrenceInterval(),
-                            otherCost.getRecurrenceMultiplier(),
-                            otherCost.getDate(),
-                            otherCost.getEndDate(),
-                            Date.from(lastYearDate.toInstant()),
-                            otherCost.getEndDate());
-                }
-
-                totalCosts += otherCost.getPrice() * recurrences;
-                costsWithinYear += otherCost.getPrice() * recurrencesInLastYear;
-
-                ZonedDateTime date = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
-                ZonedDateTime recurrenceEndDate = (otherCost.getEndDate() != null && endDate.isAfter(ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault())))
-                        ? ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault()) : endDate;
-
-                while (date.isBefore(recurrenceEndDate)) {
-                    monthReportData.add(date, otherCost.getPrice());
-                    yearReportData.add(date, otherCost.getPrice());
-                    switch (otherCost.getRecurrenceInterval()) {
-                        case ONCE -> date = ZonedDateTime.now().plusYears(100); // Terminar el bucle
-                        case DAY -> date = date.plusDays(otherCost.getRecurrenceMultiplier());
-                        case MONTH -> date = date.plusMonths(otherCost.getRecurrenceMultiplier());
-                        case QUARTER -> date = date.plusMonths(otherCost.getRecurrenceMultiplier() * 3L);
-                        case YEAR -> date = date.plusYears(otherCost.getRecurrenceMultiplier());
-                    }
-                }
-
-                if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                    endMileage = Math.max(endMileage, otherCost.getMileage());
-                }
-
-                if (startDate.isAfter(ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault()))) {
-                    startDate = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
-                }
+            endMileage = Math.max(endMileage, refueling.getMileage());
+            if (startDate.isAfter(date)) {
+                startDate = date;
             }
-
-            for (TireList tireList : tireLists) {
-                if (tireList.getPrice() == 0.0f) {
-                    continue;
-                }
-                totalCosts += tireList.getPrice();
-
-                ZonedDateTime date = ZonedDateTime.ofInstant(tireList.getBuyDate().toInstant(), ZoneId.systemDefault());
-                monthReportData.add(date, tireList.getPrice());
-                yearReportData.add(date, tireList.getPrice());
-
-                if (date.isAfter(lastYearDate) && date.isBefore(now.plusSeconds(1))) {
-                    costsWithinYear += tireList.getPrice();
-                }
-
-                if (startDate.isAfter(date)) {
-                    startDate = date;
-                }
-            }
-
-            // Calcular promedios
-            long elapsedSeconds = ChronoUnit.SECONDS.between(startDate, endDate);
-            double costsPerSecond = totalCosts / Math.max(1L, elapsedSeconds);
-
-            section.addItem(new Item("Ø " + mContext.getString(R.string.report_day),
-                    mContext.getString((elapsedSeconds > DAY_SECONDS ?
-                                    R.string.report_price : R.string.report_price_estimated),
-                            costsPerSecond * DAY_SECONDS, mUnit)));
-
-            section.addItem(new Item("Ø " + mContext.getString(R.string.report_month),
-                    mContext.getString((elapsedSeconds > MONTH_SECONDS ?
-                                    R.string.report_price : R.string.report_price_estimated),
-                            costsPerSecond * MONTH_SECONDS, mUnit)));
-
-            section.addItem(new Item("Ø " + mContext.getString(R.string.report_year),
-                    mContext.getString((elapsedSeconds > YEAR_SECONDS ?
-                                    R.string.report_price : R.string.report_price_estimated),
-                            costsPerSecond * YEAR_SECONDS, mUnit)));
-
-            int mileageDiff = Math.max(1, endMileage - startMileage);
-            section.addItem(new Item("Ø " + prefs.getUnitDistance(),
-                    mContext.getString(R.string.report_price, totalCosts / mileageDiff, mUnit)));
-
-            section.addItem(new Item(mContext.getString(R.string.report_last_year),
-                    mContext.getString(R.string.report_price, costsWithinYear, mUnit)));
-
-            section.addItem(new Item(mContext.getString(R.string.report_since,
-                    DateFormat.getDateFormat(mContext).format(Date.from(startDate.toInstant()))),
-                    mContext.getString(R.string.report_price, totalCosts, mUnit)));
         }
+
+        for (OtherCost otherCost : otherCosts) {
+            int recurrences;
+            int recurrencesInLastYear;
+
+            if (otherCost.getEndDate() == null ||
+                    otherCost.getEndDate().after(new Date())) {
+                recurrences = Recurrences.getRecurrencesSince(
+                        otherCost.getRecurrenceInterval(),
+                        otherCost.getRecurrenceMultiplier(),
+                        otherCost.getDate());
+
+                recurrencesInLastYear = Recurrences.getRecurrencesBetween(
+                        otherCost.getRecurrenceInterval(),
+                        otherCost.getRecurrenceMultiplier(),
+                        otherCost.getDate(),
+                        Date.from(now.toInstant()),
+                        Date.from(lastYearDate.toInstant()),
+                        Date.from(now.toInstant()));
+            } else {
+                recurrences = Recurrences.getRecurrencesBetween(
+                        otherCost.getRecurrenceInterval(),
+                        otherCost.getRecurrenceMultiplier(),
+                        otherCost.getDate(),
+                        otherCost.getEndDate());
+                recurrencesInLastYear = Recurrences.getRecurrencesBetween(
+                        otherCost.getRecurrenceInterval(),
+                        otherCost.getRecurrenceMultiplier(),
+                        otherCost.getDate(),
+                        otherCost.getEndDate(),
+                        Date.from(lastYearDate.toInstant()),
+                        otherCost.getEndDate());
+            }
+
+            totalCosts += otherCost.getPrice() * recurrences;
+            costsWithinYear += otherCost.getPrice() * recurrencesInLastYear;
+
+            ZonedDateTime date = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
+            ZonedDateTime recurrenceEndDate = (otherCost.getEndDate() != null && endDate.isAfter(ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault())))
+                    ? ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault()) : endDate;
+
+            while (date.isBefore(recurrenceEndDate)) {
+                monthReportData.add(date, otherCost.getPrice());
+                yearReportData.add(date, otherCost.getPrice());
+                switch (otherCost.getRecurrenceInterval()) {
+                    case ONCE -> date = ZonedDateTime.now().plusYears(100); // Terminar el bucle
+                    case DAY -> date = date.plusDays(otherCost.getRecurrenceMultiplier());
+                    case MONTH -> date = date.plusMonths(otherCost.getRecurrenceMultiplier());
+                    case QUARTER -> date = date.plusMonths(otherCost.getRecurrenceMultiplier() * 3L);
+                    case YEAR -> date = date.plusYears(otherCost.getRecurrenceMultiplier());
+                }
+            }
+
+            if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
+                endMileage = Math.max(endMileage, otherCost.getMileage());
+            }
+
+            if (startDate.isAfter(ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault()))) {
+                startDate = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
+            }
+        }
+
+        for (TireList tireList : tireLists) {
+            if (tireList.getPrice() == 0.0f) {
+                continue;
+            }
+            totalCosts += tireList.getPrice();
+
+            ZonedDateTime date = ZonedDateTime.ofInstant(tireList.getBuyDate().toInstant(), ZoneId.systemDefault());
+            monthReportData.add(date, tireList.getPrice());
+            yearReportData.add(date, tireList.getPrice());
+
+            if (date.isAfter(lastYearDate) && date.isBefore(now.plusSeconds(1))) {
+                costsWithinYear += tireList.getPrice();
+            }
+
+            if (startDate.isAfter(date)) {
+                startDate = date;
+            }
+        }
+
+        // Calcular promedios
+        long elapsedSeconds = ChronoUnit.SECONDS.between(startDate, endDate);
+        double costsPerSecond = totalCosts / Math.max(1L, elapsedSeconds);
+
+        section.addItem(new Item("Ø " + mContext.getString(R.string.report_day),
+                mContext.getString((elapsedSeconds > DAY_SECONDS ?
+                                R.string.report_price : R.string.report_price_estimated),
+                        costsPerSecond * DAY_SECONDS, mUnit)));
+
+        section.addItem(new Item("Ø " + mContext.getString(R.string.report_month),
+                mContext.getString((elapsedSeconds > MONTH_SECONDS ?
+                                R.string.report_price : R.string.report_price_estimated),
+                        costsPerSecond * MONTH_SECONDS, mUnit)));
+
+        section.addItem(new Item("Ø " + mContext.getString(R.string.report_year),
+                mContext.getString((elapsedSeconds > YEAR_SECONDS ?
+                                R.string.report_price : R.string.report_price_estimated),
+                        costsPerSecond * YEAR_SECONDS, mUnit)));
+
+        int mileageDiff = Math.max(1, endMileage - startMileage);
+        Preferences prefs = new Preferences(mContext);
+        section.addItem(new Item("Ø " + prefs.getUnitDistance(),
+                mContext.getString(R.string.report_price, totalCosts / mileageDiff, mUnit)));
+
+        section.addItem(new Item(mContext.getString(R.string.report_last_year),
+                mContext.getString(R.string.report_price, costsWithinYear, mUnit)));
+
+        section.addItem(new Item(mContext.getString(R.string.report_since,
+                DateFormat.getDateFormat(mContext).format(Date.from(startDate.toInstant()))),
+                mContext.getString(R.string.report_price, totalCosts, mUnit)));
     }
 }

@@ -66,15 +66,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
                         float consumption = fuelConsumption.computeFuelConsumption(partialVolume,
                                 partialDistance);
-                        String tooltip = mContext.getString(R.string.report_toast_fuel_consumption,
-                                car.getName(),
-                                consumption,
-                                mUnit,
-                                refueling.getFuelTypeName(),
-                                mDateFormat.format(refueling.getDate()));
-                        if (refueling.isGuessed()) {
-                            tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
-                        }
+                        String tooltip = makeTooltip(car.getName(), consumption, refueling.getFuelTypeName(), refueling.getDate(), refueling.isGuessed());
 
                         add(ReportDateHelper.toFloat(refueling.getDate()),
                                 consumption,
@@ -125,6 +117,19 @@ public class FuelConsumptionReport extends AbstractReport {
         return mContext.getString(R.string.report_title_fuel_consumption);
     }
 
+    private String makeTooltip(String carName, float consumption, String fuelTypeName, java.util.Date date, boolean guessed) {
+        String tooltip = mContext.getString(R.string.report_toast_fuel_consumption,
+                carName,
+                consumption,
+                mUnit,
+                fuelTypeName,
+                mDateFormat.format(date));
+        if (guessed) {
+            tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
+        }
+        return tooltip;
+    }
+
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
         synchronized (mCachedChartData) {
@@ -152,59 +157,63 @@ public class FuelConsumptionReport extends AbstractReport {
                 .stream().collect(Collectors.groupingBy(RefuelingWithDetails::carId));
 
         for (Car car : cars) {
-            Long carIdObj = car.getId();
-            if (carIdObj == null) continue;
-            long carId = carIdObj;
-            boolean sectionAdded = false;
+            processCar(car, refuelingsByCar);
+        }
+    }
 
-            // Get balanced refuelings for this car once.
-            List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
-            if (carRefuelings == null) carRefuelings = Collections.emptyList();
+    private void processCar(Car car, Map<Long, List<RefuelingWithDetails>> refuelingsByCar) {
+        Long carIdObj = car.getId();
+        if (carIdObj == null) return;
+        long carId = carIdObj;
+        boolean sectionAdded = false;
 
-            Preferences prefsForGuess = new Preferences(mContext);
-            List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
-            if (balancedRefuelings == null) balancedRefuelings = Collections.emptyList();
+        // Get balanced refuelings for this car once.
+        List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
+        if (carRefuelings == null) carRefuelings = Collections.emptyList();
 
-            // Group balanced refuelings by category in memory.
-            Map<String, List<BalancedRefueling>> refuelingsByCategory = balancedRefuelings.stream()
-                    .filter(r -> r.getFuelTypeCategory() != null)
-                    .collect(Collectors.groupingBy(BalancedRefueling::getFuelTypeCategory));
+        Preferences prefsForGuess = new Preferences(mContext);
+        List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+        if (balancedRefuelings == null) balancedRefuelings = Collections.emptyList();
 
-            for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategory.entrySet()) {
-                String category = entry.getKey();
-                List<BalancedRefueling> categoryRefuelings = entry.getValue();
+        // Group balanced refuelings by category in memory.
+        Map<String, List<BalancedRefueling>> refuelingsByCategory = balancedRefuelings.stream()
+                .filter(r -> r.getFuelTypeCategory() != null)
+                .collect(Collectors.groupingBy(BalancedRefueling::getFuelTypeCategory));
 
-                ReportChartData carData = new ReportChartData(mContext, car, category, categoryRefuelings);
-                if (carData.isEmpty()) {
-                    continue;
-                }
+        for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategory.entrySet()) {
+            String category = entry.getKey();
+            List<BalancedRefueling> categoryRefuelings = entry.getValue();
 
-                reportData.add(carData);
-
-                Section section = addDataSection(car, category);
-                Float[] yValues = carData.getYValues().toArray(new Float[0]);
-                section.addItem(new Item(mContext.getString(R.string.report_highest), String.format(Locale.getDefault(),
-                        CONSUMPTION_FORMAT, Calculator.max(yValues), mUnit)));
-                section.addItem(new Item(mContext.getString(R.string.report_lowest), String.format(Locale.getDefault(),
-                        CONSUMPTION_FORMAT, Calculator.min(yValues), mUnit)));
-                section.addItem(new Item(mContext.getString(R.string.report_average), String.format(Locale.getDefault(),
-                        CONSUMPTION_FORMAT, carData.getAverageConsumption(), mUnit)));
-
-                // Total volume metric
-                float totalVolume = 0;
-                for (BalancedRefueling refueling : balancedRefuelings) {
-                    totalVolume += refueling.getVolume();
-                }
-                section.addItem(new Item(mContext.getString(R.string.report_total_volume),
-                        String.format(Locale.getDefault(), CONSUMPTION_FORMAT, totalVolume, prefsForGuess.getUnitVolume())));
-
-                sectionAdded = true;
+            ReportChartData carData = new ReportChartData(mContext, car, category, categoryRefuelings);
+            if (carData.isEmpty()) {
+                continue;
             }
 
-            if (!sectionAdded) {
-                Section section = addDataSection(car);
-                section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
+            reportData.add(carData);
+
+            Section section = addDataSection(car, category);
+            Float[] yValues = carData.getYValues().toArray(new Float[0]);
+            section.addItem(new Item(mContext.getString(R.string.report_highest), String.format(Locale.getDefault(),
+                    CONSUMPTION_FORMAT, Calculator.max(yValues), mUnit)));
+            section.addItem(new Item(mContext.getString(R.string.report_lowest), String.format(Locale.getDefault(),
+                    CONSUMPTION_FORMAT, Calculator.min(yValues), mUnit)));
+            section.addItem(new Item(mContext.getString(R.string.report_average), String.format(Locale.getDefault(),
+                    CONSUMPTION_FORMAT, carData.getAverageConsumption(), mUnit)));
+
+            // Total volume metric
+            float totalVolume = 0;
+            for (BalancedRefueling refueling : balancedRefuelings) {
+                totalVolume += refueling.getVolume();
             }
+            section.addItem(new Item(mContext.getString(R.string.report_total_volume),
+                    String.format(Locale.getDefault(), CONSUMPTION_FORMAT, totalVolume, prefsForGuess.getUnitVolume())));
+
+            sectionAdded = true;
+        }
+
+        if (!sectionAdded) {
+            Section section = addDataSection(car);
+            section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
         }
     }
 

@@ -285,29 +285,29 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
         edtMountDistanceInputLayout = v.findViewById(R.id.edt_mount_distance_input_layout);
         edtMountDateInputLayout = v.findViewById(R.id.edt_mount_date_input_layout);
         edtMountDistanceAnimator = new SimpleAnimator(getActivity(), edtMountDistanceInputLayout,
-            SimpleAnimator.Property.Height);
+            SimpleAnimator.Property.HEIGHT);
         edtMountDateAnimator = new SimpleAnimator(getActivity(), edtMountDateInputLayout,
-            SimpleAnimator.Property.Height);
+            SimpleAnimator.Property.HEIGHT);
         chkUmount = v.findViewById(R.id.chk_umount);
         edtUmountDistance = v.findViewById(R.id.edt_umount_distance);
         edtUmountDate = new DateTimeInput(v.findViewById(R.id.edt_umount_date), DateTimeInput.Mode.DATE);
         edtUmountDistanceInputLayout = v.findViewById(R.id.edt_umount_distance_input_layout);
         edtUmountDateInputLayout = v.findViewById(R.id.edt_umount_date_input_layout);
         edtUmountDistanceAnimator = new SimpleAnimator(getActivity(), edtUmountDistanceInputLayout,
-            SimpleAnimator.Property.Height);
+            SimpleAnimator.Property.HEIGHT);
         chkMountAnimator = new SimpleAnimator(getActivity(), chkMount,
-            SimpleAnimator.Property.Height);
+            SimpleAnimator.Property.HEIGHT);
         edtUmountDateAnimator = new SimpleAnimator(getActivity(), edtUmountDateInputLayout,
-            SimpleAnimator.Property.Height);
+            SimpleAnimator.Property.HEIGHT);
         chkUmountAnimator = new SimpleAnimator(getActivity(), chkUmount,
-            SimpleAnimator.Property.Height);
+            SimpleAnimator.Property.HEIGHT);
         chkTrashDate = v.findViewById(R.id.chk_trash_date);
         edtTrashDate = new DateTimeInput(v.findViewById(R.id.edt_trash_date), DateTimeInput.Mode.DATE);
         edtTrashDateInputLayout = v.findViewById(R.id.edt_trash_date_input_layout);
         edtTrashDateAnimator = new SimpleAnimator(getActivity(), edtTrashDateInputLayout,
-            SimpleAnimator.Property.Height);
+            SimpleAnimator.Property.HEIGHT);
         chkTrashDateAnimator = new SimpleAnimator(getActivity(), chkTrashDate,
-            SimpleAnimator.Property.Height);
+            SimpleAnimator.Property.HEIGHT);
 
         // Date + Time
         edtDate.applyOnClickListener(PICK_DATE_REQUEST_CODE, getParentFragmentManager());

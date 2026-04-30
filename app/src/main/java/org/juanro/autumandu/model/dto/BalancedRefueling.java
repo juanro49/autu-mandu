@@ -139,6 +139,16 @@ public class BalancedRefueling {
             refuelings = calculateBalancedRefuelings(refuelings);
         }
 
+        calculateConsumptions(refuelings);
+
+        if (orderDescending) {
+            Collections.reverse(refuelings);
+        }
+
+        return refuelings;
+    }
+
+    private static void calculateConsumptions(List<BalancedRefueling> refuelings) {
         // ALWAYS calculate consumption and mileage difference.
         // Mileage difference is calculated for ALL refuelings (distance since previous record).
         // Consumption is only calculated for full refuelings (accumulating partials).
@@ -152,27 +162,27 @@ public class BalancedRefueling {
             }
 
             if (!current.isPartial()) {
-                float volumeSinceLastFull = current.getVolume();
-                // Find previous full refueling (ignoring partials in between for consumption calculation)
-                for (int j = i - 1; j >= 0; j--) {
-                    BalancedRefueling older = refuelings.get(j);
-                    if (!older.isPartial()) {
-                        int diffSinceLastFull = current.getMileage() - older.getMileage();
-                        if (diffSinceLastFull > 0) {
-                            current.setConsumption((volumeSinceLastFull / diffSinceLastFull) * 100);
-                        }
-                        break;
-                    }
-                    volumeSinceLastFull += older.getVolume();
-                }
+                current.setConsumption(calculateConsumptionForFullRefueling(refuelings, i));
             }
         }
+    }
 
-        if (orderDescending) {
-            Collections.reverse(refuelings);
+    private static Float calculateConsumptionForFullRefueling(List<BalancedRefueling> refuelings, int index) {
+        BalancedRefueling current = refuelings.get(index);
+        float volumeSinceLastFull = current.getVolume();
+        // Find previous full refueling (ignoring partials in between for consumption calculation)
+        for (int j = index - 1; j >= 0; j--) {
+            BalancedRefueling older = refuelings.get(j);
+            if (!older.isPartial()) {
+                int diffSinceLastFull = current.getMileage() - older.getMileage();
+                if (diffSinceLastFull > 0) {
+                    return (volumeSinceLastFull / diffSinceLastFull) * 100;
+                }
+                break;
+            }
+            volumeSinceLastFull += older.getVolume();
         }
-
-        return refuelings;
+        return null;
     }
 
     private static List<BalancedRefueling> calculateBalancedRefuelings(List<BalancedRefueling> refuelings) {

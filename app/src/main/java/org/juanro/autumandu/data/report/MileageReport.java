@@ -46,15 +46,8 @@ public class MileageReport extends AbstractReport {
             super(context, car.getName(), car.getColor());
 
             for (BalancedRefueling refueling : refuelings) {
-                String tooltip = mContext.getString(R.string.report_toast_mileage,
-                        car.getName(),
-                        refueling.getMileage(),
-                        mUnit,
-                        formatXValue(ReportDateHelper.toFloat(refueling.getDate()),
-                                GRAPH_OPTION_ACCUMULATED));
-                if (refueling.isGuessed()) {
-                    tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
-                }
+                String tooltip = makeTooltip(car.getName(), refueling.getMileage(),
+                        refueling.getDate(), GRAPH_OPTION_ACCUMULATED, refueling.isGuessed());
 
                 add(ReportDateHelper.toFloat(refueling.getDate()),
                         (float) refueling.getMileage(),
@@ -72,15 +65,8 @@ public class MileageReport extends AbstractReport {
             for (BalancedRefueling refueling : refuelings) {
                 if (lastRefuelingMileage > -1) {
                     int mileageDiff = refueling.getMileage() - lastRefuelingMileage;
-                    String tooltip = mContext.getString(R.string.report_toast_mileage,
-                            car.getName(),
-                            mileageDiff,
-                            mUnit,
-                            formatXValue(ReportDateHelper.toFloat(refueling.getDate()),
-                                    GRAPH_OPTION_PER_REFUELING));
-                    if (refueling.isGuessed()) {
-                        tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
-                    }
+                    String tooltip = makeTooltip(car.getName(), mileageDiff,
+                            refueling.getDate(), GRAPH_OPTION_PER_REFUELING, refueling.isGuessed());
 
                     add(ReportDateHelper.toFloat(refueling.getDate()),
                             (float) mileageDiff,
@@ -106,13 +92,11 @@ public class MileageReport extends AbstractReport {
 
                     int xIndex = indexOf(x);
                     if (xIndex == -1) {
-                        add(x, y, mContext.getString(R.string.report_toast_mileage_month,
-                                car.getName(), (double) y, mUnit, formatXValue(x, GRAPH_OPTION_PER_MONTH)));
+                        add(x, y, makeTooltipMonth(car.getName(), y, x));
                     } else {
                         DataPoint dp = mDataPoints.get(xIndex);
                         dp.y += y;
-                        dp.tooltip = mContext.getString(R.string.report_toast_mileage_month,
-                                car.getName(), (double) dp.y, mUnit, formatXValue(x, GRAPH_OPTION_PER_MONTH));
+                        dp.tooltip = makeTooltipMonth(car.getName(), dp.y, x);
                     }
                 }
 
@@ -174,6 +158,23 @@ public class MileageReport extends AbstractReport {
         return mContext.getString(R.string.report_title_mileage);
     }
 
+    private String makeTooltip(String carName, int mileage, java.util.Date date, int option, boolean guessed) {
+        String tooltip = mContext.getString(R.string.report_toast_mileage,
+                carName,
+                mileage,
+                mUnit,
+                formatXValue(ReportDateHelper.toFloat(date), option));
+        if (guessed) {
+            tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
+        }
+        return tooltip;
+    }
+
+    private String makeTooltipMonth(String carName, double mileage, float xValue) {
+        return mContext.getString(R.string.report_toast_mileage_month,
+                carName, mileage, mUnit, formatXValue(xValue, GRAPH_OPTION_PER_MONTH));
+    }
+
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
         synchronized (mCachedChartData) {
@@ -219,84 +220,89 @@ public class MileageReport extends AbstractReport {
                 .stream().collect(Collectors.groupingBy(RefuelingWithDetails::carId));
 
         for (Car car : cars) {
-            Long carIdObj = car.getId();
-            if (carIdObj == null) continue;
-            long carId = carIdObj;
+            processCar(car, refuelingsByCar);
+        }
+    }
 
-            // Get balanced refuelings for this car once.
-            List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
-            if (carRefuelings == null) carRefuelings = Collections.emptyList();
+    private void processCar(Car car, Map<Long, List<RefuelingWithDetails>> refuelingsByCar) {
+        Long carIdObj = car.getId();
+        if (carIdObj == null) return;
+        long carId = carIdObj;
 
-            Preferences prefsForGuess = new Preferences(mContext);
-            List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+        // Get balanced refuelings for this car once.
+        List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
+        if (carRefuelings == null) carRefuelings = Collections.emptyList();
 
-            // Accumulated data
-            ReportChartDataAccumulated carDataAccumulated = new ReportChartDataAccumulated(
-                    mContext, car, balancedRefuelings);
-            if (!carDataAccumulated.isEmpty()) {
-                reportDataAccumulated.add(carDataAccumulated);
-            }
+        Preferences prefsForGuess = new Preferences(mContext);
+        List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
 
-            // Per refueling data (grouped by category)
-            Map<String, List<BalancedRefueling>> refuelingsByCategory = balancedRefuelings.stream()
-                    .filter(r -> r.getFuelTypeCategory() != null)
-                    .collect(Collectors.groupingBy(BalancedRefueling::getFuelTypeCategory));
+        // Accumulated data
+        ReportChartDataAccumulated carDataAccumulated = new ReportChartDataAccumulated(
+                mContext, car, balancedRefuelings);
+        if (!carDataAccumulated.isEmpty()) {
+            reportDataAccumulated.add(carDataAccumulated);
+        }
 
-            for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategory.entrySet()) {
-                String category = entry.getKey();
-                List<BalancedRefueling> categoryRefuelings = entry.getValue();
+        // Per refueling data (grouped by category)
+        Map<String, List<BalancedRefueling>> refuelingsByCategory = balancedRefuelings.stream()
+                .filter(r -> r.getFuelTypeCategory() != null)
+                .collect(Collectors.groupingBy(BalancedRefueling::getFuelTypeCategory));
 
-                ReportChartDataPerRefueling carDataPerRefueling = new ReportChartDataPerRefueling(
-                        mContext, car, category, categoryRefuelings);
+        for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategory.entrySet()) {
+            String category = entry.getKey();
+            List<BalancedRefueling> categoryRefuelings = entry.getValue();
 
-                // Add section for car
-                Section section;
-                if (car.getSuspendedSince() != null) {
-                    section = addDataSection(String.format("%s (%s) [%s]", car.getName(), category,
-                            mContext.getString(R.string.suspended)), car.getColor(), 1);
-                } else {
-                    section = addDataSection(String.format("%s (%s)", car.getName(), category),
-                            car.getColor());
-                }
+            ReportChartDataPerRefueling carDataPerRefueling = new ReportChartDataPerRefueling(
+                    mContext, car, category, categoryRefuelings);
 
-                if (carDataPerRefueling.isEmpty()) {
-                    section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
-                } else {
-                    reportDataPerRefueling.add(carDataPerRefueling);
-
-                    Float[] carYValues = carDataPerRefueling.getYValues().toArray(new Float[0]);
-                    section.addItem(new Item(mContext.getString(R.string.report_highest),
-                            String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.max(carYValues), mUnit)));
-                    section.addItem(new Item(mContext.getString(R.string.report_lowest),
-                            String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.min(carYValues), mUnit)));
-                    section.addItem(new Item(mContext.getString(R.string.report_average),
-                            String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.avg(carYValues), mUnit)));
-                }
-            }
-
-            // Per month data
-            ReportChartDataPerMonth carDataPerMonth = new ReportChartDataPerMonth(mContext, car, balancedRefuelings);
-            if (!carDataPerMonth.isEmpty()) {
-                reportDataPerMonth.add(carDataPerMonth);
-            }
-
-            // Odometer and Recorded distance stats
-            int latestMileage = db.getCarDao().getLatestMileage(carId);
-            Integer earliestMileage = db.getCarDao().getEarliestMileage(carId);
-            int recordedMileage = earliestMileage != null ? latestMileage - earliestMileage : 0;
-
+            // Add section for car
             Section section;
             if (car.getSuspendedSince() != null) {
-                section = addDataSection(String.format("%s [%s]", car.getName(),
+                section = addDataSection(String.format("%s (%s) [%s]", car.getName(), category,
                         mContext.getString(R.string.suspended)), car.getColor(), 1);
             } else {
-                section = addDataSection(car.getName(), car.getColor());
+                section = addDataSection(String.format("%s (%s)", car.getName(), category),
+                        car.getColor());
             }
 
-            section.addItem(new Item(mContext.getString(R.string.report_total_mileage),
-                    String.format(Locale.getDefault(), DISTANCE_FORMAT, latestMileage, mUnit)));
-            section.addItem(new Item(mContext.getString(R.string.report_recorded_mileage),
-                    String.format(Locale.getDefault(), DISTANCE_FORMAT, recordedMileage, mUnit)));
+            if (carDataPerRefueling.isEmpty()) {
+                section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
+            } else {
+                reportDataPerRefueling.add(carDataPerRefueling);
+
+                Float[] carYValues = carDataPerRefueling.getYValues().toArray(new Float[0]);
+                section.addItem(new Item(mContext.getString(R.string.report_highest),
+                        String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.max(carYValues), mUnit)));
+                section.addItem(new Item(mContext.getString(R.string.report_lowest),
+                        String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.min(carYValues), mUnit)));
+                section.addItem(new Item(mContext.getString(R.string.report_average),
+                        String.format(Locale.getDefault(), DISTANCE_FORMAT, (int) Calculator.avg(carYValues), mUnit)));
+            }
         }
+
+        // Per month data
+        ReportChartDataPerMonth carDataPerMonth = new ReportChartDataPerMonth(mContext, car, balancedRefuelings);
+        if (!carDataPerMonth.isEmpty()) {
+            reportDataPerMonth.add(carDataPerMonth);
+        }
+
+        AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
+        // Odometer and Recorded distance stats
+        int latestMileage = db.getCarDao().getLatestMileage(carId);
+        Integer earliestMileage = db.getCarDao().getEarliestMileage(carId);
+        int recordedMileage = earliestMileage != null ? latestMileage - earliestMileage : 0;
+
+        Section section;
+        if (car.getSuspendedSince() != null) {
+            section = addDataSection(String.format("%s [%s]", car.getName(),
+                    mContext.getString(R.string.suspended)), car.getColor(), 1);
+        } else {
+            section = addDataSection(car.getName(), car.getColor());
+        }
+
+        section.addItem(new Item(mContext.getString(R.string.report_total_mileage),
+                String.format(Locale.getDefault(), DISTANCE_FORMAT, latestMileage, mUnit)));
+        section.addItem(new Item(mContext.getString(R.string.report_recorded_mileage),
+                String.format(Locale.getDefault(), DISTANCE_FORMAT, recordedMileage, mUnit)));
     }
 }
