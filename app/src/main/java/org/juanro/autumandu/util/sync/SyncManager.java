@@ -37,6 +37,10 @@ public class SyncManager {
     public static final String SYNC_WORK_NAME_PERIODIC = "org.juanro.autumandu.sync.periodic";
     public static final String SYNC_WORK_NAME_ONCE = "org.juanro.autumandu.sync.once";
 
+    private SyncManager() {
+        // Utility class
+    }
+
     /**
      * Schedules a periodic sync task every hour.
      */

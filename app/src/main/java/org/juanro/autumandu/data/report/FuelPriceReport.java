@@ -34,6 +34,8 @@ import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Refueling;
 
 public class FuelPriceReport extends AbstractReport {
+    private static final String PRICE_FORMAT = "%.3f %s";
+
     private class ReportChartData extends AbstractReportChartLineData {
         private double mMax, mMin, mAverage;
 
@@ -157,11 +159,11 @@ public class FuelPriceReport extends AbstractReport {
 
                 Section section = addDataSection(fuelType.getName(), color);
                 section.addItem(new Item(mContext.getString(R.string.report_highest),
-                        String.format(Locale.getDefault(), "%.3f %s", data.getMax(), mUnit)));
+                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getMax(), mUnit)));
                 section.addItem(new Item(mContext.getString(R.string.report_lowest),
-                        String.format(Locale.getDefault(), "%.3f %s", data.getMin(), mUnit)));
+                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getMin(), mUnit)));
                 section.addItem(new Item(mContext.getString(R.string.report_average),
-                        String.format(Locale.getDefault(), "%.3f %s", data.getAverage(), mUnit)));
+                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getAverage(), mUnit)));
 
                 currentColor++;
             }

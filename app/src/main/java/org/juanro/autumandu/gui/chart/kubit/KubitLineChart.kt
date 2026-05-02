@@ -81,77 +81,26 @@ fun KubitLineChart(
         val isDark = isSystemInDarkTheme()
         val textColor = if (isDark) Color.White else Color.Black
 
-        var minX = Float.MAX_VALUE
-        var maxX = -Float.MAX_VALUE
-        var minY = Float.MAX_VALUE
-        var maxY = -Float.MAX_VALUE
-
-        rawData.forEach { series ->
-            series.dataPoints.forEach { point ->
-                if (point.x.isFinite() && point.y.isFinite()) {
-                    if (point.x < minX) minX = point.x
-                    if (point.x > maxX) maxX = point.x
-                    if (point.y < minY) minY = point.y
-                    if (point.y > maxY) maxY = point.y
-                }
-            }
-        }
-
-        if (minX == Float.MAX_VALUE) {
-            minX = 0f; maxX = 1f; minY = 0f; maxY = 1f
-        }
-        if (maxX == minX) maxX = minX + 1f
+        val bounds = remember(rawData) { calculateBounds(rawData) }
 
         // Rango de X ajustado para que los puntos de los extremos sean visibles
-        val rangeX = maxX - minX
+        val rangeX = bounds.maxX - bounds.minX
         val safeRangeX = if (rangeX > 0f) rangeX else 1f
-        val effectiveXMin = minX - safeRangeX * 0.02f
-        val effectiveXMax = maxX + safeRangeX * 0.005f
+        val effectiveXMin = bounds.minX - safeRangeX * 0.02f
+        val effectiveXMax = bounds.maxX + safeRangeX * 0.005f
 
-        // Rango de Y optimizado: sin margen arriba para pegar el gráfico al título
-        val yMinBound = minY
-        val yMaxBound = maxY
-        val rangeY = yMaxBound - yMinBound
+        // Rango de Y optimizado
+        val rangeY = bounds.maxY - bounds.minY
         val safeRangeY = if (rangeY > 0f) rangeY else 1f
 
         // 10% de margen abajo para no chocar con el eje X, 15% arriba para el popup
-        val effectiveYMin = yMinBound - safeRangeY * 0.10f
-        val effectiveYMax = yMaxBound + safeRangeY * 0.15f
+        val effectiveYMin = bounds.minY - safeRangeY * 0.10f
+        val effectiveYMax = bounds.maxY + safeRangeY * 0.15f
         val effectiveRangeY = effectiveYMax - effectiveYMin
 
-        // Usamos los valores reales para Y y calculamos yUnitSize para que se ajuste al alto
-        val lines: ImmutableList<Line> = rawData.mapIndexed { index, data ->
-            val lineColor = Color(data.color)
-            val isTrend = data is TrendReportChartData || data is OverallTrendReportChartData
-            Line(
-                dataPoints = data.dataPoints.filter { it.x.isFinite() && it.y.isFinite() }.map { dp ->
-                    val isMarked = data is AbstractReportChartLineData && data.isMarked(dp.x)
-                    // Añadimos un pequeño offset para evitar puntos superpuestos en la misma X (que crashean LineChart)
-                    val xOffset = index * 0.0001f
-                    Point(
-                        dp.x + xOffset,
-                        dp.y,
-                        intersectionNode = if (isTrend) null else IntersectionPoint(
-                            radius = dimensionResource(id = R.dimen.chart_line_point_radius),
-                            color = if (isMarked) textColor else lineColor
-                        )
-                    )
-                },
-                lineStyle = if (isTrend) {
-                    LineStyle(color = lineColor.copy(alpha = 0.7f), width = 3.5f)
-                } else {
-                    LineStyle(color = lineColor, width = 5.5f)
-                },
-                selectionHighlightPoint = SelectionHighlightPoint(color = textColor),
-                selectionHighlightPopUp = SelectionHighlightPopUp(
-                    backgroundColor = (if (isDark) Color.Black else Color.White).copy(alpha = 0.8f),
-                    labelColor = textColor,
-                    labelSize = 10.sp,
-                    paddingBetweenPopUpAndPoint = dimensionResource(id = R.dimen.chart_line_padding_medium),
-                    popUpLabel = { _, y -> yAxisLabel(y) }
-                )
-            )
-        }.filter { it.dataPoints.isNotEmpty() }.toPersistentList()
+        val lines = remember(rawData, textColor, isDark) {
+            createLines(rawData, textColor, isDark, yAxisLabel)
+        }
 
         val labelStyle = remember(textColor) { TextStyle(color = textColor.copy(alpha = 0.5f), fontSize = 9.sp) }
         val gridStyle = remember(isDark) {
@@ -164,82 +113,23 @@ fun KubitLineChart(
             )
         }
 
-        // 8 pasos para una granularidad mayor y cubrir todo el alto
         val ySteps = remember(effectiveYMin, effectiveRangeY) {
-            (0..8).map { i ->
-                val realValue = effectiveYMin + i.toFloat() * effectiveRangeY / 8.2f
-                AxisStep(
-                    axisValue = realValue,
-                    axisLabel = if (i == 0) "" else yAxisLabel(realValue),
-                    labelStyle = labelStyle,
-                    stepStyle = gridStyle
-                )
-            }.toPersistentList()
+            createYSteps(effectiveYMin, effectiveRangeY, labelStyle, gridStyle, yAxisLabel)
         }
 
-        // etiquetas del eje X: una por cada mes
-        val xSteps = remember(rangeX, minX, maxX, effectiveXMin, effectiveXMax) {
-            if (rangeX > 0) {
-                val steps = mutableListOf<AxisStep>()
-                // Paso base invisible para el alineamiento
-                steps.add(AxisStep(effectiveXMin, "", labelStyle, stepStyle = null))
-
-                val startCal = Calendar.getInstance().apply {
-                    time = ReportDateHelper.toDate(minX)
-                    set(Calendar.DAY_OF_MONTH, 1)
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                }
-                val endCal = Calendar.getInstance().apply {
-                    time = ReportDateHelper.toDate(maxX)
-                }
-
-                while (startCal.before(endCal) || startCal.equals(endCal)) {
-                    val currentFloat = ReportDateHelper.toFloat(startCal.time)
-                    if (currentFloat >= minX) {
-                        steps.add(AxisStep(
-                            axisValue = currentFloat,
-                            axisLabel = xAxisLabel(currentFloat),
-                            labelStyle = labelStyle,
-                            stepStyle = gridStyle
-                        ))
-                    }
-                    startCal.add(Calendar.MONTH, 1)
-                }
-
-                // Si no hay pasos (rango menor a un mes), ponemos el inicio y el fin
-                if (steps.size <= 2) {
-                    steps.add(AxisStep(minX, xAxisLabel(minX), labelStyle, stepStyle = gridStyle))
-                    steps.add(AxisStep(maxX, xAxisLabel(maxX), labelStyle, stepStyle = gridStyle))
-                }
-                // Aseguramos que el eje X se extienda hasta effectiveXMax para dar espacio lateral a los popups
-                steps.add(AxisStep(effectiveXMax, "", labelStyle, stepStyle = null))
-                steps.toPersistentList()
-            } else {
-                persistentListOf(
-                    AxisStep(
-                        axisValue = minX,
-                        axisLabel = xAxisLabel(minX),
-                        labelStyle = labelStyle,
-                        stepStyle = gridStyle
-                    )
-                )
-            }
+        val xSteps = remember(rangeX, bounds.minX, bounds.maxX, effectiveXMin, effectiveXMax) {
+            createXSteps(rangeX, bounds.minX, bounds.maxX, effectiveXMin, effectiveXMax, labelStyle, gridStyle, xAxisLabel)
         }
 
         val yAxisData = remember(ySteps) { AxisData(axisSteps = ySteps) }
         val xAxisData = remember(xSteps) { AxisData(axisSteps = xSteps) }
 
-        // Cálculo dinámico de la escala para mostrar aproximadamente los últimos meses/puntos
-        // similar a applyViewport de la versión anterior.
         val baseStepSize = dimensionResource(id = R.dimen.chart_line_x_step_base)
         val xStepSize = remember(rangeX, isFullScreen, baseStepSize) {
             if (rangeX > 0 && !isFullScreen) {
                 baseStepSize * 1.8f
             } else baseStepSize
         }
-        // Altura total 220dp - 15dp (bottom padding) = 205dp para aprovechar el espacio superior
         val chartHeight = dimensionResource(id = R.dimen.chart_canvas_height)
         val yStepSize = chartHeight / effectiveRangeY
         val axisPadding = AxisPadding(
@@ -249,76 +139,230 @@ fun KubitLineChart(
             bottom = dimensionResource(id = R.dimen.chart_axis_padding_bottom)
         )
 
-        var initialScrollDone by remember { mutableStateOf(false) }
-        val chartDescription = stringResource(id = R.string.chart_content_description_line)
+        ChartContent(
+            isFullScreen = isFullScreen,
+            xAxisData = xAxisData,
+            yAxisData = yAxisData,
+            xStepSize = xStepSize,
+            yStepSize = yStepSize,
+            axisPadding = axisPadding,
+            lines = lines
+        )
+    }
+}
 
-        Box(
-            modifier = if (isFullScreen) Modifier.fillMaxSize() else Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            ChartScaffold(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimensionResource(id = R.dimen.chart_height))
-                    .background(Color.Transparent)
-                    .semantics { contentDescription = chartDescription },
-                xAxisData = xAxisData,
-                yAxisData = yAxisData,
-                xUnitSize = xStepSize,
-                yUnitSize = yStepSize,
-                axisPadding = axisPadding,
-                isPinchZoomEnabled = true,
-                horizontalAxis = { scroll: Dp, zoom: Float, padding: AxisPadding ->
-                    HorizontalAxisChart(
-                        data = xAxisData,
-                        labelHeight = 25.dp,
-                        horizontalScroll = scroll,
-                        zoom = zoom,
-                        fixedUnitSize = xStepSize,
-                        padding = padding,
-                        labelVerticalAlignment = AxisLabelVerticalAlignment.Top,
-                        labelVerticalGap = dimensionResource(id = R.dimen.chart_label_padding),
-                        labelsBackgroundColor = Color.Transparent
-                    )
-                },
-                verticalAxis = { scroll: Dp, zoom: Float, padding: AxisPadding ->
-                    VerticalAxisChart(
-                        data = yAxisData,
-                        labelWidth = 25.dp,
-                        verticalScroll = scroll,
-                        zoom = zoom,
-                        fixedUnitSize = yStepSize,
-                        padding = padding,
-                        labelHorizontalAlignment = AxisLabelHorizontalAlignment.End,
-                        labelHorizontalGap = 1.dp,
-                        labelsBackgroundColor = Color.Transparent
-                    )
-                },
-                content = { scaffoldData: ChartScaffoldContentData ->
-                    // Scroll inicial al final
-                    LaunchedEffect(scaffoldData.onHorizontalScrollChangeRequest) {
-                        if (!initialScrollDone) {
-                            scaffoldData.onHorizontalScrollChangeRequest?.invoke(Float.MAX_VALUE)
-                            initialScrollDone = true
-                        }
-                    }
+private data class ChartBounds(val minX: Float, val maxX: Float, val minY: Float, val maxY: Float)
 
-                    LineChart(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clipToBounds(),
-                        lines = lines,
-                        xAxisData = xAxisData,
-                        yAxisData = yAxisData,
-                        xAxisStepSize = xStepSize,
-                        yAxisStepSize = yStepSize,
-                        horizontalScroll = scaffoldData.horizontalScroll,
-                        zoom = scaffoldData.zoom,
-                        backgroundColor = Color.Transparent,
-                        onPointSelect = { _: Point, _: Offset -> /* Kubit maneja internamente el popup si está configurado en la Line */ }
-                    )
-                }
-            )
+private fun calculateBounds(rawData: List<AbstractReportChartData>): ChartBounds {
+    var minX = Float.MAX_VALUE
+    var maxX = -Float.MAX_VALUE
+    var minY = Float.MAX_VALUE
+    var maxY = -Float.MAX_VALUE
+
+    rawData.forEach { series ->
+        series.dataPoints.forEach { point ->
+            if (point.x.isFinite() && point.y.isFinite()) {
+                if (point.x < minX) minX = point.x
+                if (point.x > maxX) maxX = point.x
+                if (point.y < minY) minY = point.y
+                if (point.y > maxY) maxY = point.y
+            }
         }
+    }
+
+    if (minX == Float.MAX_VALUE) {
+        return ChartBounds(0f, 1f, 0f, 1f)
+    }
+    if (maxX == minX) maxX = minX + 1f
+    return ChartBounds(minX, maxX, minY, maxY)
+}
+
+private fun createLines(
+    rawData: List<AbstractReportChartData>,
+    textColor: Color,
+    isDark: Boolean,
+    yAxisLabel: (Float) -> String
+): ImmutableList<Line> {
+    return rawData.mapIndexed { index, data ->
+        val lineColor = Color(data.color)
+        val isTrend = data is TrendReportChartData || data is OverallTrendReportChartData
+        Line(
+            dataPoints = data.dataPoints.filter { it.x.isFinite() && it.y.isFinite() }.map { dp ->
+                val isMarked = data is AbstractReportChartLineData && data.isMarked(dp.x)
+                val xOffset = index * 0.0001f
+                Point(
+                    dp.x + xOffset,
+                    dp.y,
+                    intersectionNode = if (isTrend) null else IntersectionPoint(
+                        radius = 4.dp, // Assuming radius fix
+                        color = if (isMarked) textColor else lineColor
+                    )
+                )
+            },
+            lineStyle = if (isTrend) {
+                LineStyle(color = lineColor.copy(alpha = 0.7f), width = 3.5f)
+            } else {
+                LineStyle(color = lineColor, width = 5.5f)
+            },
+            selectionHighlightPoint = SelectionHighlightPoint(color = textColor),
+            selectionHighlightPopUp = SelectionHighlightPopUp(
+                backgroundColor = (if (isDark) Color.Black else Color.White).copy(alpha = 0.8f),
+                labelColor = textColor,
+                labelSize = 10.sp,
+                paddingBetweenPopUpAndPoint = 8.dp,
+                popUpLabel = { _, y -> yAxisLabel(y) }
+            )
+        )
+    }.filter { it.dataPoints.isNotEmpty() }.toPersistentList()
+}
+
+private fun createYSteps(
+    min: Float,
+    range: Float,
+    labelStyle: TextStyle,
+    gridStyle: AxisStepStyle,
+    yAxisLabel: (Float) -> String
+): ImmutableList<AxisStep> {
+    return (0..8).map { i ->
+        val realValue = min + i.toFloat() * range / 8.2f
+        AxisStep(
+            axisValue = realValue,
+            axisLabel = if (i == 0) "" else yAxisLabel(realValue),
+            labelStyle = labelStyle,
+            stepStyle = gridStyle
+        )
+    }.toPersistentList()
+}
+
+private fun createXSteps(
+    rangeX: Float,
+    minX: Float,
+    maxX: Float,
+    effectiveXMin: Float,
+    effectiveXMax: Float,
+    labelStyle: TextStyle,
+    gridStyle: AxisStepStyle,
+    xAxisLabel: (Float) -> String
+): ImmutableList<AxisStep> {
+    if (rangeX <= 0) {
+        return persistentListOf(
+            AxisStep(minX, xAxisLabel(minX), labelStyle, stepStyle = gridStyle)
+        )
+    }
+
+    val steps = mutableListOf<AxisStep>()
+    steps.add(AxisStep(effectiveXMin, "", labelStyle, stepStyle = null))
+
+    val startCal = Calendar.getInstance().apply {
+        time = ReportDateHelper.toDate(minX)
+        set(Calendar.DAY_OF_MONTH, 1)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+    }
+    val endCal = Calendar.getInstance().apply {
+        time = ReportDateHelper.toDate(maxX)
+    }
+
+    while (startCal.before(endCal) || startCal == endCal) {
+        val currentFloat = ReportDateHelper.toFloat(startCal.time)
+        if (currentFloat >= minX) {
+            steps.add(AxisStep(
+                axisValue = currentFloat,
+                axisLabel = xAxisLabel(currentFloat),
+                labelStyle = labelStyle,
+                stepStyle = gridStyle
+            ))
+        }
+        startCal.add(Calendar.MONTH, 1)
+    }
+
+    if (steps.size <= 2) {
+        steps.add(AxisStep(minX, xAxisLabel(minX), labelStyle, stepStyle = gridStyle))
+        steps.add(AxisStep(maxX, xAxisLabel(maxX), labelStyle, stepStyle = gridStyle))
+    }
+    steps.add(AxisStep(effectiveXMax, "", labelStyle, stepStyle = null))
+    return steps.toPersistentList()
+}
+
+@Composable
+private fun ChartContent(
+    isFullScreen: Boolean,
+    xAxisData: AxisData,
+    yAxisData: AxisData,
+    xStepSize: Dp,
+    yStepSize: Dp,
+    axisPadding: AxisPadding,
+    lines: ImmutableList<Line>
+) {
+    var initialScrollDone by remember { mutableStateOf(false) }
+    val chartDescription = stringResource(id = R.string.chart_content_description_line)
+
+    Box(
+        modifier = if (isFullScreen) Modifier.fillMaxSize() else Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        ChartScaffold(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(id = R.dimen.chart_height))
+                .background(Color.Transparent)
+                .semantics { contentDescription = chartDescription },
+            xAxisData = xAxisData,
+            yAxisData = yAxisData,
+            xUnitSize = xStepSize,
+            yUnitSize = yStepSize,
+            axisPadding = axisPadding,
+            isPinchZoomEnabled = true,
+            horizontalAxis = { scroll, zoom, padding ->
+                HorizontalAxisChart(
+                    data = xAxisData,
+                    labelHeight = 25.dp,
+                    horizontalScroll = scroll,
+                    zoom = zoom,
+                    fixedUnitSize = xStepSize,
+                    padding = padding,
+                    labelVerticalAlignment = AxisLabelVerticalAlignment.Top,
+                    labelVerticalGap = dimensionResource(id = R.dimen.chart_label_padding),
+                    labelsBackgroundColor = Color.Transparent
+                )
+            },
+            verticalAxis = { scroll, zoom, padding ->
+                VerticalAxisChart(
+                    data = yAxisData,
+                    labelWidth = 25.dp,
+                    verticalScroll = scroll,
+                    zoom = zoom,
+                    fixedUnitSize = yStepSize,
+                    padding = padding,
+                    labelHorizontalAlignment = AxisLabelHorizontalAlignment.End,
+                    labelHorizontalGap = 1.dp,
+                    labelsBackgroundColor = Color.Transparent
+                )
+            },
+            content = { scaffoldData ->
+                LaunchedEffect(scaffoldData.onHorizontalScrollChangeRequest) {
+                    if (!initialScrollDone) {
+                        scaffoldData.onHorizontalScrollChangeRequest?.invoke(Float.MAX_VALUE)
+                        initialScrollDone = true
+                    }
+                }
+
+                LineChart(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clipToBounds(),
+                    lines = lines,
+                    xAxisData = xAxisData,
+                    yAxisData = yAxisData,
+                    xAxisStepSize = xStepSize,
+                    yAxisStepSize = yStepSize,
+                    horizontalScroll = scaffoldData.horizontalScroll,
+                    zoom = scaffoldData.zoom,
+                    backgroundColor = Color.Transparent,
+                    onPointSelect = { _, _ -> }
+                )
+            }
+        )
     }
 }

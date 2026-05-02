@@ -66,7 +66,7 @@ public class AutoBackupWorker extends Worker {
                 );
             }
 
-            return result.isPresent() && result.get() ? Result.success() : Result.failure();
+            return result.orElse(false) ? Result.success() : Result.failure();
         } catch (Exception e) {
             Log.e(TAG, "Error during automatic backup: " + e.getMessage(), e);
             return Result.failure();

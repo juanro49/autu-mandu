@@ -41,6 +41,7 @@ import org.juanro.autumandu.util.Recurrences;
 
 public class OverallCostsReport extends AbstractReport {
 
+    private static final String COST_PER_100_UNIT_FORMAT = "/100 ";
     private final List<AbstractReportChartData> mChartData = new ArrayList<>();
 
     public OverallCostsReport(Context context) {
@@ -85,8 +86,6 @@ public class OverallCostsReport extends AbstractReport {
     @Override
     protected void onUpdate() {
         Preferences prefs = new Preferences(mContext);
-        String mUnit = prefs.getUnitCurrency();
-        String mDistanceUnit = prefs.getUnitDistance();
         mChartData.clear();
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
@@ -99,168 +98,194 @@ public class OverallCostsReport extends AbstractReport {
         Map<Long, List<TireList>> tiresByCar = db.getTireDao().getAllTireLists()
                 .stream().collect(Collectors.groupingBy(TireList::getCarId));
 
-        double globalFuelCosts = 0;
-        double globalBillsCosts = 0;
-        double globalTiresCosts = 0;
-        double globalInvestmentCosts = 0;
-        double globalIncomeTotal = 0;
+        GlobalCosts globalCosts = new GlobalCosts();
 
         for (Car car : cars) {
-            Long carIdObj = car.getId();
-            if (carIdObj == null) continue;
-            long carId = carIdObj;
-
-            Section section;
-            if (car.getSuspendedSince() != null) {
-                section = addDataSection(String.format("%s [%s]", car.getName(),
-                        mContext.getString(R.string.suspended)), car.getColor(), 1);
-            } else {
-                section = addDataSection(car.getName(), car.getColor());
-            }
-
-            double fuelCosts = 0;
-            double billsCosts = 0;
-            double tiresCosts = 0;
-            double investmentCosts = car.getBuyingPrice();
-            double incomeTotal = 0;
-
-            List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
-            if (carRefuelings == null) carRefuelings = Collections.emptyList();
-            List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefs.isAutoGuessMissingDataEnabled(), false);
-
-            for (BalancedRefueling refueling : balancedRefuelings) {
-                fuelCosts += refueling.getPrice();
-            }
-
-            List<OtherCost> otherCosts = otherCostsByCar.get(carId);
-            if (otherCosts != null) {
-                for (OtherCost otherCost : otherCosts) {
-                    int recurrences;
-                    if (otherCost.getEndDate() == null || otherCost.getEndDate().after(new Date())) {
-                        recurrences = Recurrences.getRecurrencesSince(
-                                otherCost.getRecurrenceInterval(),
-                                otherCost.getRecurrenceMultiplier(),
-                                otherCost.getDate());
-                    } else {
-                        recurrences = Recurrences.getRecurrencesBetween(
-                                otherCost.getRecurrenceInterval(),
-                                otherCost.getRecurrenceMultiplier(),
-                                otherCost.getDate(),
-                                otherCost.getEndDate());
-                    }
-
-                    if (otherCost.getPrice() > 0) {
-                        billsCosts += otherCost.getPrice() * recurrences;
-                    } else {
-                        incomeTotal += Math.abs(otherCost.getPrice()) * recurrences;
-                    }
-                }
-            }
-
-            List<TireList> tireLists = tiresByCar.get(carId);
-            if (tireLists != null) {
-                for (TireList tireList : tireLists) {
-                    tiresCosts += tireList.getPrice();
-                }
-            }
-
-            globalFuelCosts += fuelCosts;
-            globalBillsCosts += billsCosts;
-            globalTiresCosts += tiresCosts;
-            globalInvestmentCosts += investmentCosts;
-            globalIncomeTotal += incomeTotal;
-
-            double totalCosts = fuelCosts + billsCosts + tiresCosts + investmentCosts;
-            if (totalCosts == 0 && balancedRefuelings.isEmpty()) {
-                section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
-                continue;
-            }
-
-            section.addItem(new Item(mContext.getString(R.string.report_overall_costs_fuel),
-                    mContext.getString(R.string.report_price, fuelCosts, mUnit)));
-            section.addItem(new Item(mContext.getString(R.string.report_overall_costs_bills),
-                    mContext.getString(R.string.report_price, billsCosts, mUnit)));
-            section.addItem(new Item(mContext.getString(R.string.report_overall_costs_tires),
-                    mContext.getString(R.string.report_price, tiresCosts, mUnit)));
-            section.addItem(new Item(mContext.getString(R.string.report_overall_costs_investment),
-                    mContext.getString(R.string.report_price, investmentCosts, mUnit)));
-            section.addItem(new Item(mContext.getString(R.string.report_overall_costs_income),
-                    mContext.getString(R.string.report_price, incomeTotal, mUnit)));
-
-            // Efficiency metrics - Cost per Distance
-            int endMileage = car.getInitialMileage();
-            ZonedDateTime startDate = (car.getSuspendedSince() != null) ?
-                    ZonedDateTime.ofInstant(car.getSuspendedSince().toInstant(), ZoneId.systemDefault()) :
-                    ZonedDateTime.now();
-
-            if (!balancedRefuelings.isEmpty()) {
-                endMileage = Math.max(endMileage, balancedRefuelings.get(balancedRefuelings.size() - 1).getMileage());
-                if (balancedRefuelings.get(0).getDate().getTime() < startDate.toInstant().toEpochMilli()) {
-                    startDate = ZonedDateTime.ofInstant(balancedRefuelings.get(0).getDate().toInstant(), ZoneId.systemDefault());
-                }
-            }
-
-            if (otherCosts != null) {
-                for (OtherCost otherCost : otherCosts) {
-                    if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                        endMileage = Math.max(endMileage, otherCost.getMileage());
-                    }
-                    if (otherCost.getDate().getTime() < startDate.toInstant().toEpochMilli()) {
-                        startDate = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
-                    }
-                }
-            }
-
-            int totalDistance = endMileage - car.getInitialMileage();
-            if (totalDistance > 0) {
-                section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mDistanceUnit,
-                        mContext.getString(R.string.report_price, totalCosts / totalDistance * 100.0, mUnit) + "/100 " + mDistanceUnit));
-                section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
-                        mContext.getString(R.string.report_price, fuelCosts / totalDistance * 100.0, mUnit) + "/100 " + mDistanceUnit));
-                section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
-                        mContext.getString(R.string.report_price, billsCosts / totalDistance * 100.0, mUnit) + "/100 " + mDistanceUnit));
-                section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
-                        mContext.getString(R.string.report_price, tiresCosts / totalDistance * 100.0, mUnit) + "/100 " + mDistanceUnit));
-                section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
-                        mContext.getString(R.string.report_price, investmentCosts / totalDistance * 100.0, mUnit) + "/100 " + mDistanceUnit));
-            }
-
-            // Cost per Time
-            long days = Math.max(1, ChronoUnit.DAYS.between(startDate, ZonedDateTime.now()));
-            section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mContext.getString(R.string.report_month),
-                    mContext.getString(R.string.report_price, totalCosts / days * 30.4375, mUnit)));
-            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
-                    mContext.getString(R.string.report_price, fuelCosts / days * 30.4375, mUnit)));
-            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
-                    mContext.getString(R.string.report_price, billsCosts / days * 30.4375, mUnit)));
-            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
-                    mContext.getString(R.string.report_price, tiresCosts / days * 30.4375, mUnit)));
-            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
-                    mContext.getString(R.string.report_price, investmentCosts / days * 30.4375, mUnit)));
-
-            section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mContext.getString(R.string.report_day),
-                    mContext.getString(R.string.report_price, totalCosts / days, mUnit)));
-            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
-                    mContext.getString(R.string.report_price, fuelCosts / days, mUnit)));
-            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
-                    mContext.getString(R.string.report_price, billsCosts / days, mUnit)));
-            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
-                    mContext.getString(R.string.report_price, tiresCosts / days, mUnit)));
-            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
-                    mContext.getString(R.string.report_price, investmentCosts / days, mUnit)));
+            processCar(car, refuelingsByCar, otherCostsByCar, tiresByCar, globalCosts, prefs);
         }
 
         // Add categorical data to chart based on global totals
         ReportChartData globalChartData = new ReportChartData(mContext, mContext.getString(R.string.report_title_overall_costs), -1);
-        double globalTotal = globalFuelCosts + globalBillsCosts + globalTiresCosts + globalInvestmentCosts + globalIncomeTotal;
+        double globalTotal = globalCosts.fuel + globalCosts.bills + globalCosts.tires + globalCosts.investment + globalCosts.income;
         if (globalTotal > 0) {
-            globalChartData.add(0f, (float) (globalFuelCosts / globalTotal * 100), mContext.getString(R.string.report_overall_costs_fuel));
-            globalChartData.add(1f, (float) (globalBillsCosts / globalTotal * 100), mContext.getString(R.string.report_overall_costs_bills));
-            globalChartData.add(2f, (float) (globalTiresCosts / globalTotal * 100), mContext.getString(R.string.report_overall_costs_tires));
-            globalChartData.add(3f, (float) (globalInvestmentCosts / globalTotal * 100), mContext.getString(R.string.report_overall_costs_investment));
-            globalChartData.add(4f, (float) (globalIncomeTotal / globalTotal * 100), mContext.getString(R.string.report_overall_costs_income));
+            globalChartData.add(0f, (float) (globalCosts.fuel / globalTotal * 100), mContext.getString(R.string.report_overall_costs_fuel));
+            globalChartData.add(1f, (float) (globalCosts.bills / globalTotal * 100), mContext.getString(R.string.report_overall_costs_bills));
+            globalChartData.add(2f, (float) (globalCosts.tires / globalTotal * 100), mContext.getString(R.string.report_overall_costs_tires));
+            globalChartData.add(3f, (float) (globalCosts.investment / globalTotal * 100), mContext.getString(R.string.report_overall_costs_investment));
+            globalChartData.add(4f, (float) (globalCosts.income / globalTotal * 100), mContext.getString(R.string.report_overall_costs_income));
             mChartData.add(globalChartData);
         }
+    }
+
+    private void processCar(Car car, Map<Long, List<RefuelingWithDetails>> refuelingsByCar,
+                            Map<Long, List<OtherCost>> otherCostsByCar,
+                            Map<Long, List<TireList>> tiresByCar,
+                            GlobalCosts globalCosts, Preferences prefs) {
+        Long carIdObj = car.getId();
+        if (carIdObj == null) return;
+        long carId = carIdObj;
+
+        Section section;
+        if (car.getSuspendedSince() != null) {
+            section = addDataSection(String.format("%s [%s]", car.getName(),
+                    mContext.getString(R.string.suspended)), car.getColor(), 1);
+        } else {
+            section = addDataSection(car.getName(), car.getColor());
+        }
+
+        double fuelCosts = 0;
+        double billsCosts = 0;
+        double tiresCosts = 0;
+        double investmentCosts = car.getBuyingPrice();
+        double incomeTotal = 0;
+
+        List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(carId);
+        if (carRefuelings == null) carRefuelings = Collections.emptyList();
+        List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefs.isAutoGuessMissingDataEnabled(), false);
+
+        for (BalancedRefueling refueling : balancedRefuelings) {
+            fuelCosts += refueling.getPrice();
+        }
+
+        List<OtherCost> otherCosts = otherCostsByCar.get(carId);
+        if (otherCosts != null) {
+            for (OtherCost otherCost : otherCosts) {
+                int recurrences = calculateRecurrences(otherCost);
+                if (otherCost.getPrice() > 0) {
+                    billsCosts += otherCost.getPrice() * recurrences;
+                } else {
+                    incomeTotal += Math.abs(otherCost.getPrice()) * recurrences;
+                }
+            }
+        }
+
+        List<TireList> tireLists = tiresByCar.get(carId);
+        if (tireLists != null) {
+            for (TireList tireList : tireLists) {
+                tiresCosts += tireList.getPrice();
+            }
+        }
+
+        globalCosts.fuel += fuelCosts;
+        globalCosts.bills += billsCosts;
+        globalCosts.tires += tiresCosts;
+        globalCosts.investment += investmentCosts;
+        globalCosts.income += incomeTotal;
+
+        double totalCosts = fuelCosts + billsCosts + tiresCosts + investmentCosts;
+        if (totalCosts == 0 && balancedRefuelings.isEmpty()) {
+            section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
+            return;
+        }
+
+        addSummaryItems(section, fuelCosts, billsCosts, tiresCosts, investmentCosts, incomeTotal, prefs.getUnitCurrency());
+
+        // Efficiency metrics - Cost per Distance
+        int endMileage = car.getInitialMileage();
+        ZonedDateTime startDate = (car.getSuspendedSince() != null) ?
+                ZonedDateTime.ofInstant(car.getSuspendedSince().toInstant(), ZoneId.systemDefault()) :
+                ZonedDateTime.now();
+
+        if (!balancedRefuelings.isEmpty()) {
+            endMileage = Math.max(endMileage, balancedRefuelings.get(balancedRefuelings.size() - 1).getMileage());
+            if (balancedRefuelings.get(0).getDate().getTime() < startDate.toInstant().toEpochMilli()) {
+                startDate = ZonedDateTime.ofInstant(balancedRefuelings.get(0).getDate().toInstant(), ZoneId.systemDefault());
+            }
+        }
+
+        if (otherCosts != null) {
+            for (OtherCost otherCost : otherCosts) {
+                if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
+                    endMileage = Math.max(endMileage, otherCost.getMileage());
+                }
+                if (otherCost.getDate().getTime() < startDate.toInstant().toEpochMilli()) {
+                    startDate = ZonedDateTime.ofInstant(otherCost.getDate().toInstant(), ZoneId.systemDefault());
+                }
+            }
+        }
+
+        addEfficiencyItems(section, totalCosts, fuelCosts, billsCosts, tiresCosts, investmentCosts,
+                car.getInitialMileage(), endMileage, startDate, prefs);
+    }
+
+    private int calculateRecurrences(OtherCost otherCost) {
+        if (otherCost.getEndDate() == null || otherCost.getEndDate().after(new Date())) {
+            return Recurrences.getRecurrencesSince(
+                    otherCost.getRecurrenceInterval(),
+                    otherCost.getRecurrenceMultiplier(),
+                    otherCost.getDate());
+        } else {
+            return Recurrences.getRecurrencesBetween(
+                    otherCost.getRecurrenceInterval(),
+                    otherCost.getRecurrenceMultiplier(),
+                    otherCost.getDate(),
+                    otherCost.getEndDate());
+        }
+    }
+
+    private void addSummaryItems(Section section, double fuel, double bills, double tires, double investment, double income, String unit) {
+        section.addItem(new Item(mContext.getString(R.string.report_overall_costs_fuel),
+                mContext.getString(R.string.report_price, fuel, unit)));
+        section.addItem(new Item(mContext.getString(R.string.report_overall_costs_bills),
+                mContext.getString(R.string.report_price, bills, unit)));
+        section.addItem(new Item(mContext.getString(R.string.report_overall_costs_tires),
+                mContext.getString(R.string.report_price, tires, unit)));
+        section.addItem(new Item(mContext.getString(R.string.report_overall_costs_investment),
+                mContext.getString(R.string.report_price, investment, unit)));
+        section.addItem(new Item(mContext.getString(R.string.report_overall_costs_income),
+                mContext.getString(R.string.report_price, income, unit)));
+    }
+
+    private void addEfficiencyItems(Section section, double totalCosts, double fuelCosts, double billsCosts,
+                                    double tiresCosts, double investmentCosts, int startMileage, int endMileage,
+                                    ZonedDateTime startDate, Preferences prefs) {
+        String mUnit = prefs.getUnitCurrency();
+        String mDistanceUnit = prefs.getUnitDistance();
+        int totalDistance = endMileage - startMileage;
+        if (totalDistance > 0) {
+            section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mDistanceUnit,
+                    mContext.getString(R.string.report_price, totalCosts / totalDistance * 100.0, mUnit) + COST_PER_100_UNIT_FORMAT + mDistanceUnit));
+            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
+                    mContext.getString(R.string.report_price, fuelCosts / totalDistance * 100.0, mUnit) + COST_PER_100_UNIT_FORMAT + mDistanceUnit));
+            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
+                    mContext.getString(R.string.report_price, billsCosts / totalDistance * 100.0, mUnit) + COST_PER_100_UNIT_FORMAT + mDistanceUnit));
+            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
+                    mContext.getString(R.string.report_price, tiresCosts / totalDistance * 100.0, mUnit) + COST_PER_100_UNIT_FORMAT + mDistanceUnit));
+            section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
+                    mContext.getString(R.string.report_price, investmentCosts / totalDistance * 100.0, mUnit) + COST_PER_100_UNIT_FORMAT + mDistanceUnit));
+        }
+
+        // Cost per Time
+        long days = Math.max(1, ChronoUnit.DAYS.between(startDate, ZonedDateTime.now()));
+        section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mContext.getString(R.string.report_month),
+                mContext.getString(R.string.report_price, totalCosts / days * 30.4375, mUnit)));
+        section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
+                mContext.getString(R.string.report_price, fuelCosts / days * 30.4375, mUnit)));
+        section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
+                mContext.getString(R.string.report_price, billsCosts / days * 30.4375, mUnit)));
+        section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
+                mContext.getString(R.string.report_price, tiresCosts / days * 30.4375, mUnit)));
+        section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
+                mContext.getString(R.string.report_price, investmentCosts / days * 30.4375, mUnit)));
+
+        section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mContext.getString(R.string.report_day),
+                mContext.getString(R.string.report_price, totalCosts / days, mUnit)));
+        section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
+                mContext.getString(R.string.report_price, fuelCosts / days, mUnit)));
+        section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
+                mContext.getString(R.string.report_price, billsCosts / days, mUnit)));
+        section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
+                mContext.getString(R.string.report_price, tiresCosts / days, mUnit)));
+        section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
+                mContext.getString(R.string.report_price, investmentCosts / days, mUnit)));
+    }
+
+    private static class GlobalCosts {
+        double fuel = 0;
+        double bills = 0;
+        double tires = 0;
+        double investment = 0;
+        double income = 0;
     }
 
     private static class ReportChartData extends AbstractReportChartColumnData {

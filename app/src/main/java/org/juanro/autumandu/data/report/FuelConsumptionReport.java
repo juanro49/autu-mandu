@@ -21,6 +21,7 @@ import android.content.Context;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -84,6 +85,19 @@ public class FuelConsumptionReport extends AbstractReport {
             mAvgConsumption = fuelConsumption.computeFuelConsumption(totalVolume, totalDistance);
         }
 
+        private String makeTooltip(String carName, float consumption, String fuelTypeName, Date date, boolean guessed) {
+            String tooltip = mContext.getString(R.string.report_toast_fuel_consumption,
+                    carName,
+                    consumption,
+                    mUnit,
+                    fuelTypeName,
+                    mDateFormat.format(date));
+            if (guessed) {
+                tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
+            }
+            return tooltip;
+        }
+
         public double getAverageConsumption() {
             return mAvgConsumption;
         }
@@ -115,19 +129,6 @@ public class FuelConsumptionReport extends AbstractReport {
     @Override
     public String getTitle() {
         return mContext.getString(R.string.report_title_fuel_consumption);
-    }
-
-    private String makeTooltip(String carName, float consumption, String fuelTypeName, java.util.Date date, boolean guessed) {
-        String tooltip = mContext.getString(R.string.report_toast_fuel_consumption,
-                carName,
-                consumption,
-                mUnit,
-                fuelTypeName,
-                mDateFormat.format(date));
-        if (guessed) {
-            tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
-        }
-        return tooltip;
     }
 
     @Override

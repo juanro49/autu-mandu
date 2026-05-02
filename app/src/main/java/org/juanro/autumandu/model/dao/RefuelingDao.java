@@ -16,6 +16,7 @@
 
 package org.juanro.autumandu.model.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -157,7 +158,7 @@ public interface RefuelingDao {
         ORDER BY date DESC, mileage DESC
         LIMIT 1
     """)
-    Refueling getPrevious(long carId, java.util.Date date);
+    Refueling getPrevious(long carId, Date date);
 
     @Query("""
         SELECT * FROM refueling
@@ -165,7 +166,7 @@ public interface RefuelingDao {
         ORDER BY date ASC, mileage ASC
         LIMIT 1
     """)
-    Refueling getNext(long carId, java.util.Date date);
+    Refueling getNext(long carId, Date date);
 
     @Query("SELECT * FROM refueling ORDER BY date DESC, mileage DESC")
     LiveData<List<Refueling>> getAllLiveData();

@@ -134,16 +134,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
                     }
 
                     spnRepeat.setSelection(otherCost.getRecurrenceInterval().ordinal());
-                    if (otherCost.getRecurrenceInterval() != RecurrenceInterval.ONCE) {
-                        if (otherCost.getEndDate() != null) {
-                            chkEndDate.setChecked(true);
-                            edtEndDateAnimator.show();
-                        }
-                    } else {
-                        chkEndDate.setChecked(false);
-                        chkEndDateAnimator.hide();
-                        edtEndDateAnimator.hide();
-                    }
+                    updateRecurrenceFieldsVisibility(false);
 
                     edtEndDate.setDate(otherCost.getEndDate() == null ? new Date() : otherCost.getEndDate());
                     edtNote.setText(otherCost.getNote());
@@ -170,8 +161,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
             edtEndDate.setDate(new Date());
 
             // Initial visibility for new items
-            chkEndDateAnimator.hide();
-            edtEndDateAnimator.hide();
+            updateRecurrenceFieldsVisibility(false);
         }
     }
 
@@ -223,31 +213,16 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
 
         // Repeat
         spnRepeat.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            private int lastPosition = 0;
-
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0 && lastPosition == 0) {
-                    chkEndDateAnimator.show();
-                } else if (position == 0 && lastPosition > 0) {
-                    chkEndDate.setChecked(false);
-                    chkEndDateAnimator.hide();
-                    edtEndDateAnimator.hide();
-                }
-                lastPosition = position;
+                updateRecurrenceFieldsVisibility(true);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        chkEndDate.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                edtEndDateAnimator.show();
-            } else {
-                edtEndDateAnimator.hide();
-            }
-        });
+        chkEndDate.setOnCheckedChangeListener((buttonView, isChecked) -> updateRecurrenceFieldsVisibility(true));
 
         edtEndDate.applyOnClickListener(PICK_END_DATE_REQUEST_CODE, getParentFragmentManager());
 
@@ -300,6 +275,38 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
                 }
             }
         });
+    }
+
+    private void updateRecurrenceFieldsVisibility(boolean animated) {
+        boolean repeat = spnRepeat.getSelectedItemPosition() > 0;
+        boolean showEndDate = chkEndDate.isChecked();
+
+        if (repeat) {
+            if (animated) chkEndDateAnimator.show();
+            else chkEndDate.setVisibility(View.VISIBLE);
+        } else {
+            chkEndDate.setChecked(false);
+            if (animated) chkEndDateAnimator.hide();
+            else chkEndDate.setVisibility(View.GONE);
+        }
+
+        if (repeat && showEndDate) {
+            if (animated) edtEndDateAnimator.show();
+            else {
+                View view = findView(R.id.edt_end_date_input_layout);
+                if (view != null) view.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (animated) edtEndDateAnimator.hide();
+            else {
+                View view = findView(R.id.edt_end_date_input_layout);
+                if (view != null) view.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private View findView(int id) {
+        return getView() != null ? getView().findViewById(id) : null;
     }
 
     @Override

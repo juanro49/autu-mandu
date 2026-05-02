@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -55,6 +56,18 @@ public class MileageReport extends AbstractReport {
                         refueling.isGuessed());
             }
         }
+
+        private String makeTooltip(String carName, int mileage, Date date, int option, boolean guessed) {
+            String tooltip = mContext.getString(R.string.report_toast_mileage,
+                    carName,
+                    mileage,
+                    mUnit,
+                    formatXValue(ReportDateHelper.toFloat(date), option));
+            if (guessed) {
+                tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
+            }
+            return tooltip;
+        }
     }
 
     private class ReportChartDataPerRefueling extends AbstractReportChartLineData {
@@ -76,6 +89,18 @@ public class MileageReport extends AbstractReport {
 
                 lastRefuelingMileage = refueling.getMileage();
             }
+        }
+
+        private String makeTooltip(String carName, int mileage, Date date, int option, boolean guessed) {
+            String tooltip = mContext.getString(R.string.report_toast_mileage,
+                    carName,
+                    mileage,
+                    mUnit,
+                    formatXValue(ReportDateHelper.toFloat(date), option));
+            if (guessed) {
+                tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
+            }
+            return tooltip;
         }
     }
 
@@ -102,6 +127,11 @@ public class MileageReport extends AbstractReport {
 
                 lastRefuelingMileage = refueling.getMileage();
             }
+        }
+
+        private String makeTooltipMonth(String carName, double mileage, float xValue) {
+            return mContext.getString(R.string.report_toast_mileage_month,
+                    carName, mileage, mUnit, formatXValue(xValue, GRAPH_OPTION_PER_MONTH));
         }
     }
 
@@ -156,23 +186,6 @@ public class MileageReport extends AbstractReport {
     @Override
     public String getTitle() {
         return mContext.getString(R.string.report_title_mileage);
-    }
-
-    private String makeTooltip(String carName, int mileage, java.util.Date date, int option, boolean guessed) {
-        String tooltip = mContext.getString(R.string.report_toast_mileage,
-                carName,
-                mileage,
-                mUnit,
-                formatXValue(ReportDateHelper.toFloat(date), option));
-        if (guessed) {
-            tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
-        }
-        return tooltip;
-    }
-
-    private String makeTooltipMonth(String carName, double mileage, float xValue) {
-        return mContext.getString(R.string.report_toast_mileage_month,
-                carName, mileage, mUnit, formatXValue(xValue, GRAPH_OPTION_PER_MONTH));
     }
 
     @Override

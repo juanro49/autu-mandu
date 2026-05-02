@@ -35,6 +35,10 @@ import java.util.List;
  */
 public class ReportDetailBinder {
 
+    private ReportDetailBinder() {
+        // Utility class
+    }
+
     public static void bindDetails(ViewGroup detailsContainer, List<AbstractReport.AbstractListItem> reportData) {
         int currentCount = detailsContainer.getChildCount();
         int targetCount = reportData.size();
@@ -62,14 +66,25 @@ public class ReportDetailBinder {
                 rowView.setTag(vh);
             }
             if (item instanceof AbstractReport.Section section) {
-                vh.label.setText(section.getLabel());
-                vh.label.setTextColor(section.getColor());
-                if (vh.sectionDrawable != null) vh.sectionDrawable.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
+                bindSection(vh, section);
             } else {
-                var dataItem = (AbstractReport.Item) item;
-                vh.label.setText(dataItem.getLabel());
-                if (vh.value != null) vh.value.setText(dataItem.getValue());
+                bindItem(vh, (AbstractReport.Item) item);
             }
+        }
+    }
+
+    private static void bindSection(DetailViewHolder vh, AbstractReport.Section section) {
+        vh.label.setText(section.getLabel());
+        vh.label.setTextColor(section.getColor());
+        if (vh.sectionDrawable != null) {
+            vh.sectionDrawable.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
+        }
+    }
+
+    private static void bindItem(DetailViewHolder vh, AbstractReport.Item dataItem) {
+        vh.label.setText(dataItem.getLabel());
+        if (vh.value != null) {
+            vh.value.setText(dataItem.getValue());
         }
     }
 

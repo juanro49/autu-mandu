@@ -45,6 +45,7 @@ import java.util.List;
 
 public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
 
+    private static final String UNIT_FUEL_CONSUMPTION = "unit_fuel_consumption";
     private PreferencesGeneralViewModel mViewModel;
 
     private class PreferenceChangeListener implements OnPreferenceChangeListener {
@@ -80,7 +81,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
                 }
 
                 updateFuelConsumptionField(fuelConsumption);
-            } else if (prefKey.equals("unit_fuel_consumption")) {
+            } else if (prefKey.equals(UNIT_FUEL_CONSUMPTION)) {
                 FuelConsumption fuelConsumption = new FuelConsumption(requireContext());
                 fuelConsumption.setConsumptionType(Integer.parseInt(newValue.toString()));
                 updateFuelConsumptionField(fuelConsumption, (ListPreference) preference);
@@ -111,7 +112,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
         }
 
         public void updateFuelConsumptionField(FuelConsumption fuelConsumption) {
-            ListPreference prefFuelConsumption = findPreference("unit_fuel_consumption");
+            ListPreference prefFuelConsumption = findPreference(UNIT_FUEL_CONSUMPTION);
             if (prefFuelConsumption != null) {
                 updateFuelConsumptionField(fuelConsumption, prefFuelConsumption);
             }
@@ -177,7 +178,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
         }
 
         // Unit fuel consumption
-        ListPreference fieldFuelConsumption = findPreference("unit_fuel_consumption");
+        ListPreference fieldFuelConsumption = findPreference(UNIT_FUEL_CONSUMPTION);
         if (fieldFuelConsumption != null) {
             onPreferenceChangeListener.updateFuelConsumptionField(fuelConsumption, fieldFuelConsumption);
             fieldFuelConsumption.setOnPreferenceChangeListener(onPreferenceChangeListener);

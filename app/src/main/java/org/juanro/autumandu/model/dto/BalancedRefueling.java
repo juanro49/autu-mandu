@@ -205,100 +205,98 @@ public class BalancedRefueling {
                     lastFullRefueling = i;
                 }
                 i++;
-                continue;
-            }
+            } else {
+                distance += refueling.getMileage() - refuelings.get(i - 1).getMileage();
+                volume += refueling.getVolume();
+                if (refueling.isPartial()) {
+                    i++;
+                } else {
+                    double consumption = volume / distance;
+                    if (consumption / avgConsumption < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
+                        float missingVolume = avgConsumption * distance - volume;
+                        int possibleDistance = avgDistance;
 
-            distance += refueling.getMileage() - refuelings.get(i - 1).getMileage();
-            volume += refueling.getVolume();
-            if (refueling.isPartial()) {
-                i++;
-                continue;
-            }
+                        for (int pI = lastFullRefueling + 1; pI < i && missingVolume > 0; pI++) {
+                            int pDistance = refuelings.get(pI).getMileage() - refuelings.get(pI - 1).getMileage();
+                            if (pDistance <= possibleDistance) {
+                                possibleDistance -= pDistance;
+                                possibleDistance += (int) (refuelings.get(pI).getVolume() / avgConsumption);
+                            } else {
+                                float newVolume = Math.min(avgDistance * avgConsumption, missingVolume);
+                                float volumeSinceLastFullRefueling = newVolume;
+                                for (int pI2 = lastFullRefueling + 1; pI2 < pI; pI2++) {
+                                    volumeSinceLastFullRefueling += refuelings.get(pI2).getVolume();
+                                }
+                                int newMileage = refuelings.get(lastFullRefueling).getMileage()
+                                        + (int) (volumeSinceLastFullRefueling / avgConsumption);
 
-            double consumption = volume / distance;
-            if (consumption / avgConsumption < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
-                float missingVolume = avgConsumption * distance - volume;
-                int possibleDistance = avgDistance;
+                                long pTimeDiff = refuelings.get(pI).getDate().getTime() - refuelings.get(pI - 1).getDate().getTime();
+                                Date newDate = new Date(refuelings.get(pI - 1).getDate().getTime()
+                                        + (long) (pTimeDiff / (double) pDistance * (newVolume / avgConsumption)));
 
-                for (int pI = lastFullRefueling + 1; pI < i && missingVolume > 0; pI++) {
-                    int pDistance = refuelings.get(pI).getMileage() - refuelings.get(pI - 1).getMileage();
-                    if (pDistance <= possibleDistance) {
-                        possibleDistance -= pDistance;
-                        possibleDistance += (int) (refuelings.get(pI).getVolume() / avgConsumption);
-                    } else {
-                        float newVolume = Math.min(avgDistance * avgConsumption, missingVolume);
-                        float volumeSinceLastFullRefueling = newVolume;
-                        for (int pI2 = lastFullRefueling + 1; pI2 < pI; pI2++) {
-                            volumeSinceLastFullRefueling += refuelings.get(pI2).getVolume();
+                                float newPrice = newVolume * avgPricePerUnit;
+
+                                BalancedRefueling guess = new BalancedRefueling(nextId++, newDate, newMileage, newVolume, newPrice,
+                                        false, "", refueling.getFuelTypeId(), refueling.getStationId(), refueling.getCarId(),
+                                        refueling.getFuelTypeName(), refueling.getFuelTypeCategory(), refueling.getStationName(),
+                                        refueling.getCarName(), refueling.getCarColor(), refueling.getCarInitialMileage(),
+                                        refueling.getCarSuspendedSince(), refueling.getCarBuyingPrice(), refueling.getCarNumTires());
+                                guess.setGuessed(true);
+                                refuelings.add(pI, guess);
+
+                                missingVolume -= newVolume;
+                                possibleDistance = avgDistance;
+                                lastFullRefueling = pI;
+                                i++;
+                            }
                         }
-                        int newMileage = refuelings.get(lastFullRefueling).getMileage()
-                                + (int) (volumeSinceLastFullRefueling / avgConsumption);
 
-                        long pTimeDiff = refuelings.get(pI).getDate().getTime() - refuelings.get(pI - 1).getDate().getTime();
-                        Date newDate = new Date(refuelings.get(pI - 1).getDate().getTime()
-                                + (long) (pTimeDiff / (double)pDistance * (newVolume / avgConsumption)));
+                        while (missingVolume > 0) {
+                            float newVolume = Math.min(avgDistance * avgConsumption, missingVolume);
+                            float volumeSinceLastFullRefueling = newVolume;
+                            for (int pI2 = lastFullRefueling + 1; pI2 < i; pI2++) {
+                                volumeSinceLastFullRefueling += refuelings.get(pI2).getVolume();
+                            }
 
-                        float newPrice = newVolume * avgPricePerUnit;
+                            boolean partial = false;
+                            int newMileage = refuelings.get(lastFullRefueling).getMileage()
+                                    + (int) (volumeSinceLastFullRefueling / avgConsumption);
 
-                        BalancedRefueling guess = new BalancedRefueling(nextId++, newDate, newMileage, newVolume, newPrice,
-                                false, "", refueling.getFuelTypeId(), refueling.getStationId(), refueling.getCarId(),
-                                refueling.getFuelTypeName(), refueling.getFuelTypeCategory(), refueling.getStationName(),
-                                refueling.getCarName(), refueling.getCarColor(), refueling.getCarInitialMileage(),
-                                refueling.getCarSuspendedSince(), refueling.getCarBuyingPrice(), refueling.getCarNumTires());
-                        guess.setGuessed(true);
-                        refuelings.add(pI, guess);
+                            if (newMileage < refuelings.get(i - 1).getMileage()) {
+                                newMileage = refuelings.get(i - 1).getMileage()
+                                        + possibleDistance
+                                        + (int) (refuelings.get(i - 1).getVolume() / avgConsumption);
+                                partial = true;
+                            }
 
-                        missingVolume -= newVolume;
-                        possibleDistance = avgDistance;
-                        lastFullRefueling = pI;
-                        i++;
+                            int cDistance = refueling.getMileage() - refuelings.get(i - 1).getMileage();
+                            long cTimeDiff = refueling.getDate().getTime() - refuelings.get(i - 1).getDate().getTime();
+                            Date newDate = new Date(refuelings.get(i - 1).getDate().getTime()
+                                    + (long) (cTimeDiff / (double) cDistance * (newVolume / avgConsumption)));
+
+                            float newPrice = newVolume * avgPricePerUnit;
+
+                            BalancedRefueling guess = new BalancedRefueling(nextId++, newDate, newMileage, newVolume, newPrice,
+                                    partial, "", refueling.getFuelTypeId(), refueling.getStationId(), refueling.getCarId(),
+                                    refuelings.get(i - 1).getFuelTypeName(), refuelings.get(i - 1).getFuelTypeCategory(), refuelings.get(i - 1).getStationName(),
+                                    refuelings.get(i - 1).getCarName(), refuelings.get(i - 1).getCarColor(), refuelings.get(i - 1).getCarInitialMileage(),
+                                    refuelings.get(i - 1).getCarSuspendedSince(), refuelings.get(i - 1).getCarBuyingPrice(), refuelings.get(i - 1).getCarNumTires());
+                            guess.setGuessed(true);
+                            refuelings.add(i, guess);
+
+                            missingVolume -= newVolume;
+                            possibleDistance = avgDistance;
+                            lastFullRefueling = i;
+                            i++;
+                        }
                     }
-                }
 
-                while (missingVolume > 0) {
-                    float newVolume = Math.min(avgDistance * avgConsumption, missingVolume);
-                    float volumeSinceLastFullRefueling = newVolume;
-                    for (int pI2 = lastFullRefueling + 1; pI2 < i; pI2++) {
-                        volumeSinceLastFullRefueling += refuelings.get(pI2).getVolume();
-                    }
-
-                    boolean partial = false;
-                    int newMileage = refuelings.get(lastFullRefueling).getMileage()
-                            + (int) (volumeSinceLastFullRefueling / avgConsumption);
-
-                    if (newMileage < refuelings.get(i - 1).getMileage()) {
-                        newMileage = refuelings.get(i - 1).getMileage()
-                                + possibleDistance
-                                + (int) (refuelings.get(i - 1).getVolume() / avgConsumption);
-                        partial = true;
-                    }
-
-                    int cDistance = refueling.getMileage() - refuelings.get(i - 1).getMileage();
-                    long cTimeDiff = refueling.getDate().getTime() - refuelings.get(i - 1).getDate().getTime();
-                    Date newDate = new Date(refuelings.get(i - 1).getDate().getTime()
-                            + (long) (cTimeDiff / (double)cDistance * (newVolume / avgConsumption)));
-
-                    float newPrice = newVolume * avgPricePerUnit;
-
-                    BalancedRefueling guess = new BalancedRefueling(nextId++, newDate, newMileage, newVolume, newPrice,
-                            partial, "", refueling.getFuelTypeId(), refueling.getStationId(), refueling.getCarId(),
-                            refuelings.get(i-1).getFuelTypeName(), refuelings.get(i-1).getFuelTypeCategory(), refuelings.get(i-1).getStationName(),
-                            refuelings.get(i-1).getCarName(), refuelings.get(i-1).getCarColor(), refuelings.get(i-1).getCarInitialMileage(),
-                            refuelings.get(i-1).getCarSuspendedSince(), refuelings.get(i-1).getCarBuyingPrice(), refuelings.get(i-1).getCarNumTires());
-                    guess.setGuessed(true);
-                    refuelings.add(i, guess);
-
-                    missingVolume -= newVolume;
-                    possibleDistance = avgDistance;
+                    distance = 0;
+                    volume = 0;
                     lastFullRefueling = i;
                     i++;
                 }
             }
-
-            distance = 0;
-            volume = 0;
-            lastFullRefueling = i;
-            i++;
         }
 
         return refuelings;

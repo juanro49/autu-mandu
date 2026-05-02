@@ -96,7 +96,20 @@ public abstract class AbstractDataListFragment<T> extends
         var v = inflater.inflate(R.layout.fragment_data_list, container, false);
 
         listAdapter = new DataAdapter();
+        setupRecyclerView(v);
+        setupSelectionTracker(v);
+        setupFragmentResultListener();
 
+        getLiveData().observe(getViewLifecycleOwner(), listAdapter::setData);
+
+        if (savedInstanceState != null) {
+            selectionTracker.onRestoreInstanceState(savedInstanceState.getBundle(STATE_SELECTION));
+        }
+
+        return v;
+    }
+
+    private void setupRecyclerView(View v) {
         var list = (RecyclerView) v.findViewById(android.R.id.list);
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         var context = getContext();
@@ -105,7 +118,10 @@ public abstract class AbstractDataListFragment<T> extends
         }
         list.setAdapter(listAdapter);
         dataListCallback.onViewCreated(list);
+    }
 
+    private void setupSelectionTracker(View v) {
+        var list = (RecyclerView) v.findViewById(android.R.id.list);
         selectionTracker = new SelectionTracker.Builder<>(
                 "data-selection-" + carId,
                 list,
@@ -117,53 +133,54 @@ public abstract class AbstractDataListFragment<T> extends
         selectionTracker.addObserver(new SelectionTracker.SelectionObserver<>() {
             @Override
             public void onSelectionChanged() {
-                if (selectionTracker.hasSelection() && actionMode == null) {
-                    var activity = (AppCompatActivity) getActivity();
-                    if (activity != null) {
-                        actionMode = activity.startSupportActionMode(new ActionModeCallback());
-                    }
-                } else if (!selectionTracker.hasSelection() && actionMode != null) {
-                    actionMode.finish();
-                }
-
-                if (actionMode != null) {
-                    var count = selectionTracker.getSelection().size();
-                    actionMode.setTitle(String.format(getString(R.string.cab_title_selected), count));
-                }
-
+                updateActionMode();
                 if (activateOnClick && selectionTracker.getSelection().size() == 1) {
                     long id = selectionTracker.getSelection().iterator().next();
                     dataListCallback.onItemSelected(getExtraEdit(), id);
                 }
             }
         });
+    }
 
-        getLiveData().observe(getViewLifecycleOwner(), listAdapter::setData);
-
-        if (savedInstanceState != null) {
-            selectionTracker.onRestoreInstanceState(savedInstanceState.getBundle(STATE_SELECTION));
+    private void updateActionMode() {
+        if (selectionTracker.hasSelection() && actionMode == null) {
+            var activity = (AppCompatActivity) getActivity();
+            if (activity != null) {
+                actionMode = activity.startSupportActionMode(new ActionModeCallback());
+            }
+        } else if (!selectionTracker.hasSelection() && actionMode != null) {
+            actionMode.finish();
         }
 
+        if (actionMode != null) {
+            var count = selectionTracker.getSelection().size();
+            actionMode.setTitle(String.format(getString(R.string.cab_title_selected), count));
+        }
+    }
+
+    private void setupFragmentResultListener() {
         getChildFragmentManager().setFragmentResultListener(MessageDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
             var action = result.getInt(MessageDialogFragment.RESULT_ACTION);
             var requestCode = result.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
             if (action == MessageDialogFragment.ACTION_POSITIVE && requestCode == REQUEST_DELETE) {
-                var idsToDelete = new ArrayList<Long>();
-                for (var id : selectionTracker.getSelection()) {
-                    idsToDelete.add(id);
-                }
-
-                for (var id : idsToDelete) {
-                    deleteItem(id);
-                }
-
-                if (actionMode != null) {
-                    actionMode.finish();
-                }
+                deleteSelectedItems();
             }
         });
+    }
 
-        return v;
+    private void deleteSelectedItems() {
+        var idsToDelete = new ArrayList<Long>();
+        for (var id : selectionTracker.getSelection()) {
+            idsToDelete.add(id);
+        }
+
+        for (var id : idsToDelete) {
+            deleteItem(id);
+        }
+
+        if (actionMode != null) {
+            actionMode.finish();
+        }
     }
 
     @Override
