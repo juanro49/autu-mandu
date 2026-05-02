@@ -89,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements
     private static final String STATE_TITLE = "title";
     private static final String STATE_NAV_ITEM_INDEX = "nav_item_index";
 
+    private static final String INTENT_EXTRA_FRAGMENT = "fragment";
+    private static final String INTENT_EXTRA_ARGUMENTS = "arguments";
+
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView mNavigationView;
@@ -179,8 +182,8 @@ public class MainActivity extends AppCompatActivity implements
                     return;
                 }
 
-                if (mCurrentFragment instanceof BackPressedListener) {
-                    if (((BackPressedListener) mCurrentFragment).onBackPressed()) {
+                if (mCurrentFragment instanceof BackPressedListener listener) {
+                    if (listener.onBackPressed()) {
                         return;
                     }
                 }
@@ -396,8 +399,8 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = menuItem.getIntent();
         if (intent == null) return false;
 
-        String fragment = intent.getStringExtra("fragment");
-        Bundle arguments = intent.getBundleExtra("arguments");
+        String fragment = intent.getStringExtra(INTENT_EXTRA_FRAGMENT);
+        Bundle arguments = intent.getBundleExtra(INTENT_EXTRA_ARGUMENTS);
         if (fragment != null) {
             try {
                 mCurrentFragment = (Fragment) Class.forName(fragment).newInstance();
@@ -473,7 +476,7 @@ public class MainActivity extends AppCompatActivity implements
 
         menu.add(groupId, itemId++, Menu.NONE, R.string.drawer_reports)
                 .setIcon(R.drawable.ic_c_report_24dp)
-                .setIntent(new Intent().putExtra("fragment", ReportFragment.class.getName()));
+                .setIntent(new Intent().putExtra(INTENT_EXTRA_FRAGMENT, ReportFragment.class.getName()));
         for (Car car : cars) {
             Bundle args = new Bundle();
             args.putLong(DataFragment.EXTRA_CAR_ID, car.getId());
@@ -481,13 +484,13 @@ public class MainActivity extends AppCompatActivity implements
             menu.add(groupId, itemId++, Menu.NONE, car.getName())
                     .setIcon(R.drawable.ic_list_24dp)
                     .setIntent(new Intent()
-                            .putExtra("fragment", DataFragment.class.getName())
-                            .putExtra("arguments", args));
+                            .putExtra(INTENT_EXTRA_FRAGMENT, DataFragment.class.getName())
+                            .putExtra(INTENT_EXTRA_ARGUMENTS, args));
         }
 
         menu.add(groupId, itemId, Menu.NONE, R.string.drawer_calculator)
                 .setIcon(R.drawable.ic_functions_24dp)
-                .setIntent(new Intent().putExtra("fragment", CalculatorFragment.class.getName()));
+                .setIntent(new Intent().putExtra(INTENT_EXTRA_FRAGMENT, CalculatorFragment.class.getName()));
 
         menu.add(R.string.drawer_settings).setIntent(new Intent(this, PreferencesActivity.class));
         menu.add(R.string.drawer_help).setIntent(new Intent(this, HelpActivity.class));

@@ -16,8 +16,11 @@ import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
  * Optimizada para trabajar con los IDs fijos de Room y evitar dependencias de ordinales.
  */
 public final class CSVConvert {
-    private static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat(
-        "yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+    private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
+    private static final ThreadLocal<DateFormat> DATE_FORMAT_THREAD_LOCAL = ThreadLocal.withInitial(() ->
+            new SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US));
+
     private static final NumberFormat DEFAULT_FLOAT_FORMAT = NumberFormat.getInstance(Locale.US);
 
     private CSVConvert() {
@@ -28,7 +31,7 @@ public final class CSVConvert {
     static Date toDate(String value) {
         if (value == null || value.isEmpty()) return null;
         try {
-            return DEFAULT_DATE_FORMAT.parse(value);
+            return DATE_FORMAT_THREAD_LOCAL.get().parse(value);
         } catch (ParseException e) {
             DateFormat fallbackFormat = DateFormat.getDateTimeInstance();
             try {
@@ -111,7 +114,7 @@ public final class CSVConvert {
     static String toString(Date value) {
         if (value == null) return null;
         try {
-            return DEFAULT_DATE_FORMAT.format(value);
+            return DATE_FORMAT_THREAD_LOCAL.get().format(value);
         } catch (Exception e) {
             return null;
         }

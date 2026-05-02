@@ -112,8 +112,8 @@ public class MileageReport extends AbstractReport {
             for (BalancedRefueling refueling : refuelings) {
                 if (lastRefuelingMileage > -1) {
                     ZonedDateTime date = ZonedDateTime.ofInstant(refueling.getDate().toInstant(), ZoneId.systemDefault());
-                    float x = date.getYear() * 12 + date.getMonthValue() - 1;
-                    float y = refueling.getMileage() - lastRefuelingMileage;
+                    float x = date.getYear() * 12.0f + date.getMonthValue() - 1.0f;
+                    float y = (float) refueling.getMileage() - lastRefuelingMileage;
 
                     int xIndex = indexOf(x);
                     if (xIndex == -1) {

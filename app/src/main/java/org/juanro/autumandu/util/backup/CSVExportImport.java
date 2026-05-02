@@ -199,6 +199,7 @@ public class CSVExportImport {
         try {
             imExportSemaphore.acquire();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new CSVImportException("Another import or export is already running.");
         }
 
@@ -370,6 +371,7 @@ public class CSVExportImport {
         try {
             imExportSemaphore.acquire();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new CSVImportException("Another import or export is already running.");
         }
 

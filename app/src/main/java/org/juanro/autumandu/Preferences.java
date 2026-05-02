@@ -230,13 +230,13 @@ public class Preferences {
 
     // Deprecated Sync Settings Logic
 
-    @Deprecated
+    @Deprecated(since = "2026-04-05")
     @Nullable
     public String getDeprecatedSynchronizationProvider() {
         return prefs.getString("sync_current_provider", null);
     }
 
-    @Deprecated
+    @Deprecated(since = "2026-04-05")
     public void removeDeprecatedSyncSettings() {
         prefs.edit()
                 .remove("sync_dropbox_account")
@@ -250,7 +250,7 @@ public class Preferences {
                 .apply();
     }
 
-    @Deprecated
+    @Deprecated(since = "2026-04-05")
     @Nullable
     public Date getDeprecatedGoogleDriveLocalModifiedDate() {
         long date = prefs.getLong("sync_drive_modified_date", -1);

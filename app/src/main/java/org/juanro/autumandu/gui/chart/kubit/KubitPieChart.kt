@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,130 +52,171 @@ fun KubitPieChart(
     DisableSaveableState {
         val isDark = isSystemInDarkTheme()
         val textColor = if (isDark) Color.White else Color.Black
-
-        // opción de gráfico 0: Tarta, 1: Donut (definido en OverallCostsReport.java)
         val isDonut = chartOption == 1
 
-        // Agrupamos todos los puntos de datos de todas las series por su tooltip (categoría)
-        val groupedData = rawData.flatMap { it.dataPoints }
-            .filter { it.y.isFinite() && it.y > 0 }
-            .groupBy { it.tooltip ?: "" }
-            .mapValues { entry -> entry.value.sumOf { it.y.toDouble() }.toFloat() }
+        val groupedData = remember(rawData) {
+            rawData.flatMap { it.dataPoints }
+                .filter { it.y.isFinite() && it.y > 0 }
+                .groupBy { it.tooltip ?: "" }
+                .mapValues { entry -> entry.value.sumOf { it.y.toDouble() }.toFloat() }
+        }
 
-        // Calculamos el total global para los porcentajes y el centro del Donut
         val total = groupedData.values.sum()
+        val categoryColors = getCategoryColors()
+        val sections = createPieSections(groupedData, total, categoryColors)
 
-        val categoryColors = listOf(
-            colorResource(id = R.color.blue),        // Combustible
-            colorResource(id = R.color.green),       // Facturas
-            colorResource(id = R.color.amber),       // Neumáticos
-            colorResource(id = R.color.deep_orange), // Inversión
-            colorResource(id = R.color.purple),      // Ingresos
-            colorResource(id = R.color.blue_grey)    // Otros
+        val chartDescription = stringResource(
+            id = if (isDonut) R.string.chart_content_description_donut else R.string.chart_content_description_pie
         )
-
-        // Creamos las secciones de la tarta sin etiquetas de texto (solo porcentaje si cabe)
-        val sections = groupedData.entries.mapIndexed { index, entry ->
-            val value = entry.value
-            val percentage = if (total > 0) (value / total * 100) else 0f
-            val sectorColor = categoryColors[index % categoryColors.size]
-
-            PieSectionData(
-                value = value,
-                // Solo mostramos el porcentaje en la tarta si es mayor al 8% para evitar amontonamientos
-                label = if (percentage > 8f) String.format(Locale.getDefault(), "%.0f%%", percentage) else "",
-                style = PieSectionStyle(
-                    sectorColor = sectorColor,
-                    selectedSectorColor = sectorColor,
-                    labelColor = Color.White
-                )
-            )
-        }
-
-        val chartDescription = if (isDonut) {
-            stringResource(id = R.string.chart_content_description_donut)
-        } else {
-            stringResource(id = R.string.chart_content_description_pie)
-        }
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(dimensionResource(id = R.dimen.chart_height)) // Sincronizado con report.xml
+                .height(dimensionResource(id = R.dimen.chart_height))
                 .padding(vertical = dimensionResource(id = R.dimen.report_card_padding) / 2)
                 .semantics { contentDescription = chartDescription },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                // Gráfico de Tarta / Donut - Ajustamos para maximizar espacio de leyenda
-                PieChart(
-                    modifier = Modifier
-                        .size(dimensionResource(id = R.dimen.chart_pie_size))
-                        .background(Color.Transparent),
-                    pie = Pie(sections = sections),
-                    sectionWidth = if (isDonut) dimensionResource(id = R.dimen.chart_donut_thickness) else Dp.Hairline
-                )
-
-                if (isDonut) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(id = R.string.chart_label_total),
-                            color = textColor.copy(alpha = 0.6f),
-                            fontSize = 10.sp
-                        )
-                        Text(
-                            text = yAxisLabel(total),
-                            color = textColor,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
+            PieChartArea(isDonut, sections, total, textColor, yAxisLabel)
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.chart_label_padding)))
-
-            // Leyenda optimizada en cuadrícula
-            val entriesList = groupedData.entries.toList()
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.fab_margin)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.chart_legend_row_spacing))
-            ) {
-                entriesList.chunked(2).forEach { rowItems ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.chart_legend_col_spacing))
-                    ) {
-                        rowItems.forEach { entry ->
-                            val index = entriesList.indexOf(entry)
-                            val percentage = if (total > 0) (entry.value / total * 100) else 0f
-                            val color = categoryColors[index % categoryColors.size]
-
-                            Row(
-                                modifier = Modifier.weight(1f),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(dimensionResource(id = R.dimen.chart_legend_dot_size))
-                                        .background(color, CircleShape)
-                                )
-                                Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.chart_legend_dot_spacing)))
-                                Text(
-                                    text = String.format(Locale.getDefault(), "%s (%.1f%%)", entry.key, percentage),
-                                    color = textColor.copy(alpha = 0.9f),
-                                    fontSize = 11.sp,
-                                    maxLines = 1
-                                )
-                            }
-                        }
-                        if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-            }
+            PieLegend(groupedData, total, categoryColors, textColor)
         }
     }
+}
+
+@Composable
+private fun getCategoryColors() = listOf(
+    colorResource(id = R.color.blue),
+    colorResource(id = R.color.green),
+    colorResource(id = R.color.amber),
+    colorResource(id = R.color.deep_orange),
+    colorResource(id = R.color.purple),
+    colorResource(id = R.color.blue_grey)
+)
+
+private fun createPieSections(
+    groupedData: Map<String, Float>,
+    total: Float,
+    colors: List<Color>
+): List<PieSectionData> {
+    return groupedData.entries.mapIndexed { index, entry ->
+        val value = entry.value
+        val percentage = if (total > 0) (value / total * 100) else 0f
+        val sectorColor = colors[index % colors.size]
+
+        PieSectionData(
+            value = value,
+            label = if (percentage > 8f) String.format(Locale.getDefault(), "%.0f%%", percentage) else "",
+            style = PieSectionStyle(
+                sectorColor = sectorColor,
+                selectedSectorColor = sectorColor,
+                labelColor = Color.White
+            )
+        )
+    }
+}
+
+@Composable
+private fun PieChartArea(
+    isDonut: Boolean,
+    sections: List<PieSectionData>,
+    total: Float,
+    textColor: Color,
+    yAxisLabel: (Float) -> String
+) {
+    Box(contentAlignment = Alignment.Center) {
+        PieChart(
+            modifier = Modifier
+                .size(dimensionResource(id = R.dimen.chart_pie_size))
+                .background(Color.Transparent),
+            pie = Pie(sections = sections),
+            sectionWidth = if (isDonut) dimensionResource(id = R.dimen.chart_donut_thickness) else Dp.Hairline
+        )
+
+        if (isDonut) {
+            DonutCenterText(total, textColor, yAxisLabel)
+        }
+    }
+}
+
+@Composable
+private fun DonutCenterText(total: Float, textColor: Color, yAxisLabel: (Float) -> String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = stringResource(id = R.string.chart_label_total),
+            color = textColor.copy(alpha = 0.6f),
+            fontSize = 10.sp
+        )
+        Text(
+            text = yAxisLabel(total),
+            color = textColor,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun PieLegend(
+    groupedData: Map<String, Float>,
+    total: Float,
+    colors: List<Color>,
+    textColor: Color
+) {
+    val entriesList = groupedData.entries.toList()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(id = R.dimen.fab_margin)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.chart_legend_row_spacing))
+    ) {
+        entriesList.chunked(2).forEach { rowItems ->
+            LegendRow(rowItems, entriesList, total, colors, textColor)
+        }
+    }
+}
+
+@Composable
+private fun LegendRow(
+    rowItems: List<Map.Entry<String, Float>>,
+    fullList: List<Map.Entry<String, Float>>,
+    total: Float,
+    colors: List<Color>,
+    textColor: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.chart_legend_col_spacing))
+    ) {
+        rowItems.forEach { entry ->
+            val index = fullList.indexOf(entry)
+            val percentage = if (total > 0) (entry.value / total * 100) else 0f
+            val color = colors[index % colors.size]
+
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                LegendItem(entry.key, percentage, color, textColor)
+            }
+        }
+        if (rowItems.size == 1) Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun LegendItem(label: String, percentage: Float, color: Color, textColor: Color) {
+    Box(
+        modifier = Modifier
+            .size(dimensionResource(id = R.dimen.chart_legend_dot_size))
+            .background(color, CircleShape)
+    )
+    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.chart_legend_dot_spacing)))
+    Text(
+        text = String.format(Locale.getDefault(), "%s (%.1f%%)", label, percentage),
+        color = textColor.copy(alpha = 0.9f),
+        fontSize = 11.sp,
+        maxLines = 1
+    )
 }

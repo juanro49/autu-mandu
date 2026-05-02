@@ -187,8 +187,8 @@ public abstract class AbstractReport {
             List<AbstractListItem> items = new ArrayList<>();
             for (AbstractListItem item : dataCopy) {
                 items.add(item);
-                if (item instanceof Section) {
-                    items.addAll(((Section) item).getItems());
+                if (item instanceof Section section) {
+                    items.addAll(section.getItems());
                 }
             }
 

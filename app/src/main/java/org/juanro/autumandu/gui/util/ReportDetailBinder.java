@@ -45,31 +45,51 @@ public class ReportDetailBinder {
 
         for (int i = 0; i < Math.max(currentCount, targetCount); i++) {
             if (i >= targetCount) {
-                if (i < detailsContainer.getChildCount()) detailsContainer.getChildAt(i).setVisibility(View.GONE);
+                hideExtraRow(detailsContainer, i);
                 continue;
             }
-            var item = reportData.get(i);
-            boolean isSection = item instanceof AbstractReport.Section;
-            int layout = isSection ? R.layout.report_row_section : R.layout.report_row_data;
-            View rowView = i < currentCount ? detailsContainer.getChildAt(i) : null;
-            boolean needsInflate = rowView == null || (isSection != (rowView instanceof TextView));
-            if (needsInflate) {
-                if (rowView != null) detailsContainer.removeViewAt(i);
-                rowView = LayoutInflater.from(detailsContainer.getContext()).inflate(layout, detailsContainer, false);
-                detailsContainer.addView(rowView, i);
-            } else {
-                rowView.setVisibility(View.VISIBLE);
+
+            AbstractReport.AbstractListItem item = reportData.get(i);
+            View rowView = getOrCreateRowView(detailsContainer, i, item);
+            bindRowView(rowView, item);
+        }
+    }
+
+    private static void hideExtraRow(ViewGroup container, int index) {
+        if (index < container.getChildCount()) {
+            container.getChildAt(index).setVisibility(View.GONE);
+        }
+    }
+
+    private static View getOrCreateRowView(ViewGroup container, int index, AbstractReport.AbstractListItem item) {
+        boolean isSection = item instanceof AbstractReport.Section;
+        int layout = isSection ? R.layout.report_row_section : R.layout.report_row_data;
+        View rowView = index < container.getChildCount() ? container.getChildAt(index) : null;
+
+        boolean needsInflate = rowView == null || (isSection != (rowView instanceof TextView));
+        if (needsInflate) {
+            if (rowView != null) {
+                container.removeViewAt(index);
             }
-            DetailViewHolder vh = (DetailViewHolder) rowView.getTag();
-            if (vh == null) {
-                vh = new DetailViewHolder(rowView);
-                rowView.setTag(vh);
-            }
-            if (item instanceof AbstractReport.Section section) {
-                bindSection(vh, section);
-            } else {
-                bindItem(vh, (AbstractReport.Item) item);
-            }
+            rowView = LayoutInflater.from(container.getContext()).inflate(layout, container, false);
+            container.addView(rowView, index);
+        } else {
+            rowView.setVisibility(View.VISIBLE);
+        }
+        return rowView;
+    }
+
+    private static void bindRowView(View rowView, AbstractReport.AbstractListItem item) {
+        DetailViewHolder vh = (DetailViewHolder) rowView.getTag();
+        if (vh == null) {
+            vh = new DetailViewHolder(rowView);
+            rowView.setTag(vh);
+        }
+
+        if (item instanceof AbstractReport.Section section) {
+            bindSection(vh, section);
+        } else {
+            bindItem(vh, (AbstractReport.Item) item);
         }
     }
 

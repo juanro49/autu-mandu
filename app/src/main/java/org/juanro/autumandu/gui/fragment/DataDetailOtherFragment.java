@@ -100,6 +100,16 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
 
     @Override
     protected void fillFields(Bundle savedInstanceState, View v) {
+        setupResultListeners();
+
+        if (isInEditMode()) {
+            loadExistingData();
+        } else {
+            setupNewItemDefaults();
+        }
+    }
+
+    private void setupResultListeners() {
         getParentFragmentManager().setFragmentResultListener(DatePickerDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
             int requestCode = result.getInt(DatePickerDialogFragment.RESULT_REQUEST_CODE);
             var date = new Date(result.getLong(DatePickerDialogFragment.RESULT_DATE));
@@ -115,53 +125,54 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
                 edtTime.setDate(new Date(result.getLong(TimePickerDialogFragment.RESULT_TIME)));
             }
         });
+    }
 
-        if (isInEditMode()) {
-            viewModel.getOtherCost().observe(getViewLifecycleOwner(), otherCost -> {
-                if (otherCost != null) {
-                    cachedIsExpenditure = otherCost.getPrice() > 0;
-                    edtDate.setDate(otherCost.getDate());
-                    edtTime.setDate(otherCost.getDate());
-                    edtTitle.setText(otherCost.getTitle());
-                    if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
-                        edtMileage.setText(String.valueOf(otherCost.getMileage()));
-                    }
-
-                    if (isExpenditure()) {
-                        edtPrice.setText(String.valueOf(otherCost.getPrice()));
-                    } else {
-                        edtPrice.setText(String.valueOf(-otherCost.getPrice()));
-                    }
-
-                    spnRepeat.setSelection(otherCost.getRecurrenceInterval().ordinal());
-                    updateRecurrenceFieldsVisibility(false);
-
-                    edtEndDate.setDate(otherCost.getEndDate() == null ? new Date() : otherCost.getEndDate());
-                    edtNote.setText(otherCost.getNote());
-
-                    mInitialCarId = otherCost.getCarId();
-                    for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                        if (spnCar.getItemIdAtPosition(pos) == mInitialCarId) {
-                            spnCar.setSelection(pos);
-                            break;
-                        }
-                    }
-
-                    if (spnRepeat.getSelectedItemPosition() == 0) {
-                        chkEndDateAnimator.hide();
-                    }
-                    if (!chkEndDate.isChecked()) {
-                        edtEndDateAnimator.hide();
-                    }
+    private void loadExistingData() {
+        viewModel.getOtherCost().observe(getViewLifecycleOwner(), otherCost -> {
+            if (otherCost != null) {
+                cachedIsExpenditure = otherCost.getPrice() > 0;
+                edtDate.setDate(otherCost.getDate());
+                edtTime.setDate(otherCost.getDate());
+                edtTitle.setText(otherCost.getTitle());
+                if (otherCost.getMileage() != null && otherCost.getMileage() > -1) {
+                    edtMileage.setText(String.valueOf(otherCost.getMileage()));
                 }
-            });
-        } else {
-            edtDate.setDate(new Date());
-            edtTime.setDate(new Date());
-            edtEndDate.setDate(new Date());
 
-            // Initial visibility for new items
-            updateRecurrenceFieldsVisibility(false);
+                float displayPrice = isExpenditure() ? otherCost.getPrice() : -otherCost.getPrice();
+                edtPrice.setText(String.valueOf(displayPrice));
+
+                spnRepeat.setSelection(otherCost.getRecurrenceInterval().ordinal());
+                updateRecurrenceFieldsVisibility(false);
+
+                edtEndDate.setDate(otherCost.getEndDate() == null ? new Date() : otherCost.getEndDate());
+                edtNote.setText(otherCost.getNote());
+
+                mInitialCarId = otherCost.getCarId();
+                selectSpinnerItemById(spnCar, mInitialCarId);
+
+                if (spnRepeat.getSelectedItemPosition() == 0) {
+                    chkEndDateAnimator.hide();
+                }
+                if (!chkEndDate.isChecked()) {
+                    edtEndDateAnimator.hide();
+                }
+            }
+        });
+    }
+
+    private void setupNewItemDefaults() {
+        edtDate.setDate(new Date());
+        edtTime.setDate(new Date());
+        edtEndDate.setDate(new Date());
+        updateRecurrenceFieldsVisibility(false);
+    }
+
+    private void selectSpinnerItemById(Spinner spinner, long id) {
+        for (int pos = 0; pos < spinner.getCount(); pos++) {
+            if (spinner.getItemIdAtPosition(pos) == id) {
+                spinner.setSelection(pos);
+                break;
+            }
         }
     }
 

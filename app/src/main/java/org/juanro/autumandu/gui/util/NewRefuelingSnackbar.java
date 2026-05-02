@@ -110,7 +110,7 @@ public class NewRefuelingSnackbar {
 
             return fuelConsumption.computeFuelConsumption(
                     volumeSinceFullRefueling,
-                    thisMileage - mileageOfLastFullRefueling);
+                    (float) thisMileage - mileageOfLastFullRefueling);
         } else {
             return -1;
         }

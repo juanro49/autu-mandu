@@ -143,9 +143,9 @@ public class BasicDigestAuthenticator implements Authenticator {
             }
 
             String a2 = null;
-            if (qop == Protection.Auth) {
+            if (qop == Protection.AUTH) {
                 a2 = method + ":" + digestURI;
-            } else if (qop == Protection.AuthInt) {
+            } else if (qop == Protection.AUTH_INT) {
                 try {
                     RequestBody body = request.body();
                     a2 = method + ":" + digestURI + ":" + (body != null ? h(body) : h(""));
@@ -217,8 +217,8 @@ public class BasicDigestAuthenticator implements Authenticator {
     }
 
     protected enum Protection {
-        Auth("auth"),
-        AuthInt("auth-int");
+        AUTH("auth"),
+        AUTH_INT("auth-int");
 
         public final String value;
 
@@ -238,8 +238,8 @@ public class BasicDigestAuthenticator implements Authenticator {
                     }
                 }
 
-                if (qopAuthInt) return AuthInt;
-                if (qopAuth) return Auth;
+                if (qopAuthInt) return AUTH_INT;
+                if (qopAuth) return AUTH;
             }
             return null;
         }

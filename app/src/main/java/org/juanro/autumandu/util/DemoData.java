@@ -79,94 +79,100 @@ public final class DemoData {
             long super95 = createFuelType(db, "Super 95", "Benzin");
             long superE10 = createFuelType(db, "Super E10", "Benzin");
             long lpg = createFuelType(db, "LPG", "Gas");
-
             long stationId = createStation(db, "Iberdoex");
 
-            // Fiat Punto
-            long punto = createCar(db, "Fiat Punto", Color.BLUE);
-
-            int puntoCount = 50;
-            ZonedDateTime puntoDate = ZonedDateTime.now().minusMonths(puntoCount / 2).withSecond(0).withNano(0);
-            int puntoMileage = 15000;
-
-            createOtherCost(db, "Rechtes Abblendlicht", puntoDate.plusDays(randInt(50, 100)), null,
-                    121009, 10, RecurrenceInterval.ONCE, 1, "", punto);
-            createOtherCost(db, "Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1,
-                    "", punto);
-
-            createTire(db, puntoDate, null, 50, 4, "Insa Turbo", "Eco Evolution", "", punto);
-
-            for (int i = 0; i < puntoCount; i++) {
-                puntoDate = puntoDate.plusDays(randInt(12, 18));
-                puntoMileage += randInt(570, 620);
-                float volume = randFloat(43, 48);
-                boolean partial = false;
-                if (randBooleanTrueInOneOutOf(6)) {
-                    volume -= randFloat(20, 40);
-                    partial = true;
-                }
-
-                float price = volume * randFloat(140, 160) / 100;
-                long fuelType = randBooleanTrueInOneOutOf(4) ? superE10 : super95;
-
-                if (!randBooleanTrueInOneOutOf(15)) {
-                    createRefueling(db, puntoDate, puntoMileage, volume, price, partial, "",
-                            fuelType, stationId, punto);
-                }
-            }
-
-            // Opel Astra
-            long astra = createCar(db, "Opel Astra", Color.RED);
-
-            int astraCountSuper95 = 30;
-            ZonedDateTime astraDateSuper95 = ZonedDateTime.now().minusMonths(astraCountSuper95 / 3).withSecond(0).withNano(0);
-            ZonedDateTime astraDateLpg = ZonedDateTime.now().minusMonths(astraCountSuper95 / 3).withSecond(0).withNano(0);
-            int astraMileageSuper95 = 120000;
-            int astraMileageLpg = 120000;
-
-            createOtherCost(db, "Steuern", astraDateSuper95, null, -1, 250, RecurrenceInterval.YEAR, 1,
-                    "", astra);
-            createOtherCost(db, "Versicherung", astraDateSuper95, null, -1, 40, RecurrenceInterval.MONTH,
-                    1, "", astra);
-
-            createTire(db, astraDateSuper95, null, 50, 4, "Insa Turbo", "All Season 4", "", astra);
-
-            for (int i = 0; i < astraCountSuper95; i++) {
-                astraDateSuper95 = astraDateSuper95.plusDays(randInt(8, 13));
-                astraMileageSuper95 += randInt(570, 620);
-                float volume = randFloat(55, 60);
-                boolean partial = false;
-                if (randBooleanTrueInOneOutOf(6)) {
-                    volume -= randFloat(20, 40);
-                    partial = true;
-                }
-
-                float price = volume * randFloat(140, 160) / 100;
-
-                if (!randBooleanTrueInOneOutOf(15)) {
-                    createRefueling(db, astraDateSuper95, astraMileageSuper95, volume, price, partial, "",
-                            super95, stationId, astra);
-                }
-            }
-
-            for (int i = 0; i < astraCountSuper95; i++) { // Reuse count for simplicity
-                astraDateLpg = astraDateLpg.plusDays(randInt(8, 13));
-                astraMileageLpg += randInt(570, 620);
-                float volume = randFloat(25, 30);
-                boolean partial = false;
-                if (randBooleanTrueInOneOutOf(6)) {
-                    volume -= randFloat(10, 20);
-                    partial = true;
-                }
-
-                float price = volume * randFloat(85, 105) / 100;
-
-                if (!randBooleanTrueInOneOutOf(15)) {
-                    createRefueling(db, astraDateLpg, astraMileageLpg, volume, price, partial, "",
-                            lpg, stationId, astra);
-                }
-            }
+            addPuntoDemoData(db, super95, superE10, stationId);
+            addAstraDemoData(db, super95, lpg, stationId);
         });
+    }
+
+    private static void addPuntoDemoData(AutuManduDatabase db, long super95, long superE10, long stationId) {
+        long punto = createCar(db, "Fiat Punto", Color.BLUE);
+        int puntoCount = 50;
+        ZonedDateTime puntoDate = ZonedDateTime.now().minusMonths(puntoCount / 2).withSecond(0).withNano(0);
+        int puntoMileage = 15000;
+
+        createOtherCost(db, "Rechtes Abblendlicht", puntoDate.plusDays(randInt(50, 100)), null,
+                121009, 10, RecurrenceInterval.ONCE, 1, "", punto);
+        createOtherCost(db, "Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1,
+                "", punto);
+
+        createTire(db, puntoDate, null, 50, 4, "Insa Turbo", "Eco Evolution", "", punto);
+
+        for (int i = 0; i < puntoCount; i++) {
+            puntoDate = puntoDate.plusDays(randInt(12, 18));
+            puntoMileage += randInt(570, 620);
+            float volume = randFloat(43, 48);
+            boolean partial = false;
+            if (randBooleanTrueInOneOutOf(6)) {
+                volume -= randFloat(20, 40);
+                partial = true;
+            }
+
+            float price = volume * randFloat(140, 160) / 100;
+            long fuelType = randBooleanTrueInOneOutOf(4) ? superE10 : super95;
+
+            if (!randBooleanTrueInOneOutOf(15)) {
+                createRefueling(db, puntoDate, puntoMileage, volume, price, partial, "",
+                        fuelType, stationId, punto);
+            }
+        }
+    }
+
+    private static void addAstraDemoData(AutuManduDatabase db, long super95, long lpg, long stationId) {
+        long astra = createCar(db, "Opel Astra", Color.RED);
+        int astraCount = 30;
+        ZonedDateTime astraDate = ZonedDateTime.now().minusMonths(astraCount / 3).withSecond(0).withNano(0);
+        int astraMileage = 120000;
+
+        createOtherCost(db, "Steuern", astraDate, null, -1, 250, RecurrenceInterval.YEAR, 1,
+                "", astra);
+        createOtherCost(db, "Versicherung", astraDate, null, -1, 40, RecurrenceInterval.MONTH,
+                1, "", astra);
+
+        createTire(db, astraDate, null, 50, 4, "Insa Turbo", "All Season 4", "", astra);
+
+        addRefuelingsForAstra(db, astra, astraDate, astraMileage, astraCount, super95, lpg, stationId);
+    }
+
+    private static void addRefuelingsForAstra(AutuManduDatabase db, long carId, ZonedDateTime startDate, int startMileage, int count, long super95, long lpg, long stationId) {
+        ZonedDateTime date95 = startDate;
+        int mileage95 = startMileage;
+        for (int i = 0; i < count; i++) {
+            date95 = date95.plusDays(randInt(8, 13));
+            mileage95 += randInt(570, 620);
+            float volume = randFloat(55, 60);
+            boolean partial = false;
+            if (randBooleanTrueInOneOutOf(6)) {
+                volume -= randFloat(20, 40);
+                partial = true;
+            }
+
+            float price = volume * randFloat(140, 160) / 100;
+            if (!randBooleanTrueInOneOutOf(15)) {
+                createRefueling(db, date95, mileage95, volume, price, partial, "",
+                        super95, stationId, carId);
+            }
+        }
+
+        ZonedDateTime dateLpg = startDate;
+        int mileageLpg = startMileage;
+        for (int i = 0; i < count; i++) {
+            dateLpg = dateLpg.plusDays(randInt(8, 13));
+            mileageLpg += randInt(570, 620);
+            float volume = randFloat(25, 30);
+            boolean partial = false;
+            if (randBooleanTrueInOneOutOf(6)) {
+                volume -= randFloat(10, 20);
+                partial = true;
+            }
+
+            float price = volume * randFloat(85, 105) / 100;
+            if (!randBooleanTrueInOneOutOf(15)) {
+                createRefueling(db, dateLpg, mileageLpg, volume, price, partial, "",
+                        lpg, stationId, carId);
+            }
+        }
     }
 
     public static void removeDemoData() {

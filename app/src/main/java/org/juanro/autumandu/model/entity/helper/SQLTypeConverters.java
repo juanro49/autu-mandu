@@ -9,6 +9,10 @@ import androidx.room.TypeConverter;
  */
 public class SQLTypeConverters {
 
+    private SQLTypeConverters() {
+        // Utility class
+    }
+
     @TypeConverter
     public static Date toDate(Long timestamp) {
         return timestamp == null ? null : new Date(timestamp);
