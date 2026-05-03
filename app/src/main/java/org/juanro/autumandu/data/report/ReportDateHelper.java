@@ -29,11 +29,15 @@ import java.util.Date;
  *
  * @see <a href="https://bitbucket.org/frigus02/car-report/issues/83">Issue #83 for more details</a>
  */
-public class ReportDateHelper {
+public final class ReportDateHelper {
     private static final float SECONDS_PER_DAY = 86400.0f;
     private static final float MILLIS_PER_SECOND = 1000.0f;
 
     private static volatile long mBaseTime = 0;
+
+    private ReportDateHelper() {
+        // Utility class
+    }
 
     /**
      * Sets the base date to be used as Day 0 for all subsequent conversions.

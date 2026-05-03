@@ -88,35 +88,21 @@ public class X500PrincipalHelper {
 
     private void parseDN(@NonNull String dn) throws IllegalArgumentException {
         int startIndex = 0;
-        char c = '\0';
         List<String> nameValues = new ArrayList<>();
-
         rdnNameArray.clear();
 
         while (startIndex < dn.length()) {
-            int endIndex;
-            for (endIndex = startIndex; endIndex < dn.length(); endIndex++) {
-                c = dn.charAt(endIndex);
-                if (c == ',' || c == '+')
-                    break;
-                if (c == '\\') {
-                    endIndex++;
-                }
+            int endIndex = findEndIndex(dn, startIndex);
+            char c = endIndex < dn.length() ? dn.charAt(endIndex) : '\0';
+
+            if (nameValues == null) {
+                nameValues = new ArrayList<>();
             }
+            nameValues.add(dn.substring(startIndex, endIndex));
 
-            if (endIndex > dn.length())
-                throw new IllegalArgumentException("unterminated escape " + dn);
-
-            if (nameValues != null) {
-                nameValues.add(dn.substring(startIndex, endIndex));
-
-                if (c != '+') {
-                    rdnNameArray.add(nameValues);
-                    if (endIndex != dn.length())
-                        nameValues = new ArrayList<>();
-                    else
-                        nameValues = null;
-                }
+            if (c != '+') {
+                rdnNameArray.add(nameValues);
+                nameValues = null;
             }
 
             startIndex = endIndex + 1;
@@ -125,6 +111,19 @@ public class X500PrincipalHelper {
         if (nameValues != null) {
             throw new IllegalArgumentException("improperly terminated DN " + dn);
         }
+    }
+
+    private int findEndIndex(String dn, int startIndex) {
+        int endIndex;
+        for (endIndex = startIndex; endIndex < dn.length(); endIndex++) {
+            char c = dn.charAt(endIndex);
+            if (c == ',' || c == '+') break;
+            if (c == '\\') endIndex++;
+        }
+        if (endIndex > dn.length()) {
+            throw new IllegalArgumentException("unterminated escape " + dn);
+        }
+        return endIndex;
     }
 
     private String findPart(String attributeID) {

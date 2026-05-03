@@ -17,55 +17,43 @@
 package org.juanro.autumandu.gui.pref;
 
 import android.os.Bundle;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.dialog.EditFuelTypeDialogFragment;
 import org.juanro.autumandu.gui.dialog.MessageDialogFragment;
-import org.juanro.autumandu.gui.util.AbstractPreferenceActivity;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.viewmodel.FuelTypesViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PreferencesFuelTypesFragment extends ListFragment implements
-        AbstractPreferenceActivity.OptionsMenuListener {
+public class PreferencesFuelTypesFragment extends AbstractPreferencesListFragment {
 
     private FuelTypesViewModel mViewModel;
+    private FuelTypeAdapter mListAdapter;
 
     private class FuelTypeAdapter extends BaseAdapter {
         private List<FuelType> mFuelTypes = new ArrayList<>();
 
         @Override
-        public int getCount() {
-            return mFuelTypes.size();
-        }
-
+        public int getCount() { return mFuelTypes.size(); }
         @Override
-        public FuelType getItem(int position) {
-            return mFuelTypes.get(position);
-        }
-
+        public FuelType getItem(int position) { return mFuelTypes.get(position); }
         @Override
-        public long getItemId(int position) {
-            return mFuelTypes.get(position).getId();
-        }
+        public long getItemId(int position) { return mFuelTypes.get(position).getId(); }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -84,14 +72,11 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
             FuelType fuelType = getItem(position);
             holder.text1.setText(fuelType.getName());
             holder.text2.setText(fuelType.getCategory());
-
             return convertView;
         }
 
         @Override
-        public boolean hasStableIds() {
-            return true;
-        }
+        public boolean hasStableIds() { return true; }
 
         public void setFuelTypes(List<FuelType> fuelTypes) {
             mFuelTypes = fuelTypes;
@@ -104,115 +89,43 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
         }
     }
 
-    private class FuelTypesMultiChoiceModeListener implements MultiChoiceModeListener {
-        private ActionMode mActionMode;
-        private long[] mSelectedIds;
-
-        public void deleteSelectedFuelTypes() {
-            if (mSelectedIds != null) {
-                mViewModel.deleteFuelTypes(mSelectedIds);
-                mSelectedIds = null;
-            }
-        }
-
-        public void finishActionMode() {
-            if (mActionMode != null) {
-                mActionMode.finish();
-            }
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            if (item.getItemId() == R.id.menu_delete) {
-                mSelectedIds = getListView().getCheckedItemIds();
-                mViewModel.checkUsage(mSelectedIds, isUsed -> requireActivity().runOnUiThread(() -> {
-                    if (isUsed) {
-                        MessageDialogFragment.newInstance(0, R.string.alert_delete_title,
-                                getString(R.string.alert_cannot_delete_fuel_type),
-                                android.R.string.ok, null)
-                                .show(getParentFragmentManager(), null);
-                        mSelectedIds = null;
-                    } else {
-                        MessageDialogFragment.newInstance(REQUEST_DELETE,
-                                R.string.alert_delete_title,
-                                getString(R.string.alert_delete_fuel_types_message,
-                                        getListView().getCheckedItemCount()),
-                                android.R.string.yes, android.R.string.no)
-                                .show(getParentFragmentManager(), null);
-                    }
-                }));
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mActionMode = mode;
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.edit_fuel_types_cab, menu);
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            mActionMode = null;
-        }
-
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-                                              boolean checked) {
-            int count = getListView().getCheckedItemCount();
-            mode.setTitle(String.format(getString(R.string.cab_title_selected), count));
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-    }
-
-    private static final int REQUEST_DELETE = 1;
-    private static final int REQUEST_ADD = 2;
-    private static final int REQUEST_EDIT = 3;
-
-    private FuelTypesMultiChoiceModeListener mMultiChoiceModeListener;
-    private FuelTypeAdapter mListAdapter;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
         mViewModel = new ViewModelProvider(this).get(FuelTypesViewModel.class);
-
-        mMultiChoiceModeListener = new FuelTypesMultiChoiceModeListener();
-        getListView().setMultiChoiceModeListener(mMultiChoiceModeListener);
-        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        super.onViewCreated(view, savedInstanceState);
 
         mListAdapter = new FuelTypeAdapter();
         setListAdapter(mListAdapter);
+        mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), mListAdapter::setFuelTypes);
+    }
 
-        mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), fuelTypes -> mListAdapter.setFuelTypes(fuelTypes));
+    @Override
+    protected int getCabMenu() { return R.menu.edit_fuel_types_cab; }
 
-        getParentFragmentManager().setFragmentResultListener(
-                MessageDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
-                    int requestCode = result.getInt(MessageDialogFragment.RESULT_REQUEST_CODE);
-                    int action = result.getInt(MessageDialogFragment.RESULT_ACTION);
-                    if (requestCode == REQUEST_DELETE && action == MessageDialogFragment.ACTION_POSITIVE) {
-                        onDialogPositiveClick(requestCode);
-                    }
-                });
+    @Override
+    protected String getEditRequestKey() { return EditFuelTypeDialogFragment.REQUEST_KEY; }
 
-        getParentFragmentManager().setFragmentResultListener(EditFuelTypeDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, bundle) -> {
-            if (bundle.getInt(EditFuelTypeDialogFragment.RESULT_ACTION) == EditFuelTypeDialogFragment.ACTION_POSITIVE) {
-                onDialogPositiveClick(bundle.getInt(EditFuelTypeDialogFragment.RESULT_REQUEST_CODE));
+    @Override
+    protected void checkUsageAndConfirmDelete(long[] ids) {
+        mViewModel.checkUsage(ids, isUsed -> requireActivity().runOnUiThread(() -> {
+            if (isUsed) {
+                MessageDialogFragment.newInstance(0, R.string.alert_delete_title,
+                        getString(R.string.alert_cannot_delete_fuel_type),
+                        android.R.string.ok, null)
+                        .show(getParentFragmentManager(), null);
+            } else {
+                MessageDialogFragment.newInstance(REQUEST_DELETE,
+                        R.string.alert_delete_title,
+                        getString(R.string.alert_delete_fuel_types_message, ids.length),
+                        android.R.string.yes, android.R.string.no)
+                        .show(getParentFragmentManager(), null);
             }
-        });
+        }));
+    }
+
+    @Override
+    protected void deleteSelected(long[] ids) {
+        mViewModel.deleteFuelTypes(ids);
     }
 
     @Override
@@ -234,18 +147,5 @@ public class PreferencesFuelTypesFragment extends ListFragment implements
     public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
         EditFuelTypeDialogFragment.newInstance(REQUEST_EDIT, id)
                 .show(getParentFragmentManager(), null);
-    }
-
-    private void onDialogPositiveClick(int requestCode) {
-        if (requestCode == REQUEST_DELETE) {
-            mMultiChoiceModeListener.deleteSelectedFuelTypes();
-            mMultiChoiceModeListener.finishActionMode();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mMultiChoiceModeListener.finishActionMode();
     }
 }

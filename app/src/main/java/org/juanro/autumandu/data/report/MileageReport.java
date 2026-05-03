@@ -120,8 +120,8 @@ public class MileageReport extends AbstractReport {
                         add(x, y, makeTooltipMonth(car.getName(), y, x));
                     } else {
                         DataPoint dp = mDataPoints.get(xIndex);
-                        dp.y += y;
-                        dp.tooltip = makeTooltipMonth(car.getName(), dp.y, x);
+                        dp.setY(dp.getY() + y);
+                        dp.setTooltip(makeTooltipMonth(car.getName(), dp.getY(), x));
                     }
                 }
 

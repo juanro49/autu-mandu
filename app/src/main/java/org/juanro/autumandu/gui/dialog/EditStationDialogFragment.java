@@ -16,17 +16,13 @@
 
 package org.juanro.autumandu.gui.dialog;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,42 +35,30 @@ import org.juanro.autumandu.model.dto.StationWithVolume;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.viewmodel.StationsViewModel;
 
-public class EditStationDialogFragment extends DialogFragment {
+public class EditStationDialogFragment extends AbstractEditDialogFragment {
     public static final String REQUEST_KEY = "org.juanro.autumandu.EDIT_STATION_REQUEST";
-    public static final String RESULT_ACTION = "action";
-    public static final String RESULT_REQUEST_CODE = "request_code";
-
-    public static final int ACTION_POSITIVE = 1;
-    public static final int ACTION_NEGATIVE = 2;
-
-    private static final String ARG_STATION_ID = "station_id";
-    private static final String ARG_REQUEST_CODE = "request_code";
 
     public static EditStationDialogFragment newInstance(int requestCode, long stationId) {
         EditStationDialogFragment f = new EditStationDialogFragment();
-
         Bundle args = new Bundle();
-        args.putLong(ARG_STATION_ID, stationId);
+        args.putLong(ARG_ID, stationId);
         args.putInt(ARG_REQUEST_CODE, requestCode);
         f.setArguments(args);
-
         return f;
     }
 
     private Set<String> mOtherStationNames;
     private Station mStation;
-    private EditText mEdtName;
     private StationsViewModel mViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        long currentStationId = getArguments() != null ? getArguments().getLong(ARG_STATION_ID, 0) : 0;
+        long currentStationId = getArguments() != null ? getArguments().getLong(ARG_ID, 0) : 0;
         mOtherStationNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
         mViewModel = new ViewModelProvider(this).get(StationsViewModel.class);
-
         mViewModel.getStations().observe(this, stations -> {
             mOtherStationNames.clear();
             for (StationWithVolume stationWithVolume : stations) {
@@ -91,40 +75,20 @@ public class EditStationDialogFragment extends DialogFragment {
         });
     }
 
-    @NonNull
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        final Dialog dialog = new Dialog(requireActivity());
-        @SuppressLint("InflateParams")
-        View view = getLayoutInflater().inflate(R.layout.dialog_station, null);
-        dialog.setContentView(view);
+    protected int getLayout() { return R.layout.dialog_station; }
 
-        mEdtName = view.findViewById(R.id.edt_name);
+    @Override
+    protected int getAddTitle() { return R.string.title_add_station; }
 
-        long currentStationId = getArguments() != null ? getArguments().getLong(ARG_STATION_ID, 0) : 0;
-        dialog.setTitle(currentStationId == 0
-                ? R.string.title_add_station
-                : R.string.title_edit_station);
+    @Override
+    protected int getEditTitle() { return R.string.title_edit_station; }
 
+    @Override
+    protected void initFields(View view, Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             mEdtName.setText(savedInstanceState.getString("name"));
         }
-
-        Button btnOk = view.findViewById(R.id.btn_ok);
-        btnOk.setOnClickListener(v -> {
-            if (save()) {
-                sendResult(ACTION_POSITIVE);
-                dialog.dismiss();
-            }
-        });
-
-        Button btnCancel = view.findViewById(R.id.btn_cancel);
-        btnCancel.setOnClickListener(v -> {
-            sendResult(ACTION_NEGATIVE);
-            dialog.dismiss();
-        });
-
-        return dialog;
     }
 
     @Override
@@ -135,21 +99,17 @@ public class EditStationDialogFragment extends DialogFragment {
         }
     }
 
-    private void sendResult(int action) {
-        Bundle result = new Bundle();
-        result.putInt(RESULT_ACTION, action);
-        result.putInt(RESULT_REQUEST_CODE, getArguments() != null ? getArguments().getInt(ARG_REQUEST_CODE) : 0);
-        getParentFragmentManager().setFragmentResult(REQUEST_KEY, result);
-    }
+    @Override
+    protected String getRequestKey() { return REQUEST_KEY; }
 
-    private boolean save() {
+    @Override
+    protected boolean save() {
         FormValidator validator = new FormValidator();
         validator.add(new FormFieldNotEmptyValidator(mEdtName));
         validator.add(new AbstractFormFieldValidator(mEdtName) {
             @Override
             protected boolean isValid() {
-                String name = mEdtName.getText().toString();
-                return !mOtherStationNames.contains(name);
+                return !mOtherStationNames.contains(mEdtName.getText().toString());
             }
 
             @Override
@@ -160,16 +120,13 @@ public class EditStationDialogFragment extends DialogFragment {
 
         if (validator.validate()) {
             if (mStation == null) {
-                Station station = new Station(mEdtName.getText().toString());
-                mViewModel.saveStation(station);
+                mViewModel.saveStation(new Station(mEdtName.getText().toString()));
             } else {
                 mStation.setName(mEdtName.getText().toString());
                 mViewModel.saveStation(mStation);
             }
-
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 }

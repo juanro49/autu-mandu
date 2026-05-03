@@ -82,8 +82,7 @@ public class BalancedRefueling {
 
     private BalancedRefueling(long id, Date date, int mileage, float volume, float price,
                               boolean partial, String note, long fuelTypeId, long stationId, long carId,
-                              String fuelTypeName, String fuelTypeCategory, String stationName, String carName,
-                              int carColor, int carInitialMileage, Date carSuspendedSince, double carBuyingPrice, int carNumTires) {
+                              String fuelTypeName, String fuelTypeCategory, String stationName, CarInfo carInfo) {
         this.id = id;
         this.date = date;
         this.mileage = mileage;
@@ -99,13 +98,15 @@ public class BalancedRefueling {
         this.fuelTypeCategory = fuelTypeCategory;
         this.stationName = stationName;
 
-        this.carName = carName;
-        this.carColor = carColor;
-        this.carInitialMileage = carInitialMileage;
-        this.carSuspendedSince = carSuspendedSince;
-        this.carBuyingPrice = carBuyingPrice;
-        this.carNumTires = carNumTires;
+        this.carName = carInfo.name();
+        this.carColor = carInfo.color();
+        this.carInitialMileage = carInfo.initialMileage();
+        this.carSuspendedSince = carInfo.suspendedSince();
+        this.carBuyingPrice = carInfo.buyingPrice();
+        this.carNumTires = carInfo.numTires();
     }
+
+    private record CarInfo(String name, int color, int initialMileage, Date suspendedSince, double buyingPrice, int numTires) {}
 
     /**
      * Balances a list of refuelings by guessing missing data and calculating consumption.
@@ -242,7 +243,8 @@ public class BalancedRefueling {
         float remainingMissing = missingVolume;
         int pDistanceLimit = ctx.avgDistance;
 
-        for (int pI = ctx.lastFullRefueling + 1; pI < i && remainingMissing > 0; pI++) {
+        int pI = ctx.lastFullRefueling + 1;
+        while (pI < i && remainingMissing > 0) {
             int pDistance = refuelings.get(pI).getMileage() - refuelings.get(pI - 1).getMileage();
             if (pDistance <= pDistanceLimit) {
                 pDistanceLimit -= pDistance;
@@ -258,6 +260,7 @@ public class BalancedRefueling {
                 i++;
                 pI++;
             }
+            pI++;
         }
         return i;
     }
@@ -291,33 +294,28 @@ public class BalancedRefueling {
 
     private static BalancedRefueling createGuessedRefueling(List<BalancedRefueling> refuelings, int index, RefuelingBalanceContext ctx, float volume, boolean partial) {
         BalancedRefueling refueling = refuelings.get(index);
-        int pDistance = refueling.getMileage() - refuelings.get(index - 1).getMileage();
         float volumeSinceLastFull = volume + calculateVolumeInInterval(refuelings, ctx.lastFullRefueling, index - 1);
+        int newMileage = ctx.lastFullRefuelingMileage(refuelings, ctx.lastFullRefueling) + (int) (volumeSinceLastFull / ctx.avgConsumption);
 
-        int newMileage = refuelings.get(ctx.lastFullRefueling).getMileage() + (int) (volumeSinceLastFull / ctx.avgConsumption);
-        long pTimeDiff = refueling.getDate().getTime() - refuelings.get(index - 1).getDate().getTime();
-        Date newDate = new Date(refuelings.get(index - 1).getDate().getTime() + (long) (pTimeDiff / (double) pDistance * (volume / ctx.avgConsumption)));
-
-        BalancedRefueling guess = new BalancedRefueling(ctx.nextId++, newDate, newMileage, volume, volume * ctx.avgPricePerUnit,
-                partial, "", refueling.getFuelTypeId(), refueling.getStationId(), refueling.getCarId(),
-                refueling.getFuelTypeName(), refueling.getFuelTypeCategory(), refueling.getStationName(),
-                refueling.getCarName(), refueling.getCarColor(), refueling.getCarInitialMileage(),
-                refueling.getCarSuspendedSince(), refueling.getCarBuyingPrice(), refueling.getCarNumTires());
-        guess.setGuessed(true);
-        return guess;
+        return createGuessedRefuelingInternal(refuelings, index, ctx, volume, newMileage, partial, refueling);
     }
 
     private static BalancedRefueling createGuessedRefuelingAtEnd(List<BalancedRefueling> refuelings, int index, RefuelingBalanceContext ctx, float volume, int mileage, boolean partial) {
-        BalancedRefueling refueling = refuelings.get(index);
-        int cDistance = refueling.getMileage() - refuelings.get(index - 1).getMileage();
-        long cTimeDiff = refueling.getDate().getTime() - refuelings.get(index - 1).getDate().getTime();
-        Date newDate = new Date(refuelings.get(index - 1).getDate().getTime() + (long) (cTimeDiff / (double) cDistance * (volume / ctx.avgConsumption)));
+        BalancedRefueling refueling = refuelings.get(index - 1);
+        return createGuessedRefuelingInternal(refuelings, index, ctx, volume, mileage, partial, refueling);
+    }
+
+    private static BalancedRefueling createGuessedRefuelingInternal(List<BalancedRefueling> refuelings, int index, RefuelingBalanceContext ctx, float volume, int mileage, boolean partial, BalancedRefueling template) {
+        int distance = refuelings.get(index).getMileage() - refuelings.get(index - 1).getMileage();
+        long timeDiff = refuelings.get(index).getDate().getTime() - refuelings.get(index - 1).getDate().getTime();
+        Date newDate = new Date(refuelings.get(index - 1).getDate().getTime() + (long) (timeDiff / (double) distance * (volume / ctx.avgConsumption)));
+
+        CarInfo carInfo = new CarInfo(template.getCarName(), template.getCarColor(), template.getCarInitialMileage(),
+                template.getCarSuspendedSince(), template.getCarBuyingPrice(), template.getCarNumTires());
 
         BalancedRefueling guess = new BalancedRefueling(ctx.nextId++, newDate, mileage, volume, volume * ctx.avgPricePerUnit,
-                partial, "", refueling.getFuelTypeId(), refueling.getStationId(), refueling.getCarId(),
-                refuelings.get(index - 1).getFuelTypeName(), refuelings.get(index - 1).getFuelTypeCategory(), refuelings.get(index - 1).getStationName(),
-                refuelings.get(index - 1).getCarName(), refuelings.get(index - 1).getCarColor(), refuelings.get(index - 1).getCarInitialMileage(),
-                refuelings.get(index - 1).getCarSuspendedSince(), refuelings.get(index - 1).getCarBuyingPrice(), refuelings.get(index - 1).getCarNumTires());
+                partial, "", template.getFuelTypeId(), template.getStationId(), template.getCarId(),
+                template.getFuelTypeName(), template.getFuelTypeCategory(), template.getStationName(), carInfo);
         guess.setGuessed(true);
         return guess;
     }
@@ -341,6 +339,10 @@ public class BalancedRefueling {
             this.distance = 0;
             this.volume = 0;
             this.lastFullRefueling = lastFull;
+        }
+
+        int lastFullRefuelingMileage(List<BalancedRefueling> refuelings, int lastFull) {
+            return refuelings.get(lastFull).getMileage();
         }
     }
 

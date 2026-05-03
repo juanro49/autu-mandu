@@ -31,53 +31,57 @@ import java.util.List;
  * Utility class to show a snackbar after a new refueling has been added.
  * Optimized with Room DTOs and proper accessibility of fields.
  */
-public class NewRefuelingSnackbar {
+public final class NewRefuelingSnackbar {
+    private NewRefuelingSnackbar() {
+        // Utility class
+    }
+
     public static void show(@NonNull View view, long id) {
         Context context = view.getContext().getApplicationContext();
         FuelConsumption fuelConsumption = new FuelConsumption(context);
 
         AutuManduDatabase.DB_EXECUTOR.execute(() -> {
             AutuManduDatabase db = AutuManduDatabase.getInstance(context);
-            // Usamos la versión síncrona del DAO ya que estamos dentro de DB_EXECUTOR
             RefuelingWithDetails refueling = db.getRefuelingDao().getByIdWithDetails(id);
-            if (refueling == null) {
-                return;
-            }
+            if (refueling == null) return;
 
             List<RefuelingWithDetails> previousRefuelings = db.getRefuelingDao()
                     .getWithDetailsForCarAndCategory(refueling.carId(), refueling.fuelTypeCategory());
 
-            int currentIndex = -1;
-            for (int i = 0; i < previousRefuelings.size(); i++) {
-                if (previousRefuelings.get(i).id() == id) {
-                    currentIndex = i;
-                    break;
-                }
-            }
-
+            int currentIndex = findCurrentIndex(id, previousRefuelings);
             if (currentIndex > 0 && !refueling.partial()) {
                 float consumption = getFuelConsumptionToPreviousRefueling(fuelConsumption,
                         refueling.volume(), refueling.mileage(), previousRefuelings, currentIndex - 1);
                 if (consumption > 0) {
-                    String finalConsumptionChange = "";
-
-                    if (currentIndex > 1) {
-                        RefuelingWithDetails prevRefueling = previousRefuelings.get(currentIndex - 1);
-                        float prevConsumption = getFuelConsumptionToPreviousRefueling(fuelConsumption,
-                                prevRefueling.volume(), prevRefueling.mileage(), previousRefuelings, currentIndex - 2);
-                        if (prevConsumption > 0) {
-                            finalConsumptionChange = prevConsumption > consumption ? "↓" : "↑";
-                        }
-                    }
-
-                    final String consumptionChange = finalConsumptionChange;
-                    view.post(() -> {
-                        String message = context.getString(R.string.toast_new_refueling, consumption,
-                                fuelConsumption.getUnitLabel(), consumptionChange);
-                        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
-                    });
+                    processConsumptionInfo(view, context, fuelConsumption, consumption, previousRefuelings, currentIndex);
                 }
             }
+        });
+    }
+
+    private static int findCurrentIndex(long id, List<RefuelingWithDetails> refuelings) {
+        for (int i = 0; i < refuelings.size(); i++) {
+            if (refuelings.get(i).id() == id) return i;
+        }
+        return -1;
+    }
+
+    private static void processConsumptionInfo(View view, Context context, FuelConsumption fuelConsumption, float consumption, List<RefuelingWithDetails> refuelings, int currentIndex) {
+        String consumptionChange = "";
+        if (currentIndex > 1) {
+            RefuelingWithDetails prevRefueling = refuelings.get(currentIndex - 1);
+            float prevConsumption = getFuelConsumptionToPreviousRefueling(fuelConsumption,
+                    prevRefueling.volume(), prevRefueling.mileage(), refuelings, currentIndex - 2);
+            if (prevConsumption > 0) {
+                consumptionChange = prevConsumption > consumption ? "↓" : "↑";
+            }
+        }
+
+        final String finalConsumptionChange = consumptionChange;
+        view.post(() -> {
+            String message = context.getString(R.string.toast_new_refueling, consumption,
+                    fuelConsumption.getUnitLabel(), finalConsumptionChange);
+            Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
         });
     }
 

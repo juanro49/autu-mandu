@@ -81,8 +81,8 @@ public class CostsReport extends AbstractReport {
                 add(x, costs, makeTooltip(costs, x));
             } else {
                 DataPoint dp = mDataPoints.get(index);
-                dp.y += costs;
-                dp.tooltip = makeTooltip(dp.y, x);
+                dp.setY(dp.getY() + costs);
+                dp.setTooltip(makeTooltip(dp.getY(), x));
             }
         }
 

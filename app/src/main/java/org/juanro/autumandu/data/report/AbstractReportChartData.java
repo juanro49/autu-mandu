@@ -25,15 +25,22 @@ import java.util.List;
 
 public abstract class AbstractReportChartData {
     public static class DataPoint implements Comparable<DataPoint> {
-        public float x;
-        public float y;
-        public String tooltip;
+        private float x;
+        private float y;
+        private String tooltip;
 
         public DataPoint(float x, float y, String tooltip) {
             this.x = x;
             this.y = y;
             this.tooltip = tooltip;
         }
+
+        public float getX() { return x; }
+        public void setX(float x) { this.x = x; }
+        public float getY() { return y; }
+        public void setY(float y) { this.y = y; }
+        public String getTooltip() { return tooltip; }
+        public void setTooltip(String tooltip) { this.tooltip = tooltip; }
 
         @Override
         public int compareTo(@NonNull DataPoint other) {
@@ -73,7 +80,7 @@ public abstract class AbstractReportChartData {
     }
 
     public List<Float> getYValues() {
-        return mDataPoints.stream().map(p -> p.y).toList();
+        return mDataPoints.stream().map(DataPoint::getY).toList();
     }
 
     public final boolean isEmpty() {
@@ -90,7 +97,7 @@ public abstract class AbstractReportChartData {
 
     protected int indexOf(Float x) {
         for (int i = 0; i < mDataPoints.size(); i++) {
-            if (mDataPoints.get(i).x == x) {
+            if (mDataPoints.get(i).getX() == x) {
                 return i;
             }
         }

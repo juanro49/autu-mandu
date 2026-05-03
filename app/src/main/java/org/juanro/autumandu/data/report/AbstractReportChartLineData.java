@@ -36,7 +36,7 @@ public abstract class AbstractReportChartLineData extends AbstractReportChartDat
 
     protected void set(int index, Float x, Float y, String tooltip, boolean marked) {
         if (index >= 0 && index < mDataPoints.size()) {
-            mMarkPoints.remove(mDataPoints.get(index).x);
+            mMarkPoints.remove(mDataPoints.get(index).getX());
         }
 
         super.set(index, x, y, tooltip);

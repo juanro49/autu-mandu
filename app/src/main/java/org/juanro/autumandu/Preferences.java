@@ -27,7 +27,6 @@ import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -226,34 +225,5 @@ public class Preferences {
     private String getExternalFilesDirPath() {
         var externalDir = context.getExternalFilesDir(null);
         return externalDir != null ? externalDir.getAbsolutePath() : "";
-    }
-
-    // Deprecated Sync Settings Logic
-
-    @Deprecated(since = "2026-04-05")
-    @Nullable
-    public String getDeprecatedSynchronizationProvider() {
-        return prefs.getString("sync_current_provider", null);
-    }
-
-    @Deprecated(since = "2026-04-05")
-    public void removeDeprecatedSyncSettings() {
-        prefs.edit()
-                .remove("sync_dropbox_account")
-                .remove("sync_dropbox_token")
-                .remove("sync_dropbox_rev")
-                .remove("sync_drive_modified_date")
-                .remove("sync_drive_account")
-                .remove("sync_current_provider")
-                .remove("sync_on_change")
-                .remove("sync_on_start")
-                .apply();
-    }
-
-    @Deprecated(since = "2026-04-05")
-    @Nullable
-    public Date getDeprecatedGoogleDriveLocalModifiedDate() {
-        long date = prefs.getLong("sync_drive_modified_date", -1);
-        return (date == -1) ? null : new Date(date);
     }
 }

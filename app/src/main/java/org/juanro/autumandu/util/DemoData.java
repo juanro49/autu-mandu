@@ -92,12 +92,12 @@ public final class DemoData {
         ZonedDateTime puntoDate = ZonedDateTime.now().minusMonths(puntoCount / 2).withSecond(0).withNano(0);
         int puntoMileage = 15000;
 
-        createOtherCost(db, "Rechtes Abblendlicht", puntoDate.plusDays(randInt(50, 100)), null,
-                121009, 10, RecurrenceInterval.ONCE, 1, "", punto);
-        createOtherCost(db, "Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1,
-                "", punto);
+        createOtherCost(db, new OtherCostConfig("Rechtes Abblendlicht", puntoDate.plusDays(randInt(50, 100)), null,
+                121009, 10, RecurrenceInterval.ONCE, 1, "", punto));
+        createOtherCost(db, new OtherCostConfig("Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1,
+                "", punto));
 
-        createTire(db, puntoDate, null, 50, 4, "Insa Turbo", "Eco Evolution", "", punto);
+        createTire(db, new TireConfig(puntoDate, null, 50, 4, "Insa Turbo", "Eco Evolution", "", punto));
 
         for (int i = 0; i < puntoCount; i++) {
             puntoDate = puntoDate.plusDays(randInt(12, 18));
@@ -113,8 +113,8 @@ public final class DemoData {
             long fuelType = randBooleanTrueInOneOutOf(4) ? superE10 : super95;
 
             if (!randBooleanTrueInOneOutOf(15)) {
-                createRefueling(db, puntoDate, puntoMileage, volume, price, partial, "",
-                        fuelType, stationId, punto);
+                createRefueling(db, new RefuelingConfig(puntoDate, puntoMileage, volume, price, partial, "",
+                        fuelType, stationId, punto));
             }
         }
     }
@@ -125,20 +125,21 @@ public final class DemoData {
         ZonedDateTime astraDate = ZonedDateTime.now().minusMonths(astraCount / 3).withSecond(0).withNano(0);
         int astraMileage = 120000;
 
-        createOtherCost(db, "Steuern", astraDate, null, -1, 250, RecurrenceInterval.YEAR, 1,
-                "", astra);
-        createOtherCost(db, "Versicherung", astraDate, null, -1, 40, RecurrenceInterval.MONTH,
-                1, "", astra);
+        createOtherCost(db, new OtherCostConfig("Steuern", astraDate, null, -1, 250, RecurrenceInterval.YEAR, 1,
+                "", astra));
+        createOtherCost(db, new OtherCostConfig("Versicherung", astraDate, null, -1, 40, RecurrenceInterval.MONTH,
+                1, "", astra));
 
-        createTire(db, astraDate, null, 50, 4, "Insa Turbo", "All Season 4", "", astra);
+        createTire(db, new TireConfig(astraDate, null, 50, 4, "Insa Turbo", "All Season 4", "", astra));
 
-        addRefuelingsForAstra(db, astra, astraDate, astraMileage, astraCount, super95, lpg, stationId);
+        AstraRefuelingConfig config = new AstraRefuelingConfig(astra, astraDate, astraMileage, astraCount, super95, lpg, stationId);
+        addRefuelingsForAstra(db, config);
     }
 
-    private static void addRefuelingsForAstra(AutuManduDatabase db, long carId, ZonedDateTime startDate, int startMileage, int count, long super95, long lpg, long stationId) {
-        ZonedDateTime date95 = startDate;
-        int mileage95 = startMileage;
-        for (int i = 0; i < count; i++) {
+    private static void addRefuelingsForAstra(AutuManduDatabase db, AstraRefuelingConfig config) {
+        ZonedDateTime date95 = config.startDate();
+        int mileage95 = config.startMileage();
+        for (int i = 0; i < config.count(); i++) {
             date95 = date95.plusDays(randInt(8, 13));
             mileage95 += randInt(570, 620);
             float volume = randFloat(55, 60);
@@ -150,14 +151,14 @@ public final class DemoData {
 
             float price = volume * randFloat(140, 160) / 100;
             if (!randBooleanTrueInOneOutOf(15)) {
-                createRefueling(db, date95, mileage95, volume, price, partial, "",
-                        super95, stationId, carId);
+                createRefueling(db, new RefuelingConfig(date95, mileage95, volume, price, partial, "",
+                        config.super95(), config.stationId(), config.carId()));
             }
         }
 
-        ZonedDateTime dateLpg = startDate;
-        int mileageLpg = startMileage;
-        for (int i = 0; i < count; i++) {
+        ZonedDateTime dateLpg = config.startDate();
+        int mileageLpg = config.startMileage();
+        for (int i = 0; i < config.count(); i++) {
             dateLpg = dateLpg.plusDays(randInt(8, 13));
             mileageLpg += randInt(570, 620);
             float volume = randFloat(25, 30);
@@ -169,11 +170,13 @@ public final class DemoData {
 
             float price = volume * randFloat(85, 105) / 100;
             if (!randBooleanTrueInOneOutOf(15)) {
-                createRefueling(db, dateLpg, mileageLpg, volume, price, partial, "",
-                        lpg, stationId, carId);
+                createRefueling(db, new RefuelingConfig(dateLpg, mileageLpg, volume, price, partial, "",
+                        config.lpg(), config.stationId(), config.carId()));
             }
         }
     }
+
+    private record AstraRefuelingConfig(long carId, ZonedDateTime startDate, int startMileage, int count, long super95, long lpg, long stationId) {}
 
     public static void removeDemoData() {
         DB_EXECUTOR.execute(() -> {
@@ -209,56 +212,57 @@ public final class DemoData {
         return db.getStationDao().insert(station)[0];
     }
 
-    private static void createRefueling(AutuManduDatabase db, ZonedDateTime date, int mileage, float volume,
-                                        float price, boolean partial, String note, long fuelTypeId,
-                                        long stationId, long carId) {
+    private static void createRefueling(AutuManduDatabase db, RefuelingConfig config) {
         if (RANDOM.nextDouble() > 0.95) return;
 
         Refueling refueling = new Refueling();
-        refueling.setDate(Date.from(date.toInstant()));
-        refueling.setMileage(mileage);
-        refueling.setVolume(volume);
-        refueling.setPrice(price);
-        refueling.setPartial(partial);
-        refueling.setNote(note);
-        refueling.setFuelTypeId(fuelTypeId);
-        refueling.setStationId(stationId);
-        refueling.setCarId(carId);
+        refueling.setDate(Date.from(config.date().toInstant()));
+        refueling.setMileage(config.mileage());
+        refueling.setVolume(config.volume());
+        refueling.setPrice(config.price());
+        refueling.setPartial(config.partial());
+        refueling.setNote(config.note());
+        refueling.setFuelTypeId(config.fuelTypeId());
+        refueling.setStationId(config.stationId());
+        refueling.setCarId(config.carId());
 
         db.getRefuelingDao().insert(refueling);
     }
 
-    private static void createOtherCost(AutuManduDatabase db, String title, ZonedDateTime date,
-                                        ZonedDateTime endDate, int mileage, float price,
-                                        RecurrenceInterval recurrenceInterval,
-                                        int recurrenceMultiplier, String note, long carId) {
+    private record RefuelingConfig(ZonedDateTime date, int mileage, float volume, float price, boolean partial, String note, long fuelTypeId, long stationId, long carId) {}
+
+    private static void createOtherCost(AutuManduDatabase db, OtherCostConfig config) {
         OtherCost otherCost = new OtherCost();
-        otherCost.setTitle(title);
-        otherCost.setDate(Date.from(date.toInstant()));
-        otherCost.setEndDate(endDate == null ? null : Date.from(endDate.toInstant()));
-        otherCost.setMileage(mileage);
-        otherCost.setPrice(price);
-        otherCost.setRecurrenceInterval(recurrenceInterval);
-        otherCost.setRecurrenceMultiplier(recurrenceMultiplier);
-        otherCost.setNote(note);
-        otherCost.setCarId(carId);
+        otherCost.setTitle(config.title());
+        otherCost.setDate(Date.from(config.date().toInstant()));
+        otherCost.setEndDate(config.endDate() == null ? null : Date.from(config.endDate().toInstant()));
+        otherCost.setMileage(config.mileage());
+        otherCost.setPrice(config.price());
+        otherCost.setRecurrenceInterval(config.recurrenceInterval());
+        otherCost.setRecurrenceMultiplier(config.recurrenceMultiplier());
+        otherCost.setNote(config.note());
+        otherCost.setCarId(config.carId());
 
         db.getOtherCostDao().insert(otherCost);
     }
 
-    private static void createTire(AutuManduDatabase db, ZonedDateTime buyDate, ZonedDateTime trashDate, float price, int quantity, String manufacturer, String model, String note, long carId) {
+    private record OtherCostConfig(String title, ZonedDateTime date, ZonedDateTime endDate, int mileage, float price, RecurrenceInterval recurrenceInterval, int recurrenceMultiplier, String note, long carId) {}
+
+    private static void createTire(AutuManduDatabase db, TireConfig config) {
         TireList tireList = new TireList();
-        tireList.setBuyDate(Date.from(buyDate.toInstant()));
-        tireList.setTrashDate(trashDate == null ? null : Date.from(trashDate.toInstant()));
-        tireList.setPrice(price);
-        tireList.setQuantity(quantity);
-        tireList.setManufacturer(manufacturer);
-        tireList.setModel(model);
-        tireList.setNote(note);
-        tireList.setCarId(carId);
+        tireList.setBuyDate(Date.from(config.buyDate().toInstant()));
+        tireList.setTrashDate(config.trashDate() == null ? null : Date.from(config.trashDate().toInstant()));
+        tireList.setPrice(config.price());
+        tireList.setQuantity(config.quantity());
+        tireList.setManufacturer(config.manufacturer());
+        tireList.setModel(config.model());
+        tireList.setNote(config.note());
+        tireList.setCarId(config.carId());
 
         db.getTireDao().insert(tireList);
     }
+
+    private record TireConfig(ZonedDateTime buyDate, ZonedDateTime trashDate, float price, int quantity, String manufacturer, String model, String note, long carId) {}
 
     private static int randInt(int min, int max) {
         return min + RANDOM.nextInt((max - min) + 1);

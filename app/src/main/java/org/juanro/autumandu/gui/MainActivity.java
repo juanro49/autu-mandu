@@ -17,7 +17,6 @@
 package org.juanro.autumandu.gui;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -182,10 +181,8 @@ public class MainActivity extends AppCompatActivity implements
                     return;
                 }
 
-                if (mCurrentFragment instanceof BackPressedListener listener) {
-                    if (listener.onBackPressed()) {
-                        return;
-                    }
+                if (mCurrentFragment instanceof BackPressedListener listener && listener.onBackPressed()) {
+                    return;
                 }
 
                 if (mCurrentFragment != null
@@ -272,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements
         inflater.inflate(R.menu.main, menu);
         mSyncMenuItem = menu.findItem(R.id.menu_synchronize);
 
-        Account account = getCurrentSyncAccount();
+        Account account = SyncManager.getCurrentSyncAccount(this);
         if (mSyncMenuItem != null) {
             mSyncMenuItem.setVisible(account != null);
         }
@@ -453,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements
         // Profile section on top of drawer
         ImageView topImage = mNavigationViewTop.findViewById(android.R.id.icon1);
         TextView topText = mNavigationViewTop.findViewById(android.R.id.text1);
-        Account account = getCurrentSyncAccount();
+        Account account = SyncManager.getCurrentSyncAccount(this);
         if (account == null) {
             topImage.setVisibility(View.GONE);
             topText.setVisibility(View.GONE);
@@ -556,16 +553,6 @@ public class MainActivity extends AppCompatActivity implements
             // Cars could have changed, so we need to update navigation drawer.
             mViewModel.getCars().removeObservers(this);
             mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
-        }
-    }
-
-    private Account getCurrentSyncAccount() {
-        AccountManager accountManager = AccountManager.get(this);
-        Account[] accounts = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
-        if (accounts.length > 0) {
-            return accounts[0];
-        } else {
-            return null;
         }
     }
 

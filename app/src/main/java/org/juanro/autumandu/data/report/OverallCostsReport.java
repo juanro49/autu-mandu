@@ -140,8 +140,9 @@ public class OverallCostsReport extends AbstractReport {
         addSummaryItems(section, costs.fuel, costs.bills, costs.tires, costs.investment, costs.income, prefs.getUnitCurrency());
 
         var timeBounds = calculateTimeBounds(car, costs.refuelings, dataMaps.otherCosts.get(carId));
-        addEfficiencyItems(section, costs.total, costs.fuel, costs.bills, costs.tires, costs.investment,
-                car.getInitialMileage(), timeBounds.endMileage, timeBounds.startDate, prefs);
+        EfficiencyContext context = new EfficiencyContext(costs.total, costs.fuel, costs.bills,
+                costs.tires, costs.investment, car.getInitialMileage(), timeBounds.endMileage, timeBounds.startDate);
+        addEfficiencyItems(section, context, prefs);
     }
 
     private CarCosts calculateCarCosts(Car car, long carId, CarDataMaps dataMaps, Preferences prefs) {
@@ -245,60 +246,54 @@ public class OverallCostsReport extends AbstractReport {
                 mContext.getString(R.string.report_price, income, unit)));
     }
 
-    private void addEfficiencyItems(Section section, double totalCosts, double fuelCosts, double billsCosts,
-                                    double tiresCosts, double investmentCosts, int startMileage, int endMileage,
-                                    ZonedDateTime startDate, Preferences prefs) {
-        addDistanceEfficiencyItems(section, totalCosts, fuelCosts, billsCosts, tiresCosts, investmentCosts, startMileage, endMileage, prefs);
-        addTimeEfficiencyItems(section, totalCosts, fuelCosts, billsCosts, tiresCosts, investmentCosts, startDate, prefs);
+    private void addEfficiencyItems(Section section, EfficiencyContext ctx, Preferences prefs) {
+        addDistanceEfficiencyItems(section, ctx, prefs);
+        addTimeEfficiencyItems(section, ctx, prefs);
     }
 
-    private void addDistanceEfficiencyItems(Section section, double totalCosts, double fuelCosts, double billsCosts,
-                                            double tiresCosts, double investmentCosts, int startMileage, int endMileage,
-                                            Preferences prefs) {
+    private void addDistanceEfficiencyItems(Section section, EfficiencyContext ctx, Preferences prefs) {
         String unit = prefs.getUnitCurrency();
         String distanceUnit = prefs.getUnitDistance();
-        int totalDistance = endMileage - startMileage;
+        int totalDistance = ctx.endMileage() - ctx.startMileage();
         if (totalDistance > 0) {
             section.addItem(new Item(mContext.getString(R.string.report_average) + " " + distanceUnit,
-                    mContext.getString(R.string.report_price, totalCosts / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, ctx.totalCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
-                    mContext.getString(R.string.report_price, fuelCosts / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, ctx.fuelCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
-                    mContext.getString(R.string.report_price, billsCosts / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, ctx.billsCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
-                    mContext.getString(R.string.report_price, tiresCosts / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, ctx.tiresCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
-                    mContext.getString(R.string.report_price, investmentCosts / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, ctx.investmentCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
         }
     }
 
-    private void addTimeEfficiencyItems(Section section, double totalCosts, double fuelCosts, double billsCosts,
-                                        double tiresCosts, double investmentCosts, ZonedDateTime startDate,
-                                        Preferences prefs) {
+    private void addTimeEfficiencyItems(Section section, EfficiencyContext ctx, Preferences prefs) {
         String unit = prefs.getUnitCurrency();
-        long days = Math.max(1, ChronoUnit.DAYS.between(startDate, ZonedDateTime.now()));
+        long days = Math.max(1, ChronoUnit.DAYS.between(ctx.startDate(), ZonedDateTime.now()));
 
         section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mContext.getString(R.string.report_month),
-                mContext.getString(R.string.report_price, totalCosts / days * 30.4375, unit)));
+                mContext.getString(R.string.report_price, ctx.totalCosts() / days * 30.4375, unit)));
         section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
-                mContext.getString(R.string.report_price, fuelCosts / days * 30.4375, unit)));
+                mContext.getString(R.string.report_price, ctx.fuelCosts() / days * 30.4375, unit)));
         section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
-                mContext.getString(R.string.report_price, billsCosts / days * 30.4375, unit)));
+                mContext.getString(R.string.report_price, ctx.billsCosts() / days * 30.4375, unit)));
         section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
-                mContext.getString(R.string.report_price, tiresCosts / days * 30.4375, unit)));
+                mContext.getString(R.string.report_price, ctx.tiresCosts() / days * 30.4375, unit)));
         section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
-                mContext.getString(R.string.report_price, investmentCosts / days * 30.4375, unit)));
+                mContext.getString(R.string.report_price, ctx.investmentCosts() / days * 30.4375, unit)));
 
         section.addItem(new Item(mContext.getString(R.string.report_average) + " " + mContext.getString(R.string.report_day),
-                mContext.getString(R.string.report_price, totalCosts / days, unit)));
+                mContext.getString(R.string.report_price, ctx.totalCosts() / days, unit)));
         section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
-                mContext.getString(R.string.report_price, fuelCosts / days, unit)));
+                mContext.getString(R.string.report_price, ctx.fuelCosts() / days, unit)));
         section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
-                mContext.getString(R.string.report_price, billsCosts / days, unit)));
+                mContext.getString(R.string.report_price, ctx.billsCosts() / days, unit)));
         section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
-                mContext.getString(R.string.report_price, tiresCosts / days, unit)));
+                mContext.getString(R.string.report_price, ctx.tiresCosts() / days, unit)));
         section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
-                mContext.getString(R.string.report_price, investmentCosts / days, unit)));
+                mContext.getString(R.string.report_price, ctx.investmentCosts() / days, unit)));
     }
 
     private static class GlobalCosts {
@@ -313,6 +308,17 @@ public class OverallCostsReport extends AbstractReport {
             Map<Long, List<RefuelingWithDetails>> refuelings,
             Map<Long, List<OtherCost>> otherCosts,
             Map<Long, List<TireList>> tires
+    ) {}
+
+    private record EfficiencyContext(
+            double totalCosts,
+            double fuelCosts,
+            double billsCosts,
+            double tiresCosts,
+            double investmentCosts,
+            int startMileage,
+            int endMileage,
+            ZonedDateTime startDate
     ) {}
 
     private Section createSectionForCar(Car car) {

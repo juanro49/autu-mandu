@@ -53,12 +53,12 @@ public class TrendReportChartData extends AbstractReportChartLineData {
         int k = (order - 1) / 2;
 
         for (int t = k; t < size - k; t++) {
-            float x = dataPoints.get(t).x;
+            float x = dataPoints.get(t).getX();
 
             // y_t = (y_t-k + y_t-k+1 + ... + y_t + ... + y_t+k-1 + y_t+k) / order
             float sumY = 0;
             for (int i = t - k; i <= t + k; i++) {
-                sumY += dataPoints.get(i).y;
+                sumY += dataPoints.get(i).getY();
             }
 
             float y = sumY / order;

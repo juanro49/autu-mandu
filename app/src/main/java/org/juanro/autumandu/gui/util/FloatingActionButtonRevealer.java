@@ -24,9 +24,13 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * Utility class to show/hide a FloatingActionMenu based on RecyclerView scrolling.
  */
-public class FloatingActionButtonRevealer {
+public final class FloatingActionButtonRevealer {
     private static final int SCROLL_OFFSET = 4;
     private static final int SHOW_DELAY_MS = 300;
+
+    private FloatingActionButtonRevealer() {
+        // Utility class
+    }
 
     /**
      * Sets up the FloatingActionMenu to hide/show based on the scroll direction of the RecyclerView.

@@ -76,7 +76,7 @@ object KubitChartBridge {
                         rawData = finalData,
                         yAxisLabel = { report.formatYValue(it, chartOption) },
                         xAxisLabel = { report.formatXValue(it, chartOption) },
-                        isFullScreen = isFullScreen
+                        config = LineChartConfig(isFullScreen = isFullScreen)
                     )
                 }
             }
@@ -104,7 +104,7 @@ object KubitChartBridge {
                         rawData = finalData,
                         yAxisLabel = { report.formatYValue(it, chartOption) },
                         xAxisLabel = { report.formatXValue(it, chartOption) },
-                        isFullScreen = isFullScreen
+                        config = ColumnChartConfig(isFullScreen = isFullScreen)
                     )
                 }
             }
@@ -179,8 +179,7 @@ object KubitChartBridge {
                             val index = it.toInt()
                             if (index >= 0 && index < items.size) items[index].name() else ""
                         },
-                        xAxisLabelRotation = 0f,
-                        isCalculator = true
+                        config = ColumnChartConfig(isCalculator = true)
                     )
                 }
             }

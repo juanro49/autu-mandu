@@ -18,19 +18,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory android:title="@string/pref_title_category_synchronization" >
         <Preference
-            android:key="sync"
+            android:key="sync_setup"
             android:title="@string/pref_title_sync_setup" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_backup" >
         <Preference
-            android:key="backup"
+            android:key="backup_now"
             android:summary="@string/pref_summary_backup"
             android:title="@string/pref_title_backup" />
         <Preference
-            android:key="restore"
+            android:key="restore_now"
             android:summary="@string/pref_summary_restore"
             android:title="@string/pref_title_restore" />
-        <SwitchPreference
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="behavior_auto_backup"
             android:summary="@string/pref_summary_behavior_auto_backup"
@@ -49,18 +49,18 @@
             android:title="@string/pref_title_backup_location"
             android:summary="@string/pref_summary_backup_location" />
         <Preference
-            android:key="restore_folder"
+            android:key="backup_folder_default"
             android:title="@string/pref_title_restore_backup_location"
             android:summary="@string/pref_summary_restore_backup_location"
             />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_title_category_export" >
         <Preference
-            android:key="exportcsv"
+            android:key="export_csv"
             android:summary="@string/pref_summary_export_csv"
             android:title="@string/pref_title_exportcsv" />
         <Preference
-            android:key="importcsv"
+            android:key="import_csv"
             android:summary="@string/pref_summary_import_csv"
             android:title="@string/pref_title_importcsv" />
     </PreferenceCategory>

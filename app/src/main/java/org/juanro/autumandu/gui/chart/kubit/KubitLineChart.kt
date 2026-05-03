@@ -73,7 +73,7 @@ fun KubitLineChart(
     rawData: List<AbstractReportChartData>,
     yAxisLabel: (Float) -> String,
     xAxisLabel: (Float) -> String,
-    isFullScreen: Boolean = false
+    config: LineChartConfig = LineChartConfig()
 ) {
     if (rawData.isEmpty() || rawData.all { it.dataPoints.isEmpty() }) return
 
@@ -125,8 +125,8 @@ fun KubitLineChart(
         val xAxisData = remember(xSteps) { AxisData(axisSteps = xSteps) }
 
         val baseStepSize = dimensionResource(id = R.dimen.chart_line_x_step_base)
-        val xStepSize = remember(rangeX, isFullScreen, baseStepSize) {
-            if (rangeX > 0 && !isFullScreen) {
+        val xStepSize = remember(rangeX, config.isFullScreen, baseStepSize) {
+            if (rangeX > 0 && !config.isFullScreen) {
                 baseStepSize * 1.8f
             } else baseStepSize
         }
@@ -140,39 +140,38 @@ fun KubitLineChart(
         )
 
         ChartContent(
-            isFullScreen = isFullScreen,
-            xAxisData = xAxisData,
-            yAxisData = yAxisData,
-            xStepSize = xStepSize,
-            yStepSize = yStepSize,
-            axisPadding = axisPadding,
+            config = config,
+            uiConfig = LineChartUiConfig(xAxisData, yAxisData, xStepSize, yStepSize, axisPadding),
             lines = lines
         )
     }
 }
 
+data class LineChartConfig(val isFullScreen: Boolean = false)
+
+private data class LineChartUiConfig(
+    val xAxisData: AxisData,
+    val yAxisData: AxisData,
+    val xStepSize: Dp,
+    val yStepSize: Dp,
+    val axisPadding: AxisPadding
+)
+
 private data class ChartBounds(val minX: Float, val maxX: Float, val minY: Float, val maxY: Float)
 
 private fun calculateBounds(rawData: List<AbstractReportChartData>): ChartBounds {
-    var minX = Float.MAX_VALUE
-    var maxX = -Float.MAX_VALUE
-    var minY = Float.MAX_VALUE
-    var maxY = -Float.MAX_VALUE
+    val validPoints = rawData.flatMap { it.dataPoints }
+        .filter { it.x.isFinite() && it.y.isFinite() }
 
-    rawData.forEach { series ->
-        series.dataPoints.forEach { point ->
-            if (point.x.isFinite() && point.y.isFinite()) {
-                if (point.x < minX) minX = point.x
-                if (point.x > maxX) maxX = point.x
-                if (point.y < minY) minY = point.y
-                if (point.y > maxY) maxY = point.y
-            }
-        }
-    }
-
-    if (minX == Float.MAX_VALUE) {
+    if (validPoints.isEmpty()) {
         return ChartBounds(0f, 1f, 0f, 1f)
     }
+
+    val minX = validPoints.minOf { it.x }
+    var maxX = validPoints.maxOf { it.x }
+    val minY = validPoints.minOf { it.y }
+    val maxY = validPoints.maxOf { it.y }
+
     if (maxX == minX) maxX = minX + 1f
     return ChartBounds(minX, maxX, minY, maxY)
 }
@@ -287,19 +286,15 @@ private fun createXSteps(
 
 @Composable
 private fun ChartContent(
-    isFullScreen: Boolean,
-    xAxisData: AxisData,
-    yAxisData: AxisData,
-    xStepSize: Dp,
-    yStepSize: Dp,
-    axisPadding: AxisPadding,
+    config: LineChartConfig,
+    uiConfig: LineChartUiConfig,
     lines: ImmutableList<Line>
 ) {
     var initialScrollDone by remember { mutableStateOf(false) }
     val chartDescription = stringResource(id = R.string.chart_content_description_line)
 
     Box(
-        modifier = if (isFullScreen) Modifier.fillMaxSize() else Modifier.fillMaxWidth(),
+        modifier = if (config.isFullScreen) Modifier.fillMaxSize() else Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         ChartScaffold(
@@ -308,19 +303,19 @@ private fun ChartContent(
                 .height(dimensionResource(id = R.dimen.chart_height))
                 .background(Color.Transparent)
                 .semantics { contentDescription = chartDescription },
-            xAxisData = xAxisData,
-            yAxisData = yAxisData,
-            xUnitSize = xStepSize,
-            yUnitSize = yStepSize,
-            axisPadding = axisPadding,
+            xAxisData = uiConfig.xAxisData,
+            yAxisData = uiConfig.yAxisData,
+            xUnitSize = uiConfig.xStepSize,
+            yUnitSize = uiConfig.yStepSize,
+            axisPadding = uiConfig.axisPadding,
             isPinchZoomEnabled = true,
             horizontalAxis = { scroll, zoom, padding ->
                 HorizontalAxisChart(
-                    data = xAxisData,
+                    data = uiConfig.xAxisData,
                     labelHeight = 25.dp,
                     horizontalScroll = scroll,
                     zoom = zoom,
-                    fixedUnitSize = xStepSize,
+                    fixedUnitSize = uiConfig.xStepSize,
                     padding = padding,
                     labelVerticalAlignment = AxisLabelVerticalAlignment.Top,
                     labelVerticalGap = dimensionResource(id = R.dimen.chart_label_padding),
@@ -329,11 +324,11 @@ private fun ChartContent(
             },
             verticalAxis = { scroll, zoom, padding ->
                 VerticalAxisChart(
-                    data = yAxisData,
+                    data = uiConfig.yAxisData,
                     labelWidth = 25.dp,
                     verticalScroll = scroll,
                     zoom = zoom,
-                    fixedUnitSize = yStepSize,
+                    fixedUnitSize = uiConfig.yStepSize,
                     padding = padding,
                     labelHorizontalAlignment = AxisLabelHorizontalAlignment.End,
                     labelHorizontalGap = 1.dp,
@@ -353,10 +348,10 @@ private fun ChartContent(
                         .fillMaxSize()
                         .clipToBounds(),
                     lines = lines,
-                    xAxisData = xAxisData,
-                    yAxisData = yAxisData,
-                    xAxisStepSize = xStepSize,
-                    yAxisStepSize = yStepSize,
+                    xAxisData = uiConfig.xAxisData,
+                    yAxisData = uiConfig.yAxisData,
+                    xAxisStepSize = uiConfig.xStepSize,
+                    yAxisStepSize = uiConfig.yStepSize,
                     horizontalScroll = scaffoldData.horizontalScroll,
                     zoom = scaffoldData.zoom,
                     backgroundColor = Color.Transparent,

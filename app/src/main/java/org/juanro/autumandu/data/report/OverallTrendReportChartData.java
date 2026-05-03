@@ -39,8 +39,8 @@ public class OverallTrendReportChartData extends AbstractReportChartLineData {
         double sumX = 0;
         double sumY = 0;
         for (AbstractReportChartData.DataPoint dp : dataPoints) {
-            sumX += dp.x;
-            sumY += dp.y;
+            sumX += dp.getX();
+            sumY += dp.getY();
         }
 
         float avgX = (float) (sumX / dataPoints.size());
@@ -49,8 +49,8 @@ public class OverallTrendReportChartData extends AbstractReportChartLineData {
         BigDecimal sum1 = BigDecimal.ZERO; // (x_i - avg(X)) ^ 2
         BigDecimal sum2 = BigDecimal.ZERO; // (x_i - avg(X)) * (y_i - avg(Y))
         for (AbstractReportChartData.DataPoint dp : dataPoints) {
-            BigDecimal xMinusAvgX = BigDecimal.valueOf(dp.x - avgX);
-            BigDecimal yMinusAvgY = BigDecimal.valueOf(dp.y - avgY);
+            BigDecimal xMinusAvgX = BigDecimal.valueOf(dp.getX() - avgX);
+            BigDecimal yMinusAvgY = BigDecimal.valueOf(dp.getY() - avgY);
             sum1 = sum1.add(xMinusAvgX.multiply(xMinusAvgX));
             sum2 = sum2.add(yMinusAvgY.multiply(xMinusAvgX));
         }
@@ -59,8 +59,8 @@ public class OverallTrendReportChartData extends AbstractReportChartLineData {
             float beta1 = sum2.divide(sum1, MathContext.DECIMAL128).floatValue();
             float beta0 = avgY - (beta1 * avgX);
 
-            float firstX = dataPoints.get(0).x;
-            float lastX = dataPoints.get(dataPoints.size() - 1).x;
+            float firstX = dataPoints.get(0).getX();
+            float lastX = dataPoints.get(dataPoints.size() - 1).getX();
 
             add(firstX,
                     beta0 + (beta1 * firstX),

@@ -21,7 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Utility class for fragment-related operations.
  * Includes thread-safe fragment animation control.
  */
-public class FragmentUtils {
+public final class FragmentUtils {
+    private FragmentUtils() {
+        // Utility class
+    }
+
     /**
      * Counter to disable fragment animations.
      * Use AtomicInteger to ensure thread safety when multiple fragments or threads

@@ -16,8 +16,11 @@
 
 package org.juanro.autumandu.util.sync;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.Context;
 
+import androidx.annotation.Nullable;
 import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
@@ -33,12 +36,24 @@ import java.util.concurrent.TimeUnit;
  * Manager for scheduling synchronization tasks using WorkManager.
  * Optimized for battery efficiency and reliable network operations.
  */
-public class SyncManager {
+public final class SyncManager {
     public static final String SYNC_WORK_NAME_PERIODIC = "org.juanro.autumandu.sync.periodic";
     public static final String SYNC_WORK_NAME_ONCE = "org.juanro.autumandu.sync.once";
 
     private SyncManager() {
         // Utility class
+    }
+
+    /**
+     * Returns the currently active sync account, if any.
+     * @param context Application context.
+     * @return The active sync account or null.
+     */
+    @Nullable
+    public static Account getCurrentSyncAccount(Context context) {
+        AccountManager accountManager = AccountManager.get(context);
+        Account[] accounts = accountManager.getAccountsByType(Authenticator.ACCOUNT_TYPE);
+        return accounts.length > 0 ? accounts[0] : null;
     }
 
     /**

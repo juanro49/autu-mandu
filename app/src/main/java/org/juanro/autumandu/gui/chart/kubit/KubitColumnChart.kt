@@ -82,9 +82,7 @@ fun KubitColumnChart(
     rawData: List<AbstractReportChartData>,
     yAxisLabel: (Float) -> String,
     xAxisLabel: (Float) -> String,
-    xAxisLabelRotation: Float = 0f,
-    isCalculator: Boolean = false,
-    isFullScreen: Boolean = false
+    config: ColumnChartConfig = ColumnChartConfig()
 ) {
     if (rawData.isEmpty() || rawData.all { it.dataPoints.isEmpty() }) return
 
@@ -135,34 +133,47 @@ fun KubitColumnChart(
         val yAxisData = remember(ySteps) { AxisData(axisSteps = ySteps) }
         val xAxisData = remember(xSteps) { AxisData(axisSteps = xSteps) }
 
-        val xStepSize = dimensionResource(id = if (isCalculator) R.dimen.chart_calculator_x_step else R.dimen.chart_column_x_step)
+        val xStepSize = dimensionResource(id = if (config.isCalculator) R.dimen.chart_calculator_x_step else R.dimen.chart_column_x_step)
         val axisPadding = AxisPadding(
-            start = dimensionResource(id = if (isCalculator) R.dimen.chart_calculator_axis_padding_start else R.dimen.chart_axis_padding_start),
+            start = dimensionResource(id = if (config.isCalculator) R.dimen.chart_calculator_axis_padding_start else R.dimen.chart_axis_padding_start),
             end = 20.dp,
             top = 0.dp,
             bottom = dimensionResource(id = R.dimen.chart_axis_padding_bottom)
         )
 
         ChartContainer(
-            isCalculator = isCalculator,
-            isFullScreen = isFullScreen,
-            isDark = isDark,
-            textColor = textColor,
-            selectedSegment = selectedSegment,
-            xAxisData = xAxisData,
-            yAxisData = yAxisData,
-            xStepSize = xStepSize,
-            axisPadding = axisPadding,
-            effectiveRangeY = effectiveRangeY,
-            barDataList = barDataList,
-            trendLines = trendLines,
-            xAxisLabelRotation = xAxisLabelRotation,
+            config = config,
+            uiConfig = ChartUiConfig(isDark, textColor, xAxisData, yAxisData, xStepSize, axisPadding, effectiveRangeY, xAxisLabelRotation = config.xAxisLabelRotation),
+            dataConfig = ChartDataConfig(barDataList, trendLines, selectedSegment),
             yAxisLabel = yAxisLabel,
             onSelectionClear = { selectedSegment = null },
             onSegmentClick = { segment -> selectedSegment = if (selectedSegment == segment) null else segment }
         )
     }
 }
+
+data class ColumnChartConfig(
+    val xAxisLabelRotation: Float = 0f,
+    val isCalculator: Boolean = false,
+    val isFullScreen: Boolean = false
+)
+
+private data class ChartUiConfig(
+    val isDark: Boolean,
+    val textColor: Color,
+    val xAxisData: AxisData,
+    val yAxisData: AxisData,
+    val xStepSize: androidx.compose.ui.unit.Dp,
+    val axisPadding: AxisPadding,
+    val effectiveRangeY: Float,
+    val xAxisLabelRotation: Float
+)
+
+private data class ChartDataConfig(
+    val barDataList: PersistentList<BarChartData>,
+    val trendLines: PersistentList<Line>,
+    val selectedSegment: BarChartSegmentData?
+)
 
 private data class SplitSeries(val trendSeries: List<AbstractReportChartData>, val barSeries: List<AbstractReportChartData>)
 
@@ -327,19 +338,9 @@ private fun createXSteps(
 
 @Composable
 private fun ChartContainer(
-    isCalculator: Boolean,
-    isFullScreen: Boolean,
-    isDark: Boolean,
-    textColor: Color,
-    selectedSegment: BarChartSegmentData?,
-    xAxisData: AxisData,
-    yAxisData: AxisData,
-    xStepSize: androidx.compose.ui.unit.Dp,
-    axisPadding: AxisPadding,
-    effectiveRangeY: Float,
-    barDataList: PersistentList<BarChartData>,
-    trendLines: PersistentList<Line>,
-    xAxisLabelRotation: Float,
+    config: ColumnChartConfig,
+    uiConfig: ChartUiConfig,
+    dataConfig: ChartDataConfig,
     yAxisLabel: (Float) -> String,
     onSelectionClear: () -> Unit,
     onSegmentClick: (BarChartSegmentData) -> Unit
@@ -348,10 +349,10 @@ private fun ChartContainer(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .then(if (isCalculator || isFullScreen) Modifier.fillMaxHeight() else Modifier.height(dimensionResource(id = R.dimen.chart_height)))
+            .then(if (config.isCalculator || config.isFullScreen) Modifier.fillMaxHeight() else Modifier.height(dimensionResource(id = R.dimen.chart_height)))
             .semantics { contentDescription = chartDescription }
     ) {
-        SelectionPanel(selectedSegment, isDark, textColor, yAxisLabel)
+        SelectionPanel(dataConfig.selectedSegment, uiConfig.isDark, uiConfig.textColor, yAxisLabel)
 
         Box(modifier = Modifier.weight(1f)) {
             Box(
@@ -365,34 +366,34 @@ private fun ChartContainer(
             )
 
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                val dynamicYStepSize = (maxHeight - axisPadding.bottom - axisPadding.top) / effectiveRangeY
+                val dynamicYStepSize = (maxHeight - uiConfig.axisPadding.bottom - uiConfig.axisPadding.top) / uiConfig.effectiveRangeY
                 ChartScaffold(
                     modifier = Modifier.fillMaxSize().background(Color.Transparent),
-                    xAxisData = xAxisData,
-                    yAxisData = yAxisData,
-                    xUnitSize = xStepSize,
+                    xAxisData = uiConfig.xAxisData,
+                    yAxisData = uiConfig.yAxisData,
+                    xUnitSize = uiConfig.xStepSize,
                     yUnitSize = dynamicYStepSize,
-                    axisPadding = axisPadding,
+                    axisPadding = uiConfig.axisPadding,
                     isPinchZoomEnabled = true,
                     horizontalAxis = { scroll, zoom, padding ->
                         HorizontalAxisChart(
-                            data = xAxisData,
-                            labelHeight = dimensionResource(id = if (isCalculator) R.dimen.chart_calculator_label_height else R.dimen.chart_axis_label_height),
+                            data = uiConfig.xAxisData,
+                            labelHeight = dimensionResource(id = if (config.isCalculator) R.dimen.chart_calculator_label_height else R.dimen.chart_axis_label_height),
                             horizontalScroll = scroll,
                             zoom = zoom,
-                            fixedUnitSize = xStepSize,
+                            fixedUnitSize = uiConfig.xStepSize,
                             padding = padding,
                             labelVerticalAlignment = AxisLabelVerticalAlignment.Top,
                             labelVerticalGap = 2.dp,
-                            labelRotation = xAxisLabelRotation,
+                            labelRotation = uiConfig.xAxisLabelRotation,
                             labelCenterAlignment = AxisLabelCenterAlignment.Center,
                             labelsBackgroundColor = Color.Transparent
                         )
                     },
                     verticalAxis = { scroll, zoom, padding ->
                         VerticalAxisChart(
-                            data = yAxisData,
-                            labelWidth = dimensionResource(id = if (isCalculator) R.dimen.chart_calculator_label_width else R.dimen.chart_axis_label_width),
+                            data = uiConfig.yAxisData,
+                            labelWidth = dimensionResource(id = if (config.isCalculator) R.dimen.chart_calculator_label_width else R.dimen.chart_axis_label_width),
                             verticalScroll = scroll,
                             zoom = zoom,
                             fixedUnitSize = dynamicYStepSize,
@@ -403,7 +404,7 @@ private fun ChartContainer(
                         )
                     },
                     content = { scaffoldData ->
-                        ChartMainContent(isCalculator, barDataList, trendLines, xAxisData, yAxisData, xStepSize, dynamicYStepSize, scaffoldData.horizontalScroll, scaffoldData.zoom, scaffoldData.onHorizontalScrollChangeRequest, onSegmentClick)
+                        ChartMainContent(config.isCalculator, dataConfig.barDataList, dataConfig.trendLines, uiConfig.xAxisData, uiConfig.yAxisData, uiConfig.xStepSize, dynamicYStepSize, scaffoldData.horizontalScroll, scaffoldData.zoom, scaffoldData.onHorizontalScrollChangeRequest, onSegmentClick)
                     }
                 )
             }

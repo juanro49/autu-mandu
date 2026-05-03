@@ -36,9 +36,13 @@ import org.juanro.autumandu.R;
 /**
  * Utility class for managing registered synchronization providers.
  */
-public class SyncProviders {
+public final class SyncProviders {
     private static final String TAG = "SyncProviders";
     private static AbstractSyncProvider[] sSyncProviders = null;
+
+    private SyncProviders() {
+        // Utility class
+    }
 
     /**
      * Returns all registered sync providers.
