@@ -45,7 +45,6 @@ import java.util.List;
 
 public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
 
-    private static final String UNIT_FUEL_CONSUMPTION = "unit_fuel_consumption";
     private PreferencesGeneralViewModel mViewModel;
 
     private class PreferenceChangeListener implements OnPreferenceChangeListener {
@@ -53,14 +52,14 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             String prefKey = preference.getKey();
             switch (prefKey) {
-                case "behavior_default_car" -> handleDefaultCarChange(preference, newValue);
-                case "behavior_distance_entry_mode" -> handleDistanceEntryModeChange(preference, newValue);
-                case "behavior_price_entry_mode" -> handlePriceEntryModeChange(preference, newValue);
-                case "behavior_reminder_snooze_duration" -> handleSnoozeDurationChange(preference, newValue);
-                case "unit_distance", "unit_volume" -> handleUnitChange(preference, newValue);
-                case UNIT_FUEL_CONSUMPTION -> handleFuelConsumptionChange((ListPreference) preference, newValue);
-                case "ui_theme" -> handleThemeChange((ListPreference) preference, newValue);
-                case "ui_dynamic_color" -> requireActivity().recreate();
+                case Preferences.KEY_DEFAULT_CAR -> handleDefaultCarChange(preference, newValue);
+                case Preferences.KEY_DISTANCE_ENTRY_MODE -> handleDistanceEntryModeChange(preference, newValue);
+                case Preferences.KEY_PRICE_ENTRY_MODE -> handlePriceEntryModeChange(preference, newValue);
+                case Preferences.KEY_REMINDER_SNOOZE_DURATION -> handleSnoozeDurationChange(preference, newValue);
+                case Preferences.KEY_UNIT_DISTANCE, Preferences.KEY_UNIT_VOLUME -> handleUnitChange(preference, newValue);
+                case Preferences.KEY_UNIT_FUEL_CONSUMPTION -> handleFuelConsumptionChange((ListPreference) preference, newValue);
+                case Preferences.KEY_THEME -> handleThemeChange((ListPreference) preference, newValue);
+                case Preferences.KEY_DYNAMIC_COLOR -> requireActivity().recreate();
                 default -> {
                     if (preference instanceof EditTextPreference) {
                         preference.setSummary(newValue.toString());
@@ -99,7 +98,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
         private void handleUnitChange(Preference preference, Object newValue) {
             preference.setSummary(newValue.toString());
             FuelConsumption fuelConsumption = new FuelConsumption(requireContext());
-            if (preference.getKey().equals("unit_distance")) {
+            if (preference.getKey().equals(Preferences.KEY_UNIT_DISTANCE)) {
                 fuelConsumption.setUnitDistance(newValue.toString());
             } else {
                 fuelConsumption.setUnitVolume(newValue.toString());
@@ -135,7 +134,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
         }
 
         public void updateFuelConsumptionField(FuelConsumption fuelConsumption) {
-            ListPreference prefFuelConsumption = findPreference(UNIT_FUEL_CONSUMPTION);
+            ListPreference prefFuelConsumption = findPreference(Preferences.KEY_UNIT_FUEL_CONSUMPTION);
             if (prefFuelConsumption != null) {
                 updateFuelConsumptionField(fuelConsumption, prefFuelConsumption);
             }
@@ -179,29 +178,29 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
         setupSnoozeDurationPreference(prefs);
 
         // Unit Currency
-        setupSimplePreference("unit_currency", prefs.getUnitCurrency());
+        setupSimplePreference(Preferences.KEY_UNIT_CURRENCY, prefs.getUnitCurrency());
 
         // Unit Volume
-        setupSimplePreference("unit_volume", prefs.getUnitVolume());
+        setupSimplePreference(Preferences.KEY_UNIT_VOLUME, prefs.getUnitVolume());
 
         // Unit Distance
-        setupSimplePreference("unit_distance", prefs.getUnitDistance());
+        setupSimplePreference(Preferences.KEY_UNIT_DISTANCE, prefs.getUnitDistance());
 
         // UI Theme
-        ListPreference themePref = findPreference("ui_theme");
+        ListPreference themePref = findPreference(Preferences.KEY_THEME);
         if (themePref != null) {
             onPreferenceChangeListener.updateThemeSummary(themePref, prefs.getTheme());
             themePref.setOnPreferenceChangeListener(onPreferenceChangeListener);
         }
 
         // UI Dynamic Color
-        Preference dynamicColorPref = findPreference("ui_dynamic_color");
+        Preference dynamicColorPref = findPreference(Preferences.KEY_DYNAMIC_COLOR);
         if (dynamicColorPref != null) {
             dynamicColorPref.setOnPreferenceChangeListener(onPreferenceChangeListener);
         }
 
         // Unit fuel consumption
-        ListPreference fieldFuelConsumption = findPreference(UNIT_FUEL_CONSUMPTION);
+        ListPreference fieldFuelConsumption = findPreference(Preferences.KEY_UNIT_FUEL_CONSUMPTION);
         if (fieldFuelConsumption != null) {
             onPreferenceChangeListener.updateFuelConsumptionField(fuelConsumption, fieldFuelConsumption);
             fieldFuelConsumption.setOnPreferenceChangeListener(onPreferenceChangeListener);
@@ -209,7 +208,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
     }
 
     private void setupDefaultCarPreference(Preferences prefs) {
-        ListPreference defaultCar = findPreference("behavior_default_car");
+        ListPreference defaultCar = findPreference(Preferences.KEY_DEFAULT_CAR);
         if (defaultCar == null) return;
 
         long defaultCarId = prefs.getDefaultCar();
@@ -246,7 +245,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
             entryValues[i] = modes[i].name();
         }
 
-        ListPreference distanceEntryMode = findPreference("behavior_distance_entry_mode");
+        ListPreference distanceEntryMode = findPreference(Preferences.KEY_DISTANCE_ENTRY_MODE);
         if (distanceEntryMode != null) {
             distanceEntryMode.setEntries(entries);
             distanceEntryMode.setEntryValues(entryValues);
@@ -264,7 +263,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
             entryValues[i] = modes[i].name();
         }
 
-        ListPreference priceEntryMode = findPreference("behavior_price_entry_mode");
+        ListPreference priceEntryMode = findPreference(Preferences.KEY_PRICE_ENTRY_MODE);
         if (priceEntryMode != null) {
             priceEntryMode.setEntries(entries);
             priceEntryMode.setEntryValues(entryValues);
@@ -291,7 +290,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
             entryValues[i] = availableTimeSpans[i].toString();
         }
 
-        ListPreference snoozeDuration = findPreference("behavior_reminder_snooze_duration");
+        ListPreference snoozeDuration = findPreference(Preferences.KEY_REMINDER_SNOOZE_DURATION);
         if (snoozeDuration != null) {
             snoozeDuration.setEntries(entries);
             snoozeDuration.setEntryValues(entryValues);
@@ -325,7 +324,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
             }
         }
 
-        Preference reportOrder = findPreference("behavior_report_order");
+        Preference reportOrder = findPreference(Preferences.KEY_REPORT_ORDER);
         if (reportOrder != null) {
             reportOrder.setSummary(TextUtils.join(", ", reportTitles));
         }

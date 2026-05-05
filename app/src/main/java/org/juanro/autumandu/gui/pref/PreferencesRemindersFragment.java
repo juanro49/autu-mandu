@@ -103,93 +103,103 @@ public class PreferencesRemindersFragment extends ListFragment implements
             if (itemView == null) {
                 itemView = LayoutInflater.from(requireContext()).inflate(R.layout.list_item_reminder,
                         parent, false);
-
-                holder = new ReminderViewHolder();
-                holder.title = itemView.findViewById(R.id.txt_title);
-                holder.car = itemView.findViewById(R.id.txt_car);
-                holder.afterDistance = itemView.findViewById(R.id.txt_after_distance);
-                holder.afterTime = itemView.findViewById(R.id.txt_after_time);
-                holder.status = itemView.findViewById(R.id.txt_status);
-                holder.btnDone = itemView.findViewById(R.id.btn_done);
-                holder.btnSnooze = itemView.findViewById(R.id.btn_snooze);
-                holder.btnDone.setFocusable(false);
-                holder.btnSnooze.setFocusable(false);
-
+                holder = new ReminderViewHolder(itemView);
                 itemView.setTag(holder);
             } else {
                 holder = (ReminderViewHolder) itemView.getTag();
             }
 
-            var item = getItem(position);
-            final long reminderId = item.reminder().getId();
-
-            holder.title.setText(item.reminder().getTitle());
-            holder.car.setText(item.carName());
-
-            holder.btnDone.setOnClickListener(v1 -> viewModel.markAsDone(reminderId));
-            holder.btnSnooze.setOnClickListener(v1 -> viewModel.snooze(reminderId));
-
-            if (item.reminder().getAfterDistance() != null) {
-                holder.afterDistance.setText(String.format(
-                        Locale.getDefault(),
-                        FORMAT_NUMBER_UNIT,
-                        item.reminder().getAfterDistance(),
-                        unitDistance));
-                holder.afterDistance.setVisibility(View.VISIBLE);
-            } else {
-                holder.afterDistance.setVisibility(View.GONE);
-            }
-
-            if (item.reminder().getAfterTimeSpanUnit() != null) {
-                var span = new TimeSpan(item.reminder().getAfterTimeSpanUnit(),
-                        item.reminder().getAfterTimeSpanCount() == null ? 1 : item.reminder().getAfterTimeSpanCount());
-                holder.afterTime.setText(span.toLocalizedString(requireContext()));
-                holder.afterTime.setVisibility(View.VISIBLE);
-            } else {
-                holder.afterTime.setVisibility(View.GONE);
-            }
-
-            if (item.isDue()) {
-                holder.status.setTextColor(MaterialColors.getColor(holder.status, R.attr.colorError));
-                if (item.reminder().isNotificationDismissed()) {
-                    holder.status.setText(R.string.description_reminder_status_due_dismissed);
-                } else if (item.isSnoozed() && item.reminder().getSnoozedUntil() != null) {
-                    holder.status.setText(getString(
-                            R.string.description_reminder_status_due_snoozed,
-                            dateFormat.format(item.reminder().getSnoozedUntil())));
-                } else {
-                    holder.status.setText(R.string.description_reminder_status_due);
-                }
-            } else {
-                holder.status.setTextColor(MaterialColors.getColor(holder.status, R.attr.colorOnSurfaceVariant));
-                if (item.reminder().getAfterDistance() != null && item.reminder().getAfterTimeSpanUnit() != null) {
-                    holder.status.setText(getString(
-                            R.string.description_reminder_status_distance_and_time,
-                            String.format(Locale.getDefault(), FORMAT_NUMBER_UNIT, item.getDistanceToDue(), unitDistance),
-                            TimeSpan.fromMillis(item.getTimeToDue()).toLocalizedString(requireContext())));
-                } else if (item.reminder().getAfterDistance() != null) {
-                    holder.status.setText(getString(
-                            R.string.description_reminder_status_distance,
-                            String.format(Locale.getDefault(), FORMAT_NUMBER_UNIT, item.getDistanceToDue(), unitDistance)));
-                } else {
-                    holder.status.setText(getString(
-                            R.string.description_reminder_status_time,
-                            TimeSpan.fromMillis(item.getTimeToDue()).toLocalizedString(requireContext())));
-                }
-            }
-
+            holder.bind(getItem(position), viewModel, dateFormat, unitDistance);
             return itemView;
         }
     }
 
     private static class ReminderViewHolder {
-        private TextView title;
-        private TextView car;
-        private TextView afterDistance;
-        private TextView afterTime;
-        private TextView status;
-        private View btnDone;
-        private View btnSnooze;
+        private final TextView title;
+        private final TextView car;
+        private final TextView afterDistance;
+        private final TextView afterTime;
+        private final TextView status;
+        private final View btnDone;
+        private final View btnSnooze;
+
+        public ReminderViewHolder(View itemView) {
+            title = itemView.findViewById(R.id.txt_title);
+            car = itemView.findViewById(R.id.txt_car);
+            afterDistance = itemView.findViewById(R.id.txt_after_distance);
+            afterTime = itemView.findViewById(R.id.txt_after_time);
+            status = itemView.findViewById(R.id.txt_status);
+            btnDone = itemView.findViewById(R.id.btn_done);
+            btnSnooze = itemView.findViewById(R.id.btn_snooze);
+            btnDone.setFocusable(false);
+            btnSnooze.setFocusable(false);
+        }
+
+        public void bind(ReminderWithCar item, RemindersViewModel viewModel,
+                         java.text.DateFormat dateFormat, String unitDistance) {
+            final long reminderId = item.reminder().getId();
+            final var context = title.getContext();
+
+            title.setText(item.reminder().getTitle());
+            car.setText(item.carName());
+
+            btnDone.setOnClickListener(v1 -> viewModel.markAsDone(reminderId));
+            btnSnooze.setOnClickListener(v1 -> viewModel.snooze(reminderId));
+
+            if (item.reminder().getAfterDistance() != null) {
+                afterDistance.setText(String.format(
+                        Locale.getDefault(),
+                        FORMAT_NUMBER_UNIT,
+                        item.reminder().getAfterDistance(),
+                        unitDistance));
+                afterDistance.setVisibility(View.VISIBLE);
+            } else {
+                afterDistance.setVisibility(View.GONE);
+            }
+
+            if (item.reminder().getAfterTimeSpanUnit() != null) {
+                var span = new TimeSpan(item.reminder().getAfterTimeSpanUnit(),
+                        item.reminder().getAfterTimeSpanCount() == null ? 1 : item.reminder().getAfterTimeSpanCount());
+                afterTime.setText(span.toLocalizedString(context));
+                afterTime.setVisibility(View.VISIBLE);
+            } else {
+                afterTime.setVisibility(View.GONE);
+            }
+
+            bindStatus(item, dateFormat, unitDistance, context);
+        }
+
+        private void bindStatus(ReminderWithCar item, java.text.DateFormat dateFormat,
+                                String unitDistance, android.content.Context context) {
+            if (item.isDue()) {
+                status.setTextColor(MaterialColors.getColor(status, R.attr.colorError));
+                if (item.reminder().isNotificationDismissed()) {
+                    status.setText(R.string.description_reminder_status_due_dismissed);
+                } else if (item.isSnoozed() && item.reminder().getSnoozedUntil() != null) {
+                    status.setText(context.getString(
+                            R.string.description_reminder_status_due_snoozed,
+                            dateFormat.format(item.reminder().getSnoozedUntil())));
+                } else {
+                    status.setText(R.string.description_reminder_status_due);
+                }
+            } else {
+                status.setTextColor(MaterialColors.getColor(status, R.attr.colorOnSurfaceVariant));
+                if (item.reminder().getAfterDistance() != null && item.reminder().getAfterTimeSpanUnit() != null) {
+                    status.setText(context.getString(
+                            R.string.description_reminder_status_distance_and_time,
+                            String.format(Locale.getDefault(), FORMAT_NUMBER_UNIT, item.getDistanceToDue(), unitDistance),
+                            TimeSpan.fromMillis(item.getTimeToDue()).toLocalizedString(context)));
+                } else if (item.reminder().getAfterDistance() != null) {
+                    status.setText(context.getString(
+                            R.string.description_reminder_status_distance,
+                            String.format(Locale.getDefault(), FORMAT_NUMBER_UNIT, item.getDistanceToDue(), unitDistance)));
+                } else {
+                    status.setText(context.getString(
+                            R.string.description_reminder_status_time,
+                            TimeSpan.fromMillis(item.getTimeToDue()).toLocalizedString(context)));
+                }
+            }
+        }
     }
 
     private class ReminderMultiChoiceModeListener implements AbsListView.MultiChoiceModeListener {

@@ -34,6 +34,7 @@ import org.juanro.autumandu.DistanceEntryMode;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.PriceEntryMode;
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.gui.adapter.CarArrayAdapter;
 import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
 import org.juanro.autumandu.gui.dialog.TimePickerDialogFragment;
 import org.juanro.autumandu.gui.util.DateTimeInput;
@@ -315,36 +316,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
 
     private void setupCarSpinner() {
         mViewModel.getCars().observe(getViewLifecycleOwner(), cars -> {
-            spnCar.setAdapter(new ArrayAdapter<>(requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item, cars) {
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v = (TextView) super.getView(position, convertView, parent);
-                    Car item = getItem(position);
-                    if (item != null) {
-                        v.setText(item.getName());
-                    }
-                    return v;
-                }
-
-                @NonNull
-                @Override
-                public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v = (TextView) super.getDropDownView(position, convertView, parent);
-                    Car item = getItem(position);
-                    if (item != null) {
-                        v.setText(item.getName());
-                    }
-                    return v;
-                }
-
-                @Override
-                public long getItemId(int position) {
-                    Car item = getItem(position);
-                    return item != null ? item.getId() : -1;
-                }
-            });
+            spnCar.setAdapter(new CarArrayAdapter(requireContext(), cars));
 
             if (!isInEditMode()) {
                 long selectCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;

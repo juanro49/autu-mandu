@@ -390,42 +390,54 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = menuItem.getIntent();
         if (intent == null) return false;
 
-        String fragment = intent.getStringExtra(INTENT_EXTRA_FRAGMENT);
-        Bundle arguments = intent.getBundleExtra(INTENT_EXTRA_ARGUMENTS);
-        if (fragment != null) {
-            try {
-                mCurrentFragment = (Fragment) Class.forName(fragment).newInstance();
-                mCurrentFragment.setArguments(arguments);
-            } catch (Exception e) {
-                Log.e("MainActivity", "Error instantiating fragment", e);
-            }
-
-            Menu menu = mNavigationView.getMenu();
-            for (int i = 0; i < menu.size(); i++) {
-                if (menu.getItem(i) == menuItem) {
-                    mCurrentNavItemIndex = i;
-                    break;
-                }
-            }
-
-            FragmentManager fm = getSupportFragmentManager();
-            fm.popBackStack();
-            fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
-
-            setTitle(menuItem.getTitle());
-
-            // Update ActionBar icon
-            updateActionBarIcon();
-            return true;
+        String fragmentClassName = intent.getStringExtra(INTENT_EXTRA_FRAGMENT);
+        if (fragmentClassName != null) {
+            return navigateToFragment(menuItem, fragmentClassName, intent.getBundleExtra(INTENT_EXTRA_ARGUMENTS));
         } else {
-            if (intent.getComponent() != null &&
-                    (intent.getComponent().getClassName().equals(PreferencesActivity.class.getName()) ||
-                     intent.getComponent().getClassName().equals(HelpActivity.class.getName()))) {
-                startActivity(intent);
-                return true;
-            }
+            return navigateToActivity(intent);
+        }
+    }
+
+    private boolean navigateToFragment(MenuItem menuItem, String className, Bundle arguments) {
+        try {
+            mCurrentFragment = (Fragment) Class.forName(className).getDeclaredConstructor().newInstance();
+            mCurrentFragment.setArguments(arguments);
+        } catch (Exception e) {
+            Log.e("MainActivity", "Error instantiating fragment", e);
             return false;
         }
+
+        updateCurrentNavItemIndex(menuItem);
+
+        FragmentManager fm = getSupportFragmentManager();
+        fm.popBackStack();
+        fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
+
+        setTitle(menuItem.getTitle());
+
+        // Update ActionBar icon
+        updateActionBarIcon();
+        return true;
+    }
+
+    private void updateCurrentNavItemIndex(MenuItem menuItem) {
+        Menu menu = mNavigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            if (menu.getItem(i) == menuItem) {
+                mCurrentNavItemIndex = i;
+                break;
+            }
+        }
+    }
+
+    private boolean navigateToActivity(Intent intent) {
+        if (intent.getComponent() != null &&
+                (intent.getComponent().getClassName().equals(PreferencesActivity.class.getName()) ||
+                        intent.getComponent().getClassName().equals(HelpActivity.class.getName()))) {
+            startActivity(intent);
+            return true;
+        }
+        return false;
     }
 
     private void updateActionBarIcon() {
@@ -515,35 +527,27 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateSyncMenuItem() {
-        boolean isSyncInProgress = false;
+        boolean isSyncInProgress = isWorkRunning(mOnceWorkInfos, true) ||
+                isWorkRunning(mPeriodicWorkInfos, false);
 
-        if (mOnceWorkInfos != null) {
-            for (WorkInfo workInfo : mOnceWorkInfos) {
-                if (workInfo.getState() == WorkInfo.State.RUNNING || workInfo.getState() == WorkInfo.State.ENQUEUED) {
-                    isSyncInProgress = true;
-                    break;
-                }
-            }
-        }
-
-        if (!isSyncInProgress && mPeriodicWorkInfos != null) {
-            for (WorkInfo workInfo : mPeriodicWorkInfos) {
-                if (workInfo.getState() == WorkInfo.State.RUNNING) {
-                    isSyncInProgress = true;
-                    break;
-                }
-            }
-        }
-
-        if (isSyncInProgress) {
-            if (mSyncMenuItem != null) {
+        if (mSyncMenuItem != null) {
+            if (isSyncInProgress) {
                 mSyncMenuItem.setActionView(R.layout.actionbar_indeterminate_progress);
-            }
-        } else {
-            if (mSyncMenuItem != null) {
+            } else {
                 mSyncMenuItem.setActionView(null);
             }
         }
+    }
+
+    private boolean isWorkRunning(List<WorkInfo> workInfos, boolean includeEnqueued) {
+        if (workInfos == null) return false;
+        for (WorkInfo workInfo : workInfos) {
+            if (workInfo.getState() == WorkInfo.State.RUNNING ||
+                    (includeEnqueued && workInfo.getState() == WorkInfo.State.ENQUEUED)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean closeFABMenu() {

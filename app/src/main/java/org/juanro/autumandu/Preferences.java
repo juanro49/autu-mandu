@@ -47,24 +47,24 @@ public class Preferences {
     private static final String TAG = "Preferences";
 
     // Preference Keys
-    private static final String KEY_DEFAULT_CAR = "behavior_default_car";
-    private static final String KEY_DISTANCE_ENTRY_MODE = "behavior_distance_entry_mode";
-    private static final String KEY_PRICE_ENTRY_MODE = "behavior_price_entry_mode";
-    private static final String KEY_SYNC_LOCAL_FILE_REV = "sync_local_file_rev";
-    private static final String KEY_REPORT_ORDER = "behavior_report_order";
-    private static final String KEY_REMINDER_SNOOZE_DURATION = "behavior_reminder_snooze_duration";
-    private static final String KEY_UNIT_CURRENCY = "unit_currency";
-    private static final String KEY_UNIT_DISTANCE = "unit_distance";
-    private static final String KEY_UNIT_VOLUME = "unit_volume";
-    private static final String KEY_UNIT_FUEL_CONSUMPTION = "unit_fuel_consumption";
-    private static final String KEY_AUTO_GUESS_MISSING_DATA = "behavior_auto_guess_missing_data";
-    private static final String KEY_SHOW_CAR_MENU = "behavior_show_car_menu";
-    private static final String KEY_BACKUP_FOLDER = "backup_folder";
-    private static final String KEY_BACKUP_FOLDER_DEFAULT = "backup_folder_default";
-    private static final String KEY_AUTO_BACKUP = "behavior_auto_backup";
-    private static final String KEY_KEEP_BACKUPS = "behaviour_keep_backups";
-    private static final String KEY_THEME = "ui_theme";
-    private static final String KEY_DYNAMIC_COLOR = "ui_dynamic_color";
+    public static final String KEY_DEFAULT_CAR = "behavior_default_car";
+    public static final String KEY_DISTANCE_ENTRY_MODE = "behavior_distance_entry_mode";
+    public static final String KEY_PRICE_ENTRY_MODE = "behavior_price_entry_mode";
+    public static final String KEY_SYNC_LOCAL_FILE_REV = "sync_local_file_rev";
+    public static final String KEY_REPORT_ORDER = "behavior_report_order";
+    public static final String KEY_REMINDER_SNOOZE_DURATION = "behavior_reminder_snooze_duration";
+    public static final String KEY_UNIT_CURRENCY = "unit_currency";
+    public static final String KEY_UNIT_DISTANCE = "unit_distance";
+    public static final String KEY_UNIT_VOLUME = "unit_volume";
+    public static final String KEY_UNIT_FUEL_CONSUMPTION = "unit_fuel_consumption";
+    public static final String KEY_AUTO_GUESS_MISSING_DATA = "behavior_auto_guess_missing_data";
+    public static final String KEY_SHOW_CAR_MENU = "behavior_show_car_menu";
+    public static final String KEY_BACKUP_FOLDER = "backup_folder";
+    public static final String KEY_BACKUP_FOLDER_DEFAULT = "backup_folder_default";
+    public static final String KEY_AUTO_BACKUP = "behavior_auto_backup";
+    public static final String KEY_KEEP_BACKUPS = "behaviour_keep_backups";
+    public static final String KEY_THEME = "ui_theme";
+    public static final String KEY_DYNAMIC_COLOR = "ui_dynamic_color";
 
     private final Context context;
     private final SharedPreferences prefs;

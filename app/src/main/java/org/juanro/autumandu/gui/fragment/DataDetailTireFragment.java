@@ -36,6 +36,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.gui.adapter.CarArrayAdapter;
 import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
 import org.juanro.autumandu.gui.dialog.TimePickerDialogFragment;
 import org.juanro.autumandu.gui.util.DateTimeInput;
@@ -390,28 +391,8 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
 
     private void setupCarSpinner() {
         viewModel.getCars().observe(getViewLifecycleOwner(), cars -> {
-            spnCar.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, cars) {
-                @Override
-                public long getItemId(int position) {
-                    var item = getItem(position);
-                    return item != null ? item.getId() : -1;
-                }
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    var v1 = (TextView) super.getView(position, convertView, parent);
-                    var item = getItem(position);
-                    if (item != null) v1.setText(item.getName());
-                    return v1;
-                }
-                @Override
-                public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    var v1 = (TextView) super.getDropDownView(position, convertView, parent);
-                    var item = getItem(position);
-                    if (item != null) v1.setText(item.getName());
-                    return v1;
-                }
-            });
+            spnCar.setAdapter(new CarArrayAdapter(requireContext(), cars));
+
             if (mInitialCarId != -1) {
                 int count = spnCar.getCount();
                 for (int i = 0; i < count; i++) {

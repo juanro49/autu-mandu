@@ -36,6 +36,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.gui.adapter.CarArrayAdapter;
 import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
 import org.juanro.autumandu.gui.dialog.TimePickerDialogFragment;
 import org.juanro.autumandu.gui.util.DateTimeInput;
@@ -253,7 +254,9 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
                 updateRecurrenceFieldsVisibility(true);
             }
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Not used
+            }
         });
 
         chkEndDate.setOnCheckedChangeListener((buttonView, isChecked) -> updateRecurrenceFieldsVisibility(true));
@@ -261,35 +264,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
 
     private void setupCarSpinner(Preferences prefs) {
         viewModel.getCars().observe(getViewLifecycleOwner(), cars -> {
-            spnCar.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, cars) {
-                @Override
-                public long getItemId(int position) {
-                    var item = getItem(position);
-                    return item != null ? item.getId() : -1;
-                }
-
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    var view = (TextView) super.getView(position, convertView, parent);
-                    var item = getItem(position);
-                    if (item != null) {
-                        view.setText(item.getName());
-                    }
-                    return view;
-                }
-
-                @NonNull
-                @Override
-                public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    var view = (TextView) super.getDropDownView(position, convertView, parent);
-                    var item = getItem(position);
-                    if (item != null) {
-                        view.setText(item.getName());
-                    }
-                    return view;
-                }
-            });
+            spnCar.setAdapter(new CarArrayAdapter(requireContext(), cars));
 
             if (!isInEditMode()) {
                 mInitialCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
@@ -316,7 +291,9 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Not used
+            }
         });
     }
 

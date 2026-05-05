@@ -49,14 +49,10 @@ public class AutuManduApplication extends android.app.Application implements Sha
     private static AutuManduApplication instance;
     private final List<Activity> activities = Collections.synchronizedList(new ArrayList<>());
 
-    private static void initializeInstance(AutuManduApplication application) {
-        instance = application;
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
-        initializeInstance(this);
+        instance = this;
 
         // Register for preference changes to handle theme switching globally
         PreferenceManager.getDefaultSharedPreferences(this)

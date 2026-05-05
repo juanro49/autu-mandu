@@ -53,7 +53,10 @@ import org.juanro.autumandu.R;
 import org.juanro.autumandu.util.sync.AbstractSyncProvider;
 import org.juanro.autumandu.util.sync.AuthenticationFinishedListener;
 import org.juanro.autumandu.util.sync.Authenticator;
+import org.juanro.autumandu.util.sync.SyncAuthException;
+import org.juanro.autumandu.util.sync.SyncIoException;
 import org.juanro.autumandu.util.sync.SyncManager;
+import org.juanro.autumandu.util.sync.SyncParseException;
 import org.juanro.autumandu.util.sync.SyncProviders;
 import org.juanro.autumandu.util.sync.provider.WebDavSyncProvider;
 
@@ -268,7 +271,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         });
     }
 
-    private String executeFirstSync(boolean download) throws Exception {
+    private String executeFirstSync(boolean download) throws SyncAuthException, SyncIoException, SyncParseException {
         AutuManduApplication.closeDatabases();
         if (download) {
             mSelectedSyncProvider.downloadFile();

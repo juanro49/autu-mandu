@@ -64,7 +64,8 @@ public class CSVExportImport {
     private static final String TABLE_TIRE_USAGE = "tire_usage";
 
     // Common columns
-    private static final String _ID = "_id";
+    private static final String COLUMN_ID = "_id";
+    private static final String DEFAULT_NAME = "Unknown";
 
     // Car columns
     private static final String CAR_NAME = "car__name";
@@ -73,16 +74,16 @@ public class CSVExportImport {
     private static final String CAR_SUSPENDED_SINCE = "suspended_since";
     private static final String CAR_BUYING_PRICE = "buying_price";
     private static final String CAR_NUM_TIRES = "num_tires";
-    private static final String[] CAR_ALL_COLUMNS = {_ID, CAR_NAME, CAR_COLOR, CAR_INITIAL_MILEAGE, CAR_SUSPENDED_SINCE, CAR_BUYING_PRICE, CAR_NUM_TIRES};
+    private static final String[] CAR_ALL_COLUMNS = {COLUMN_ID, CAR_NAME, CAR_COLOR, CAR_INITIAL_MILEAGE, CAR_SUSPENDED_SINCE, CAR_BUYING_PRICE, CAR_NUM_TIRES};
 
     // FuelType columns
     private static final String FUEL_TYPE_NAME = "fuel_type__name";
     private static final String FUEL_TYPE_CATEGORY = "category";
-    private static final String[] FUEL_TYPE_ALL_COLUMNS = {_ID, FUEL_TYPE_NAME, FUEL_TYPE_CATEGORY};
+    private static final String[] FUEL_TYPE_ALL_COLUMNS = {COLUMN_ID, FUEL_TYPE_NAME, FUEL_TYPE_CATEGORY};
 
     // Station columns
     private static final String STATION_NAME = "station__name";
-    private static final String[] STATION_ALL_COLUMNS = {_ID, STATION_NAME};
+    private static final String[] STATION_ALL_COLUMNS = {COLUMN_ID, STATION_NAME};
 
     // OtherCost columns
     private static final String OTHER_COST_TITLE = "title";
@@ -94,7 +95,7 @@ public class CSVExportImport {
     private static final String OTHER_COST_END_DATE = "end_date";
     private static final String OTHER_COST_NOTE = "note";
     private static final String OTHER_COST_CAR_ID = "car_id";
-    private static final String[] OTHER_COST_ALL_COLUMNS = {_ID, OTHER_COST_TITLE, OTHER_COST_DATE, OTHER_COST_MILEAGE, OTHER_COST_PRICE, OTHER_COST_RECURRENCE_INTERVAL, OTHER_COST_RECURRENCE_MULTIPLIER, OTHER_COST_END_DATE, OTHER_COST_NOTE, OTHER_COST_CAR_ID};
+    private static final String[] OTHER_COST_ALL_COLUMNS = {COLUMN_ID, OTHER_COST_TITLE, OTHER_COST_DATE, OTHER_COST_MILEAGE, OTHER_COST_PRICE, OTHER_COST_RECURRENCE_INTERVAL, OTHER_COST_RECURRENCE_MULTIPLIER, OTHER_COST_END_DATE, OTHER_COST_NOTE, OTHER_COST_CAR_ID};
 
     // Refueling columns
     private static final String REFUELING_DATE = "date";
@@ -106,7 +107,7 @@ public class CSVExportImport {
     private static final String REFUELING_FUEL_TYPE_ID = "fuel_type_id";
     private static final String REFUELING_STATION_ID = "station_id";
     private static final String REFUELING_CAR_ID = "car_id";
-    private static final String[] REFUELING_ALL_COLUMNS = {_ID, REFUELING_DATE, REFUELING_MILEAGE, REFUELING_VOLUME, REFUELING_PRICE, REFUELING_PARTIAL, REFUELING_NOTE, REFUELING_FUEL_TYPE_ID, REFUELING_STATION_ID, REFUELING_CAR_ID};
+    private static final String[] REFUELING_ALL_COLUMNS = {COLUMN_ID, REFUELING_DATE, REFUELING_MILEAGE, REFUELING_VOLUME, REFUELING_PRICE, REFUELING_PARTIAL, REFUELING_NOTE, REFUELING_FUEL_TYPE_ID, REFUELING_STATION_ID, REFUELING_CAR_ID};
 
     // Reminder columns
     private static final String REMINDER_TITLE = "title";
@@ -118,7 +119,7 @@ public class CSVExportImport {
     private static final String REMINDER_NOTIFICATION_DISMISSED = "notification_dismissed";
     private static final String REMINDER_SNOOZED_UNTIL = "snoozed_until";
     private static final String REMINDER_CAR_ID = "car_id";
-    private static final String[] REMINDER_ALL_COLUMNS = {_ID, REMINDER_TITLE, REMINDER_AFTER_TIME_SPAN_UNIT, REMINDER_AFTER_TIME_SPAN_COUNT, REMINDER_AFTER_DISTANCE, REMINDER_START_DATE, REMINDER_START_MILEAGE, REMINDER_NOTIFICATION_DISMISSED, REMINDER_SNOOZED_UNTIL, REMINDER_CAR_ID};
+    private static final String[] REMINDER_ALL_COLUMNS = {COLUMN_ID, REMINDER_TITLE, REMINDER_AFTER_TIME_SPAN_UNIT, REMINDER_AFTER_TIME_SPAN_COUNT, REMINDER_AFTER_DISTANCE, REMINDER_START_DATE, REMINDER_START_MILEAGE, REMINDER_NOTIFICATION_DISMISSED, REMINDER_SNOOZED_UNTIL, REMINDER_CAR_ID};
 
     // TireList columns
     private static final String TIRE_LIST_BUY_DATE = "buy_date";
@@ -129,7 +130,7 @@ public class CSVExportImport {
     private static final String TIRE_LIST_MODEL = "model";
     private static final String TIRE_LIST_NOTE = "note";
     private static final String TIRE_LIST_CAR_ID = "car_id";
-    private static final String[] TIRE_LIST_ALL_COLUMNS = {_ID, TIRE_LIST_BUY_DATE, TIRE_LIST_TRASH_DATE, TIRE_LIST_PRICE, TIRE_LIST_QUANTITY, TIRE_LIST_MANUFACTURER, TIRE_LIST_MODEL, TIRE_LIST_NOTE, TIRE_LIST_CAR_ID};
+    private static final String[] TIRE_LIST_ALL_COLUMNS = {COLUMN_ID, TIRE_LIST_BUY_DATE, TIRE_LIST_TRASH_DATE, TIRE_LIST_PRICE, TIRE_LIST_QUANTITY, TIRE_LIST_MANUFACTURER, TIRE_LIST_MODEL, TIRE_LIST_NOTE, TIRE_LIST_CAR_ID};
 
     // TireUsage columns
     private static final String TIRE_USAGE_DISTANCE_MOUNT = "distance_mount";
@@ -137,7 +138,7 @@ public class CSVExportImport {
     private static final String TIRE_USAGE_DISTANCE_UMOUNT = "distance_umount";
     private static final String TIRE_USAGE_DATE_UMOUNT = "date_umount";
     private static final String TIRE_USAGE_TIRE_ID = "tire_id";
-    private static final String[] TIRE_USAGE_ALL_COLUMNS = {_ID, TIRE_USAGE_DISTANCE_MOUNT, TIRE_USAGE_DATE_MOUNT, TIRE_USAGE_DISTANCE_UMOUNT, TIRE_USAGE_DATE_UMOUNT, TIRE_USAGE_TIRE_ID};
+    private static final String[] TIRE_USAGE_ALL_COLUMNS = {COLUMN_ID, TIRE_USAGE_DISTANCE_MOUNT, TIRE_USAGE_DATE_MOUNT, TIRE_USAGE_DISTANCE_UMOUNT, TIRE_USAGE_DATE_UMOUNT, TIRE_USAGE_TIRE_ID};
 
     private final Context context;
     private DocumentFile exportDir;
@@ -389,53 +390,11 @@ public class CSVExportImport {
 
         Log.d(TAG, "Starting CSV import...");
         try {
-            var tempFormat = csvFormat;
-            try {
-                tempFormat = findDelimiter(tempFormat);
-                Log.d(TAG, "Using delimiter: " + tempFormat.getDelimiterString());
-            } catch (IOException e) {
-                Log.e(TAG, "Error determining CSV delimiter", e);
-                throw new CSVImportException("Error determining CSV delimiter.");
-            }
-            final var importFormat = tempFormat;
-
+            final var importFormat = getImportFormat();
             var db = AutuManduDatabase.getInstance(context);
             db.runInTransaction(() -> {
-                try {
-                    Log.d(TAG, "Clearing tables before import...");
-                    // Manual deletion in correct order to respect foreign keys
-                    db.getTireDao().deleteAllTireUsages();
-                    db.getTireDao().deleteAllTireLists();
-                    db.getRefuelingDao().deleteAll();
-                    db.getOtherCostDao().deleteAll();
-                    db.getReminderDao().deleteAll();
-                    db.getStationDao().deleteAll();
-                    db.getFuelTypeDao().deleteAll();
-                    db.getCarDao().deleteAll();
-
-                    Log.d(TAG, "Importing cars...");
-                    importCars(db, importFormat);
-                    Log.d(TAG, "Importing fuel types...");
-                    importFuelTypes(db, importFormat);
-                    Log.d(TAG, "Importing stations...");
-                    importStations(db, importFormat);
-                    Log.d(TAG, "Importing other costs...");
-                    importOtherCosts(db, importFormat);
-                    Log.d(TAG, "Importing refuelings...");
-                    importRefuelings(db, importFormat);
-                    Log.d(TAG, "Importing reminders...");
-                    importReminders(db, importFormat);
-                    Log.d(TAG, "Importing tire list...");
-                    importTireList(db, importFormat);
-                    Log.d(TAG, "Importing tire usages...");
-                    importTireUsages(db, importFormat);
-                    Log.d(TAG, "Import finished successfully.");
-                } catch (Exception e) {
-                    Log.e(TAG, "Error during transaction", e);
-                    throw new RuntimeException(e);
-                }
+                performImport(db, importFormat);
             });
-
         } catch (CSVImportException e) {
             Log.e(TAG, "CSVImportException during import", e);
             throw e;
@@ -445,6 +404,49 @@ public class CSVExportImport {
         } finally {
             imExportSemaphore.release();
         }
+    }
+
+    private CSVFormat getImportFormat() throws CSVImportException {
+        try {
+            var format = findDelimiter(csvFormat);
+            Log.d(TAG, "Using delimiter: " + format.getDelimiterString());
+            return format;
+        } catch (IOException e) {
+            Log.e(TAG, "Error determining CSV delimiter", e);
+            throw new CSVImportException("Error determining CSV delimiter.");
+        }
+    }
+
+    private void performImport(AutuManduDatabase db, CSVFormat format) {
+        try {
+            Log.d(TAG, "Clearing tables before import...");
+            clearDatabase(db);
+
+            Log.d(TAG, "Importing data...");
+            importCars(db, format);
+            importFuelTypes(db, format);
+            importStations(db, format);
+            importOtherCosts(db, format);
+            importRefuelings(db, format);
+            importReminders(db, format);
+            importTireList(db, format);
+            importTireUsages(db, format);
+            Log.d(TAG, "Import finished successfully.");
+        } catch (Exception e) {
+            Log.e(TAG, "Error during import perform", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void clearDatabase(AutuManduDatabase db) {
+        db.getTireDao().deleteAllTireUsages();
+        db.getTireDao().deleteAllTireLists();
+        db.getRefuelingDao().deleteAll();
+        db.getOtherCostDao().deleteAll();
+        db.getReminderDao().deleteAll();
+        db.getStationDao().deleteAll();
+        db.getFuelTypeDao().deleteAll();
+        db.getCarDao().deleteAll();
     }
 
     private CSVFormat findDelimiter(CSVFormat format) throws IOException {
@@ -467,173 +469,193 @@ public class CSVExportImport {
         return CSVFormat.Builder.create(format).setDelimiter(',').get();
     }
 
-    private String getSafe(CSVRecord record, String column) {
-        return (record.isMapped(column) && record.isSet(column)) ? record.get(column) : null;
+    private String getSafe(CSVRecord csvRecord, String column) {
+        return (csvRecord.isMapped(column) && csvRecord.isSet(column)) ? csvRecord.get(column) : null;
     }
 
     private void importCars(AutuManduDatabase db, CSVFormat format) throws IOException {
         doImport(TABLE_CAR + FILE_EXTENSION, format, csvRecord -> {
-            Long id = CSVConvert.toLong(getSafe(csvRecord, _ID));
-            if (id == null) return;
-
-            var car = new Car();
-            car.setId(id);
-            car.setName(Objects.requireNonNullElse(getSafe(csvRecord, CAR_NAME), "Unknown"));
-            var color = CSVConvert.toInteger(getSafe(csvRecord, CAR_COLOR));
-            car.setColor(color != null ? color : 0);
-            var initMileage = CSVConvert.toInteger(getSafe(csvRecord, CAR_INITIAL_MILEAGE));
-            car.setInitialMileage(initMileage != null ? initMileage : 0);
-            car.setSuspendedSince(CSVConvert.toDate(getSafe(csvRecord, CAR_SUSPENDED_SINCE)));
-            var price = CSVConvert.toFloat(getSafe(csvRecord, CAR_BUYING_PRICE));
-            car.setBuyingPrice(price != null ? price.doubleValue() : 0.0);
-            var tires = CSVConvert.toInteger(getSafe(csvRecord, CAR_NUM_TIRES));
-            car.setNumTires(tires != null ? tires : 4);
-            db.getCarDao().insert(car);
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                db.getCarDao().insert(mapCar(csvRecord, id));
+            }
         });
+    }
+
+    private Car mapCar(CSVRecord csvRecord, long id) {
+        var car = new Car();
+        car.setId(id);
+        car.setName(Objects.requireNonNullElse(getSafe(csvRecord, CAR_NAME), DEFAULT_NAME));
+        var color = CSVConvert.toInteger(getSafe(csvRecord, CAR_COLOR));
+        car.setColor(color != null ? color : 0);
+        var initMileage = CSVConvert.toInteger(getSafe(csvRecord, CAR_INITIAL_MILEAGE));
+        car.setInitialMileage(initMileage != null ? initMileage : 0);
+        car.setSuspendedSince(CSVConvert.toDate(getSafe(csvRecord, CAR_SUSPENDED_SINCE)));
+        var price = CSVConvert.toFloat(getSafe(csvRecord, CAR_BUYING_PRICE));
+        car.setBuyingPrice(price != null ? price.doubleValue() : 0.0);
+        var tires = CSVConvert.toInteger(getSafe(csvRecord, CAR_NUM_TIRES));
+        car.setNumTires(tires != null ? tires : 4);
+        return car;
     }
 
     private void importFuelTypes(AutuManduDatabase db, CSVFormat format) throws IOException {
         doImport(TABLE_FUEL_TYPE + FILE_EXTENSION, format, csvRecord -> {
-            Long id = CSVConvert.toLong(getSafe(csvRecord, _ID));
-            if (id == null) return;
-
-            var fuelType = new FuelType();
-            fuelType.setId(id);
-            fuelType.setName(Objects.requireNonNullElse(getSafe(csvRecord, FUEL_TYPE_NAME), "Unknown"));
-            fuelType.setCategory(getSafe(csvRecord, FUEL_TYPE_CATEGORY));
-            db.getFuelTypeDao().insert(fuelType);
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                var fuelType = new FuelType();
+                fuelType.setId(id);
+                fuelType.setName(Objects.requireNonNullElse(getSafe(csvRecord, FUEL_TYPE_NAME), DEFAULT_NAME));
+                fuelType.setCategory(getSafe(csvRecord, FUEL_TYPE_CATEGORY));
+                db.getFuelTypeDao().insert(fuelType);
+            }
         });
     }
 
     private void importStations(AutuManduDatabase db, CSVFormat format) throws IOException {
         doImport(TABLE_STATION + FILE_EXTENSION, format, csvRecord -> {
-            Long id = CSVConvert.toLong(getSafe(csvRecord, _ID));
-            if (id == null) return;
-
-            var station = new Station();
-            station.setId(id);
-            station.setName(Objects.requireNonNullElse(getSafe(csvRecord, STATION_NAME), "Unknown"));
-            db.getStationDao().insert(station);
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                var station = new Station();
+                station.setId(id);
+                station.setName(Objects.requireNonNullElse(getSafe(csvRecord, STATION_NAME), DEFAULT_NAME));
+                db.getStationDao().insert(station);
+            }
         });
     }
 
     private void importOtherCosts(AutuManduDatabase db, CSVFormat format) throws IOException {
         doImport(TABLE_OTHER_COST + FILE_EXTENSION, format, csvRecord -> {
-            Long id = CSVConvert.toLong(getSafe(csvRecord, _ID));
-            if (id == null) return;
-
-            var otherCost = new OtherCost();
-            otherCost.setId(id);
-            otherCost.setTitle(Objects.requireNonNullElse(getSafe(csvRecord, OTHER_COST_TITLE), "Unknown"));
-            var date = CSVConvert.toDate(getSafe(csvRecord, OTHER_COST_DATE));
-            otherCost.setDate(date != null ? date : new Date());
-            otherCost.setMileage(CSVConvert.toInteger(getSafe(csvRecord, OTHER_COST_MILEAGE)));
-            var price = CSVConvert.toFloat(getSafe(csvRecord, OTHER_COST_PRICE));
-            otherCost.setPrice(price != null ? price : 0f);
-            var interval = CSVConvert.toRecurrenceInterval(getSafe(csvRecord, OTHER_COST_RECURRENCE_INTERVAL));
-            otherCost.setRecurrenceInterval(interval != null ? interval : org.juanro.autumandu.model.entity.helper.RecurrenceInterval.ONCE);
-            var mult = CSVConvert.toInteger(getSafe(csvRecord, OTHER_COST_RECURRENCE_MULTIPLIER));
-            otherCost.setRecurrenceMultiplier(mult != null ? mult : 0);
-            otherCost.setEndDate(CSVConvert.toDate(getSafe(csvRecord, OTHER_COST_END_DATE)));
-            otherCost.setNote(Objects.requireNonNullElse(getSafe(csvRecord, OTHER_COST_NOTE), ""));
-            var carId = CSVConvert.toLong(getSafe(csvRecord, OTHER_COST_CAR_ID));
-            otherCost.setCarId(carId != null ? carId : 0L);
-            db.getOtherCostDao().insert(otherCost);
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                db.getOtherCostDao().insert(mapOtherCost(csvRecord, id));
+            }
         });
+    }
+
+    private OtherCost mapOtherCost(CSVRecord csvRecord, long id) {
+        var otherCost = new OtherCost();
+        otherCost.setId(id);
+        otherCost.setTitle(Objects.requireNonNullElse(getSafe(csvRecord, OTHER_COST_TITLE), DEFAULT_NAME));
+        var date = CSVConvert.toDate(getSafe(csvRecord, OTHER_COST_DATE));
+        otherCost.setDate(date != null ? date : new Date());
+        otherCost.setMileage(CSVConvert.toInteger(getSafe(csvRecord, OTHER_COST_MILEAGE)));
+        var price = CSVConvert.toFloat(getSafe(csvRecord, OTHER_COST_PRICE));
+        otherCost.setPrice(price != null ? price : 0f);
+        var interval = CSVConvert.toRecurrenceInterval(getSafe(csvRecord, OTHER_COST_RECURRENCE_INTERVAL));
+        otherCost.setRecurrenceInterval(interval != null ? interval : org.juanro.autumandu.model.entity.helper.RecurrenceInterval.ONCE);
+        var mult = CSVConvert.toInteger(getSafe(csvRecord, OTHER_COST_RECURRENCE_MULTIPLIER));
+        otherCost.setRecurrenceMultiplier(mult != null ? mult : 0);
+        otherCost.setEndDate(CSVConvert.toDate(getSafe(csvRecord, OTHER_COST_END_DATE)));
+        otherCost.setNote(Objects.requireNonNullElse(getSafe(csvRecord, OTHER_COST_NOTE), ""));
+        var carId = CSVConvert.toLong(getSafe(csvRecord, OTHER_COST_CAR_ID));
+        otherCost.setCarId(carId != null ? carId : 0L);
+        return otherCost;
     }
 
     private void importRefuelings(AutuManduDatabase db, CSVFormat format) throws IOException {
         doImport(TABLE_REFUELING + FILE_EXTENSION, format, csvRecord -> {
-            Long id = CSVConvert.toLong(getSafe(csvRecord, _ID));
-            if (id == null) return;
-
-            var refueling = new Refueling();
-            refueling.setId(id);
-            var date = CSVConvert.toDate(getSafe(csvRecord, REFUELING_DATE));
-            refueling.setDate(date != null ? date : new Date());
-            var mileage = CSVConvert.toInteger(getSafe(csvRecord, REFUELING_MILEAGE));
-            refueling.setMileage(mileage != null ? mileage : 0);
-            var volume = CSVConvert.toFloat(getSafe(csvRecord, REFUELING_VOLUME));
-            refueling.setVolume(volume != null ? volume : 0f);
-            var price = CSVConvert.toFloat(getSafe(csvRecord, REFUELING_PRICE));
-            refueling.setPrice(price != null ? price : 0f);
-            var partial = CSVConvert.toBoolean(getSafe(csvRecord, REFUELING_PARTIAL));
-            refueling.setPartial(Boolean.TRUE.equals(partial));
-            refueling.setNote(Objects.requireNonNullElse(getSafe(csvRecord, REFUELING_NOTE), ""));
-            var fuelId = CSVConvert.toLong(getSafe(csvRecord, REFUELING_FUEL_TYPE_ID));
-            refueling.setFuelTypeId(fuelId != null ? fuelId : 0L);
-            var stationId = CSVConvert.toLong(getSafe(csvRecord, REFUELING_STATION_ID));
-            refueling.setStationId(stationId != null ? stationId : 0L);
-            var carId = CSVConvert.toLong(getSafe(csvRecord, REFUELING_CAR_ID));
-            refueling.setCarId(carId != null ? carId : 0L);
-            db.getRefuelingDao().insert(refueling);
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                db.getRefuelingDao().insert(mapRefueling(csvRecord, id));
+            }
         });
+    }
+
+    private Refueling mapRefueling(CSVRecord csvRecord, long id) {
+        var refueling = new Refueling();
+        refueling.setId(id);
+        var date = CSVConvert.toDate(getSafe(csvRecord, REFUELING_DATE));
+        refueling.setDate(date != null ? date : new Date());
+        var mileage = CSVConvert.toInteger(getSafe(csvRecord, REFUELING_MILEAGE));
+        refueling.setMileage(mileage != null ? mileage : 0);
+        var volume = CSVConvert.toFloat(getSafe(csvRecord, REFUELING_VOLUME));
+        refueling.setVolume(volume != null ? volume : 0f);
+        var price = CSVConvert.toFloat(getSafe(csvRecord, REFUELING_PRICE));
+        refueling.setPrice(price != null ? price : 0f);
+        var partial = CSVConvert.toBoolean(getSafe(csvRecord, REFUELING_PARTIAL));
+        refueling.setPartial(Boolean.TRUE.equals(partial));
+        refueling.setNote(Objects.requireNonNullElse(getSafe(csvRecord, REFUELING_NOTE), ""));
+        var fuelId = CSVConvert.toLong(getSafe(csvRecord, REFUELING_FUEL_TYPE_ID));
+        refueling.setFuelTypeId(fuelId != null ? fuelId : 0L);
+        var stationId = CSVConvert.toLong(getSafe(csvRecord, REFUELING_STATION_ID));
+        refueling.setStationId(stationId != null ? stationId : 0L);
+        var carId = CSVConvert.toLong(getSafe(csvRecord, REFUELING_CAR_ID));
+        refueling.setCarId(carId != null ? carId : 0L);
+        return refueling;
     }
 
     private void importReminders(AutuManduDatabase db, CSVFormat format) throws IOException {
         doImport(TABLE_REMINDER + FILE_EXTENSION, format, csvRecord -> {
-            Long id = CSVConvert.toLong(getSafe(csvRecord, _ID));
-            if (id == null) return;
-
-            var reminder = new Reminder();
-            reminder.setId(id);
-            reminder.setTitle(Objects.requireNonNullElse(getSafe(csvRecord, REMINDER_TITLE), "Unknown"));
-            reminder.setAfterTimeSpanUnit(CSVConvert.toTimeSpanUnit(getSafe(csvRecord, REMINDER_AFTER_TIME_SPAN_UNIT)));
-            reminder.setAfterTimeSpanCount(CSVConvert.toInteger(getSafe(csvRecord, REMINDER_AFTER_TIME_SPAN_COUNT)));
-            reminder.setAfterDistance(CSVConvert.toInteger(getSafe(csvRecord, REMINDER_AFTER_DISTANCE)));
-            var startDate = CSVConvert.toDate(getSafe(csvRecord, REMINDER_START_DATE));
-            reminder.setStartDate(startDate != null ? startDate : new Date());
-            var startMileage = CSVConvert.toInteger(getSafe(csvRecord, REMINDER_START_MILEAGE));
-            reminder.setStartMileage(startMileage != null ? startMileage : 0);
-            var dismissed = CSVConvert.toBoolean(getSafe(csvRecord, REMINDER_NOTIFICATION_DISMISSED));
-            reminder.setNotificationDismissed(Boolean.TRUE.equals(dismissed));
-            reminder.setSnoozedUntil(CSVConvert.toDate(getSafe(csvRecord, REMINDER_SNOOZED_UNTIL)));
-            var carId = CSVConvert.toLong(getSafe(csvRecord, REMINDER_CAR_ID));
-            reminder.setCarId(carId != null ? carId : 0L);
-            db.getReminderDao().insert(reminder);
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                db.getReminderDao().insert(mapReminder(csvRecord, id));
+            }
         });
+    }
+
+    private Reminder mapReminder(CSVRecord csvRecord, long id) {
+        var reminder = new Reminder();
+        reminder.setId(id);
+        reminder.setTitle(Objects.requireNonNullElse(getSafe(csvRecord, REMINDER_TITLE), DEFAULT_NAME));
+        reminder.setAfterTimeSpanUnit(CSVConvert.toTimeSpanUnit(getSafe(csvRecord, REMINDER_AFTER_TIME_SPAN_UNIT)));
+        reminder.setAfterTimeSpanCount(CSVConvert.toInteger(getSafe(csvRecord, REMINDER_AFTER_TIME_SPAN_COUNT)));
+        reminder.setAfterDistance(CSVConvert.toInteger(getSafe(csvRecord, REMINDER_AFTER_DISTANCE)));
+        var startDate = CSVConvert.toDate(getSafe(csvRecord, REMINDER_START_DATE));
+        reminder.setStartDate(startDate != null ? startDate : new Date());
+        var startMileage = CSVConvert.toInteger(getSafe(csvRecord, REMINDER_START_MILEAGE));
+        reminder.setStartMileage(startMileage != null ? startMileage : 0);
+        var dismissed = CSVConvert.toBoolean(getSafe(csvRecord, REMINDER_NOTIFICATION_DISMISSED));
+        reminder.setNotificationDismissed(Boolean.TRUE.equals(dismissed));
+        reminder.setSnoozedUntil(CSVConvert.toDate(getSafe(csvRecord, REMINDER_SNOOZED_UNTIL)));
+        var carId = CSVConvert.toLong(getSafe(csvRecord, REMINDER_CAR_ID));
+        reminder.setCarId(carId != null ? carId : 0L);
+        return reminder;
     }
 
     private void importTireList(AutuManduDatabase db, CSVFormat format) throws IOException {
         doImport(TABLE_TIRE_LIST + FILE_EXTENSION, format, csvRecord -> {
-            Long id = CSVConvert.toLong(getSafe(csvRecord, _ID));
-            if (id == null) return;
-
-            var tireList = new TireList();
-            tireList.setId(id);
-            var buyDate = CSVConvert.toDate(getSafe(csvRecord, TIRE_LIST_BUY_DATE));
-            tireList.setBuyDate(buyDate != null ? buyDate : new Date());
-            tireList.setTrashDate(CSVConvert.toDate(getSafe(csvRecord, TIRE_LIST_TRASH_DATE)));
-            var price = CSVConvert.toFloat(getSafe(csvRecord, TIRE_LIST_PRICE));
-            tireList.setPrice(price != null ? price : 0f);
-            var quantity = CSVConvert.toInteger(getSafe(csvRecord, TIRE_LIST_QUANTITY));
-            tireList.setQuantity(quantity != null ? quantity : 0);
-            tireList.setManufacturer(Objects.requireNonNullElse(getSafe(csvRecord, TIRE_LIST_MANUFACTURER), "Unknown"));
-            tireList.setModel(Objects.requireNonNullElse(getSafe(csvRecord, TIRE_LIST_MODEL), "Unknown"));
-            tireList.setNote(Objects.requireNonNullElse(getSafe(csvRecord, TIRE_LIST_NOTE), ""));
-            var carId = CSVConvert.toLong(getSafe(csvRecord, TIRE_LIST_CAR_ID));
-            tireList.setCarId(carId != null ? carId : 0L);
-            db.getTireDao().insert(tireList);
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                db.getTireDao().insert(mapTireList(csvRecord, id));
+            }
         });
+    }
+
+    private TireList mapTireList(CSVRecord csvRecord, long id) {
+        var tireList = new TireList();
+        tireList.setId(id);
+        var buyDate = CSVConvert.toDate(getSafe(csvRecord, TIRE_LIST_BUY_DATE));
+        tireList.setBuyDate(buyDate != null ? buyDate : new Date());
+        tireList.setTrashDate(CSVConvert.toDate(getSafe(csvRecord, TIRE_LIST_TRASH_DATE)));
+        var price = CSVConvert.toFloat(getSafe(csvRecord, TIRE_LIST_PRICE));
+        tireList.setPrice(price != null ? price : 0f);
+        var quantity = CSVConvert.toInteger(getSafe(csvRecord, TIRE_LIST_QUANTITY));
+        tireList.setQuantity(quantity != null ? quantity : 0);
+        tireList.setManufacturer(Objects.requireNonNullElse(getSafe(csvRecord, TIRE_LIST_MANUFACTURER), DEFAULT_NAME));
+        tireList.setModel(Objects.requireNonNullElse(getSafe(csvRecord, TIRE_LIST_MODEL), DEFAULT_NAME));
+        tireList.setNote(Objects.requireNonNullElse(getSafe(csvRecord, TIRE_LIST_NOTE), ""));
+        var carId = CSVConvert.toLong(getSafe(csvRecord, TIRE_LIST_CAR_ID));
+        tireList.setCarId(carId != null ? carId : 0L);
+        return tireList;
     }
 
     private void importTireUsages(AutuManduDatabase db, CSVFormat format) throws IOException {
         doImport(TABLE_TIRE_USAGE + FILE_EXTENSION, format, csvRecord -> {
-            Long id = CSVConvert.toLong(getSafe(csvRecord, _ID));
-            if (id == null) return;
-
-            var tireUsage = new TireUsage();
-            tireUsage.setId(id);
-            var mountDist = CSVConvert.toInteger(getSafe(csvRecord, TIRE_USAGE_DISTANCE_MOUNT));
-            tireUsage.setDistanceMount(mountDist != null ? mountDist : 0);
-            var mountDate = CSVConvert.toDate(getSafe(csvRecord, TIRE_USAGE_DATE_MOUNT));
-            tireUsage.setDateMount(mountDate != null ? mountDate : new Date());
-            var umountDist = CSVConvert.toInteger(getSafe(csvRecord, TIRE_USAGE_DISTANCE_UMOUNT));
-            tireUsage.setDistanceUmount(umountDist != null ? umountDist : 0);
-            tireUsage.setDateUmount(CSVConvert.toDate(getSafe(csvRecord, TIRE_USAGE_DATE_UMOUNT)));
-            var tireId = CSVConvert.toLong(getSafe(csvRecord, TIRE_USAGE_TIRE_ID));
-            tireUsage.setTireId(tireId != null ? tireId : 0L);
-            db.getTireDao().insert(tireUsage);
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                var tireUsage = new TireUsage();
+                tireUsage.setId(id);
+                var mountDist = CSVConvert.toInteger(getSafe(csvRecord, TIRE_USAGE_DISTANCE_MOUNT));
+                tireUsage.setDistanceMount(mountDist != null ? mountDist : 0);
+                var mountDate = CSVConvert.toDate(getSafe(csvRecord, TIRE_USAGE_DATE_MOUNT));
+                tireUsage.setDateMount(mountDate != null ? mountDate : new Date());
+                var umountDist = CSVConvert.toInteger(getSafe(csvRecord, TIRE_USAGE_DISTANCE_UMOUNT));
+                tireUsage.setDistanceUmount(umountDist != null ? umountDist : 0);
+                tireUsage.setDateUmount(CSVConvert.toDate(getSafe(csvRecord, TIRE_USAGE_DATE_UMOUNT)));
+                var tireId = CSVConvert.toLong(getSafe(csvRecord, TIRE_USAGE_TIRE_ID));
+                tireUsage.setTireId(tireId != null ? tireId : 0L);
+                db.getTireDao().insert(tireUsage);
+            }
         });
     }
 
@@ -644,7 +666,7 @@ public class CSVExportImport {
 
     @FunctionalInterface
     private interface ImportAction {
-        void importRecord(CSVRecord record) throws IOException;
+        void importRecord(CSVRecord csvRecord) throws IOException;
     }
 
     private void doExport(String fileName, String[] columns, ExportAction action) throws IOException {

@@ -24,7 +24,7 @@
 
     <device-transfer>
         <!-- Para transferencias directas entre dispositivos (ej. cable o Wi-Fi directo),
-             solemos querer pasar todo lo que hay en cloud + archivos locales si los hay -->
+             solemos querer pasar íntegramente lo que hay en cloud + archivos locales si los hay -->
         <include domain="database" path="."/>
         <include domain="sharedpref" path="."/>
         <include domain="file" path="."/>

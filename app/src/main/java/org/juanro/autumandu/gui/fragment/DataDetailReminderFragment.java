@@ -32,6 +32,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.gui.adapter.CarArrayAdapter;
 import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
 import org.juanro.autumandu.gui.util.DateTimeInput;
 import org.juanro.autumandu.model.entity.Car;
@@ -199,7 +200,9 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
                 spnAfterTimeUnit.setVisibility(position == 0 || position == 2 ? View.VISIBLE : View.GONE);
             }
             @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Not used
+            }
         });
     }
 
@@ -238,32 +241,14 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
                 viewModel.setSelectedCarId(id);
             }
             @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Not used
+            }
         });
 
         viewModel.getActiveCars().observe(getViewLifecycleOwner(), cars -> {
-            spnCar.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, cars) {
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v1 = (TextView) super.getView(position, convertView, parent);
-                    Car item = getItem(position);
-                    if (item != null) v1.setText(item.getName());
-                    return v1;
-                }
-                @Override
-                public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v1 = (TextView) super.getDropDownView(position, convertView, parent);
-                    Car item = getItem(position);
-                    if (item != null) v1.setText(item.getName());
-                    return v1;
-                }
-                @Override
-                public long getItemId(int position) {
-                    Car item = getItem(position);
-                    return item != null ? item.getId() : -1;
-                }
-            });
+            spnCar.setAdapter(new CarArrayAdapter(requireContext(), cars));
+
             if (mInitialCarId != -1) {
                 int count = spnCar.getCount();
                 for (int i = 0; i < count; i++) {
@@ -291,13 +276,11 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
         boolean valid = !edtTitle.getText().toString().trim().isEmpty();
         if (valid) {
             int position = spnAfterType.getSelectedItemPosition();
-            if (position == 0) {
-                valid = !TextUtils.isEmpty(edtAfterDistance.getText()) && !TextUtils.isEmpty(edtAfterTime.getText());
-            } else if (position == 1) {
-                valid = !TextUtils.isEmpty(edtAfterDistance.getText());
-            } else {
-                valid = !TextUtils.isEmpty(edtAfterTime.getText());
-            }
+            valid = switch (position) {
+                case 0 -> !TextUtils.isEmpty(edtAfterDistance.getText()) && !TextUtils.isEmpty(edtAfterTime.getText());
+                case 1 -> !TextUtils.isEmpty(edtAfterDistance.getText());
+                default -> !TextUtils.isEmpty(edtAfterTime.getText());
+            };
         }
         return valid;
     }

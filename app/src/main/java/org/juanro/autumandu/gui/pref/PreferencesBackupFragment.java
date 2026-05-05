@@ -116,7 +116,9 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
                         try {
                             settings.put("webdav_url", url);
                             am.setUserData(account, "org.juanro.autumandu.sync.provider.settings", settings.toString());
-                        } catch (org.json.JSONException ignored) {}
+                        } catch (org.json.JSONException ignored) {
+                            // Should not happen as we are creating the object ourselves
+                        }
 
                         updateSyncPreference();
                         SyncManager.runSyncOnce(requireContext());
@@ -164,11 +166,8 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
         mViewModel = new ViewModelProvider(this).get(BackupViewModel.class);
 
         Bundle args = getArguments();
-        if (args != null) {
-            if (args.containsKey(EXTRA_RESTORE_DB_URI)) {
-                performRestore(args.getParcelable(EXTRA_RESTORE_DB_URI));
-            }
-            // For CSV import we use a default path, but we could handle a URI here if needed.
+        if (args != null && args.containsKey(EXTRA_RESTORE_DB_URI)) {
+            performRestore(args.getParcelable(EXTRA_RESTORE_DB_URI));
         }
 
         SwitchPreferenceCompat autoBackup = findPreference(PREFERENCE_AUTO_BACKUP);
