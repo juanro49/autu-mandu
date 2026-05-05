@@ -71,7 +71,6 @@ import com.kubit.charts.components.chart.linechart.model.LineStyle
 import com.kubit.charts.components.chart.linechart.model.Point
 import com.kubit.charts.components.scaffold.ChartScaffold
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import org.juanro.autumandu.data.report.AbstractReportChartData
 import org.juanro.autumandu.data.report.OverallTrendReportChartData
@@ -96,60 +95,80 @@ fun KubitColumnChart(
         val allXValues = remember(series.barSeries) { extractSortedXValues(series.barSeries) }
         val bounds = remember(series, allXValues) { calculateStackedBounds(series, allXValues) }
 
-        val rangeY = bounds.maxY - bounds.minY
-        val safeRangeY = if (rangeY > 0f) rangeY else 1f
-        val effectiveYMin = bounds.minY - safeRangeY * 0.10f
-        val effectiveYMax = bounds.maxY + safeRangeY * 0.15f
-        val effectiveRangeY = effectiveYMax - effectiveYMin
+        val chartResources = loadChartResources(config)
+        val yBounds = calculateEffectiveYBounds(bounds)
 
-        val segmentFormat = stringResource(id = R.string.chart_content_description_segment)
-        val barThickness = dimensionResource(id = R.dimen.chart_bar_thickness)
-        val barDataList = remember(allXValues, rawData, selectedSegment, segmentFormat, barThickness) {
-            createBarDataList(allXValues, rawData, selectedSegment, segmentFormat, barThickness, yAxisLabel)
+        val barDataList = remember(allXValues, rawData, selectedSegment, chartResources.segmentFormat, chartResources.barThickness) {
+            createBarDataList(allXValues, rawData, selectedSegment, chartResources.segmentFormat, chartResources.barThickness, yAxisLabel)
         }
 
         val trendLines = remember(series.trendSeries, allXValues) {
             createTrendLines(series.trendSeries, allXValues)
         }
 
-        val labelStyle = remember(textColor) { TextStyle(color = textColor.copy(alpha = 0.5f), fontSize = 9.sp) }
-        val gridStyle = remember(isDark) {
-            AxisStepStyle.dashed(
-                strokeWidth = 1.dp,
-                strokeColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.1f),
-                dashLength = 4.dp,
-                gapLength = 4.dp,
-                phase = 0.dp
-            )
-        }
-
-        val ySteps = remember(effectiveYMin, effectiveRangeY) {
-            createYSteps(effectiveYMin, effectiveRangeY, labelStyle, gridStyle, yAxisLabel)
+        val styles = createChartStyles(isDark, textColor)
+        val ySteps = remember(yBounds.effectiveYMin, yBounds.effectiveRangeY) {
+            createYSteps(yBounds.effectiveYMin, yBounds.effectiveRangeY, styles.labelStyle, styles.gridStyle, yAxisLabel)
         }
         val xSteps = remember(allXValues) {
-            createXSteps(allXValues, labelStyle, gridStyle, xAxisLabel)
+            createXSteps(allXValues, styles.labelStyle, styles.gridStyle, xAxisLabel)
         }
-
-        val yAxisData = remember(ySteps) { AxisData(axisSteps = ySteps) }
-        val xAxisData = remember(xSteps) { AxisData(axisSteps = xSteps) }
-
-        val xStepSize = dimensionResource(id = if (config.isCalculator) R.dimen.chart_calculator_x_step else R.dimen.chart_column_x_step)
-        val axisPadding = AxisPadding(
-            start = dimensionResource(id = if (config.isCalculator) R.dimen.chart_calculator_axis_padding_start else R.dimen.chart_axis_padding_start),
-            end = 20.dp,
-            top = 0.dp,
-            bottom = dimensionResource(id = R.dimen.chart_axis_padding_bottom)
-        )
 
         ChartContainer(
             config = config,
-            uiConfig = ChartUiConfig(isDark, textColor, xAxisData, yAxisData, xStepSize, axisPadding, effectiveRangeY, xAxisLabelRotation = config.xAxisLabelRotation),
+            uiConfig = ChartUiConfig(isDark, textColor, AxisData(xSteps), AxisData(ySteps), chartResources.xStepSize, chartResources.axisPadding, yBounds.effectiveRangeY, config.xAxisLabelRotation),
             dataConfig = ChartDataConfig(barDataList, trendLines, selectedSegment),
             yAxisLabel = yAxisLabel,
             onSelectionClear = { selectedSegment = null },
             onSegmentClick = { segment -> selectedSegment = if (selectedSegment == segment) null else segment }
         )
     }
+}
+
+private data class ChartResources(
+    val segmentFormat: String,
+    val barThickness: androidx.compose.ui.unit.Dp,
+    val xStepSize: androidx.compose.ui.unit.Dp,
+    val axisPadding: AxisPadding
+)
+
+@Composable
+private fun loadChartResources(config: ColumnChartConfig): ChartResources {
+    return ChartResources(
+        segmentFormat = stringResource(id = R.string.chart_content_description_segment),
+        barThickness = dimensionResource(id = R.dimen.chart_bar_thickness),
+        xStepSize = dimensionResource(id = if (config.isCalculator) R.dimen.chart_calculator_x_step else R.dimen.chart_column_x_step),
+        axisPadding = AxisPadding(
+            start = dimensionResource(id = if (config.isCalculator) R.dimen.chart_calculator_axis_padding_start else R.dimen.chart_axis_padding_start),
+            end = 20.dp,
+            top = 0.dp,
+            bottom = dimensionResource(id = R.dimen.chart_axis_padding_bottom)
+        )
+    )
+}
+
+private data class EffectiveYBounds(val effectiveYMin: Float, val effectiveYMax: Float, val effectiveRangeY: Float)
+
+private fun calculateEffectiveYBounds(bounds: StackedBounds): EffectiveYBounds {
+    val rangeY = bounds.maxY - bounds.minY
+    val safeRangeY = if (rangeY > 0f) rangeY else 1f
+    val effectiveYMin = bounds.minY - safeRangeY * 0.10f
+    val effectiveYMax = bounds.maxY + safeRangeY * 0.15f
+    return EffectiveYBounds(effectiveYMin, effectiveYMax, effectiveYMax - effectiveYMin)
+}
+
+private data class ChartStyles(val labelStyle: TextStyle, val gridStyle: AxisStepStyle)
+
+private fun createChartStyles(isDark: Boolean, textColor: Color): ChartStyles {
+    val labelStyle = TextStyle(color = textColor.copy(alpha = 0.5f), fontSize = 9.sp)
+    val gridStyle = AxisStepStyle.dashed(
+        strokeWidth = 1.dp,
+        strokeColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.1f),
+        dashLength = 4.dp,
+        gapLength = 4.dp,
+        phase = 0.dp
+    )
+    return ChartStyles(labelStyle, gridStyle)
 }
 
 data class ColumnChartConfig(
@@ -321,7 +340,6 @@ private fun createXSteps(
     gridStyle: AxisStepStyle,
     xAxisLabel: (Float) -> String
 ): PersistentList<AxisStep> {
-    if (allXValues.isEmpty()) return persistentListOf<AxisStep>()
     val steps = mutableListOf<AxisStep>()
     steps.add(AxisStep(-0.5f, "", labelStyle, stepStyle = null))
     for (i in allXValues.indices) {
@@ -404,7 +422,18 @@ private fun ChartContainer(
                         )
                     },
                     content = { scaffoldData ->
-                        ChartMainContent(config.isCalculator, dataConfig.barDataList, dataConfig.trendLines, uiConfig.xAxisData, uiConfig.yAxisData, uiConfig.xStepSize, dynamicYStepSize, scaffoldData.horizontalScroll, scaffoldData.zoom, scaffoldData.onHorizontalScrollChangeRequest, onSegmentClick)
+                        ChartMainContent(
+                            isCalculator = config.isCalculator,
+                            dataConfig = dataConfig,
+                            uiConfig = uiConfig,
+                            yStepSize = dynamicYStepSize,
+                            stateParams = ChartStateParams(
+                                horizontalScroll = scaffoldData.horizontalScroll,
+                                zoom = scaffoldData.zoom,
+                                onScrollRequest = scaffoldData.onHorizontalScrollChangeRequest
+                            ),
+                            onSegmentClick = onSegmentClick
+                        )
                     }
                 )
             }
@@ -448,51 +477,52 @@ private fun SelectionPanel(selectedSegment: BarChartSegmentData?, isDark: Boolea
     }
 }
 
+private data class ChartStateParams(
+    val horizontalScroll: androidx.compose.ui.unit.Dp,
+    val zoom: Float,
+    val onScrollRequest: ((Float) -> Unit)?
+)
+
 @Composable
 private fun ChartMainContent(
     isCalculator: Boolean,
-    barDataList: PersistentList<BarChartData>,
-    trendLines: PersistentList<Line>,
-    xAxisData: AxisData,
-    yAxisData: AxisData,
-    xStepSize: androidx.compose.ui.unit.Dp,
+    dataConfig: ChartDataConfig,
+    uiConfig: ChartUiConfig,
     yStepSize: androidx.compose.ui.unit.Dp,
-    horizontalScroll: androidx.compose.ui.unit.Dp,
-    zoom: Float,
-    onScrollRequest: ((Float) -> Unit)?,
+    stateParams: ChartStateParams,
     onSegmentClick: (BarChartSegmentData) -> Unit
 ) {
     var initialScrollDone by remember { mutableStateOf(false) }
-    LaunchedEffect(onScrollRequest) {
+    LaunchedEffect(stateParams.onScrollRequest) {
         if (!initialScrollDone) {
             val scrollTarget = if (isCalculator) 0f else Float.MAX_VALUE
-            onScrollRequest?.invoke(scrollTarget)
+            stateParams.onScrollRequest?.invoke(scrollTarget)
             initialScrollDone = true
         }
     }
 
     BarChart(
-        data = barDataList,
-        xAxisData = xAxisData,
-        yAxisData = yAxisData,
-        xAxisStepSize = xStepSize,
+        data = dataConfig.barDataList,
+        xAxisData = uiConfig.xAxisData,
+        yAxisData = uiConfig.yAxisData,
+        xAxisStepSize = uiConfig.xStepSize,
         yAxisStepSize = yStepSize,
-        zoom = zoom,
-        horizontalScroll = horizontalScroll,
+        zoom = stateParams.zoom,
+        horizontalScroll = stateParams.horizontalScroll,
         modifier = Modifier.fillMaxSize().background(Color.Transparent).clipToBounds(),
         onBarClick = onSegmentClick
     )
 
-    if (trendLines.isNotEmpty()) {
+    if (dataConfig.trendLines.isNotEmpty()) {
         LineChart(
             modifier = Modifier.fillMaxSize().clipToBounds(),
-            lines = trendLines,
-            xAxisData = xAxisData,
-            yAxisData = yAxisData,
-            xAxisStepSize = xStepSize,
+            lines = dataConfig.trendLines,
+            xAxisData = uiConfig.xAxisData,
+            yAxisData = uiConfig.yAxisData,
+            xAxisStepSize = uiConfig.xStepSize,
             yAxisStepSize = yStepSize,
-            horizontalScroll = horizontalScroll,
-            zoom = zoom,
+            horizontalScroll = stateParams.horizontalScroll,
+            zoom = stateParams.zoom,
             backgroundColor = Color.Transparent
         )
     }

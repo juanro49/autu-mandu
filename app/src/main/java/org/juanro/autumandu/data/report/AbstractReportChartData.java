@@ -53,7 +53,7 @@ public abstract class AbstractReportChartData {
     protected final int mColor;
     protected final List<DataPoint> mDataPoints = new ArrayList<>();
 
-    public AbstractReportChartData(Context context, String name, int color) {
+    protected AbstractReportChartData(Context context, String name, int color) {
         mContext = context.getApplicationContext();
         mName = name;
         mColor = color;

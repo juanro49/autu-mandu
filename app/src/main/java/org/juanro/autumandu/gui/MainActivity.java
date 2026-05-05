@@ -111,9 +111,6 @@ public class MainActivity extends AppCompatActivity implements
             result -> {
                 if (result.getResultCode() == RESULT_CANCELED) {
                     finish();
-                } else {
-                    mViewModel.getCars().removeObservers(this);
-                    mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
                 }
             }
     );
@@ -121,8 +118,6 @@ public class MainActivity extends AppCompatActivity implements
     private final ActivityResultLauncher<Intent> mAddDataLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                mViewModel.getCars().removeObservers(this);
-                mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
                 if (result.getResultCode() == RESULT_OK && result.getData() != null && mCurrentFragment != null) {
                     long newId = result.getData().getLongExtra(DataDetailActivity.EXTRA_NEW_ID, 0);
                     View view = mCurrentFragment.getView();
@@ -225,6 +220,9 @@ public class MainActivity extends AppCompatActivity implements
         updateSyncMenuItem();
 
         AutoBackupWorker.enqueue(this);
+
+        // Ensure navigation drawer is up to date and ViewModel is connected to current DB instance
+        mViewModel.refreshSources();
     }
 
     @Override
@@ -235,10 +233,6 @@ public class MainActivity extends AppCompatActivity implements
         {
             invalidateOptionsMenu();
         }
-
-        // Cars could have been changed, so the drawer has to be updated.
-        mViewModel.getCars().removeObservers(this);
-        mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
 
         // If a new refueling has been added, show Snackbar with details.
         if (requestCode % REQUEST_ADD_DATA == DataDetailActivity.EXTRA_EDIT_REFUELING
@@ -549,10 +543,6 @@ public class MainActivity extends AppCompatActivity implements
             if (mSyncMenuItem != null) {
                 mSyncMenuItem.setActionView(null);
             }
-
-            // Cars could have changed, so we need to update navigation drawer.
-            mViewModel.getCars().removeObservers(this);
-            mViewModel.getCars().observe(this, this::updateNavigationViewMenu);
         }
     }
 
@@ -575,36 +565,39 @@ public class MainActivity extends AppCompatActivity implements
         Preferences prefs = new Preferences(this);
         // Usamos observeForever y removeObserver para asegurar que el clic sea una acción única
         // y no acumule observadores que disparen múltiples diálogos.
-        androidx.lifecycle.Observer<List<Car>> observer = new androidx.lifecycle.Observer<>() {
+        mViewModel.getNotSuspendedCars().observeForever(new androidx.lifecycle.Observer<>() {
             @Override
             public void onChanged(List<Car> cars) {
                 mViewModel.getNotSuspendedCars().removeObserver(this);
-                if (cars == null || cars.isEmpty()) return;
-
-                if (cars.size() == 1 || !prefs.isShowCarMenu()) {
-                    long carId = cars.size() == 1 ? cars.get(0).getId() : prefs.getDefaultCar();
-                    Intent intent = getDetailActivityIntent(edit, carId, otherType);
-                    mAddDataLauncher.launch(intent);
-                } else {
-                    final long[] carIds = new long[cars.size()];
-                    final String[] carNames = new String[cars.size()];
-                    for (int i = 0; i < cars.size(); i++) {
-                        Car car = cars.get(i);
-                        carIds[i] = car.getId();
-                        carNames[i] = car.getName();
-                    }
-
-                    new MaterialAlertDialogBuilder(MainActivity.this)
-                            .setItems(carNames, (dialog, which) -> {
-                                Intent intent = getDetailActivityIntent(edit, carIds[which], otherType);
-                                mAddDataLauncher.launch(intent);
-                            })
-                            .create()
-                            .show();
-                }
+                processCarSelectionForFAB(edit, otherType, cars, prefs);
             }
-        };
-        mViewModel.getNotSuspendedCars().observeForever(observer);
+        });
     }
 
+    private void processCarSelectionForFAB(int edit, int otherType, List<Car> cars, Preferences prefs) {
+        if (cars == null || cars.isEmpty()) return;
+
+        if (cars.size() == 1 || !prefs.isShowCarMenu()) {
+            long carId = cars.size() == 1 ? cars.get(0).getId() : prefs.getDefaultCar();
+            mAddDataLauncher.launch(getDetailActivityIntent(edit, carId, otherType));
+        } else {
+            showCarSelectionDialog(edit, otherType, cars);
+        }
+    }
+
+    private void showCarSelectionDialog(int edit, int otherType, List<Car> cars) {
+        final long[] carIds = new long[cars.size()];
+        final String[] carNames = new String[cars.size()];
+        for (int i = 0; i < cars.size(); i++) {
+            Car car = cars.get(i);
+            carIds[i] = car.getId();
+            carNames[i] = car.getName();
+        }
+
+        new MaterialAlertDialogBuilder(this)
+                .setItems(carNames, (dialog, which) ->
+                        mAddDataLauncher.launch(getDetailActivityIntent(edit, carIds[which], otherType)))
+                .create()
+                .show();
+    }
 }

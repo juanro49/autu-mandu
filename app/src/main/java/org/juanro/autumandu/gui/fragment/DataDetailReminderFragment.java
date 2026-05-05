@@ -23,7 +23,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -106,59 +105,72 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
         if (isInEditMode()) {
             viewModel.getReminder().observe(getViewLifecycleOwner(), reminder -> {
                 if (reminder != null) {
-                    edtTitle.setText(reminder.getTitle());
-                    if (reminder.getAfterDistance() != null) {
-                        edtAfterDistance.setText(String.valueOf(reminder.getAfterDistance()));
-                    } else {
-                        edtAfterDistance.setText("");
-                    }
-                    if (reminder.getAfterTimeSpanCount() != null) {
-                        edtAfterTime.setText(String.valueOf(reminder.getAfterTimeSpanCount()));
-                    } else {
-                        edtAfterTime.setText("");
-                    }
-
-                    if (reminder.getAfterDistance() != null && reminder.getAfterTimeSpanCount() != null) {
-                        spnAfterType.setSelection(0);
-                    } else if (reminder.getAfterDistance() != null) {
-                        spnAfterType.setSelection(1);
-                    } else {
-                        spnAfterType.setSelection(2);
-                    }
-
-                    if (reminder.getAfterTimeSpanUnit() != null) {
-                        spnAfterTimeUnit.setSelection(reminder.getAfterTimeSpanUnit().ordinal());
-                    }
-
-                    edtStartMileage.setText(String.valueOf(reminder.getStartMileage()));
-                    edtStartDate.setDate(reminder.getStartDate());
-                    edtSnoozedUntil.setDate(reminder.getSnoozedUntil());
-                    chkDismissed.setChecked(reminder.isNotificationDismissed());
-
-                    mInitialCarId = reminder.getCarId();
-                    for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                        if (spnCar.getItemIdAtPosition(pos) == mInitialCarId) {
-                            spnCar.setSelection(pos);
-                            break;
-                        }
-                    }
+                    updateFieldsFromReminder(reminder);
+                    updateInitialCarSelection(reminder.getCarId());
                 }
             });
         } else {
-            mInitialCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID, -1) : -1;
-            if (mInitialCarId == -1) {
-                Preferences prefs = new Preferences(requireContext());
-                mInitialCarId = prefs.getDefaultCar();
-            }
-            viewModel.setSelectedCarId(mInitialCarId);
-            edtStartDate.setDate(new Date());
+            setupNewReminderDefaults();
         }
+    }
+
+    private void updateFieldsFromReminder(Reminder reminder) {
+        edtTitle.setText(reminder.getTitle());
+        edtAfterDistance.setText(reminder.getAfterDistance() != null ? String.valueOf(reminder.getAfterDistance()) : "");
+        edtAfterTime.setText(reminder.getAfterTimeSpanCount() != null ? String.valueOf(reminder.getAfterTimeSpanCount()) : "");
+
+        if (reminder.getAfterDistance() != null && reminder.getAfterTimeSpanCount() != null) {
+            spnAfterType.setSelection(0);
+        } else if (reminder.getAfterDistance() != null) {
+            spnAfterType.setSelection(1);
+        } else {
+            spnAfterType.setSelection(2);
+        }
+
+        if (reminder.getAfterTimeSpanUnit() != null) {
+            spnAfterTimeUnit.setSelection(reminder.getAfterTimeSpanUnit().ordinal());
+        }
+
+        edtStartMileage.setText(String.valueOf(reminder.getStartMileage()));
+        edtStartDate.setDate(reminder.getStartDate());
+        edtSnoozedUntil.setDate(reminder.getSnoozedUntil());
+        chkDismissed.setChecked(reminder.isNotificationDismissed());
+    }
+
+    private void updateInitialCarSelection(long carId) {
+        mInitialCarId = carId;
+        int count = spnCar.getCount();
+        for (int i = 0; i < count; i++) {
+            if (spnCar.getItemIdAtPosition(i) == mInitialCarId) {
+                spnCar.setSelection(i);
+                break;
+            }
+        }
+    }
+
+    private void setupNewReminderDefaults() {
+        mInitialCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID, -1) : -1;
+        if (mInitialCarId == -1) {
+            Preferences prefs = new Preferences(requireContext());
+            mInitialCarId = prefs.getDefaultCar();
+        }
+        viewModel.setSelectedCarId(mInitialCarId);
+        edtStartDate.setDate(new Date());
     }
 
     @Override
     protected void initFields(Bundle savedInstanceState, View v) {
         final Preferences prefs = new Preferences(requireContext());
+        initViewReferences(v);
+        setupUnitHints(prefs);
+        setupAfterTypeListener();
+        setupAdvancedFieldsVisibility(v);
+        setupPickers(v);
+        setupCarSpinner();
+        setupLatestMileageObserver();
+    }
 
+    private void initViewReferences(View v) {
         edtTitle = v.findViewById(R.id.edt_title);
         spnCar = v.findViewById(R.id.spn_car);
         spnAfterType = v.findViewById(R.id.spn_after_type);
@@ -170,14 +182,15 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
         edtStartMileage = v.findViewById(R.id.edt_start_mileage);
         edtStartDate = new DateTimeInput(v.findViewById(R.id.edt_start_date), DateTimeInput.Mode.DATE);
         edtSnoozedUntil = new DateTimeInput(v.findViewById(R.id.edt_snoozed_until), DateTimeInput.Mode.DATE);
-        View edtSnoozedUntilLayout = v.findViewById(R.id.edt_snoozed_until_input_layout);
-        ImageButton btnQuitSnooze = v.findViewById(R.id.btn_quit_snooze);
         chkDismissed = v.findViewById(R.id.chk_dismissed);
-        View txtSectionAdvanced = v.findViewById(R.id.txt_section_advanced);
+    }
 
+    private void setupUnitHints(Preferences prefs) {
         addUnitToHint(edtAfterDistance, R.string.hint_reminder_after_distance, prefs.getUnitDistance());
         addUnitToHint(edtStartMileage, R.string.hint_reminder_start_mileage, prefs.getUnitDistance());
+    }
 
+    private void setupAfterTypeListener() {
         spnAfterType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
@@ -185,20 +198,21 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
                 edtAfterTimeLayout.setVisibility(position == 0 || position == 2 ? View.VISIBLE : View.GONE);
                 spnAfterTimeUnit.setVisibility(position == 0 || position == 2 ? View.VISIBLE : View.GONE);
             }
-
             @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {
-                // Not used
-            }
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
+    }
 
+    private void setupAdvancedFieldsVisibility(View v) {
         if (!isInEditMode()) {
-            txtSectionAdvanced.setVisibility(View.GONE);
-            edtSnoozedUntilLayout.setVisibility(View.GONE);
-            btnQuitSnooze.setVisibility(View.GONE);
-            chkDismissed.setVisibility(View.GONE);
+            v.findViewById(R.id.txt_section_advanced).setVisibility(View.GONE);
+            v.findViewById(R.id.edt_snoozed_until_input_layout).setVisibility(View.GONE);
+            v.findViewById(R.id.btn_quit_snooze).setVisibility(View.GONE);
+            v.findViewById(R.id.chk_dismissed).setVisibility(View.GONE);
         }
+    }
 
+    private void setupPickers(View v) {
         getParentFragmentManager().setFragmentResultListener(DatePickerDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
             int requestCode = result.getInt(DatePickerDialogFragment.RESULT_REQUEST_CODE);
             Date date = new Date(result.getLong(DatePickerDialogFragment.RESULT_DATE));
@@ -211,65 +225,50 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
 
         edtStartDate.applyOnClickListener(PICK_START_DATE_REQUEST_CODE, getParentFragmentManager());
         edtSnoozedUntil.applyOnClickListener(PICK_SNOOZED_UNTIL_REQUEST_CODE, getParentFragmentManager());
+        View btnQuitSnooze = v.findViewById(R.id.btn_quit_snooze);
+        if (btnQuitSnooze != null) {
+            btnQuitSnooze.setOnClickListener(v1 -> edtSnoozedUntil.setDate(null));
+        }
+    }
 
-        btnQuitSnooze.setOnClickListener(v1 -> edtSnoozedUntil.setDate(null));
-
+    private void setupCarSpinner() {
         spnCar.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
                 viewModel.setSelectedCarId(id);
             }
-
             @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {
-                // Not used
-            }
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
         });
 
-        if (!isInEditMode()) {
-            viewModel.getLatestMileageForSelectedCar().observe(getViewLifecycleOwner(), mileage -> {
-                if (mileage != null) {
-                    edtStartMileage.setText(String.valueOf(mileage));
-                }
-            });
-        }
-
         viewModel.getActiveCars().observe(getViewLifecycleOwner(), cars -> {
-            spnCar.setAdapter(new ArrayAdapter<>(requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item, cars) {
+            spnCar.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, cars) {
                 @NonNull
                 @Override
                 public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v = (TextView) super.getView(position, convertView, parent);
+                    TextView v1 = (TextView) super.getView(position, convertView, parent);
                     Car item = getItem(position);
-                    if (item != null) {
-                        v.setText(item.getName());
-                    }
-                    return v;
+                    if (item != null) v1.setText(item.getName());
+                    return v1;
                 }
-
-                @NonNull
                 @Override
                 public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v = (TextView) super.getDropDownView(position, convertView, parent);
+                    TextView v1 = (TextView) super.getDropDownView(position, convertView, parent);
                     Car item = getItem(position);
-                    if (item != null) {
-                        v.setText(item.getName());
-                    }
-                    return v;
+                    if (item != null) v1.setText(item.getName());
+                    return v1;
                 }
-
                 @Override
                 public long getItemId(int position) {
                     Car item = getItem(position);
                     return item != null ? item.getId() : -1;
                 }
             });
-
             if (mInitialCarId != -1) {
-                for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                    if (spnCar.getItemIdAtPosition(pos) == mInitialCarId) {
-                        spnCar.setSelection(pos);
+                int count = spnCar.getCount();
+                for (int i = 0; i < count; i++) {
+                    if (spnCar.getItemIdAtPosition(i) == mInitialCarId) {
+                        spnCar.setSelection(i);
                         break;
                     }
                 }
@@ -277,13 +276,24 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
         });
     }
 
+    private void setupLatestMileageObserver() {
+        if (!isInEditMode()) {
+            viewModel.getLatestMileageForSelectedCar().observe(getViewLifecycleOwner(), mileage -> {
+                if (mileage != null) {
+                    edtStartMileage.setText(String.valueOf(mileage));
+                }
+            });
+        }
+    }
+
     @Override
     protected boolean validate() {
         boolean valid = !edtTitle.getText().toString().trim().isEmpty();
         if (valid) {
-            if (spnAfterType.getSelectedItemPosition() == 0) {
+            int position = spnAfterType.getSelectedItemPosition();
+            if (position == 0) {
                 valid = !TextUtils.isEmpty(edtAfterDistance.getText()) && !TextUtils.isEmpty(edtAfterTime.getText());
-            } else if (spnAfterType.getSelectedItemPosition() == 1) {
+            } else if (position == 1) {
                 valid = !TextUtils.isEmpty(edtAfterDistance.getText());
             } else {
                 valid = !TextUtils.isEmpty(edtAfterTime.getText());
@@ -294,11 +304,21 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
 
     @Override
     protected long save() {
-        return 0; // No se usa, usamos saveAsync
+        return 0; // Using saveAsync
     }
 
     @Override
     protected void saveAsync() {
+        Reminder reminder = createReminderFromFields();
+        viewModel.save(reminder, () -> requireActivity().runOnUiThread(() -> {
+            if (isAdded()) {
+                ReminderWorker.enqueueUpdate(requireContext());
+                mOnItemActionListener.onItemSavedAsync(reminder.getId());
+            }
+        }));
+    }
+
+    private Reminder createReminderFromFields() {
         Reminder reminder = new Reminder();
         if (isInEditMode()) {
             reminder.setId(mId);
@@ -307,13 +327,14 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
         reminder.setTitle(edtTitle.getText().toString().trim());
         reminder.setCarId(spnCar.getSelectedItemId());
 
-        if (spnAfterType.getSelectedItemPosition() == 0 || spnAfterType.getSelectedItemPosition() == 1) {
+        int afterType = spnAfterType.getSelectedItemPosition();
+        if (afterType == 0 || afterType == 1) {
             reminder.setAfterDistance(getIntegerFromEditText(edtAfterDistance, 0));
         } else {
             reminder.setAfterDistance(null);
         }
 
-        if (spnAfterType.getSelectedItemPosition() == 0 || spnAfterType.getSelectedItemPosition() == 2) {
+        if (afterType == 0 || afterType == 2) {
             reminder.setAfterTimeSpanCount(getIntegerFromEditText(edtAfterTime, 0));
             reminder.setAfterTimeSpanUnit(TimeSpanUnit.values()[spnAfterTimeUnit.getSelectedItemPosition()]);
         } else {
@@ -326,13 +347,7 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
         reminder.setStartDate(startDate != null ? startDate : new Date());
         reminder.setSnoozedUntil(edtSnoozedUntil.getDate());
         reminder.setNotificationDismissed(chkDismissed.isChecked());
-
-        viewModel.save(reminder, () -> requireActivity().runOnUiThread(() -> {
-            if (isAdded()) {
-                ReminderWorker.enqueueUpdate(requireContext());
-                mOnItemActionListener.onItemSavedAsync(reminder.getId());
-            }
-        }));
+        return reminder;
     }
 
     @Override
@@ -352,6 +367,6 @@ public class DataDetailReminderFragment extends AbstractDataDetailFragment {
 
     @Override
     protected void delete() {
-        // Not used, using deleteAsync()
+        // Using deleteAsync
     }
 }

@@ -36,7 +36,7 @@ public abstract class AbstractReport {
     public abstract static class AbstractListItem implements Comparable<AbstractListItem> {
         protected final String mLabel;
 
-        public AbstractListItem(String label) {
+        protected AbstractListItem(String label) {
             mLabel = label;
         }
 
@@ -151,7 +151,7 @@ public abstract class AbstractReport {
     protected final Map<Integer, List<AbstractReportChartData>> mCachedChartData = new java.util.HashMap<>();
     private boolean mUpdated = false;
 
-    public AbstractReport(Context context) {
+    protected AbstractReport(Context context) {
         mContext = context.getApplicationContext();
     }
 

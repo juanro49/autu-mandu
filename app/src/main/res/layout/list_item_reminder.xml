@@ -19,6 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_list_item"
+    android:descendantFocusability="afterDescendants"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingStart="?android:attr/listPreferredItemPaddingStart"
@@ -87,6 +88,8 @@
         android:layout_height="@dimen/min_touch_target_size"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="@string/notification_reminder_action_done"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:src="@drawable/ic_check_24dp"
         app:tint="?attr/colorPrimary" />
 
@@ -96,6 +99,8 @@
         android:layout_height="@dimen/min_touch_target_size"
         android:background="?android:attr/selectableItemBackground"
         android:contentDescription="@string/notification_reminder_action_snooze"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:src="@drawable/ic_snooze_24dp"
         app:tint="?attr/colorOnSurfaceVariant" />
 </LinearLayout>

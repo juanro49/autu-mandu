@@ -85,49 +85,58 @@ public class DistanceVolumeCalculation extends AbstractCalculation {
                 .collect(Collectors.toMap(FuelType::getId, ft -> Objects.toString(ft.getCategory(), ""), (existing, replacement) -> existing));
 
         for (Car car : cars) {
-            List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(car.getId());
-            if (carRefuelings == null || carRefuelings.isEmpty()) continue;
+            processCar(car, refuelingsByCar, fuelTypeToCategory);
+        }
+    }
 
-            Map<String, List<RefuelingWithDetails>> byCategory = carRefuelings.stream()
-                    .collect(Collectors.groupingBy(r -> {
-                        String category = fuelTypeToCategory.get(r.fuelTypeId());
-                        return category != null ? category : "";
-                    }));
+    private void processCar(Car car, Map<Long, List<RefuelingWithDetails>> refuelingsByCar, Map<Long, String> fuelTypeToCategory) {
+        List<RefuelingWithDetails> carRefuelings = refuelingsByCar.get(car.getId());
+        if (carRefuelings == null || carRefuelings.isEmpty()) return;
 
-            for (Map.Entry<String, List<RefuelingWithDetails>> entry : byCategory.entrySet()) {
-                String category = entry.getKey();
-                if (category.isEmpty()) continue;
+        Map<String, List<RefuelingWithDetails>> byCategory = carRefuelings.stream()
+                .collect(Collectors.groupingBy(r -> {
+                    String category = fuelTypeToCategory.get(r.fuelTypeId());
+                    return category != null ? category : "";
+                }));
 
-                Preferences prefsForGuess = new Preferences(mContext);
-                List<BalancedRefueling> balanced = BalancedRefueling.balance(entry.getValue(), prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+        for (Map.Entry<String, List<RefuelingWithDetails>> entry : byCategory.entrySet()) {
+            processCategory(car, entry.getKey(), entry.getValue());
+        }
+    }
 
-                int lastMileage = 0;
-                int totalDistance = 0, distance = 0;
-                float totalVolume = 0, volume = 0;
-                boolean foundFullRefueling = false;
+    private void processCategory(Car car, String category, List<RefuelingWithDetails> categoryRefuelings) {
+        if (category.isEmpty()) return;
 
-                for (BalancedRefueling refueling : balanced) {
-                    if (!foundFullRefueling) {
-                        if (!refueling.isPartial()) foundFullRefueling = true;
-                    } else {
-                        distance += refueling.getMileage() - lastMileage;
-                        volume += refueling.getVolume();
-                        if (!refueling.isPartial()) {
-                            totalDistance += distance;
-                            totalVolume += volume;
-                            distance = 0;
-                            volume = 0;
-                        }
-                    }
-                    lastMileage = refueling.getMileage();
-                }
+        Preferences prefsForGuess = new Preferences(mContext);
+        List<BalancedRefueling> balanced = BalancedRefueling.balance(categoryRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
 
-                if (totalDistance > 0 && totalVolume > 0) {
-                    mNames.add(String.format("%s (%s)", car.getName(), category));
-                    mAvgConsumptions.add((double) totalVolume / totalDistance);
-                    mColors.add(car.getColor());
+        int lastMileage = 0;
+        int totalDistance = 0;
+        int distance = 0;
+        float totalVolume = 0;
+        float volume = 0;
+        boolean foundFullRefueling = false;
+
+        for (BalancedRefueling refueling : balanced) {
+            if (!foundFullRefueling) {
+                if (!refueling.isPartial()) foundFullRefueling = true;
+            } else {
+                distance += refueling.getMileage() - lastMileage;
+                volume += refueling.getVolume();
+                if (!refueling.isPartial()) {
+                    totalDistance += distance;
+                    totalVolume += volume;
+                    distance = 0;
+                    volume = 0;
                 }
             }
+            lastMileage = refueling.getMileage();
+        }
+
+        if (totalDistance > 0 && totalVolume > 0) {
+            mNames.add(String.format("%s (%s)", car.getName(), category));
+            mAvgConsumptions.add((double) totalVolume / totalDistance);
+            mColors.add(car.getColor());
         }
     }
 

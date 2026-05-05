@@ -134,8 +134,14 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                 Log.i(LOG_TAG, String.format(Locale.US, "Migration to version %d completed successfully.", newVersion));
             } catch (IOException e) {
                 Log.e(LOG_TAG, String.format(Locale.US, "Error during migration to version %d.", newVersion), e);
-                throw new RuntimeException("Critical error during database migration", e);
+                throw new DatabaseMigrationException(newVersion, e);
             }
+        }
+    }
+
+    public static class DatabaseMigrationException extends RuntimeException {
+        public DatabaseMigrationException(int version, Throwable cause) {
+            super("Critical error during database migration to version " + version, cause);
         }
     }
 }

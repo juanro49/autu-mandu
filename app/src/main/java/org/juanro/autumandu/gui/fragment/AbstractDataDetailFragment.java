@@ -85,6 +85,11 @@ public abstract class AbstractDataDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setupActionBar();
+        setupMenuProvider();
+    }
+
+    private void setupActionBar() {
         ActionBar actionBar = ((androidx.appcompat.app.AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -96,7 +101,9 @@ public abstract class AbstractDataDetailFragment extends Fragment {
                 actionBar.setTitle(getTitleForNew());
             }
         }
+    }
 
+    private void setupMenuProvider() {
         MenuHost menuHost = requireActivity();
         menuHost.addMenuProvider(new MenuProvider() {
             @Override
@@ -110,29 +117,37 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                if (id == R.id.menu_save) {
-                    if (validate()) {
-                        saveAsync();
-                    }
-                    return true;
-                } else if (id == R.id.menu_cancel || id == android.R.id.home) {
-                    mOnItemActionListener.onItemCanceled();
-                    return true;
-                } else if (id == R.id.menu_delete) {
-                    var message = getString(getAlertDeleteMessage());
-                    if (getAlertDeleteMessage() == R.string.alert_delete_tire_message) {
-                        message = getString(R.string.alert_delete_tire_message, 1);
-                    }
-                    MessageDialogFragment.newInstance(DELETE_REQUEST_CODE,
-                            R.string.alert_delete_title,
-                            message, android.R.string.yes,
-                            android.R.string.no).show(getParentFragmentManager(), null);
-                    return true;
-                }
-                return false;
+                return handleMenuItemSelected(menuItem);
             }
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
+    private boolean handleMenuItemSelected(@NonNull MenuItem menuItem) {
+        int id = menuItem.getItemId();
+        if (id == R.id.menu_save) {
+            if (validate()) {
+                saveAsync();
+            }
+            return true;
+        } else if (id == R.id.menu_cancel || id == android.R.id.home) {
+            mOnItemActionListener.onItemCanceled();
+            return true;
+        } else if (id == R.id.menu_delete) {
+            showDeleteConfirmation();
+            return true;
+        }
+        return false;
+    }
+
+    private void showDeleteConfirmation() {
+        var message = getString(getAlertDeleteMessage());
+        if (getAlertDeleteMessage() == R.string.alert_delete_tire_message) {
+            message = getString(R.string.alert_delete_tire_message, 1);
+        }
+        MessageDialogFragment.newInstance(DELETE_REQUEST_CODE,
+                R.string.alert_delete_title,
+                message, android.R.string.yes,
+                android.R.string.no).show(getParentFragmentManager(), null);
     }
 
     protected void saveAsync() {

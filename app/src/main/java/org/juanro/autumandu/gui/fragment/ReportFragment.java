@@ -53,6 +53,7 @@ import java.util.concurrent.Executors;
 
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.report.AbstractReport;
+import org.juanro.autumandu.data.report.AbstractReportChartData;
 import org.juanro.autumandu.data.report.FuelConsumptionReport;
 import org.juanro.autumandu.data.report.FuelPriceReport;
 import org.juanro.autumandu.data.report.MileageReport;
@@ -117,15 +118,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             this.report = report;
             txtTitle.setText(report.getTitle());
 
-            // 1. Limpieza y estado compacto inicial (Sin detalles visibles)
-            removePreviousKubitChart();
-            details.setVisibility(View.GONE); // Siempre GONE para que la card sea compacta al inicio
-            chartNotEnoughData.setVisibility(View.GONE);
-
-            chartContainer.setVisibility(View.VISIBLE);
-            chartLoading.setAlpha(1f);
-            chartLoading.setVisibility(View.VISIBLE);
-            chartLoading.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            resetUIState();
 
             EXECUTOR.execute(() -> {
                 report.update();
@@ -134,50 +127,59 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                 var rawData = report.getRawChartData(options.getChartOption());
                 boolean enoughData = !rawData.isEmpty();
 
-                // 2. Actualizar UI escalonadamente para máxima fluidez
-                itemView.post(() -> {
-                    if (this.report != report) return;
-
-                    // Fase A: Renderizar gráfico (Compose es lo más pesado)
-                    if (enoughData) {
-                        View kubitView;
-                        if (report instanceof OverallCostsReport) {
-                            kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
-                        } else if (report instanceof FuelConsumptionReport ||
-                                report instanceof FuelPriceReport ||
-                                (report instanceof MileageReport && options.getChartOption() != 2)) {
-                            kubitView = KubitChartBridge.createLineChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
-                        } else {
-                            kubitView = KubitChartBridge.createColumnChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
-                        }
-                        kubitView.setId(R.id.kubit_chart_view);
-                        kubitView.setAlpha(0f);
-                        chartContainer.addView(kubitView);
-                        kubitView.animate().alpha(1f).setDuration(400).start();
-                    }
-
-                    chartLoading.animate().alpha(0f).setDuration(200).withEndAction(() -> {
-                        chartLoading.setVisibility(View.GONE);
-                        chartLoading.setLayerType(View.LAYER_TYPE_NONE, null);
-                    }).start();
-
-                    chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
-
-                    // Fase B: Preparar detalles para el futuro (sin mostrarlos)
-                    ReportDetailBinder.bindDetails(details, reportData);
-
-                    // Configurar posición del panel de detalles (detrás de main)
-                    var params = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
-                    params.topMargin = main.getHeight(); // Oculto completamente
-                    details.requestLayout();
-                });
+                itemView.post(() -> updateUI(report, options, reportData, rawData, enoughData));
 
                 try { Thread.sleep(250); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
             });
         }
 
+        private void resetUIState() {
+            removePreviousKubitChart();
+            details.setVisibility(View.GONE);
+            chartNotEnoughData.setVisibility(View.GONE);
+            chartContainer.setVisibility(View.VISIBLE);
+            chartLoading.setAlpha(1f);
+            chartLoading.setVisibility(View.VISIBLE);
+            chartLoading.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        }
 
+        private void updateUI(AbstractReport report, ReportChartOptions options, List<AbstractReport.AbstractListItem> reportData, List<? extends AbstractReportChartData> rawData, boolean enoughData) {
+            if (this.report != report) return;
 
+            if (enoughData) {
+                renderChart(report, options, rawData);
+            }
+
+            chartLoading.animate().alpha(0f).setDuration(200).withEndAction(() -> {
+                chartLoading.setVisibility(View.GONE);
+                chartLoading.setLayerType(View.LAYER_TYPE_NONE, null);
+            }).start();
+
+            chartNotEnoughData.setVisibility(enoughData ? View.GONE : View.VISIBLE);
+
+            ReportDetailBinder.bindDetails(details, reportData);
+
+            var params = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
+            params.topMargin = main.getHeight();
+            details.requestLayout();
+        }
+
+        private void renderChart(AbstractReport report, ReportChartOptions options, List<? extends AbstractReportChartData> rawData) {
+            View kubitView;
+            if (report instanceof OverallCostsReport) {
+                kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
+            } else if (report instanceof FuelConsumptionReport ||
+                    report instanceof FuelPriceReport ||
+                    (report instanceof MileageReport && options.getChartOption() != 2)) {
+                kubitView = KubitChartBridge.createLineChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+            } else {
+                kubitView = KubitChartBridge.createColumnChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend());
+            }
+            kubitView.setId(R.id.kubit_chart_view);
+            kubitView.setAlpha(0f);
+            chartContainer.addView(kubitView);
+            kubitView.animate().alpha(1f).setDuration(400).start();
+        }
     }
 
     private class ReportAdapter extends ListAdapter<AbstractReport, ReportHolder> {
@@ -190,7 +192,6 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
                 @Override
                 public boolean areContentsTheSame(@NonNull AbstractReport oldItem, @NonNull AbstractReport newItem) {
-                    // Evita re-bindear si es la misma instancia y ya está actualizada
                     return Objects.equals(oldItem, newItem) && oldItem.isUpdated();
                 }
             });
@@ -198,7 +199,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
         @NonNull
         @Override
-        public ReportHolder onCreateViewHolder(@NonNull ViewGroup parent, int position) {
+        public ReportHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             var view = LayoutInflater.from(parent.getContext()).inflate(R.layout.report,
                     parent, false);
             return new ReportHolder(view);
@@ -235,12 +236,10 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             outRect.right = spacing;
             outRect.bottom = spacing;
 
-            // Add top spacing for items in first row.
             if (position < columns) {
                 outRect.top = spacing;
             }
 
-            // Add left spacing for items in the first column.
             if (position % columns == 0) {
                 outRect.left = spacing;
             }
@@ -315,7 +314,6 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         if (index != -1) {
             reportAdapter.notifyItemChanged(index);
         } else {
-            // Fallback para asegurar la actualización si la instancia ha cambiado
             List<AbstractReport> currentList = reportAdapter.getCurrentList();
             for (int i = 0; i < currentList.size(); i++) {
                 if (currentList.get(i).getClass().equals(currentMenuReport.getClass())) {

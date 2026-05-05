@@ -22,7 +22,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.view.Gravity;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -132,23 +131,20 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
     protected void fillFields(Bundle savedInstanceState, View view) {
         viewModel = new ViewModelProvider(this).get(CarDetailViewModel.class);
         viewModel.setCarId(mId);
-        viewModel.getCar().observe(getViewLifecycleOwner(), car -> {
-            this.car = car;
-            if (car != null) {
-                edtName.setText(car.getName());
-                edtInitialMileage.setText(String.valueOf(car.getInitialMileage()));
-                edtNumTires.setText(String.valueOf(car.getNumTires()));
-                edtBuyingPrice.setText(String.valueOf(car.getBuyingPrice()));
-                ViewCompat.setBackgroundTintList(colorPreview, ColorStateList.valueOf(car.getColor()));
-                chkSuspended.setChecked(car.getSuspendedSince() != null);
+        viewModel.getCar().observe(getViewLifecycleOwner(), carEntity -> {
+            this.car = carEntity;
+            if (carEntity != null) {
+                edtName.setText(carEntity.getName());
+                edtInitialMileage.setText(String.valueOf(carEntity.getInitialMileage()));
+                edtNumTires.setText(String.valueOf(carEntity.getNumTires()));
+                edtBuyingPrice.setText(String.valueOf(carEntity.getBuyingPrice()));
+                ViewCompat.setBackgroundTintList(colorPreview, ColorStateList.valueOf(carEntity.getColor()));
+                chkSuspended.setChecked(carEntity.getSuspendedSince() != null);
             }
         });
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
+
 
     @Override
     protected int getLayout() {

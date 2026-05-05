@@ -195,14 +195,11 @@ public class MileageReport extends AbstractReport {
                 return mCachedChartData.get(chartOption);
             }
 
-            List<AbstractReportChartData> data;
-            if (chartOption == GRAPH_OPTION_ACCUMULATED) {
-                data = new ArrayList<>(reportDataAccumulated);
-            } else if (chartOption == GRAPH_OPTION_PER_REFUELING) {
-                data = new ArrayList<>(reportDataPerRefueling);
-            } else {
-                data = new ArrayList<>(reportDataPerMonth);
-            }
+            List<AbstractReportChartData> data = switch (chartOption) {
+                case GRAPH_OPTION_ACCUMULATED -> new ArrayList<>(reportDataAccumulated);
+                case GRAPH_OPTION_PER_REFUELING -> new ArrayList<>(reportDataPerRefueling);
+                default -> new ArrayList<>(reportDataPerMonth);
+            };
 
             mCachedChartData.put(chartOption, data);
             return data;

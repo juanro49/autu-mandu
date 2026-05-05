@@ -104,18 +104,28 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authenticator_add_account);
 
+        setupEdgeToEdge();
+        handleAccountAuthenticatorResponse();
+        initUI();
+        restoreState(savedInstanceState);
+    }
+
+    private void setupEdgeToEdge() {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return WindowInsetsCompat.CONSUMED;
         });
+    }
 
-        // Manual setup for AccountAuthenticatorResponse as we no longer extend AccountAuthenticatorActivity
+    private void handleAccountAuthenticatorResponse() {
         mAccountAuthenticatorResponse = getIntent().getParcelableExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
         if (mAccountAuthenticatorResponse != null) {
             mAccountAuthenticatorResponse.onRequestContinued();
         }
+    }
 
+    private void initUI() {
         mRecyclerView = findViewById(R.id.sync_provider_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(new SyncProviderAdapter());
@@ -133,33 +143,36 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         mFirstSyncErrorView.setVisibility(View.GONE);
         mFirstSyncErrorMessage = findViewById(R.id.first_sync_error_message);
         findViewById(R.id.first_sync_error_btn_ok).setOnClickListener(v -> finish());
+    }
 
-        if (savedInstanceState != null) {
-            long providerId = savedInstanceState.getLong(STATE_SELECTED_SYNC_PROVIDER_ID, -1);
-            if (providerId != -1) {
-                for (AbstractSyncProvider provider : SyncProviders.getSyncProviders(this)) {
-                    if (provider.getId() == providerId) {
-                        mSelectedSyncProvider = provider;
-                        break;
-                    }
+    private void restoreState(Bundle savedInstanceState) {
+        if (savedInstanceState == null) return;
+
+        long providerId = savedInstanceState.getLong(STATE_SELECTED_SYNC_PROVIDER_ID, -1);
+        if (providerId != -1) {
+            for (AbstractSyncProvider provider : SyncProviders.getSyncProviders(this)) {
+                if (provider.getId() == providerId) {
+                    mSelectedSyncProvider = provider;
+                    break;
                 }
             }
+        }
 
-            mAuthenticatedAccount = savedInstanceState.getParcelable(STATE_AUTHENTICATED_ACCOUNT);
-            mAuthenticatedAccountPassword = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_PASSWORD);
-            mAuthenticatedAccountAuthToken = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_AUTH_TOKEN);
-            String settingsStr = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_SETTINGS);
-            if (settingsStr != null) {
-                try {
-                    mAuthenticatedAccountSettings = new JSONObject(settingsStr);
-                } catch (Exception ignored) {
-                }
+        mAuthenticatedAccount = savedInstanceState.getParcelable(STATE_AUTHENTICATED_ACCOUNT);
+        mAuthenticatedAccountPassword = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_PASSWORD);
+        mAuthenticatedAccountAuthToken = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_AUTH_TOKEN);
+        String settingsStr = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_SETTINGS);
+        if (settingsStr != null) {
+            try {
+                mAuthenticatedAccountSettings = new JSONObject(settingsStr);
+            } catch (Exception ignored) {
+                // Ignore invalid settings
             }
+        }
 
-            if (mAuthenticatedAccount != null) {
-                mRecyclerView.setVisibility(View.GONE);
-                startFirstSync();
-            }
+        if (mAuthenticatedAccount != null) {
+            mRecyclerView.setVisibility(View.GONE);
+            startFirstSync();
         }
     }
 
@@ -242,31 +255,9 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
 
         mExecutor.execute(() -> {
             try {
-                String remoteRev;
-                AutuManduApplication.closeDatabases();
-                if (download) {
-                    mSelectedSyncProvider.downloadFile();
-                    remoteRev = mSelectedSyncProvider.getRemoteFileRev();
-                } else {
-                    remoteRev = mSelectedSyncProvider.uploadFile();
-                }
-
+                String remoteRev = executeFirstSync(download);
                 mSelectedSyncProvider.setLocalFileRev(remoteRev);
-                runOnUiThread(() -> {
-                    if (isFinishing() || isDestroyed()) return;
-
-                    SyncManager.schedulePeriodicSync(AuthenticatorAddAccountActivity.this);
-                    addAccountToManager();
-
-                    if (download) {
-                        // Restart the app to ensure all ViewModels and LiveDatas are recreated with the new database.
-                        Intent intent = new Intent(AuthenticatorAddAccountActivity.this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    }
-
-                    finish();
-                });
+                runOnUiThread(() -> finalizeFirstSync(download));
             } catch (final Exception e) {
                 runOnUiThread(() -> {
                     if (!isFinishing() && !isDestroyed()) {
@@ -275,6 +266,32 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
                 });
             }
         });
+    }
+
+    private String executeFirstSync(boolean download) throws Exception {
+        AutuManduApplication.closeDatabases();
+        if (download) {
+            mSelectedSyncProvider.downloadFile();
+            return mSelectedSyncProvider.getRemoteFileRev();
+        } else {
+            return mSelectedSyncProvider.uploadFile();
+        }
+    }
+
+    private void finalizeFirstSync(boolean download) {
+        if (isFinishing() || isDestroyed()) return;
+
+        SyncManager.schedulePeriodicSync(AuthenticatorAddAccountActivity.this);
+        addAccountToManager();
+
+        if (download) {
+            // Restart the app to ensure all ViewModels and LiveDatas are recreated with the new database.
+            Intent intent = new Intent(AuthenticatorAddAccountActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+
+        finish();
     }
 
     private void addAccountToManager() {
@@ -310,6 +327,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
                 try {
                     future.getResult();
                 } catch (OperationCanceledException | IOException | AuthenticatorException ignored) {
+                    // Ignore removal errors
                 }
             }, null);
         }

@@ -56,7 +56,9 @@ import java.util.Locale;
 public class PreferencesRemindersFragment extends ListFragment implements
         AbstractPreferenceActivity.OptionsMenuListener {
 
+    private static final String FORMAT_NUMBER_UNIT = "%d %s";
     private RemindersViewModel viewModel;
+
 
     private class ReminderAdapter extends BaseAdapter {
         private final java.text.DateFormat dateFormat;
@@ -95,48 +97,42 @@ public class PreferencesRemindersFragment extends ListFragment implements
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View v, ViewGroup parent) {
+            View itemView = v;
             ReminderViewHolder holder;
-            if (convertView == null) {
-                convertView = LayoutInflater.from(requireContext()).inflate(R.layout.list_item_reminder,
+            if (itemView == null) {
+                itemView = LayoutInflater.from(requireContext()).inflate(R.layout.list_item_reminder,
                         parent, false);
 
                 holder = new ReminderViewHolder();
-                holder.title = convertView.findViewById(R.id.txt_title);
-                holder.car = convertView.findViewById(R.id.txt_car);
-                holder.afterDistance = convertView.findViewById(R.id.txt_after_distance);
-                holder.afterTime = convertView.findViewById(R.id.txt_after_time);
-                holder.status = convertView.findViewById(R.id.txt_status);
+                holder.title = itemView.findViewById(R.id.txt_title);
+                holder.car = itemView.findViewById(R.id.txt_car);
+                holder.afterDistance = itemView.findViewById(R.id.txt_after_distance);
+                holder.afterTime = itemView.findViewById(R.id.txt_after_time);
+                holder.status = itemView.findViewById(R.id.txt_status);
+                holder.btnDone = itemView.findViewById(R.id.btn_done);
+                holder.btnSnooze = itemView.findViewById(R.id.btn_snooze);
+                holder.btnDone.setFocusable(false);
+                holder.btnSnooze.setFocusable(false);
 
-                var btnDone = convertView.findViewById(R.id.btn_done);
-                var btnSnooze = convertView.findViewById(R.id.btn_snooze);
-
-                btnDone.setOnClickListener(v -> {
-                    var pos = getListView().getPositionForView(v);
-                    var id = getItemId(pos);
-                    ReminderService.markRemindersDone(requireContext(), id);
-                });
-
-                btnSnooze.setOnClickListener(v -> {
-                    var pos = getListView().getPositionForView(v);
-                    var id = getItemId(pos);
-                    ReminderService.snoozeReminders(requireContext(), id);
-                });
-
-                convertView.setTag(holder);
+                itemView.setTag(holder);
             } else {
-                holder = (ReminderViewHolder) convertView.getTag();
+                holder = (ReminderViewHolder) itemView.getTag();
             }
 
             var item = getItem(position);
+            final long reminderId = item.reminder().getId();
 
             holder.title.setText(item.reminder().getTitle());
             holder.car.setText(item.carName());
 
+            holder.btnDone.setOnClickListener(v1 -> viewModel.markAsDone(reminderId));
+            holder.btnSnooze.setOnClickListener(v1 -> viewModel.snooze(reminderId));
+
             if (item.reminder().getAfterDistance() != null) {
                 holder.afterDistance.setText(String.format(
                         Locale.getDefault(),
-                        "%d %s",
+                        FORMAT_NUMBER_UNIT,
                         item.reminder().getAfterDistance(),
                         unitDistance));
                 holder.afterDistance.setVisibility(View.VISIBLE);
@@ -169,12 +165,12 @@ public class PreferencesRemindersFragment extends ListFragment implements
                 if (item.reminder().getAfterDistance() != null && item.reminder().getAfterTimeSpanUnit() != null) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_distance_and_time,
-                            String.format(Locale.getDefault(), "%d %s", item.getDistanceToDue(), unitDistance),
+                            String.format(Locale.getDefault(), FORMAT_NUMBER_UNIT, item.getDistanceToDue(), unitDistance),
                             TimeSpan.fromMillis(item.getTimeToDue()).toLocalizedString(requireContext())));
                 } else if (item.reminder().getAfterDistance() != null) {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_distance,
-                            String.format(Locale.getDefault(), "%d %s", item.getDistanceToDue(), unitDistance)));
+                            String.format(Locale.getDefault(), FORMAT_NUMBER_UNIT, item.getDistanceToDue(), unitDistance)));
                 } else {
                     holder.status.setText(getString(
                             R.string.description_reminder_status_time,
@@ -182,16 +178,18 @@ public class PreferencesRemindersFragment extends ListFragment implements
                 }
             }
 
-            return convertView;
+            return itemView;
         }
     }
 
     private static class ReminderViewHolder {
-        public TextView title;
-        public TextView car;
-        public TextView afterDistance;
-        public TextView afterTime;
-        public TextView status;
+        private TextView title;
+        private TextView car;
+        private TextView afterDistance;
+        private TextView afterTime;
+        private TextView status;
+        private View btnDone;
+        private View btnSnooze;
     }
 
     private class ReminderMultiChoiceModeListener implements AbsListView.MultiChoiceModeListener {

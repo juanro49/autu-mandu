@@ -26,7 +26,9 @@ import androidx.lifecycle.MediatorLiveData;
 import org.juanro.autumandu.data.query.ReminderQueries;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.dto.ReminderWithCar;
+import org.juanro.autumandu.util.reminder.ReminderService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -48,14 +50,15 @@ public class RemindersViewModel extends AndroidViewModel {
             }
 
             DB_EXECUTOR.execute(() -> {
-                for (ReminderWithCar item : list) {
+                List<ReminderWithCar> processedList = new ArrayList<>(list);
+                for (ReminderWithCar item : processedList) {
                     ReminderQueries queries = new ReminderQueries(getApplication(), item);
                     item.setDue(queries.isDue());
                     item.setSnoozed(queries.isSnoozed());
                     item.setDistanceToDue(queries.getDistanceToDue());
                     item.setTimeToDue(queries.getTimeToDue());
                 }
-                reminders.postValue(list);
+                reminders.postValue(processedList);
             });
         });
     }
@@ -70,5 +73,12 @@ public class RemindersViewModel extends AndroidViewModel {
                 db.getReminderDao().deleteById(id);
             }
         });
+    }
+    public void markAsDone(long id) {
+        DB_EXECUTOR.execute(() -> ReminderService.markRemindersDone(getApplication(), id));
+    }
+
+    public void snooze(long id) {
+        DB_EXECUTOR.execute(() -> ReminderService.snoozeReminders(getApplication(), id));
     }
 }

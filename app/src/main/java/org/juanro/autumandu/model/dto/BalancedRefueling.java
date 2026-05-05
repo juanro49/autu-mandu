@@ -80,24 +80,23 @@ public class BalancedRefueling {
         this.carNumTires = refueling.carNumTires();
     }
 
-    private BalancedRefueling(long id, Date date, int mileage, float volume, float price,
-                              boolean partial, String note, long fuelTypeId, long stationId, long carId,
-                              String fuelTypeName, String fuelTypeCategory, String stationName, CarInfo carInfo) {
-        this.id = id;
-        this.date = date;
-        this.mileage = mileage;
-        this.volume = volume;
-        this.price = price;
-        this.partial = partial;
-        this.note = note;
-        this.fuelTypeId = fuelTypeId;
-        this.stationId = stationId;
-        this.carId = carId;
+    private BalancedRefueling(RefuelingData data, Metadata metadata) {
+        this.id = data.id();
+        this.date = data.date();
+        this.mileage = data.mileage();
+        this.volume = data.volume();
+        this.price = data.price();
+        this.partial = data.partial();
+        this.note = data.note();
 
-        this.fuelTypeName = fuelTypeName;
-        this.fuelTypeCategory = fuelTypeCategory;
-        this.stationName = stationName;
+        this.fuelTypeId = metadata.fuelTypeId();
+        this.stationId = metadata.stationId();
+        this.carId = metadata.carId();
+        this.fuelTypeName = metadata.fuelTypeName();
+        this.fuelTypeCategory = metadata.fuelTypeCategory();
+        this.stationName = metadata.stationName();
 
+        CarInfo carInfo = metadata.carInfo();
         this.carName = carInfo.name();
         this.carColor = carInfo.color();
         this.carInitialMileage = carInfo.initialMileage();
@@ -106,6 +105,8 @@ public class BalancedRefueling {
         this.carNumTires = carInfo.numTires();
     }
 
+    private record RefuelingData(long id, Date date, int mileage, float volume, float price, boolean partial, String note) {}
+    private record Metadata(long fuelTypeId, long stationId, long carId, String fuelTypeName, String fuelTypeCategory, String stationName, CarInfo carInfo) {}
     private record CarInfo(String name, int color, int initialMileage, Date suspendedSince, double buyingPrice, int numTires) {}
 
     /**
@@ -120,7 +121,6 @@ public class BalancedRefueling {
                                                  boolean guessMissingData,
                                                  boolean orderDescending) {
         List<BalancedRefueling> refuelings = new ArrayList<>();
-        // In the input, the order might be newest first. We need oldest first for processing.
         List<RefuelingWithDetails> sortedInput = new ArrayList<>(input);
         Collections.sort(sortedInput, (o1, o2) -> o1.date().compareTo(o2.date()));
 
@@ -132,10 +132,8 @@ public class BalancedRefueling {
             return refuelings;
         }
 
-        // Validate mileages
         boolean allValid = areRefuelingsValid(refuelings);
 
-        // Guess missing refuelings if requested and all current refuelings have valid mileages.
         if (guessMissingData && allValid) {
             refuelings = calculateBalancedRefuelings(refuelings);
         }
@@ -313,9 +311,11 @@ public class BalancedRefueling {
         CarInfo carInfo = new CarInfo(template.getCarName(), template.getCarColor(), template.getCarInitialMileage(),
                 template.getCarSuspendedSince(), template.getCarBuyingPrice(), template.getCarNumTires());
 
-        BalancedRefueling guess = new BalancedRefueling(ctx.nextId++, newDate, mileage, volume, volume * ctx.avgPricePerUnit,
-                partial, "", template.getFuelTypeId(), template.getStationId(), template.getCarId(),
+        RefuelingData refuelingData = new RefuelingData(ctx.nextId++, newDate, mileage, volume, volume * ctx.avgPricePerUnit, partial, "");
+        Metadata metadata = new Metadata(template.getFuelTypeId(), template.getStationId(), template.getCarId(),
                 template.getFuelTypeName(), template.getFuelTypeCategory(), template.getStationName(), carInfo);
+
+        BalancedRefueling guess = new BalancedRefueling(refuelingData, metadata);
         guess.setGuessed(true);
         return guess;
     }
@@ -347,6 +347,16 @@ public class BalancedRefueling {
     }
 
     private static int getBalancedAverageDistanceOfFullRefuelings(List<BalancedRefueling> refuelings) {
+        List<Integer> allDistances = extractDistances(refuelings);
+        if (allDistances.isEmpty()) return 0;
+
+        List<Integer> filteredDistances = removeOutliers(allDistances);
+
+        int avgDistance = (int) Calculator.avg(filteredDistances.toArray(new Integer[0]));
+        return refineAverageDistance(filteredDistances, avgDistance);
+    }
+
+    private static List<Integer> extractDistances(List<BalancedRefueling> refuelings) {
         List<Integer> allDistances = new ArrayList<>();
         for (int i = 1; i < refuelings.size(); i++) {
             if (!refuelings.get(i).isPartial() && !refuelings.get(i - 1).isPartial()) {
@@ -358,16 +368,21 @@ public class BalancedRefueling {
                 allDistances.add(refuelings.get(i).getMileage() - refuelings.get(i - 1).getMileage());
             }
         }
-        if (allDistances.isEmpty()) return 0;
+        return allDistances;
+    }
 
-        Collections.sort(allDistances);
-        int removeCount = Math.round(allDistances.size() * 0.2f);
-        for (int i = 0; i < removeCount; i++) {
-            allDistances.remove(0);
-            allDistances.remove(allDistances.size() - 1);
+    private static <T extends Comparable<T>> List<T> removeOutliers(List<T> list) {
+        List<T> sortedList = new ArrayList<>(list);
+        Collections.sort(sortedList);
+        int removeCount = Math.round(sortedList.size() * 0.2f);
+        if (removeCount * 2 >= sortedList.size()) {
+            return sortedList;
         }
+        return new ArrayList<>(sortedList.subList(removeCount, sortedList.size() - removeCount));
+    }
 
-        int avgDistance = (int) Calculator.avg(allDistances.toArray(new Integer[0]));
+    private static int refineAverageDistance(List<Integer> allDistances, int initialAvg) {
+        int avgDistance = initialAvg;
         boolean updated;
         do {
             updated = false;
@@ -376,16 +391,27 @@ public class BalancedRefueling {
                 if (relativeDistance < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
                         || relativeDistance > (1 + MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
                     allDistances.remove(i);
-                    avgDistance = (int) Calculator.avg(allDistances.toArray(new Integer[0]));
+                    if (!allDistances.isEmpty()) {
+                        avgDistance = (int) Calculator.avg(allDistances.toArray(new Integer[0]));
+                    }
                     updated = true;
                 }
             }
         } while (updated && !allDistances.isEmpty());
-
         return avgDistance;
     }
 
     private static float getBalancedAverageVolumeOfFullRefuelings(List<BalancedRefueling> refuelings) {
+        List<Float> allVolumes = extractVolumes(refuelings);
+        if (allVolumes.isEmpty()) return 0;
+
+        List<Float> filteredVolumes = removeOutliers(allVolumes);
+
+        float avgVolume = (float) Calculator.avg(filteredVolumes.toArray(new Float[0]));
+        return refineAverageVolume(filteredVolumes, avgVolume);
+    }
+
+    private static List<Float> extractVolumes(List<BalancedRefueling> refuelings) {
         List<Float> allVolumes = new ArrayList<>();
         for (int i = 1; i < refuelings.size(); i++) {
             if (!refuelings.get(i).isPartial() && !refuelings.get(i - 1).isPartial()) {
@@ -397,16 +423,11 @@ public class BalancedRefueling {
                 allVolumes.add(refuelings.get(i).getVolume());
             }
         }
-        if (allVolumes.isEmpty()) return 0;
+        return allVolumes;
+    }
 
-        Collections.sort(allVolumes);
-        int removeCount = Math.round(allVolumes.size() * 0.2f);
-        for (int i = 0; i < removeCount; i++) {
-            allVolumes.remove(0);
-            allVolumes.remove(allVolumes.size() - 1);
-        }
-
-        float avgVolume = (float) Calculator.avg(allVolumes.toArray(new Float[0]));
+    private static float refineAverageVolume(List<Float> allVolumes, float initialAvg) {
+        float avgVolume = initialAvg;
         boolean updated;
         do {
             updated = false;
@@ -415,12 +436,13 @@ public class BalancedRefueling {
                 if (relativeVolume < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
                         || relativeVolume > (1 + MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
                     allVolumes.remove(i);
-                    avgVolume = (float) Calculator.avg(allVolumes.toArray(new Float[0]));
+                    if (!allVolumes.isEmpty()) {
+                        avgVolume = (float) Calculator.avg(allVolumes.toArray(new Float[0]));
+                    }
                     updated = true;
                 }
             }
         } while (updated && !allVolumes.isEmpty());
-
         return avgVolume;
     }
 

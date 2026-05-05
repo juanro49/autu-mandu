@@ -23,7 +23,7 @@ import java.util.Set;
 public abstract class AbstractReportChartLineData extends AbstractReportChartData {
     private final Set<Float> mMarkPoints = new HashSet<>();
 
-    public AbstractReportChartLineData(Context context, String name, int color) {
+    protected AbstractReportChartLineData(Context context, String name, int color) {
         super(context, name, color);
     }
 

@@ -33,9 +33,8 @@ import okio.ByteString;
 public class BasicDigestAuthenticator implements Authenticator {
     private static final String TAG = "BasicDigestAuthenticator";
 
-    protected static final String
-            HEADER_AUTHENTICATE = "WWW-Authenticate",
-            HEADER_AUTHORIZATION = "Authorization";
+    protected static final String HEADER_AUTHENTICATE = "WWW-Authenticate";
+    protected static final String HEADER_AUTHORIZATION = "Authorization";
 
     private final String host;
     private final String username;
@@ -65,7 +64,8 @@ public class BasicDigestAuthenticator implements Authenticator {
         Response priorResponse = response.priorResponse();
         boolean triedBefore = priorResponse != null && priorResponse.request().header(HEADER_AUTHORIZATION) != null;
 
-        HttpUtils.AuthScheme basicAuth = null, digestAuth = null;
+        HttpUtils.AuthScheme basicAuth = null;
+        HttpUtils.AuthScheme digestAuth = null;
         List<String> headers = response.headers(HEADER_AUTHENTICATE);
 
         for (HttpUtils.AuthScheme scheme : HttpUtils.parseWwwAuthenticate(headers.toArray(new String[0]))) {
@@ -121,11 +121,28 @@ public class BasicDigestAuthenticator implements Authenticator {
             params.add("algorithm=" + quotedString(algorithm.value));
         }
 
-        final String method = request.method();
         final String digestURI = request.url().encodedPath();
         params.add("uri=" + quotedString(digestURI));
 
-        String responseValue = null;
+        String responseValue = calculateResponseValue(request, realm, nonce, algorithm, qop, params);
+
+        if (responseValue != null) {
+            params.add("response=" + quotedString(responseValue));
+            return request.newBuilder()
+                    .header(HEADER_AUTHORIZATION, "Digest " + TextUtils.join(", ", params))
+                    .build();
+        }
+
+        return null;
+    }
+
+    private String calculateResponseValue(Request request, String realm, String nonce, Algorithm algorithm, Protection qop, List<String> params) {
+        String a1 = calculateA1(algorithm, realm, nonce);
+        String a2 = calculateA2(request, qop);
+
+        if (a1 == null || a2 == null) {
+            return null;
+        }
 
         if (qop != null) {
             params.add("qop=" + qop.value);
@@ -135,44 +152,38 @@ public class BasicDigestAuthenticator implements Authenticator {
             String ncValue = String.format("%08x", nc);
             params.add("nc=" + ncValue);
 
-            String a1 = null;
-            if (algorithm == Algorithm.MD5) {
-                a1 = username + ":" + realm + ":" + password;
-            } else if (algorithm == Algorithm.MD5_SESSION) {
-                a1 = h(username + ":" + realm + ":" + password) + ":" + nonce + ":" + clientNonce;
-            }
-
-            String a2 = null;
-            if (qop == Protection.AUTH) {
-                a2 = method + ":" + digestURI;
-            } else if (qop == Protection.AUTH_INT) {
-                try {
-                    RequestBody body = request.body();
-                    a2 = method + ":" + digestURI + ":" + (body != null ? h(body) : h(""));
-                } catch (IOException e) {
-                    Log.w(TAG, "Couldn't get entity-body for hash calculation");
-                }
-            }
-
-            if (a1 != null && a2 != null) {
-                responseValue = kd(h(a1), nonce + ":" + ncValue + ":" + clientNonce + ":" + qop.value + ":" + h(a2));
-            }
+            return kd(h(a1), nonce + ":" + ncValue + ":" + clientNonce + ":" + qop.value + ":" + h(a2));
         } else {
             // legacy (backwards compatibility with RFC 2069)
             if (algorithm == Algorithm.MD5) {
-                String a1 = username + ":" + realm + ":" + password;
-                String a2 = method + ":" + digestURI;
-                responseValue = kd(h(a1), nonce + ":" + h(a2));
+                return kd(h(a1), nonce + ":" + h(a2));
             }
         }
+        return null;
+    }
 
-        if (responseValue != null) {
-            params.add("response=" + quotedString(responseValue));
-            return request.newBuilder()
-                    .header(HEADER_AUTHORIZATION, "Digest " + TextUtils.join(", ", params))
-                    .build();
+    private String calculateA1(Algorithm algorithm, String realm, String nonce) {
+        if (algorithm == Algorithm.MD5) {
+            return username + ":" + realm + ":" + password;
+        } else if (algorithm == Algorithm.MD5_SESSION) {
+            return h(username + ":" + realm + ":" + password) + ":" + nonce + ":" + clientNonce;
         }
+        return null;
+    }
 
+    private String calculateA2(Request request, Protection qop) {
+        final String method = request.method();
+        final String digestURI = request.url().encodedPath();
+        if (qop == Protection.AUTH || qop == null) {
+            return method + ":" + digestURI;
+        } else if (qop == Protection.AUTH_INT) {
+            try {
+                RequestBody body = request.body();
+                return method + ":" + digestURI + ":" + (body != null ? h(body) : h(""));
+            } catch (IOException e) {
+                Log.w(TAG, "Couldn't get entity-body for hash calculation");
+            }
+        }
         return null;
     }
 

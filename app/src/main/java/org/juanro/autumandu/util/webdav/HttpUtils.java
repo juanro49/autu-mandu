@@ -38,12 +38,14 @@ public final class HttpUtils {
 
                 Matcher matcher = AUTH_SCHEME_WITH_PARAM.matcher(s);
                 if (matcher.matches()) {
-                    schemes.add(scheme = new AuthScheme(matcher.group(1)));
+                    scheme = new AuthScheme(matcher.group(1));
+                    schemes.add(scheme);
                     scheme.addRawParam(matcher.group(2));
                 } else if (scheme != null) {
                     scheme.addRawParam(s);
                 } else {
-                    schemes.add(scheme = new AuthScheme(s));
+                    scheme = new AuthScheme(s);
+                    schemes.add(scheme);
                 }
             }
         }
@@ -56,14 +58,16 @@ public final class HttpUtils {
 
         boolean inQuotes = false;
         int len = wwwAuth.length();
-        for (int i = 0; i < len; i++) {
+        int i = 0;
+        while (i < len) {
             char c = wwwAuth.charAt(i);
 
             if (c == '"') {
                 inQuotes = !inQuotes;
             } else if (inQuotes && c == '\\' && i + 1 < len) {
                 token.append(c);
-                c = wwwAuth.charAt(++i);
+                i++;
+                c = wwwAuth.charAt(i);
             }
 
             if (c == ',' && !inQuotes) {
@@ -72,8 +76,9 @@ public final class HttpUtils {
             } else {
                 token.append(c);
             }
+            i++;
         }
-        if (token.length() != 0) {
+        if (!token.toString().isEmpty()) {
             tokens.add(token.toString());
         }
         return tokens;

@@ -111,10 +111,14 @@ public class CalculatorFragment extends Fragment {
             }
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not used
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not used
+            }
         });
 
         viewModel.getResults().observe(getViewLifecycleOwner(), this::updateChart);

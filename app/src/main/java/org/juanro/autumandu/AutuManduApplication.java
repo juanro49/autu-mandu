@@ -167,4 +167,17 @@ public class AutuManduApplication extends android.app.Application implements Sha
             AutuManduDatabase.resetInstance();
         }
     }
+
+    /**
+     * Recreates all currently active activities.
+     */
+    public static void recreateAllActivities() {
+        if (instance != null) {
+            synchronized (instance.activities) {
+                for (Activity activity : new ArrayList<>(instance.activities)) {
+                    activity.recreate();
+                }
+            }
+        }
+    }
 }

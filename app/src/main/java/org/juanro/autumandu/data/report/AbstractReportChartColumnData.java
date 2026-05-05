@@ -18,7 +18,7 @@ package org.juanro.autumandu.data.report;
 import android.content.Context;
 
 public abstract class AbstractReportChartColumnData extends AbstractReportChartData {
-    public AbstractReportChartColumnData(Context context, String name, int color) {
+    protected AbstractReportChartColumnData(Context context, String name, int color) {
         super(context, name, color);
     }
 }

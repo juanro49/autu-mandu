@@ -43,6 +43,7 @@ import org.juanro.autumandu.gui.util.FormFieldGreaterZeroValidator;
 import org.juanro.autumandu.gui.util.FormValidator;
 import org.juanro.autumandu.gui.util.SimpleAnimator;
 import org.juanro.autumandu.model.entity.TireList;
+import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.TireUsage;
 import org.juanro.autumandu.util.reminder.ReminderWorker;
 import org.juanro.autumandu.viewmodel.TireDetailViewModel;
@@ -54,10 +55,10 @@ import java.util.Date;
  */
 public class DataDetailTireFragment extends AbstractDataDetailFragment {
     private static final int PICK_DATE_REQUEST_CODE = 0;
-    private static final int PICK_TIME_REQUEST_CODE = 1;
-    private static final int PICK_TRASH_DATE_REQUEST_CODE = 2;
-    private static final int PICK_MOUNT_DATE_REQUEST_CODE = 3;
-    private static final int PICK_UMOUNT_DATE_REQUEST_CODE = 4;
+    private static final int PICK_TRASH_DATE_REQUEST_CODE = 1;
+    private static final int PICK_MOUNT_DATE_REQUEST_CODE = 2;
+    private static final int PICK_UMOUNT_DATE_REQUEST_CODE = 3;
+    private static final int PICK_TIME_REQUEST_CODE = 4;
 
     public static DataDetailTireFragment newInstance(long id) {
         var f = new DataDetailTireFragment();
@@ -69,33 +70,34 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
 
     private EditText edtManufacturer;
     private EditText edtModel;
+    private DateTimeInput edtDate;
+    private DateTimeInput edtTime;
     private EditText edtQuantity;
     private EditText edtPrice;
     private EditText edtNote;
-    private DateTimeInput edtDate;
-    private DateTimeInput edtTime;
-    private CheckBox chkTrashDate;
-    private SimpleAnimator edtTrashDateAnimator;
-    private SimpleAnimator chkTrashDateAnimator;
-    private DateTimeInput edtTrashDate;
-    private TextInputLayout edtTrashDateInputLayout;
+    private Spinner spnCar;
     private CheckBox chkMount;
     private EditText edtMountDistance;
     private DateTimeInput edtMountDate;
+    private TextInputLayout edtMountDistanceInputLayout;
+    private TextInputLayout edtMountDateInputLayout;
     private SimpleAnimator edtMountDistanceAnimator;
     private SimpleAnimator edtMountDateAnimator;
     private SimpleAnimator chkMountAnimator;
-    private TextInputLayout edtMountDistanceInputLayout;
-    private TextInputLayout edtMountDateInputLayout;
     private CheckBox chkUmount;
     private EditText edtUmountDistance;
     private DateTimeInput edtUmountDate;
+    private TextInputLayout edtUmountDistanceInputLayout;
+    private TextInputLayout edtUmountDateInputLayout;
     private SimpleAnimator edtUmountDistanceAnimator;
     private SimpleAnimator edtUmountDateAnimator;
     private SimpleAnimator chkUmountAnimator;
-    private TextInputLayout edtUmountDistanceInputLayout;
-    private TextInputLayout edtUmountDateInputLayout;
-    private Spinner spnCar;
+    private CheckBox chkTrashDate;
+    private DateTimeInput edtTrashDate;
+    private TextInputLayout edtTrashDateInputLayout;
+    private SimpleAnimator edtTrashDateAnimator;
+    private SimpleAnimator chkTrashDateAnimator;
+
     private int carNumTires;
     private int numTiresMounted;
     private long mInitialCarId = -1;
@@ -131,79 +133,95 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
     @Override
     protected void fillFields(Bundle savedInstanceState, View v) {
         if (!isInEditMode()) {
-            var prefs = new Preferences(requireContext());
-
-            tire = new TireList();
-            edtDate.setDate(new Date());
-            edtTime.setDate(new Date());
-            edtTrashDate.setDate(new Date());
-            edtMountDate.setDate(new Date());
-            edtUmountDate.setDate(new Date());
-            chkMount.setVisibility(View.GONE);
-            chkMountAnimator.hide();
-            chkUmount.setVisibility(View.GONE);
-            chkUmountAnimator.hide();
-            chkTrashDate.setVisibility(View.GONE);
-            chkTrashDateAnimator.hide();
-
-            mInitialCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
-            if (mInitialCarId == 0) {
-                mInitialCarId = prefs.getDefaultCar();
-            }
-
-            viewModel.setCarId(mInitialCarId);
+            setupNewTireDefaults();
         } else {
-            viewModel.getTire().observe(getViewLifecycleOwner(), tireList -> {
-                if (tireList == null) return;
-                tire = tireList;
-
-                viewModel.setCarId(tireList.getCarId());
-
-                edtDate.setDate(tireList.getBuyDate());
-                edtTime.setDate(tireList.getBuyDate());
-                edtManufacturer.setText(tireList.getManufacturer());
-                edtModel.setText(tireList.getModel());
-                edtQuantity.setText(String.valueOf(tireList.getQuantity()));
-                edtPrice.setText(String.valueOf(tireList.getPrice()));
-                edtNote.setText(tireList.getNote());
-
-                if (tireList.getTrashDate() != null) {
-                    chkMount.setVisibility(View.GONE);
-                    chkUmount.setVisibility(View.GONE);
-                    chkMountAnimator.hide();
-                    chkUmountAnimator.hide();
-                    chkTrashDate.setChecked(true);
-                }
-                edtTrashDate.setDate(tireList.getTrashDate() == null ? new Date() : tireList.getTrashDate());
-
-                mInitialCarId = tireList.getCarId();
-                for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                    if (spnCar.getItemIdAtPosition(pos) == mInitialCarId) {
-                        spnCar.setSelection(pos);
-                        break;
-                    }
-                }
-
-                edtMountDate.setDate(new Date());
-                edtUmountDate.setDate(new Date());
-            });
-
-            viewModel.isTireMounted().observe(getViewLifecycleOwner(), isMounted -> {
-                if (isMounted) {
-                    chkMount.setVisibility(View.GONE);
-                    chkTrashDate.setVisibility(View.GONE);
-                    chkMountAnimator.hide();
-                    chkTrashDateAnimator.hide();
-                } else {
-                    chkUmount.setVisibility(View.GONE);
-                    chkUmountAnimator.hide();
-                }
-            });
+            setupEditTireObservers();
         }
 
         viewModel.getCarNumTires().observe(getViewLifecycleOwner(), numTires -> this.carNumTires = numTires != null ? numTires : 0);
         viewModel.getNumTiresMounted().observe(getViewLifecycleOwner(), numMounted -> this.numTiresMounted = numMounted != null ? numMounted : 0);
 
+        setupLatestMileageObserver();
+        hideOptionalInputLayouts();
+    }
+
+    private void setupNewTireDefaults() {
+        var prefs = new Preferences(requireContext());
+        tire = new TireList();
+        edtDate.setDate(new Date());
+        edtTime.setDate(new Date());
+        edtTrashDate.setDate(new Date());
+        edtMountDate.setDate(new Date());
+        edtUmountDate.setDate(new Date());
+        chkMount.setVisibility(View.GONE);
+        chkMountAnimator.hide();
+        chkUmount.setVisibility(View.GONE);
+        chkUmountAnimator.hide();
+        chkTrashDate.setVisibility(View.GONE);
+        chkTrashDateAnimator.hide();
+
+        mInitialCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
+        if (mInitialCarId == 0) {
+            mInitialCarId = prefs.getDefaultCar();
+        }
+        viewModel.setCarId(mInitialCarId);
+    }
+
+    private void setupEditTireObservers() {
+        viewModel.getTire().observe(getViewLifecycleOwner(), tireList -> {
+            if (tireList == null) return;
+            tire = tireList;
+            viewModel.setCarId(tireList.getCarId());
+            updateFieldsFromTire(tireList);
+            updateInitialCarSelection(tireList.getCarId());
+            edtMountDate.setDate(new Date());
+            edtUmountDate.setDate(new Date());
+        });
+
+        viewModel.isTireMounted().observe(getViewLifecycleOwner(), isMounted -> {
+            if (isMounted) {
+                chkMount.setVisibility(View.GONE);
+                chkTrashDate.setVisibility(View.GONE);
+                chkMountAnimator.hide();
+                chkTrashDateAnimator.hide();
+            } else {
+                chkUmount.setVisibility(View.GONE);
+                chkUmountAnimator.hide();
+            }
+        });
+    }
+
+    private void updateFieldsFromTire(TireList tireList) {
+        edtDate.setDate(tireList.getBuyDate());
+        edtTime.setDate(tireList.getBuyDate());
+        edtManufacturer.setText(tireList.getManufacturer());
+        edtModel.setText(tireList.getModel());
+        edtQuantity.setText(String.valueOf(tireList.getQuantity()));
+        edtPrice.setText(String.valueOf(tireList.getPrice()));
+        edtNote.setText(tireList.getNote());
+
+        if (tireList.getTrashDate() != null) {
+            chkMount.setVisibility(View.GONE);
+            chkUmount.setVisibility(View.GONE);
+            chkMountAnimator.hide();
+            chkUmountAnimator.hide();
+            chkTrashDate.setChecked(true);
+        }
+        edtTrashDate.setDate(tireList.getTrashDate() == null ? new Date() : tireList.getTrashDate());
+    }
+
+    private void updateInitialCarSelection(long carId) {
+        mInitialCarId = carId;
+        int count = spnCar.getCount();
+        for (int i = 0; i < count; i++) {
+            if (spnCar.getItemIdAtPosition(i) == mInitialCarId) {
+                spnCar.setSelection(i);
+                break;
+            }
+        }
+    }
+
+    private void setupLatestMileageObserver() {
         viewModel.getLatestMileage().observe(getViewLifecycleOwner(), latestMileage -> {
             int mileage = latestMileage != null ? latestMileage : 0;
             if (TextUtils.isEmpty(edtMountDistance.getText())) {
@@ -219,30 +237,26 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
                 edtUmountDate.setDate(new Date());
             }
         });
+    }
 
+    private void hideOptionalInputLayouts() {
         if (!chkMount.isChecked()) {
-            edtMountDistanceInputLayout.setVisibility(View.GONE);
-            edtMountDistanceInputLayout.getLayoutParams().height = 0;
-            edtMountDistanceInputLayout.setAlpha(0);
-            edtMountDateInputLayout.setVisibility(View.GONE);
-            edtMountDateInputLayout.getLayoutParams().height = 0;
-            edtMountDateInputLayout.setAlpha(0);
+            hideInputLayout(edtMountDistanceInputLayout);
+            hideInputLayout(edtMountDateInputLayout);
         }
-
         if (!chkUmount.isChecked()) {
-            edtUmountDistanceInputLayout.setVisibility(View.GONE);
-            edtUmountDistanceInputLayout.getLayoutParams().height = 0;
-            edtUmountDistanceInputLayout.setAlpha(0);
-            edtUmountDateInputLayout.setVisibility(View.GONE);
-            edtUmountDateInputLayout.getLayoutParams().height = 0;
-            edtUmountDateInputLayout.setAlpha(0);
+            hideInputLayout(edtUmountDistanceInputLayout);
+            hideInputLayout(edtUmountDateInputLayout);
         }
-
         if (!chkTrashDate.isChecked()) {
-            edtTrashDateInputLayout.setVisibility(View.GONE);
-            edtTrashDateInputLayout.getLayoutParams().height = 0;
-            edtTrashDateInputLayout.setAlpha(0);
+            hideInputLayout(edtTrashDateInputLayout);
         }
+    }
+
+    private void hideInputLayout(TextInputLayout layout) {
+        layout.setVisibility(View.GONE);
+        layout.getLayoutParams().height = 0;
+        layout.setAlpha(0);
     }
 
     @Override
@@ -269,12 +283,20 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
     protected void initFields(Bundle savedInstanceState, View v) {
         var prefs = new Preferences(requireContext());
 
+        initViewReferences(v);
+        setupDateAndTimePickers();
+        setupUnits(prefs);
+        setupMountListeners();
+        setupUmountListeners();
+        setupTrashListeners();
+        setupCarSpinner();
+    }
+
+    private void initViewReferences(View v) {
         edtManufacturer = v.findViewById(R.id.edt_manufacturer);
         edtModel = v.findViewById(R.id.edt_model);
-        edtDate = new DateTimeInput(v.findViewById(R.id.edt_date),
-            DateTimeInput.Mode.DATE);
-        edtTime = new DateTimeInput(v.findViewById(R.id.edt_time),
-            DateTimeInput.Mode.TIME);
+        edtDate = new DateTimeInput(v.findViewById(R.id.edt_date), DateTimeInput.Mode.DATE);
+        edtTime = new DateTimeInput(v.findViewById(R.id.edt_time), DateTimeInput.Mode.TIME);
         edtQuantity = v.findViewById(R.id.edt_quantity);
         edtPrice = v.findViewById(R.id.edt_price);
         edtNote = v.findViewById(R.id.edt_note);
@@ -284,45 +306,41 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
         edtMountDate = new DateTimeInput(v.findViewById(R.id.edt_mount_date), DateTimeInput.Mode.DATE);
         edtMountDistanceInputLayout = v.findViewById(R.id.edt_mount_distance_input_layout);
         edtMountDateInputLayout = v.findViewById(R.id.edt_mount_date_input_layout);
-        edtMountDistanceAnimator = new SimpleAnimator(getActivity(), edtMountDistanceInputLayout,
-            SimpleAnimator.Property.HEIGHT);
-        edtMountDateAnimator = new SimpleAnimator(getActivity(), edtMountDateInputLayout,
-            SimpleAnimator.Property.HEIGHT);
+        edtMountDistanceAnimator = new SimpleAnimator(getActivity(), edtMountDistanceInputLayout, SimpleAnimator.Property.HEIGHT);
+        edtMountDateAnimator = new SimpleAnimator(getActivity(), edtMountDateInputLayout, SimpleAnimator.Property.HEIGHT);
         chkUmount = v.findViewById(R.id.chk_umount);
         edtUmountDistance = v.findViewById(R.id.edt_umount_distance);
         edtUmountDate = new DateTimeInput(v.findViewById(R.id.edt_umount_date), DateTimeInput.Mode.DATE);
         edtUmountDistanceInputLayout = v.findViewById(R.id.edt_umount_distance_input_layout);
         edtUmountDateInputLayout = v.findViewById(R.id.edt_umount_date_input_layout);
-        edtUmountDistanceAnimator = new SimpleAnimator(getActivity(), edtUmountDistanceInputLayout,
-            SimpleAnimator.Property.HEIGHT);
-        chkMountAnimator = new SimpleAnimator(getActivity(), chkMount,
-            SimpleAnimator.Property.HEIGHT);
-        edtUmountDateAnimator = new SimpleAnimator(getActivity(), edtUmountDateInputLayout,
-            SimpleAnimator.Property.HEIGHT);
-        chkUmountAnimator = new SimpleAnimator(getActivity(), chkUmount,
-            SimpleAnimator.Property.HEIGHT);
+        edtUmountDistanceAnimator = new SimpleAnimator(getActivity(), edtUmountDistanceInputLayout, SimpleAnimator.Property.HEIGHT);
+        edtUmountDateAnimator = new SimpleAnimator(getActivity(), edtUmountDateInputLayout, SimpleAnimator.Property.HEIGHT);
+        chkMountAnimator = new SimpleAnimator(getActivity(), chkMount, SimpleAnimator.Property.HEIGHT);
+        chkUmountAnimator = new SimpleAnimator(getActivity(), chkUmount, SimpleAnimator.Property.HEIGHT);
         chkTrashDate = v.findViewById(R.id.chk_trash_date);
         edtTrashDate = new DateTimeInput(v.findViewById(R.id.edt_trash_date), DateTimeInput.Mode.DATE);
         edtTrashDateInputLayout = v.findViewById(R.id.edt_trash_date_input_layout);
-        edtTrashDateAnimator = new SimpleAnimator(getActivity(), edtTrashDateInputLayout,
-            SimpleAnimator.Property.HEIGHT);
-        chkTrashDateAnimator = new SimpleAnimator(getActivity(), chkTrashDate,
-            SimpleAnimator.Property.HEIGHT);
+        edtTrashDateAnimator = new SimpleAnimator(getActivity(), edtTrashDateInputLayout, SimpleAnimator.Property.HEIGHT);
+        chkTrashDateAnimator = new SimpleAnimator(getActivity(), chkTrashDate, SimpleAnimator.Property.HEIGHT);
+    }
 
-        // Date + Time
+    private void setupDateAndTimePickers() {
         edtDate.applyOnClickListener(PICK_DATE_REQUEST_CODE, getParentFragmentManager());
         edtTime.applyOnClickListener(PICK_TIME_REQUEST_CODE, getParentFragmentManager());
+        edtMountDate.applyOnClickListener(PICK_MOUNT_DATE_REQUEST_CODE, getParentFragmentManager());
+        edtUmountDate.applyOnClickListener(PICK_UMOUNT_DATE_REQUEST_CODE, getParentFragmentManager());
+        edtTrashDate.applyOnClickListener(PICK_TRASH_DATE_REQUEST_CODE, getParentFragmentManager());
+    }
 
-        // Units
+    private void setupUnits(Preferences prefs) {
         addUnitToHint(edtPrice, R.string.hint_price, prefs.getUnitCurrency());
+    }
 
+    private void setupMountListeners() {
         chkMount.setOnClickListener(v1 -> {
             boolean isChecked = chkMount.isChecked();
             if (isChecked) {
-                // Cantidad que el usuario quiere montar (del EditText)
                 int quantityToMount = getIntegerFromEditText(edtQuantity, 0);
-
-                // Total = Ya montados + Nuevos a montar
                 int totalAfterMount = numTiresMounted + quantityToMount;
 
                 if (carNumTires < totalAfterMount) {
@@ -331,9 +349,7 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
                     return;
                 }
 
-                if (edtMountDate.getDate() == null) {
-                    edtMountDate.setDate(new Date());
-                }
+                if (edtMountDate.getDate() == null) edtMountDate.setDate(new Date());
 
                 chkTrashDate.setChecked(false);
                 edtTrashDateAnimator.hide();
@@ -346,13 +362,12 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
                 chkTrashDateAnimator.show();
             }
         });
+    }
 
+    private void setupUmountListeners() {
         chkUmount.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                if (edtUmountDate.getDate() == null) {
-                    edtUmountDate.setDate(new Date());
-                }
-
+                if (edtUmountDate.getDate() == null) edtUmountDate.setDate(new Date());
                 edtUmountDistanceAnimator.show();
                 edtUmountDateAnimator.show();
             } else {
@@ -360,58 +375,48 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
                 edtUmountDateAnimator.hide();
             }
         });
+    }
 
+    private void setupTrashListeners() {
         chkTrashDate.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                if (edtTrashDate.getDate() == null) {
-                    edtTrashDate.setDate(new Date());
-                }
+                if (edtTrashDate.getDate() == null) edtTrashDate.setDate(new Date());
                 edtTrashDateAnimator.show();
             } else {
                 edtTrashDateAnimator.hide();
             }
         });
+    }
 
-        edtMountDate.applyOnClickListener(PICK_MOUNT_DATE_REQUEST_CODE, getParentFragmentManager());
-        edtUmountDate.applyOnClickListener(PICK_UMOUNT_DATE_REQUEST_CODE, getParentFragmentManager());
-        edtTrashDate.applyOnClickListener(PICK_TRASH_DATE_REQUEST_CODE, getParentFragmentManager());
-
-        // Car
+    private void setupCarSpinner() {
         viewModel.getCars().observe(getViewLifecycleOwner(), cars -> {
-            spnCar.setAdapter(new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, cars) {
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    var v1 = (TextView) super.getView(position, convertView, parent);
-                    var item = getItem(position);
-                    if (item != null) {
-                        v1.setText(item.getName());
-                    }
-                    return v1;
-                }
-
-                @Override
-                public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    var v1 = (TextView) super.getDropDownView(position, convertView, parent);
-                    var item = getItem(position);
-                    if (item != null) {
-                        v1.setText(item.getName());
-                    }
-                    return v1;
-                }
-
+            spnCar.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, cars) {
                 @Override
                 public long getItemId(int position) {
                     var item = getItem(position);
                     return item != null ? item.getId() : -1;
                 }
+                @NonNull
+                @Override
+                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                    var v1 = (TextView) super.getView(position, convertView, parent);
+                    var item = getItem(position);
+                    if (item != null) v1.setText(item.getName());
+                    return v1;
+                }
+                @Override
+                public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                    var v1 = (TextView) super.getDropDownView(position, convertView, parent);
+                    var item = getItem(position);
+                    if (item != null) v1.setText(item.getName());
+                    return v1;
+                }
             });
-
             if (mInitialCarId != -1) {
-                for (int pos = 0; pos < spnCar.getCount(); pos++) {
-                    if (spnCar.getItemIdAtPosition(pos) == mInitialCarId) {
-                        spnCar.setSelection(pos);
+                int count = spnCar.getCount();
+                for (int i = 0; i < count; i++) {
+                    if (spnCar.getItemIdAtPosition(i) == mInitialCarId) {
+                        spnCar.setSelection(i);
                         break;
                     }
                 }
@@ -423,19 +428,34 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 viewModel.setCarId(id);
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                // Not used
             }
         });
     }
 
+
     @Override
     protected void saveAsync() {
-        if (tire == null) {
-            return;
+        if (tire == null) return;
+
+        updateTireFromFields();
+
+        TireUsage newUsage = null;
+        if (chkMount.isChecked()) {
+            newUsage = prepareNewUsage();
+            if (newUsage == null) return; // Validation failed
         }
 
+        if (chkUmount.isChecked()) {
+            processUnmounting(newUsage);
+        } else {
+            viewModel.save(tire, newUsage, null, this::onSaved);
+        }
+    }
+
+    private void updateTireFromFields() {
         Date trashDate = null;
         if (chkTrashDate.isChecked()) {
             trashDate = edtTrashDate.getDate();
@@ -449,80 +469,59 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
         tire.setTrashDate(trashDate);
         tire.setNote(edtNote.getText().toString().trim());
         tire.setCarId(spnCar.getSelectedItemId());
+    }
 
-        TireUsage newUsage = null;
-        if (chkMount.isChecked()) {
-            // Validación de capacidad al guardar
-            int currentQuantity = getIntegerFromEditText(edtQuantity, 0);
-            Integer numMounted = viewModel.getNumTiresMounted().getValue();
-            int totalAfterMount = (numMounted != null ? numMounted : 0);
+    private TireUsage prepareNewUsage() {
+        int currentQuantity = getIntegerFromEditText(edtQuantity, 0);
+        Integer numMountedValue = viewModel.getNumTiresMounted().getValue();
+        int totalAfterMount = (numMountedValue != null ? numMountedValue : 0);
 
-            // Si es edición y ya estaba montado, no sumamos su propia cantidad dos veces
-            Boolean isAlreadyMounted = viewModel.isTireMounted().getValue();
-            if (isAlreadyMounted != null && isAlreadyMounted) {
-                // En este caso numMounted ya incluye la cantidad anterior de este neumático.
-                // Pero si el usuario cambia la cantidad en el EditText, debemos validar el nuevo total.
-                if (tire != null) {
-                    totalAfterMount = totalAfterMount - tire.getQuantity() + currentQuantity;
-                }
-            } else {
-                totalAfterMount += currentQuantity;
-            }
-
-            if (carNumTires < totalAfterMount) {
-                Toast.makeText(requireContext(), R.string.toast_all_tires_mounted, Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            newUsage = new TireUsage();
-            var mountDate = edtMountDate.getDate();
-            newUsage.setDateMount(mountDate != null ? mountDate : new Date());
-            newUsage.setDistanceMount(getIntegerFromEditText(edtMountDistance, 0));
-            newUsage.setDateUmount(null);
-            newUsage.setDistanceUmount(0);
+        Boolean isAlreadyMounted = viewModel.isTireMounted().getValue();
+        if (isAlreadyMounted != null && isAlreadyMounted) {
+            totalAfterMount = totalAfterMount - tire.getQuantity() + currentQuantity;
+        } else {
+            totalAfterMount += currentQuantity;
         }
 
-        if (chkUmount.isChecked()) {
-            // Aseguramos que el kilometraje de desmontaje sea válido
-            int umountDistance = getIntegerFromEditText(edtUmountDistance, 0);
+        if (carNumTires < totalAfterMount) {
+            Toast.makeText(requireContext(), R.string.toast_all_tires_mounted, Toast.LENGTH_LONG).show();
+            return null;
+        }
 
-            viewModel.getUsageByTireIdNotUmount(mId, usage -> {
-                if (usage != null) {
-                    if (umountDistance < usage.getDistanceMount()) {
-                        requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.alert_invalid_distance, Toast.LENGTH_SHORT).show());
-                        return;
-                    }
+        TireUsage newUsage = new TireUsage();
+        var mountDate = edtMountDate.getDate();
+        newUsage.setDateMount(mountDate != null ? mountDate : new Date());
+        newUsage.setDistanceMount(getIntegerFromEditText(edtMountDistance, 0));
+        newUsage.setDateUmount(null);
+        newUsage.setDistanceUmount(0);
+        return newUsage;
+    }
 
-                    usage.setDateUmount(edtUmountDate.getDate());
-                    usage.setDistanceUmount(umountDistance);
-                    viewModel.save(tire, null, usage, () -> {
-                        if (isAdded()) {
-                            requireActivity().runOnUiThread(() -> {
-                                ReminderWorker.enqueueUpdate(requireContext());
-                                mOnItemActionListener.onItemSavedAsync(tire.getId());
-                            });
-                        }
-                    });
-                } else {
-                    // Fallback si no hay uso activo, guardamos solo tire
-                    viewModel.save(tire, null, null, () -> {
-                        if (isAdded()) {
-                            requireActivity().runOnUiThread(() -> {
-                                ReminderWorker.enqueueUpdate(requireContext());
-                                mOnItemActionListener.onItemSavedAsync(tire.getId());
-                            });
-                        }
-                    });
+    private void processUnmounting(TireUsage newUsage) {
+        int umountDistance = getIntegerFromEditText(edtUmountDistance, 0);
+
+        viewModel.getUsageByTireIdNotUmount(mId, usage -> {
+            if (usage != null) {
+                if (umountDistance < usage.getDistanceMount()) {
+                    requireActivity().runOnUiThread(() -> Toast.makeText(requireContext(), R.string.alert_invalid_distance, Toast.LENGTH_SHORT).show());
+                    return;
                 }
-            });
-        } else {
-            viewModel.save(tire, newUsage, null, () -> {
-                if (isAdded()) {
-                    requireActivity().runOnUiThread(() -> {
-                        ReminderWorker.enqueueUpdate(requireContext());
-                        mOnItemActionListener.onItemSavedAsync(tire.getId());
-                    });
-                }
+
+                usage.setDateUmount(edtUmountDate.getDate());
+                usage.setDistanceUmount(umountDistance);
+                viewModel.save(tire, newUsage, usage, this::onSaved);
+            } else {
+                // Fallback if no active usage found, save only tire and potential newUsage
+                viewModel.save(tire, newUsage, null, this::onSaved);
+            }
+        });
+    }
+
+    private void onSaved() {
+        if (isAdded()) {
+            requireActivity().runOnUiThread(() -> {
+                ReminderWorker.enqueueUpdate(requireContext());
+                mOnItemActionListener.onItemSavedAsync(tire.getId());
             });
         }
     }
@@ -538,11 +537,12 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
 
     @Override
     protected long save() {
-        return 0;
+        return 0; // Using saveAsync
     }
 
     @Override
     protected void delete() {
+        // Using deleteAsync
     }
 
     @Override

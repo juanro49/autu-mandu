@@ -21,6 +21,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.entity.Car;
@@ -28,15 +29,31 @@ import org.juanro.autumandu.model.entity.Car;
 import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
-    private final AutuManduDatabase db;
-    private final LiveData<List<Car>> cars;
-    private final LiveData<List<Car>> notSuspendedCars;
+    private final MediatorLiveData<List<Car>> cars = new MediatorLiveData<>();
+    private final MediatorLiveData<List<Car>> notSuspendedCars = new MediatorLiveData<>();
+    private final MediatorLiveData<Integer> carCount = new MediatorLiveData<>();
+    private LiveData<List<Car>> currentCarsSource;
+    private LiveData<List<Car>> currentNotSuspendedCarsSource;
+    private LiveData<Integer> currentCarCountSource;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        db = AutuManduDatabase.getInstance(application);
-        cars = db.getCarDao().getAllLiveData();
-        notSuspendedCars = db.getCarDao().getNotSuspendedLiveData();
+        refreshSources();
+    }
+
+    public void refreshSources() {
+        if (currentCarsSource != null) cars.removeSource(currentCarsSource);
+        if (currentNotSuspendedCarsSource != null) notSuspendedCars.removeSource(currentNotSuspendedCarsSource);
+        if (currentCarCountSource != null) carCount.removeSource(currentCarCountSource);
+
+        var db = AutuManduDatabase.getInstance(getApplication());
+        currentCarsSource = db.getCarDao().getAllLiveData();
+        currentNotSuspendedCarsSource = db.getCarDao().getNotSuspendedLiveData();
+        currentCarCountSource = db.getCarDao().getCountLiveData();
+
+        cars.addSource(currentCarsSource, cars::setValue);
+        notSuspendedCars.addSource(currentNotSuspendedCarsSource, notSuspendedCars::setValue);
+        carCount.addSource(currentCarCountSource, carCount::setValue);
     }
 
     public LiveData<List<Car>> getCars() {
@@ -48,6 +65,6 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public LiveData<Integer> getCarCount() {
-        return db.getCarDao().getCountLiveData();
+        return carCount;
     }
 }

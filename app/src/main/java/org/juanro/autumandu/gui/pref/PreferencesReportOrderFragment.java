@@ -180,6 +180,7 @@ public class PreferencesReportOrderFragment extends PreferenceFragmentCompat {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+            // Swiping is not supported
         }
     }
 }

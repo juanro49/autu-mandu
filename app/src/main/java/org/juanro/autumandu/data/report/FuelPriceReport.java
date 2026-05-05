@@ -37,7 +37,9 @@ public class FuelPriceReport extends AbstractReport {
     private static final String PRICE_FORMAT = "%.3f %s";
 
     private class ReportChartData extends AbstractReportChartLineData {
-        private double mMax, mMin, mAverage;
+        private double mMax;
+        private double mMin;
+        private double mAverage;
 
         public ReportChartData(Context context, FuelType fuelType, int color, List<Refueling> refuelings) {
             super(context, fuelType.getName(), color);

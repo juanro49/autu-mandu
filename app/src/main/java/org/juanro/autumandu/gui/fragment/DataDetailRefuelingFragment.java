@@ -77,9 +77,10 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     private org.juanro.autumandu.viewmodel.RefuelingDetailViewModel mViewModel;
 
     private void selectSpinnerItemById(Spinner spinner, long id) {
-        for (int pos = 0; pos < spinner.getCount(); pos++) {
-            if (spinner.getItemIdAtPosition(pos) == id) {
-                spinner.setSelection(pos);
+        int count = spinner.getCount();
+        for (int i = 0; i < count; i++) {
+            if (spinner.getItemIdAtPosition(i) == id) {
+                spinner.setSelection(i);
                 break;
             }
         }
@@ -170,6 +171,15 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     protected void initFields(Bundle savedInstanceState, View v) {
         final Preferences prefs = new Preferences(requireContext());
 
+        initViewReferences(v);
+        setupDateTimePickers();
+        setupMileageValidation(prefs);
+        setupPriceEntryMode(prefs);
+        setupSpinners();
+        setupCarSpinner();
+    }
+
+    private void initViewReferences(View v) {
         edtDate = new DateTimeInput(v.findViewById(R.id.edt_date),
                 DateTimeInput.Mode.DATE);
         edtTime = new DateTimeInput(v.findViewById(R.id.edt_time),
@@ -183,7 +193,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
         spnStation = v.findViewById(R.id.spn_station);
         edtNote = v.findViewById(R.id.edt_note);
         spnCar = v.findViewById(R.id.spn_car);
+    }
 
+    private void setupDateTimePickers() {
         getParentFragmentManager().setFragmentResultListener(DatePickerDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
             int requestCode = result.getInt(DatePickerDialogFragment.RESULT_REQUEST_CODE);
             Date date = new Date(result.getLong(DatePickerDialogFragment.RESULT_DATE));
@@ -199,17 +211,16 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
             }
         });
 
-        // Date and time
         edtDate.applyOnClickListener(PICK_DATE_REQUEST_CODE,
                 getParentFragmentManager());
         edtTime.applyOnClickListener(PICK_TIME_REQUEST_CODE,
                 getParentFragmentManager());
+    }
 
-        // Distance entry mode
+    private void setupMileageValidation(Preferences prefs) {
         mDistanceEntryMode = prefs.getDistanceEntryMode();
         addUnitToHint(edtMileage, mDistanceEntryMode.getNameResourceId(), prefs.getUnitDistance());
 
-        // Mileage warning
         txtMileageWarning.setVisibility(View.GONE);
         txtMileageWarning.setText(mDistanceEntryMode == DistanceEntryMode.TOTAL
                 ? R.string.validate_error_mileage_out_of_range_total
@@ -219,8 +230,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
                 updateMileageInputWarningVisibility();
             }
         });
+    }
 
-        // Price entry mode
+    private void setupPriceEntryMode(Preferences prefs) {
         mPriceEntryMode = prefs.getPriceEntryMode();
         String pricePerUnit = String.format("%s/%s", prefs.getUnitCurrency(), prefs.getUnitVolume());
         if (mPriceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME) {
@@ -233,7 +245,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
             addUnitToHint(edtVolume, R.string.hint_volume, prefs.getUnitVolume());
             addUnitToHint(edtPrice, R.string.hint_price_per_unit, pricePerUnit);
         }
+    }
 
+    private void setupSpinners() {
         mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), fuelTypes ->
             spnFuelType.setAdapter(new ArrayAdapter<>(requireContext(),
                     android.R.layout.simple_spinner_dropdown_item, fuelTypes) {
@@ -297,7 +311,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
                     return item != null ? item.getId() : -1;
                 }
             }));
+    }
 
+    private void setupCarSpinner() {
         mViewModel.getCars().observe(getViewLifecycleOwner(), cars -> {
             spnCar.setAdapter(new ArrayAdapter<>(requireContext(),
                     android.R.layout.simple_spinner_dropdown_item, cars) {
@@ -356,6 +372,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
             }
         });
     }
+
 
     @Override
     protected boolean validate() {

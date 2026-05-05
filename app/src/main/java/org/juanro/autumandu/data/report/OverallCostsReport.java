@@ -331,13 +331,8 @@ public class OverallCostsReport extends AbstractReport {
     }
 
     private static class ReportChartData extends AbstractReportChartColumnData {
-        public ReportChartData(Context context, String name, int color) {
+        protected ReportChartData(Context context, String name, int color) {
             super(context, name, color);
-        }
-
-        @Override
-        protected void add(Float x, Float y, String tooltip) {
-            super.add(x, y, tooltip);
         }
     }
 }

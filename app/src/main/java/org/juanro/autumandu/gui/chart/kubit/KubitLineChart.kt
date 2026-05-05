@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -57,7 +56,6 @@ import com.kubit.charts.components.chart.linechart.model.Point
 import com.kubit.charts.components.chart.linechart.model.SelectionHighlightPoint
 import com.kubit.charts.components.chart.linechart.model.SelectionHighlightPopUp
 import com.kubit.charts.components.scaffold.ChartScaffold
-import com.kubit.charts.components.scaffold.ChartScaffoldContentData
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
@@ -86,8 +84,13 @@ fun KubitLineChart(
         // Rango de X ajustado para que los puntos de los extremos sean visibles
         val rangeX = bounds.maxX - bounds.minX
         val safeRangeX = if (rangeX > 0f) rangeX else 1f
-        val effectiveXMin = bounds.minX - safeRangeX * 0.02f
-        val effectiveXMax = bounds.maxX + safeRangeX * 0.005f
+        val xAxisBounds = XAxisBounds(
+            rangeX = rangeX,
+            minX = bounds.minX,
+            maxX = bounds.maxX,
+            effectiveXMin = bounds.minX - safeRangeX * 0.02f,
+            effectiveXMax = bounds.maxX + safeRangeX * 0.005f
+        )
 
         // Rango de Y optimizado
         val rangeY = bounds.maxY - bounds.minY
@@ -117,8 +120,8 @@ fun KubitLineChart(
             createYSteps(effectiveYMin, effectiveRangeY, labelStyle, gridStyle, yAxisLabel)
         }
 
-        val xSteps = remember(rangeX, bounds.minX, bounds.maxX, effectiveXMin, effectiveXMax) {
-            createXSteps(rangeX, bounds.minX, bounds.maxX, effectiveXMin, effectiveXMax, labelStyle, gridStyle, xAxisLabel)
+        val xSteps = remember(xAxisBounds) {
+            createXSteps(xAxisBounds, labelStyle, gridStyle, xAxisLabel)
         }
 
         val yAxisData = remember(ySteps) { AxisData(axisSteps = ySteps) }
@@ -148,6 +151,14 @@ fun KubitLineChart(
 }
 
 data class LineChartConfig(val isFullScreen: Boolean = false)
+
+private data class XAxisBounds(
+    val rangeX: Float,
+    val minX: Float,
+    val maxX: Float,
+    val effectiveXMin: Float,
+    val effectiveXMax: Float
+)
 
 private data class LineChartUiConfig(
     val xAxisData: AxisData,
@@ -193,7 +204,7 @@ private fun createLines(
                     dp.x + xOffset,
                     dp.y,
                     intersectionNode = if (isTrend) null else IntersectionPoint(
-                        radius = 4.dp, // Assuming radius fix
+                        radius = 4.dp,
                         color = if (isMarked) textColor else lineColor
                     )
                 )
@@ -234,38 +245,34 @@ private fun createYSteps(
 }
 
 private fun createXSteps(
-    rangeX: Float,
-    minX: Float,
-    maxX: Float,
-    effectiveXMin: Float,
-    effectiveXMax: Float,
+    bounds: XAxisBounds,
     labelStyle: TextStyle,
     gridStyle: AxisStepStyle,
     xAxisLabel: (Float) -> String
 ): ImmutableList<AxisStep> {
-    if (rangeX <= 0) {
+    if (bounds.rangeX <= 0) {
         return persistentListOf(
-            AxisStep(minX, xAxisLabel(minX), labelStyle, stepStyle = gridStyle)
+            AxisStep(bounds.minX, xAxisLabel(bounds.minX), labelStyle, stepStyle = gridStyle)
         )
     }
 
     val steps = mutableListOf<AxisStep>()
-    steps.add(AxisStep(effectiveXMin, "", labelStyle, stepStyle = null))
+    steps.add(AxisStep(bounds.effectiveXMin, "", labelStyle, stepStyle = null))
 
     val startCal = Calendar.getInstance().apply {
-        time = ReportDateHelper.toDate(minX)
+        time = ReportDateHelper.toDate(bounds.minX)
         set(Calendar.DAY_OF_MONTH, 1)
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
     }
     val endCal = Calendar.getInstance().apply {
-        time = ReportDateHelper.toDate(maxX)
+        time = ReportDateHelper.toDate(bounds.maxX)
     }
 
     while (startCal.before(endCal) || startCal == endCal) {
         val currentFloat = ReportDateHelper.toFloat(startCal.time)
-        if (currentFloat >= minX) {
+        if (currentFloat >= bounds.minX) {
             steps.add(AxisStep(
                 axisValue = currentFloat,
                 axisLabel = xAxisLabel(currentFloat),
@@ -277,10 +284,10 @@ private fun createXSteps(
     }
 
     if (steps.size <= 2) {
-        steps.add(AxisStep(minX, xAxisLabel(minX), labelStyle, stepStyle = gridStyle))
-        steps.add(AxisStep(maxX, xAxisLabel(maxX), labelStyle, stepStyle = gridStyle))
+        steps.add(AxisStep(bounds.minX, xAxisLabel(bounds.minX), labelStyle, stepStyle = gridStyle))
+        steps.add(AxisStep(bounds.maxX, xAxisLabel(bounds.maxX), labelStyle, stepStyle = gridStyle))
     }
-    steps.add(AxisStep(effectiveXMax, "", labelStyle, stepStyle = null))
+    steps.add(AxisStep(bounds.effectiveXMax, "", labelStyle, stepStyle = null))
     return steps.toPersistentList()
 }
 

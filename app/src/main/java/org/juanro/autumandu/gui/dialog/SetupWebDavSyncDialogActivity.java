@@ -89,9 +89,13 @@ public class SetupWebDavSyncDialogActivity extends AppCompatActivity {
         mEdtUrl = findViewById(R.id.edt_url);
         mEdtUrl.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not used
+            }
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not used
+            }
             @Override
             public void afterTextChanged(Editable s) {
                 resetCertificateView();

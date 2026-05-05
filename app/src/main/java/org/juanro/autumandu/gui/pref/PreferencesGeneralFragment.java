@@ -52,52 +52,75 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             String prefKey = preference.getKey();
-            if (prefKey.equals("behavior_default_car")) {
-                mViewModel.getCarById(Long.parseLong(newValue.toString()), car -> {
-                    if (car != null && isAdded()) {
-                        requireActivity().runOnUiThread(() -> preference.setSummary(car.getName()));
+            switch (prefKey) {
+                case "behavior_default_car" -> handleDefaultCarChange(preference, newValue);
+                case "behavior_distance_entry_mode" -> handleDistanceEntryModeChange(preference, newValue);
+                case "behavior_price_entry_mode" -> handlePriceEntryModeChange(preference, newValue);
+                case "behavior_reminder_snooze_duration" -> handleSnoozeDurationChange(preference, newValue);
+                case "unit_distance", "unit_volume" -> handleUnitChange(preference, newValue);
+                case UNIT_FUEL_CONSUMPTION -> handleFuelConsumptionChange((ListPreference) preference, newValue);
+                case "ui_theme" -> handleThemeChange((ListPreference) preference, newValue);
+                case "ui_dynamic_color" -> requireActivity().recreate();
+                default -> {
+                    if (preference instanceof EditTextPreference) {
+                        preference.setSummary(newValue.toString());
                     }
-                });
-            } else if (prefKey.equals("behavior_distance_entry_mode")) {
-                DistanceEntryMode mode = DistanceEntryMode.valueOf(newValue.toString());
-                preference.setSummary(getString(mode.getNameResourceId()));
-            } else if (prefKey.equals("behavior_price_entry_mode")) {
-                PriceEntryMode mode = PriceEntryMode.valueOf(newValue.toString());
-                preference.setSummary(getString(mode.getNameResourceId()));
-            } else if (prefKey.equals("behavior_reminder_snooze_duration")) {
-                TimeSpan timeSpan = TimeSpan.fromString(newValue.toString(), null);
-                if (timeSpan != null) {
-                    preference.setSummary(timeSpan.toLocalizedString(requireContext()));
                 }
-            } else if (preference instanceof EditTextPreference) {
-                preference.setSummary(newValue.toString());
-
-                // Update fuel consumption mLabel
-                FuelConsumption fuelConsumption = new FuelConsumption(requireContext());
-                if (prefKey.equals("unit_distance")) {
-                    fuelConsumption.setUnitDistance(newValue.toString());
-                } else if (prefKey.equals("unit_volume")) {
-                    fuelConsumption.setUnitVolume(newValue.toString());
-                }
-
-                updateFuelConsumptionField(fuelConsumption);
-            } else if (prefKey.equals(UNIT_FUEL_CONSUMPTION)) {
-                FuelConsumption fuelConsumption = new FuelConsumption(requireContext());
-                fuelConsumption.setConsumptionType(Integer.parseInt(newValue.toString()));
-                updateFuelConsumptionField(fuelConsumption, (ListPreference) preference);
-            } else if (prefKey.equals("ui_theme")) {
-                String theme = newValue.toString();
-                switch (theme) {
-                    case "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    case "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    default -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                }
-                updateThemeSummary((ListPreference) preference, theme);
-            } else if (prefKey.equals("ui_dynamic_color")) {
-                requireActivity().recreate();
             }
 
             return true;
+        }
+
+        private void handleDefaultCarChange(Preference preference, Object newValue) {
+            mViewModel.getCarById(Long.parseLong(newValue.toString()), car -> {
+                if (car != null && isAdded()) {
+                    requireActivity().runOnUiThread(() -> preference.setSummary(car.getName()));
+                }
+            });
+        }
+
+        private void handleDistanceEntryModeChange(Preference preference, Object newValue) {
+            DistanceEntryMode mode = DistanceEntryMode.valueOf(newValue.toString());
+            preference.setSummary(getString(mode.getNameResourceId()));
+        }
+
+        private void handlePriceEntryModeChange(Preference preference, Object newValue) {
+            PriceEntryMode mode = PriceEntryMode.valueOf(newValue.toString());
+            preference.setSummary(getString(mode.getNameResourceId()));
+        }
+
+        private void handleSnoozeDurationChange(Preference preference, Object newValue) {
+            TimeSpan timeSpan = TimeSpan.fromString(newValue.toString(), null);
+            if (timeSpan != null) {
+                preference.setSummary(timeSpan.toLocalizedString(requireContext()));
+            }
+        }
+
+        private void handleUnitChange(Preference preference, Object newValue) {
+            preference.setSummary(newValue.toString());
+            FuelConsumption fuelConsumption = new FuelConsumption(requireContext());
+            if (preference.getKey().equals("unit_distance")) {
+                fuelConsumption.setUnitDistance(newValue.toString());
+            } else {
+                fuelConsumption.setUnitVolume(newValue.toString());
+            }
+            updateFuelConsumptionField(fuelConsumption);
+        }
+
+        private void handleFuelConsumptionChange(ListPreference preference, Object newValue) {
+            FuelConsumption fuelConsumption = new FuelConsumption(requireContext());
+            fuelConsumption.setConsumptionType(Integer.parseInt(newValue.toString()));
+            updateFuelConsumptionField(fuelConsumption, preference);
+        }
+
+        private void handleThemeChange(ListPreference preference, Object newValue) {
+            String theme = newValue.toString();
+            switch (theme) {
+                case "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                case "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                default -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            }
+            updateThemeSummary(preference, theme);
         }
 
         private void updateThemeSummary(ListPreference preference, String value) {

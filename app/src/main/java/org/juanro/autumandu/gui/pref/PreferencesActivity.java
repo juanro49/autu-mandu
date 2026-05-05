@@ -23,6 +23,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -39,50 +40,87 @@ public class PreferencesActivity extends AbstractPreferenceActivity implements
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState == null) {
-            Intent intent = getIntent();
-            String fragmentClassName = intent.getStringExtra(EXTRA_SHOW_FRAGMENT);
-            int titleRes = intent.getIntExtra(EXTRA_SHOW_FRAGMENT_TITLE, 0);
-            Uri csvUri = null;
-            Uri dbUri = null;
-
-            // Check if we were started to view a file
-            if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-                fragmentClassName = PreferencesBackupFragment.class.getName();
-                titleRes = R.string.pref_title_backup;
-                Uri dataUri = intent.getData();
-                String path = dataUri.getPath();
-                if (path != null && path.endsWith(".db")) {
-                    dbUri = dataUri;
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            int count = getSupportFragmentManager().getBackStackEntryCount();
+            if (count == 0) {
+                Intent intent = getIntent();
+                if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
+                    setTitle(R.string.pref_title_backup);
                 } else {
-                    csvUri = dataUri;
-                }
-            }
-
-            Fragment fragment;
-            if (fragmentClassName != null) {
-                fragment = getSupportFragmentManager().getFragmentFactory().instantiate(
-                        getClassLoader(), fragmentClassName);
-                if (titleRes != 0) {
-                    setTitle(titleRes);
-                }
-                if (csvUri != null) {
-                    Bundle args = new Bundle();
-                    args.putParcelable(PreferencesBackupFragment.EXTRA_IMPORT_CSV_URI, csvUri);
-                    fragment.setArguments(args);
-                } else if (dbUri != null) {
-                    Bundle args = new Bundle();
-                    args.putParcelable(PreferencesBackupFragment.EXTRA_RESTORE_DB_URI, dbUri);
-                    fragment.setArguments(args);
+                    int titleRes = intent.getIntExtra(EXTRA_SHOW_FRAGMENT_TITLE, 0);
+                    if (titleRes != 0) {
+                        setTitle(titleRes);
+                    } else {
+                        setTitle(getTitleResourceId());
+                    }
                 }
             } else {
-                fragment = new PreferencesHeadersFragment();
+                FragmentManager.BackStackEntry entry = getSupportFragmentManager().getBackStackEntryAt(count - 1);
+                setTitle(entry.getName());
             }
+        });
 
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_wrapper, fragment)
-                    .commit();
+        if (savedInstanceState == null) {
+            setupInitialFragment();
         }
+    }
+
+    private void setupInitialFragment() {
+        Intent intent = getIntent();
+        String fragmentClassName = intent.getStringExtra(EXTRA_SHOW_FRAGMENT);
+        int titleRes = intent.getIntExtra(EXTRA_SHOW_FRAGMENT_TITLE, 0);
+
+        Fragment fragment;
+        if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
+            fragment = createFragmentFromViewAction(intent);
+        } else if (fragmentClassName != null) {
+            fragment = createFragmentByClassName(fragmentClassName, titleRes, intent);
+        } else {
+            fragment = new PreferencesHeadersFragment();
+        }
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_wrapper, fragment)
+                .commit();
+    }
+
+    private Fragment createFragmentFromViewAction(Intent intent) {
+        setTitle(R.string.pref_title_backup);
+        Fragment fragment = new PreferencesBackupFragment();
+
+        Uri dataUri = intent.getData();
+        if (dataUri != null) {
+            String path = dataUri.getPath();
+            Bundle args = new Bundle();
+            if (path != null && path.endsWith(".db")) {
+                args.putParcelable(PreferencesBackupFragment.EXTRA_RESTORE_DB_URI, dataUri);
+            } else {
+                args.putParcelable(PreferencesBackupFragment.EXTRA_IMPORT_CSV_URI, dataUri);
+            }
+            fragment.setArguments(args);
+        }
+
+        return fragment;
+    }
+
+    private Fragment createFragmentByClassName(String className, int titleRes, Intent intent) {
+        Fragment fragment = getSupportFragmentManager().getFragmentFactory().instantiate(
+                getClassLoader(), className);
+        if (titleRes != 0) {
+            setTitle(titleRes);
+        }
+
+        // Check for specific URIs in extras
+        Uri csvUri = intent.getParcelableExtra(PreferencesBackupFragment.EXTRA_IMPORT_CSV_URI);
+        Uri dbUri = intent.getParcelableExtra(PreferencesBackupFragment.EXTRA_RESTORE_DB_URI);
+        if (csvUri != null || dbUri != null) {
+            Bundle args = new Bundle();
+            if (csvUri != null) args.putParcelable(PreferencesBackupFragment.EXTRA_IMPORT_CSV_URI, csvUri);
+            if (dbUri != null) args.putParcelable(PreferencesBackupFragment.EXTRA_RESTORE_DB_URI, dbUri);
+            fragment.setArguments(args);
+        }
+
+        return fragment;
     }
 
     @Override
@@ -105,7 +143,7 @@ public class PreferencesActivity extends AbstractPreferenceActivity implements
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_wrapper, fragment)
-                .addToBackStack(null)
+                .addToBackStack(pref.getTitle() != null ? pref.getTitle().toString() : null)
                 .commit();
 
         if (pref.getTitle() != null) {

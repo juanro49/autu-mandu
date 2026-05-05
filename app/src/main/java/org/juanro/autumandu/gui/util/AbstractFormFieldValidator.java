@@ -30,7 +30,7 @@ public abstract class AbstractFormFieldValidator {
     protected final Context context;
     protected final TextView[] fields;
 
-    public AbstractFormFieldValidator(TextView field) {
+    protected AbstractFormFieldValidator(TextView field) {
         this.context = field.getContext();
         this.fields = new TextView[]{field};
     }
@@ -49,7 +49,7 @@ public abstract class AbstractFormFieldValidator {
                 CharSequence currentError = getError(field);
                 String newError = context.getString(getMessage());
                 String error;
-                if (currentError == null || currentError.length() == 0) {
+                if (android.text.TextUtils.isEmpty(currentError)) {
                     error = newError;
                 } else {
                     error = currentError + "\n\n" + newError;

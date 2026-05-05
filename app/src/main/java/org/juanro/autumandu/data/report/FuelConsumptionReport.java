@@ -48,8 +48,10 @@ public class FuelConsumptionReport extends AbstractReport {
             FuelConsumption fuelConsumption = new FuelConsumption(context);
 
             int lastMileage = 0;
-            int totalDistance = 0, partialDistance = 0;
-            float totalVolume = 0, partialVolume = 0;
+            int totalDistance = 0;
+            int partialDistance = 0;
+            float totalVolume = 0;
+            float partialVolume = 0;
             boolean foundFullRefueling = false;
 
             for (BalancedRefueling refueling : refuelings) {

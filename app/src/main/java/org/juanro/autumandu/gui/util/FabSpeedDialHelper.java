@@ -47,46 +47,26 @@ public class FabSpeedDialHelper {
             overlay.setOnClickListener(v -> close());
         }
 
-        // Mini FAB Listeners
-        View refueling = miniContainer.findViewById(R.id.fab_add_refueling);
-        if (refueling != null) {
-            refueling.setOnClickListener(v -> {
-                MainActivity activity = getMainActivity();
-                if (activity != null) {
-                    activity.onFABAddRefuelingClicked(v);
-                }
-            });
-        }
+        setupMiniFab(R.id.fab_add_refueling, MainActivity::onFABAddRefuelingClicked);
+        setupMiniFab(R.id.fab_add_other_expenditure, MainActivity::onFABAddOtherExpenditureClicked);
+        setupMiniFab(R.id.fab_add_other_income, MainActivity::onFABAddOtherIncomeClicked);
+        setupMiniFab(R.id.fab_add_tires, MainActivity::onFABAddTiresClicked);
+    }
 
-        View otherExpenditure = miniContainer.findViewById(R.id.fab_add_other_expenditure);
-        if (otherExpenditure != null) {
-            otherExpenditure.setOnClickListener(v -> {
+    private void setupMiniFab(int id, MiniFabAction action) {
+        View view = miniContainer.findViewById(id);
+        if (view != null) {
+            view.setOnClickListener(v -> {
                 MainActivity activity = getMainActivity();
                 if (activity != null) {
-                    activity.onFABAddOtherExpenditureClicked(v);
+                    action.onExecute(activity, v);
                 }
             });
         }
+    }
 
-        View otherIncome = miniContainer.findViewById(R.id.fab_add_other_income);
-        if (otherIncome != null) {
-            otherIncome.setOnClickListener(v -> {
-                MainActivity activity = getMainActivity();
-                if (activity != null) {
-                    activity.onFABAddOtherIncomeClicked(v);
-                }
-            });
-        }
-
-        View tires = miniContainer.findViewById(R.id.fab_add_tires);
-        if (tires != null) {
-            tires.setOnClickListener(v -> {
-                MainActivity activity = getMainActivity();
-                if (activity != null) {
-                    activity.onFABAddTiresClicked(v);
-                }
-            });
-        }
+    private interface MiniFabAction {
+        void onExecute(MainActivity activity, View v);
     }
 
     private MainActivity getMainActivity() {
