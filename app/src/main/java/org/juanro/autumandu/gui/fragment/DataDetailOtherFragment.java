@@ -103,7 +103,10 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
     @Override
     protected void fillFields(Bundle savedInstanceState, View v) {
         setupResultListeners();
+        configureMode();
+    }
 
+    private void configureMode() {
         if (isInEditMode()) {
             loadExistingData();
         } else {
@@ -176,16 +179,6 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         edtTime.setDate(new Date());
         edtEndDate.setDate(new Date());
         updateRecurrenceFieldsVisibility(false);
-    }
-
-    private void selectSpinnerItemById(Spinner spinner, long id) {
-        int count = spinner.getCount();
-        for (int i = 0; i < count; i++) {
-            if (spinner.getItemIdAtPosition(i) == id) {
-                spinner.setSelection(i);
-                break;
-            }
-        }
     }
 
     @Override
@@ -265,23 +258,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
     private void setupCarSpinner(Preferences prefs) {
         viewModel.getCars().observe(getViewLifecycleOwner(), cars -> {
             spnCar.setAdapter(new CarArrayAdapter(requireContext(), cars));
-
-            if (!isInEditMode()) {
-                mInitialCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
-                if (mInitialCarId == 0) {
-                    mInitialCarId = prefs.getDefaultCar();
-                }
-            }
-
-            if (mInitialCarId != -1) {
-                int count = spnCar.getCount();
-                for (int i = 0; i < count; i++) {
-                    if (spnCar.getItemIdAtPosition(i) == mInitialCarId) {
-                        spnCar.setSelection(i);
-                        break;
-                    }
-                }
-            }
+            updateInitialCarSelection(prefs);
         });
 
         spnCar.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -297,10 +274,26 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         });
     }
 
+    private void updateInitialCarSelection(Preferences prefs) {
+        if (!isInEditMode()) {
+            mInitialCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
+            if (mInitialCarId == 0) {
+                mInitialCarId = prefs.getDefaultCar();
+            }
+        }
+
+        if (mInitialCarId != -1) {
+            selectSpinnerItemById(spnCar, mInitialCarId);
+        }
+    }
+
     private void updateRecurrenceFieldsVisibility(boolean animated) {
         boolean repeat = spnRepeat.getSelectedItemPosition() > 0;
-        boolean showEndDate = chkEndDate.isChecked();
+        updateEndDateCheckboxVisibility(repeat, animated);
+        updateEndDateInputVisibility(repeat, animated);
+    }
 
+    private void updateEndDateCheckboxVisibility(boolean repeat, boolean animated) {
         if (repeat) {
             if (animated) chkEndDateAnimator.show();
             else chkEndDate.setVisibility(View.VISIBLE);
@@ -309,8 +302,10 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
             if (animated) chkEndDateAnimator.hide();
             else chkEndDate.setVisibility(View.GONE);
         }
+    }
 
-        if (repeat && showEndDate) {
+    private void updateEndDateInputVisibility(boolean repeat, boolean animated) {
+        if (repeat && chkEndDate.isChecked()) {
             if (animated) edtEndDateAnimator.show();
             else {
                 View view = findView(R.id.edt_end_date_input_layout);

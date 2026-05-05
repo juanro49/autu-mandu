@@ -78,7 +78,7 @@ public final class HttpUtils {
             }
             i++;
         }
-        if (token.length() > 0) {
+        if (!token.isEmpty()) {
             tokens.add(token.toString());
         }
         return tokens;

@@ -39,7 +39,6 @@ import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
 import org.juanro.autumandu.gui.dialog.TimePickerDialogFragment;
 import org.juanro.autumandu.gui.util.DateTimeInput;
 import org.juanro.autumandu.gui.util.RefuelingValidator;
-import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.util.reminder.ReminderWorker;
@@ -77,16 +76,6 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
 
     private org.juanro.autumandu.viewmodel.RefuelingDetailViewModel mViewModel;
 
-    private void selectSpinnerItemById(Spinner spinner, long id) {
-        int count = spinner.getCount();
-        for (int i = 0; i < count; i++) {
-            if (spinner.getItemIdAtPosition(i) == id) {
-                spinner.setSelection(i);
-                break;
-            }
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,55 +86,62 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     @Override
     protected void fillFields(Bundle savedInstanceState, View v) {
         if (!isInEditMode()) {
-            edtDate.setDate(new Date());
-            edtTime.setDate(new Date());
-
-            long selectCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
-            if (selectCarId == 0) {
-                Preferences prefs = new Preferences(requireContext());
-                selectCarId = prefs.getDefaultCar();
-            }
-
-            mViewModel.setCarIdForDefaults(selectCarId);
-
-            mViewModel.getMostUsedFuelType().observe(getViewLifecycleOwner(), mostUsedFuelType -> {
-                if (mostUsedFuelType != null) {
-                    selectSpinnerItemById(spnFuelType, mostUsedFuelType.getId());
-                }
-            });
-
-            mViewModel.getMostUsedStation().observe(getViewLifecycleOwner(), mostUsedStation -> {
-                if (mostUsedStation != null) {
-                    selectSpinnerItemById(spnStation, mostUsedStation.getId());
-                }
-            });
+            setupNewRefuelingFields();
         } else {
-            mViewModel.getRefueling().observe(getViewLifecycleOwner(), refueling -> {
-                if (refueling == null) return;
-
-                mViewModel.getDisplayMileage(refueling, mDistanceEntryMode, mileage ->
-                        requireActivity().runOnUiThread(() -> {
-                            if (isAdded()) {
-                                edtMileage.setText(String.valueOf(mileage));
-                            }
-                        }));
-
-                edtDate.setDate(refueling.date());
-                edtTime.setDate(refueling.date());
-                chkPartial.setChecked(refueling.partial());
-                edtNote.setText(refueling.note());
-
-                selectSpinnerItemById(spnFuelType, refueling.fuelTypeId());
-                selectSpinnerItemById(spnStation, refueling.stationId());
-                selectSpinnerItemById(spnCar, refueling.carId());
-
-                var priceData = mViewModel.getPriceEntryData(refueling, mPriceEntryMode);
-                edtVolume.setText(priceData.volume);
-                edtPrice.setText(priceData.price);
-
-                updateMileageInputWarningVisibility();
-            });
+            setupEditRefuelingFields();
         }
+    }
+
+    private void setupNewRefuelingFields() {
+        edtDate.setDate(new Date());
+        edtTime.setDate(new Date());
+
+        long selectCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
+        if (selectCarId == 0) {
+            selectCarId = new Preferences(requireContext()).getDefaultCar();
+        }
+
+        mViewModel.setCarIdForDefaults(selectCarId);
+
+        mViewModel.getMostUsedFuelType().observe(getViewLifecycleOwner(), mostUsedFuelType -> {
+            if (mostUsedFuelType != null) {
+                selectSpinnerItemById(spnFuelType, mostUsedFuelType.getId());
+            }
+        });
+
+        mViewModel.getMostUsedStation().observe(getViewLifecycleOwner(), mostUsedStation -> {
+            if (mostUsedStation != null) {
+                selectSpinnerItemById(spnStation, mostUsedStation.getId());
+            }
+        });
+    }
+
+    private void setupEditRefuelingFields() {
+        mViewModel.getRefueling().observe(getViewLifecycleOwner(), refueling -> {
+            if (refueling == null) return;
+
+            mViewModel.getDisplayMileage(refueling, mDistanceEntryMode, mileage ->
+                    requireActivity().runOnUiThread(() -> {
+                        if (isAdded()) {
+                            edtMileage.setText(String.valueOf(mileage));
+                        }
+                    }));
+
+            edtDate.setDate(refueling.date());
+            edtTime.setDate(refueling.date());
+            chkPartial.setChecked(refueling.partial());
+            edtNote.setText(refueling.note());
+
+            selectSpinnerItemById(spnFuelType, refueling.fuelTypeId());
+            selectSpinnerItemById(spnStation, refueling.stationId());
+            selectSpinnerItemById(spnCar, refueling.carId());
+
+            var priceData = mViewModel.getPriceEntryData(refueling, mPriceEntryMode);
+            edtVolume.setText(priceData.volume);
+            edtPrice.setText(priceData.price);
+
+            updateMileageInputWarningVisibility();
+        });
     }
 
     @Override
@@ -236,15 +232,20 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     private void setupPriceEntryMode(Preferences prefs) {
         mPriceEntryMode = prefs.getPriceEntryMode();
         String pricePerUnit = String.format("%s/%s", prefs.getUnitCurrency(), prefs.getUnitVolume());
-        if (mPriceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME) {
-            addUnitToHint(edtVolume, R.string.hint_volume, prefs.getUnitVolume());
-            addUnitToHint(edtPrice, R.string.hint_price_total, prefs.getUnitCurrency());
-        } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
-            addUnitToHint(edtVolume, R.string.hint_price_per_unit, pricePerUnit);
-            addUnitToHint(edtPrice, R.string.hint_price_total, prefs.getUnitCurrency());
-        } else if (mPriceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
-            addUnitToHint(edtVolume, R.string.hint_volume, prefs.getUnitVolume());
-            addUnitToHint(edtPrice, R.string.hint_price_per_unit, pricePerUnit);
+
+        switch (mPriceEntryMode) {
+            case TOTAL_AND_VOLUME -> {
+                addUnitToHint(edtVolume, R.string.hint_volume, prefs.getUnitVolume());
+                addUnitToHint(edtPrice, R.string.hint_price_total, prefs.getUnitCurrency());
+            }
+            case PER_UNIT_AND_TOTAL -> {
+                addUnitToHint(edtVolume, R.string.hint_price_per_unit, pricePerUnit);
+                addUnitToHint(edtPrice, R.string.hint_price_total, prefs.getUnitCurrency());
+            }
+            case PER_UNIT_AND_VOLUME -> {
+                addUnitToHint(edtVolume, R.string.hint_volume, prefs.getUnitVolume());
+                addUnitToHint(edtPrice, R.string.hint_price_per_unit, pricePerUnit);
+            }
         }
     }
 
@@ -317,16 +318,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     private void setupCarSpinner() {
         mViewModel.getCars().observe(getViewLifecycleOwner(), cars -> {
             spnCar.setAdapter(new CarArrayAdapter(requireContext(), cars));
-
-            if (!isInEditMode()) {
-                long selectCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
-                if (selectCarId == 0) {
-                    Preferences currentPrefs = new Preferences(requireContext());
-                    selectCarId = currentPrefs.getDefaultCar();
-                }
-
-                selectSpinnerItemById(spnCar, selectCarId);
-            }
+            updateInitialCarSelection();
         });
 
         spnCar.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
@@ -343,6 +335,18 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
                 // Not used
             }
         });
+    }
+
+    private void updateInitialCarSelection() {
+        if (!isInEditMode()) {
+            long selectCarId = getArguments() != null ? getArguments().getLong(EXTRA_CAR_ID) : 0;
+            if (selectCarId == 0) {
+                Preferences currentPrefs = new Preferences(requireContext());
+                selectCarId = currentPrefs.getDefaultCar();
+            }
+
+            selectSpinnerItemById(spnCar, selectCarId);
+        }
     }
 
 

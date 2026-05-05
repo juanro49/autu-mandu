@@ -36,6 +36,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Animation;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import java.text.NumberFormat;
 
@@ -247,6 +248,17 @@ public abstract class AbstractDataDetailFragment extends Fragment {
             ((TextInputLayout) parent).setHint(newHint);
         } else {
             editText.setHint(newHint);
+        }
+    }
+
+    protected void selectSpinnerItemById(Spinner spinner, long id) {
+        if (spinner == null) return;
+        int count = spinner.getCount();
+        for (int i = 0; i < count; i++) {
+            if (spinner.getItemIdAtPosition(i) == id) {
+                spinner.setSelection(i);
+                break;
+            }
         }
     }
 

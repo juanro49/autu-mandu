@@ -213,13 +213,7 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
 
     private void updateInitialCarSelection(long carId) {
         mInitialCarId = carId;
-        int count = spnCar.getCount();
-        for (int i = 0; i < count; i++) {
-            if (spnCar.getItemIdAtPosition(i) == mInitialCarId) {
-                spnCar.setSelection(i);
-                break;
-            }
-        }
+        selectSpinnerItemById(spnCar, mInitialCarId);
     }
 
     private void setupLatestMileageObserver() {
@@ -394,13 +388,7 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
             spnCar.setAdapter(new CarArrayAdapter(requireContext(), cars));
 
             if (mInitialCarId != -1) {
-                int count = spnCar.getCount();
-                for (int i = 0; i < count; i++) {
-                    if (spnCar.getItemIdAtPosition(i) == mInitialCarId) {
-                        spnCar.setSelection(i);
-                        break;
-                    }
-                }
+                selectSpinnerItemById(spnCar, mInitialCarId);
             }
         });
 

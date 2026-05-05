@@ -434,7 +434,7 @@ public class CSVExportImport {
             Log.d(TAG, "Import finished successfully.");
         } catch (Exception e) {
             Log.e(TAG, "Error during import perform", e);
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error during import perform", e);
         }
     }
 
