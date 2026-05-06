@@ -29,6 +29,8 @@ import okhttp3.Response;
  * Compatible with Android API 25+.
  */
 public class HttpException extends Exception {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private final int code;
 
     public HttpException(@NonNull Response response) {

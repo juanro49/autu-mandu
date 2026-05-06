@@ -136,11 +136,12 @@ public class FuelConsumptionReport extends AbstractReport {
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
         synchronized (mCachedChartData) {
-            if (mCachedChartData.containsKey(chartOption)) {
-                return mCachedChartData.get(chartOption);
+            final Integer optionKey = Integer.valueOf(chartOption);
+            if (mCachedChartData.containsKey(optionKey)) {
+                return mCachedChartData.get(optionKey);
             }
             List<AbstractReportChartData> data = new ArrayList<>(reportData);
-            mCachedChartData.put(chartOption, data);
+            mCachedChartData.put(optionKey, data);
             return data;
         }
     }

@@ -17,6 +17,8 @@ package org.juanro.autumandu.gui.util;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
+
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
 
@@ -81,7 +83,7 @@ public final class NewRefuelingSnackbar {
         view.post(() -> {
             String message = context.getString(R.string.toast_new_refueling, consumption,
                     fuelConsumption.getUnitLabel(), finalConsumptionChange);
-            Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(view, message, BaseTransientBottomBar.LENGTH_LONG).show();
         });
     }
 

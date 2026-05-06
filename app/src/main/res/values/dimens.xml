@@ -45,7 +45,6 @@
     <dimen name="report_row_text_size_small">14sp</dimen>
     <dimen name="report_row_section_margin_top">10dp</dimen>
     <dimen name="report_row_section_text_size">12sp</dimen>
-    <dimen name="report_elevation">2dp</dimen>
     <dimen name="min_touch_target_size">48dp</dimen>
 
     <!-- Chart Dimensions -->

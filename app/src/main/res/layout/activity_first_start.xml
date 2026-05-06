@@ -19,8 +19,7 @@
     android:id="@+id/scroll_view"
     android:layout_width="?attr/detailsElementLayoutWidth"
     android:layout_height="match_parent"
-    android:layout_gravity="center_horizontal"
-    android:background="?attr/colorSurface">
+    android:layout_gravity="center_horizontal">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
@@ -128,7 +127,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_huge"
-            android:onClick="onCreateCarClick"
             android:text="@string/first_start_create_car"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -141,7 +139,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_small"
-            android:onClick="onSetupSyncClick"
             android:text="@string/first_start_setup_sync"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

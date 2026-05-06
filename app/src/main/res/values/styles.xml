@@ -39,10 +39,4 @@
         <item name="android:layout_marginStart">4dp</item>
     </style>
 
-    <style name="AppWidget.Toolbar" parent="Widget.Material3.Toolbar">
-        <item name="android:background">?attr/colorSurfaceContainer</item>
-        <item name="navigationIcon">?attr/homeAsUpIndicator</item>
-        <item name="titleTextColor">?attr/colorOnSurface</item>
-    </style>
-
 </resources>

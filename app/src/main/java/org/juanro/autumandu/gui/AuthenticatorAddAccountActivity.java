@@ -19,6 +19,8 @@ package org.juanro.autumandu.gui;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.IntentCompat;
+import androidx.core.os.BundleCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -122,7 +124,8 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
     }
 
     private void handleAccountAuthenticatorResponse() {
-        mAccountAuthenticatorResponse = getIntent().getParcelableExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
+        mAccountAuthenticatorResponse = IntentCompat.getParcelableExtra(getIntent(),
+                AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse.class);
         if (mAccountAuthenticatorResponse != null) {
             mAccountAuthenticatorResponse.onRequestContinued();
         }
@@ -161,7 +164,8 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
             }
         }
 
-        mAuthenticatedAccount = savedInstanceState.getParcelable(STATE_AUTHENTICATED_ACCOUNT);
+        mAuthenticatedAccount = BundleCompat.getParcelable(savedInstanceState,
+                STATE_AUTHENTICATED_ACCOUNT, Account.class);
         mAuthenticatedAccountPassword = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_PASSWORD);
         mAuthenticatedAccountAuthToken = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_AUTH_TOKEN);
         String settingsStr = savedInstanceState.getString(STATE_AUTHENTICATED_ACCOUNT_SETTINGS);
@@ -369,17 +373,19 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
             AbstractSyncProvider provider = mProviders[position];
             holder.text1.setText(provider.getName());
             holder.icon.setImageResource(provider.getIcon());
-            holder.itemView.setOnClickListener(v -> {
-                mSelectedSyncProvider = provider;
-                try {
-                    mSelectedSyncProvider.setup(null, null, null, null);
-                    mSelectedSyncProvider.startAuthentication(AuthenticatorAddAccountActivity.this, mSyncSetupLauncher);
-                    mRecyclerView.setVisibility(View.GONE);
-                    mProgressView.setVisibility(View.VISIBLE);
-                } catch (Exception e) {
-                    handleFirstSyncError(e);
-                }
-            });
+            holder.itemView.setOnClickListener(v -> selectProvider(provider));
+        }
+
+        private void selectProvider(AbstractSyncProvider provider) {
+            mSelectedSyncProvider = provider;
+            try {
+                mSelectedSyncProvider.setup(null, null, null, null);
+                mSelectedSyncProvider.startAuthentication(AuthenticatorAddAccountActivity.this, mSyncSetupLauncher);
+                mRecyclerView.setVisibility(View.GONE);
+                mProgressView.setVisibility(View.VISIBLE);
+            } catch (Exception e) {
+                handleFirstSyncError(e);
+            }
         }
 
         @Override

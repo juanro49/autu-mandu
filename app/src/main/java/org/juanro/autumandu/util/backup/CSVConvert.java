@@ -1,9 +1,11 @@
 package org.juanro.autumandu.util.backup;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
@@ -18,8 +20,7 @@ import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
 public final class CSVConvert {
     private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private static final ThreadLocal<DateFormat> DATE_FORMAT_THREAD_LOCAL = ThreadLocal.withInitial(() ->
-            new SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.US));
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN, Locale.US);
 
     private static final NumberFormat DEFAULT_FLOAT_FORMAT = NumberFormat.getInstance(Locale.US);
 
@@ -31,12 +32,13 @@ public final class CSVConvert {
     static Date toDate(String value) {
         if (value == null || value.isEmpty()) return null;
         try {
-            return DATE_FORMAT_THREAD_LOCAL.get().parse(value);
-        } catch (ParseException e) {
-            DateFormat fallbackFormat = DateFormat.getDateTimeInstance();
+            var odt = OffsetDateTime.parse(value, DATE_FORMATTER);
+            return Date.from(odt.toInstant());
+        } catch (Exception e) {
             try {
-                return fallbackFormat.parse(value);
-            } catch (ParseException e1) {
+                // Fallback to Instant parse for some formats
+                return Date.from(Instant.parse(value));
+            } catch (Exception e1) {
                 return null;
             }
         }
@@ -95,6 +97,12 @@ public final class CSVConvert {
     }
 
     @Nullable
+    static Boolean isBoolean(String value) {
+        if (value == null || value.isEmpty()) return null;
+        return Boolean.parseBoolean(value);
+    }
+
+    @Nullable
     static TimeSpanUnit toTimeSpanUnit(String value) {
         Integer intValue = toInteger(value);
         return intValue != null ? TimeSpanUnit.fromId(intValue) : null;
@@ -114,7 +122,8 @@ public final class CSVConvert {
     static String toString(Date value) {
         if (value == null) return null;
         try {
-            return DATE_FORMAT_THREAD_LOCAL.get().format(value);
+            var odt = OffsetDateTime.ofInstant(value.toInstant(), ZoneId.systemDefault());
+            return DATE_FORMATTER.format(odt);
         } catch (Exception e) {
             return null;
         }

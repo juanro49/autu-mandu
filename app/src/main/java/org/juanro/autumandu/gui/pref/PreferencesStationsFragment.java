@@ -44,7 +44,6 @@ import java.util.Locale;
 public class PreferencesStationsFragment extends AbstractPreferencesListFragment {
 
     private StationsViewModel mViewModel;
-    private StationAdapter mListAdapter;
 
     private class StationAdapter extends BaseAdapter {
         private List<StationWithVolume> mStations = new ArrayList<>();
@@ -86,9 +85,9 @@ public class PreferencesStationsFragment extends AbstractPreferencesListFragment
         mViewModel = new ViewModelProvider(this).get(StationsViewModel.class);
         super.onViewCreated(view, savedInstanceState);
 
-        mListAdapter = new StationAdapter();
-        setListAdapter(mListAdapter);
-        mViewModel.getStations().observe(getViewLifecycleOwner(), mListAdapter::setStations);
+        StationAdapter listAdapter = new StationAdapter();
+        setListAdapter(listAdapter);
+        mViewModel.getStations().observe(getViewLifecycleOwner(), listAdapter::setStations);
     }
 
     @Override
@@ -109,7 +108,7 @@ public class PreferencesStationsFragment extends AbstractPreferencesListFragment
                 MessageDialogFragment.newInstance(REQUEST_DELETE,
                         R.string.alert_delete_title,
                         getString(R.string.alert_delete_station_message, ids.length),
-                        android.R.string.yes, android.R.string.no)
+                        android.R.string.ok, android.R.string.cancel)
                         .show(getParentFragmentManager(), null);
             }
         }));

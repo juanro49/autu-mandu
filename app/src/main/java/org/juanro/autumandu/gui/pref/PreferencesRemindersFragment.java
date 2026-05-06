@@ -217,7 +217,7 @@ public class PreferencesRemindersFragment extends ListFragment implements
                 var message = getString(R.string.alert_delete_reminders_message,
                         getListView().getCheckedItemCount());
                 MessageDialogFragment.newInstance(REQUEST_DELETE, R.string.alert_delete_title, message,
-                        android.R.string.yes, android.R.string.no)
+                        android.R.string.ok, android.R.string.cancel)
                         .show(getParentFragmentManager(), null);
                 return true;
             }
@@ -252,13 +252,9 @@ public class PreferencesRemindersFragment extends ListFragment implements
 
     private static final int REQUEST_DELETE = 1;
 
-    private ReminderAdapter reminderAdapter;
     private ReminderMultiChoiceModeListener multiChoiceModeListener;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -266,11 +262,11 @@ public class PreferencesRemindersFragment extends ListFragment implements
 
         viewModel = new ViewModelProvider(this).get(RemindersViewModel.class);
 
-        reminderAdapter = new ReminderAdapter();
+        ReminderAdapter reminderAdapter = new ReminderAdapter();
         multiChoiceModeListener = new ReminderMultiChoiceModeListener();
 
         getListView().setMultiChoiceModeListener(multiChoiceModeListener);
-        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         setListAdapter(reminderAdapter);
 
         viewModel.getReminders().observe(getViewLifecycleOwner(), reminders -> reminderAdapter.setItems(reminders));

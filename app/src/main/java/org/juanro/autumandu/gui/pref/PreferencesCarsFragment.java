@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -105,7 +106,9 @@ public class PreferencesCarsFragment extends ListFragment implements
                 holder.suspended.setVisibility(View.GONE);
             }
 
-            holder.color.getBackground().setColorFilter(car.getColor(), PorterDuff.Mode.SRC_IN);
+            androidx.core.graphics.drawable.DrawableCompat.setTint(
+                    holder.color.getBackground().mutate(),
+                    car.getColor());
 
             return convertView;
         }
@@ -146,7 +149,7 @@ public class PreferencesCarsFragment extends ListFragment implements
                     MessageDialogFragment.newInstance(
                             DELETE_REQUEST_CODE,
                             R.string.alert_delete_title, message,
-                            android.R.string.yes, android.R.string.no).show(
+                            android.R.string.ok, android.R.string.cancel).show(
                             getParentFragmentManager(), null);
                 }
                 return true;
@@ -185,10 +188,7 @@ public class PreferencesCarsFragment extends ListFragment implements
     private CarAdapter carAdapter;
     private CarMultiChoiceModeListener multiChoiceModeListener;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -200,7 +200,7 @@ public class PreferencesCarsFragment extends ListFragment implements
         multiChoiceModeListener = new CarMultiChoiceModeListener();
 
         getListView().setMultiChoiceModeListener(multiChoiceModeListener);
-        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         setListAdapter(carAdapter);
 
         viewModel.getCars().observe(getViewLifecycleOwner(), cars -> carAdapter.setCars(cars));

@@ -82,9 +82,6 @@ public class MainActivity extends AppCompatActivity implements
         boolean onBackPressed();
     }
 
-    private static final int REQUEST_FROM_DRAWER = 20;
-    private static final int REQUEST_ADD_DATA = 30;
-
     private static final String STATE_TITLE = "title";
     private static final String STATE_NAV_ITEM_INDEX = "nav_item_index";
 
@@ -226,30 +223,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_FROM_DRAWER)
-        {
-            invalidateOptionsMenu();
-        }
-
-        // If a new refueling has been added, show Snackbar with details.
-        if (requestCode % REQUEST_ADD_DATA == DataDetailActivity.EXTRA_EDIT_REFUELING
-            && resultCode == RESULT_OK
-            && data != null
-            && mCurrentFragment != null)
-        {
-            long newId = data.getLongExtra(DataDetailActivity.EXTRA_NEW_ID, 0);
-            View view = mCurrentFragment.getView();
-            if (newId > 0 && view != null)
-            {
-                NewRefuelingSnackbar.show(view, newId);
-            }
-        }
-    }
-
-    @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (mDrawerToggle != null) {
@@ -298,21 +271,21 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void onFABAddRefuelingClicked(View fab) {
+    public void onFABAddRefuelingClicked() {
         handleFABClick(DataDetailActivity.EXTRA_EDIT_REFUELING, -1);
     }
 
-    public void onFABAddOtherExpenditureClicked(View fab) {
+    public void onFABAddOtherExpenditureClicked() {
         handleFABClick(DataDetailActivity.EXTRA_EDIT_OTHER,
                 DataDetailOtherFragment.EXTRA_OTHER_TYPE_EXPENDITURE);
     }
 
-    public void onFABAddOtherIncomeClicked(View fab) {
+    public void onFABAddOtherIncomeClicked() {
         handleFABClick(DataDetailActivity.EXTRA_EDIT_OTHER,
                 DataDetailOtherFragment.EXTRA_OTHER_TYPE_INCOME);
     }
 
-    public void onFABAddTiresClicked(View fab) {
+    public void onFABAddTiresClicked() {
         handleFABClick(DataDetailActivity.EXTRA_EDIT_TIRE, -1);
     }
 
@@ -344,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar,
                 R.string.drawer_open, R.string.drawer_close) {
+            @Override
             public void onDrawerOpened(View drawerView) {
                 ActionBar ab = getSupportActionBar();
                 if (ab != null) {
@@ -357,6 +331,7 @@ public class MainActivity extends AppCompatActivity implements
                 invalidateOptionsMenu();
             }
 
+            @Override
             public void onDrawerClosed(View view) {
                 ActionBar ab = getSupportActionBar();
                 if (ab != null) {
@@ -371,10 +346,7 @@ public class MainActivity extends AppCompatActivity implements
         mDrawerToggle.syncState();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
+
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {

@@ -392,9 +392,7 @@ public class CSVExportImport {
         try {
             final var importFormat = getImportFormat();
             var db = AutuManduDatabase.getInstance(context);
-            db.runInTransaction(() -> {
-                performImport(db, importFormat);
-            });
+            db.runInTransaction(() -> performImport(db, importFormat));
         } catch (CSVImportException e) {
             Log.e(TAG, "CSVImportException during import", e);
             throw e;
@@ -434,7 +432,7 @@ public class CSVExportImport {
             Log.d(TAG, "Import finished successfully.");
         } catch (Exception e) {
             Log.e(TAG, "Error during import perform", e);
-            throw new RuntimeException("Error during import perform", e);
+            throw new CSVImportProcessingRuntimeException("Error during import perform", e);
         }
     }
 

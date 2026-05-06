@@ -65,7 +65,7 @@ public class EditStationDialogFragment extends AbstractEditDialogFragment {
                 Station station = stationWithVolume.station();
                 if (currentStationId == station.getId()) {
                     mStation = station;
-                    if (mEdtName != null && mEdtName.getText().length() == 0) {
+                    if (mEdtName != null && android.text.TextUtils.isEmpty(mEdtName.getText())) {
                         mEdtName.setText(mStation.getName());
                     }
                 } else {

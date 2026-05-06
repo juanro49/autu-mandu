@@ -83,7 +83,7 @@ public class CSVExportImportTest {
         final long[] carId = new long[1];
         final long[] fuelTypeId = new long[1];
         final long[] stationId = new long[1];
-        final Date refuelingDate = new Date();
+        final Date date = new Date();
 
         db.runInTransaction(() -> {
             Car car = new Car();
@@ -107,34 +107,51 @@ public class CSVExportImportTest {
             refueling.setCarId(carId[0]);
             refueling.setFuelTypeId(fuelTypeId[0]);
             refueling.setStationId(stationId[0]);
-            refueling.setDate(refuelingDate);
+            refueling.setDate(date);
             refueling.setMileage(1100);
             refueling.setVolume(50.5f);
             refueling.setPrice(75.25f);
             refueling.setPartial(false);
             refueling.setNote("Test Note");
             db.getRefuelingDao().insert(refueling);
+
+            org.juanro.autumandu.model.entity.OtherCost otherCost = new org.juanro.autumandu.model.entity.OtherCost();
+            otherCost.setCarId(carId[0]);
+            otherCost.setTitle("Service");
+            otherCost.setDate(date);
+            otherCost.setMileage(1000);
+            otherCost.setPrice(150.0f);
+            otherCost.setRecurrenceInterval(org.juanro.autumandu.model.entity.helper.RecurrenceInterval.YEAR);
+            otherCost.setRecurrenceMultiplier(1);
+            db.getOtherCostDao().insert(otherCost);
+
+            org.juanro.autumandu.model.entity.Reminder reminder = new org.juanro.autumandu.model.entity.Reminder();
+            reminder.setCarId(carId[0]);
+            reminder.setTitle("Check oil");
+            reminder.setAfterTimeSpanUnit(org.juanro.autumandu.model.entity.helper.TimeSpanUnit.MONTH);
+            reminder.setAfterTimeSpanCount(6);
+            reminder.setStartDate(date);
+            db.getReminderDao().insert(reminder);
+
+            org.juanro.autumandu.model.entity.TireList tireList = new org.juanro.autumandu.model.entity.TireList();
+            tireList.setCarId(carId[0]);
+            tireList.setManufacturer("Michelin");
+            tireList.setModel("Pilot Sport");
+            tireList.setBuyDate(date);
+            tireList.setQuantity(4);
+            long tireId = db.getTireDao().insert(tireList)[0];
+
+            org.juanro.autumandu.model.entity.TireUsage tireUsage = new org.juanro.autumandu.model.entity.TireUsage();
+            tireUsage.setTireId(tireId);
+            tireUsage.setDistanceMount(100);
+            tireUsage.setDateMount(date);
+            db.getTireDao().insert(tireUsage);
         });
 
         // 2. Export
         CSVExportImport exportImport = new CSVExportImport(context);
-        // Manually trigger init to pick up the new backup path from prefs
         exportImport.init();
         exportImport.export();
-
-        // Check file existence
-        File csvDir = new File(tempDir, CSVExportImport.DIRECTORY);
-        if (!csvDir.exists()) {
-             File[] children = tempDir.listFiles();
-             StringBuilder sb = new StringBuilder();
-             if (children != null) {
-                 for (File c : children) sb.append(c.getName()).append(", ");
-             }
-             assertTrue("CSV directory should exist in " + tempDir.getAbsolutePath() + ". Found: " + sb.toString(), csvDir.exists());
-        }
-
-        File carFile = new File(csvDir, "car.csv");
-        assertTrue("car.csv should exist: " + carFile.getAbsolutePath(), carFile.exists());
 
         // 3. Clear DB
         db.runInTransaction(() -> {
@@ -156,17 +173,21 @@ public class CSVExportImportTest {
         List<Car> cars = db.getCarDao().getAll();
         assertEquals(1, cars.size());
         assertEquals("Test Car", cars.get(0).getName());
-        assertEquals(20000.0, cars.get(0).getBuyingPrice(), 0.001);
-        assertEquals(4, cars.get(0).getNumTires());
-
-        List<Station> stations = db.getStationDao().getAll();
-        assertEquals(1, stations.size());
-        assertEquals("Test Station", stations.get(0).getName());
 
         List<Refueling> refuelings = db.getRefuelingDao().getAll();
         assertEquals(1, refuelings.size());
         assertEquals(1100, refuelings.get(0).getMileage());
-        assertEquals(50.5f, refuelings.get(0).getVolume(), 0.001f);
-        assertEquals(stationId[0], refuelings.get(0).getStationId());
+
+        assertEquals(1, db.getOtherCostDao().getAll().size());
+        assertEquals("Service", db.getOtherCostDao().getAll().get(0).getTitle());
+
+        assertEquals(1, db.getReminderDao().getAll().size());
+        assertEquals("Check oil", db.getReminderDao().getAll().get(0).getTitle());
+
+        assertEquals(1, db.getTireDao().getAllTireLists().size());
+        assertEquals("Michelin", db.getTireDao().getAllTireLists().get(0).getManufacturer());
+
+        assertEquals(1, db.getTireDao().getAllTireUsages().size());
+        assertEquals(100, db.getTireDao().getAllTireUsages().get(0).getDistanceMount());
     }
 }

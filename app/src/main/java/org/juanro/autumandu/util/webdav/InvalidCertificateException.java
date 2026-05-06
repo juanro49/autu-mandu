@@ -23,6 +23,8 @@ import java.security.cert.X509Certificate;
  * Exception thrown when a WebDAV certificate is invalid.
  */
 public class InvalidCertificateException extends Exception {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private final X509Certificate certificate;
 
     public InvalidCertificateException(@NonNull X509Certificate certificate, @NonNull Throwable innerException) {

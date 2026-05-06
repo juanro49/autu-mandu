@@ -16,6 +16,7 @@
 
 package org.juanro.autumandu.gui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -42,8 +43,10 @@ import org.juanro.autumandu.gui.util.RefuelingValidator;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.util.reminder.ReminderWorker;
+import org.juanro.autumandu.viewmodel.RefuelingDetailViewModel;
 
 import java.util.Date;
+import java.util.List;
 
 public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     private static final int PICK_DATE_REQUEST_CODE = 0;
@@ -251,68 +254,78 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
 
     private void setupSpinners() {
         mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), fuelTypes ->
-            spnFuelType.setAdapter(new ArrayAdapter<>(requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item, fuelTypes) {
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v = (TextView) super.getView(position, convertView, parent);
-                    FuelType item = getItem(position);
-                    if (item != null) {
-                        v.setText(item.getName());
-                    }
-                    return v;
-                }
-
-                @NonNull
-                @Override
-                public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v = (TextView) super.getDropDownView(position, convertView, parent);
-                    FuelType item = getItem(position);
-                    if (item != null) {
-                        v.setText(item.getName());
-                    }
-                    return v;
-                }
-
-                @Override
-                public long getItemId(int position) {
-                    FuelType item = getItem(position);
-                    return item != null ? item.getId() : -1;
-                }
-            }));
+            spnFuelType.setAdapter(new FuelTypeArrayAdapter(requireContext(), fuelTypes)));
 
         mViewModel.getStations().observe(getViewLifecycleOwner(), stations ->
-            spnStation.setAdapter(new ArrayAdapter<>(requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item, stations) {
-                @NonNull
-                @Override
-                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v = (TextView) super.getView(position, convertView, parent);
-                    Station item = getItem(position);
-                    if (item != null) {
-                        v.setText(item.getName());
-                    }
-                    return v;
-                }
+            spnStation.setAdapter(new StationArrayAdapter(requireContext(), stations)));
+    }
 
-                @NonNull
-                @Override
-                public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                    TextView v = (TextView) super.getDropDownView(position, convertView, parent);
-                    Station item = getItem(position);
-                    if (item != null) {
-                        v.setText(item.getName());
-                    }
-                    return v;
-                }
+    private static class FuelTypeArrayAdapter extends ArrayAdapter<FuelType> {
+        public FuelTypeArrayAdapter(Context context, List<FuelType> items) {
+            super(context, android.R.layout.simple_spinner_dropdown_item, items);
+        }
 
-                @Override
-                public long getItemId(int position) {
-                    Station item = getItem(position);
-                    return item != null ? item.getId() : -1;
-                }
-            }));
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            TextView v = (TextView) super.getView(position, convertView, parent);
+            FuelType item = getItem(position);
+            if (item != null) {
+                v.setText(item.getName());
+            }
+            return v;
+        }
+
+        @NonNull
+        @Override
+        public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            TextView v = (TextView) super.getDropDownView(position, convertView, parent);
+            FuelType item = getItem(position);
+            if (item != null) {
+                v.setText(item.getName());
+            }
+            return v;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            FuelType item = getItem(position);
+            return item != null ? item.getId() : -1;
+        }
+    }
+
+    private static class StationArrayAdapter extends ArrayAdapter<Station> {
+        public StationArrayAdapter(Context context, List<Station> items) {
+            super(context, android.R.layout.simple_spinner_dropdown_item, items);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            TextView v = (TextView) super.getView(position, convertView, parent);
+            Station item = getItem(position);
+            if (item != null) {
+                v.setText(item.getName());
+            }
+            return v;
+        }
+
+        @NonNull
+        @Override
+        public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            TextView v = (TextView) super.getDropDownView(position, convertView, parent);
+            Station item = getItem(position);
+            if (item != null) {
+                v.setText(item.getName());
+            }
+            return v;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            Station item = getItem(position);
+            return item != null ? item.getId() : -1;
+        }
     }
 
     private void setupCarSpinner() {
@@ -358,7 +371,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
 
     @Override
     protected void saveAsync() {
-        mViewModel.save(
+        mViewModel.save(new RefuelingDetailViewModel.SaveParams(
                 isInEditMode() ? mId : null,
                 getIntegerFromEditText(edtMileage, 0),
                 DateTimeInput.getDateTime(edtDate.getDate(), edtTime.getDate()),
@@ -374,10 +387,10 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
                 () -> requireActivity().runOnUiThread(() -> {
                     if (isAdded()) {
                         ReminderWorker.enqueueUpdate(requireContext());
-                        mOnItemActionListener.onItemSavedAsync(mId); // Note: refueling.getId() is not available here, but mId is fine for existing, and for new we might need the new id.
+                        mOnItemActionListener.onItemSavedAsync(mId);
                     }
                 })
-        );
+        ));
     }
 
     @Override
@@ -413,7 +426,7 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
         mViewModel.validateMileage(mileage, carId, date, mDistanceEntryMode, showWarning ->
                 requireActivity().runOnUiThread(() -> {
                     if (isAdded()) {
-                        txtMileageWarning.setVisibility(showWarning ? View.VISIBLE : View.GONE);
+                        txtMileageWarning.setVisibility(Boolean.TRUE.equals(showWarning) ? View.VISIBLE : View.GONE);
                     }
                 }));
     }

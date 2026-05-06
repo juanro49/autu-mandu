@@ -20,6 +20,8 @@ package org.juanro.autumandu.util.sync;
  * Optimized for clarity and removing unused constructors.
  */
 public class SyncParseException extends Exception {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private static final String DEFAULT_MESSAGE = "Unrecoverable error during sync parsing.";
 
     public SyncParseException() {

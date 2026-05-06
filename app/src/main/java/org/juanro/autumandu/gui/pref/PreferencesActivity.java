@@ -22,6 +22,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.IntentCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
@@ -111,8 +112,10 @@ public class PreferencesActivity extends AbstractPreferenceActivity implements
         }
 
         // Check for specific URIs in extras
-        Uri csvUri = intent.getParcelableExtra(PreferencesBackupFragment.EXTRA_IMPORT_CSV_URI);
-        Uri dbUri = intent.getParcelableExtra(PreferencesBackupFragment.EXTRA_RESTORE_DB_URI);
+        Uri csvUri = IntentCompat.getParcelableExtra(intent,
+                PreferencesBackupFragment.EXTRA_IMPORT_CSV_URI, Uri.class);
+        Uri dbUri = IntentCompat.getParcelableExtra(intent,
+                PreferencesBackupFragment.EXTRA_RESTORE_DB_URI, Uri.class);
         if (csvUri != null || dbUri != null) {
             Bundle args = new Bundle();
             if (csvUri != null) args.putParcelable(PreferencesBackupFragment.EXTRA_IMPORT_CSV_URI, csvUri);

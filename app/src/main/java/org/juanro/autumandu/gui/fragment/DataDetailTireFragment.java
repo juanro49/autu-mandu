@@ -180,7 +180,7 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
         });
 
         viewModel.isTireMounted().observe(getViewLifecycleOwner(), isMounted -> {
-            if (isMounted) {
+            if (Boolean.TRUE.equals(isMounted)) {
                 chkMount.setVisibility(View.GONE);
                 chkTrashDate.setVisibility(View.GONE);
                 chkMountAnimator.hide();
@@ -446,7 +446,7 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
         int totalAfterMount = (numMountedValue != null ? numMountedValue : 0);
 
         Boolean isAlreadyMounted = viewModel.isTireMounted().getValue();
-        if (isAlreadyMounted != null && isAlreadyMounted) {
+        if (Boolean.TRUE.equals(isAlreadyMounted)) {
             totalAfterMount = totalAfterMount - tire.getQuantity() + currentQuantity;
         } else {
             totalAfterMount += currentQuantity;

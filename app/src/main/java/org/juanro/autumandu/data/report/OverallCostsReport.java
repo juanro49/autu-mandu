@@ -74,11 +74,12 @@ public class OverallCostsReport extends AbstractReport {
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
         synchronized (mCachedChartData) {
-            if (mCachedChartData.containsKey(chartOption)) {
-                return mCachedChartData.get(chartOption);
+            final Integer optionKey = Integer.valueOf(chartOption);
+            if (mCachedChartData.containsKey(optionKey)) {
+                return mCachedChartData.get(optionKey);
             }
             List<AbstractReportChartData> data = new ArrayList<>(mChartData);
-            mCachedChartData.put(chartOption, data);
+            mCachedChartData.put(optionKey, data);
             return data;
         }
     }

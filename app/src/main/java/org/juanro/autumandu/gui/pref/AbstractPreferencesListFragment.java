@@ -97,7 +97,7 @@ public abstract class AbstractPreferencesListFragment extends ListFragment imple
 
         mMultiChoiceModeListener = new ListMultiChoiceModeListener();
         getListView().setMultiChoiceModeListener(mMultiChoiceModeListener);
-        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
 
         getParentFragmentManager().setFragmentResultListener(
                 MessageDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {

@@ -347,4 +347,7 @@
     <string name="pref_theme_light">Claro</string>
     <string name="pref_theme_dark">Oscuro</string>
     <string name="pref_theme_system">Predeterminado del sistema</string>
+    <string name="alert_invalid_distance">La distancia al desmontar debe ser mayor o igual a la distancia al montar.</string>
+    <string name="title_select_color">Seleccionar color</string>
+    <string name="validate_error_empty">El campo no puede estar vacío</string>
 </resources>

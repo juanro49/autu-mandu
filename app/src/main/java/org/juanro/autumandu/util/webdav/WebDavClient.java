@@ -25,12 +25,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.X509Certificate;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -48,14 +46,9 @@ public class WebDavClient {
     private static final String TAG = "WebDavClient";
 
     /**
-     * SimpleDateFormat is not thread-safe. ThreadLocal is used to provide thread-safety
-     * while maintaining compatibility with API 25 (java.time requires API 26).
+     * DateTimeFormatter is thread-safe.
      */
-    private static final ThreadLocal<DateFormat> MODIFICATION_DATE_FORMAT = ThreadLocal.withInitial(() -> {
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return sdf;
-    });
+    private static final DateTimeFormatter MODIFICATION_DATE_FORMAT = DateTimeFormatter.RFC_1123_DATE_TIME;
 
     private final OkHttpClient client;
     private final Uri baseUri;
@@ -133,16 +126,16 @@ public class WebDavClient {
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 String lastModified = response.header("Last-Modified");
-                DateFormat format = MODIFICATION_DATE_FORMAT.get();
-                if (lastModified != null && format != null) {
-                    return format.parse(lastModified);
+                if (lastModified != null) {
+                    var zdt = ZonedDateTime.parse(lastModified, MODIFICATION_DATE_FORMAT);
+                    return Date.from(zdt.toInstant());
                 } else {
                     throw new IOException("Server did not return a Last-Modified header.");
                 }
             } else {
                 throw new HttpException(response);
             }
-        } catch (IOException | ParseException e) {
+        } catch (IOException | java.time.format.DateTimeParseException e) {
             throw new HttpException(request, e);
         }
     }

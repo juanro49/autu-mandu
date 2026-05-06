@@ -97,14 +97,66 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             txtTitle.setOnClickListener(v -> showFullScreenChart(report, chartContainer));
 
             View btnReportDetails = itemView.findViewById(R.id.btn_report_details);
-            btnReportDetails.setOnClickListener(ReportFragment.this::toggleReportDetails);
+            btnReportDetails.setOnClickListener(v -> toggleDetails());
 
             View btnReportOptions = itemView.findViewById(R.id.btn_report_options);
-            btnReportOptions.setOnClickListener(v -> showReportOptions(report, v));
+            btnReportOptions.setOnClickListener(v -> showOptions(report, v));
 
             chartNotEnoughData = itemView.findViewById(R.id.chart_not_enough_data);
             main = itemView.findViewById(R.id.main);
             details = itemView.findViewById(R.id.details);
+        }
+
+        private void showFullScreenChart(AbstractReport report, View v) {
+            if (getView() == null) {
+                return;
+            }
+
+            var options = ReportAdapter.loadOptions(itemView.getContext(), report);
+            var rawData = report.getRawChartData(options.getChartOption());
+
+            View kubitView;
+            if (report instanceof OverallCostsReport) {
+                kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
+            } else if (report instanceof FuelConsumptionReport ||
+                    report instanceof FuelPriceReport ||
+                    (report instanceof MileageReport && options.getChartOption() != 2)) {
+                kubitView = KubitChartBridge.createLineChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend(), true);
+            } else {
+                kubitView = KubitChartBridge.createColumnChart(itemView.getContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend(), true);
+            }
+
+            int animationTime = itemView.getResources().getInteger(android.R.integer.config_longAnimTime);
+            fullScreenAnimator.show(v, getView(), kubitView, animationTime);
+        }
+
+        private void showOptions(AbstractReport report, View v) {
+            currentMenuReport = report;
+            var options = ReportAdapter.loadOptions(itemView.getContext(), report);
+
+            var popup = new PopupMenu(itemView.getContext(), v);
+            popup.inflate(R.menu.report_options);
+            popup.setOnMenuItemClickListener(ReportFragment.this);
+
+            var menu = popup.getMenu();
+            if (report instanceof OverallCostsReport) {
+                menu.removeItem(R.id.menu_show_trend);
+                menu.removeItem(R.id.menu_show_overall_trend);
+            } else {
+                menu.findItem(R.id.menu_show_trend).setChecked(options.isShowTrend());
+                menu.findItem(R.id.menu_show_overall_trend).setChecked(options.isShowOverallTrend());
+            }
+
+            var graphOptions = report.getAvailableChartOptions();
+            if (graphOptions.length >= 2) {
+                for (var i = 0; i < graphOptions.length; i++) {
+                    var item = menu.add(R.id.group_graph, Menu.NONE, i, graphOptions[i]);
+                    item.setChecked(i == options.getChartOption());
+                }
+                menu.setGroupCheckable(R.id.group_graph, true, true);
+            }
+
+            popup.show();
         }
 
         private void removePreviousKubitChart() {
@@ -122,7 +174,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
             EXECUTOR.execute(() -> {
                 report.update();
-                var options = loadReportChartOptions(itemView.getContext(), report);
+                var options = ReportAdapter.loadOptions(itemView.getContext(), report);
                 var reportData = report.getData(true);
                 var rawData = report.getRawChartData(options.getChartOption());
                 boolean enoughData = !rawData.isEmpty();
@@ -131,6 +183,35 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
                 try { Thread.sleep(250); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
             });
+        }
+
+        private void toggleDetails() {
+            final var detailsParams = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
+
+            var from = detailsParams.topMargin;
+            var to = (from >= main.getHeight()) ? (main.getHeight() - details.getHeight()) : main.getHeight();
+
+            var animator = new ValueAnimator();
+            animator.setDuration(itemView.getResources().getInteger(android.R.integer.config_longAnimTime));
+            animator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    details.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    if (detailsParams.topMargin <= main.getHeight() - details.getHeight()) {
+                        details.setVisibility(View.INVISIBLE);
+                    }
+                }
+            });
+            animator.addUpdateListener(animation -> {
+                detailsParams.topMargin = (Integer) animation.getAnimatedValue();
+                details.requestLayout();
+            });
+            animator.start();
         }
 
         private void resetUIState() {
@@ -213,6 +294,28 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
         public void setItems(List<AbstractReport> items) {
             submitList(items);
+        }
+
+        public static ReportChartOptions loadOptions(Context context, AbstractReport report) {
+            var prefs = context.getSharedPreferences(ReportFragment.class.getName(), Context.MODE_PRIVATE);
+            var reportName = report.getClass().getSimpleName();
+
+            var options = new ReportChartOptions();
+            options.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
+            options.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
+            options.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
+
+            return options;
+        }
+
+        public static void saveOptions(Context context, AbstractReport report, ReportChartOptions options) {
+            var prefsEdit = context.getSharedPreferences(ReportFragment.class.getName(), Context.MODE_PRIVATE).edit();
+            var reportName = report.getClass().getSimpleName();
+
+            prefsEdit.putBoolean(reportName + "_show_trend", options.isShowTrend());
+            prefsEdit.putBoolean(reportName + "_show_overall_trend", options.isShowOverallTrend());
+            prefsEdit.putInt(reportName + "_current_chart_option", options.getChartOption());
+            prefsEdit.apply();
         }
     }
 
@@ -299,7 +402,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        var options = loadReportChartOptions(requireContext(), currentMenuReport);
+        var options = ReportAdapter.loadOptions(requireContext(), currentMenuReport);
         if (item.getItemId() == R.id.menu_show_trend) {
             options.setShowTrend(!item.isChecked());
         } else if (item.getItemId() == R.id.menu_show_overall_trend) {
@@ -308,7 +411,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             options.setChartOption(item.getOrder());
         }
 
-        saveReportChartOptions(requireContext(), currentMenuReport, options);
+        ReportAdapter.saveOptions(requireContext(), currentMenuReport, options);
 
         int index = reportAdapter.getCurrentList().indexOf(currentMenuReport);
         if (index != -1) {
@@ -326,122 +429,10 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         return true;
     }
 
-    private void showFullScreenChart(AbstractReport report, View v) {
-        if (getView() == null) {
-            return;
-        }
 
-        var options = loadReportChartOptions(requireContext(), report);
-        var rawData = report.getRawChartData(options.getChartOption());
-
-        View kubitView;
-        if (report instanceof OverallCostsReport) {
-            kubitView = KubitChartBridge.createPieChart(requireContext(), report, rawData, options.getChartOption());
-        } else if (report instanceof FuelConsumptionReport ||
-                report instanceof FuelPriceReport ||
-                (report instanceof MileageReport && options.getChartOption() != 2)) {
-            kubitView = KubitChartBridge.createLineChart(requireContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend(), true);
-        } else {
-            kubitView = KubitChartBridge.createColumnChart(requireContext(), report, rawData, options.getChartOption(), options.isShowTrend(), options.isShowOverallTrend(), true);
-        }
-
-        int animationTime = getResources().getInteger(android.R.integer.config_longAnimTime);
-        fullScreenAnimator.show(v, getView(), kubitView, animationTime);
-    }
 
     private void hideFullScreenChart() {
         int animationTime = getResources().getInteger(android.R.integer.config_longAnimTime);
         fullScreenAnimator.hide(animationTime);
-    }
-
-    private void toggleReportDetails(View v) {
-        View container = v;
-        while (container != null && container.getId() != R.id.report_content_container) {
-            container = (View) container.getParent();
-        }
-
-        if (container == null) {
-            return;
-        }
-
-        final var main = container.findViewById(R.id.main);
-        final var details = container.findViewById(R.id.details);
-        final var detailsParams = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
-
-        var from = detailsParams.topMargin;
-        var to = (from >= main.getHeight()) ? (main.getHeight() - details.getHeight()) : main.getHeight();
-
-        var animator = new ValueAnimator();
-        animator.setDuration(getResources().getInteger(android.R.integer.config_longAnimTime));
-        animator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                details.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (detailsParams.topMargin <= main.getHeight() - details.getHeight()) {
-                    details.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
-        animator.addUpdateListener(animation -> {
-            detailsParams.topMargin = (Integer) animation.getAnimatedValue();
-            details.requestLayout();
-        });
-        animator.start();
-    }
-
-    private void showReportOptions(AbstractReport report, View v) {
-        currentMenuReport = report;
-        var options = loadReportChartOptions(requireContext(), report);
-
-        var popup = new PopupMenu(getActivity(), v);
-        popup.inflate(R.menu.report_options);
-        popup.setOnMenuItemClickListener(this);
-
-        var menu = popup.getMenu();
-        if (report instanceof OverallCostsReport) {
-            menu.removeItem(R.id.menu_show_trend);
-            menu.removeItem(R.id.menu_show_overall_trend);
-        } else {
-            menu.findItem(R.id.menu_show_trend).setChecked(options.isShowTrend());
-            menu.findItem(R.id.menu_show_overall_trend).setChecked(options.isShowOverallTrend());
-        }
-
-        var graphOptions = report.getAvailableChartOptions();
-        if (graphOptions.length >= 2) {
-            for (var i = 0; i < graphOptions.length; i++) {
-                var item = menu.add(R.id.group_graph, Menu.NONE, i, graphOptions[i]);
-                item.setChecked(i == options.getChartOption());
-            }
-            menu.setGroupCheckable(R.id.group_graph, true, true);
-        }
-
-        popup.show();
-    }
-
-    private static ReportChartOptions loadReportChartOptions(Context context, AbstractReport report) {
-        var prefs = context.getSharedPreferences(ReportFragment.class.getName(), Context.MODE_PRIVATE);
-        var reportName = report.getClass().getSimpleName();
-
-        var options = new ReportChartOptions();
-        options.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
-        options.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
-        options.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
-
-        return options;
-    }
-
-    private static void saveReportChartOptions(Context context, AbstractReport report, ReportChartOptions options) {
-        var prefsEdit = context.getSharedPreferences(ReportFragment.class.getName(), Context.MODE_PRIVATE).edit();
-        var reportName = report.getClass().getSimpleName();
-
-        prefsEdit.putBoolean(reportName + "_show_trend", options.isShowTrend());
-        prefsEdit.putBoolean(reportName + "_show_overall_trend", options.isShowOverallTrend());
-        prefsEdit.putInt(reportName + "_current_chart_option", options.getChartOption());
-        prefsEdit.apply();
     }
 }

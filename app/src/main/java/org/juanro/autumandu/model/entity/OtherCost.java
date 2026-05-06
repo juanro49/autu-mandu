@@ -60,22 +60,11 @@ public class OtherCost {
     @ColumnInfo(name = "car_id")
     private long carId;
 
+    /**
+     * Empty constructor required by Room for entity instantiation.
+     */
     public OtherCost() {
-    }
-
-    @Ignore
-    public OtherCost(@NonNull String title, long carId, @NonNull Date date, @Nullable Integer mileage,
-                     float price, @NonNull RecurrenceInterval recurrenceInterval,
-                     int recurrenceMultiplier, @Nullable Date endDate, @NonNull String note) {
-        this.title = title;
-        this.carId = carId;
-        this.date = date;
-        this.mileage = mileage;
-        this.price = price;
-        this.recurrenceInterval = recurrenceInterval;
-        this.recurrenceMultiplier = recurrenceMultiplier;
-        this.endDate = endDate;
-        this.note = note;
+        // Required by Room
     }
 
     public Long getId() {

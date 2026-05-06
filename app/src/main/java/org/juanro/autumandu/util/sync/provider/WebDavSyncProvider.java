@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.IntentCompat;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -112,7 +113,8 @@ public class WebDavSyncProvider extends AbstractSyncProvider {
             String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
             String password = data.getStringExtra(AccountManager.KEY_PASSWORD);
             String url = data.getStringExtra(KEY_WEB_DAV_URL);
-            X509Certificate certificate = (X509Certificate) data.getSerializableExtra(KEY_WEB_DAV_CERTIFICATE);
+            X509Certificate certificate = IntentCompat.getSerializableExtra(data,
+                    KEY_WEB_DAV_CERTIFICATE, X509Certificate.class);
 
             JSONObject settings = new JSONObject();
             try {

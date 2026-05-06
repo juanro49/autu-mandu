@@ -43,7 +43,6 @@ import java.util.List;
 public class PreferencesFuelTypesFragment extends AbstractPreferencesListFragment {
 
     private FuelTypesViewModel mViewModel;
-    private FuelTypeAdapter mListAdapter;
 
     private class FuelTypeAdapter extends BaseAdapter {
         private List<FuelType> mFuelTypes = new ArrayList<>();
@@ -94,9 +93,9 @@ public class PreferencesFuelTypesFragment extends AbstractPreferencesListFragmen
         mViewModel = new ViewModelProvider(this).get(FuelTypesViewModel.class);
         super.onViewCreated(view, savedInstanceState);
 
-        mListAdapter = new FuelTypeAdapter();
-        setListAdapter(mListAdapter);
-        mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), mListAdapter::setFuelTypes);
+        FuelTypeAdapter listAdapter = new FuelTypeAdapter();
+        setListAdapter(listAdapter);
+        mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), listAdapter::setFuelTypes);
     }
 
     @Override
@@ -117,7 +116,7 @@ public class PreferencesFuelTypesFragment extends AbstractPreferencesListFragmen
                 MessageDialogFragment.newInstance(REQUEST_DELETE,
                         R.string.alert_delete_title,
                         getString(R.string.alert_delete_fuel_types_message, ids.length),
-                        android.R.string.yes, android.R.string.no)
+                        android.R.string.ok, android.R.string.cancel)
                         .show(getParentFragmentManager(), null);
             }
         }));

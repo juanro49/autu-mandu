@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.DrawableCompat;
 
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.report.AbstractReport;
@@ -97,7 +98,9 @@ public class ReportDetailBinder {
         vh.label.setText(section.getLabel());
         vh.label.setTextColor(section.getColor());
         if (vh.sectionDrawable != null) {
-            vh.sectionDrawable.setColorFilter(section.getColor(), PorterDuff.Mode.SRC);
+            DrawableCompat.setTint(
+                    vh.sectionDrawable.mutate(),
+                    section.getColor());
         }
     }
 

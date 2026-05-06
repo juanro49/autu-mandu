@@ -7,6 +7,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -48,9 +51,9 @@ public abstract class AutuManduDatabase extends RoomDatabase {
     public abstract StationDao getStationDao();
     public abstract TireDao getTireDao();
 
-    public static final java.util.concurrent.Executor DB_EXECUTOR = java.util.concurrent.Executors.newSingleThreadExecutor();
+    public static final Executor DB_EXECUTOR = Executors.newSingleThreadExecutor();
 
-    private static volatile AutuManduDatabase sInstance;
+    private static final AtomicReference<AutuManduDatabase> sInstance = new AtomicReference<>();
     private static final String LOG_TAG = "AutuManduDatabase";
 
     /**
@@ -59,9 +62,11 @@ public abstract class AutuManduDatabase extends RoomDatabase {
      * @return The instance of the Database.
      */
     public static AutuManduDatabase getInstance(Context context) {
-        if (sInstance == null) {
-            synchronized (AutuManduDatabase.class) {
-                if (sInstance == null) {
+        AutuManduDatabase db = sInstance.get();
+        if (db == null) {
+            synchronized (sInstance) {
+                db = sInstance.get();
+                if (db == null) {
                     var appContext = context.getApplicationContext();
                     var builder = Room.databaseBuilder(
                             appContext, AutuManduDatabase.class, DATABASE_NAME);
@@ -82,18 +87,20 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                             new AssetFileBasedMigration(appContext, 14)
                     );
 
-                    sInstance = builder.build();
+                    db = builder.build();
+                    sInstance.set(db);
                 }
             }
         }
-        return sInstance;
+        return db;
     }
 
     public static void resetInstance() {
-        synchronized (AutuManduDatabase.class) {
-            if (sInstance != null) {
-                sInstance.close();
-                sInstance = null;
+        synchronized (sInstance) {
+            AutuManduDatabase db = sInstance.get();
+            if (db != null) {
+                db.close();
+                sInstance.set(null);
             }
         }
     }
@@ -140,6 +147,9 @@ public abstract class AutuManduDatabase extends RoomDatabase {
     }
 
     public static class DatabaseMigrationException extends RuntimeException {
+        @java.io.Serial
+        private static final long serialVersionUID = 1L;
+
         public DatabaseMigrationException(int version, Throwable cause) {
             super("Critical error during database migration to version " + version, cause);
         }

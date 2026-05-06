@@ -52,6 +52,7 @@ public final class HttpUtils {
         return schemes;
     }
 
+    @SuppressWarnings("java:S7158")
     private static List<String> tokenizeWwwAuth(String wwwAuth) {
         List<String> tokens = new ArrayList<>();
         StringBuilder token = new StringBuilder();
@@ -78,7 +79,7 @@ public final class HttpUtils {
             }
             i++;
         }
-        if (!token.isEmpty()) {
+        if (token.length() > 0) {
             tokens.add(token.toString());
         }
         return tokens;

@@ -31,6 +31,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.ContextCompat;
+
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -87,7 +89,7 @@ public class ReminderService {
                 }
             }
 
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 notificationManager.notify(NOTIFICATION_ID, buildNotification(context, dueIds));
             }
         } else {

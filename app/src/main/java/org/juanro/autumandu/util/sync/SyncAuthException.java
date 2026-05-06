@@ -19,6 +19,8 @@ package org.juanro.autumandu.util.sync;
  * Exception thrown when sync authentication fails.
  */
 public class SyncAuthException extends Exception {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private static final String DEFAULT_MESSAGE = "Saved account is not authorized anymore.";
 
     public SyncAuthException() {

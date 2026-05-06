@@ -70,20 +70,11 @@ public class TireList {
     @ColumnInfo(name = "car_id")
     private long carId;
 
+    /**
+     * Empty constructor required by Room for entity instantiation.
+     */
     public TireList() {
-    }
-
-    @Ignore
-    public TireList(long carId, @NonNull Date buyDate, @Nullable Date trashDate, float price, int quantity,
-                    @NonNull String manufacturer, @NonNull String model, @NonNull String note) {
-        this.carId = carId;
-        this.buyDate = buyDate;
-        this.trashDate = trashDate;
-        this.price = price;
-        this.quantity = quantity;
-        this.manufacturer = manufacturer;
-        this.model = model;
-        this.note = note;
+        // Required by Room
     }
 
     public Long getId() {

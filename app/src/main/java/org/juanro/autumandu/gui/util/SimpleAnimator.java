@@ -57,8 +57,8 @@ public class SimpleAnimator {
         this.duration = duration;
 
         ViewGroup.LayoutParams params = view.getLayoutParams();
-        if (params instanceof LinearLayout.LayoutParams) {
-            origWeight = ((LinearLayout.LayoutParams) params).weight;
+        if (params instanceof LinearLayout.LayoutParams linearLayoutParams) {
+            origWeight = linearLayoutParams.weight;
         } else if (property == Property.WEIGHT) {
             throw new IllegalArgumentException("You can only animate weight property in linear " +
                     "layouts.");

@@ -147,8 +147,8 @@ public abstract class AbstractDataDetailFragment extends Fragment {
         }
         MessageDialogFragment.newInstance(DELETE_REQUEST_CODE,
                 R.string.alert_delete_title,
-                message, android.R.string.yes,
-                android.R.string.no).show(getParentFragmentManager(), null);
+                message, android.R.string.ok,
+                android.R.string.cancel).show(getParentFragmentManager(), null);
     }
 
     protected void saveAsync() {
@@ -244,8 +244,8 @@ public abstract class AbstractDataDetailFragment extends Fragment {
         CharSequence newHint = String.format("%s [%s]", getString(hintResource), unit);
 
         ViewParent parent = editText.getParent().getParent();
-        if (parent instanceof TextInputLayout) {
-            ((TextInputLayout) parent).setHint(newHint);
+        if (parent instanceof TextInputLayout textInputLayout) {
+            textInputLayout.setHint(newHint);
         } else {
             editText.setHint(newHint);
         }

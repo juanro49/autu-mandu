@@ -60,23 +60,11 @@ public class Reminder {
     @ColumnInfo(name = "car_id")
     private long carId;
 
+    /**
+     * Empty constructor required by Room for entity instantiation.
+     */
     public Reminder() {
-    }
-
-    @Ignore
-    public Reminder(long carId, @NonNull String title, @Nullable TimeSpanUnit afterTimeSpanUnit,
-                    @Nullable Integer afterTimeSpanCount, @Nullable Integer afterDistance,
-                    @NonNull Date startDate, int startMileage, boolean notificationDismissed,
-                    @Nullable Date snoozedUntil) {
-        this.carId = carId;
-        this.title = title;
-        this.afterTimeSpanUnit = afterTimeSpanUnit;
-        this.afterTimeSpanCount = afterTimeSpanCount;
-        this.afterDistance = afterDistance;
-        this.startDate = startDate;
-        this.startMileage = startMileage;
-        this.notificationDismissed = notificationDismissed;
-        this.snoozedUntil = snoozedUntil;
+        // Required by Room
     }
 
     public Long getId() {

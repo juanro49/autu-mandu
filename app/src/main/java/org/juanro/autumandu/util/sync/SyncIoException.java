@@ -19,6 +19,8 @@ package org.juanro.autumandu.util.sync;
  * Exception thrown when a network or I/O error occurs during sync.
  */
 public class SyncIoException extends Exception {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
     private static final String MESSAGE_PREFIX = "Network error: ";
 
     public SyncIoException(Throwable cause) {

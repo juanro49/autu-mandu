@@ -68,21 +68,11 @@ public class Refueling {
     @ColumnInfo(name = "car_id")
     private long carId;
 
+    /**
+     * Empty constructor required by Room for entity instantiation.
+     */
     public Refueling() {
-    }
-
-    @Ignore
-    public Refueling(long carId, long fuelTypeId, long stationId, @NonNull Date date, int mileage, float volume,
-                     float price, boolean partial, @NonNull String note) {
-        this.carId = carId;
-        this.fuelTypeId = fuelTypeId;
-        this.stationId = stationId;
-        this.date = date;
-        this.mileage = mileage;
-        this.volume = volume;
-        this.price = price;
-        this.partial = partial;
-        this.note = note;
+        // Required by Room
     }
 
     public Long getId() {

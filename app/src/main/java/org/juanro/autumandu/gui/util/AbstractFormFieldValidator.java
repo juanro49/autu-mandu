@@ -92,8 +92,8 @@ public abstract class AbstractFormFieldValidator {
     private TextInputLayout getTextInputLayout(TextView field) {
         ViewParent parent = field.getParent();
         while (parent instanceof View) {
-            if (parent instanceof TextInputLayout) {
-                return (TextInputLayout) parent;
+            if (parent instanceof TextInputLayout textInputLayout) {
+                return textInputLayout;
             }
             parent = parent.getParent();
         }

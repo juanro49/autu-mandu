@@ -464,7 +464,7 @@ public abstract class AbstractDataListFragment<T> extends
                         selectionTracker.getSelection().size());
                 MessageDialogFragment.newInstance(
                         REQUEST_DELETE, R.string.alert_delete_title, message,
-                        android.R.string.yes, android.R.string.no).show(
+                        android.R.string.ok, android.R.string.cancel).show(
                         getChildFragmentManager(), null);
                 return true;
             }

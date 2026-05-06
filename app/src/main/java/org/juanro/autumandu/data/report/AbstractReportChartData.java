@@ -46,6 +46,21 @@ public abstract class AbstractReportChartData {
         public int compareTo(@NonNull DataPoint other) {
             return Float.compare(this.x, other.x);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DataPoint dataPoint = (DataPoint) o;
+            return Float.compare(dataPoint.x, x) == 0 &&
+                    Float.compare(dataPoint.y, y) == 0 &&
+                    java.util.Objects.equals(tooltip, dataPoint.tooltip);
+        }
+
+        @Override
+        public int hashCode() {
+            return java.util.Objects.hash(x, y, tooltip);
+        }
     }
 
     protected final Context mContext;

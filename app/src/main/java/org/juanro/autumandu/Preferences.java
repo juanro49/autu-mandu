@@ -18,7 +18,6 @@ package org.juanro.autumandu;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -176,12 +175,7 @@ public class Preferences {
     }
 
     public String getBackupPath() {
-        var savedValue = prefs.getString(KEY_BACKUP_FOLDER, "");
-        if (TextUtils.isEmpty(savedValue)) {
-            savedValue = getExternalFilesDirPath();
-            putString(KEY_BACKUP_FOLDER, savedValue);
-        }
-        return savedValue;
+        return prefs.getString(KEY_BACKUP_FOLDER, getAppFilesDirPath());
     }
 
     public void setBackupPath(@NonNull String path) {
@@ -189,16 +183,11 @@ public class Preferences {
     }
 
     public String getDefaultBackupPath() {
-        var savedValue = prefs.getString(KEY_BACKUP_FOLDER_DEFAULT, "");
-        if (TextUtils.isEmpty(savedValue)) {
-            savedValue = getExternalFilesDirPath();
-            putString(KEY_BACKUP_FOLDER_DEFAULT, savedValue);
-        }
-        return savedValue;
+        return prefs.getString(KEY_BACKUP_FOLDER_DEFAULT, getAppFilesDirPath());
     }
 
     public void restoreDefaultBackupPath() {
-        putString(KEY_BACKUP_FOLDER, getExternalFilesDirPath());
+        putString(KEY_BACKUP_FOLDER, getAppFilesDirPath());
     }
 
     public boolean getAutoBackupEnabled() {
@@ -222,8 +211,7 @@ public class Preferences {
     }
 
     @NonNull
-    private String getExternalFilesDirPath() {
-        var externalDir = context.getExternalFilesDir(null);
-        return externalDir != null ? externalDir.getAbsolutePath() : "";
+    private String getAppFilesDirPath() {
+        return context.getFilesDir().getAbsolutePath();
     }
 }

@@ -62,15 +62,18 @@ public class FirstStartActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        findViewById(R.id.btn_create_car).setOnClickListener(v -> onCreateCarClick());
+        findViewById(R.id.btn_setup_sync).setOnClickListener(v -> onSetupSyncClick());
     }
 
-    public void onCreateCarClick(View v) {
+    private void onCreateCarClick() {
         Intent intent = new Intent(this, DataDetailActivity.class);
         intent.putExtra(DataDetailActivity.EXTRA_EDIT, DataDetailActivity.EXTRA_EDIT_CAR);
         mStartForResult.launch(intent);
     }
 
-    public void onSetupSyncClick(View v) {
+    private void onSetupSyncClick() {
         Intent intent = new Intent(this, PreferencesActivity.class);
         intent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT,
                 PreferencesBackupFragment.class.getName());

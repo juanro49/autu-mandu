@@ -20,7 +20,8 @@ public class WebDavSyncProviderTest {
     public void testProviderProperties() {
         WebDavSyncProvider provider = new WebDavSyncProvider();
         assertEquals("WebDAV", provider.getName());
-        assertNotNull(provider.getId());
+        long providerId = provider.getId();
+        assertEquals(3L, providerId);
     }
 
     @Test

@@ -40,7 +40,6 @@
                 android:id="@+id/details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorSurfaceContainer"
                 android:orientation="vertical"
                 android:padding="@dimen/report_card_padding"
                 android:visibility="invisible" />
@@ -49,7 +48,6 @@
                 android:id="@+id/main"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorSurfaceContainer"
                 android:orientation="vertical"
                 android:padding="@dimen/report_card_padding">
 

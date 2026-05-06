@@ -62,7 +62,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
     private final ActivityResultLauncher<String> mRequestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             isGranted -> {
-                if (isGranted) {
+                if (Boolean.TRUE.equals(isGranted)) {
                     if (mPendingPermissionRequestCode == REQUEST_AUTO_BACKUP_PERMISSIONS) {
                         SwitchPreferenceCompat autoBackup = findPreference(PREFERENCE_AUTO_BACKUP);
                         if (autoBackup != null) {
@@ -167,7 +167,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
 
         Bundle args = getArguments();
         if (args != null && args.containsKey(EXTRA_RESTORE_DB_URI)) {
-            performRestore(args.getParcelable(EXTRA_RESTORE_DB_URI));
+            performRestore(androidx.core.os.BundleCompat.getParcelable(args, EXTRA_RESTORE_DB_URI, Uri.class));
         }
 
         SwitchPreferenceCompat autoBackup = findPreference(PREFERENCE_AUTO_BACKUP);
@@ -260,7 +260,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
         new androidx.appcompat.app.AlertDialog.Builder(context)
                 .setTitle(R.string.alert_restore_title)
                 .setMessage(R.string.alert_restore_message)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> mViewModel.runRestore(
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> mViewModel.runRestore(
                         uri,
                         () -> {
                             if (isAdded()) {
@@ -278,7 +278,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
                             }
                         }
                 ))
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
@@ -305,7 +305,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
             new androidx.appcompat.app.AlertDialog.Builder(context)
                     .setTitle(R.string.alert_import_csv_title)
                     .setMessage(R.string.alert_import_csv_message)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> mViewModel.runImportCSV(
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> mViewModel.runImportCSV(
                             () -> {
                                 if (isAdded()) {
                                     requireActivity().runOnUiThread(() -> {
@@ -322,7 +322,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
                                 }
                             }
                     ))
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show();
         } else {
             Toast.makeText(context, R.string.pref_summary_import_csv_no_data, Toast.LENGTH_SHORT).show();
@@ -368,7 +368,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
 
     private Preference.OnPreferenceChangeListener createOnChangeListenerToAskForStorageAccess() {
         return (preference, o) -> {
-            if (((Boolean) o) && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
+            if (Boolean.TRUE.equals(o) && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
                     ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
                             PackageManager.PERMISSION_GRANTED) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {

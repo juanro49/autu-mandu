@@ -387,7 +387,7 @@ public class BalancedRefueling {
         do {
             updated = false;
             for (int i = allDistances.size() - 1; i >= 0; i--) {
-                float relativeDistance = (float) allDistances.get(i) / (float) avgDistance;
+                float relativeDistance = (float) allDistances.get(i) / avgDistance;
                 if (relativeDistance < (1 - MAX_RELATIVE_CONSUMPTION_DEVIATION)
                         || relativeDistance > (1 + MAX_RELATIVE_CONSUMPTION_DEVIATION)) {
                     allDistances.remove(i);

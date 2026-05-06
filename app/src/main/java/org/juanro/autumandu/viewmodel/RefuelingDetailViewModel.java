@@ -19,6 +19,7 @@ package org.juanro.autumandu.viewmodel;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -117,42 +118,54 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
                 }));
     }
 
-    public void save(Long currentId, int mileageInput, Date date, boolean partial, String note,
-                     long fuelTypeId, long stationId, long carId,
-                     float volumeInput, float priceInput,
-                     DistanceEntryMode distanceEntryMode, PriceEntryMode priceEntryMode,
-                     Runnable onSaved) {
-        getPreviousRefueling(carId, date, previousRefueling -> {
+    public record SaveParams(
+            @Nullable Long currentId,
+            int mileageInput,
+            Date date,
+            boolean partial,
+            String note,
+            long fuelTypeId,
+            long stationId,
+            long carId,
+            float volumeInput,
+            float priceInput,
+            DistanceEntryMode distanceEntryMode,
+            PriceEntryMode priceEntryMode,
+            Runnable onSaved
+    ) {}
+
+    public void save(SaveParams params) {
+        getPreviousRefueling(params.carId(), params.date(), previousRefueling -> {
             Refueling refueling = new Refueling();
-            if (currentId != null && currentId > 0) {
-                refueling.setId(currentId);
+            if (params.currentId() != null && params.currentId() > 0) {
+                refueling.setId(params.currentId());
             }
 
-            int mileage = mileageInput;
-            if (previousRefueling != null && distanceEntryMode == DistanceEntryMode.TRIP) {
+            int mileage = params.mileageInput();
+            if (previousRefueling != null && params.distanceEntryMode() == DistanceEntryMode.TRIP) {
                 mileage += previousRefueling.getMileage();
             }
 
-            refueling.setDate(date);
+            refueling.setDate(params.date());
             refueling.setMileage(mileage);
-            refueling.setPartial(partial);
-            refueling.setNote(note);
-            refueling.setFuelTypeId(fuelTypeId);
-            refueling.setStationId(stationId);
-            refueling.setCarId(carId);
+            refueling.setPartial(params.partial());
+            refueling.setNote(params.note());
+            refueling.setFuelTypeId(params.fuelTypeId());
+            refueling.setStationId(params.stationId());
+            refueling.setCarId(params.carId());
 
-            if (priceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME) {
-                refueling.setVolume(volumeInput);
-                refueling.setPrice(priceInput);
-            } else if (priceEntryMode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
-                refueling.setVolume(priceInput / volumeInput);
-                refueling.setPrice(priceInput);
-            } else if (priceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
-                refueling.setVolume(volumeInput);
-                refueling.setPrice(volumeInput * priceInput);
+            if (params.priceEntryMode() == PriceEntryMode.TOTAL_AND_VOLUME) {
+                refueling.setVolume(params.volumeInput());
+                refueling.setPrice(params.priceInput());
+            } else if (params.priceEntryMode() == PriceEntryMode.PER_UNIT_AND_TOTAL) {
+                refueling.setVolume(params.priceInput() / params.volumeInput());
+                refueling.setPrice(params.priceInput());
+            } else if (params.priceEntryMode() == PriceEntryMode.PER_UNIT_AND_VOLUME) {
+                refueling.setVolume(params.volumeInput());
+                refueling.setPrice(params.volumeInput() * params.priceInput());
             }
 
-            save(refueling, onSaved);
+            save(refueling, params.onSaved());
         });
     }
 

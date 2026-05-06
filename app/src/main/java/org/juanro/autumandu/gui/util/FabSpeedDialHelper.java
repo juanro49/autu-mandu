@@ -47,10 +47,10 @@ public class FabSpeedDialHelper {
             overlay.setOnClickListener(v -> close());
         }
 
-        setupMiniFab(R.id.fab_add_refueling, MainActivity::onFABAddRefuelingClicked);
-        setupMiniFab(R.id.fab_add_other_expenditure, MainActivity::onFABAddOtherExpenditureClicked);
-        setupMiniFab(R.id.fab_add_other_income, MainActivity::onFABAddOtherIncomeClicked);
-        setupMiniFab(R.id.fab_add_tires, MainActivity::onFABAddTiresClicked);
+        setupMiniFab(R.id.fab_add_refueling, activity -> activity.onFABAddRefuelingClicked());
+        setupMiniFab(R.id.fab_add_other_expenditure, activity -> activity.onFABAddOtherExpenditureClicked());
+        setupMiniFab(R.id.fab_add_other_income, activity -> activity.onFABAddOtherIncomeClicked());
+        setupMiniFab(R.id.fab_add_tires, activity -> activity.onFABAddTiresClicked());
     }
 
     private void setupMiniFab(int id, MiniFabAction action) {
@@ -59,23 +59,24 @@ public class FabSpeedDialHelper {
             view.setOnClickListener(v -> {
                 MainActivity activity = getMainActivity();
                 if (activity != null) {
-                    action.onExecute(activity, v);
+                    action.onExecute(activity);
+                    close();
                 }
             });
         }
     }
 
     private interface MiniFabAction {
-        void onExecute(MainActivity activity, View v);
+        void onExecute(MainActivity activity);
     }
 
     private MainActivity getMainActivity() {
         android.content.Context ctx = mainFab.getContext();
-        while (ctx instanceof android.content.ContextWrapper) {
-            if (ctx instanceof MainActivity mainActivity) {
+        while (ctx instanceof android.content.ContextWrapper contextWrapper) {
+            if (contextWrapper instanceof MainActivity mainActivity) {
                 return mainActivity;
             }
-            ctx = ((android.content.ContextWrapper) ctx).getBaseContext();
+            ctx = contextWrapper.getBaseContext();
         }
         return null;
     }
