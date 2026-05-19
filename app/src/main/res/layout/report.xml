@@ -114,6 +114,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/chart_height"
                     android:layout_margin="@dimen/report_chart_margin" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_report_action"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/report_chart_margin"
+                    android:layout_marginBottom="@dimen/margin_small"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_location_on_24dp"
+                    tools:text="Action"
+                    tools:visibility="visible" />
             </LinearLayout>
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>

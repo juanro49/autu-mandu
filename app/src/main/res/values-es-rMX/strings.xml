@@ -395,4 +395,6 @@
     <string name="validate_error_end_before_start">La fecha/hora de fin debe ser posterior a la de inicio</string>
     <string name="label_trip_refueling">Repostaje vinculado</string>
     <string name="import_select_file">Seleccionar archivo CSV</string>
+    <string name="btn_find_station_carburoid">Buscar con Carburoid</string>
+    <string name="toast_carburoid_not_installed">Carburoid no está instalado. Abriendo página de GitHub.</string>
 </resources>

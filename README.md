@@ -23,8 +23,8 @@ The following options are currently included:
 - [x] Mileage between refuelings
 - [x] Tire management
 - [x] Costs in general
-- [ ] Trip journal
-- [ ] Stations map with price
+- [x] Trip journal
+- [x] Stations map with price (via recommended app [Carburoid](https://github.com/vokimon/carburoid))
 
 You can add reminders based on mileage and time for car related recurring actions, e.g. general
 inspection once a year.

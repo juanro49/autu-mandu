@@ -45,6 +45,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
 import java.util.Objects;
@@ -66,6 +67,7 @@ import org.juanro.autumandu.gui.util.FabSpeedDialHelper;
 import org.juanro.autumandu.gui.util.FloatingActionButtonRevealer;
 import org.juanro.autumandu.gui.util.ReportDetailBinder;
 import org.juanro.autumandu.gui.util.ReportFullScreenAnimator;
+import org.juanro.autumandu.util.Carburoid;
 import org.juanro.autumandu.viewmodel.ReportViewModel;
 
 public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClickListener,
@@ -85,6 +87,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         private final View main;
         private final ViewGroup details;
         private final View chartLoading;
+        private final MaterialButton btnReportAction;
 
         private AbstractReport report;
 
@@ -93,6 +96,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
             chartContainer = itemView.findViewById(R.id.chart_container);
             chartLoading = itemView.findViewById(R.id.chart_loading);
+            btnReportAction = itemView.findViewById(R.id.btn_report_action);
 
             txtTitle = itemView.findViewById(R.id.txt_title);
             txtTitle.setOnClickListener(v -> showFullScreenChart(report, chartContainer));
@@ -170,6 +174,14 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         public void bind(AbstractReport report) {
             this.report = report;
             txtTitle.setText(report.getTitle());
+
+            if (report instanceof FuelPriceReport) {
+                btnReportAction.setVisibility(View.VISIBLE);
+                btnReportAction.setText(R.string.btn_find_station_carburoid);
+                btnReportAction.setOnClickListener(v -> Carburoid.launch(v.getContext(), null));
+            } else {
+                btnReportAction.setVisibility(View.GONE);
+            }
 
             resetUIState();
 

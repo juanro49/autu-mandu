@@ -426,4 +426,8 @@
     <string name="validate_error_odometer_end_smaller_than_start">End odometer must be greater than or equal to start odometer</string>
     <string name="validate_error_sum_km_mismatch">Sum of categorized km must match total distance (%1$d %2$s)</string>
     <string name="validate_error_end_before_start">End date/time must be after start date/time</string>
+    <string name="btn_find_station_carburoid">Find with Carburoid</string>
+    <string name="carburoid_url" translatable="false">https://github.com/vokimon/carburoid</string>
+    <string name="carburoid_package" translatable="false">net.canvoki.carburoid</string>
+    <string name="toast_carburoid_not_installed">Carburoid is not installed. Opening GitHub page.</string>
 </resources>
