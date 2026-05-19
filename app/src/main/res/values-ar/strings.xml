@@ -116,7 +116,7 @@
     <string name="pref_title_behavior_default_car">السيارة الافتراضية</string>
     <string name="pref_title_behavior_price_entry_mode">طريقة ادخال السعر</string>
     <string name="help_section_fuel_types">أنواع الوقود</string>
-    <string name="help_folder_name">مساعدة</string>
+    <string name="help_folder_name">help</string>
     <string name="help_section_csv">CSV</string>
     <string name="first_start_hi">مرحبا!</string>
     <string name="first_start_step1_img_desc">الخطوة الأولى</string>

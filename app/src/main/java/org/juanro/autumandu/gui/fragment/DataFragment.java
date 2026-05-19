@@ -87,8 +87,9 @@ public class DataFragment extends Fragment implements DataListCallback,
 
             if (txtNoEntrySelected != null) {
                 int id = switch (position) {
-                    case 0, 4 -> R.drawable.ic_c_refueling_128dp;
-                    case 1 -> R.drawable.ic_c_tire_128dp;
+                    case 0, 5 -> R.drawable.ic_c_refueling_128dp;
+                    case 1 -> R.drawable.ic_c_trip_128dp;
+                    case 2 -> R.drawable.ic_c_tire_128dp;
                     default -> R.drawable.ic_c_other_128dp;
                 };
 
@@ -116,7 +117,8 @@ public class DataFragment extends Fragment implements DataListCallback,
             AbstractDataListFragment<?> fragment = switch (position) {
                 case 0 -> new DataListRefuelingFragment();
                 case 1 -> new DataListTireFragment();
-                case 4 -> new DataListStationFragment();
+                case 4 -> new DataListTripFragment();
+                case 5 -> new DataListStationFragment();
                 default -> new DataListOtherFragment();
             };
 

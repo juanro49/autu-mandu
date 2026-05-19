@@ -21,12 +21,11 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class DataRoundTripTest {
-    private Context context;
     private AutuManduDatabase db;
 
     @Before
     public void setUp() {
-        context = ApplicationProvider.getApplicationContext();
+        Context context = ApplicationProvider.getApplicationContext();
         db = AutuManduDatabase.getInstance(context);
         db.runInTransaction(() -> {
             db.getTireDao().deleteAllTireUsages();
@@ -124,13 +123,10 @@ public class DataRoundTripTest {
         // It processes them in ascending order of date.
         // Let's find the 11100 mileage entry and check consumption.
 
-        BalancedRefueling target = null;
-        for (BalancedRefueling br : balanced) {
-            if (br.getMileage() == 11100) {
-                target = br;
-                break;
-            }
-        }
+        BalancedRefueling target = balanced.stream()
+                .filter(br -> br.getMileage() == 11100)
+                .findFirst()
+                .orElse(null);
 
         assertNotNull("Refueling with mileage 11100 should be found", target);
         assertNotNull("Consumption should be calculated for 11100", target.getConsumption());
@@ -172,8 +168,8 @@ public class DataRoundTripTest {
 
             List<Refueling> refuelings = db.getRefuelingDao().getByCarId(carId);
             assertEquals(1, refuelings.size());
-            assertEquals(stationId, refuelings.get(0).getStationId());
-            assertEquals(fuelTypeId, refuelings.get(0).getFuelTypeId());
+            assertEquals(stationId, refuelings.getFirst().getStationId());
+            assertEquals(fuelTypeId, refuelings.getFirst().getFuelTypeId());
         });
     }
 }

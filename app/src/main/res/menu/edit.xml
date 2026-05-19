@@ -18,6 +18,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_copy"
+        android:title="@string/menu_copy"
+        app:showAsAction="ifRoom|withText" />
+    <item
         android:id="@+id/menu_delete"
         android:icon="@drawable/ic_delete_24dp"
         app:showAsAction="ifRoom|withText"

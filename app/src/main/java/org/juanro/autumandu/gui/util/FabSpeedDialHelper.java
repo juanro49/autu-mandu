@@ -47,10 +47,11 @@ public class FabSpeedDialHelper {
             overlay.setOnClickListener(v -> close());
         }
 
-        setupMiniFab(R.id.fab_add_refueling, activity -> activity.onFABAddRefuelingClicked());
-        setupMiniFab(R.id.fab_add_other_expenditure, activity -> activity.onFABAddOtherExpenditureClicked());
-        setupMiniFab(R.id.fab_add_other_income, activity -> activity.onFABAddOtherIncomeClicked());
-        setupMiniFab(R.id.fab_add_tires, activity -> activity.onFABAddTiresClicked());
+        setupMiniFab(R.id.fab_add_refueling, MainActivity::onFABAddRefuelingClicked);
+        setupMiniFab(R.id.fab_add_trip, MainActivity::onFABAddTripClicked);
+        setupMiniFab(R.id.fab_add_other_expenditure, MainActivity::onFABAddOtherExpenditureClicked);
+        setupMiniFab(R.id.fab_add_other_income, MainActivity::onFABAddOtherIncomeClicked);
+        setupMiniFab(R.id.fab_add_tires, MainActivity::onFABAddTiresClicked);
     }
 
     private void setupMiniFab(int id, MiniFabAction action) {
@@ -72,11 +73,11 @@ public class FabSpeedDialHelper {
 
     private MainActivity getMainActivity() {
         android.content.Context ctx = mainFab.getContext();
-        while (ctx instanceof android.content.ContextWrapper contextWrapper) {
-            if (contextWrapper instanceof MainActivity mainActivity) {
+        while (ctx instanceof android.content.ContextWrapper) {
+            if (ctx instanceof MainActivity mainActivity) {
                 return mainActivity;
             }
-            ctx = contextWrapper.getBaseContext();
+            ctx = ((android.content.ContextWrapper) ctx).getBaseContext();
         }
         return null;
     }

@@ -167,6 +167,7 @@
     <string name="report_title_fuel_price">Цена топлива</string>
     <string name="report_title_mileage">Пробег</string>
     <string name="report_title_costs">Цена</string>
+    <string name="report_title_trips">Сводка поездок</string>
     <string name="report_trend_label">%s (тренд)</string>
     <string name="report_overall_trend_label">%s (общий тренд)</string>
     <string name="report_graph_month_history">История по месяцам</string>
@@ -279,6 +280,7 @@
     <string name="notice_not_paid">Не оплачено</string>
 
     <string name="title_refuelings">Заправка</string>
+    <string name="title_trips">Журнал поездок</string>
     <string name="title_expenditures">Прочие расходы</string>
     <string name="title_income">Прочий доход</string>
 

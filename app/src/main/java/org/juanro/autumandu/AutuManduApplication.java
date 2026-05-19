@@ -49,6 +49,11 @@ public class AutuManduApplication extends android.app.Application implements Sha
     private static AutuManduApplication instance;
     private final List<Activity> activities = Collections.synchronizedList(new ArrayList<>());
 
+    /**
+     * Internal method to set the instance.
+     * Note: Application is a singleton by design in Android.
+     * The use of this pattern is required here to provide global access to the application context.
+     */
     private static synchronized void setInstance(AutuManduApplication application) {
         instance = application;
     }

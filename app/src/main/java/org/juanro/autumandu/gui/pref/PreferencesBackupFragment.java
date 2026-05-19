@@ -108,6 +108,10 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
                     String password = data.getStringExtra(android.accounts.AccountManager.KEY_PASSWORD);
                     String url = data.getStringExtra("webdav_url");
 
+                    if (userName == null) {
+                        return;
+                    }
+
                     android.accounts.Account account = new android.accounts.Account(userName, "org.juanro.autumandu.sync");
                     android.accounts.AccountManager am = android.accounts.AccountManager.get(requireContext());
                     if (am.addAccountExplicitly(account, password, null)) {
@@ -236,10 +240,10 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
 
     private void performBackup() {
         mViewModel.runBackup(
-                () -> {
+                fileName -> {
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() ->
-                                Toast.makeText(requireContext(), R.string.toast_backup_succeeded, Toast.LENGTH_SHORT).show());
+                                Toast.makeText(requireContext(), getString(R.string.toast_backup_succeeded, fileName), Toast.LENGTH_SHORT).show());
                     }
                 },
                 message -> {
@@ -341,11 +345,8 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
             }
             sync.setSummary(account.name);
             sync.setOnPreferenceClickListener(preference -> {
-                String providerName = "";
                 AbstractSyncProvider provider = SyncProviders.getSyncProviderByAccount(requireContext(), account);
-                if (provider != null) {
-                    providerName = provider.getName();
-                }
+                String providerName = provider != null ? provider.getName() : "";
 
                 new androidx.appcompat.app.AlertDialog.Builder(requireContext())
                         .setTitle(providerName)

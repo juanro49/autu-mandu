@@ -67,7 +67,6 @@ import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.util.DemoData;
 import org.juanro.autumandu.util.reminder.ReminderWorker;
 import org.juanro.autumandu.util.sync.AbstractSyncProvider;
-import org.juanro.autumandu.util.sync.Authenticator;
 import org.juanro.autumandu.util.sync.SyncManager;
 import org.juanro.autumandu.util.sync.SyncProviders;
 import org.juanro.autumandu.viewmodel.MainViewModel;
@@ -273,6 +272,10 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onFABAddRefuelingClicked() {
         handleFABClick(DataDetailActivity.EXTRA_EDIT_REFUELING, -1);
+    }
+
+    public void onFABAddTripClicked() {
+        handleFABClick(DataDetailActivity.EXTRA_EDIT_TRIP, -1);
     }
 
     public void onFABAddOtherExpenditureClicked() {

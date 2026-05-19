@@ -58,6 +58,7 @@ import org.juanro.autumandu.data.report.FuelConsumptionReport;
 import org.juanro.autumandu.data.report.FuelPriceReport;
 import org.juanro.autumandu.data.report.MileageReport;
 import org.juanro.autumandu.data.report.OverallCostsReport;
+import org.juanro.autumandu.data.report.TripReport;
 import org.juanro.autumandu.data.report.ReportChartOptions;
 import org.juanro.autumandu.gui.MainActivity.BackPressedListener;
 import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
@@ -116,7 +117,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             var rawData = report.getRawChartData(options.getChartOption());
 
             View kubitView;
-            if (report instanceof OverallCostsReport) {
+            if (report instanceof OverallCostsReport || report instanceof TripReport) {
                 kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
             } else if (report instanceof FuelConsumptionReport ||
                     report instanceof FuelPriceReport ||
@@ -247,7 +248,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
         private void renderChart(AbstractReport report, ReportChartOptions options, List<? extends AbstractReportChartData> rawData) {
             View kubitView;
-            if (report instanceof OverallCostsReport) {
+            if (report instanceof OverallCostsReport || report instanceof TripReport) {
                 kubitView = KubitChartBridge.createPieChart(itemView.getContext(), report, rawData, options.getChartOption());
             } else if (report instanceof FuelConsumptionReport ||
                     report instanceof FuelPriceReport ||

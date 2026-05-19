@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serial;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -25,6 +26,8 @@ import org.juanro.autumandu.model.dao.RefuelingDao;
 import org.juanro.autumandu.model.dao.ReminderDao;
 import org.juanro.autumandu.model.dao.StationDao;
 import org.juanro.autumandu.model.dao.TireDao;
+import org.juanro.autumandu.model.dao.TripDao;
+import org.juanro.autumandu.model.dao.TripPrefabDao;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.OtherCost;
@@ -33,11 +36,13 @@ import org.juanro.autumandu.model.entity.Reminder;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.model.entity.TireList;
 import org.juanro.autumandu.model.entity.TireUsage;
+import org.juanro.autumandu.model.entity.Trip;
+import org.juanro.autumandu.model.entity.TripPrefab;
 import org.juanro.autumandu.model.entity.helper.SQLTypeConverters;
 
 @Database(
-    entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class, Station.class, TireList.class, TireUsage.class},
-    version = 14
+    entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class, Station.class, TireList.class, TireUsage.class, Trip.class, TripPrefab.class},
+    version = 15
 )
 @TypeConverters({SQLTypeConverters.class})
 public abstract class AutuManduDatabase extends RoomDatabase {
@@ -50,6 +55,8 @@ public abstract class AutuManduDatabase extends RoomDatabase {
     public abstract ReminderDao getReminderDao();
     public abstract StationDao getStationDao();
     public abstract TireDao getTireDao();
+    public abstract TripDao getTripDao();
+    public abstract TripPrefabDao getTripPrefabDao();
 
     public static final Executor DB_EXECUTOR = Executors.newSingleThreadExecutor();
 
@@ -84,15 +91,52 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                             new AssetFileBasedMigration(appContext, 11),
                             new AssetFileBasedMigration(appContext, 12),
                             new AssetFileBasedMigration(appContext, 13),
-                            new AssetFileBasedMigration(appContext, 14)
+                            new AssetFileBasedMigration(appContext, 14),
+                            new AssetFileBasedMigration(appContext, 15)
                     );
 
                     db = builder.build();
+
+                    // Perform a sanity check to ensure migrations and schema validation are successful.
+                    try {
+                        db.getOpenHelper().getWritableDatabase();
+                    } catch (IllegalStateException e) {
+                        Log.e(LOG_TAG, "Database schema mismatch detected. Attempting recovery...", e);
+                        handleMigrationFailure(appContext);
+                        // Re-throw to inform the caller that this instance is unusable.
+                        throw e;
+                    }
+
                     sInstance.set(db);
                 }
             }
         }
         return db;
+    }
+
+    /**
+     * Attempts to recover from a failed migration by downgrading the database version
+     * so that the migration can be retried after fixes.
+     */
+    private static void handleMigrationFailure(Context context) {
+        try {
+            var dbPath = context.getDatabasePath(DATABASE_NAME);
+            if (dbPath.exists()) {
+                try (var db = android.database.sqlite.SQLiteDatabase.openDatabase(
+                        dbPath.getAbsolutePath(), null, android.database.sqlite.SQLiteDatabase.OPEN_READWRITE)) {
+                    int version = db.getVersion();
+                    if (version >= 15) {
+                        Log.w(LOG_TAG, "Rolling back database version from " + version + " to 14 to allow retry.");
+                        db.setVersion(14);
+                        // Drop new tables if they were created incompletely
+                        db.execSQL("DROP TABLE IF EXISTS trip");
+                        db.execSQL("DROP TABLE IF EXISTS trip_prefab");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to perform migration rollback", e);
+        }
     }
 
     public static void resetInstance() {
@@ -125,8 +169,14 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                 var statement = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
+                    // Remove SQL comments (--)
+                    int commentIndex = line.indexOf("--");
+                    if (commentIndex != -1) {
+                        line = line.substring(0, commentIndex);
+                    }
+
                     var trimmedLine = line.trim();
-                    if (trimmedLine.isEmpty() || trimmedLine.startsWith("--")) {
+                    if (trimmedLine.isEmpty()) {
                         continue;
                     }
 
@@ -147,7 +197,7 @@ public abstract class AutuManduDatabase extends RoomDatabase {
     }
 
     public static class DatabaseMigrationException extends RuntimeException {
-        @java.io.Serial
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public DatabaseMigrationException(int version, Throwable cause) {

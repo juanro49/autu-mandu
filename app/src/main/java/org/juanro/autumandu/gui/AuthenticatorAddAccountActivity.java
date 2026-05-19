@@ -74,6 +74,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
     private TextView mFirstSyncErrorMessage;
 
     private AbstractSyncProvider mSelectedSyncProvider;
+    private SyncProviderAdapter mAdapter;
     private Account mAuthenticatedAccount;
     private String mAuthenticatedAccountPassword;
     private String mAuthenticatedAccountAuthToken;
@@ -134,7 +135,8 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
     private void initUI() {
         mRecyclerView = findViewById(R.id.sync_provider_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new SyncProviderAdapter());
+        mAdapter = new SyncProviderAdapter();
+        mRecyclerView.setAdapter(mAdapter);
 
         mProgressView = findViewById(android.R.id.progress);
         mProgressView.setVisibility(View.GONE);
@@ -250,7 +252,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
                     }
                 });
             } catch (final Exception e) {
-                runOnUiThread(() -> handleFirstSyncError(e));
+                runOnUiThread(() -> mAdapter.handleFirstSyncError(e));
             }
         });
     }
@@ -268,7 +270,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
             } catch (final Exception e) {
                 runOnUiThread(() -> {
                     if (!isFinishing() && !isDestroyed()) {
-                        handleFirstSyncError(e);
+                        mAdapter.handleFirstSyncError(e);
                     }
                 });
             }
@@ -327,26 +329,6 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         setResult(Activity.RESULT_OK);
     }
 
-    private void handleFirstSyncError(Exception e) {
-        if (mAuthenticatedAccount != null) {
-            AccountManager accountManager = AccountManager.get(this);
-            accountManager.removeAccount(mAuthenticatedAccount, this, future -> {
-                try {
-                    future.getResult();
-                } catch (OperationCanceledException | IOException | AuthenticatorException ignored) {
-                    // Ignore removal errors
-                }
-            }, null);
-        }
-
-        setAccountAuthenticatorResult(null);
-        setResult(Activity.RESULT_CANCELED, null);
-
-        mProgressView.setVisibility(View.GONE);
-        mFirstSyncErrorView.setVisibility(View.VISIBLE);
-        mFirstSyncErrorMessage.setText(e.getMessage());
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -391,6 +373,26 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         @Override
         public int getItemCount() {
             return mProviders.length;
+        }
+
+        void handleFirstSyncError(Exception e) {
+            if (mAuthenticatedAccount != null) {
+                AccountManager accountManager = AccountManager.get(AuthenticatorAddAccountActivity.this);
+                accountManager.removeAccount(mAuthenticatedAccount, AuthenticatorAddAccountActivity.this, future -> {
+                    try {
+                        future.getResult();
+                    } catch (OperationCanceledException | IOException | AuthenticatorException ignored) {
+                        // Ignore removal errors
+                    }
+                }, null);
+            }
+
+            setAccountAuthenticatorResult(null);
+            setResult(Activity.RESULT_CANCELED, null);
+
+            mProgressView.setVisibility(View.GONE);
+            mFirstSyncErrorView.setVisibility(View.VISIBLE);
+            mFirstSyncErrorMessage.setText(e.getMessage());
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {

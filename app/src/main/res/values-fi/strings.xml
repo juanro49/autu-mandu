@@ -200,7 +200,7 @@
     <string name="help_section_calculations">Laskelmat</string>
     <string name="help_section_fuel_types">Polttoainetyypit</string>
     <string name="help_section_csv">CSV</string>
-    <string name="help_folder_name">apu</string>
+    <string name="help_folder_name">help</string>
     <string name="first_start_hi">Moi!</string>
     <string name="first_start_intro">Autu Mandu voi esittää mukavia raportteja autosi kuluista, mukaan lukien polttoaineenkulutus ja kokonaiskustannukset. Aloita näillä yksinkertaisilla vaiheilla:</string>
     <string name="first_start_step1_text">Luo auto.</string>

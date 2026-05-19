@@ -1,15 +1,12 @@
 package org.juanro.autumandu.model;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import androidx.test.filters.SmallTest;
 import androidx.test.platform.app.InstrumentationRegistry;
-import org.juanro.autumandu.model.entity.FuelType;
-import org.juanro.autumandu.model.entity.OtherCost;
 
 import static org.junit.Assert.*;
 
@@ -28,17 +25,17 @@ public class RoomBehaviorTest {
 
         // The following has no real use for the test, but in ensures the database is opened and is
         // at least readable.
-        for (OtherCost oc: db.getOtherCostDao().getAll()) {
-            Log.d("TestUnusedOutput", "price " + oc.getPrice());
-        }
+        db.getOtherCostDao().getAll();
 
         db.close();
         assertFalse(db.isOpen());
 
-        // Do the same again to test the behaviour on a closed database. Use different data.
-        for (FuelType ft: db.getFuelTypeDao().getAll()) {
-            Log.d("TestUnusedOutput", "name " + ft.getName());
-        }
-        assertTrue(db.isOpen());
+        // After closing, we should reset the instance to get a new one that is open.
+        AutuManduDatabase.resetInstance();
+        AutuManduDatabase newDb = AutuManduDatabase.getInstance(mContext);
+        assertTrue(newDb.isOpen());
+
+        // Now it should work again.
+        newDb.getFuelTypeDao().getAll();
     }
 }

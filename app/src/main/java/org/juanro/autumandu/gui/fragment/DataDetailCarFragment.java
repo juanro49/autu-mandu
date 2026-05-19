@@ -22,7 +22,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.view.Gravity;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.view.ViewCompat;
@@ -142,6 +141,14 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
                 chkSuspended.setChecked(carEntity.getSuspendedSince() != null);
             }
         });
+
+        // Hide suspension UI if creating new car
+        if (mId == -1) {
+            view.findViewById(R.id.txt_section_suspend).setVisibility(View.GONE);
+            view.findViewById(R.id.txt_description_suspend).setVisibility(View.GONE);
+            chkSuspended.setVisibility(View.GONE);
+            view.findViewById(R.id.edt_suspend_date_input_layout).setVisibility(View.GONE);
+        }
     }
 
 

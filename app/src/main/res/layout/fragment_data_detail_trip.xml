@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/padding_medium">
+
+        <!-- Date & Times Section -->
+        <TextView
+            android:id="@+id/txt_section_times"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/section_trip_times"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_date_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_start_date"
+            app:layout_constraintEnd_toStartOf="@+id/edt_start_time_input_layout"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_times"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:focusable="false"
+                android:clickable="true"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_start_time_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_small"
+            android:hint="@string/hint_trip_start_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/edt_date_input_layout"
+            app:layout_constraintTop_toTopOf="@+id/edt_date_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_start_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:focusable="false"
+                android:clickable="true"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_date_end_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:hint="@string/hint_end_date"
+            app:layout_constraintEnd_toStartOf="@+id/edt_end_time_input_layout"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_date_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_date_end"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:focusable="false"
+                android:clickable="true"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_end_time_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_small"
+            android:hint="@string/hint_trip_end_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/edt_date_end_input_layout"
+            app:layout_constraintTop_toTopOf="@+id/edt_date_end_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_end_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:focusable="false"
+                android:clickable="true"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_times"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="edt_date_end_input_layout,edt_end_time_input_layout" />
+
+        <!-- Route & Purpose Section -->
+        <TextView
+            android:id="@+id/txt_section_route"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/section_trip_route"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier_times"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_route_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_trip_route"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/ic_location_on_24dp"
+            app:endIconContentDescription="@string/section_trip_geolocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_route"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/edt_route"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="textCapSentences"
+                android:completionThreshold="1"
+                android:autofillHints="postalAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_purpose_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:hint="@string/hint_trip_purpose"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_route_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/edt_purpose"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="textCapSentences"
+                android:completionThreshold="1"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Odometer Section -->
+        <TextView
+            android:id="@+id/txt_section_odometer"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/section_trip_odometer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_purpose_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_odometer_start_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_trip_odometer_start"
+            app:layout_constraintEnd_toStartOf="@+id/edt_odometer_end_input_layout"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_odometer"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_odometer_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="number"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_odometer_end_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_small"
+            android:hint="@string/hint_trip_odometer_end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/edt_odometer_start_input_layout"
+            app:layout_constraintTop_toTopOf="@+id/edt_odometer_start_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_odometer_end"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="number"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Categorization Section -->
+        <TextView
+            android:id="@+id/txt_section_categorization"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/section_trip_categorization"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_odometer_start_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_km_business_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_trip_km_business"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_categorization"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_km_business"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="number"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_km_private_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:hint="@string/hint_trip_km_private"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_km_business_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_km_private"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="number"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_km_home_work_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:hint="@string/hint_trip_km_home_work"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_km_private_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_km_home_work"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="number"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Costs Section -->
+        <TextView
+            android:id="@+id/txt_section_costs"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/section_trip_costs"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_km_home_work_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <TextView
+            android:id="@+id/txt_label_refueling"
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/edit_title_refueling"
+            android:labelFor="@+id/spn_refueling"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_costs"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <Spinner
+            android:id="@+id/spn_refueling"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/input_field_height"
+            app:layout_constraintEnd_toStartOf="@+id/btn_show_refueling"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_label_refueling"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <ImageButton
+            android:id="@+id/btn_show_refueling"
+            android:layout_width="@dimen/min_touch_target_size"
+            android:layout_height="@dimen/min_touch_target_size"
+            android:src="@drawable/ic_info_24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/edit_title_refueling"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/spn_refueling"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/spn_refueling" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_cost_fuel_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:hint="@string/hint_trip_cost_fuel"
+            app:layout_constraintEnd_toStartOf="@+id/edt_cost_other_input_layout"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spn_refueling"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_cost_fuel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="number|numberDecimal"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_cost_other_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_small"
+            android:hint="@string/hint_trip_cost_other"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/edt_cost_fuel_input_layout"
+            app:layout_constraintTop_toTopOf="@+id/edt_cost_fuel_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_cost_other"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="number|numberDecimal"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Information Section -->
+        <TextView
+            android:id="@+id/txt_section_info"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/section_trip_info"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_cost_fuel_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_visited_companies_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_trip_visited_companies"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_info"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_visited_companies"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="textCapSentences"
+                android:autofillHints="organizationName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_driver_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:hint="@string/hint_trip_driver"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_visited_companies_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/edt_driver"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="textCapSentences"
+                android:completionThreshold="1"
+                android:autofillHints="personName" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_occupants_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:hint="@string/hint_trip_occupants"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_driver_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_occupants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="number"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_cargo_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:hint="@string/hint_trip_cargo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_occupants_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_cargo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="textCapSentences"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Geolocation Section -->
+        <TextView
+            android:id="@+id/txt_section_geolocation"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/section_trip_geolocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_cargo_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_get_start_location"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_trip_start_location"
+            app:icon="@drawable/ic_location_on_24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_geolocation" />
+
+        <TextView
+            android:id="@+id/txt_start_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_small"
+            android:text="@string/trip_location_not_set"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            app:layout_constraintBottom_toBottomOf="@id/btn_get_start_location"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btn_get_start_location"
+            app:layout_constraintTop_toTopOf="@id/btn_get_start_location" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_get_end_location"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/btn_trip_end_location"
+            app:icon="@drawable/ic_location_on_24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_get_start_location" />
+
+        <TextView
+            android:id="@+id/txt_end_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_small"
+            android:text="@string/trip_location_not_set"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            app:layout_constraintBottom_toBottomOf="@id/btn_get_end_location"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btn_get_end_location"
+            app:layout_constraintTop_toTopOf="@id/btn_get_end_location" />
+
+        <!-- Advanced / Note Section -->
+        <TextView
+            android:id="@+id/txt_section_advanced"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/section_advanced"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_get_end_location"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_note_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_note_optional"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_advanced"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
+                android:gravity="center_vertical|start"
+                android:inputType="text|textMultiLine"
+                android:autofillHints="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Car Label -->
+        <TextView
+            android:id="@+id/txt_label_car"
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/label_car"
+            android:labelFor="@+id/spn_car"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_note_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <Spinner
+            android:id="@+id/spn_car"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_label_car"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

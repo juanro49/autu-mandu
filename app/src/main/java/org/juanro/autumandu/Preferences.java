@@ -36,6 +36,7 @@ import org.juanro.autumandu.data.report.FuelConsumptionReport;
 import org.juanro.autumandu.data.report.FuelPriceReport;
 import org.juanro.autumandu.data.report.MileageReport;
 import org.juanro.autumandu.data.report.OverallCostsReport;
+import org.juanro.autumandu.data.report.TripReport;
 import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
 import org.juanro.autumandu.util.TimeSpan;
 
@@ -109,32 +110,46 @@ public class Preferences {
         putString(KEY_SYNC_LOCAL_FILE_REV, rev);
     }
 
-    @SuppressWarnings("unchecked")
     public List<Class<? extends AbstractReport>> getReportOrder() {
+        List<Class<? extends AbstractReport>> defaultOrder = List.of(
+                FuelConsumptionReport.class,
+                FuelPriceReport.class,
+                MileageReport.class,
+                TripReport.class,
+                CostsReport.class,
+                OverallCostsReport.class
+        );
+
         var reportNames = prefs.getString(KEY_REPORT_ORDER, null);
         if (reportNames == null) {
-            return new ArrayList<>(List.of(
-                    FuelConsumptionReport.class,
-                    FuelPriceReport.class,
-                    MileageReport.class,
-                    CostsReport.class,
-                    OverallCostsReport.class
-            ));
+            return new ArrayList<>(defaultOrder);
         }
 
-        return Arrays.stream(reportNames.split(","))
+        List<Class<? extends AbstractReport>> savedOrder = Arrays.stream(reportNames.split(","))
                 .map(name -> {
                     try {
                         var cls = Class.forName(name);
-                        return AbstractReport.class.isAssignableFrom(cls) ? cls : null;
+                        if (AbstractReport.class.isAssignableFrom(cls)) {
+                            //noinspection unchecked
+                            return (Class<? extends AbstractReport>) cls;
+                        }
+                        return null;
                     } catch (Exception e) {
                         Log.w(TAG, "Error loading report class: " + name);
                         return null;
                     }
                 })
                 .filter(Objects::nonNull)
-                .map(cls -> (Class<? extends AbstractReport>) cls)
                 .collect(Collectors.toCollection(ArrayList::new));
+
+        // Ensure new reports are added if they were missing from the saved order
+        for (Class<? extends AbstractReport> reportClass : defaultOrder) {
+            if (!savedOrder.contains(reportClass)) {
+                savedOrder.add(reportClass);
+            }
+        }
+
+        return savedOrder;
     }
 
     public void setReportOrder(@NonNull List<Class<? extends AbstractReport>> reports) {
@@ -190,7 +205,7 @@ public class Preferences {
         putString(KEY_BACKUP_FOLDER, getAppFilesDirPath());
     }
 
-    public boolean getAutoBackupEnabled() {
+    public boolean isAutoBackupEnabled() {
         return prefs.getBoolean(KEY_AUTO_BACKUP, false);
     }
 

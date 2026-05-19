@@ -39,19 +39,10 @@ public interface TireDao {
     LiveData<List<TireList>> getAllTireListsLiveData();
 
     @Query("SELECT * FROM tire_list WHERE _id = :id")
-    TireList getTireListById(long id);
-
-    @Query("SELECT * FROM tire_list WHERE _id = :id")
     LiveData<TireList> getTireListByIdLiveData(long id);
 
     @Query("SELECT * FROM tire_usage ORDER BY date_mount DESC")
     List<TireUsage> getAllTireUsages();
-
-    @Query("SELECT * FROM tire_usage WHERE tire_id = :tireId ORDER BY date_mount DESC")
-    List<TireUsage> getUsageByTireId(long tireId);
-
-    @Query("SELECT * FROM tire_usage WHERE tire_id = :tireId ORDER BY date_mount DESC")
-    LiveData<List<TireUsage>> getUsageByTireIdLiveData(long tireId);
 
     @Query("""
         SELECT l.*,
@@ -111,9 +102,6 @@ public interface TireDao {
 
     @Query("DELETE FROM tire_list WHERE _id = :id")
     void deleteTireListById(long id);
-
-    @Query("DELETE FROM tire_usage WHERE _id = :id")
-    void deleteTireUsageById(long id);
 
     @Query("DELETE FROM tire_list")
     void deleteAllTireLists();

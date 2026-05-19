@@ -35,6 +35,7 @@ import org.juanro.autumandu.gui.fragment.DataDetailOtherFragment;
 import org.juanro.autumandu.gui.fragment.DataDetailRefuelingFragment;
 import org.juanro.autumandu.gui.fragment.DataDetailReminderFragment;
 import org.juanro.autumandu.gui.fragment.DataDetailTireFragment;
+import org.juanro.autumandu.gui.fragment.DataDetailTripFragment;
 import org.juanro.autumandu.gui.pref.PreferencesActivity;
 import org.juanro.autumandu.gui.pref.PreferencesStationsFragment;
 
@@ -53,6 +54,7 @@ public class DataDetailActivity extends AppCompatActivity implements
     public static final int EXTRA_EDIT_REMINDER = 3;
     public static final int EXTRA_EDIT_STATION = 4;
     public static final int EXTRA_EDIT_TIRE = 5;
+    public static final int EXTRA_EDIT_TRIP = 6;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,10 +65,11 @@ public class DataDetailActivity extends AppCompatActivity implements
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.detail), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root_layout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
-            return insets;
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, Math.max(systemBars.bottom, ime.bottom));
+            return WindowInsetsCompat.CONSUMED;
         });
 
         if (savedInstanceState == null) {
@@ -103,6 +106,7 @@ public class DataDetailActivity extends AppCompatActivity implements
             case EXTRA_EDIT_CAR -> new DataDetailCarFragment();
             case EXTRA_EDIT_TIRE -> new DataDetailTireFragment();
             case EXTRA_EDIT_REMINDER -> new DataDetailReminderFragment();
+            case EXTRA_EDIT_TRIP -> new DataDetailTripFragment();
             default -> null;
         };
     }

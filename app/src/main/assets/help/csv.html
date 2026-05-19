@@ -58,6 +58,39 @@ snoozed_until: [date]</p>
 <p>_id: [int]<br>
 station__name: [string] Name of the fuel station.</p>
 
+<h2>trip</h2>
+<p>_id: [int]<br>
+car_id: [int] the Id of the car.<br>
+refueling_id: [int] the Id of the linked refueling.<br>
+date: [date] Start date.<br>
+date_end: [date] End date (for overnight trips).<br>
+time_start: [time]<br>
+time_end: [time]<br>
+route_target: [string] Description of the route or target destination.<br>
+purpose: [string] Purpose of the trip (e.g. business, private).<br>
+companies_visited: [string]<br>
+driver: [string]<br>
+occupants: [int]<br>
+cargo: [string]<br>
+km_start: [int] Odometer reading at the start.<br>
+km_end: [int] Odometer reading at the end.<br>
+km_business: [int] Distance driven for business purposes.<br>
+km_private: [int] Distance driven for private purposes.<br>
+km_home_work: [int] Distance driven between home and work.<br>
+fuel_liters: [float]<br>
+fuel_cost: [float]<br>
+other_costs_description: [string]<br>
+other_costs_amount: [float]<br>
+created_at: [datetime]<br>
+updated_at: [datetime]</p>
+
+<h2>trip_prefab</h2>
+<p>_id: [int]<br>
+car_id: [int] the Id of the car.<br>
+type: [string] The type of the prefab value (route, purpose, driver, company).<br>
+value: [string]<br>
+usage_count: [int] Number of times this value has been used.</p>
+
 <h2>tire_list</h2>
 <p>_id: [int]<br>
 buy_date: [date]<br>
@@ -76,3 +109,7 @@ date_mount: [date]<br>
 distance_umount: [int] Mileage when unmounted.<br>
 date_umount: [date]<br>
 tire_id: [int] the Id of the tire from the tire_list table.</p>
+
+<h1>Trip Import/Export</h1>
+<p>Besides the global backup, the Driver's Log module allows importing and exporting trips independently. This is useful for migrating data from other apps or meeting external reporting requirements.</p>
+<p>The application supports several formats, including a generic comma-separated format and specific formats like Skoda (semicolon). During import, the app will try to match columns based on the CSV headers.</p>

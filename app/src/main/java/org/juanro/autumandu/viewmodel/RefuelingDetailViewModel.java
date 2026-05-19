@@ -34,6 +34,8 @@ import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Refueling;
 import org.juanro.autumandu.model.entity.Station;
 
+import org.juanro.autumandu.model.entity.Trip;
+
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -65,6 +67,12 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
     public LiveData<RefuelingWithDetails> getRefueling() {
         return Transformations.switchMap(refuelingId, id ->
                 id == -1 ? new MutableLiveData<>(null) : db.getRefuelingDao().getByIdWithDetailsLiveData(id)
+        );
+    }
+
+    public LiveData<List<Trip>> getLinkedTrips() {
+        return Transformations.switchMap(refuelingId, id ->
+                id == -1 ? new MutableLiveData<>(new java.util.ArrayList<>()) : db.getTripDao().getTripsForRefuelingLive(id)
         );
     }
 
@@ -143,26 +151,31 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
 
             int mileage = params.mileageInput();
             if (previousRefueling != null && params.distanceEntryMode() == DistanceEntryMode.TRIP) {
-                mileage += previousRefueling.getMileage();
+                refueling.setMileage(mileage + previousRefueling.getMileage());
+            } else {
+                refueling.setMileage(mileage);
             }
 
             refueling.setDate(params.date());
-            refueling.setMileage(mileage);
             refueling.setPartial(params.partial());
             refueling.setNote(params.note());
             refueling.setFuelTypeId(params.fuelTypeId());
             refueling.setStationId(params.stationId());
             refueling.setCarId(params.carId());
 
-            if (params.priceEntryMode() == PriceEntryMode.TOTAL_AND_VOLUME) {
-                refueling.setVolume(params.volumeInput());
-                refueling.setPrice(params.priceInput());
-            } else if (params.priceEntryMode() == PriceEntryMode.PER_UNIT_AND_TOTAL) {
-                refueling.setVolume(params.priceInput() / params.volumeInput());
-                refueling.setPrice(params.priceInput());
-            } else if (params.priceEntryMode() == PriceEntryMode.PER_UNIT_AND_VOLUME) {
-                refueling.setVolume(params.volumeInput());
-                refueling.setPrice(params.volumeInput() * params.priceInput());
+            switch (params.priceEntryMode()) {
+                case TOTAL_AND_VOLUME -> {
+                    refueling.setVolume(params.volumeInput());
+                    refueling.setPrice(params.priceInput());
+                }
+                case PER_UNIT_AND_TOTAL -> {
+                    refueling.setVolume(params.priceInput() / params.volumeInput());
+                    refueling.setPrice(params.priceInput());
+                }
+                case PER_UNIT_AND_VOLUME -> {
+                    refueling.setVolume(params.volumeInput());
+                    refueling.setPrice(params.volumeInput() * params.priceInput());
+                }
             }
 
             save(refueling, params.onSaved());
@@ -210,35 +223,24 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
         void onLoaded(T result);
     }
 
-    public static class PriceEntryData {
-        public final String volume;
-        public final String price;
-
-        public PriceEntryData(String volume, String price) {
-            this.volume = volume;
-            this.price = price;
-        }
-    }
+    public record PriceEntryData(String volume, String price) {}
 
     public PriceEntryData getPriceEntryData(RefuelingWithDetails refueling, PriceEntryMode mode) {
-        String volumeStr = "";
-        String priceStr = "";
+        float perUnit = (refueling.volume() > 0) ? refueling.price() / refueling.volume() : 0.0f;
 
-        if (mode == PriceEntryMode.TOTAL_AND_VOLUME) {
-            volumeStr = String.valueOf(refueling.volume());
-            if (refueling.price() != 0.0f) {
-                priceStr = String.valueOf(refueling.price());
-            }
-        } else if (mode == PriceEntryMode.PER_UNIT_AND_TOTAL) {
-            volumeStr = String.valueOf(refueling.price() / refueling.volume());
-            priceStr = String.valueOf(refueling.price());
-        } else if (mode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
-            volumeStr = String.valueOf(refueling.volume());
-            if (refueling.price() != 0.0f) {
-                priceStr = String.valueOf(refueling.price() / refueling.volume());
-            }
-        }
-
-        return new PriceEntryData(volumeStr, priceStr);
+        return switch (mode) {
+            case TOTAL_AND_VOLUME -> new PriceEntryData(
+                    String.valueOf(refueling.volume()),
+                    (refueling.price() != 0.0f) ? String.valueOf(refueling.price()) : ""
+            );
+            case PER_UNIT_AND_TOTAL -> new PriceEntryData(
+                    String.valueOf(perUnit),
+                    String.valueOf(refueling.price())
+            );
+            case PER_UNIT_AND_VOLUME -> new PriceEntryData(
+                    String.valueOf(refueling.volume()),
+                    (refueling.price() != 0.0f) ? String.valueOf(perUnit) : ""
+            );
+        };
     }
 }

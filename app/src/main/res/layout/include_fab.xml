@@ -105,6 +105,45 @@
                 app:tint="?attr/colorOnSecondaryContainer" />
         </LinearLayout>
 
+        <!-- Trip -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fab_mini_margin"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/fab_label_margin"
+                android:importantForAccessibility="no"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="@dimen/fab_label_corner_radius"
+                app:cardElevation="@dimen/fab_label_elevation">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/fab_label_padding_horizontal"
+                    android:paddingVertical="@dimen/fab_label_padding_vertical"
+                    android:text="@string/fab_add_trip"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="@dimen/fab_label_text_size" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_trip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/fab_add_trip"
+                android:accessibilityTraversalBefore="@id/fab_add_refueling"
+                tools:ignore="UnresolvableCustomView"
+                app:fabSize="mini"
+                app:srcCompat="@drawable/ic_c_trip_24dp"
+                app:backgroundTint="?attr/colorSecondaryContainer"
+                app:tint="?attr/colorOnSecondaryContainer" />
+        </LinearLayout>
+
         <!-- Other Expenditure -->
         <LinearLayout
             android:layout_width="wrap_content"
@@ -136,7 +175,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/fab_add_other_expenditure"
-                android:accessibilityTraversalBefore="@id/fab_add_refueling"
+                android:accessibilityTraversalBefore="@id/fab_add_trip"
                 tools:ignore="UnresolvableCustomView"
                 app:fabSize="mini"
                 app:srcCompat="@drawable/ic_c_other_24dp"
