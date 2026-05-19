@@ -48,6 +48,7 @@ public class ReportViewModel extends AndroidViewModel {
         mReports.addSource(db.getRefuelingDao().getWithDetailsForCarLiveData(-1), refueling -> invalidateAndRefresh());
         mReports.addSource(db.getOtherCostDao().getAllLiveData(), otherCosts -> invalidateAndRefresh());
         mReports.addSource(db.getTireDao().getAllTireListsLiveData(), tires -> invalidateAndRefresh());
+        mReports.addSource(db.getTripDao().getTripsWithDetailsForCarLive(-1), trips -> invalidateAndRefresh());
 
         refreshReports();
     }

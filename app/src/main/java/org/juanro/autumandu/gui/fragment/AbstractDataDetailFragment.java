@@ -113,6 +113,7 @@ public abstract class AbstractDataDetailFragment extends Fragment {
 
                 if (!isInEditMode()) {
                     menu.removeItem(R.id.menu_delete);
+                    menu.removeItem(R.id.menu_copy);
                 }
             }
 
@@ -136,15 +137,18 @@ public abstract class AbstractDataDetailFragment extends Fragment {
         } else if (id == R.id.menu_delete) {
             showDeleteConfirmation();
             return true;
+        } else if (id == R.id.menu_copy) {
+            onCopy();
+            return true;
         }
         return false;
     }
 
+    protected void onCopy() {
+    }
+
     private void showDeleteConfirmation() {
         var message = getString(getAlertDeleteMessage());
-        if (getAlertDeleteMessage() == R.string.alert_delete_tire_message) {
-            message = getString(R.string.alert_delete_tire_message, 1);
-        }
         MessageDialogFragment.newInstance(DELETE_REQUEST_CODE,
                 R.string.alert_delete_title,
                 message, android.R.string.ok,

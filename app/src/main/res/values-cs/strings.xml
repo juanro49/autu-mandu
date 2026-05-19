@@ -132,7 +132,7 @@
     <string name="help_section_getting_started">Začínáme</string>
     <string name="help_section_fuel_types">Typy paliv</string>
     <string name="help_section_csv">Soubor CSV</string>
-    <string name="help_folder_name">pomoc</string>
+    <string name="help_folder_name">help</string>
     <string name="first_start_hi">Zdravíčko!</string>
     <string name="price_entry_mode_per_unit_and_total">Cena za jednotku &amp; celková cena</string>
     <string name="calc_option_distance_to_fuel_price">Vzdálenost (%1$s) na cenu paliva (%2$s)</string>

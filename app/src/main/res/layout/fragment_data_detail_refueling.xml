@@ -256,5 +256,29 @@
             app:layout_constraintTop_toBottomOf="@id/txt_label_car"
             app:layout_constraintWidth_max="@dimen/button_max_width" />
 
+        <!-- Section: Linked Trips -->
+        <TextView
+            android:id="@+id/txt_section_linked_trips"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/title_trips"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spn_car"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/lst_linked_trips"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_linked_trips"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

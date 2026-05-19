@@ -81,6 +81,42 @@ public final class CSVConvert {
         }
     }
 
+    static Double toDouble(String value) {
+        if (value == null || value.isEmpty()) return null;
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    static java.time.LocalDate toLocalDate(String value) {
+        if (value == null || value.isEmpty()) return null;
+        try {
+            return java.time.LocalDate.parse(value);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    static java.time.LocalTime toLocalTime(String value) {
+        if (value == null || value.isEmpty()) return null;
+        try {
+            return java.time.LocalTime.parse(value);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    static java.time.LocalDateTime toLocalDateTime(String value) {
+        if (value == null || value.isEmpty()) return null;
+        try {
+            return java.time.LocalDateTime.parse(value);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @Nullable
     static Boolean toBoolean(@Nullable String value) {
         if (value == null || value.isEmpty()) {
@@ -94,12 +130,6 @@ public final class CSVConvert {
     static RecurrenceInterval toRecurrenceInterval(String value) {
         Integer intValue = toInteger(value);
         return intValue != null ? RecurrenceInterval.fromId(intValue) : null;
-    }
-
-    @Nullable
-    static Boolean isBoolean(String value) {
-        if (value == null || value.isEmpty()) return null;
-        return Boolean.parseBoolean(value);
     }
 
     @Nullable
@@ -147,5 +177,17 @@ public final class CSVConvert {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    static String toString(java.time.LocalDate value) {
+        return value == null ? null : value.toString();
+    }
+
+    static String toString(java.time.LocalTime value) {
+        return value == null ? null : value.toString();
+    }
+
+    static String toString(java.time.LocalDateTime value) {
+        return value == null ? null : value.toString();
     }
 }

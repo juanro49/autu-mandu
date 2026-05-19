@@ -8,7 +8,6 @@ import org.juanro.autumandu.util.sync.AuthenticationFinishedListener;
 import org.juanro.autumandu.util.sync.Authenticator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.json.JSONObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,12 +26,7 @@ public class WebDavSyncProviderTest {
     @Test
     public void testHandleAuthenticationResultAccountType() {
         final Account[] capturedAccount = new Account[1];
-        AuthenticationFinishedListener listener = new AuthenticationFinishedListener() {
-            @Override
-            public void onAuthenticationFinished(Account account, String password, String authToken, JSONObject settings) {
-                capturedAccount[0] = account;
-            }
-        };
+        AuthenticationFinishedListener listener = (account, password, authToken, settings) -> capturedAccount[0] = account;
 
         Intent data = new Intent();
         data.putExtra(AccountManager.KEY_ACCOUNT_NAME, "test@example.com");

@@ -57,6 +57,39 @@ snoozed_until: [date]</p>
 <p>_id: [int]<br>
 station__name: [string] Nombre de la estación de servicio.</p>
 
+<h2>trip</h2>
+<p>_id: [int]<br>
+car_id: [int] el ID del vehículo.<br>
+refueling_id: [int] el ID del repostaje vinculado.<br>
+date: [date] Fecha de inicio.<br>
+date_end: [date] Fecha de fin (para viajes nocturnos).<br>
+time_start: [time]<br>
+time_end: [time]<br>
+route_target: [string] Descripción de la ruta o destino.<br>
+purpose: [string] Propósito del viaje (ej: negocios, privado).<br>
+companies_visited: [string]<br>
+driver: [string]<br>
+occupants: [int]<br>
+cargo: [string]<br>
+km_start: [int] Lectura del odómetro al inicio.<br>
+km_end: [int] Lectura del odómetro al final.<br>
+km_business: [int] Distancia recorrida por negocios.<br>
+km_private: [int] Distancia recorrida de forma privada.<br>
+km_home_work: [int] Distancia recorrida entre casa y trabajo.<br>
+fuel_liters: [float]<br>
+fuel_cost: [float]<br>
+other_costs_description: [string]<br>
+other_costs_amount: [float]<br>
+created_at: [datetime]<br>
+updated_at: [datetime]</p>
+
+<h2>trip_prefab</h2>
+<p>_id: [int]<br>
+car_id: [int] el ID del vehículo.<br>
+type: [string] El tipo de valor predefinido (route, purpose, driver, company).<br>
+value: [string]<br>
+usage_count: [int] Número de veces que se ha usado este valor.</p>
+
 <h2>tire_list</h2>
 <p>_id: [int]<br>
 buy_date: [date]<br>
@@ -75,3 +108,7 @@ date_mount: [date]<br>
 distance_umount: [int] Kilometraje al desmontar.<br>
 date_umount: [date]<br>
 tire_id: [int] el ID del neumático de la tabla tire_list.</p>
+
+<h1>Importación/Exportación de Viajes</h1>
+<p>Además de la copia de seguridad global, el módulo de Registro de Viajes permite importar y exportar viajes de forma independiente. Esto es útil para migrar datos desde otras aplicaciones o cumplir con requisitos de informes externos.</p>
+<p>La aplicación soporta varios formatos, incluyendo un formato genérico (comas) y formatos específicos como el de Skoda (punto y coma). Al importar, la aplicación intentará hacer coincidir las columnas basándose en los encabezados del archivo CSV.</p>

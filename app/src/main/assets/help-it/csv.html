@@ -65,6 +65,39 @@
 <p>_id: [int]<br>
     station__name: [string] Nome della stazione di servizio.</p>
 
+<h2>trip</h2>
+<p>_id: [int]<br>
+    car_id: [int] l'identificativo dell'auto.<br>
+    refueling_id: [int] l'identificativo del rifornimento collegato.<br>
+    date: [date] Data di inizio.<br>
+    date_end: [date] Data di fine (per viaggi notturni).<br>
+    time_start: [time]<br>
+    time_end: [time]<br>
+    route_target: [string] Descrizione del percorso o della destinazione.<br>
+    purpose: [string] Scopo del viaggio (es. lavoro, privato).<br>
+    companies_visited: [string]<br>
+    driver: [string]<br>
+    occupants: [int]<br>
+    cargo: [string]<br>
+    km_start: [int] Lettura del contachilometri alla partenza.<br>
+    km_end: [int] Lettura del contachilometri all'arrivo.<br>
+    km_business: [int] Chilometri percorsi per lavoro.<br>
+    km_private: [int] Chilometri percorsi per scopi privati.<br>
+    km_home_work: [int] Chilometri percorsi tra casa e lavoro.<br>
+    fuel_liters: [float]<br>
+    fuel_cost: [float]<br>
+    other_costs_description: [string]<br>
+    other_costs_amount: [float]<br>
+    created_at: [datetime]<br>
+    updated_at: [datetime]</p>
+
+<h2>trip_prefab</h2>
+<p>_id: [int]<br>
+    car_id: [int] l'identificativo dell'auto.<br>
+    type: [string] Il tipo di valore predefinito (route, purpose, driver, company).<br>
+    value: [string]<br>
+    usage_count: [int] Numero di volte che questo valore è stato utilizzato.</p>
+
 <h2>tire_list</h2>
 <p>_id: [int]<br>
     buy_date: [date]<br>
@@ -83,3 +116,7 @@
     distance_umount: [int] Chilometraggio allo smontaggio.<br>
     date_umount: [date]<br>
     tire_id: [int] l'identificativo dello pneumatico dalla tabella tire_list.</p>
+
+<h1>Importazione/Esportazione di Viaggi</h1>
+<p>Oltre al backup globale, il modulo Registro di Viaggi permette di importare ed esportare viaggi indipendentemente. Questo è utile per migrare dati da altre app o soddisfare requisiti di reportistica esterna.</p>
+<p>L'applicazione supporta diversi formati, tra cui un formato generico (separato da virgole) e formati specifici come Skoda (punto e virgola). Durante l'importazione, l'app cercherà di far corrispondere le colonne in base alle intestazioni del file CSV.</p>

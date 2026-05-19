@@ -17,8 +17,10 @@
 package org.juanro.autumandu.gui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -30,6 +32,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.juanro.autumandu.DistanceEntryMode;
 import org.juanro.autumandu.Preferences;
@@ -42,11 +46,13 @@ import org.juanro.autumandu.gui.util.DateTimeInput;
 import org.juanro.autumandu.gui.util.RefuelingValidator;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Station;
+import org.juanro.autumandu.model.entity.Trip;
 import org.juanro.autumandu.util.reminder.ReminderWorker;
 import org.juanro.autumandu.viewmodel.RefuelingDetailViewModel;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     private static final int PICK_DATE_REQUEST_CODE = 0;
@@ -73,6 +79,9 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     private Spinner spnStation;
     private EditText edtNote;
     private Spinner spnCar;
+
+    private TextView txtSectionLinkedTrips;
+    private RecyclerView lstLinkedTrips;
 
     private DistanceEntryMode mDistanceEntryMode;
     private PriceEntryMode mPriceEntryMode;
@@ -140,10 +149,21 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
             selectSpinnerItemById(spnCar, refueling.carId());
 
             var priceData = mViewModel.getPriceEntryData(refueling, mPriceEntryMode);
-            edtVolume.setText(priceData.volume);
-            edtPrice.setText(priceData.price);
+            edtVolume.setText(priceData.volume());
+            edtPrice.setText(priceData.price());
 
             updateMileageInputWarningVisibility();
+        });
+
+        mViewModel.getLinkedTrips().observe(getViewLifecycleOwner(), trips -> {
+            if (trips != null && !trips.isEmpty()) {
+                txtSectionLinkedTrips.setVisibility(View.VISIBLE);
+                lstLinkedTrips.setVisibility(View.VISIBLE);
+                lstLinkedTrips.setAdapter(new LinkedTripAdapter(trips));
+            } else {
+                txtSectionLinkedTrips.setVisibility(View.GONE);
+                lstLinkedTrips.setVisibility(View.GONE);
+            }
         });
     }
 
@@ -193,6 +213,10 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
         spnStation = v.findViewById(R.id.spn_station);
         edtNote = v.findViewById(R.id.edt_note);
         spnCar = v.findViewById(R.id.spn_car);
+
+        txtSectionLinkedTrips = v.findViewById(R.id.txt_section_linked_trips);
+        lstLinkedTrips = v.findViewById(R.id.lst_linked_trips);
+        lstLinkedTrips.setLayoutManager(new LinearLayoutManager(requireContext()));
     }
 
     private void setupDateTimePickers() {
@@ -429,5 +453,52 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
                         txtMileageWarning.setVisibility(Boolean.TRUE.equals(showWarning) ? View.VISIBLE : View.GONE);
                     }
                 }));
+    }
+
+    private class LinkedTripAdapter extends RecyclerView.Adapter<LinkedTripAdapter.ViewHolder> {
+        private final List<Trip> mTrips;
+        private final String mUnitDistance;
+
+        public LinkedTripAdapter(List<Trip> trips) {
+            mTrips = trips;
+            mUnitDistance = new Preferences(requireContext()).getUnitDistance();
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_2, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Trip trip = mTrips.get(position);
+            holder.text1.setText(String.format("%s -> %s", trip.getRouteTarget(), trip.getPurpose()));
+            holder.text2.setText(String.format(Locale.getDefault(), "%d %s", trip.getTotalDistance(), mUnitDistance));
+
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), org.juanro.autumandu.gui.DataDetailActivity.class);
+                intent.putExtra(org.juanro.autumandu.gui.DataDetailActivity.EXTRA_EDIT, org.juanro.autumandu.gui.DataDetailActivity.EXTRA_EDIT_TRIP);
+                intent.putExtra(AbstractDataDetailFragment.EXTRA_ID, trip.getId());
+                startActivity(intent);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mTrips.size();
+        }
+
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            TextView text1;
+            TextView text2;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                text1 = itemView.findViewById(android.R.id.text1);
+                text2 = itemView.findViewById(android.R.id.text2);
+            }
+        }
     }
 }

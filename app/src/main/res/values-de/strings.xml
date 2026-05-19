@@ -153,6 +153,7 @@
     <string name="report_title_fuel_price">Benzinpreis</string>
     <string name="report_title_mileage">Kilometerstand</string>
     <string name="report_title_costs">Kosten</string>
+    <string name="report_title_trips">Fahrtenbuch Zusammenfassung</string>
     <string name="report_trend_label">%s (Trend)</string>
     <string name="report_overall_trend_label">%s (Gesamttrend)</string>
     <string name="report_graph_month_history">Monat Historie</string>
@@ -269,6 +270,7 @@
     <string name="pref_summary_no_file_selector">Auf diesem Gerät fehlt eine App zum auswählen des Backups.</string>
     <string name="pref_summary_restore_file_seems_wrong">Es wurde nichts ausgewählt oder die Datei scheint nicht für eine Wiederherstellung geeignet.</string>
     <string name="title_refuelings">Tankfüllungen</string>
+    <string name="title_trips">Fahrtenbuch</string>
     <string name="title_expenditures">Andere Ausgaben</string>
     <string name="title_income">Andere Einnahmen</string>
     <string name="repeat_once">Einmalig</string>
@@ -296,7 +298,8 @@
     <string name="pref_title_restore_backup_location">Wiederherstellungsziel</string>
     <string name="pref_default_backup_path_restored">Standard-Sicherungspfad wiederhergestellt:</string>
     <string name="pref_summary_restore_backup_location">Standardpfad für die Speicherung von Sicherungen wiederherstellen.</string>
-    <string name="alert_delete_tire_message">Die %d ausgewählten Reifensätze werden gelöscht.</string>
+    <string name="alert_delete_tire_message">Dieser Reifensatz wird gelöscht.</string>
+    <string name="alert_delete_tires_message">Die %d ausgewählten Reifensätze werden gelöscht.</string>
     <string name="alert_invalid_distance">Die Ausbau-Entfernung muss größer oder gleich der Einbau-Entfernung sein.</string>
     <string name="alert_mount_umount_message">Der ausgewählte Reifensatz wird montiert/demontiert.</string>
     <string name="title_tires">Reifen</string>

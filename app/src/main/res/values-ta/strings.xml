@@ -236,7 +236,7 @@
     <string name="help_section_calculations">கணக்கீடுகள்</string>
     <string name="help_section_fuel_types">எரிபொருள் வகைகள்</string>
     <string name="help_section_csv">சிஎச்வி</string>
-    <string name="help_folder_name">உதவி</string>
+    <string name="help_folder_name">help</string>
     <string name="first_start_hi">ஆய்!</string>
     <string name="first_start_intro">எரிபொருள் நுகர்வு மற்றும் ஒட்டுமொத்த செலவுகள் உள்ளிட்ட உங்கள் கார் செலவினங்களுக்கான நல்ல அறிக்கைகளை ஆட்டூ மாண்டு காண்பிக்க முடியும். இந்த எளிய வழிமுறைகளுடன் தொடங்கவும்:</string>
     <string name="first_start_step1_img_desc">முதல் படி</string>

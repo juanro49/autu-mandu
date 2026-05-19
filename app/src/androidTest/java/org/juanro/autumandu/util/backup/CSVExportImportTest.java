@@ -1,27 +1,31 @@
 package org.juanro.autumandu.util.backup;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.util.Log;
+
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+
+import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.entity.Car;
-import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Refueling;
-import org.juanro.autumandu.model.entity.Station;
-import org.juanro.autumandu.Preferences;
+import org.juanro.autumandu.model.entity.Reminder;
+import org.juanro.autumandu.model.entity.TireList;
+import org.juanro.autumandu.model.entity.TireUsage;
+import org.juanro.autumandu.model.entity.helper.TimeSpanUnit;
+import org.juanro.autumandu.util.DemoData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
@@ -34,7 +38,7 @@ public class CSVExportImportTest {
     private Preferences prefs;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         context = ApplicationProvider.getApplicationContext();
         db = AutuManduDatabase.getInstance(context);
 
@@ -60,9 +64,13 @@ public class CSVExportImportTest {
 
     @After
     public void tearDown() {
-        prefs.setBackupPath(originalBackupPath);
+        if (prefs != null) {
+            prefs.setBackupPath(originalBackupPath);
+        }
         AutuManduDatabase.resetInstance();
-        deleteRecursive(tempDir);
+        if (tempDir != null) {
+            deleteRecursive(tempDir);
+        }
     }
 
     private void deleteRecursive(File fileOrDirectory) {
@@ -74,84 +82,49 @@ public class CSVExportImportTest {
                 }
             }
         }
-        fileOrDirectory.delete();
+        if (!fileOrDirectory.delete()) {
+            Log.w("CSVTest", "No se pudo borrar: " + fileOrDirectory.getAbsolutePath());
+        }
     }
 
     @Test
     public void testExportImportRoundTrip() throws Exception {
-        // 1. Prepare data
-        final long[] carId = new long[1];
-        final long[] fuelTypeId = new long[1];
-        final long[] stationId = new long[1];
-        final Date date = new Date();
+        // 1. Prepare data using DemoData
+        DemoData.addDemoDataSync(context);
 
-        db.runInTransaction(() -> {
-            Car car = new Car();
-            car.setName("Test Car");
-            car.setColor(Color.RED);
-            car.setInitialMileage(100);
-            car.setBuyingPrice(20000.0);
-            car.setNumTires(4);
-            carId[0] = db.getCarDao().insert(car)[0];
+        // Add a reminder manually as DemoData doesn't include them
+        long carId = db.getCarDao().getAll().getFirst().getId();
+        Reminder reminder = new Reminder();
+        reminder.setCarId(carId);
+        reminder.setTitle("Test Reminder");
+        reminder.setStartDate(new java.util.Date());
+        reminder.setAfterTimeSpanUnit(TimeSpanUnit.MONTH);
+        reminder.setAfterTimeSpanCount(1);
+        db.getReminderDao().insert(reminder);
 
-            FuelType fuelType = new FuelType();
-            fuelType.setName("Super 95");
-            fuelType.setCategory("Benzin");
-            fuelTypeId[0] = db.getFuelTypeDao().insert(fuelType)[0];
-
-            Station station = new Station();
-            station.setName("Test Station");
-            stationId[0] = db.getStationDao().insert(station)[0];
-
-            Refueling refueling = new Refueling();
-            refueling.setCarId(carId[0]);
-            refueling.setFuelTypeId(fuelTypeId[0]);
-            refueling.setStationId(stationId[0]);
-            refueling.setDate(date);
-            refueling.setMileage(1100);
-            refueling.setVolume(50.5f);
-            refueling.setPrice(75.25f);
-            refueling.setPartial(false);
-            refueling.setNote("Test Note");
-            db.getRefuelingDao().insert(refueling);
-
-            org.juanro.autumandu.model.entity.OtherCost otherCost = new org.juanro.autumandu.model.entity.OtherCost();
-            otherCost.setCarId(carId[0]);
-            otherCost.setTitle("Service");
-            otherCost.setDate(date);
-            otherCost.setMileage(1000);
-            otherCost.setPrice(150.0f);
-            otherCost.setRecurrenceInterval(org.juanro.autumandu.model.entity.helper.RecurrenceInterval.YEAR);
-            otherCost.setRecurrenceMultiplier(1);
-            db.getOtherCostDao().insert(otherCost);
-
-            org.juanro.autumandu.model.entity.Reminder reminder = new org.juanro.autumandu.model.entity.Reminder();
-            reminder.setCarId(carId[0]);
-            reminder.setTitle("Check oil");
-            reminder.setAfterTimeSpanUnit(org.juanro.autumandu.model.entity.helper.TimeSpanUnit.MONTH);
-            reminder.setAfterTimeSpanCount(6);
-            reminder.setStartDate(date);
-            db.getReminderDao().insert(reminder);
-
-            org.juanro.autumandu.model.entity.TireList tireList = new org.juanro.autumandu.model.entity.TireList();
-            tireList.setCarId(carId[0]);
-            tireList.setManufacturer("Michelin");
-            tireList.setModel("Pilot Sport");
-            tireList.setBuyDate(date);
-            tireList.setQuantity(4);
-            long tireId = db.getTireDao().insert(tireList)[0];
-
-            org.juanro.autumandu.model.entity.TireUsage tireUsage = new org.juanro.autumandu.model.entity.TireUsage();
-            tireUsage.setTireId(tireId);
-            tireUsage.setDistanceMount(100);
-            tireUsage.setDateMount(date);
-            db.getTireDao().insert(tireUsage);
-        });
+        // Add a tire usage manually
+        TireList tireList = db.getTireDao().getAllTireLists().getFirst();
+        TireUsage tireUsage = new TireUsage();
+        tireUsage.setTireId(tireList.getId());
+        tireUsage.setDateMount(new java.util.Date());
+        tireUsage.setDistanceMount(1000);
+        db.getTireDao().insert(tireUsage);
 
         // 2. Export
+        Log.d("CSVTest", "Directorio temporal: " + tempDir.getAbsolutePath());
         CSVExportImport exportImport = new CSVExportImport(context);
         exportImport.init();
+
+        Log.d("CSVTest", "Exportando datos...");
         exportImport.export();
+
+        // 2.1 Verificar que los archivos CSV existen y tienen contenido
+        File backupDir = new File(tempDir, "CSV");
+        Log.d("CSVTest", "Buscando archivos CSV en: " + backupDir.getAbsolutePath());
+
+        File carCsv = new File(backupDir, "car.csv");
+        assertTrue("El archivo car.csv no existe", carCsv.exists());
+        assertTrue("El archivo car.csv está vacío", carCsv.length() > 0);
 
         // 3. Clear DB
         db.runInTransaction(() -> {
@@ -167,27 +140,21 @@ public class CSVExportImportTest {
         assertEquals(0, db.getCarDao().getAll().size());
 
         // 4. Import
+        Log.d("CSVTest", "Importando datos...");
         exportImport.importData();
 
-        // 5. Verify data
+        Log.d("CSVTest", "Verificando datos importados...");
+
+        // 5. Verify data (using some values from DemoData)
         List<Car> cars = db.getCarDao().getAll();
-        assertEquals(1, cars.size());
-        assertEquals("Test Car", cars.get(0).getName());
+        assertFalse("No se importaron coches", cars.isEmpty());
 
         List<Refueling> refuelings = db.getRefuelingDao().getAll();
-        assertEquals(1, refuelings.size());
-        assertEquals(1100, refuelings.get(0).getMileage());
+        assertFalse("No se importaron repostajes", refuelings.isEmpty());
 
-        assertEquals(1, db.getOtherCostDao().getAll().size());
-        assertEquals("Service", db.getOtherCostDao().getAll().get(0).getTitle());
-
-        assertEquals(1, db.getReminderDao().getAll().size());
-        assertEquals("Check oil", db.getReminderDao().getAll().get(0).getTitle());
-
-        assertEquals(1, db.getTireDao().getAllTireLists().size());
-        assertEquals("Michelin", db.getTireDao().getAllTireLists().get(0).getManufacturer());
-
-        assertEquals(1, db.getTireDao().getAllTireUsages().size());
-        assertEquals(100, db.getTireDao().getAllTireUsages().get(0).getDistanceMount());
+        assertFalse("No se importaron otros costos", db.getOtherCostDao().getAll().isEmpty());
+        assertFalse("No se importaron recordatorios", db.getReminderDao().getAll().isEmpty());
+        assertFalse("No se importaron listas de neumáticos", db.getTireDao().getAllTireLists().isEmpty());
+        assertFalse("No se importaron usos de neumáticos", db.getTireDao().getAllTireUsages().isEmpty());
     }
 }

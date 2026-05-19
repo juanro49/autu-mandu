@@ -18,9 +18,9 @@
 
     <style name="section_header" parent="android:Widget.TextView">
         <item name="android:drawableBottom">@drawable/section_header</item>
-        <item name="android:drawablePadding">4dp</item>
+        <item name="android:drawablePadding">@dimen/spacing_tiny</item>
         <item name="android:layout_marginTop">@dimen/spacing_small</item>
-        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingStart">@dimen/spacing_tiny</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textSize">14sp</item>
@@ -36,7 +36,7 @@
     <style name="AppWidget.FloatingSpinnerLabel" parent="android:Widget.TextView">
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textAppearance">?attr/textAppearanceTitleMedium</item>
-        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:layout_marginStart">@dimen/spacing_tiny</item>
     </style>
 
 </resources>

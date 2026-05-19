@@ -33,21 +33,21 @@ public class TimeSpanTest {
     public void testFromMillis() {
         // 365 days in millis
         long yearMillis = 365L * 24 * 60 * 60 * 1000;
-        TimeSpan timeSpan = TimeSpan.fromMillis(yearMillis);
-        assertEquals(TimeSpanUnit.YEAR, timeSpan.unit());
-        assertEquals(1, timeSpan.count());
+        TimeSpan timeSpanYear = TimeSpan.fromMillis(yearMillis);
+        assertEquals(TimeSpanUnit.YEAR, timeSpanYear.unit());
+        assertEquals(1, timeSpanYear.count());
 
         // 30 days in millis
         long monthMillis = 30L * 24 * 60 * 60 * 1000;
-        timeSpan = TimeSpan.fromMillis(monthMillis);
-        assertEquals(TimeSpanUnit.MONTH, timeSpan.unit());
-        assertEquals(1, timeSpan.count());
+        TimeSpan timeSpanMonth = TimeSpan.fromMillis(monthMillis);
+        assertEquals(TimeSpanUnit.MONTH, timeSpanMonth.unit());
+        assertEquals(1, timeSpanMonth.count());
 
         // 5 days in millis
         long daysMillis = 5L * 24 * 60 * 60 * 1000;
-        timeSpan = TimeSpan.fromMillis(daysMillis);
-        assertEquals(TimeSpanUnit.DAY, timeSpan.unit());
-        assertEquals(5, timeSpan.count());
+        TimeSpan timeSpanDays = TimeSpan.fromMillis(daysMillis);
+        assertEquals(TimeSpanUnit.DAY, timeSpanDays.unit());
+        assertEquals(5, timeSpanDays.count());
     }
 
     @Test

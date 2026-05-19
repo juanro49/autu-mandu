@@ -51,11 +51,11 @@ public class BackupViewModel extends AndroidViewModel {
         return csvExportImport;
     }
 
-    public void runBackup(Runnable onComplete, ErrorCallback onError) {
+    public void runBackup(java.util.function.Consumer<String> onComplete, ErrorCallback onError) {
         DB_EXECUTOR.execute(() -> {
-            boolean success = backup.backup(true);
-            if (success) {
-                onComplete.run();
+            String fileName = backup.backup(true);
+            if (fileName != null) {
+                onComplete.accept(fileName);
             } else {
                 onError.onError(null);
             }

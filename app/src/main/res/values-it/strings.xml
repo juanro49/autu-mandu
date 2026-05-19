@@ -156,6 +156,7 @@ limitations under the License.
     <string name="report_title_fuel_price">Prezzo carburante</string>
     <string name="report_title_mileage">Chilometraggio</string>
     <string name="report_title_costs">Costi</string>
+    <string name="report_title_trips">Riepilogo Viaggi</string>
     <string name="report_trend_label">%s (Andamento)</string>
     <string name="report_overall_trend_label">%s (Andamento medio)</string>
     <string name="report_graph_month_history">Storico mensile</string>
@@ -269,6 +270,7 @@ limitations under the License.
     <string name="quit_snooze_desc">Ferma sospensione</string>
     <string name="notice_not_paid">Non pagato</string>
     <string name="title_refuelings">Rifornimenti</string>
+    <string name="title_trips">Registro Viaggi</string>
     <string name="title_expenditures">Altre spese</string>
     <string name="title_income">Altre entrate</string>
     <string name="repeat_once">Una volta</string>

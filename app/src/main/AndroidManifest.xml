@@ -27,6 +27,10 @@
     <!-- Purpose: reminders notifications (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <!-- Purpose: geolocation for trips -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:name=".AutuManduApplication"
         android:icon="@mipmap/ic_launcher"

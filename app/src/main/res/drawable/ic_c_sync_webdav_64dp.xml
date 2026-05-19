@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Drop Shadow (Ellipse at bottom) -->
+    <path
+        android:fillColor="#20000000"
+        android:pathData="M 43.4871,41.5918 A 19.1361,4.6404 0 1 1 5.2149,41.5918 A 19.1361,4.6404 0 1 1 43.4871,41.5918 Z" />
+    <!-- Base / Stand -->
+    <path
+        android:fillColor="#FF888A85"
+        android:pathData="M 21.9235,29.9915 C 21.1400,29.9915 20.5172,30.6143 20.5172,31.3978 L 20.5172,38.4915 L 16.8922,38.4915 C 16.1087,38.4915 15.4860,39.1143 15.4860,39.8978 L 15.4860,44.1165 C 15.4860,44.9000 16.1087,45.5228 16.8922,45.5228 L 30.0797,45.5228 C 30.8632,45.5228 31.4860,44.9000 31.4860,44.1165 L 31.4860,39.8978 C 31.4860,39.1143 30.8632,38.4915 30.0797,38.4915 L 27.0485,38.4915 L 27.0485,31.3978 C 27.0485,30.6143 26.4257,29.9915 25.6422,29.9915 L 21.9235,29.9915 Z" />
+    <!-- Highlight on base -->
+    <path
+        android:fillColor="#40FFFFFF"
+        android:pathData="M 26.5512,35.9759 L 21.0200,35.9759 C 21.0200,35.9759 21.0200,37.6634 21.0200,38.1478 C 21.5669,36.3665 26.5512,35.9759 26.5512,35.9759 Z" />
+    <!-- Small button/detail -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 19,40.625 A 0.5313,0.5313 0 0 1 18.4688,41.1563 0.5313,0.5313 0 0 1 17.9375,40.625 0.5313,0.5313 0 0 1 18.4688,40.0938 0.5313,0.5313 0 0 1 19,40.625 Z" />
+    <!-- Main Box / Monitor Outer -->
+    <path
+        android:fillColor="#FF2E3436"
+        android:pathData="M 5.4716,34.6445 C 5.4934,35.0608 5.9315,35.4771 6.3478,35.4771 L 37.6748,35.4771 C 38.0911,35.4771 38.4856,35.0608 38.4638,34.6445 L 37.5274,7.4178 C 37.5056,7.0015 37.0675,6.5851 36.6512,6.5851 L 23.3803,6.5851 C 22.8952,6.5851 22.1458,6.2696 21.9787,5.4785 L 21.3673,2.5854 C 21.2118,1.8498 20.4851,1.5476 20.0687,1.5476 L 5.2899,1.5476 C 4.8736,1.5476 4.4791,1.9639 4.5009,2.3802 L 5.4716,34.6445 Z" />
+    <!-- Lines on Screen (Light Blue) -->
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.1764,18.5196 L 36.442,18.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 5.992,14.5196 L 36.4389,14.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 5.9305,8.5196 L 36.4378,8.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.3359,28.5196 L 36.4447,28.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.4589,30.5196 L 36.4467,30.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 5.992,12.5196 L 36.4389,12.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 5.9612,10.5196 L 36.4384,10.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 5.8719,6.5196 L 21.1527,6.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 5.8235,4.5196 L 20.6073,4.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.2745,24.5196 L 36.4437,24.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.2379,22.5196 L 36.443,22.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.1764,20.5196 L 36.442,20.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.1456,16.5196 L 36.4414,16.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.2745,26.5196 L 36.4437,26.5196" />
+    <path
+        android:fillColor="#FF729FCF"
+        android:pathData="M 6.4589,32.5196 L 36.4467,32.5196" />
+    <!-- Secondary Element / Side Box (Darker Blue) -->
+    <path
+        android:fillColor="#FF3465A4"
+        android:pathData="M 40.7333,35.4677 C 41.8772,35.4236 42.6964,34.3714 42.7804,33.1467 C 43.5721,21.5980 44.4397,11.9147 44.4397,11.9147 C 44.5119,11.6673 44.2718,11.4198 43.9596,11.4198 L 9.5884,11.4198 C 9.5884,11.4198 7.7381,33.2867 7.7381,33.2867 C 7.6235,34.2687 7.2721,35.0914 6.1883,35.4704 L 40.7333,35.4677 Z" />
+    <!-- Inner Monitor Detail (Light Blue) -->
+    <path
+        android:fillColor="#AA729FCF"
+        android:pathData="M 10.5700,12.4210 L 43.3611,12.4858 L 41.7871,32.4878 C 41.7028,33.5593 41.3364,33.9160 39.9144,33.9160 C 38.0429,33.9160 11.2365,33.8836 8.5197,33.8836 C 8.7533,33.5628 8.8534,32.8950 8.8548,32.8790 L 10.5700,12.4210 Z" />
+    <!-- Text "DAV" (Bold) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M 19,25 H 21.5 C 23.5,25 24.5,26 24.5,28.5 C 24.5,31 23.5,32 21.5,32 H 19 V 25 Z M 20.5,26.2 V 30.8 H 21.5 C 22.5,30.8 23,30.2 23,28.5 C 23,26.8 22.5,26.2 21.5,26.2 H 20.5 Z M 26.5,25 L 24.5,32 H 25.8 L 26.2,30.5 H 28.8 L 29.2,32 H 30.5 L 28.5,25 H 26.5 Z M 26.6,29.2 L 27.5,26.2 L 28.4,29.2 H 26.6 Z M 31,25 L 32.5,30.5 L 34,25 H 35.5 L 33.2,32 H 31.8 L 29.5,25 H 31 Z" />
+    <!-- Monitor Highlight / Reflection -->
+    <path
+        android:fillColor="#20FFFFFF"
+        android:pathData="M 10.5700,12.1803 L 9.4034,27.8235 C 9.4034,27.8235 17.6995,23.6755 28.0697,23.6755 C 38.4399,23.6755 43.6250,12.1803 43.6250,12.1803 L 10.5700,12.1803 Z" />
+</vector>

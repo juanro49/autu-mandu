@@ -48,23 +48,26 @@ public class AutoBackupWorker extends Worker {
         var context = getApplicationContext();
         var preferences = new Preferences(context);
 
-        if (!preferences.getAutoBackupEnabled()) {
+        if (!preferences.isAutoBackupEnabled()) {
             return Result.success();
         }
 
+        return performAutoBackup(context);
+    }
+
+    private Result performAutoBackup(Context context) {
         Log.d(TAG, "Starting automatic backup...");
         try {
             var backup = new Backup(context);
             final var result = backup.autoBackup();
 
-            if (result.isPresent()) {
-                final boolean success = result.get();
-                // Toasts must be shown on the main thread
-                new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(context, (success ? R.string.toast_auto_backup_succeeded :
-                                R.string.toast_auto_backup_failed), Toast.LENGTH_SHORT).show()
-                );
-            }
+            result.ifPresent(success ->
+                    // Toasts must be shown on the main thread
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            Toast.makeText(context, (success ? R.string.toast_auto_backup_succeeded :
+                                    R.string.toast_auto_backup_failed), Toast.LENGTH_SHORT).show()
+                    )
+            );
 
             return result.orElse(false) ? Result.success() : Result.failure();
         } catch (Exception e) {

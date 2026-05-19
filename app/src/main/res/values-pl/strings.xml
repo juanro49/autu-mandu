@@ -98,7 +98,7 @@
     <string name="pref_title_restore">Przywróć</string>
     <string name="help_section_tips">Porady</string>
     <string name="help_section_csv">CSV</string>
-    <string name="help_folder_name">pomoc</string>
+    <string name="help_folder_name">help</string>
     <string name="repeat_once">Raz</string>
     <string name="time_day">Dni</string>
     <string name="alert_sync_first_sync_upload">Dane lokalne</string>

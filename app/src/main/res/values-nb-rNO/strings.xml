@@ -24,7 +24,7 @@
     <string name="pref_title_exportcsv">Eksporter CSV</string>
     <string name="first_start_step1_img_desc">Første steg</string>
     <string name="pref_title_header_general">Generelle innstillinger</string>
-    <string name="help_folder_name">hjelp-nb</string>
+    <string name="help_folder_name">help</string>
     <string name="alert_import_csv_title">Importer CSV</string>
     <string name="report_highest">Høyeste</string>
     <string name="toast_import_csv_succeeded">Importert</string>

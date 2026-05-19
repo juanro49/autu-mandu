@@ -22,6 +22,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.concurrent.Executor;
@@ -35,6 +38,7 @@ import org.juanro.autumandu.model.entity.OtherCost;
 import org.juanro.autumandu.model.entity.Refueling;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.model.entity.TireList;
+import org.juanro.autumandu.model.entity.Trip;
 import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
 
 /**
@@ -74,16 +78,20 @@ public final class DemoData {
     public static void addDemoData() {
         DB_EXECUTOR.execute(() -> {
             Context context = AutuManduApplication.getContext();
-            AutuManduDatabase db = AutuManduDatabase.getInstance(context);
-
-            long super95 = createFuelType(db, "Super 95", "Benzin");
-            long superE10 = createFuelType(db, "Super E10", "Benzin");
-            long lpg = createFuelType(db, "LPG", "Gas");
-            long stationId = createStation(db, "Iberdoex");
-
-            addPuntoDemoData(db, super95, superE10, stationId);
-            addAstraDemoData(db, super95, lpg, stationId);
+            addDemoDataSync(context);
         });
+    }
+
+    public static void addDemoDataSync(Context context) {
+        AutuManduDatabase db = AutuManduDatabase.getInstance(context);
+
+        long super95 = createFuelType(db, "Super 95", "Benzin");
+        long superE10 = createFuelType(db, "Super E10", "Benzin");
+        long lpg = createFuelType(db, "LPG", "Gas");
+        long stationId = createStation(db, "Iberdoex");
+
+        addPuntoDemoData(db, super95, superE10, stationId);
+        addAstraDemoData(db, super95, lpg, stationId);
     }
 
     private static void addPuntoDemoData(AutuManduDatabase db, long super95, long superE10, long stationId) {
@@ -116,6 +124,23 @@ public final class DemoData {
                 createRefueling(db, new RefuelingConfig(puntoDate, puntoMileage, volume, price, partial, "",
                         fuelType, stationId, punto));
             }
+
+            // Add some trips around refuelings
+            if (i % 5 == 0) {
+                int tripDist = randInt(10, 100);
+                createTrip(db, new TripConfig(
+                        puntoDate.toLocalDate(),
+                        puntoDate.toLocalDate(),
+                        puntoDate.toLocalTime(),
+                        puntoDate.toLocalTime().plusMinutes(randInt(15, 120)),
+                        "Office",
+                        "Work",
+                        puntoMileage - tripDist,
+                        puntoMileage,
+                        tripDist, 0, 0,
+                        punto
+                ));
+            }
         }
     }
 
@@ -134,6 +159,27 @@ public final class DemoData {
 
         AstraRefuelingConfig config = new AstraRefuelingConfig(astra, astraDate, astraMileage, astraCount, super95, lpg, stationId);
         addRefuelingsForAstra(db, config);
+
+        // Add some trips for Astra
+        ZonedDateTime tripDate = astraDate;
+        int tripMileage = astraMileage;
+        for (int i = 0; i < 20; i++) {
+            tripDate = tripDate.plusDays(randInt(1, 3));
+            int dist = randInt(20, 150);
+            createTrip(db, new TripConfig(
+                    tripDate.toLocalDate(),
+                    tripDate.toLocalDate(),
+                    tripDate.toLocalTime(),
+                    tripDate.toLocalTime().plusMinutes(randInt(30, 180)),
+                    "Trip " + (i + 1),
+                    "Purpose " + (i % 3),
+                    tripMileage,
+                    tripMileage + dist,
+                    dist, 0, 0,
+                    astra
+            ));
+            tripMileage += dist + randInt(0, 10);
+        }
     }
 
     private static void addRefuelingsForAstra(AutuManduDatabase db, AstraRefuelingConfig config) {
@@ -263,6 +309,28 @@ public final class DemoData {
     }
 
     private record TireConfig(ZonedDateTime buyDate, ZonedDateTime trashDate, float price, int quantity, String manufacturer, String model, String note, long carId) {}
+
+    private static void createTrip(AutuManduDatabase db, TripConfig config) {
+        Trip trip = new Trip();
+        trip.setCarId(config.carId());
+        trip.setDate(config.date());
+        trip.setDateEnd(config.dateEnd());
+        trip.setTimeStart(config.timeStart());
+        trip.setTimeEnd(config.timeEnd());
+        trip.setRouteTarget(config.route());
+        trip.setPurpose(config.purpose());
+        trip.setKmStart(config.kmStart());
+        trip.setKmEnd(config.kmEnd());
+        trip.setKmBusiness(config.kmBusiness());
+        trip.setKmPrivate(config.kmPrivate());
+        trip.setKmHomeWork(config.kmHomeWork());
+        trip.setCreatedAt(LocalDateTime.now());
+        trip.setUpdatedAt(LocalDateTime.now());
+
+        db.getTripDao().insert(trip);
+    }
+
+    private record TripConfig(LocalDate date, LocalDate dateEnd, LocalTime timeStart, LocalTime timeEnd, String route, String purpose, int kmStart, int kmEnd, int kmBusiness, int kmPrivate, int kmHomeWork, long carId) {}
 
     private static int randInt(int min, int max) {
         return min + RANDOM.nextInt((max - min) + 1);

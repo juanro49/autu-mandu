@@ -34,7 +34,9 @@ public class CSVConvertTest {
 
     @Test
     public void testToFloat() {
-        assertEquals(123.45f, CSVConvert.toFloat("123.45"), 0.001f);
+        Float val = CSVConvert.toFloat("123.45");
+        assertNotNull(val);
+        assertEquals(123.45f, val, 0.001f);
         assertNull(CSVConvert.toFloat(null));
         assertNull(CSVConvert.toFloat("abc"));
     }
@@ -54,27 +56,29 @@ public class CSVConvertTest {
 
     @Test
     public void testToBoolean() {
-        assertTrue(CSVConvert.toBoolean("true"));
-        assertFalse(CSVConvert.toBoolean("false"));
+        assertEquals(Boolean.TRUE, CSVConvert.toBoolean("true"));
+        assertEquals(Boolean.FALSE, CSVConvert.toBoolean("false"));
         assertNull(CSVConvert.toBoolean(null));
     }
 
     @Test
     public void testToRecurrenceInterval() {
-        assertEquals(RecurrenceInterval.MONTHLY, CSVConvert.toRecurrenceInterval("1"));
-        assertNull(CSVConvert.toRecurrenceInterval("99"));
+        assertEquals(RecurrenceInterval.MONTH, CSVConvert.toRecurrenceInterval("2"));
+        // fromId defaults to ONCE if not found or 99 is not mapped
+        assertEquals(RecurrenceInterval.ONCE, CSVConvert.toRecurrenceInterval("99"));
     }
 
     @Test
     public void testToTimeSpanUnit() {
-        assertEquals(TimeSpanUnit.MONTH, CSVConvert.toTimeSpanUnit("2"));
-        assertNull(CSVConvert.toTimeSpanUnit("99"));
+        assertEquals(TimeSpanUnit.MONTH, CSVConvert.toTimeSpanUnit("1"));
+        // fromId defaults to DAY if not found
+        assertEquals(TimeSpanUnit.DAY, CSVConvert.toTimeSpanUnit("99"));
     }
 
     @Test
     public void testToStringEnum() {
-        assertEquals("1", CSVConvert.toString(RecurrenceInterval.MONTHLY));
-        assertEquals("2", CSVConvert.toString(TimeSpanUnit.MONTH));
+        assertEquals("2", CSVConvert.toString(RecurrenceInterval.MONTH));
+        assertEquals("1", CSVConvert.toString(TimeSpanUnit.MONTH));
         assertNull(CSVConvert.toString((Enum<?>) null));
     }
 

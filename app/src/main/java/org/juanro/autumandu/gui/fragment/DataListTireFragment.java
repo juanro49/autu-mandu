@@ -59,7 +59,7 @@ public class DataListTireFragment extends AbstractDataListFragment<TireWithDetai
 
     @Override
     protected int getAlertDeleteManyMessage() {
-        return R.string.alert_delete_tire_message;
+        return R.string.alert_delete_tires_message;
     }
 
     @Override

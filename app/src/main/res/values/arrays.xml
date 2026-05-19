@@ -21,6 +21,7 @@
         <item>@string/title_tires</item>
         <item>@string/title_expenditures</item>
         <item>@string/title_income</item>
+        <item>@string/title_trips</item>
         <item>@string/title_stations</item>
     </string-array>
 

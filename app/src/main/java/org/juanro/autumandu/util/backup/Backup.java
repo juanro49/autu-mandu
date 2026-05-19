@@ -89,11 +89,12 @@ public class Backup {
      * or an empty Optional if no backup needed.
      */
     public Optional<Boolean> autoBackup() {
-        if (backupFileExists() || !prefs.getAutoBackupEnabled()) {
+        if (backupFileExists() || !prefs.isAutoBackupEnabled()) {
             return Optional.empty();
         }
 
-        boolean success = backup(false);
+        String fileName = backup(false);
+        boolean success = fileName != null;
         if (success) {
             deleteOldBackups(getBackupDir());
         }
@@ -132,16 +133,16 @@ public class Backup {
 
     /**
      * Trigger a backup.
-     * @return Whether the database was backed successfully.
+     * @return The filename of the backup if successful, null otherwise.
      */
-    public boolean backup(boolean replace) {
+    public String backup(boolean replace) {
         // Crucial for Room: Close all connections to flush WAL/SHM files to the main DB file.
         AutuManduApplication.closeDatabases();
 
         String fileName = "cr-" + dateFormat.format(new Date()) + ".db";
         DocumentFile backupDir = getBackupDir();
 
-        if (backupDir == null) return false;
+        if (backupDir == null) return null;
 
         DocumentFile backupFile = backupDir.createFile("*/*", fileName);
 
@@ -155,18 +156,22 @@ public class Backup {
 
         if (backupFile == null) {
             Log.e(TAG, "Backup error, can't create file in path: " + backupDir.getUri());
-            return false;
+            return null;
         }
 
         try (ParcelFileDescriptor pfd = resolver.openFileDescriptor(backupFile.getUri(), "w")) {
             if (pfd == null) {
                 Log.e(TAG, "Could not open ParcelFileDescriptor for " + backupFile.getUri());
-                return false;
+                return null;
             }
-            return FileCopyUtil.copyFile(dbFile, pfd);
+            if (FileCopyUtil.copyFile(dbFile, pfd)) {
+                return fileName;
+            } else {
+                return null;
+            }
         } catch (IOException e) {
             Log.e(TAG, "Backup error: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 

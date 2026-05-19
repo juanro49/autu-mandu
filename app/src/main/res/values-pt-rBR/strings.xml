@@ -171,6 +171,7 @@
     <string name="report_title_fuel_price">Preço do combustível</string>
     <string name="report_title_mileage">Quilometragem</string>
     <string name="report_title_costs">Custos</string>
+    <string name="report_title_trips">Resumo de Viagens</string>
     <string name="report_trend_label">%s (Linha de tendência)</string>
     <string name="report_overall_trend_label">%s (Linha de tendência global)</string>
     <string name="report_graph_month_history">Histórico do mês</string>
@@ -291,6 +292,7 @@
     <string name="notice_not_paid">Não pago</string>
 
     <string name="title_refuelings">Abastecimentos</string>
+    <string name="title_trips">Registro de Viagens</string>
     <string name="title_expenditures">Despesas</string>
     <string name="title_income">Receitas</string>
 

@@ -96,8 +96,8 @@ public class DateTimeInput {
         }
     }
 
-    public EditText getEditText() {
-        return mParent;
+    public void setError(@Nullable CharSequence error) {
+        mParent.setError(error);
     }
 
     public static Date getDateTime(Date date, Date time) {

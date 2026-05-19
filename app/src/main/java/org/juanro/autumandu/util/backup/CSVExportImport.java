@@ -62,6 +62,8 @@ public class CSVExportImport {
     private static final String TABLE_REMINDER = "reminder";
     private static final String TABLE_TIRE_LIST = "tire_list";
     private static final String TABLE_TIRE_USAGE = "tire_usage";
+    private static final String TABLE_TRIP = "trip";
+    private static final String TABLE_TRIP_PREFAB = "trip_prefab";
 
     // Common columns
     private static final String COLUMN_ID = "_id";
@@ -140,24 +142,54 @@ public class CSVExportImport {
     private static final String TIRE_USAGE_TIRE_ID = "tire_id";
     private static final String[] TIRE_USAGE_ALL_COLUMNS = {COLUMN_ID, TIRE_USAGE_DISTANCE_MOUNT, TIRE_USAGE_DATE_MOUNT, TIRE_USAGE_DISTANCE_UMOUNT, TIRE_USAGE_DATE_UMOUNT, TIRE_USAGE_TIRE_ID};
 
+    // Trip columns
+    private static final String TRIP_CAR_ID = "car_id";
+    private static final String TRIP_REFUELING_ID = "refueling_id";
+    private static final String TRIP_DATE = "date";
+    private static final String TRIP_DATE_END = "date_end";
+    private static final String TRIP_TIME_START = "time_start";
+    private static final String TRIP_TIME_END = "time_end";
+    private static final String TRIP_ROUTE_TARGET = "route_target";
+    private static final String TRIP_PURPOSE = "purpose";
+    private static final String TRIP_COMPANIES_VISITED = "companies_visited";
+    private static final String TRIP_DRIVER = "driver";
+    private static final String TRIP_OCCUPANTS = "occupants";
+    private static final String TRIP_CARGO = "cargo";
+    private static final String TRIP_KM_START = "km_start";
+    private static final String TRIP_KM_END = "km_end";
+    private static final String TRIP_KM_BUSINESS = "km_business";
+    private static final String TRIP_KM_PRIVATE = "km_private";
+    private static final String TRIP_KM_HOME_WORK = "km_home_work";
+    private static final String TRIP_FUEL_LITERS = "fuel_liters";
+    private static final String TRIP_FUEL_COST = "fuel_cost";
+    private static final String TRIP_OTHER_COSTS_DESCRIPTION = "other_costs_description";
+    private static final String TRIP_OTHER_COSTS_AMOUNT = "other_costs_amount";
+    private static final String TRIP_CREATED_AT = "created_at";
+    private static final String TRIP_UPDATED_AT = "updated_at";
+    private static final String[] TRIP_ALL_COLUMNS = {COLUMN_ID, TRIP_CAR_ID, TRIP_REFUELING_ID, TRIP_DATE, TRIP_DATE_END, TRIP_TIME_START, TRIP_TIME_END, TRIP_ROUTE_TARGET, TRIP_PURPOSE, TRIP_COMPANIES_VISITED, TRIP_DRIVER, TRIP_OCCUPANTS, TRIP_CARGO, TRIP_KM_START, TRIP_KM_END, TRIP_KM_BUSINESS, TRIP_KM_PRIVATE, TRIP_KM_HOME_WORK, TRIP_FUEL_LITERS, TRIP_FUEL_COST, TRIP_OTHER_COSTS_DESCRIPTION, TRIP_OTHER_COSTS_AMOUNT, TRIP_CREATED_AT, TRIP_UPDATED_AT};
+
+    // TripPrefab columns
+    private static final String TRIP_PREFAB_CAR_ID = "car_id";
+    private static final String TRIP_PREFAB_TYPE = "type";
+    private static final String TRIP_PREFAB_VALUE = "value";
+    private static final String TRIP_PREFAB_USAGE_COUNT = "usage_count";
+    private static final String[] TRIP_PREFAB_ALL_COLUMNS = {COLUMN_ID, TRIP_PREFAB_CAR_ID, TRIP_PREFAB_TYPE, TRIP_PREFAB_VALUE, TRIP_PREFAB_USAGE_COUNT};
+
     private final Context context;
     private DocumentFile exportDir;
     private final CSVFormat csvFormat;
     private final Semaphore imExportSemaphore = new Semaphore(1);
 
     public void init() {
-        DocumentFile dir = new Backup(context).getBackupDir();
-        if (dir != null && dir.isDirectory()) {
-            var csvDir = dir.findFile(DIRECTORY);
-            if (csvDir == null) {
-                dir = dir.createDirectory(DIRECTORY);
-            } else {
-                dir = csvDir;
-            }
+        DocumentFile baseDir = new Backup(context).getBackupDir();
+        final DocumentFile targetDir;
+        if (baseDir != null && baseDir.isDirectory()) {
+            var csvDir = baseDir.findFile(DIRECTORY);
+            targetDir = (csvDir == null) ? baseDir.createDirectory(DIRECTORY) : csvDir;
         } else {
-            dir = null;
+            targetDir = null;
         }
-        this.exportDir = dir;
+        this.exportDir = targetDir;
     }
 
     private DocumentFile getExportDir() {
@@ -189,20 +221,9 @@ public class CSVExportImport {
                 dir.findFile(TABLE_REFUELING + FILE_EXTENSION) != null ||
                 dir.findFile(TABLE_REMINDER + FILE_EXTENSION) != null ||
                 dir.findFile(TABLE_TIRE_LIST + FILE_EXTENSION) != null ||
-                dir.findFile(TABLE_TIRE_USAGE + FILE_EXTENSION) != null;
-    }
-
-    public boolean allExportFilesExist() {
-        DocumentFile dir = getExportDir();
-        if (dir == null) return false;
-        return dir.findFile(TABLE_CAR + FILE_EXTENSION) != null &&
-                dir.findFile(TABLE_FUEL_TYPE + FILE_EXTENSION) != null &&
-                dir.findFile(TABLE_STATION + FILE_EXTENSION) != null &&
-                dir.findFile(TABLE_OTHER_COST + FILE_EXTENSION) != null &&
-                dir.findFile(TABLE_REFUELING + FILE_EXTENSION) != null &&
-                dir.findFile(TABLE_REMINDER + FILE_EXTENSION) != null &&
-                dir.findFile(TABLE_TIRE_LIST + FILE_EXTENSION) != null &&
-                dir.findFile(TABLE_TIRE_USAGE + FILE_EXTENSION) != null;
+                dir.findFile(TABLE_TIRE_USAGE + FILE_EXTENSION) != null ||
+                dir.findFile(TABLE_TRIP + FILE_EXTENSION) != null ||
+                dir.findFile(TABLE_TRIP_PREFAB + FILE_EXTENSION) != null;
     }
 
     public void export() throws CSVImportException {
@@ -228,6 +249,8 @@ public class CSVExportImport {
             exportReminders(db);
             exportTireList(db);
             exportTireUsages(db);
+            exportTrips(db);
+            exportTripPrefabs(db);
 
         } catch (CSVImportException e) {
             throw e;
@@ -367,13 +390,64 @@ public class CSVExportImport {
         });
     }
 
+    private void exportTrips(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_TRIP + FILE_EXTENSION, TRIP_ALL_COLUMNS, csv -> {
+            for (var trip : db.getTripDao().getAll()) {
+                csv.printRecord(
+                        trip.getId(),
+                        trip.getCarId(),
+                        trip.getRefuelingId(),
+                        CSVConvert.toString(trip.getDate()),
+                        CSVConvert.toString(trip.getDateEnd()),
+                        CSVConvert.toString(trip.getTimeStart()),
+                        CSVConvert.toString(trip.getTimeEnd()),
+                        trip.getRouteTarget(),
+                        trip.getPurpose(),
+                        trip.getCompaniesVisited(),
+                        trip.getDriver(),
+                        trip.getOccupants(),
+                        trip.getCargo(),
+                        trip.getKmStart(),
+                        trip.getKmEnd(),
+                        trip.getKmBusiness(),
+                        trip.getKmPrivate(),
+                        trip.getKmHomeWork(),
+                        CSVConvert.toString(trip.getFuelLiters()),
+                        CSVConvert.toString(trip.getFuelCost()),
+                        trip.getOtherCostsDescription(),
+                        CSVConvert.toString(trip.getOtherCostsAmount()),
+                        CSVConvert.toString(trip.getCreatedAt()),
+                        CSVConvert.toString(trip.getUpdatedAt())
+                );
+            }
+        });
+    }
+
+    private void exportTripPrefabs(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_TRIP_PREFAB + FILE_EXTENSION, TRIP_PREFAB_ALL_COLUMNS, csv -> {
+            for (var prefab : db.getTripPrefabDao().getAll()) {
+                csv.printRecord(
+                        prefab.getId(),
+                        prefab.getCarId(),
+                        prefab.getType(),
+                        prefab.getValue(),
+                        prefab.getUsageCount()
+                );
+            }
+        });
+    }
+
     private DocumentFile getOrCreateFile(String name) throws IOException {
         DocumentFile dir = getExportDir();
         if (dir == null) throw new IOException("Export directory not accessible.");
-        var file = dir.findFile(name);
-        if (file == null) {
-            file = dir.createFile("text/csv", name);
+        DocumentFile existingFile = dir.findFile(name);
+
+        String nameWithoutExtension = name;
+        if (name.endsWith(FILE_EXTENSION)) {
+            nameWithoutExtension = name.substring(0, name.length() - FILE_EXTENSION.length());
         }
+
+        DocumentFile file = (existingFile != null) ? existingFile : dir.createFile("text/csv", nameWithoutExtension);
         if (file == null) {
             throw new IOException("Could not create file: " + name);
         }
@@ -417,9 +491,7 @@ public class CSVExportImport {
 
     private void performImport(AutuManduDatabase db, CSVFormat format) {
         try {
-            Log.d(TAG, "Clearing tables before import...");
-            clearDatabase(db);
-
+            // La importación CSV actualiza entradas existentes y agrega nuevas, no elimina.
             Log.d(TAG, "Importing data...");
             importCars(db, format);
             importFuelTypes(db, format);
@@ -429,22 +501,13 @@ public class CSVExportImport {
             importReminders(db, format);
             importTireList(db, format);
             importTireUsages(db, format);
+            importTrips(db, format);
+            importTripPrefabs(db, format);
             Log.d(TAG, "Import finished successfully.");
         } catch (Exception e) {
             Log.e(TAG, "Error during import perform", e);
             throw new CSVImportProcessingRuntimeException("Error during import perform", e);
         }
-    }
-
-    private void clearDatabase(AutuManduDatabase db) {
-        db.getTireDao().deleteAllTireUsages();
-        db.getTireDao().deleteAllTireLists();
-        db.getRefuelingDao().deleteAll();
-        db.getOtherCostDao().deleteAll();
-        db.getReminderDao().deleteAll();
-        db.getStationDao().deleteAll();
-        db.getFuelTypeDao().deleteAll();
-        db.getCarDao().deleteAll();
     }
 
     private CSVFormat findDelimiter(CSVFormat format) throws IOException {
@@ -653,6 +716,73 @@ public class CSVExportImport {
                 var tireId = CSVConvert.toLong(getSafe(csvRecord, TIRE_USAGE_TIRE_ID));
                 tireUsage.setTireId(tireId != null ? tireId : 0L);
                 db.getTireDao().insert(tireUsage);
+            }
+        });
+    }
+
+    private void importTrips(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_TRIP + FILE_EXTENSION, format, csvRecord -> {
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                db.getTripDao().insert(mapTrip(csvRecord, id));
+            }
+        });
+    }
+
+    private org.juanro.autumandu.model.entity.Trip mapTrip(CSVRecord csvRecord, long id) {
+        var trip = new org.juanro.autumandu.model.entity.Trip();
+        trip.setId(id);
+        trip.setCarId(Objects.requireNonNullElse(CSVConvert.toLong(getSafe(csvRecord, TRIP_CAR_ID)), 0L));
+        trip.setRefuelingId(CSVConvert.toLong(getSafe(csvRecord, TRIP_REFUELING_ID)));
+
+        var date = CSVConvert.toLocalDate(getSafe(csvRecord, TRIP_DATE));
+        trip.setDate(date != null ? date : java.time.LocalDate.now());
+
+        var dateEnd = CSVConvert.toLocalDate(getSafe(csvRecord, TRIP_DATE_END));
+        trip.setDateEnd(dateEnd != null ? dateEnd : trip.getDate());
+
+        var start = CSVConvert.toLocalTime(getSafe(csvRecord, TRIP_TIME_START));
+        trip.setTimeStart(start != null ? start : java.time.LocalTime.now());
+
+        var end = CSVConvert.toLocalTime(getSafe(csvRecord, TRIP_TIME_END));
+        trip.setTimeEnd(end != null ? end : java.time.LocalTime.now());
+
+        trip.setRouteTarget(Objects.requireNonNullElse(getSafe(csvRecord, TRIP_ROUTE_TARGET), ""));
+        trip.setPurpose(Objects.requireNonNullElse(getSafe(csvRecord, TRIP_PURPOSE), ""));
+        trip.setCompaniesVisited(getSafe(csvRecord, TRIP_COMPANIES_VISITED));
+        trip.setDriver(getSafe(csvRecord, TRIP_DRIVER));
+        trip.setOccupants(CSVConvert.toInteger(getSafe(csvRecord, TRIP_OCCUPANTS)));
+        trip.setCargo(getSafe(csvRecord, TRIP_CARGO));
+        trip.setKmStart(Objects.requireNonNullElse(CSVConvert.toInteger(getSafe(csvRecord, TRIP_KM_START)), 0));
+        trip.setKmEnd(Objects.requireNonNullElse(CSVConvert.toInteger(getSafe(csvRecord, TRIP_KM_END)), 0));
+        trip.setKmBusiness(Objects.requireNonNullElse(CSVConvert.toInteger(getSafe(csvRecord, TRIP_KM_BUSINESS)), 0));
+        trip.setKmPrivate(Objects.requireNonNullElse(CSVConvert.toInteger(getSafe(csvRecord, TRIP_KM_PRIVATE)), 0));
+        trip.setKmHomeWork(Objects.requireNonNullElse(CSVConvert.toInteger(getSafe(csvRecord, TRIP_KM_HOME_WORK)), 0));
+        trip.setFuelLiters(CSVConvert.toDouble(getSafe(csvRecord, TRIP_FUEL_LITERS)));
+        trip.setFuelCost(CSVConvert.toDouble(getSafe(csvRecord, TRIP_FUEL_COST)));
+        trip.setOtherCostsDescription(getSafe(csvRecord, TRIP_OTHER_COSTS_DESCRIPTION));
+        trip.setOtherCostsAmount(CSVConvert.toDouble(getSafe(csvRecord, TRIP_OTHER_COSTS_AMOUNT)));
+
+        var created = CSVConvert.toLocalDateTime(getSafe(csvRecord, TRIP_CREATED_AT));
+        trip.setCreatedAt(created != null ? created : java.time.LocalDateTime.now());
+
+        var updated = CSVConvert.toLocalDateTime(getSafe(csvRecord, TRIP_UPDATED_AT));
+        trip.setUpdatedAt(updated != null ? updated : java.time.LocalDateTime.now());
+
+        return trip;
+    }
+
+    private void importTripPrefabs(AutuManduDatabase db, CSVFormat format) throws IOException {
+        doImport(TABLE_TRIP_PREFAB + FILE_EXTENSION, format, csvRecord -> {
+            Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+            if (id != null) {
+                var prefab = new org.juanro.autumandu.model.entity.TripPrefab();
+                prefab.setId(id);
+                prefab.setCarId(Objects.requireNonNullElse(CSVConvert.toLong(getSafe(csvRecord, TRIP_PREFAB_CAR_ID)), 0L));
+                prefab.setType(Objects.requireNonNullElse(getSafe(csvRecord, TRIP_PREFAB_TYPE), "route"));
+                prefab.setValue(Objects.requireNonNullElse(getSafe(csvRecord, TRIP_PREFAB_VALUE), ""));
+                prefab.setUsageCount(Objects.requireNonNullElse(CSVConvert.toInteger(getSafe(csvRecord, TRIP_PREFAB_USAGE_COUNT)), 1));
+                db.getTripPrefabDao().insert(prefab);
             }
         });
     }
