@@ -77,6 +77,20 @@ public abstract class AbstractSyncProvider {
     }
 
     /**
+     * Returns the last modified time of the local file when it was last synced.
+     */
+    public long getLocalFileLastModified() {
+        return new Preferences(AutuManduApplication.getContext()).getSyncLocalFileLastModified();
+    }
+
+    /**
+     * Updates the last modified time of the local file when it was last synced.
+     */
+    public void setLocalFileLastModified(long lastModified) {
+        new Preferences(AutuManduApplication.getContext()).setSyncLocalFileLastModified(lastModified);
+    }
+
+    /**
      * Fetches the revision of the remote file.
      */
     @Nullable
@@ -98,7 +112,7 @@ public abstract class AbstractSyncProvider {
      * Returns the local path to the Room database file.
      */
     @NonNull
-    protected File getLocalFile() {
+    public File getLocalFile() {
         return AutuManduApplication.getContext().getDatabasePath(AutuManduDatabase.DATABASE_NAME);
     }
 }

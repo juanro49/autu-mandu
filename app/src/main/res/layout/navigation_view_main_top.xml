@@ -41,6 +41,7 @@
             android:layout_alignParentBottom="true"
             android:gravity="center_vertical"
             android:textAppearance="?attr/textAppearanceTitleLarge"
-            android:textColor="?attr/colorOnPrimary" />
+            android:textColor="@color/white"
+            android:textStyle="bold" />
     </RelativeLayout>
 </LinearLayout>

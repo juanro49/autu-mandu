@@ -266,6 +266,7 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
             try {
                 String remoteRev = executeFirstSync(download);
                 mSelectedSyncProvider.setLocalFileRev(remoteRev);
+                mSelectedSyncProvider.setLocalFileLastModified(mSelectedSyncProvider.getLocalFile().lastModified());
                 runOnUiThread(() -> finalizeFirstSync(download));
             } catch (final Exception e) {
                 runOnUiThread(() -> {
@@ -290,8 +291,8 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
     private void finalizeFirstSync(boolean download) {
         if (isFinishing() || isDestroyed()) return;
 
-        SyncManager.schedulePeriodicSync(AuthenticatorAddAccountActivity.this);
         addAccountToManager();
+        SyncManager.schedulePeriodicSync(AuthenticatorAddAccountActivity.this);
 
         if (download) {
             // Restart the app to ensure all ViewModels and LiveDatas are recreated with the new database.
@@ -307,12 +308,15 @@ public class AuthenticatorAddAccountActivity extends AppCompatActivity implement
         // Add account to AccountManager
         AccountManager accountManager = AccountManager.get(AuthenticatorAddAccountActivity.this);
         boolean accountAdded = accountManager.addAccountExplicitly(mAuthenticatedAccount, mAuthenticatedAccountPassword, null);
-        if (accountAdded) {
-            // Add provider and settings as user data
-            accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER, String.valueOf(mSelectedSyncProvider.getId()));
-            if (mAuthenticatedAccountSettings != null) {
-                accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER_SETTINGS, mAuthenticatedAccountSettings.toString());
-            }
+        if (!accountAdded) {
+            // Account already exists, but we might need to update password and user data
+            accountManager.setPassword(mAuthenticatedAccount, mAuthenticatedAccountPassword);
+        }
+
+        // Always set provider and settings as user data to ensure they are present and up-to-date
+        accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER, String.valueOf(mSelectedSyncProvider.getId()));
+        if (mAuthenticatedAccountSettings != null) {
+            accountManager.setUserData(mAuthenticatedAccount, Authenticator.KEY_SYNC_PROVIDER_SETTINGS, mAuthenticatedAccountSettings.toString());
         }
 
         // Create result bundle for AccountManager

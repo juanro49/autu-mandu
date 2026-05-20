@@ -37,7 +37,7 @@ import androidx.preference.SwitchPreferenceCompat;
 import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
-import org.juanro.autumandu.gui.dialog.SetupWebDavSyncDialogActivity;
+import org.juanro.autumandu.gui.AuthenticatorAddAccountActivity;
 import org.juanro.autumandu.util.sync.AbstractSyncProvider;
 import org.juanro.autumandu.util.sync.SyncManager;
 import org.juanro.autumandu.util.sync.SyncProviders;
@@ -102,31 +102,8 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
     private final ActivityResultLauncher<Intent> mSetupSyncLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
-                    Intent data = result.getData();
-                    String userName = data.getStringExtra(android.accounts.AccountManager.KEY_ACCOUNT_NAME);
-                    String password = data.getStringExtra(android.accounts.AccountManager.KEY_PASSWORD);
-                    String url = data.getStringExtra("webdav_url");
-
-                    if (userName == null) {
-                        return;
-                    }
-
-                    android.accounts.Account account = new android.accounts.Account(userName, "org.juanro.autumandu.sync");
-                    android.accounts.AccountManager am = android.accounts.AccountManager.get(requireContext());
-                    if (am.addAccountExplicitly(account, password, null)) {
-                        am.setUserData(account, "org.juanro.autumandu.sync.provider", String.valueOf(1)); // 1 for WebDAV
-                        org.json.JSONObject settings = new org.json.JSONObject();
-                        try {
-                            settings.put("webdav_url", url);
-                            am.setUserData(account, "org.juanro.autumandu.sync.provider.settings", settings.toString());
-                        } catch (org.json.JSONException ignored) {
-                            // Should not happen as we are creating the object ourselves
-                        }
-
-                        updateSyncPreference();
-                        SyncManager.runSyncOnce(requireContext());
-                    }
+                if (result.getResultCode() == android.app.Activity.RESULT_OK) {
+                    updateSyncPreference();
                 }
             }
     );
@@ -158,7 +135,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
     };
 
     private final OnPreferenceClickListener mSetupSync = preference -> {
-        Intent intent = new Intent(requireContext(), SetupWebDavSyncDialogActivity.class);
+        Intent intent = new Intent(requireContext(), AuthenticatorAddAccountActivity.class);
         mSetupSyncLauncher.launch(intent);
         return true;
     };
@@ -352,7 +329,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
                         .setTitle(providerName)
                         .setMessage(account.name)
                         .setPositiveButton(R.string.menu_synchronize, (dialog, which) -> SyncManager.runSyncOnce(requireContext()))
-                        .setNeutralButton(R.string.about_author, (dialog, which) -> {
+                        .setNeutralButton(R.string.menu_remove_account, (dialog, which) -> {
                             android.accounts.AccountManager.get(requireContext()).removeAccount(account, null, null, null);
                             updateSyncPreference();
                         })

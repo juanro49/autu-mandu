@@ -31,6 +31,7 @@
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
     <string name="menu_delete">Delete</string>
+    <string name="menu_remove_account">Remove account</string>
     <string name="menu_copy">Copy</string>
     <string name="menu_mount_umount">Mount/Umount</string>
     <string name="menu_add_car">Add car</string>
@@ -176,6 +177,12 @@
     <string name="alert_sync_first_sync_download">Online data</string>
     <string name="alert_sync_first_sync_upload">Local data</string>
     <string name="alert_sync_first_sync_error">There was an error while performing the first sync. Please ensure you have a working network connection and try again.</string>
+    <string name="alert_sync_conflict_title">Sync Conflict</string>
+    <string name="alert_sync_conflict_message">Both local and remote data have changed since the last synchronization. Which version do you want to keep?</string>
+    <string name="toast_sync_uploading">Local changes detected. Uploading database…</string>
+    <string name="toast_sync_downloading">Remote changes detected. Downloading database…</string>
+    <string name="toast_sync_complete_no_changes">Synchronization complete. No changes detected.</string>
+    <string name="toast_sync_conflict_detected">Synchronization conflict detected! Action required.</string>
     <string name="alert_backup_overwrite_title">Backup</string>
     <string name="alert_backup_overwrite_message">A previous backup file does already exist on SD card.</string>
     <string name="alert_backup_failed">Backup failed</string>
@@ -317,6 +324,9 @@
     <string name="notification_reminder_action_done">Done</string>
     <string name="notification_reminder_action_snooze">Snooze</string>
     <string name="notification_reminder_action_snooze_all">Snooze all</string>
+    <string name="notification_sync_channel">Synchronization</string>
+    <string name="notification_sync_conflict_title">Sync Conflict</string>
+    <string name="notification_sync_conflict_text">Action required to resolve synchronization conflict.</string>
     <string name="distance_entry_mode_trip">Trip distance</string>
     <string name="distance_entry_mode_total">Total distance</string>
     <string name="price_entry_mode_per_unit_and_volume">Price per unit &amp; volume</string>

@@ -158,11 +158,13 @@ public class MainActivity extends AppCompatActivity implements
                 .observe(this, workInfos -> {
                     mOnceWorkInfos = workInfos;
                     updateSyncMenuItem();
+                    checkSyncConflict(workInfos);
                 });
         wm.getWorkInfosForUniqueWorkLiveData(SyncManager.SYNC_WORK_NAME_PERIODIC)
                 .observe(this, workInfos -> {
                     mPeriodicWorkInfos = workInfos;
                     updateSyncMenuItem();
+                    checkSyncConflict(workInfos);
                 });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -198,6 +200,10 @@ public class MainActivity extends AppCompatActivity implements
         // Update reminders and schedule periodic update
         ReminderWorker.enqueueUpdate(this);
         ReminderWorker.schedulePeriodicUpdate(this);
+
+        if (new Preferences(this).hasSyncConflict()) {
+            showSyncConflictDialog();
+        }
     }
 
     @Override
@@ -523,6 +529,35 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         return false;
+    }
+
+    private void checkSyncConflict(List<WorkInfo> workInfos) {
+        if (workInfos == null) return;
+        for (WorkInfo workInfo : workInfos) {
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                if (workInfo.getOutputData().getBoolean("conflict", false)) {
+                    showSyncConflictDialog();
+                }
+            }
+        }
+    }
+
+    private void showSyncConflictDialog() {
+        if (!new Preferences(this).hasSyncConflict()) {
+            return;
+        }
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.alert_sync_conflict_title)
+                .setMessage(R.string.alert_sync_conflict_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.alert_sync_first_sync_download, (dialog, which) ->
+                        SyncManager.resolveConflict(this, false))
+                .setNeutralButton(R.string.alert_sync_first_sync_upload, (dialog, which) ->
+                        SyncManager.resolveConflict(this, true))
+                .setNegativeButton(android.R.string.cancel, (dialog, which) ->
+                        new Preferences(this).setSyncConflict(false))
+                .show();
     }
 
     private boolean closeFABMenu() {

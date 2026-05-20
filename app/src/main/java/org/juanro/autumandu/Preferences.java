@@ -51,6 +51,8 @@ public class Preferences {
     public static final String KEY_DISTANCE_ENTRY_MODE = "behavior_distance_entry_mode";
     public static final String KEY_PRICE_ENTRY_MODE = "behavior_price_entry_mode";
     public static final String KEY_SYNC_LOCAL_FILE_REV = "sync_local_file_rev";
+    public static final String KEY_SYNC_LOCAL_FILE_LAST_MODIFIED = "sync_local_file_last_modified";
+    public static final String KEY_SYNC_CONFLICT = "sync_conflict";
     public static final String KEY_REPORT_ORDER = "behavior_report_order";
     public static final String KEY_REMINDER_SNOOZE_DURATION = "behavior_reminder_snooze_duration";
     public static final String KEY_UNIT_CURRENCY = "unit_currency";
@@ -108,6 +110,22 @@ public class Preferences {
 
     public void setSyncLocalFileRev(@Nullable String rev) {
         putString(KEY_SYNC_LOCAL_FILE_REV, rev);
+    }
+
+    public long getSyncLocalFileLastModified() {
+        return prefs.getLong(KEY_SYNC_LOCAL_FILE_LAST_MODIFIED, 0);
+    }
+
+    public void setSyncLocalFileLastModified(long lastModified) {
+        prefs.edit().putLong(KEY_SYNC_LOCAL_FILE_LAST_MODIFIED, lastModified).apply();
+    }
+
+    public boolean hasSyncConflict() {
+        return prefs.getBoolean(KEY_SYNC_CONFLICT, false);
+    }
+
+    public void setSyncConflict(boolean conflict) {
+        prefs.edit().putBoolean(KEY_SYNC_CONFLICT, conflict).apply();
     }
 
     public List<Class<? extends AbstractReport>> getReportOrder() {

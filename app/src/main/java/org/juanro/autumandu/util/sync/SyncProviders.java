@@ -30,7 +30,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.R;
 
 /**
@@ -50,10 +49,14 @@ public final class SyncProviders {
     public static AbstractSyncProvider[] getSyncProviders(Context context) {
         if (sSyncProviders == null) {
             String[] classes = getRegisteredSyncProviderClassNames(context);
+            Log.i(TAG, "Found " + classes.length + " registered sync provider classes.");
 
             sSyncProviders = new AbstractSyncProvider[classes.length];
             for (int i = 0; i < classes.length; i++) {
                 sSyncProviders[i] = newAbstractSyncProviderInstance(classes[i]);
+                if (sSyncProviders[i] != null) {
+                    Log.i(TAG, "Initialized provider: " + sSyncProviders[i].getName() + " with ID " + sSyncProviders[i].getId());
+                }
             }
         }
 
@@ -65,8 +68,11 @@ public final class SyncProviders {
      */
     public static AbstractSyncProvider getSyncProviderById(Context context, long id) {
         for (AbstractSyncProvider provider : getSyncProviders(context)) {
-            if (provider != null && provider.getId() == id) {
-                return provider;
+            if (provider != null) {
+                Log.d(TAG, "Checking provider: " + provider.getName() + " with ID " + provider.getId() + " against requested ID " + id);
+                if (provider.getId() == id) {
+                    return provider;
+                }
             }
         }
 
@@ -77,14 +83,23 @@ public final class SyncProviders {
      * Returns the sync provider associated with an account.
      */
     public static AbstractSyncProvider getSyncProviderByAccount(Context context, Account account) {
-        AccountManager accountManager = AccountManager.get(AutuManduApplication.getContext());
+        AccountManager accountManager = AccountManager.get(context);
         String providerIdStr = accountManager.getUserData(account, Authenticator.KEY_SYNC_PROVIDER);
-        if (providerIdStr == null) return null;
+        Log.i(TAG, "Getting provider for account " + account.name + " (" + account.type + "). Found provider ID string: " + providerIdStr);
+        if (providerIdStr == null) {
+            Log.e(TAG, "No sync provider ID found in account user data for " + account.name);
+            return null;
+        }
 
         try {
             long providerId = Long.parseLong(providerIdStr);
-            return getSyncProviderById(context, providerId);
+            AbstractSyncProvider provider = getSyncProviderById(context, providerId);
+            if (provider == null) {
+                Log.e(TAG, "No sync provider found with ID " + providerId);
+            }
+            return provider;
         } catch (NumberFormatException e) {
+            Log.e(TAG, "Invalid sync provider ID found in account user data: " + providerIdStr);
             return null;
         }
     }
@@ -92,26 +107,34 @@ public final class SyncProviders {
     /**
      * Returns the settings for a sync provider account.
      */
-    public static JSONObject getSyncProviderSettings(Account account) {
-        AccountManager accountManager = AccountManager.get(AutuManduApplication.getContext());
+    public static JSONObject getSyncProviderSettings(Context context, Account account) {
+        AccountManager accountManager = AccountManager.get(context);
         String settings = accountManager.getUserData(account, Authenticator.KEY_SYNC_PROVIDER_SETTINGS);
         if (settings == null) return null;
 
         try {
             return new JSONObject(settings);
         } catch (Exception e) {
+            Log.e(TAG, "Error parsing sync provider settings JSON.", e);
             return null;
         }
     }
 
     private static String[] getRegisteredSyncProviderClassNames(Context context) {
         ArrayList<String> items = new ArrayList<>();
-        XmlPullParser xpp = context.getResources().getXml(R.xml.sync_providers);
         try {
+            XmlPullParser xpp = context.getResources().getXml(R.xml.sync_providers);
             int eventType = xpp.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG && "sync-provider".equals(xpp.getName())) {
-                    items.add(xpp.getAttributeValue(null, "class"));
+                if (eventType == XmlPullParser.START_TAG) {
+                    String tagName = xpp.getName();
+                    if ("sync-provider".equals(tagName)) {
+                        String className = xpp.getAttributeValue(null, "class");
+                        Log.i(TAG, "Found sync-provider tag with class: " + className);
+                        if (className != null) {
+                            items.add(className);
+                        }
+                    }
                 }
                 eventType = xpp.next();
             }
@@ -119,6 +142,9 @@ public final class SyncProviders {
             Log.e(TAG, "Error parsing sync_providers.xml file.", e);
         }
 
+        if (items.isEmpty()) {
+            Log.e(TAG, "No sync providers found in sync_providers.xml!");
+        }
         return items.toArray(new String[0]);
     }
 

@@ -30,6 +30,7 @@
     <string name="menu_copy">Copiar</string>
     <string name="menu_cancel">Cancelar</string>
     <string name="menu_delete">Eliminar</string>
+    <string name="menu_remove_account">Eliminar cuenta</string>
     <string name="menu_mount_umount">Montar/Desmontar</string>
     <string name="menu_add_car">Agregar vehículo</string>
     <string name="menu_add_fuel_type">Agregar tipo de combustible</string>
@@ -165,6 +166,12 @@
     <string name="alert_sync_first_sync_download">Datos en línea</string>
     <string name="alert_sync_first_sync_upload">Datos locales</string>
     <string name="alert_sync_first_sync_error">Hubo un error al realizar la primera sincronización. Por favor, asegúrate de tener una conexión de red funcional e inténtalo de nuevo.</string>
+    <string name="alert_sync_conflict_title">Conflicto de sincronización</string>
+    <string name="alert_sync_conflict_message">Tanto los datos locales como los remotos han cambiado desde la última sincronización. ¿Qué versión quieres conservar?</string>
+    <string name="toast_sync_uploading">Cambios locales detectados. Subiendo base de datos…</string>
+    <string name="toast_sync_downloading">Cambios remotos detectados. Descargando base de datos…</string>
+    <string name="toast_sync_complete_no_changes">Sincronización completada. No se detectaron cambios.</string>
+    <string name="toast_sync_conflict_detected">¡Conflicto de sincronización detectado! Se requiere acción.</string>
     <string name="alert_backup_overwrite_title">Copia de seguridad</string>
     <string name="alert_backup_overwrite_message">Ya existe un archivo de copia de seguridad previo en la tarjeta SD.</string>
     <string name="alert_backup_failed">Copia de seguridad fallida</string>
@@ -305,6 +312,9 @@
     <string name="notification_reminder_action_done">Listo</string>
     <string name="notification_reminder_action_snooze">Posponer</string>
     <string name="notification_reminder_action_snooze_all">Posponer todo</string>
+    <string name="notification_sync_channel">Sincronización</string>
+    <string name="notification_sync_conflict_title">Conflicto de sincronización</string>
+    <string name="notification_sync_conflict_text">Se requiere acción para resolver el conflicto de sincronización.</string>
     <string name="distance_entry_mode_trip">Distancia del viaje</string>
     <string name="distance_entry_mode_total">Distancia total</string>
     <string name="price_entry_mode_per_unit_and_volume">Precio por unidad y volumen</string>
