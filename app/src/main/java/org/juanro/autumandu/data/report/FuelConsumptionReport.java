@@ -181,8 +181,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
         // Group balanced refuelings by category in memory.
         Map<String, List<BalancedRefueling>> refuelingsByCategory = balancedRefuelings.stream()
-                .filter(r -> r.getFuelTypeCategory() != null)
-                .collect(Collectors.groupingBy(BalancedRefueling::getFuelTypeCategory));
+                .collect(Collectors.groupingBy(r -> r.getFuelTypeCategory() != null ? r.getFuelTypeCategory() : mContext.getString(R.string.default_fuel_category)));
 
         for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategory.entrySet()) {
             String category = entry.getKey();
@@ -217,6 +216,14 @@ public class FuelConsumptionReport extends AbstractReport {
 
         if (!sectionAdded) {
             Section section = addDataSection(car);
+            if (!carRefuelings.isEmpty()) {
+                float totalVolume = 0;
+                for (RefuelingWithDetails refueling : carRefuelings) {
+                    totalVolume += refueling.volume();
+                }
+                section.addItem(new Item(mContext.getString(R.string.report_total_volume),
+                        String.format(Locale.getDefault(), CONSUMPTION_FORMAT, totalVolume, prefsForGuess.getUnitVolume())));
+            }
             section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
         }
     }

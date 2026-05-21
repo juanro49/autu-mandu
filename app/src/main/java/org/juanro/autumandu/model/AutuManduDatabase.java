@@ -19,6 +19,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.dao.CarDao;
 import org.juanro.autumandu.model.dao.FuelTypeDao;
 import org.juanro.autumandu.model.dao.OtherCostDao;
@@ -94,6 +95,24 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                             new AssetFileBasedMigration(appContext, 14),
                             new AssetFileBasedMigration(appContext, 15)
                     );
+
+                    builder.addCallback(new Callback() {
+                        @Override
+                        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                            super.onCreate(db);
+                            // Se ejecuta solo una vez cuando se crea la base de datos por primera vez.
+                            DB_EXECUTOR.execute(() -> {
+                                var database = getInstance(appContext);
+                                database.getFuelTypeDao().insert(new FuelType(
+                                        appContext.getString(R.string.default_fuel_type),
+                                        appContext.getString(R.string.default_fuel_category)
+                                ));
+                                database.getStationDao().insert(new Station(
+                                        appContext.getString(R.string.default_station)
+                                ));
+                            });
+                        }
+                    });
 
                     db = builder.build();
 

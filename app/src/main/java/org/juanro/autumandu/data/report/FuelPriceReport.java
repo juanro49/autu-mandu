@@ -160,7 +160,12 @@ public class FuelPriceReport extends AbstractReport {
             if (!data.isEmpty()) {
                 mReportChartData.add(data);
 
-                Section section = addDataSection(fuelType.getName(), color);
+                String sectionName = fuelType.getName();
+                if (fuelType.getCategory() != null) {
+                    sectionName += " (" + fuelType.getCategory() + ")";
+                }
+
+                Section section = addDataSection(sectionName, color);
                 section.addItem(new Item(mContext.getString(R.string.report_highest),
                         String.format(Locale.getDefault(), PRICE_FORMAT, data.getMax(), mUnit)));
                 section.addItem(new Item(mContext.getString(R.string.report_lowest),

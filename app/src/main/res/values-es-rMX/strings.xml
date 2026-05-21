@@ -172,6 +172,8 @@
     <string name="toast_sync_downloading">Cambios remotos detectados. Descargando base de datos…</string>
     <string name="toast_sync_complete_no_changes">Sincronización completada. No se detectaron cambios.</string>
     <string name="toast_sync_conflict_detected">¡Conflicto de sincronización detectado! Se requiere acción.</string>
+    <string name="default_fuel_type">Predeterminado</string>
+    <string name="default_station">Predeterminada</string>
     <string name="alert_backup_overwrite_title">Copia de seguridad</string>
     <string name="alert_backup_overwrite_message">Ya existe un archivo de copia de seguridad previo en la tarjeta SD.</string>
     <string name="alert_backup_failed">Copia de seguridad fallida</string>

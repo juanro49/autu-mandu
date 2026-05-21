@@ -256,8 +256,7 @@ public class MileageReport extends AbstractReport {
 
         // Per refueling data (grouped by category)
         Map<String, List<BalancedRefueling>> refuelingsByCategory = balancedRefuelings.stream()
-                .filter(r -> r.getFuelTypeCategory() != null)
-                .collect(Collectors.groupingBy(BalancedRefueling::getFuelTypeCategory));
+                .collect(Collectors.groupingBy(r -> r.getFuelTypeCategory() != null ? r.getFuelTypeCategory() : mContext.getString(R.string.default_fuel_category)));
 
         for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategory.entrySet()) {
             String category = entry.getKey();

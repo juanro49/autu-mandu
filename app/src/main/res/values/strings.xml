@@ -183,6 +183,9 @@
     <string name="toast_sync_downloading">Remote changes detected. Downloading database…</string>
     <string name="toast_sync_complete_no_changes">Synchronization complete. No changes detected.</string>
     <string name="toast_sync_conflict_detected">Synchronization conflict detected! Action required.</string>
+    <string name="default_fuel_type">Default</string>
+    <string name="default_station">Default</string>
+    <string name="default_fuel_category">General</string>
     <string name="alert_backup_overwrite_title">Backup</string>
     <string name="alert_backup_overwrite_message">A previous backup file does already exist on SD card.</string>
     <string name="alert_backup_failed">Backup failed</string>
