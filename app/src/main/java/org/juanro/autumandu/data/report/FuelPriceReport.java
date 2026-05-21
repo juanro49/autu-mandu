@@ -30,6 +30,7 @@ import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Refueling;
 
@@ -162,7 +163,7 @@ public class FuelPriceReport extends AbstractReport {
 
                 String sectionName = fuelType.getName();
                 if (fuelType.getCategory() != null) {
-                    sectionName += " (" + fuelType.getCategory() + ")";
+                    sectionName += " (" + FuelCategory.fromKey(fuelType.getCategory()).getName(mContext) + ")";
                 }
 
                 Section section = addDataSection(sectionName, color);

@@ -186,6 +186,11 @@
     <string name="default_fuel_type">Default</string>
     <string name="default_station">Default</string>
     <string name="default_fuel_category">General</string>
+    <string name="fuel_category_gasoline">Gasoline</string>
+    <string name="fuel_category_diesel">Diesel</string>
+    <string name="fuel_category_gas">Gas</string>
+    <string name="fuel_category_electricity">Electricity</string>
+    <string name="fuel_category_additives">Additives</string>
     <string name="alert_backup_overwrite_title">Backup</string>
     <string name="alert_backup_overwrite_message">A previous backup file does already exist on SD card.</string>
     <string name="alert_backup_failed">Backup failed</string>

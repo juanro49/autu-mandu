@@ -37,6 +37,7 @@ import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.dto.BalancedRefueling;
 import org.juanro.autumandu.model.dto.RefuelingWithDetails;
 import org.juanro.autumandu.model.entity.Car;
+import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.util.Calculator;
 
 public class MileageReport extends AbstractReport {
@@ -256,7 +257,11 @@ public class MileageReport extends AbstractReport {
 
         // Per refueling data (grouped by category)
         Map<String, List<BalancedRefueling>> refuelingsByCategory = balancedRefuelings.stream()
-                .collect(Collectors.groupingBy(r -> r.getFuelTypeCategory() != null ? r.getFuelTypeCategory() : mContext.getString(R.string.default_fuel_category)));
+                .collect(Collectors.groupingBy(r -> {
+                    String key = r.getFuelTypeCategory();
+                    if (key == null) return mContext.getString(R.string.default_fuel_category);
+                    return FuelCategory.fromKey(key).getName(mContext);
+                }));
 
         for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategory.entrySet()) {
             String category = entry.getKey();

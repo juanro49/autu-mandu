@@ -25,7 +25,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -34,6 +34,7 @@ import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.util.AbstractFormFieldValidator;
 import org.juanro.autumandu.gui.util.FormFieldNotEmptyValidator;
 import org.juanro.autumandu.gui.util.FormValidator;
+import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.viewmodel.FuelTypesViewModel;
 
@@ -67,7 +68,6 @@ public class EditFuelTypeDialogFragment extends AbstractEditDialogFragment {
 
     private void processFuelTypes(List<FuelType> fuelTypes, long currentFuelTypeId) {
         mOtherFuelTypeNames.clear();
-        Set<String> categories = new HashSet<>();
         for (FuelType fuelType : fuelTypes) {
             if (currentFuelTypeId == fuelType.getId()) {
                 mFuelType = fuelType;
@@ -75,10 +75,7 @@ public class EditFuelTypeDialogFragment extends AbstractEditDialogFragment {
             } else {
                 mOtherFuelTypeNames.add(fuelType.getName());
             }
-            categories.add(fuelType.getCategory());
         }
-
-        updateCategoryAdapter(categories);
     }
 
     private void updateFieldsFromFuelType() {
@@ -86,16 +83,8 @@ public class EditFuelTypeDialogFragment extends AbstractEditDialogFragment {
             mEdtName.setText(mFuelType.getName());
         }
         if (mEdtCategory != null && mEdtCategory.getText().length() == 0) {
-            mEdtCategory.setText(mFuelType.getCategory());
-        }
-    }
-
-    private void updateCategoryAdapter(Set<String> categories) {
-        if (mEdtCategory != null) {
-            String[] categoryArray = categories.toArray(new String[0]);
-            mEdtCategory.setAdapter(new ArrayAdapter<>(requireContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    categoryArray));
+            FuelCategory category = FuelCategory.fromKey(mFuelType.getCategory());
+            mEdtCategory.setText(category.getName(requireContext()), false);
         }
     }
 
@@ -111,9 +100,18 @@ public class EditFuelTypeDialogFragment extends AbstractEditDialogFragment {
     @Override
     protected void initFields(View view, Bundle savedInstanceState) {
         mEdtCategory = view.findViewById(R.id.edt_category);
+
+        List<String> categoryNames = new ArrayList<>();
+        for (FuelCategory cat : FuelCategory.values()) {
+            categoryNames.add(cat.getName(requireContext()));
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_dropdown_item_1line, categoryNames);
+        mEdtCategory.setAdapter(adapter);
+
         if (savedInstanceState != null) {
             mEdtName.setText(savedInstanceState.getString("name"));
-            mEdtCategory.setText(savedInstanceState.getString("category"));
+            mEdtCategory.setText(savedInstanceState.getString("category"), false);
         }
     }
 
@@ -156,14 +154,23 @@ public class EditFuelTypeDialogFragment extends AbstractEditDialogFragment {
     }
 
     private void performSave() {
+        String categoryName = mEdtCategory.getText().toString();
+        String categoryKey = FuelCategory.GENERAL.getKey();
+        for (FuelCategory cat : FuelCategory.values()) {
+            if (cat.getName(requireContext()).equals(categoryName)) {
+                categoryKey = cat.getKey();
+                break;
+            }
+        }
+
         if (mFuelType == null) {
             mViewModel.saveFuelType(new FuelType(
                     mEdtName.getText().toString(),
-                    mEdtCategory.getText().toString()
+                    categoryKey
             ));
         } else {
             mFuelType.setName(mEdtName.getText().toString());
-            mFuelType.setCategory(mEdtCategory.getText().toString());
+            mFuelType.setCategory(categoryKey);
             mViewModel.saveFuelType(mFuelType);
         }
     }

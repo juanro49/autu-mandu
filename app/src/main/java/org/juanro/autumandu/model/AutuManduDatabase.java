@@ -30,6 +30,7 @@ import org.juanro.autumandu.model.dao.TireDao;
 import org.juanro.autumandu.model.dao.TripDao;
 import org.juanro.autumandu.model.dao.TripPrefabDao;
 import org.juanro.autumandu.model.entity.Car;
+import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.OtherCost;
 import org.juanro.autumandu.model.entity.Refueling;
@@ -105,7 +106,7 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                                 var database = getInstance(appContext);
                                 database.getFuelTypeDao().insert(new FuelType(
                                         appContext.getString(R.string.default_fuel_type),
-                                        appContext.getString(R.string.default_fuel_category)
+                                        FuelCategory.GASOLINE.getKey()
                                 ));
                                 database.getStationDao().insert(new Station(
                                         appContext.getString(R.string.default_station)
