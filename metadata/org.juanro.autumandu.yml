@@ -20,7 +20,7 @@ Binaries: https://github.com/juanro49/autu-mandu/releases/download/%v/Autu-Mandu
 Builds:
   - versionName: 6.0.1
     versionCode: 601
-    commit: c65ea673c13079f95a8de3c3a05c2f66d9ce9a78
+    commit: cde6d167536bb6d0c73877cb417e0979e79db461
     subdir: app
     gradle:
       - yes
