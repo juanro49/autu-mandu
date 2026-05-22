@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,15 +30,21 @@ import androidx.annotation.Nullable;
 import org.juanro.autumandu.R;
 
 public class Carburoid {
+    public static final String ACTION_SELECT_PRODUCT = "net.canvoki.carburoid.ACTION_SELECT_PRODUCT";
+    public static final String EXTRA_PRODUCT = "net.canvoki.carburoid.EXTRA_PRODUCT";
 
     private Carburoid() {
         // Utility class
     }
 
-    public static void launch(@NonNull Context context, @Nullable String stationName) {
-        String query = TextUtils.isEmpty(stationName) ? "gas station" : stationName;
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + Uri.encode(query)));
+    public static void launch(@NonNull Context context, @Nullable String product) {
+        Log.i("Carburoid", "Launching Carburoid with product: " + (product != null ? product : "none"));
+        Intent intent = new Intent(ACTION_SELECT_PRODUCT);
+        if (!TextUtils.isEmpty(product)) {
+            intent.putExtra(EXTRA_PRODUCT, product);
+        }
         intent.setPackage(context.getString(R.string.carburoid_package));
+
         try {
             context.startActivity(intent);
         } catch (ActivityNotFoundException e) {

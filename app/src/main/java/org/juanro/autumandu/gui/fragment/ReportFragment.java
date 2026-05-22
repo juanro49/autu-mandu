@@ -178,7 +178,10 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             if (report instanceof FuelPriceReport) {
                 btnReportAction.setVisibility(View.VISIBLE);
                 btnReportAction.setText(R.string.btn_find_station_carburoid);
-                btnReportAction.setOnClickListener(v -> Carburoid.launch(v.getContext(), null));
+                btnReportAction.setOnClickListener(v -> {
+                    String fuelName = ((FuelPriceReport) report).getMostRecentFuelTypeName();
+                    Carburoid.launch(v.getContext(), fuelName);
+                });
             } else {
                 btnReportAction.setVisibility(View.GONE);
             }

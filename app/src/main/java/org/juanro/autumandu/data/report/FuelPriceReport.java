@@ -18,6 +18,8 @@ package org.juanro.autumandu.data.report;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,9 +94,15 @@ public class FuelPriceReport extends AbstractReport {
     private final List<AbstractReportChartData> mReportChartData = new ArrayList<>();
     private String mUnit;
     private DateFormat mDateFormat;
+    private String mMostRecentFuelTypeName;
 
     public FuelPriceReport(Context context) {
         super(context);
+    }
+
+    @Nullable
+    public String getMostRecentFuelTypeName() {
+        return mMostRecentFuelTypeName;
     }
 
     @Override
@@ -133,6 +141,7 @@ public class FuelPriceReport extends AbstractReport {
     @Override
     protected void onUpdate() {
         mReportChartData.clear();
+        mMostRecentFuelTypeName = null;
         Preferences prefs = new Preferences(mContext);
         mUnit = String.format("%s/%s", prefs.getUnitCurrency(), prefs.getUnitVolume());
         mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
@@ -140,8 +149,18 @@ public class FuelPriceReport extends AbstractReport {
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
         List<FuelType> fuelTypes = db.getFuelTypeDao().getAll();
 
+        List<Refueling> allRefuelings = db.getRefuelingDao().getAll();
+        if (!allRefuelings.isEmpty()) {
+            allRefuelings.sort((r1, r2) -> r2.getDate().compareTo(r1.getDate()));
+            long latestFuelTypeId = allRefuelings.get(0).getFuelTypeId();
+            FuelType latestFuelType = db.getFuelTypeDao().getById(latestFuelTypeId);
+            if (latestFuelType != null) {
+                mMostRecentFuelTypeName = latestFuelType.getName();
+            }
+        }
+
         // Bulk load all refuelings and group by fuelTypeId (N+1 avoidance)
-        Map<Long, List<Refueling>> refuelingsByFuelType = db.getRefuelingDao().getAll()
+        Map<Long, List<Refueling>> refuelingsByFuelType = allRefuelings
                 .stream().collect(Collectors.groupingBy(Refueling::getFuelTypeId));
 
         int[] colors = KubitChartBridge.getColors(mContext);
