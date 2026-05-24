@@ -30,6 +30,7 @@ import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.DataDetailActivity;
 import org.juanro.autumandu.model.dto.BalancedRefueling;
+import org.juanro.autumandu.model.entity.FuelCategory;
 
 public class DataListRefuelingFragment extends AbstractDataListFragment<BalancedRefueling> {
     private static final String DISTANCE_FORMAT = "%d %s";
@@ -39,7 +40,6 @@ public class DataListRefuelingFragment extends AbstractDataListFragment<Balanced
     private FuelConsumption fuelConsumption;
     private String unitDistance;
     private String unitCurrency;
-    private String unitVolume;
 
     private org.juanro.autumandu.viewmodel.RefuelingListViewModel viewModel;
 
@@ -53,7 +53,6 @@ public class DataListRefuelingFragment extends AbstractDataListFragment<Balanced
         var prefs = new Preferences(context);
         unitDistance = prefs.getUnitDistance();
         unitCurrency = prefs.getUnitCurrency();
-        unitVolume = prefs.getUnitVolume();
 
         viewModel = new ViewModelProvider(this).get(org.juanro.autumandu.viewmodel.RefuelingListViewModel.class);
         viewModel.setCarId(carId);
@@ -78,6 +77,8 @@ public class DataListRefuelingFragment extends AbstractDataListFragment<Balanced
     protected SparseArray<String> getItemData(BalancedRefueling refueling) {
         var mileage = refueling.getMileage();
         var volume = refueling.getVolume();
+        var category = FuelCategory.fromKey(refueling.getFuelTypeCategory());
+        var currentUnitVolume = category.getVolumeUnit(requireContext());
 
         if (refueling.isGuessed()) {
             var data = new SparseArray<String>(1);
@@ -101,19 +102,26 @@ public class DataListRefuelingFragment extends AbstractDataListFragment<Balanced
 
         if (refueling.getConsumption() != null) {
             data.put(R.id.data3_calculated, String.format(Locale.getDefault(), VOLUME_PRICE_FORMAT,
-                    refueling.getConsumption(), fuelConsumption.getUnitLabel()));
+                    refueling.getConsumption(), fuelConsumption.getUnitLabel(FuelConsumption.Type.fromId(new Preferences(requireContext()).getUnitFuelConsumption()), currentUnitVolume)));
         }
 
         if (refueling.getPrice() != 0.0f) {
             data.put(R.id.data2, String.format(Locale.getDefault(), VOLUME_PRICE_FORMAT, refueling.getPrice(),
                     unitCurrency));
+
             data.put(R.id.data2_calculated, String.format(Locale.getDefault(), "%.3f %s/%s",
-                    refueling.getPrice() / volume, unitCurrency, unitVolume));
+                    refueling.getPrice() / volume, unitCurrency, currentUnitVolume));
+
+            if (refueling.getMileageDifference() != null && refueling.getMileageDifference() > 0) {
+                float pricePerDistance = refueling.getPrice() / refueling.getMileageDifference();
+                data.put(R.id.data4_calculated, String.format(Locale.getDefault(), "%.3f %s/%s",
+                        pricePerDistance, unitCurrency, unitDistance));
+            }
         } else {
             data.put(R.id.data2, getString(R.string.notice_not_paid));
         }
 
-        data.put(R.id.data3, String.format(Locale.getDefault(), VOLUME_PRICE_FORMAT, volume, unitVolume));
+        data.put(R.id.data3, String.format(Locale.getDefault(), VOLUME_PRICE_FORMAT, volume, currentUnitVolume));
         if (refueling.isPartial()) {
             var label = getString(R.string.label_partial);
             var consumption = data.get(R.id.data3_calculated);

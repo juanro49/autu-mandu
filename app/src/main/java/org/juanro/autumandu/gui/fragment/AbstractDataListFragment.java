@@ -239,7 +239,7 @@ public abstract class AbstractDataListFragment<T> extends
     private class DataViewHolder extends AbstractDataViewHolder implements View.OnClickListener {
         private final int[] fields = {R.id.title, R.id.subtitle, R.id.date, R.id.station,
                 R.id.data1, R.id.data1_calculated, R.id.data2,
-                R.id.data2_calculated, R.id.data3, R.id.data3_calculated};
+                R.id.data2_calculated, R.id.data3, R.id.data3_calculated, R.id.data4_calculated};
         private final SparseArray<TextView> textViews;
         private final TextView dataInvalid;
 
