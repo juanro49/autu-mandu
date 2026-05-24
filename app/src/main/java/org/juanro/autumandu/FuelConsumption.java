@@ -57,6 +57,8 @@ public class FuelConsumption {
         return switch (consumptionType) {
             case DIST_FOR_VOL -> distance / volume;
             case VOL_FOR_DIST -> (float) (100.0 * volume / distance);
+            case MPG_UK -> (float) (distance / volume * 4.54609);
+            case MPG_US -> (float) (distance / volume * 3.78541);
         };
     }
 
@@ -68,6 +70,8 @@ public class FuelConsumption {
         return switch (consumptionType) {
             case DIST_FOR_VOL -> String.format(Locale.getDefault(), "%s/%s", unitDistance, unitVolume);
             case VOL_FOR_DIST -> String.format(Locale.getDefault(), "%s/100%s", unitVolume, unitDistance);
+            case MPG_UK -> "mpg (UK)";
+            case MPG_US -> "mpg (US)";
         };
     }
 
@@ -78,19 +82,23 @@ public class FuelConsumption {
     public String[] getUnitsEntries() {
         return new String[]{
                 getUnitLabel(Type.VOL_FOR_DIST),
-                getUnitLabel(Type.DIST_FOR_VOL)
+                getUnitLabel(Type.DIST_FOR_VOL),
+                getUnitLabel(Type.MPG_UK),
+                getUnitLabel(Type.MPG_US)
         };
     }
 
     public String[] getUnitsEntryValues() {
         return new String[]{
                 String.valueOf(Type.VOL_FOR_DIST.id),
-                String.valueOf(Type.DIST_FOR_VOL.id)
+                String.valueOf(Type.DIST_FOR_VOL.id),
+                String.valueOf(Type.MPG_UK.id),
+                String.valueOf(Type.MPG_US.id)
         };
     }
 
     public enum Type {
-        VOL_FOR_DIST(0), DIST_FOR_VOL(1);
+        VOL_FOR_DIST(0), DIST_FOR_VOL(1), MPG_UK(2), MPG_US(3);
 
         public final int id;
 
@@ -100,7 +108,12 @@ public class FuelConsumption {
 
         @NonNull
         public static Type fromId(int id) {
-            return id == 1 ? DIST_FOR_VOL : VOL_FOR_DIST;
+            return switch (id) {
+                case 1 -> DIST_FOR_VOL;
+                case 2 -> MPG_UK;
+                case 3 -> MPG_US;
+                default -> VOL_FOR_DIST;
+            };
         }
     }
 }
