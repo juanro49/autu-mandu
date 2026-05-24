@@ -47,8 +47,8 @@ import org.juanro.autumandu.gui.DataDetailActivity;
 import org.juanro.autumandu.gui.dialog.TripImportDialogFragment;
 import org.juanro.autumandu.model.dto.TripWithDetails;
 import org.juanro.autumandu.model.entity.Trip;
+import org.juanro.autumandu.util.backup.CSVTripExporter;
 import org.juanro.autumandu.util.backup.CSVTripFormat;
-import org.juanro.autumandu.util.backup.TripExporter;
 import org.juanro.autumandu.viewmodel.TripViewModel;
 
 public class DataListTripFragment extends AbstractDataListFragment<TripWithDetails> implements MenuProvider {
@@ -119,7 +119,7 @@ public class DataListTripFragment extends AbstractDataListFragment<TripWithDetai
                     return;
                 }
 
-                TripExporter exporter = new TripExporter(context);
+                CSVTripExporter exporter = new CSVTripExporter(context);
                 if (exporter.exportToCsv(trips, uri, CSVTripFormat.GENERIC)) {
                     Toast.makeText(context, R.string.toast_export_csv_succeeded, Toast.LENGTH_SHORT).show();
                 } else {

@@ -199,6 +199,7 @@
     <string name="toast_export_csv_succeeded">Exportación a la tarjeta SD completada con éxito.</string>
     <string name="toast_import_csv_succeeded">Importación completada con éxito.</string>
     <string name="toast_import_csv_result">Viajes importados: %1$d. Errores: %2$d</string>
+    <string name="toast_import_csv_general_result">Registros importados: %1$d. Errores: %2$d</string>
     <string name="toast_need_storage_permission">Para realizar esta acción Autu Mandu necesita tener acceso a tus archivos.</string>
     <string name="toast_auto_backup_succeeded">Copia de seguridad automática exitosa.</string>
     <string name="toast_auto_backup_failed">Copia de seguridad automática fallida.</string>
@@ -383,6 +384,7 @@
     <string name="import_no_file_selected">Ningún archivo seleccionado</string>
     <string name="import_format">Formato de importación</string>
     <string name="import_preview_title">Vista previa (primeras 3 filas)</string>
+    <string name="import_preview_table">Tabla a previsualizar</string>
     <string name="section_trip_times">Fechas y horas</string>
     <string name="section_trip_route">Ruta y Propósito</string>
     <string name="section_trip_odometer">Odómetro</string>

@@ -24,7 +24,8 @@ public enum CSVTripFormat {
     GENERIC(
             CSVFormat.DEFAULT.builder()
                     .setDelimiter(',')
-                    .setHeader("Date", "Date End", "Start Time", "End Time", "Route", "Purpose", "Km Start", "Km End", "Business Km", "Private Km", "Home-Work Km")
+                    .setHeader("Date", "Date End", "Start Time", "End Time", "Route", "Purpose", "Km Start", "Km End", "Business Km", "Private Km", "Home-Work Km", "Start Lat", "Start Lon", "End Lat", "End Lon")
+                    .setSkipHeaderRecord(true)
                     .get(),
             Map.ofEntries(
                     Map.entry("date", "Date"),
@@ -37,13 +38,18 @@ public enum CSVTripFormat {
                     Map.entry("km_end", "Km End"),
                     Map.entry("km_business", "Business Km"),
                     Map.entry("km_private", "Private Km"),
-                    Map.entry("km_home_work", "Home-Work Km")
+                    Map.entry("km_home_work", "Home-Work Km"),
+                    Map.entry("start_lat", "Start Lat"),
+                    Map.entry("start_lon", "Start Lon"),
+                    Map.entry("end_lat", "End Lat"),
+                    Map.entry("end_lon", "End Lon")
             )
     ),
     SKODA(
             CSVFormat.DEFAULT.builder()
                     .setDelimiter(';')
                     .setHeader("Datum", "Datum Ende", "Abfahrt", "Ankunft", "Fahrtstrecke", "Fahrtzweck", "km-Stand Anfang", "km-Stand Ende", "geschäftlich", "privat", "Wohnung/Arbeit")
+                    .setSkipHeaderRecord(true)
                     .get(),
             Map.ofEntries(
                     Map.entry("date", "Datum"),

@@ -38,7 +38,7 @@ import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.adapter.CarArrayAdapter;
 import org.juanro.autumandu.util.backup.CSVTripFormat;
-import org.juanro.autumandu.util.backup.CsvTripImporter;
+import org.juanro.autumandu.util.backup.CSVTripImporter;
 import org.juanro.autumandu.util.backup.ImportResult;
 import org.juanro.autumandu.viewmodel.TripViewModel;
 
@@ -57,7 +57,7 @@ public class TripImportDialogFragment extends DialogFragment {
     private Button btnImport;
 
     private Uri selectedUri;
-    private CsvTripImporter importer;
+    private CSVTripImporter importer;
     private TripViewModel viewModel;
 
     private final ActivityResultLauncher<String[]> mOpenFileLauncher = registerForActivityResult(
@@ -72,7 +72,7 @@ public class TripImportDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        importer = new CsvTripImporter(requireContext());
+        importer = new CSVTripImporter(requireContext());
         viewModel = new ViewModelProvider(this, new TripViewModel.Factory(requireActivity().getApplication())).get(TripViewModel.class);
 
         View view = getLayoutInflater().inflate(R.layout.fragment_trip_import, null);

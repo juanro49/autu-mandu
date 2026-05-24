@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
-public class CsvTripImporterTest {
+public class CSVTripImporterTest {
 
     @Test
     public void testGetFormat() {

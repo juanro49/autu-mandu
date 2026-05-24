@@ -123,6 +123,7 @@
     <string name="import_no_file_selected">No file selected</string>
     <string name="import_format">Import Format</string>
     <string name="import_preview_title">Preview (first 3 rows)</string>
+    <string name="import_preview_table">Table to preview</string>
     <string name="empty_if_unknown">Please leave empty if you don\'t know what to enter here.</string>
     <string name="title_first_start">First steps</string>
     <string name="title_add_refueling">Add refueling</string>
@@ -210,6 +211,7 @@
     <string name="toast_export_csv_succeeded">Export to SD card completed successfully.</string>
     <string name="toast_import_csv_succeeded">Import completed successfully.</string>
     <string name="toast_import_csv_result">Imported %1$d trips. Errors: %2$d</string>
+    <string name="toast_import_csv_general_result">Imported %1$d records. Errors: %2$d</string>
     <string name="toast_need_storage_permission">To perform this action Autu Mandu needs to have access to your files.</string>
     <string name="toast_auto_backup_succeeded">Automatic backup succeeded.</string>
     <string name="toast_auto_backup_failed">Automatic backup failed.</string>

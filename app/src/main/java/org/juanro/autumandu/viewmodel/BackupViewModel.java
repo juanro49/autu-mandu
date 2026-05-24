@@ -25,9 +25,11 @@ import androidx.lifecycle.AndroidViewModel;
 import org.juanro.autumandu.util.backup.Backup;
 import org.juanro.autumandu.util.backup.CSVExportImport;
 import org.juanro.autumandu.util.backup.CSVImportException;
+import org.juanro.autumandu.util.backup.ImportResult;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 /**
  * ViewModel for backup and CSV export/import operations.
@@ -73,11 +75,11 @@ public class BackupViewModel extends AndroidViewModel {
         });
     }
 
-    public void runImportCSV(Runnable onComplete, ErrorCallback onError) {
+    public void runImportCSV(Consumer<ImportResult> onComplete, ErrorCallback onError) {
         DB_EXECUTOR.execute(() -> {
             try {
-                csvExportImport.importData();
-                onComplete.run();
+                var result = csvExportImport.importData();
+                onComplete.accept(result);
             } catch (CSVImportException e) {
                 onError.onError(e.getMessage());
             }

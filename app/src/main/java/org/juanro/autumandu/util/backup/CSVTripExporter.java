@@ -20,6 +20,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import org.apache.commons.csv.CSVPrinter;
 import org.juanro.autumandu.model.entity.Trip;
 
@@ -29,11 +31,11 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class TripExporter {
-    private static final String TAG = "TripExporter";
+public class CSVTripExporter {
+    private static final String TAG = "CSVTripExporter";
     private final Context context;
 
-    public TripExporter(Context context) {
+    public CSVTripExporter(@NonNull Context context) {
         this.context = context;
     }
 
@@ -54,7 +56,11 @@ public class TripExporter {
                         trip.getKmEnd(),
                         trip.getKmBusiness(),
                         trip.getKmPrivate(),
-                        trip.getKmHomeWork()
+                        trip.getKmHomeWork(),
+                        trip.getStartLat(),
+                        trip.getStartLon(),
+                        trip.getEndLat(),
+                        trip.getEndLon()
                 );
             }
             printer.flush();

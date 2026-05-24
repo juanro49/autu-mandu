@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_medium">
+
+        <TextView
+            android:id="@+id/txt_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/alert_import_csv_message"
+            android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+        <!-- Table Selection -->
+        <TextView
+            android:id="@+id/txt_label_table"
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:text="@string/import_preview_table"
+            android:labelFor="@+id/spn_table" />
+
+        <Spinner
+            android:id="@+id/spn_table"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_field_height" />
+
+        <!-- Preview Section -->
+        <TextView
+            android:id="@+id/txt_preview_title"
+            style="@style/AppWidget.SectionHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:text="@string/import_preview_title"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/txt_preview_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:visibility="gone" />
+
+        <!-- Buttons -->
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/min_touch_target_size"
+                android:text="@android:string/cancel" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_import"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/min_touch_target_size"
+                android:text="@string/import_" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

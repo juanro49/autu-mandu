@@ -37,9 +37,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-public class CsvTripImporter {
-    private static final String TAG = "CsvTripImporter";
+public class CSVTripImporter {
+    private static final String TAG = "CSVTripImporter";
 
     private static final String COLUMN_DATE = "date";
     private static final String COLUMN_TIME_START = "time_start";
@@ -51,11 +52,15 @@ public class CsvTripImporter {
     private static final String COLUMN_KM_BUSINESS = "km_business";
     private static final String COLUMN_KM_PRIVATE = "km_private";
     private static final String COLUMN_KM_HOME_WORK = "km_home_work";
+    private static final String COLUMN_START_LAT = "start_lat";
+    private static final String COLUMN_START_LON = "start_lon";
+    private static final String COLUMN_END_LAT = "end_lat";
+    private static final String COLUMN_END_LON = "end_lon";
 
     private final Context context;
     private Map<String, String> columnMapping = new HashMap<>();
 
-    public CsvTripImporter(Context context) {
+    public CSVTripImporter(Context context) {
         this.context = context;
     }
 
@@ -96,11 +101,14 @@ public class CsvTripImporter {
              InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
              CSVParser parser = CSVParser.parse(reader, format.getFormat())) {
 
-            int i = 0;
+            int count = 0;
             for (CSVRecord csvRecord : parser) {
-                if (i >= maxRows) break;
+                if (isHeaderRecord(csvRecord, format)) {
+                    continue;
+                }
+                if (count >= maxRows) break;
                 preview.add(csvRecord.toMap());
-                i++;
+                count++;
             }
         } catch (Exception e) {
             Log.e(TAG, "Error previewing data", e);
@@ -130,11 +138,16 @@ public class CsvTripImporter {
 
     private void importRecord(CSVRecord csvRecord, long carId, CSVTripFormat format, AutuManduDatabase db, ImportResult result) {
         try {
+            // Skip header if it was accidentally included as a record
+            if (isHeaderRecord(csvRecord, format)) {
+                return;
+            }
+
             Trip trip = mapRecordToTrip(csvRecord, carId, format);
 
             // Check if a similar trip already exists (e.g. same date, times, and car)
             boolean exists = db.getTripDao().getTripsInDateRange(carId, trip.getDate(), trip.getDate()).stream()
-                    .anyMatch(t -> t.getTimeStart().equals(trip.getTimeStart()) && t.getKmStart() == trip.getKmStart());
+                    .anyMatch(t -> Objects.equals(t.getTimeStart(), trip.getTimeStart()) && t.getKmStart() == trip.getKmStart());
 
             if (!exists) {
                 db.getTripDao().insert(trip);
@@ -146,6 +159,16 @@ public class CsvTripImporter {
             Log.e(TAG, "Error importing record at line " + csvRecord.getRecordNumber(), e);
             result.addError("Line " + csvRecord.getRecordNumber() + ": " + e.getMessage());
         }
+    }
+
+    private boolean isHeaderRecord(CSVRecord csvRecord, CSVTripFormat format) {
+        Map<String, String> mapping = format.getColumnMapping();
+        if (mapping.containsKey(COLUMN_DATE)) {
+            String columnName = mapping.get(COLUMN_DATE);
+            String val = getSafe(csvRecord, columnName);
+            return Objects.equals(val, columnName);
+        }
+        return false;
     }
 
     private Trip mapRecordToTrip(CSVRecord csvRecord, long carId, CSVTripFormat format) {
@@ -170,41 +193,70 @@ public class CsvTripImporter {
         return trip;
     }
 
+    private String getSafe(CSVRecord csvRecord, String column) {
+        return (csvRecord.isMapped(column) && csvRecord.isSet(column)) ? csvRecord.get(column) : null;
+    }
+
     private void applyMapping(Trip trip, CSVRecord csvRecord, Map<String, String> mapping, CSVTripFormat format) {
         if (mapping.containsKey(COLUMN_DATE)) {
-            String val = csvRecord.get(mapping.get(COLUMN_DATE));
-            if (format == CSVTripFormat.SKODA) {
-                trip.setDate(LocalDate.parse(val, DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-            } else {
-                trip.setDate(LocalDate.parse(val));
+            String val = getSafe(csvRecord, mapping.get(COLUMN_DATE));
+            if (val != null && !val.isEmpty()) {
+                if (format == CSVTripFormat.SKODA) {
+                    trip.setDate(LocalDate.parse(val, DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+                } else {
+                    trip.setDate(LocalDate.parse(val));
+                }
             }
         }
         if (mapping.containsKey(COLUMN_TIME_START)) {
-            trip.setTimeStart(LocalTime.parse(csvRecord.get(mapping.get(COLUMN_TIME_START))));
+            String val = getSafe(csvRecord, mapping.get(COLUMN_TIME_START));
+            if (val != null && !val.isEmpty()) trip.setTimeStart(LocalTime.parse(val));
         }
         if (mapping.containsKey(COLUMN_TIME_END)) {
-            trip.setTimeEnd(LocalTime.parse(csvRecord.get(mapping.get(COLUMN_TIME_END))));
+            String val = getSafe(csvRecord, mapping.get(COLUMN_TIME_END));
+            if (val != null && !val.isEmpty()) trip.setTimeEnd(LocalTime.parse(val));
         }
         if (mapping.containsKey(COLUMN_ROUTE)) {
-            trip.setRouteTarget(csvRecord.get(mapping.get(COLUMN_ROUTE)));
+            trip.setRouteTarget(Objects.requireNonNullElse(getSafe(csvRecord, mapping.get(COLUMN_ROUTE)), ""));
         }
         if (mapping.containsKey(COLUMN_PURPOSE)) {
-            trip.setPurpose(csvRecord.get(mapping.get(COLUMN_PURPOSE)));
+            trip.setPurpose(Objects.requireNonNullElse(getSafe(csvRecord, mapping.get(COLUMN_PURPOSE)), ""));
         }
         if (mapping.containsKey(COLUMN_KM_START)) {
-            trip.setKmStart(Integer.parseInt(csvRecord.get(mapping.get(COLUMN_KM_START))));
+            String val = getSafe(csvRecord, mapping.get(COLUMN_KM_START));
+            if (val != null && !val.isEmpty()) trip.setKmStart(Integer.parseInt(val));
         }
         if (mapping.containsKey(COLUMN_KM_END)) {
-            trip.setKmEnd(Integer.parseInt(csvRecord.get(mapping.get(COLUMN_KM_END))));
+            String val = getSafe(csvRecord, mapping.get(COLUMN_KM_END));
+            if (val != null && !val.isEmpty()) trip.setKmEnd(Integer.parseInt(val));
         }
         if (mapping.containsKey(COLUMN_KM_BUSINESS)) {
-            trip.setKmBusiness(Integer.parseInt(csvRecord.get(mapping.get(COLUMN_KM_BUSINESS))));
+            String val = getSafe(csvRecord, mapping.get(COLUMN_KM_BUSINESS));
+            if (val != null && !val.isEmpty()) trip.setKmBusiness(Integer.parseInt(val));
         }
         if (mapping.containsKey(COLUMN_KM_PRIVATE)) {
-            trip.setKmPrivate(Integer.parseInt(csvRecord.get(mapping.get(COLUMN_KM_PRIVATE))));
+            String val = getSafe(csvRecord, mapping.get(COLUMN_KM_PRIVATE));
+            if (val != null && !val.isEmpty()) trip.setKmPrivate(Integer.parseInt(val));
         }
         if (mapping.containsKey(COLUMN_KM_HOME_WORK)) {
-            trip.setKmHomeWork(Integer.parseInt(csvRecord.get(mapping.get(COLUMN_KM_HOME_WORK))));
+            String val = getSafe(csvRecord, mapping.get(COLUMN_KM_HOME_WORK));
+            if (val != null && !val.isEmpty()) trip.setKmHomeWork(Integer.parseInt(val));
+        }
+        if (mapping.containsKey(COLUMN_START_LAT)) {
+            String val = getSafe(csvRecord, mapping.get(COLUMN_START_LAT));
+            if (val != null && !val.isEmpty()) trip.setStartLat(Double.parseDouble(val));
+        }
+        if (mapping.containsKey(COLUMN_START_LON)) {
+            String val = getSafe(csvRecord, mapping.get(COLUMN_START_LON));
+            if (val != null && !val.isEmpty()) trip.setStartLon(Double.parseDouble(val));
+        }
+        if (mapping.containsKey(COLUMN_END_LAT)) {
+            String val = getSafe(csvRecord, mapping.get(COLUMN_END_LAT));
+            if (val != null && !val.isEmpty()) trip.setEndLat(Double.parseDouble(val));
+        }
+        if (mapping.containsKey(COLUMN_END_LON)) {
+            String val = getSafe(csvRecord, mapping.get(COLUMN_END_LON));
+            if (val != null && !val.isEmpty()) trip.setEndLon(Double.parseDouble(val));
         }
     }
 
@@ -235,6 +287,19 @@ public class CsvTripImporter {
         guessTimeAndRouteMapping(guessed, original, clean);
         if (clean.contains("km") || clean.contains("mileage") || clean.contains("stand")) {
             guessKmColumnMapping(guessed, original, clean);
+        }
+        if (clean.contains("lat") || clean.contains("lon") || clean.contains("coord")) {
+            guessGeoMapping(guessed, original, clean);
+        }
+    }
+
+    private void guessGeoMapping(Map<String, String> guessed, String original, String clean) {
+        if (clean.contains("start")) {
+            if (clean.contains("lat")) guessed.put(COLUMN_START_LAT, original.trim());
+            if (clean.contains("lon")) guessed.put(COLUMN_START_LON, original.trim());
+        } else if (clean.contains("end")) {
+            if (clean.contains("lat")) guessed.put(COLUMN_END_LAT, original.trim());
+            if (clean.contains("lon")) guessed.put(COLUMN_END_LON, original.trim());
         }
     }
 

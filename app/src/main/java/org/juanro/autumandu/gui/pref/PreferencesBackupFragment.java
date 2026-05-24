@@ -16,6 +16,8 @@
 
 package org.juanro.autumandu.gui.pref;
 
+import static org.juanro.autumandu.AutuManduApplication.recreateAllActivities;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +36,6 @@ import androidx.preference.Preference.OnPreferenceClickListener;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
-import org.juanro.autumandu.AutuManduApplication;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.AuthenticatorAddAccountActivity;
@@ -247,7 +248,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
                             if (isAdded()) {
                                 requireActivity().runOnUiThread(() -> {
                                     Toast.makeText(context, R.string.toast_restore_succeeded, Toast.LENGTH_SHORT).show();
-                                    AutuManduApplication.recreateAllActivities();
+                                    recreateAllActivities();
                                     requireActivity().finish();
                                 });
                             }
@@ -281,32 +282,11 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
     }
 
     private void performImport() {
-        Context context = requireContext();
         if (mViewModel.getCsvExportImport().anyExportFileExist()) {
-            new androidx.appcompat.app.AlertDialog.Builder(context)
-                    .setTitle(R.string.alert_import_csv_title)
-                    .setMessage(R.string.alert_import_csv_message)
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> mViewModel.runImportCSV(
-                            () -> {
-                                if (isAdded()) {
-                                    requireActivity().runOnUiThread(() -> {
-                                        Toast.makeText(context, R.string.toast_import_csv_succeeded, Toast.LENGTH_SHORT).show();
-                                        AutuManduApplication.recreateAllActivities();
-                                        requireActivity().finish();
-                                    });
-                                }
-                            },
-                            message -> {
-                                if (isAdded()) {
-                                    requireActivity().runOnUiThread(() ->
-                                            Toast.makeText(context, R.string.alert_import_csv_failed, Toast.LENGTH_SHORT).show());
-                                }
-                            }
-                    ))
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show();
+            new org.juanro.autumandu.gui.dialog.GeneralCSVImportDialogFragment()
+                    .show(getChildFragmentManager(), org.juanro.autumandu.gui.dialog.GeneralCSVImportDialogFragment.TAG);
         } else {
-            Toast.makeText(context, R.string.pref_summary_import_csv_no_data, Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.pref_summary_import_csv_no_data, Toast.LENGTH_SHORT).show();
         }
     }
 
