@@ -13,19 +13,16 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<resources>
+--><resources>
     <string name="about_thanks">Благодарность:</string>
     <string name="about_version">Версия: %s</string>
     <string name="about_licenses">Лицензии</string>
-
     <string name="drawer_reports">Отчеты</string>
     <string name="drawer_calculator">Калькулятор</string>
     <string name="drawer_settings">Настройки</string>
     <string name="drawer_help">Помощь</string>
     <string name="drawer_open">Открыть навигацию</string>
     <string name="drawer_close">Закрыть навигацию</string>
-
     <string name="menu_synchronize">Синхронизировать</string>
     <string name="menu_save">Готово</string>
     <string name="menu_cancel">Отмена</string>
@@ -35,14 +32,11 @@
     <string name="menu_add_reminder">Добавить напоминание</string>
     <string name="menu_show_trend">Показать тренд</string>
     <string name="menu_show_overall_trend">Показать общий тренд</string>
-
     <string name="fab_add_refueling">Заправка</string>
     <string name="fab_add_other_expenditure">Прочие расходы</string>
     <string name="fab_add_other_income">Прочий доход</string>
-
     <string name="section_suspend">Приостановить</string>
     <string name="section_advanced">Продвинутые опции</string>
-
     <string name="hint_mileage_optional">Общий пробег (если есть)</string>
     <string name="hint_volume">Объем</string>
     <string name="hint_price">Стоимость</string>
@@ -65,7 +59,6 @@
     <string name="hint_reminder_start_mileage">Пробег (начало)</string>
     <string name="hint_reminder_start_date">Дата (начало)</string>
     <string name="hint_reminder_snoozed_until">Отложен до</string>
-
     <string name="label_partial">Частично</string>
     <string name="label_color_in_reports">Цвета отчета</string>
     <string name="label_suspend">Приостановить</string>
@@ -75,7 +68,6 @@
     <string name="label_reminder_type">Тип</string>
     <string name="label_reminder_dismissed">Уведомление удалено</string>
     <string name="label_trust_certificate">Доверять сертификату</string>
-
     <string name="description_suspend">Вы можете приостановить учет авто когда уже не используете его. В результате все повторяющиеся траты перестанут насчитываться. Также авто не будет попадать в отчет по умолчанию.</string>
     <string name="description_category">Некоторые отчеты группируется по категории топлива. Например: Бензин, солярка, газ.</string>
     <string name="description_reminder_status_due">Установлено</string>
@@ -86,20 +78,17 @@
     <string name="description_reminder_status_time">Установлено на %s</string>
     <string name="description_webdav_url">Пожалуйста укажите URL к папке на вашем WebDAV сервере. Autu Mandu будет записывать в эту папку. Данные вне папки не будут изменены.</string>
     <string name="description_webdav_trust_certificate">Android не доверяет сертификату этого веб-сайта.</string>
-
     <string name="validate_error_greater_zero">Должно быть больше 0</string>
     <string name="validate_error_not_empty">Должно быть заполнено</string>
     <string name="validate_error_mileage_out_of_range_total">Пробег должен быть между пробегом прошлой и следующей заправки. Чтобы указать пробег поездки необходимо изменить настройки заполнения.</string>
     <string name="validate_error_mileage_out_of_range_trip">Общий пробег не может быть больше чем пробег следующей заправки в этом режиме заполнения. Чтобы указать общий пробег необходимо изменить настройки заполнения.</string>
     <string name="validate_error_fuel_type_exists">Этот тип топлива не настроен.</string>
     <string name="validate_error_webdav_invalid_certificate">Сертификат, вероятно, недействителен и не может быть использован.</string>
-
     <string name="suspended">Приостановлено</string>
     <string name="suspended_since">Приостановлено с %s</string>
     <string name="overwrite">Переписать</string>
     <string name="restore">Восстановить</string>
     <string name="import_">Импортировать</string>
-
     <string name="title_first_start">Первые шаги</string>
     <string name="title_add_refueling">Добавить заправку</string>
     <string name="title_edit_refueling">Изменить заправку</string>
@@ -117,9 +106,7 @@
     <string name="title_edit_reminder">Изменить напоминание</string>
     <string name="cab_title_selected">%d выбрано</string>
     <string name="edit_title_refueling">Заправка</string>
-
     <string name="edit_message_no_entry_selected">Ничего не выбрано</string>
-
     <string name="alert_delete_title">Подтвердить удаление</string>
     <string name="alert_delete_refueling_message">Эта заправка будет удалена.</string>
     <string name="alert_delete_refuelings_message">%d заправки будут удалены.</string>
@@ -155,14 +142,12 @@
     <string name="alert_import_csv_message">Импорт изменит существующие записи и добавит новые, однако прочие записи не будут удалены.</string>
     <string name="alert_import_csv_failed">Ошибка импорта. Данные не изменены.\n\nПричина: %s</string>
     <string name="alert_error_title">Ошибка</string>
-
     <string name="toast_new_refueling">Расход топлива: %1$.2f %2$s %3$s</string>
     <string name="toast_backup_succeeded">Копирование в файл %s завершилось успешно.</string>
     <string name="toast_restore_succeeded">Восстановление завершилось успешно</string>
     <string name="toast_export_csv_succeeded">Экспорт на SD карту завершился успешно.</string>
     <string name="toast_import_csv_succeeded">Импорт завершился успешно.</string>
     <string name="toast_need_storage_permission">Для выполнения этой операции Autu Mandu необходим доступ к файлам.</string>
-
     <string name="report_title_fuel_consumption">Расход топлива</string>
     <string name="report_title_fuel_price">Цена топлива</string>
     <string name="report_title_mileage">Пробег</string>
@@ -176,8 +161,8 @@
     <string name="report_graph_per_refueling">По заправкам</string>
     <string name="report_graph_per_month">По месяцам</string>
     <string name="report_not_enough_data">Данных не достаточно</string>
-    <string name="report_since">&#931; с %s</string>
-    <string name="report_last_year">&#931; за последний год</string>
+    <string name="report_since">Σ с %s</string>
+    <string name="report_last_year">Σ за последний год</string>
     <string name="report_lowest">Самый низкий</string>
     <string name="report_highest">Самый высокий</string>
     <string name="report_average">Средний</string>
@@ -192,7 +177,6 @@
     <string name="report_toast_guessed">Вычислено для компенсации пропущенных заправок.</string>
     <string name="report_price">%1$.2f %2$s</string>
     <string name="report_price_estimated">прибл. %1$.2f %2$s</string>
-
     <string name="pref_title_header_about">О программе Autu Mandu</string>
     <string name="pref_title_header_general">Общие настройки</string>
     <string name="pref_title_header_cars">Авто</string>
@@ -230,14 +214,12 @@
     <string name="pref_summary_export_csv">Экспорт данных в CSV для использования в других программах типа Microsoft Excel или LibreOffice Calc.</string>
     <string name="pref_summary_import_csv">Импорт данных из CSV файла. Файлы должны быть похожи на те, что создаются при CSV экспорте.</string>
     <string name="pref_summary_import_csv_no_data">Нет файлов в каталоге %s на SD карте.</string>
-
     <string name="help_section_getting_started">Начало работы</string>
     <string name="help_section_tips">Подсказки</string>
     <string name="help_section_calculations">Расчеты</string>
     <string name="help_section_fuel_types">Типы топлива</string>
     <string name="help_section_csv">CSV</string>
     <string name="help_folder_name">help-ru</string>
-
     <string name="first_start_hi">Привет!</string>
     <string name="first_start_intro">Autu Mandu отображает наглядные отчеты по расходам на авто, включая расход топлива и общую стоимость обслуживания. Начните с простого:</string>
     <string name="first_start_step1_img_desc">Шаг первый</string>
@@ -248,7 +230,6 @@
     <string name="first_start_step3_text">После двух заправок Вы увидете первый график.</string>
     <string name="first_start_create_car">Создайте авто</string>
     <string name="first_start_setup_sync">Настройте синхронизацию</string>
-
     <string name="calc_option_volume_to_distance">Объем (%1$s) на пробег (%2$s)</string>
     <string name="calc_option_distance_to_volume">Пробег (%1$s) на объем (%2$s)</string>
     <string name="calc_option_volume_to_price">Объем (%1$s) к цене (%2$s)</string>
@@ -257,14 +238,12 @@
     <string name="calc_option_price_to_distance">Цена (%1$s) на пробег (%2$s)</string>
     <string name="calc_option_distance_to_fuel_price">Пробег (%1$s) к цене заправки (%2$s)</string>
     <string name="calc_option_fuel_price_to_distance">Цена заправки (%1$s) на пробег (%2$s)</string>
-
     <string name="notification_reminder_channel">Напоминания</string>
     <string name="notification_reminder_title_single">Напоминание: %s</string>
     <string name="notification_reminder_title_multiple">Несколько напоминаний</string>
     <string name="notification_reminder_action_done">Готово</string>
     <string name="notification_reminder_action_snooze">Отложить</string>
     <string name="notification_reminder_action_snooze_all">Отложить все</string>
-
     <string name="distance_entry_mode_trip">Длина маршрута</string>
     <string name="distance_entry_mode_total">Общий пробег</string>
     <string name="price_entry_mode_per_unit_and_volume">Цена за единицу &amp; объем</string>
@@ -278,22 +257,18 @@
     <string name="drag_handle_desc">Тянуть тут</string>
     <string name="quit_snooze_desc">Покинуть отложенное</string>
     <string name="notice_not_paid">Не оплачено</string>
-
     <string name="title_refuelings">Заправка</string>
     <string name="title_trips">Журнал поездок</string>
     <string name="title_expenditures">Прочие расходы</string>
     <string name="title_income">Прочий доход</string>
-
     <string name="repeat_once">Одноразово</string>
     <string name="repeat_day">Повторять каждый день</string>
     <string name="repeat_month">Повторять каждый месяц</string>
     <string name="repeat_quarter">Повторять каждый квартал</string>
     <string name="repeat_year">Повторять каждый год</string>
-
     <string name="reminder_distance_time">По пробегу или времени, что раньше</string>
     <string name="reminder_distance">По пробегу</string>
     <string name="reminder_time">По времени</string>
-
     <string name="time_day">Дней</string>
     <string name="time_month">Месяцев</string>
     <string name="time_year">Лет</string>
