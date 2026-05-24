@@ -16,7 +16,10 @@
 
 package org.juanro.autumandu.viewmodel;
 
+import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
+
 import android.app.Application;
+import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -32,7 +35,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ReportViewModel extends AndroidViewModel {
+public class ReportViewModel extends AndroidViewModel implements SharedPreferences.OnSharedPreferenceChangeListener {
     private final MediatorLiveData<List<AbstractReport>> mReports = new MediatorLiveData<>();
     private final List<AbstractReport> mCachedReports = new ArrayList<>();
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
@@ -41,6 +44,8 @@ public class ReportViewModel extends AndroidViewModel {
     public ReportViewModel(@NonNull Application application) {
         super(application);
         mPrefs = new Preferences(application);
+        getDefaultSharedPreferences(application)
+                .registerOnSharedPreferenceChangeListener(this);
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(application);
         // Observamos todas las fuentes de datos que afectan a los informes
@@ -53,7 +58,7 @@ public class ReportViewModel extends AndroidViewModel {
         refreshReports();
     }
 
-    private void invalidateAndRefresh() {
+    public void invalidateAndRefresh() {
         for (AbstractReport report : mCachedReports) {
             report.invalidate();
         }
@@ -68,8 +73,18 @@ public class ReportViewModel extends AndroidViewModel {
         mExecutor.execute(() -> {
             List<Class<? extends AbstractReport>> reportClasses = mPrefs.getReportOrder();
 
-            // Si el orden o la cantidad ha cambiado, reconstruimos la lista base
-            if (mCachedReports.size() != reportClasses.size()) {
+            // Check if the order or count has changed
+            boolean listChanged = mCachedReports.size() != reportClasses.size();
+            if (!listChanged) {
+                for (int i = 0; i < reportClasses.size(); i++) {
+                    if (!mCachedReports.get(i).getClass().equals(reportClasses.get(i))) {
+                        listChanged = true;
+                        break;
+                    }
+                }
+            }
+
+            if (listChanged) {
                 mCachedReports.clear();
                 for (Class<? extends AbstractReport> reportClass : reportClasses) {
                     AbstractReport report = AbstractReport.newInstance(reportClass, getApplication());
@@ -85,8 +100,17 @@ public class ReportViewModel extends AndroidViewModel {
     }
 
     @Override
+    public void onSharedPreferenceChanged(android.content.SharedPreferences sharedPreferences, String key) {
+        // Al cambiar cualquier preferencia, invalidamos los informes para forzar su recarga
+        // Esto cubre cambios en moneda, unidades, orden, etc.
+        invalidateAndRefresh();
+    }
+
+    @Override
     protected void onCleared() {
         super.onCleared();
+        getDefaultSharedPreferences(getApplication())
+                .unregisterOnSharedPreferenceChangeListener(this);
         mExecutor.shutdown();
     }
 }

@@ -74,11 +74,12 @@ import org.juanro.autumandu.util.Carburoid;
 import org.juanro.autumandu.viewmodel.ReportViewModel;
 
 public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClickListener,
-        BackPressedListener, SharedPreferences.OnSharedPreferenceChangeListener {
+        BackPressedListener {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private ReportAdapter reportAdapter;
+    private ReportViewModel viewModel;
     private AbstractReport currentMenuReport;
 
     private ReportFullScreenAnimator fullScreenAnimator;
@@ -385,23 +386,14 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
     @Override
     public void onStart() {
         super.onStart();
-        PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .registerOnSharedPreferenceChangeListener(this);
-        reportAdapter.notifyItemRangeChanged(0, reportAdapter.getItemCount());
+        if (viewModel != null) {
+            viewModel.invalidateAndRefresh();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (Preferences.KEY_SHOW_CARBUROID.equals(key)) {
-            reportAdapter.notifyItemRangeChanged(0, reportAdapter.getItemCount());
-        }
     }
 
     @Override
@@ -434,7 +426,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         var btnCloseFullScreen = v.findViewById(R.id.btn_close_full_screen);
         btnCloseFullScreen.setOnClickListener(view -> hideFullScreenChart());
 
-        ReportViewModel viewModel = new ViewModelProvider(this).get(ReportViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ReportViewModel.class);
         viewModel.getReports().observe(getViewLifecycleOwner(), reports -> reportAdapter.setItems(reports));
 
         return v;
