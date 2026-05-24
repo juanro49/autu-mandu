@@ -57,6 +57,9 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
                 case Preferences.KEY_PRICE_ENTRY_MODE -> handlePriceEntryModeChange(preference, newValue);
                 case Preferences.KEY_REMINDER_SNOOZE_DURATION -> handleSnoozeDurationChange(preference, newValue);
                 case Preferences.KEY_UNIT_DISTANCE, Preferences.KEY_UNIT_VOLUME -> handleUnitChange(preference, newValue);
+                case Preferences.KEY_UNIT_VOLUME_GASOLINE, Preferences.KEY_UNIT_VOLUME_DIESEL,
+                        Preferences.KEY_UNIT_VOLUME_GAS, Preferences.KEY_UNIT_VOLUME_ELECTRICITY,
+                        Preferences.KEY_UNIT_VOLUME_ADDITIVES -> preference.setSummary(newValue.toString());
                 case Preferences.KEY_UNIT_FUEL_CONSUMPTION -> handleFuelConsumptionChange((ListPreference) preference, newValue);
                 case Preferences.KEY_THEME -> handleThemeChange((ListPreference) preference, newValue);
                 case Preferences.KEY_DYNAMIC_COLOR -> requireActivity().recreate();
@@ -182,6 +185,11 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
 
         // Unit Volume
         setupSimplePreference(Preferences.KEY_UNIT_VOLUME, prefs.getUnitVolume());
+        setupSimplePreference(Preferences.KEY_UNIT_VOLUME_GASOLINE, prefs.getUnitVolume(org.juanro.autumandu.model.entity.FuelCategory.GASOLINE));
+        setupSimplePreference(Preferences.KEY_UNIT_VOLUME_DIESEL, prefs.getUnitVolume(org.juanro.autumandu.model.entity.FuelCategory.DIESEL));
+        setupSimplePreference(Preferences.KEY_UNIT_VOLUME_GAS, prefs.getUnitVolume(org.juanro.autumandu.model.entity.FuelCategory.GAS));
+        setupSimplePreference(Preferences.KEY_UNIT_VOLUME_ELECTRICITY, prefs.getUnitVolume(org.juanro.autumandu.model.entity.FuelCategory.ELECTRICITY));
+        setupSimplePreference(Preferences.KEY_UNIT_VOLUME_ADDITIVES, prefs.getUnitVolume(org.juanro.autumandu.model.entity.FuelCategory.ADDITIVES));
 
         // Unit Distance
         setupSimplePreference(Preferences.KEY_UNIT_DISTANCE, prefs.getUnitDistance());

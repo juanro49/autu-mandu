@@ -32,7 +32,7 @@ public class RefuelingValidator {
         FormValidator validator = new FormValidator();
 
         validator.add(new FormFieldGreaterZeroValidator(edtMileage));
-        validator.add(new FormFieldGreaterZeroValidator(edtVolume));
+        validator.add(new FormFieldGreaterEqualZeroValidator(edtVolume));
         if (priceEntryMode == PriceEntryMode.TOTAL_AND_VOLUME ||
                 priceEntryMode == PriceEntryMode.PER_UNIT_AND_VOLUME) {
             validator.add(new FormFieldGreaterEqualZeroOrEmptyValidator(edtPrice));

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.juanro.autumandu.FuelConsumption;
+import org.juanro.autumandu.FuelConsumption.Type;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.AutuManduDatabase;
@@ -42,11 +43,14 @@ public class FuelConsumptionReport extends AbstractReport {
 
     private class ReportChartData extends AbstractReportChartLineData {
         private final double mAvgConsumption;
+        private final String mUnit;
 
-        public ReportChartData(Context context, Car car, String category, List<BalancedRefueling> refuelings) {
-            super(context, String.format("%s (%s)", car.getName(), category), car.getColor());
+        public ReportChartData(Context context, Car car, String categoryName, FuelCategory category, List<BalancedRefueling> refuelings) {
+            super(context, String.format("%s (%s)", car.getName(), categoryName), car.getColor());
 
             FuelConsumption fuelConsumption = new FuelConsumption(context);
+            mUnit = fuelConsumption.getUnitLabel(Type.fromId(new Preferences(context).getUnitFuelConsumption()), category.getVolumeUnit(context));
+            mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
 
             int lastMileage = 0;
             int totalDistance = 0;
@@ -68,14 +72,16 @@ public class FuelConsumptionReport extends AbstractReport {
                         totalDistance += partialDistance;
                         totalVolume += partialVolume;
 
-                        float consumption = fuelConsumption.computeFuelConsumption(partialVolume,
-                                partialDistance);
-                        String tooltip = makeTooltip(car.getName(), consumption, refueling.getFuelTypeName(), refueling.getDate(), refueling.isGuessed());
+                        if (partialVolume > 0) {
+                            float consumption = fuelConsumption.computeFuelConsumption(partialVolume,
+                                    partialDistance);
+                            String tooltip = makeTooltip(car.getName(), consumption, refueling.getFuelTypeName(), refueling.getDate(), refueling.isGuessed());
 
-                        add(ReportDateHelper.toFloat(refueling.getDate()),
-                                consumption,
-                                tooltip,
-                                refueling.isGuessed());
+                            add(ReportDateHelper.toFloat(refueling.getDate()),
+                                    consumption,
+                                    tooltip,
+                                    refueling.isGuessed());
+                        }
 
                         partialDistance = 0;
                         partialVolume = 0;
@@ -104,10 +110,13 @@ public class FuelConsumptionReport extends AbstractReport {
         public double getAverageConsumption() {
             return mAvgConsumption;
         }
+
+        public String getUnit() {
+            return mUnit;
+        }
     }
 
     private final List<AbstractReportChartData> reportData = new ArrayList<>();
-    private String mUnit;
     private DateFormat mDateFormat;
 
     public FuelConsumptionReport(Context context) {
@@ -150,8 +159,6 @@ public class FuelConsumptionReport extends AbstractReport {
     @Override
     protected void onUpdate() {
         reportData.clear();
-        FuelConsumption fuelConsumption = new FuelConsumption(mContext);
-        mUnit = fuelConsumption.getUnitLabel();
         mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
@@ -180,41 +187,42 @@ public class FuelConsumptionReport extends AbstractReport {
         List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
         if (balancedRefuelings == null) balancedRefuelings = Collections.emptyList();
 
-        // Group balanced refuelings by category in memory.
-        Map<String, List<BalancedRefueling>> refuelingsByCategory = balancedRefuelings.stream()
+        Map<String, List<BalancedRefueling>> refuelingsByCategoryKey = balancedRefuelings.stream()
                 .collect(Collectors.groupingBy(r -> {
                     String key = r.getFuelTypeCategory();
-                    if (key == null) return mContext.getString(R.string.default_fuel_category);
-                    return FuelCategory.fromKey(key).getName(mContext);
+                    if (key == null) return "general";
+                    return key;
                 }));
 
-        for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategory.entrySet()) {
-            String category = entry.getKey();
+        for (Map.Entry<String, List<BalancedRefueling>> entry : refuelingsByCategoryKey.entrySet()) {
+            String categoryKey = entry.getKey();
+            FuelCategory category = FuelCategory.fromKey(categoryKey);
+            String categoryName = category.getName(mContext);
             List<BalancedRefueling> categoryRefuelings = entry.getValue();
 
-            ReportChartData carData = new ReportChartData(mContext, car, category, categoryRefuelings);
+            ReportChartData carData = new ReportChartData(mContext, car, categoryName, category, categoryRefuelings);
             if (carData.isEmpty()) {
                 continue;
             }
 
             reportData.add(carData);
 
-            Section section = addDataSection(car, category);
+            Section section = addDataSection(car, categoryName);
             Float[] yValues = carData.getYValues().toArray(new Float[0]);
             section.addItem(new Item(mContext.getString(R.string.report_highest), String.format(Locale.getDefault(),
-                    CONSUMPTION_FORMAT, Calculator.max(yValues), mUnit)));
+                    CONSUMPTION_FORMAT, Calculator.max(yValues), carData.getUnit())));
             section.addItem(new Item(mContext.getString(R.string.report_lowest), String.format(Locale.getDefault(),
-                    CONSUMPTION_FORMAT, Calculator.min(yValues), mUnit)));
+                    CONSUMPTION_FORMAT, Calculator.min(yValues), carData.getUnit())));
             section.addItem(new Item(mContext.getString(R.string.report_average), String.format(Locale.getDefault(),
-                    CONSUMPTION_FORMAT, carData.getAverageConsumption(), mUnit)));
+                    CONSUMPTION_FORMAT, carData.getAverageConsumption(), carData.getUnit())));
 
             // Total volume metric
             float totalVolume = 0;
-            for (BalancedRefueling refueling : balancedRefuelings) {
+            for (BalancedRefueling refueling : categoryRefuelings) {
                 totalVolume += refueling.getVolume();
             }
             section.addItem(new Item(mContext.getString(R.string.report_total_volume),
-                    String.format(Locale.getDefault(), CONSUMPTION_FORMAT, totalVolume, prefsForGuess.getUnitVolume())));
+                    String.format(Locale.getDefault(), CONSUMPTION_FORMAT, totalVolume, category.getVolumeUnit(mContext))));
 
             sectionAdded = true;
         }

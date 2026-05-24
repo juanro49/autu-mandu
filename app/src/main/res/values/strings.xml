@@ -277,7 +277,12 @@
     <string name="pref_title_behavior_auto_backup">Enable automatic backups</string>
     <string name="pref_title_behavior_keep_backups">Count of backups kept</string>
     <string name="pref_title_unit_currency">Currency</string>
-    <string name="pref_title_unit_volume">Volume</string>
+    <string name="pref_title_unit_volume">Global Volume</string>
+    <string name="pref_title_unit_volume_gasoline">Gasoline Volume</string>
+    <string name="pref_title_unit_volume_diesel">Diesel Volume</string>
+    <string name="pref_title_unit_volume_gas">Gas Volume</string>
+    <string name="pref_title_unit_volume_electricity">Electricity Volume</string>
+    <string name="pref_title_unit_volume_additives">Additives Volume</string>
     <string name="pref_title_unit_distance">Distance</string>
     <string name="pref_title_unit_fuel_consumption">Fuel Consumption</string>
     <string name="pref_title_sync_setup">Set up backup sync</string>

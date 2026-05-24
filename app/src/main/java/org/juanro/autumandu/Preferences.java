@@ -58,6 +58,11 @@ public class Preferences {
     public static final String KEY_UNIT_CURRENCY = "unit_currency";
     public static final String KEY_UNIT_DISTANCE = "unit_distance";
     public static final String KEY_UNIT_VOLUME = "unit_volume";
+    public static final String KEY_UNIT_VOLUME_GASOLINE = "unit_volume_gasoline";
+    public static final String KEY_UNIT_VOLUME_DIESEL = "unit_volume_diesel";
+    public static final String KEY_UNIT_VOLUME_GAS = "unit_volume_gas";
+    public static final String KEY_UNIT_VOLUME_ELECTRICITY = "unit_volume_electricity";
+    public static final String KEY_UNIT_VOLUME_ADDITIVES = "unit_volume_additives";
     public static final String KEY_UNIT_FUEL_CONSUMPTION = "unit_fuel_consumption";
     public static final String KEY_AUTO_GUESS_MISSING_DATA = "behavior_auto_guess_missing_data";
     public static final String KEY_SHOW_CAR_MENU = "behavior_show_car_menu";
@@ -193,6 +198,20 @@ public class Preferences {
 
     public String getUnitVolume() {
         return prefs.getString(KEY_UNIT_VOLUME, "l");
+    }
+
+    public String getUnitVolume(org.juanro.autumandu.model.entity.FuelCategory category) {
+        String key = switch (category) {
+            case GASOLINE -> KEY_UNIT_VOLUME_GASOLINE;
+            case DIESEL -> KEY_UNIT_VOLUME_DIESEL;
+            case GAS -> KEY_UNIT_VOLUME_GAS;
+            case ELECTRICITY -> KEY_UNIT_VOLUME_ELECTRICITY;
+            case ADDITIVES -> KEY_UNIT_VOLUME_ADDITIVES;
+            default -> KEY_UNIT_VOLUME;
+        };
+
+        String defaultValue = key.equals(KEY_UNIT_VOLUME_ELECTRICITY) ? "kWh" : getUnitVolume();
+        return prefs.getString(key, defaultValue);
     }
 
     public int getUnitFuelConsumption() {

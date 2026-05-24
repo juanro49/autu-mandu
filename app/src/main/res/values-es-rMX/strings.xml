@@ -265,7 +265,12 @@
     <string name="pref_title_behavior_auto_backup">Activar copias de seguridad automáticas</string>
     <string name="pref_title_behavior_keep_backups">Cantidad de copias de seguridad guardadas</string>
     <string name="pref_title_unit_currency">Moneda</string>
-    <string name="pref_title_unit_volume">Volumen</string>
+    <string name="pref_title_unit_volume">Volumen global</string>
+    <string name="pref_title_unit_volume_gasoline">Volumen gasolina</string>
+    <string name="pref_title_unit_volume_diesel">Volumen diésel</string>
+    <string name="pref_title_unit_volume_gas">Volumen gas</string>
+    <string name="pref_title_unit_volume_electricity">Volumen electricidad</string>
+    <string name="pref_title_unit_volume_additives">Volumen aditivos</string>
     <string name="pref_title_unit_distance">Distancia</string>
     <string name="pref_title_unit_fuel_consumption">Consumo de combustible</string>
     <string name="pref_title_sync_setup">Configurar sincronización de copia de seguridad</string>

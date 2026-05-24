@@ -43,9 +43,15 @@ public class FuelPriceReport extends AbstractReport {
         private double mMax;
         private double mMin;
         private double mAverage;
+        private final String mUnit;
 
         public ReportChartData(Context context, FuelType fuelType, int color, List<Refueling> refuelings) {
             super(context, fuelType.getName(), color);
+
+            Preferences prefs = new Preferences(context);
+            FuelCategory category = FuelCategory.fromKey(fuelType.getCategory());
+            mUnit = String.format("%s/%s", prefs.getUnitCurrency(), category.getVolumeUnit(context));
+            mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
 
             mMax = Double.MIN_VALUE;
             mMin = Double.MAX_VALUE;
@@ -89,10 +95,13 @@ public class FuelPriceReport extends AbstractReport {
         public double getMin() {
             return mMin;
         }
+
+        public String getUnit() {
+            return mUnit;
+        }
     }
 
     private final List<AbstractReportChartData> mReportChartData = new ArrayList<>();
-    private String mUnit;
     private DateFormat mDateFormat;
     private String mMostRecentFuelTypeName;
 
@@ -142,8 +151,6 @@ public class FuelPriceReport extends AbstractReport {
     protected void onUpdate() {
         mReportChartData.clear();
         mMostRecentFuelTypeName = null;
-        Preferences prefs = new Preferences(mContext);
-        mUnit = String.format("%s/%s", prefs.getUnitCurrency(), prefs.getUnitVolume());
         mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
@@ -187,11 +194,11 @@ public class FuelPriceReport extends AbstractReport {
 
                 Section section = addDataSection(sectionName, color);
                 section.addItem(new Item(mContext.getString(R.string.report_highest),
-                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getMax(), mUnit)));
+                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getMax(), data.getUnit())));
                 section.addItem(new Item(mContext.getString(R.string.report_lowest),
-                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getMin(), mUnit)));
+                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getMin(), data.getUnit())));
                 section.addItem(new Item(mContext.getString(R.string.report_average),
-                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getAverage(), mUnit)));
+                        String.format(Locale.getDefault(), PRICE_FORMAT, data.getAverage(), data.getUnit())));
 
                 currentColor++;
             }

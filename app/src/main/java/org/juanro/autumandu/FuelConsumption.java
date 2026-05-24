@@ -67,9 +67,13 @@ public class FuelConsumption {
     }
 
     public String getUnitLabel(Type consumptionType) {
+        return getUnitLabel(consumptionType, this.unitVolume);
+    }
+
+    public String getUnitLabel(Type consumptionType, String customUnitVolume) {
         return switch (consumptionType) {
-            case DIST_FOR_VOL -> String.format(Locale.getDefault(), "%s/%s", unitDistance, unitVolume);
-            case VOL_FOR_DIST -> String.format(Locale.getDefault(), "%s/100%s", unitVolume, unitDistance);
+            case DIST_FOR_VOL -> String.format(Locale.getDefault(), "%s/%s", unitDistance, customUnitVolume);
+            case VOL_FOR_DIST -> String.format(Locale.getDefault(), "%s/100%s", customUnitVolume, unitDistance);
             case MPG_UK -> "mpg (UK)";
             case MPG_US -> "mpg (US)";
         };

@@ -44,6 +44,7 @@ import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
 import org.juanro.autumandu.gui.dialog.TimePickerDialogFragment;
 import org.juanro.autumandu.gui.util.DateTimeInput;
 import org.juanro.autumandu.gui.util.RefuelingValidator;
+import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.model.entity.Trip;
@@ -277,11 +278,40 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
     }
 
     private void setupSpinners() {
-        mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), fuelTypes ->
-            spnFuelType.setAdapter(new FuelTypeArrayAdapter(requireContext(), fuelTypes)));
+        mViewModel.getFuelTypes().observe(getViewLifecycleOwner(), fuelTypes -> {
+            spnFuelType.setAdapter(new FuelTypeArrayAdapter(requireContext(), fuelTypes));
+
+            spnFuelType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                    FuelType selected = (FuelType) parent.getItemAtPosition(position);
+                    if (selected != null) {
+                        updateVolumeHint(FuelCategory.fromKey(selected.getCategory()));
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                }
+            });
+        });
 
         mViewModel.getStations().observe(getViewLifecycleOwner(), stations ->
             spnStation.setAdapter(new StationArrayAdapter(requireContext(), stations)));
+    }
+
+    private void updateVolumeHint(FuelCategory category) {
+        String volumeUnit = category.getVolumeUnit(requireContext());
+        String pricePerUnit = String.format("%s/%s", new Preferences(requireContext()).getUnitCurrency(), volumeUnit);
+
+        switch (mPriceEntryMode) {
+            case TOTAL_AND_VOLUME -> addUnitToHint(edtVolume, R.string.hint_volume, volumeUnit);
+            case PER_UNIT_AND_TOTAL -> addUnitToHint(edtVolume, R.string.hint_price_per_unit, pricePerUnit);
+            case PER_UNIT_AND_VOLUME -> {
+                addUnitToHint(edtVolume, R.string.hint_volume, volumeUnit);
+                addUnitToHint(edtPrice, R.string.hint_price_per_unit, pricePerUnit);
+            }
+        }
     }
 
     private static class FuelTypeArrayAdapter extends ArrayAdapter<FuelType> {

@@ -19,6 +19,8 @@ package org.juanro.autumandu.model.entity;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+
+import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 
 import java.util.ArrayList;
@@ -53,6 +55,10 @@ public enum FuelCategory {
 
     public String getName(Context context) {
         return context.getString(nameResId);
+    }
+
+    public String getVolumeUnit(Context context) {
+        return new Preferences(context).getUnitVolume(this);
     }
 
     @NonNull
