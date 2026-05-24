@@ -44,6 +44,11 @@
             android:key="behavior_show_car_menu"
             android:summary="@string/pref_summary_behavior_show_car_menu"
             android:title="@string/pref_title_behavior_show_car_menu" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="behavior_show_carburoid"
+            android:summary="@string/pref_summary_behavior_show_carburoid"
+            android:title="@string/pref_title_behavior_show_carburoid" />
         <ListPreference
             android:defaultValue="TOTAL"
             android:key="behavior_distance_entry_mode"

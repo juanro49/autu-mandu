@@ -61,6 +61,7 @@ public class Preferences {
     public static final String KEY_UNIT_FUEL_CONSUMPTION = "unit_fuel_consumption";
     public static final String KEY_AUTO_GUESS_MISSING_DATA = "behavior_auto_guess_missing_data";
     public static final String KEY_SHOW_CAR_MENU = "behavior_show_car_menu";
+    public static final String KEY_SHOW_CARBUROID = "behavior_show_carburoid";
     public static final String KEY_BACKUP_FOLDER = "backup_folder";
     public static final String KEY_BACKUP_FOLDER_DEFAULT = "backup_folder_default";
     public static final String KEY_AUTO_BACKUP = "behavior_auto_backup";
@@ -205,6 +206,10 @@ public class Preferences {
 
     public boolean isShowCarMenu() {
         return prefs.getBoolean(KEY_SHOW_CAR_MENU, true);
+    }
+
+    public boolean isShowCarburoidEnabled() {
+        return prefs.getBoolean(KEY_SHOW_CARBUROID, true);
     }
 
     public String getBackupPath() {

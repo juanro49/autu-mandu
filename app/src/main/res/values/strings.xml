@@ -268,6 +268,8 @@
     <string name="pref_title_category_export">Export &amp; Import</string>
     <string name="pref_title_behavior_default_car">Default car</string>
     <string name="pref_title_behavior_show_car_menu">Show car menu</string>
+    <string name="pref_title_behavior_show_carburoid">Show Carburoid button</string>
+    <string name="pref_summary_behavior_show_carburoid">Show button to find gas stations using Carburoid in fuel price report</string>
     <string name="pref_title_behavior_distance_entry_mode">Distance Entry Mode</string>
     <string name="pref_title_behavior_price_entry_mode">Price Entry Mode</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Balance missing refuelings (Beta)</string>

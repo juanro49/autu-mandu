@@ -256,6 +256,8 @@
     <string name="pref_title_category_export">Exportación e importación</string>
     <string name="pref_title_behavior_default_car">Vehículo predeterminado</string>
     <string name="pref_title_behavior_show_car_menu">Mostrar menú de vehículos</string>
+    <string name="pref_title_behavior_show_carburoid">Mostrar botón de Carburoid</string>
+    <string name="pref_summary_behavior_show_carburoid">Mostrar botón para buscar gasolineras usando Carburoid en el informe de precios de combustible</string>
     <string name="pref_title_behavior_distance_entry_mode">Modo de entrada de distancia</string>
     <string name="pref_title_behavior_price_entry_mode">Modo de entrada de precio</string>
     <string name="pref_title_behavior_auto_guess_missing_data">Equilibrar recargas faltantes (Beta)</string>

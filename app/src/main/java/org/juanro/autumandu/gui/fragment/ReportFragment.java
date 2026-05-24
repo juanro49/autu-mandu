@@ -21,6 +21,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,6 +54,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.report.AbstractReport;
 import org.juanro.autumandu.data.report.AbstractReportChartData;
@@ -71,7 +74,7 @@ import org.juanro.autumandu.util.Carburoid;
 import org.juanro.autumandu.viewmodel.ReportViewModel;
 
 public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClickListener,
-        BackPressedListener {
+        BackPressedListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -176,12 +179,17 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             txtTitle.setText(report.getTitle());
 
             if (report instanceof FuelPriceReport) {
-                btnReportAction.setVisibility(View.VISIBLE);
-                btnReportAction.setText(R.string.btn_find_station_carburoid);
-                btnReportAction.setOnClickListener(v -> {
-                    String fuelName = ((FuelPriceReport) report).getMostRecentFuelTypeName();
-                    Carburoid.launch(v.getContext(), fuelName);
-                });
+                Preferences prefs = new Preferences(itemView.getContext());
+                if (prefs.isShowCarburoidEnabled()) {
+                    btnReportAction.setVisibility(View.VISIBLE);
+                    btnReportAction.setText(R.string.btn_find_station_carburoid);
+                    btnReportAction.setOnClickListener(v -> {
+                        String fuelName = ((FuelPriceReport) report).getMostRecentFuelTypeName();
+                        Carburoid.launch(v.getContext(), fuelName);
+                    });
+                } else {
+                    btnReportAction.setVisibility(View.GONE);
+                }
             } else {
                 btnReportAction.setVisibility(View.GONE);
             }
@@ -372,6 +380,28 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .registerOnSharedPreferenceChangeListener(this);
+        reportAdapter.notifyItemRangeChanged(0, reportAdapter.getItemCount());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (Preferences.KEY_SHOW_CARBUROID.equals(key)) {
+            reportAdapter.notifyItemRangeChanged(0, reportAdapter.getItemCount());
+        }
     }
 
     @Override
