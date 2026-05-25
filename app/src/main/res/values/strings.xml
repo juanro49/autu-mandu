@@ -457,4 +457,14 @@
     <string name="carburoid_url" translatable="false">https://github.com/vokimon/carburoid</string>
     <string name="carburoid_package" translatable="false">net.canvoki.carburoid</string>
     <string name="toast_carburoid_not_installed">Carburoid is not installed. Opening GitHub page.</string>
+
+    <string name="pref_title_import_carbudget">Import from CarBudget (SailfishOS)</string>
+    <string name="pref_summary_import_carbudget">Import data from a CarBudget (.cbg) database file.</string>
+    <string name="alert_import_carbudget_title">Import CarBudget (SailfishOS)</string>
+    <string name="alert_import_carbudget_message">This will import refuelings and costs from the selected CarBudget file.</string>
+    <string name="alert_import_carbudget_select_car">Select target car for import:</string>
+    <string name="alert_import_carbudget_create_new_car">Create new car: %s</string>
+    <string name="toast_import_carbudget_success">Import from CarBudget completed successfully.</string>
+    <string name="toast_import_carbudget_result">Imported %1$d refuelings, %2$d other costs and %3$d tire sets.</string>
+    <string name="toast_import_carbudget_failed">Error importing from CarBudget: %s</string>
 </resources>

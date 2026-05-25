@@ -424,4 +424,14 @@
     <string name="import_select_file">Seleccionar archivo CSV</string>
     <string name="btn_find_station_carburoid">Buscar con Carburoid</string>
     <string name="toast_carburoid_not_installed">Carburoid no está instalado. Abriendo página de GitHub.</string>
+
+    <string name="pref_title_import_carbudget">Importar desde CarBudget (SailfishOS)</string>
+    <string name="pref_summary_import_carbudget">Importar datos desde un archivo de base de datos de CarBudget (.cbg).</string>
+    <string name="alert_import_carbudget_title">Importar CarBudget (SailfishOS)</string>
+    <string name="alert_import_carbudget_message">Esto importará repostajes y gastos del archivo de CarBudget seleccionado.</string>
+    <string name="alert_import_carbudget_select_car">Selecciona el vehículo de destino para la importación:</string>
+    <string name="alert_import_carbudget_create_new_car">Crear nuevo vehículo: %s</string>
+    <string name="toast_import_carbudget_success">La importación desde CarBudget se completó con éxito.</string>
+    <string name="toast_import_carbudget_result">Se importaron %1$d repostajes, %2$d otros gastos y %3$d juegos de neumáticos.</string>
+    <string name="toast_import_carbudget_failed">Error al importar desde CarBudget: %s</string>
 </resources>

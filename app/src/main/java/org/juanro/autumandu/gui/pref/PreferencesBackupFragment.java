@@ -39,10 +39,22 @@ import androidx.preference.SwitchPreferenceCompat;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.AuthenticatorAddAccountActivity;
+import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.entity.Car;
+import org.juanro.autumandu.util.CarBudgetImportResult;
+import org.juanro.autumandu.util.CarBudgetImporter;
+import org.juanro.autumandu.util.FileCopyUtil;
 import org.juanro.autumandu.util.sync.AbstractSyncProvider;
 import org.juanro.autumandu.util.sync.SyncManager;
 import org.juanro.autumandu.util.sync.SyncProviders;
 import org.juanro.autumandu.viewmodel.BackupViewModel;
+
+import java.io.File;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class PreferencesBackupFragment extends PreferenceFragmentCompat {
     public static final String EXTRA_IMPORT_CSV_URI = "import_csv_uri";
@@ -56,6 +68,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
     private static final int REQUEST_RESTORE_PERMISSIONS = 3;
     private static final int REQUEST_EXPORT_PERMISSIONS = 4;
     private static final int REQUEST_IMPORT_PERMISSIONS = 5;
+    private static final int REQUEST_IMPORT_CARBUDGET_PERMISSIONS = 6;
 
     private int mPendingPermissionRequestCode = -1;
     private BackupViewModel mViewModel;
@@ -118,10 +131,20 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
             }
     );
 
+    private final ActivityResultLauncher<String[]> mOpenCarBudgetDocumentLauncher = registerForActivityResult(
+            new ActivityResultContracts.OpenDocument(),
+            uri -> {
+                if (uri != null) {
+                    performImportCarBudget(uri);
+                }
+            }
+    );
+
     private final OnPreferenceClickListener mBackup = createOnClickListenerToAskForStorageAccess(REQUEST_BACKUP_PERMISSIONS);
     private final OnPreferenceClickListener mRestore = createOnClickListenerToAskForStorageAccess(REQUEST_RESTORE_PERMISSIONS);
     private final OnPreferenceClickListener mExport = createOnClickListenerToAskForStorageAccess(REQUEST_EXPORT_PERMISSIONS);
     private final OnPreferenceClickListener mImport = createOnClickListenerToAskForStorageAccess(REQUEST_IMPORT_PERMISSIONS);
+    private final OnPreferenceClickListener mImportCarBudget = createOnClickListenerToAskForStorageAccess(REQUEST_IMPORT_CARBUDGET_PERMISSIONS);
 
     private final OnPreferenceClickListener mSelectBackupFolder = preference -> {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
@@ -177,6 +200,11 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
             importCsv.setOnPreferenceClickListener(mImport);
         }
 
+        Preference importCarBudget = findPreference("import_carbudget");
+        if (importCarBudget != null) {
+            importCarBudget.setOnPreferenceClickListener(mImportCarBudget);
+        }
+
         Preference selectBackupFolder = findPreference("backup_folder");
         if (selectBackupFolder != null) {
             selectBackupFolder.setOnPreferenceClickListener(mSelectBackupFolder);
@@ -210,6 +238,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
             case REQUEST_RESTORE_PERMISSIONS -> performRestore();
             case REQUEST_EXPORT_PERMISSIONS -> performExport();
             case REQUEST_IMPORT_PERMISSIONS -> performImport();
+            case REQUEST_IMPORT_CARBUDGET_PERMISSIONS -> performImportCarBudget();
             default -> {
                 // Not a permission request that requires an action
             }
@@ -288,6 +317,82 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
         } else {
             Toast.makeText(requireContext(), R.string.pref_summary_import_csv_no_data, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void performImportCarBudget() {
+        mOpenCarBudgetDocumentLauncher.launch(new String[]{"*/*"});
+    }
+
+    private void performImportCarBudget(Uri uri) {
+        Context context = requireContext();
+        File tempFile = new File(context.getCacheDir(), "import.cbg");
+        AutuManduDatabase.DB_EXECUTOR.execute(() -> {
+            try (InputStream inputStream = context.getContentResolver().openInputStream(uri)) {
+                if (inputStream == null || !FileCopyUtil.copyFile(inputStream, new java.io.FileOutputStream(tempFile))) {
+                    throw new Exception("Failed to copy file to cache");
+                }
+
+                CarBudgetImporter importer = new CarBudgetImporter(context);
+                try (SQLiteDatabase db = SQLiteDatabase.openDatabase(tempFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY)) {
+                    Map<String, String> metadata = importer.getMetadata(db);
+                    String carDesc = importer.getCarDescription(metadata);
+
+                    AutuManduDatabase localDb = AutuManduDatabase.getInstance(context);
+                    List<Car> existingCars = localDb.getCarDao().getNotSuspended();
+
+                    requireActivity().runOnUiThread(() -> {
+                        String[] options = new String[existingCars.size() + 1];
+                        options[0] = getString(R.string.alert_import_carbudget_create_new_car, carDesc);
+                        for (int i = 0; i < existingCars.size(); i++) {
+                            options[i + 1] = existingCars.get(i).getName();
+                        }
+
+                        final int[] selectedIndex = {0};
+                        new androidx.appcompat.app.AlertDialog.Builder(context)
+                                .setTitle(R.string.alert_import_carbudget_title)
+                                .setSingleChoiceItems(options, 0, (dialog, which) -> selectedIndex[0] = which)
+                                .setPositiveButton(R.string.import_, (dialog, which) -> AutuManduDatabase.DB_EXECUTOR.execute(() -> {
+                                    long carId;
+                                    if (selectedIndex[0] == 0) {
+                                        carId = -1;
+                                    } else {
+                                        carId = existingCars.get(selectedIndex[0] - 1).getId();
+                                    }
+
+                                    CarBudgetImportResult result = importer.importDatabase(tempFile, carId);
+
+                                    // Cleanup temp file
+                                    if (tempFile.exists() && !tempFile.delete()) {
+                                        Log.w("PreferencesBackup", "Failed to delete temporary import file");
+                                    }
+
+                                    if (isAdded()) {
+                                        requireActivity().runOnUiThread(() -> {
+                                            if (result.isSuccess()) {
+                                                String summary = getString(R.string.toast_import_carbudget_result,
+                                                        result.getRefuelingCount(), result.getOtherCostCount(), result.getTireCount());
+                                                Toast.makeText(context, summary, Toast.LENGTH_LONG).show();
+                                                recreateAllActivities();
+                                                requireActivity().finish();
+                                            } else {
+                                                Toast.makeText(context, getString(R.string.toast_import_carbudget_failed, result.getErrorMessage()), Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+                                }))
+                                .setNegativeButton(android.R.string.cancel, null)
+                                .show();
+                    });
+                }
+            } catch (Exception e) {
+                Log.e("PreferencesBackup", "CarBudget import failed", e);
+                requireActivity().runOnUiThread(() -> {
+                    if (isAdded()) {
+                        Toast.makeText(context, getString(R.string.toast_import_carbudget_failed, e.getMessage()), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
     }
 
     private void updateSyncPreference() {

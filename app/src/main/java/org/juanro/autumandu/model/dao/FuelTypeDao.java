@@ -56,6 +56,9 @@ public interface FuelTypeDao {
     """)
     LiveData<FuelType> getMostUsedForCarLiveData(long carId);
 
+    @Query("SELECT * FROM fuel_type WHERE fuel_type__name = :name LIMIT 1")
+    FuelType getByName(String name);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(FuelType... fuelType);
 

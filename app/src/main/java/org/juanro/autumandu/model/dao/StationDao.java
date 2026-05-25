@@ -75,6 +75,9 @@ public interface StationDao {
     """)
     LiveData<List<org.juanro.autumandu.model.dto.StationWithVolume>> getAllWithVolumeLiveData();
 
+    @Query("SELECT * FROM station WHERE station__name = :name LIMIT 1")
+    Station getByName(String name);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(Station... station);
 

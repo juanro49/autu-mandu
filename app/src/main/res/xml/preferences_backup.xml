@@ -63,5 +63,9 @@
             android:key="import_csv"
             android:summary="@string/pref_summary_import_csv"
             android:title="@string/pref_title_importcsv" />
+        <Preference
+            android:key="import_carbudget"
+            android:summary="@string/pref_summary_import_carbudget"
+            android:title="@string/pref_title_import_carbudget" />
     </PreferenceCategory>
 </PreferenceScreen>
