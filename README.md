@@ -24,6 +24,7 @@ The following options are currently included:
 - [x] Costs in general
 - [x] Trip journal
 - [x] Stations map with price (via recommended app [Carburoid](https://github.com/vokimon/carburoid))
+- [x] Import data from [CarBudget](https://github.com/condo4/carbudget) (SailfishOS)
 
 You can add reminders based on mileage and time for car related recurring actions, e.g. general
 inspection once a year.
