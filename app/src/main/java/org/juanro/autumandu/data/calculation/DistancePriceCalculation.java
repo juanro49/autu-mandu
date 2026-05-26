@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.AutuManduDatabase;
@@ -102,7 +103,8 @@ public class DistancePriceCalculation extends AbstractCalculation {
 
     private void processCarData(Car car, List<RefuelingWithDetails> carRefuelings, List<OtherCost> otherCosts) {
         Preferences prefsForGuess = new Preferences(mContext);
-        List<BalancedRefueling> balanced = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+        var consumptionType = FuelConsumption.Type.fromId(prefsForGuess.getUnitFuelConsumption());
+        List<BalancedRefueling> balanced = BalancedRefueling.balance(carRefuelings, consumptionType, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
 
         double refuelingCosts = balanced.stream().mapToDouble(BalancedRefueling::getPrice).sum();
         int refuelingMaxMileage = balanced.stream().mapToInt(BalancedRefueling::getMileage).max().orElse(Integer.MIN_VALUE);

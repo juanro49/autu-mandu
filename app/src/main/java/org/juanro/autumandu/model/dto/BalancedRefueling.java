@@ -18,9 +18,11 @@ package org.juanro.autumandu.model.dto;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.util.Calculator;
 
 public class BalancedRefueling {
@@ -37,24 +39,21 @@ public class BalancedRefueling {
     private long stationId;
     private long carId;
 
-    private String fuelTypeName;
-    private String fuelTypeCategory;
-    private String stationName;
-    private String carName;
-    private int carColor;
-    private int carInitialMileage;
-    private Date carSuspendedSince;
-    private double carBuyingPrice;
-    private int carNumTires;
+    private final String fuelTypeName;
+    private final String fuelTypeCategory;
+    private final String stationName;
+    private final String carName;
+    private final int carColor;
+    private final int carInitialMileage;
+    private final Date carSuspendedSince;
+    private final double carBuyingPrice;
+    private final int carNumTires;
 
     private boolean guessed = false;
     private boolean valid = true;
 
     private Float consumption;
     private Integer mileageDifference;
-
-    public BalancedRefueling() {
-    }
 
     public BalancedRefueling(RefuelingWithDetails refueling) {
         this.id = refueling.id();
@@ -113,16 +112,18 @@ public class BalancedRefueling {
      * Balances a list of refuelings by guessing missing data and calculating consumption.
      *
      * @param input List of refuelings (usually ordered newest first)
+     * @param consumptionType The unit type for fuel consumption calculation
      * @param guessMissingData Whether to guess missing data (interpolation)
      * @param orderDescending Whether to return the result ordered newest first
      * @return Balanced list
      */
     public static List<BalancedRefueling> balance(List<RefuelingWithDetails> input,
+                                                 FuelConsumption.Type consumptionType,
                                                  boolean guessMissingData,
                                                  boolean orderDescending) {
         List<BalancedRefueling> refuelings = new ArrayList<>();
         List<RefuelingWithDetails> sortedInput = new ArrayList<>(input);
-        Collections.sort(sortedInput, (o1, o2) -> o1.date().compareTo(o2.date()));
+        sortedInput.sort(Comparator.comparing(RefuelingWithDetails::date));
 
         for (RefuelingWithDetails rwd : sortedInput) {
             refuelings.add(new BalancedRefueling(rwd));
@@ -135,10 +136,10 @@ public class BalancedRefueling {
         boolean allValid = areRefuelingsValid(refuelings);
 
         if (guessMissingData && allValid) {
-            refuelings = calculateBalancedRefuelings(refuelings);
+            calculateBalancedRefuelings(refuelings);
         }
 
-        calculateConsumptions(refuelings);
+        calculateConsumptions(refuelings, consumptionType);
 
         if (orderDescending) {
             Collections.reverse(refuelings);
@@ -147,7 +148,7 @@ public class BalancedRefueling {
         return refuelings;
     }
 
-    private static void calculateConsumptions(List<BalancedRefueling> refuelings) {
+    private static void calculateConsumptions(List<BalancedRefueling> refuelings, FuelConsumption.Type consumptionType) {
         for (int i = 0; i < refuelings.size(); i++) {
             BalancedRefueling current = refuelings.get(i);
 
@@ -157,12 +158,12 @@ public class BalancedRefueling {
             }
 
             if (!current.isPartial()) {
-                current.setConsumption(calculateConsumptionForFullRefueling(refuelings, i));
+                current.setConsumption(calculateConsumptionForFullRefueling(refuelings, i, consumptionType));
             }
         }
     }
 
-    private static Float calculateConsumptionForFullRefueling(List<BalancedRefueling> refuelings, int index) {
+    private static Float calculateConsumptionForFullRefueling(List<BalancedRefueling> refuelings, int index, FuelConsumption.Type consumptionType) {
         BalancedRefueling current = refuelings.get(index);
         float volumeSinceLastFull = current.getVolume();
         for (int j = index - 1; j >= 0; j--) {
@@ -170,7 +171,7 @@ public class BalancedRefueling {
             if (!older.isPartial()) {
                 int diffSinceLastFull = current.getMileage() - older.getMileage();
                 if (diffSinceLastFull > 0) {
-                    return (volumeSinceLastFull / diffSinceLastFull) * 100;
+                    return FuelConsumption.computeFuelConsumption(consumptionType, volumeSinceLastFull, diffSinceLastFull);
                 }
                 break;
             }
@@ -179,10 +180,10 @@ public class BalancedRefueling {
         return null;
     }
 
-    private static List<BalancedRefueling> calculateBalancedRefuelings(List<BalancedRefueling> refuelings) {
+    private static void calculateBalancedRefuelings(List<BalancedRefueling> refuelings) {
         int avgDistance = getBalancedAverageDistanceOfFullRefuelings(refuelings);
         float avgVolume = getBalancedAverageVolumeOfFullRefuelings(refuelings);
-        if (avgDistance <= 0) return refuelings;
+        if (avgDistance <= 0) return;
         float avgConsumption = avgVolume / avgDistance;
         float avgPricePerUnit = getAveragePricePerUnit(refuelings);
 
@@ -191,25 +192,18 @@ public class BalancedRefueling {
         int i = 0;
         while (i < refuelings.size()) {
             BalancedRefueling refueling = refuelings.get(i);
-            if (context.lastFullRefueling < 0) {
-                if (!refueling.isPartial()) {
-                    context.lastFullRefueling = i;
-                }
-                i++;
-            } else {
+            if (context.lastFullRefueling >= 0) {
                 context.distance += refueling.getMileage() - refuelings.get(i - 1).getMileage();
                 context.volume += refueling.getVolume();
-                if (refueling.isPartial()) {
-                    i++;
-                } else {
+                if (!refueling.isPartial()) {
                     i = balanceFullRefuelingInterval(refuelings, i, context);
                     context.resetInterval(i);
-                    i++;
                 }
+            } else if (!refueling.isPartial()) {
+                context.lastFullRefueling = i;
             }
+            i++;
         }
-
-        return refuelings;
     }
 
     private static int balanceFullRefuelingInterval(List<BalancedRefueling> refuelings, int currentIndex, RefuelingBalanceContext ctx) {
@@ -249,7 +243,7 @@ public class BalancedRefueling {
                 pDistanceLimit += (int) (refuelings.get(pI).getVolume() / ctx.avgConsumption);
             } else {
                 float newVolume = Math.min(ctx.avgDistance * ctx.avgConsumption, remainingMissing);
-                BalancedRefueling guess = createGuessedRefueling(refuelings, pI, ctx, newVolume, false);
+                BalancedRefueling guess = createGuessedRefueling(refuelings, pI, ctx, newVolume);
                 refuelings.add(pI, guess);
 
                 remainingMissing -= newVolume;
@@ -283,19 +277,18 @@ public class BalancedRefueling {
             refuelings.add(i, guess);
 
             remainingMissing -= newVolume;
-            pDist = ctx.avgDistance;
             ctx.lastFullRefueling = i;
             i++;
         }
         return i;
     }
 
-    private static BalancedRefueling createGuessedRefueling(List<BalancedRefueling> refuelings, int index, RefuelingBalanceContext ctx, float volume, boolean partial) {
+    private static BalancedRefueling createGuessedRefueling(List<BalancedRefueling> refuelings, int index, RefuelingBalanceContext ctx, float volume) {
         BalancedRefueling refueling = refuelings.get(index);
         float volumeSinceLastFull = volume + calculateVolumeInInterval(refuelings, ctx.lastFullRefueling, index - 1);
         int newMileage = ctx.lastFullRefuelingMileage(refuelings, ctx.lastFullRefueling) + (int) (volumeSinceLastFull / ctx.avgConsumption);
 
-        return createGuessedRefuelingInternal(refuelings, index, ctx, volume, newMileage, partial, refueling);
+        return createGuessedRefuelingInternal(refuelings, index, ctx, volume, newMileage, false, refueling);
     }
 
     private static BalancedRefueling createGuessedRefuelingAtEnd(List<BalancedRefueling> refuelings, int index, RefuelingBalanceContext ctx, float volume, int mileage, boolean partial) {
@@ -490,23 +483,14 @@ public class BalancedRefueling {
     public long getCarId() { return carId; }
     public void setCarId(long carId) { this.carId = carId; }
     public String getFuelTypeName() { return fuelTypeName; }
-    public void setFuelTypeName(String fuelTypeName) { this.fuelTypeName = fuelTypeName; }
     public String getFuelTypeCategory() { return fuelTypeCategory; }
-    public void setFuelTypeCategory(String fuelTypeCategory) { this.fuelTypeCategory = fuelTypeCategory; }
     public String getStationName() { return stationName; }
-    public void setStationName(String stationName) { this.stationName = stationName; }
     public String getCarName() { return carName; }
-    public void setCarName(String carName) { this.carName = carName; }
     public int getCarColor() { return carColor; }
-    public void setCarColor(int carColor) { this.carColor = carColor; }
     public int getCarInitialMileage() { return carInitialMileage; }
-    public void setCarInitialMileage(int carInitialMileage) { this.carInitialMileage = carInitialMileage; }
     public Date getCarSuspendedSince() { return carSuspendedSince; }
-    public void setCarSuspendedSince(Date carSuspendedSince) { this.carSuspendedSince = carSuspendedSince; }
     public double getCarBuyingPrice() { return carBuyingPrice; }
-    public void setCarBuyingPrice(double carBuyingPrice) { this.carBuyingPrice = carBuyingPrice; }
     public int getCarNumTires() { return carNumTires; }
-    public void setCarNumTires(int carNumTires) { this.carNumTires = carNumTires; }
     public boolean isGuessed() { return guessed; }
     public void setGuessed(boolean guessed) { this.guessed = guessed; }
     public boolean isValid() { return valid; }

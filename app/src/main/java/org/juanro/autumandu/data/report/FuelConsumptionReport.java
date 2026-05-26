@@ -146,12 +146,11 @@ public class FuelConsumptionReport extends AbstractReport {
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
         synchronized (mCachedChartData) {
-            final Integer optionKey = Integer.valueOf(chartOption);
-            if (mCachedChartData.containsKey(optionKey)) {
-                return mCachedChartData.get(optionKey);
+            if (mCachedChartData.containsKey(chartOption)) {
+                return mCachedChartData.get(chartOption);
             }
             List<AbstractReportChartData> data = new ArrayList<>(reportData);
-            mCachedChartData.put(optionKey, data);
+            mCachedChartData.put(chartOption, data);
             return data;
         }
     }
@@ -184,7 +183,8 @@ public class FuelConsumptionReport extends AbstractReport {
         if (carRefuelings == null) carRefuelings = Collections.emptyList();
 
         Preferences prefsForGuess = new Preferences(mContext);
-        List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+        FuelConsumption.Type consumptionType = Type.fromId(prefsForGuess.getUnitFuelConsumption());
+        List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, consumptionType, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
         if (balancedRefuelings == null) balancedRefuelings = Collections.emptyList();
 
         Map<String, List<BalancedRefueling>> refuelingsByCategoryKey = balancedRefuelings.stream()

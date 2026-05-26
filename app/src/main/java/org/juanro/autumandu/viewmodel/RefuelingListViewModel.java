@@ -24,6 +24,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import org.juanro.autumandu.FuelConsumption;
+import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.dto.BalancedRefueling;
 
@@ -45,9 +47,10 @@ public class RefuelingListViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<BalancedRefueling>> getBalancedRefuelings() {
-        var prefs = new org.juanro.autumandu.Preferences(getApplication());
+        var prefs = new Preferences(getApplication());
+        var consumptionType = FuelConsumption.Type.fromId(prefs.getUnitFuelConsumption());
         return Transformations.map(db.getRefuelingDao().getWithDetailsForCarLiveData(carId.getValue() != null ? carId.getValue() : -1),
-                input -> BalancedRefueling.balance(input, prefs.isAutoGuessMissingDataEnabled(), true));
+                input -> BalancedRefueling.balance(input, consumptionType, prefs.isAutoGuessMissingDataEnabled(), true));
     }
 
     public void delete(long id) {

@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.AutuManduDatabase;
@@ -49,7 +50,7 @@ public class MileageReport extends AbstractReport {
 
             for (BalancedRefueling refueling : refuelings) {
                 String tooltip = makeTooltip(car.getName(), refueling.getMileage(),
-                        refueling.getDate(), GRAPH_OPTION_ACCUMULATED, refueling.isGuessed());
+                        refueling.getDate(), refueling.isGuessed());
 
                 add(ReportDateHelper.toFloat(refueling.getDate()),
                         (float) refueling.getMileage(),
@@ -58,16 +59,13 @@ public class MileageReport extends AbstractReport {
             }
         }
 
-        private String makeTooltip(String carName, int mileage, Date date, int option, boolean guessed) {
+        private String makeTooltip(String carName, int mileage, Date date, boolean guessed) {
             String tooltip = mContext.getString(R.string.report_toast_mileage,
                     carName,
                     mileage,
                     mUnit,
-                    formatXValue(ReportDateHelper.toFloat(date), option));
-            if (guessed) {
-                tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
-            }
-            return tooltip;
+                    formatXValue(ReportDateHelper.toFloat(date), GRAPH_OPTION_ACCUMULATED));
+            return guessed ? tooltip + "\n" + mContext.getString(R.string.report_toast_guessed) : tooltip;
         }
     }
 
@@ -80,7 +78,7 @@ public class MileageReport extends AbstractReport {
                 if (lastRefuelingMileage > -1) {
                     int mileageDiff = refueling.getMileage() - lastRefuelingMileage;
                     String tooltip = makeTooltip(car.getName(), mileageDiff,
-                            refueling.getDate(), GRAPH_OPTION_PER_REFUELING, refueling.isGuessed());
+                            refueling.getDate(), refueling.isGuessed());
 
                     add(ReportDateHelper.toFloat(refueling.getDate()),
                             (float) mileageDiff,
@@ -92,16 +90,13 @@ public class MileageReport extends AbstractReport {
             }
         }
 
-        private String makeTooltip(String carName, int mileage, Date date, int option, boolean guessed) {
+        private String makeTooltip(String carName, int mileage, Date date, boolean guessed) {
             String tooltip = mContext.getString(R.string.report_toast_mileage,
                     carName,
                     mileage,
                     mUnit,
-                    formatXValue(ReportDateHelper.toFloat(date), option));
-            if (guessed) {
-                tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
-            }
-            return tooltip;
+                    formatXValue(ReportDateHelper.toFloat(date), GRAPH_OPTION_PER_REFUELING));
+            return guessed ? tooltip + "\n" + mContext.getString(R.string.report_toast_guessed) : tooltip;
         }
     }
 
@@ -192,9 +187,8 @@ public class MileageReport extends AbstractReport {
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
         synchronized (mCachedChartData) {
-            final Integer optionKey = Integer.valueOf(chartOption);
-            if (mCachedChartData.containsKey(optionKey)) {
-                return mCachedChartData.get(optionKey);
+            if (mCachedChartData.containsKey(chartOption)) {
+                return mCachedChartData.get(chartOption);
             }
 
             List<AbstractReportChartData> data = switch (chartOption) {
@@ -203,7 +197,7 @@ public class MileageReport extends AbstractReport {
                 default -> new ArrayList<>(reportDataPerMonth);
             };
 
-            mCachedChartData.put(optionKey, data);
+            mCachedChartData.put(chartOption, data);
             return data;
         }
     }
@@ -246,7 +240,8 @@ public class MileageReport extends AbstractReport {
         if (carRefuelings == null) carRefuelings = Collections.emptyList();
 
         Preferences prefsForGuess = new Preferences(mContext);
-        List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+        var consumptionType = FuelConsumption.Type.fromId(prefsForGuess.getUnitFuelConsumption());
+        List<BalancedRefueling> balancedRefuelings = BalancedRefueling.balance(carRefuelings, consumptionType, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
 
         // Accumulated data
         ReportChartDataAccumulated carDataAccumulated = new ReportChartDataAccumulated(

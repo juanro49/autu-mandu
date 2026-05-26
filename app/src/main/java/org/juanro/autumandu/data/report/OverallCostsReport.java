@@ -23,12 +23,12 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.AutuManduDatabase;
@@ -74,12 +74,11 @@ public class OverallCostsReport extends AbstractReport {
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
         synchronized (mCachedChartData) {
-            final Integer optionKey = Integer.valueOf(chartOption);
-            if (mCachedChartData.containsKey(optionKey)) {
-                return mCachedChartData.get(optionKey);
+            if (mCachedChartData.containsKey(chartOption)) {
+                return mCachedChartData.get(chartOption);
             }
             List<AbstractReportChartData> data = new ArrayList<>(mChartData);
-            mCachedChartData.put(optionKey, data);
+            mCachedChartData.put(chartOption, data);
             return data;
         }
     }
@@ -120,9 +119,8 @@ public class OverallCostsReport extends AbstractReport {
     }
 
     private void processCar(Car car, CarDataMaps dataMaps, GlobalCosts globalCosts, Preferences prefs) {
-        Long carIdObj = car.getId();
-        if (carIdObj == null) return;
-        long carId = carIdObj;
+        if (car.getId() == null) return;
+        long carId = car.getId();
 
         Section section = createSectionForCar(car);
         CarCosts costs = calculateCarCosts(car, carId, dataMaps, prefs);
@@ -150,8 +148,9 @@ public class OverallCostsReport extends AbstractReport {
         CarCosts costs = new CarCosts();
         costs.investment = car.getBuyingPrice();
 
+        var consumptionType = FuelConsumption.Type.fromId(prefs.getUnitFuelConsumption());
         costs.refuelings = BalancedRefueling.balance(dataMaps.refuelings.getOrDefault(carId, Collections.emptyList()),
-                prefs.isAutoGuessMissingDataEnabled(), false);
+                consumptionType, prefs.isAutoGuessMissingDataEnabled(), false);
         costs.refuelingsCount = costs.refuelings.size();
         for (BalancedRefueling refueling : costs.refuelings) {
             costs.fuel += refueling.getPrice();

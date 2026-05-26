@@ -25,7 +25,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -145,9 +144,8 @@ public class CostsReport extends AbstractReport {
     @Override
     public List<AbstractReportChartData> getRawChartData(int chartOption) {
         synchronized (mCachedChartData) {
-            final Integer optionKey = Integer.valueOf(chartOption);
-            if (mCachedChartData.containsKey(optionKey)) {
-                return mCachedChartData.get(optionKey);
+            if (mCachedChartData.containsKey(chartOption)) {
+                return mCachedChartData.get(chartOption);
             }
 
             List<AbstractReportChartData> data = new ArrayList<>();
@@ -156,7 +154,7 @@ public class CostsReport extends AbstractReport {
                     data.add(carData);
                 }
             }
-            mCachedChartData.put(optionKey, data);
+            mCachedChartData.put(chartOption, data);
             return data;
         }
     }
@@ -238,7 +236,8 @@ public class CostsReport extends AbstractReport {
 
     private void calculateFuelCosts(List<RefuelingWithDetails> carRefuelings, CalculationContext ctx, Preferences prefs) {
         if (carRefuelings == null) return;
-        List<BalancedRefueling> refuelings = BalancedRefueling.balance(carRefuelings, prefs.isAutoGuessMissingDataEnabled(), false);
+        var consumptionType = org.juanro.autumandu.FuelConsumption.Type.fromId(prefs.getUnitFuelConsumption());
+        List<BalancedRefueling> refuelings = BalancedRefueling.balance(carRefuelings, consumptionType, prefs.isAutoGuessMissingDataEnabled(), false);
         ctx.refuelingsCount = refuelings.size();
 
         for (BalancedRefueling refueling : refuelings) {

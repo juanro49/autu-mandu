@@ -5,6 +5,7 @@ import android.graphics.Color;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.model.entity.*;
 import org.juanro.autumandu.model.dto.BalancedRefueling;
 import org.juanro.autumandu.model.dto.RefuelingWithDetails;
@@ -116,7 +117,7 @@ public class DataRoundTripTest {
         assertEquals(3, refuelingsWithDetails.size());
 
         // 3. Balance
-        List<BalancedRefueling> balanced = BalancedRefueling.balance(refuelingsWithDetails, true, true);
+        List<BalancedRefueling> balanced = BalancedRefueling.balance(refuelingsWithDetails, FuelConsumption.Type.VOL_FOR_DIST, true, true);
 
         // 4. Verify Balancing Logic
         // In BalancedRefueling, calculateBalancedRefuelings calculates the consumption.

@@ -53,7 +53,8 @@ public class FuelConsumption {
         this.unitDistance = unitDistance;
     }
 
-    public float computeFuelConsumption(Type consumptionType, float volume, float distance) {
+    public static float computeFuelConsumption(Type consumptionType, float volume, float distance) {
+        if (distance <= 0) return 0;
         return switch (consumptionType) {
             case DIST_FOR_VOL -> distance / volume;
             case VOL_FOR_DIST -> (float) (100.0 * volume / distance);

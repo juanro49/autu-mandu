@@ -47,6 +47,9 @@ import org.juanro.autumandu.model.entity.Reminder;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.model.entity.TireList;
 import org.juanro.autumandu.model.entity.TireUsage;
+import org.juanro.autumandu.model.entity.Trip;
+import org.juanro.autumandu.model.entity.TripPrefab;
+import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
 
 /**
  * Class for exporting and importing data in CSV format.
@@ -669,7 +672,7 @@ public class CSVExportImport {
         var price = CSVConvert.toFloat(getSafe(csvRecord, OTHER_COST_PRICE));
         otherCost.setPrice(price != null ? price : 0f);
         var interval = CSVConvert.toRecurrenceInterval(getSafe(csvRecord, OTHER_COST_RECURRENCE_INTERVAL));
-        otherCost.setRecurrenceInterval(interval != null ? interval : org.juanro.autumandu.model.entity.helper.RecurrenceInterval.ONCE);
+        otherCost.setRecurrenceInterval(interval != null ? interval : RecurrenceInterval.ONCE);
         var mult = CSVConvert.toInteger(getSafe(csvRecord, OTHER_COST_RECURRENCE_MULTIPLIER));
         otherCost.setRecurrenceMultiplier(mult != null ? mult : 0);
         otherCost.setEndDate(CSVConvert.toDate(getSafe(csvRecord, OTHER_COST_END_DATE)));
@@ -820,8 +823,8 @@ public class CSVExportImport {
         });
     }
 
-    private org.juanro.autumandu.model.entity.Trip mapTrip(CSVRecord csvRecord, long id) {
-        var trip = new org.juanro.autumandu.model.entity.Trip();
+    private Trip mapTrip(CSVRecord csvRecord, long id) {
+        var trip = new Trip();
         trip.setId(id);
         trip.setCarId(Objects.requireNonNullElse(CSVConvert.toLong(getSafe(csvRecord, TRIP_CAR_ID)), 0L));
         trip.setRefuelingId(CSVConvert.toLong(getSafe(csvRecord, TRIP_REFUELING_ID)));
@@ -872,7 +875,7 @@ public class CSVExportImport {
             try {
                 Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
                 if (id != null) {
-                    var prefab = new org.juanro.autumandu.model.entity.TripPrefab();
+                    var prefab = new TripPrefab();
                     prefab.setId(id);
                     prefab.setCarId(Objects.requireNonNullElse(CSVConvert.toLong(getSafe(csvRecord, TRIP_PREFAB_CAR_ID)), 0L));
                     prefab.setType(Objects.requireNonNullElse(getSafe(csvRecord, TRIP_PREFAB_TYPE), "route"));

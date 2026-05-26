@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.AutuManduDatabase;
@@ -108,7 +109,8 @@ public class DistanceVolumeCalculation extends AbstractCalculation {
         if (category.isEmpty()) return;
 
         Preferences prefsForGuess = new Preferences(mContext);
-        List<BalancedRefueling> balanced = BalancedRefueling.balance(categoryRefuelings, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
+        var consumptionType = FuelConsumption.Type.fromId(prefsForGuess.getUnitFuelConsumption());
+        List<BalancedRefueling> balanced = BalancedRefueling.balance(categoryRefuelings, consumptionType, prefsForGuess.isAutoGuessMissingDataEnabled(), false);
 
         int lastMileage = 0;
         int totalDistance = 0;
