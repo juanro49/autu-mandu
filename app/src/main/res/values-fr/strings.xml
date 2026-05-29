@@ -264,4 +264,26 @@
     <string name="time_day">Jour(s)</string>
     <string name="time_month">Mois</string>
     <string name="time_year">Année(s)</string>
+    <string name="menu_remove_account">Supprimer le compte</string>
+    <string name="menu_add_station">Ajouter la station</string>
+    <string name="fab_add_tires">Nouveaux pneus</string>
+    <string name="fab_close_overlay">Fermer les options</string>
+    <string name="hint_start_date">Date de début</string>
+    <string name="hint_manufacturer">Fabricant</string>
+    <string name="hint_model">Modèle</string>
+    <string name="hint_buying_price">Prix d\'achat</string>
+    <string name="toast_sync_complete_no_changes">Synchronisation complète. Aucun changement n\'a été détecté.</string>
+    <string name="default_fuel_type">Par défaut</string>
+    <string name="default_station">Par défaut</string>
+    <string name="report_overall_costs_tires">Pneus</string>
+    <string name="report_recorded_mileage">Kilométrage enregistré</string>
+    <string name="report_total_volume">Volume total</string>
+    <string name="report_last_year">Σ depuis un an</string>
+    <string name="report_total_mileage">Nombre total de kilomètres</string>
+    <string name="report_price">%1$.2f %2$s</string>
+    <string name="pref_title_header_stations">Stations</string>
+    <string name="pref_title_behavior_auto_backup">Activer les sauvegardes automatiques</string>
+    <string name="pref_title_behavior_keep_backups">Nombre de sauvegardes gardées</string>
+    <string name="pref_title_unit_volume_gasoline">Volume d \' essence</string>
+    <string name="pref_title_unit_volume_electricity">Volume d \' électricité</string>
 </resources>
