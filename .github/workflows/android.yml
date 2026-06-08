@@ -51,24 +51,30 @@ jobs:
         run: |
           export LANG=en_US.UTF-8
 
-          # 1. Estructura para F-Droid (Copia física completa, incluyendo .git)
+          # 1. Obtener versionCode actual del código
+          VERSION_CODE=$(grep "versionCode =" app/build.gradle | grep -oE '[0-9]+' | head -n 1)
+          echo "Construyendo versionCode: $VERSION_CODE"
+
+          # 2. Estructura para F-Droid (Copia física completa, incluyendo .git)
           mkdir -p /tmp/src
           cp -a . /tmp/src/
           mkdir -p build/org.juanro.autumandu
           cp -a /tmp/src/. build/org.juanro.autumandu/
 
-          # 2. Modificar YAML para el CI (sin Binaries y con commit actual)
+          # 3. Modificar YAML para el CI:
+          # - Eliminar Binaries (para que construya desde fuente)
+          # - Actualizar commit SOLO para la versión que estamos construyendo
           sed -i '/Binaries:/d' metadata/org.juanro.autumandu.yml
-          sed -i "s/commit: .*/commit: $GITHUB_SHA/" metadata/org.juanro.autumandu.yml
+          sed -i "/versionCode: $VERSION_CODE/{n;s/commit: .*/commit: $GITHUB_SHA/}" metadata/org.juanro.autumandu.yml
 
-          # 3. Garantizar que F-Droid encuentre el commit localmente
+          # 4. Garantizar que F-Droid encuentre el commit localmente
           git config --global --add safe.directory "*"
           cd "build/org.juanro.autumandu"
           git config user.email "ci@fdroid.org"
           git config user.name "F-Droid CI"
           git tag -f "$GITHUB_SHA"
 
-          # 4. Configuración de entorno y ejecución
+          # 5. Configuración de entorno y ejecución
           cd $GITHUB_WORKSPACE
           ln -s $ANDROID_SDK_ROOT /opt/android-sdk || true
           echo "sdk_path: /opt/android-sdk" > "config.yml"
@@ -76,7 +82,7 @@ jobs:
 
           fdroid rewritemeta org.juanro.autumandu
           fdroid readmeta
-          fdroid build --verbose --on-server --no-tarball org.juanro.autumandu
+          fdroid build --verbose --on-server --no-tarball org.juanro.autumandu:$VERSION_CODE
         env:
           ANDROID_HOME: /opt/android-sdk
       - name: Upload F-Droid APK
