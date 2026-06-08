@@ -44,18 +44,21 @@ You can translate this project using [Weblate](https://hosted.weblate.org/projec
 [<img src="https://user-images.githubusercontent.com/663460/26973090-f8fdc986-4d14-11e7-995a-e7c5e79ed925.png"
     alt="Download APK from GitHub"
     height="80">](https://github.com/juanro49/autu-mandu/releases/latest)
-[<img src="https://raw.githubusercontent.com/vitorpamplona/amethyst/main/docs/design/obtainium.png"
-    alt="Get it on Obtaininum"
-    height="80">](https://github.com/ImranR98/Obtainium)
+[<img src="https://f-droid.org/badge/get-it-on-es.png"
+    alt="Consíguelo en F-Droid"
+    height="80">](https://f-droid.org/packages/org.juanro.autumandu)
 [<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
     alt="Get it on IzzyOnDroid repo F-Droid"
     height="80">](https://apt.izzysoft.de/fdroid/index/apk/org.juanro.autumandu)
+[<img src="https://raw.githubusercontent.com/vitorpamplona/amethyst/main/docs/design/obtainium.png"
+    alt="Get it on Obtaininum"
+    height="80">](https://github.com/ImranR98/Obtainium)
+[<img src="https://stc.utdstc.com/img/mediakit/download-gio-big.png"
+    alt="Get it on UptoDown"
+    height="80">](https://autu-mandu.uptodown.com/android)
 [<img src="https://consumer-img.huawei.com/content/dam/huawei-cbg-site/common/campaign/emui91/images/Badge-Black.png"
     alt="Get it on AppGallery"
     height="60">](https://url.cloud.huawei.com/n83tvRcJmE?shareTo=qrcode)
-[<img src="https://stc.utdstc.com/img/download-uptodown1.png"
-    alt="Get it on UptoDown"
-    height="60">](https://autu-mandu.uptodown.com/android)
 
 ## Build
 
