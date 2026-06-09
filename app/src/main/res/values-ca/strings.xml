@@ -51,4 +51,12 @@
     <string name="hint_trash_date">Data d\'eliminació</string>
     <string name="hint_reminder_after_distance">Passada una distància</string>
     <string name="hint_reminder_after_time">Passat un temps</string>
+    <string name="menu_remove_account">Elimina compte</string>
+    <string name="menu_copy">Copia</string>
+    <string name="fab_add_trip">Viatge</string>
+    <string name="fab_close_overlay">Tanca opcions</string>
+    <string name="hint_start_date">Data d\'inici</string>
+    <string name="hint_trip_start_time">Temps d\'inici</string>
+    <string name="hint_reminder_start_mileage">Kilometratge inicial</string>
+    <string name="hint_reminder_start_date">Inicia a data</string>
 </resources>
