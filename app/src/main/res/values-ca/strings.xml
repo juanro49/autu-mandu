@@ -12,7 +12,7 @@
     <string name="drawer_close">Tancar navegació</string>
     <string name="menu_synchronize">Sincronitzar</string>
     <string name="menu_save">Fet</string>
-    <string name="menu_cancel">Cancelar</string>
+    <string name="menu_cancel">Cancel·lar</string>
     <string name="menu_delete">Esborrar</string>
     <string name="menu_add_car">Afegir vehicle</string>
     <string name="menu_add_fuel_type">Afegir tipus de combustible</string>
