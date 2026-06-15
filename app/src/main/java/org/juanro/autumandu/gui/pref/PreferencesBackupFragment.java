@@ -431,7 +431,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
 
     private Preference.OnPreferenceChangeListener createOnChangeListenerToAskForStorageAccess() {
         return (preference, o) -> {
-            if (Boolean.TRUE.equals(o) && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
+            if (Boolean.TRUE.equals(o) && android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.R &&
                     ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
                             PackageManager.PERMISSION_GRANTED) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -448,7 +448,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
 
     private OnPreferenceClickListener createOnClickListenerToAskForStorageAccess(final int requestCode) {
         return preference -> {
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ||
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ||
                     ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                             PackageManager.PERMISSION_GRANTED) {
                 performActionAfterPermissionGranted(requestCode);
