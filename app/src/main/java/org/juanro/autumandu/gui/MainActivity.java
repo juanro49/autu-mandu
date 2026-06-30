@@ -63,6 +63,7 @@ import org.juanro.autumandu.gui.pref.PreferencesActivity;
 import org.juanro.autumandu.util.backup.AutoBackupWorker;
 import org.juanro.autumandu.gui.util.FabSpeedDialHelper;
 import org.juanro.autumandu.gui.util.NewRefuelingSnackbar;
+import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.util.DemoData;
 import org.juanro.autumandu.util.reminder.ReminderWorker;
@@ -577,14 +578,10 @@ public class MainActivity extends AppCompatActivity implements
         closeFABMenu();
 
         Preferences prefs = new Preferences(this);
-        // Usamos observeForever y removeObserver para asegurar que el clic sea una acción única
-        // y no acumule observadores que disparen múltiples diálogos.
-        mViewModel.getNotSuspendedCars().observeForever(new androidx.lifecycle.Observer<>() {
-            @Override
-            public void onChanged(List<Car> cars) {
-                mViewModel.getNotSuspendedCars().removeObserver(this);
-                processCarSelectionForFAB(edit, otherType, cars, prefs);
-            }
+        AutuManduDatabase.DB_EXECUTOR.execute(() -> {
+            var db = AutuManduDatabase.getInstance(this);
+            List<Car> cars = db.getCarDao().getNotSuspended();
+            runOnUiThread(() -> processCarSelectionForFAB(edit, otherType, cars, prefs));
         });
     }
 

@@ -560,9 +560,16 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
     }
 
     private void calculateDistanceAndAutoFill() {
+        String startStr = edtOdometerStart.getText().toString();
+        String endStr = edtOdometerEnd.getText().toString();
+
+        if (startStr.isEmpty() || endStr.isEmpty()) {
+            return;
+        }
+
         try {
-            int start = Integer.parseInt(edtOdometerStart.getText().toString());
-            int end = Integer.parseInt(edtOdometerEnd.getText().toString());
+            int start = Integer.parseInt(startStr);
+            int end = Integer.parseInt(endStr);
             int diff = end - start;
             if (diff >= 0) {
                 mAutoCalculated = true;

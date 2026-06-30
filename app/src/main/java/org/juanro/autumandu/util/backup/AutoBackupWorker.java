@@ -59,17 +59,25 @@ public class AutoBackupWorker extends Worker {
         Log.d(TAG, "Starting automatic backup...");
         try {
             var backup = new Backup(context);
+            var backupDir = backup.getBackupDir();
+            if (backupDir != null) {
+                Log.d(TAG, "Target backup path: " + backupDir.getUri());
+            }
+
             final var result = backup.autoBackup();
 
-            result.ifPresent(success ->
-                    // Toasts must be shown on the main thread
-                    new Handler(Looper.getMainLooper()).post(() ->
-                            Toast.makeText(context, (success ? R.string.toast_auto_backup_succeeded :
-                                    R.string.toast_auto_backup_failed), Toast.LENGTH_SHORT).show()
-                    )
-            );
-
-            return result.orElse(false) ? Result.success() : Result.failure();
+            if (result.isPresent()) {
+                boolean success = result.get();
+                // Toasts must be shown on the main thread
+                new Handler(Looper.getMainLooper()).post(() ->
+                        Toast.makeText(context, (success ? R.string.toast_auto_backup_succeeded :
+                                R.string.toast_auto_backup_failed), Toast.LENGTH_SHORT).show()
+                );
+                return success ? Result.success() : Result.failure();
+            } else {
+                Log.d(TAG, "Backup already exists for today or auto-backup disabled, skipping.");
+                return Result.success();
+            }
         } catch (Exception e) {
             Log.e(TAG, "Error during automatic backup: " + e.getMessage(), e);
             return Result.failure();

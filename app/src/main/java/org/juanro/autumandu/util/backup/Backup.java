@@ -18,6 +18,7 @@ package org.juanro.autumandu.util.backup;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -67,20 +68,18 @@ public class Backup {
      * @return The target path for a backup.
      */
     public DocumentFile getBackupDir() {
-        DocumentFile backupDir = null;
         String backupPath = prefs.getBackupPath();
 
         try {
             if (backupPath.startsWith("content://")) {
-                backupDir = DocumentFile.fromTreeUri(mContext, Uri.parse(backupPath));
+                return DocumentFile.fromTreeUri(mContext, Uri.parse(backupPath));
             } else {
-                backupDir = DocumentFile.fromFile(new File(backupPath));
+                return DocumentFile.fromFile(new File(backupPath));
             }
         } catch (Exception e) {
             Log.e(TAG, "Error getting backup directory", e);
+            return null;
         }
-
-        return backupDir;
     }
 
     /**
@@ -136,13 +135,21 @@ public class Backup {
      * @return The filename of the backup if successful, null otherwise.
      */
     public String backup(boolean replace) {
-        // Crucial for Room: Close all connections to flush WAL/SHM files to the main DB file.
-        AutuManduApplication.closeDatabases();
-
         String fileName = "cr-" + dateFormat.format(new Date()) + ".db";
         DocumentFile backupDir = getBackupDir();
+        if (backupDir != null) {
+            Log.d(TAG, "Target backup directory: " + backupDir.getUri());
+        } else {
+            Log.e(TAG, "Target backup directory is NULL");
+            return null;
+        }
 
-        if (backupDir == null) return null;
+        // Ensure all WAL/SHM data is flushed to the main DB file before copying.
+        try (Cursor cursor = AutuManduDatabase.getInstance(mContext).getOpenHelper().getWritableDatabase().query("PRAGMA wal_checkpoint(FULL)")) {
+            cursor.moveToFirst();
+        } catch (Exception e) {
+            Log.e(TAG, "Error performing WAL checkpoint", e);
+        }
 
         DocumentFile backupFile = backupDir.createFile("*/*", fileName);
 
