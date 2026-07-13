@@ -356,8 +356,6 @@
     <string name="default_station">Standard</string>
     <string name="default_fuel_category">Allgemein</string>
     <string name="fuel_category_gasoline">Benzin</string>
-    <string name="fuel_category_diesel"></string>
-    <string name="fuel_category_gas"></string>
     <string name="fuel_category_electricity">Strom</string>
     <string name="fuel_category_additives">Zusätze</string>
     <string name="toast_import_csv_result">%1$d Fahrten importiert. Fehler: %2$d</string>
