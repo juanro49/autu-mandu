@@ -126,10 +126,10 @@
     <string name="alert_change_color_title">Farbe auswählen</string>
     <string name="alert_sync_finishing_authentication">Authentifizierung wird abgeschlossen…</string>
     <string name="alert_sync_performing_first_sync">Erster Sync wird durchgeführt…</string>
-    <string name="alert_sync_first_sync_message">Es sind Online-Daten vorhanden. Welche Daten möchten Sie bei der ersten Synchronisation behalten.</string>
+    <string name="alert_sync_first_sync_message">Es sind Online-Daten vorhanden. Welche Daten möchten Sie bei der ersten Synchronisierung behalten.</string>
     <string name="alert_sync_first_sync_download">Online-Daten</string>
     <string name="alert_sync_first_sync_upload">Lokale Daten</string>
-    <string name="alert_sync_first_sync_error">Bei der ersten Synchronisation ist ein Fehler aufgetreten. Bitte stellen Sie sicher, dass Sie eine Internetverbinding haben und versuchen Sie es erneut.</string>
+    <string name="alert_sync_first_sync_error">Bei der ersten Synchronisierung ist ein Fehler aufgetreten. Bitte stellen Sie sicher, dass Sie eine Internetverbinding haben und versuchen Sie es erneut.</string>
     <string name="alert_backup_overwrite_title">Sichern</string>
     <string name="alert_backup_overwrite_message">Es gibt bereits eine Sicherungsdatei auf der SD-Karte.</string>
     <string name="alert_backup_failed">Sichern fehlgeschlagen</string>
@@ -229,7 +229,7 @@
     <string name="first_start_step3_img_desc">Dritter Schritt</string>
     <string name="first_start_step3_text">Nach zwei Tankfüllungen solltest du die ersten Graphen sehen.</string>
     <string name="first_start_create_car">Auto erstellen</string>
-    <string name="first_start_setup_sync">Synchronisation einrichten</string>
+    <string name="first_start_setup_sync">Synchronisierung einrichten</string>
     <string name="calc_option_volume_to_distance">Volumen (%1$s) nach Strecke (%2$s)</string>
     <string name="calc_option_distance_to_volume">Strecke (%1$s) nach Volumen (%2$s)</string>
     <string name="calc_option_volume_to_price">Volumen (%1$s) nach Preis (%2$s)</string>
@@ -347,7 +347,7 @@
     <string name="title_edit_trip">Fahrt bearbeiten</string>
     <string name="alert_delete_trip_message">Diese Fahrt wird gelöscht.</string>
     <string name="alert_sync_conflict_title">Sync-Konflikt</string>
-    <string name="alert_sync_conflict_message">Lokale und Externe Daten haben sich seit der letzten Synchronisation verändert. Welche Version willst du behalten?</string>
+    <string name="alert_sync_conflict_message">Lokale und Externe Daten haben sich seit der letzten Synchronisierung verändert. Welche Version willst du behalten?</string>
     <string name="toast_sync_uploading">Lokale Änderungen erkannt. Lade Datenbank hoch…</string>
     <string name="toast_sync_downloading">Externe Änderungen erkannt. Lade Datenbank herunter…</string>
     <string name="toast_sync_complete_no_changes">Synchronisierung abgeschlossen. Keine Änderungen erkannt.</string>
@@ -426,12 +426,15 @@
     <string name="pref_title_import_carbudget">Importiere von CarBudget (SailfishOS)</string>
     <string name="pref_summary_import_carbudget">Importiere Daten von CarBudget-Datenbank-Datei (.cbg).</string>
     <string name="alert_import_carbudget_title">Importiere CarBudget (SailfishOS)</string>
-    <string name="alert_import_carbudget_message">Dadurch werden Auftankungen und Kosten aus der gewählten CarBudget-Datei importiert.</string>
+    <string name="alert_import_carbudget_message">Dadurch werden Tankfüllungen und Kosten aus der gewählten CarBudget-Datei importiert.</string>
     <string name="alert_import_carbudget_select_car">Wähle Ziel-Auto für Import:</string>
     <string name="alert_import_carbudget_create_new_car">Erstelle neues Auto: %s</string>
     <string name="toast_import_carbudget_success">Import von CarBudget erfolgreich abgeschlossen.</string>
-    <string name="toast_import_carbudget_result">%1$d Auftankungen, %2$d andere Kosten und %3$d Reifensätze importiert.</string>
+    <string name="toast_import_carbudget_result">%1$d Tankfüllungen, %2$d andere Kosten und %3$d Reifensätze importiert.</string>
     <string name="toast_import_carbudget_failed">Fehler beim Import von CarBudget: %s</string>
     <string name="report_chart_option_donut">Kreis</string>
     <string name="label_set_trash_date">Setze Müll-Datum</string>
+    <string name="chart_content_description_segment">%1$s: %2$s</string>
+    <string name="fuel_category_diesel">Diesel</string>
+    <string name="fuel_category_gas">Gas</string>
 </resources>
