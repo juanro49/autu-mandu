@@ -27,6 +27,7 @@
     <string name="drawer_help">Help</string>
     <string name="drawer_open">Open navigation</string>
     <string name="drawer_close">Close navigation</string>
+    <string name="drawer_reminders">Reminders</string>
     <string name="menu_synchronize">Synchronize</string>
     <string name="menu_save">Done</string>
     <string name="menu_cancel">Cancel</string>
@@ -166,6 +167,8 @@
     <string name="alert_delete_reminders_message">The %d selected reminders will be deleted.</string>
     <string name="alert_delete_tire_message">This tire set will be deleted.</string>
     <string name="alert_delete_tires_message">The %d selected tire sets will be deleted.</string>
+    <string name="alert_notification_permission_title">Notification Permission</string>
+    <string name="alert_notification_permission_message">Autu Mandu needs permission to show notifications and remind you about your car maintenance.</string>
     <string name="alert_split_tire_message">Enter the number of tires to split into a new entry:</string>
     <string name="alert_invalid_quantity">Invalid quantity.</string>
     <string name="alert_invalid_distance">The unmount distance must be greater than or equal to the mount distance.</string>
@@ -226,6 +229,8 @@
     <string name="report_title_costs">Costs</string>
     <string name="report_title_overall_costs">Overall costs</string>
     <string name="report_title_trips">Trips Summary</string>
+    <string name="report_banner_due_reminders">You have due reminders!</string>
+    <string name="report_banner_due_reminders_button">View</string>
     <string name="report_overall_costs_fuel">Fuel</string>
     <string name="report_overall_costs_bills">Bills</string>
     <string name="report_overall_costs_tires">Tires</string>
@@ -345,6 +350,8 @@
     <string name="notification_reminder_action_done">Done</string>
     <string name="notification_reminder_action_snooze">Snooze</string>
     <string name="notification_reminder_action_snooze_all">Snooze all</string>
+    <string name="notification_reminder_action_dismiss">Dismiss</string>
+    <string name="notification_reminder_action_dismiss_all">Dismiss all</string>
     <string name="notification_sync_channel">Synchronization</string>
     <string name="notification_sync_conflict_title">Sync Conflict</string>
     <string name="notification_sync_conflict_text">Action required to resolve synchronization conflict.</string>

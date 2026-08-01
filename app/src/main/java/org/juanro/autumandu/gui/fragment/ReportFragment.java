@@ -72,6 +72,7 @@ import org.juanro.autumandu.gui.util.ReportDetailBinder;
 import org.juanro.autumandu.gui.util.ReportFullScreenAnimator;
 import org.juanro.autumandu.util.Carburoid;
 import org.juanro.autumandu.viewmodel.ReportViewModel;
+import org.juanro.autumandu.gui.fragment.ReminderListFragment;
 
 public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClickListener,
         BackPressedListener {
@@ -428,6 +429,15 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
         viewModel = new ViewModelProvider(this).get(ReportViewModel.class);
         viewModel.getReports().observe(getViewLifecycleOwner(), reports -> reportAdapter.setItems(reports));
+        viewModel.getHasDueReminders().observe(getViewLifecycleOwner(), due ->
+                v.findViewById(R.id.card_due_reminders).setVisibility(due ? View.VISIBLE : View.GONE));
+
+        v.findViewById(R.id.btn_view_reminders).setOnClickListener(view -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, new ReminderListFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         return v;
     }

@@ -24,10 +24,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
@@ -82,11 +79,9 @@ public class ReminderService {
         long[] dueIds = getDueReminderIds(context);
 
         if (dueIds.length > 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                var systemManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                if (systemManager != null) {
-                    systemManager.createNotificationChannel(buildNotificationChannel(context));
-                }
+            var systemManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (systemManager != null) {
+                systemManager.createNotificationChannel(buildNotificationChannel(context));
             }
 
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
@@ -196,9 +191,6 @@ public class ReminderService {
             PendingIntent.FLAG_UPDATE_CURRENT |  PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingContentIntent);
 
-        // Dismiss intent
-        builder.setDeleteIntent(getPendingIntent(context, ACTION_DISMISS_REMINDERS, reminderIds));
-
         // Specific layouts for one and many reminders
         if (reminders.size() == 1) {
             var reminder = reminders.get(0);
@@ -212,13 +204,16 @@ public class ReminderService {
                             getPendingIntent(context, ACTION_MARK_REMINDERS_DONE, reminderIds))
                     .addAction(R.drawable.ic_snooze_24dp,
                             context.getString(R.string.notification_reminder_action_snooze),
-                            getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds));
+                            getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds))
+                    .addAction(R.drawable.ic_close_24dp,
+                            context.getString(R.string.notification_reminder_action_dismiss),
+                            getPendingIntent(context, ACTION_DISMISS_REMINDERS, reminderIds));
         } else {
             var inboxStyle = new NotificationCompat.InboxStyle();
             inboxStyle.setBigContentTitle(context.getString(
                     R.string.notification_reminder_title_multiple));
 
-            var reminderTitles = new ArrayList<String>(reminders.size());
+            var reminderTitles = new ArrayList<>(reminders.size());
             for (var reminder : reminders) {
                 reminderTitles.add(reminder.reminder().getTitle());
                 inboxStyle.addLine(String.format("%s (%s)", reminder.reminder().getTitle(),
@@ -233,13 +228,15 @@ public class ReminderService {
                     .setStyle(inboxStyle)
                     .addAction(R.drawable.ic_snooze_24dp,
                             context.getString(R.string.notification_reminder_action_snooze_all),
-                            getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds));
+                            getPendingIntent(context, ACTION_SNOOZE_REMINDERS, reminderIds))
+                    .addAction(R.drawable.ic_close_24dp,
+                            context.getString(R.string.notification_reminder_action_dismiss_all),
+                            getPendingIntent(context, ACTION_DISMISS_REMINDERS, reminderIds));
         }
 
         return builder.build();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private static NotificationChannel buildNotificationChannel(Context context) {
         return new NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,

@@ -25,6 +25,7 @@
     <string name="drawer_help">Ayuda</string>
     <string name="drawer_open">Abrir navegación</string>
     <string name="drawer_close">Cerrar navegación</string>
+    <string name="drawer_reminders">Recordatorios</string>
     <string name="menu_synchronize">Sincronizar</string>
     <string name="menu_save">Guardar</string>
     <string name="menu_copy">Copiar</string>
@@ -154,6 +155,8 @@
     <string name="alert_delete_reminders_message">Los %d recordatorios seleccionados serán eliminados.</string>
     <string name="alert_delete_tire_message">El juego de neumáticos seleccionado será eliminado.</string>
     <string name="alert_delete_tires_message">Los %d juegos de neumáticos seleccionados serán eliminados.</string>
+    <string name="alert_notification_permission_title">Permiso de notificaciones</string>
+    <string name="alert_notification_permission_message">Autu Mandu necesita permiso para mostrar notificaciones y recordarte el mantenimiento de tu vehículo.</string>
     <string name="alert_split_tire_message">Introduce el número de neumáticos a separar en una nueva entrada:</string>
     <string name="alert_invalid_quantity">Cantidad no válida.</string>
     <string name="alert_invalid_distance">La distancia al desmontar debe ser mayor o igual a la distancia al montar.</string>
@@ -214,6 +217,8 @@
     <string name="report_title_costs">Costos</string>
     <string name="report_title_overall_costs">Costos generales</string>
     <string name="report_title_trips">Resumen de viajes</string>
+    <string name="report_banner_due_reminders">¡Tienes recordatorios vencidos!</string>
+    <string name="report_banner_due_reminders_button">Ver</string>
     <string name="report_overall_costs_fuel">Combustible</string>
     <string name="report_overall_costs_bills">Facturas</string>
     <string name="report_overall_costs_tires">Neumáticos</string>
@@ -332,6 +337,8 @@
     <string name="notification_reminder_action_done">Listo</string>
     <string name="notification_reminder_action_snooze">Posponer</string>
     <string name="notification_reminder_action_snooze_all">Posponer todo</string>
+    <string name="notification_reminder_action_dismiss">Descartar</string>
+    <string name="notification_reminder_action_dismiss_all">Descartar todos</string>
     <string name="notification_sync_channel">Sincronización</string>
     <string name="notification_sync_conflict_title">Conflicto de sincronización</string>
     <string name="notification_sync_conflict_text">Se requiere acción para resolver el conflicto de sincronización.</string>

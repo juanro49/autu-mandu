@@ -16,9 +16,12 @@
 
 package org.juanro.autumandu.gui;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,6 +38,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -58,6 +63,7 @@ import org.juanro.autumandu.gui.fragment.AbstractDataDetailFragment;
 import org.juanro.autumandu.gui.fragment.CalculatorFragment;
 import org.juanro.autumandu.gui.fragment.DataDetailOtherFragment;
 import org.juanro.autumandu.gui.fragment.DataFragment;
+import org.juanro.autumandu.gui.fragment.ReminderListFragment;
 import org.juanro.autumandu.gui.fragment.ReportFragment;
 import org.juanro.autumandu.gui.pref.PreferencesActivity;
 import org.juanro.autumandu.util.backup.AutoBackupWorker;
@@ -121,6 +127,15 @@ public class MainActivity extends AppCompatActivity implements
                     if (newId > 0 && view != null) {
                         NewRefuelingSnackbar.show(view, newId);
                     }
+                }
+            }
+    );
+
+    private final ActivityResultLauncher<String> mRequestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (!isGranted) {
+                    Log.i("MainActivity", "Notification permission denied");
                 }
             }
     );
@@ -201,6 +216,8 @@ public class MainActivity extends AppCompatActivity implements
         // Update reminders and schedule periodic update
         ReminderWorker.enqueueUpdate(this);
         ReminderWorker.schedulePeriodicUpdate(this);
+
+        checkNotificationPermission();
 
         if (new Preferences(this).hasSyncConflict()) {
             showSyncConflictDialog();
@@ -462,6 +479,7 @@ public class MainActivity extends AppCompatActivity implements
         menu.add(groupId, itemId++, Menu.NONE, R.string.drawer_reports)
                 .setIcon(R.drawable.ic_c_report_24dp)
                 .setIntent(new Intent().putExtra(INTENT_EXTRA_FRAGMENT, ReportFragment.class.getName()));
+
         for (Car car : cars) {
             Bundle args = new Bundle();
             args.putLong(DataFragment.EXTRA_CAR_ID, car.getId());
@@ -473,9 +491,13 @@ public class MainActivity extends AppCompatActivity implements
                             .putExtra(INTENT_EXTRA_ARGUMENTS, args));
         }
 
-        menu.add(groupId, itemId, Menu.NONE, R.string.drawer_calculator)
+        menu.add(groupId, itemId++, Menu.NONE, R.string.drawer_calculator)
                 .setIcon(R.drawable.ic_functions_24dp)
                 .setIntent(new Intent().putExtra(INTENT_EXTRA_FRAGMENT, CalculatorFragment.class.getName()));
+
+        menu.add(groupId, itemId, Menu.NONE, R.string.drawer_reminders)
+                .setIcon(R.drawable.ic_c_notification_24dp)
+                .setIntent(new Intent().putExtra(INTENT_EXTRA_FRAGMENT, ReminderListFragment.class.getName()));
 
         menu.add(R.string.drawer_settings).setIntent(new Intent(this, PreferencesActivity.class));
         menu.add(R.string.drawer_help).setIntent(new Intent(this, HelpActivity.class));
@@ -558,6 +580,30 @@ public class MainActivity extends AppCompatActivity implements
                         SyncManager.resolveConflict(this, true))
                 .setNegativeButton(android.R.string.cancel, (dialog, which) ->
                         new Preferences(this).setSyncConflict(false))
+                .show();
+    }
+
+    private void checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                    showNotificationPermissionRationale();
+                } else {
+                    mRequestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                }
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void showNotificationPermissionRationale() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.alert_notification_permission_title)
+                .setMessage(R.string.alert_notification_permission_message)
+                .setPositiveButton(android.R.string.ok, (dialog, which) ->
+                        mRequestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS))
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 

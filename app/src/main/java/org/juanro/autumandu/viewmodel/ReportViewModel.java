@@ -27,8 +27,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
 import org.juanro.autumandu.Preferences;
+import org.juanro.autumandu.data.query.ReminderQueries;
 import org.juanro.autumandu.data.report.AbstractReport;
 import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dto.ReminderWithCar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,7 @@ import java.util.concurrent.Executors;
 
 public class ReportViewModel extends AndroidViewModel implements SharedPreferences.OnSharedPreferenceChangeListener {
     private final MediatorLiveData<List<AbstractReport>> mReports = new MediatorLiveData<>();
+    private final MediatorLiveData<Boolean> mHasDueReminders = new MediatorLiveData<>();
     private final List<AbstractReport> mCachedReports = new ArrayList<>();
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private final Preferences mPrefs;
@@ -55,6 +58,24 @@ public class ReportViewModel extends AndroidViewModel implements SharedPreferenc
         mReports.addSource(db.getTireDao().getAllTireListsLiveData(), tires -> invalidateAndRefresh());
         mReports.addSource(db.getTripDao().getTripsWithDetailsForCarLive(-1), trips -> invalidateAndRefresh());
 
+        mHasDueReminders.addSource(db.getReminderDao().getAllWithCarLiveData(), list -> {
+            if (list == null) {
+                mHasDueReminders.setValue(false);
+                return;
+            }
+            mExecutor.execute(() -> {
+                boolean due = false;
+                for (ReminderWithCar item : list) {
+                    ReminderQueries queries = new ReminderQueries(getApplication(), item);
+                    if (queries.isDue() && !item.reminder().isNotificationDismissed() && !queries.isSnoozed()) {
+                        due = true;
+                        break;
+                    }
+                }
+                mHasDueReminders.postValue(due);
+            });
+        });
+
         refreshReports();
     }
 
@@ -67,6 +88,10 @@ public class ReportViewModel extends AndroidViewModel implements SharedPreferenc
 
     public LiveData<List<AbstractReport>> getReports() {
         return mReports;
+    }
+
+    public LiveData<Boolean> getHasDueReminders() {
+        return mHasDueReminders;
     }
 
     public void refreshReports() {
