@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.juanro.autumandu.CostPerDistance;
 import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
@@ -41,7 +42,6 @@ import org.juanro.autumandu.util.Recurrences;
 
 public class OverallCostsReport extends AbstractReport {
 
-    private static final String COST_PER_100_UNIT_FORMAT = "/100 ";
     private final List<AbstractReportChartData> mChartData = new ArrayList<>();
 
     public OverallCostsReport(Context context) {
@@ -253,19 +253,22 @@ public class OverallCostsReport extends AbstractReport {
 
     private void addDistanceEfficiencyItems(Section section, EfficiencyContext ctx, Preferences prefs) {
         String unit = prefs.getUnitCurrency();
-        String distanceUnit = prefs.getUnitDistance();
         int totalDistance = ctx.endMileage() - ctx.startMileage();
         if (totalDistance > 0) {
-            section.addItem(new Item(mContext.getString(R.string.report_average) + " " + distanceUnit,
-                    mContext.getString(R.string.report_price, ctx.totalCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+            CostPerDistance costPerDistance = new CostPerDistance(mContext);
+            String distUnitLabel = costPerDistance.getDistanceUnitLabel();
+            String labelPrefix = mContext.getString(R.string.report_average_cost) + " / " + distUnitLabel;
+
+            section.addItem(new Item(labelPrefix,
+                    mContext.getString(R.string.report_price, costPerDistance.computeCostPerDistance(ctx.totalCosts(), totalDistance), unit)));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_fuel),
-                    mContext.getString(R.string.report_price, ctx.fuelCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, costPerDistance.computeCostPerDistance(ctx.fuelCosts(), totalDistance), unit)));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_bills),
-                    mContext.getString(R.string.report_price, ctx.billsCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, costPerDistance.computeCostPerDistance(ctx.billsCosts(), totalDistance), unit)));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_tires),
-                    mContext.getString(R.string.report_price, ctx.tiresCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, costPerDistance.computeCostPerDistance(ctx.tiresCosts(), totalDistance), unit)));
             section.addItem(new Item("  - " + mContext.getString(R.string.report_overall_costs_investment),
-                    mContext.getString(R.string.report_price, ctx.investmentCosts() / totalDistance * 100.0, unit) + COST_PER_100_UNIT_FORMAT + distanceUnit));
+                    mContext.getString(R.string.report_price, costPerDistance.computeCostPerDistance(ctx.investmentCosts(), totalDistance), unit)));
         }
     }
 

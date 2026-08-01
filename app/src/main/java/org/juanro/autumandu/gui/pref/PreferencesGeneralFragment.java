@@ -31,6 +31,7 @@ import androidx.preference.PreferenceManager;
 
 import org.juanro.autumandu.DistanceEntryMode;
 import org.juanro.autumandu.FuelConsumption;
+import org.juanro.autumandu.CostPerDistance;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.PriceEntryMode;
 import org.juanro.autumandu.R;
@@ -61,6 +62,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
                         Preferences.KEY_UNIT_VOLUME_GAS, Preferences.KEY_UNIT_VOLUME_ELECTRICITY,
                         Preferences.KEY_UNIT_VOLUME_ADDITIVES -> preference.setSummary(newValue.toString());
                 case Preferences.KEY_UNIT_FUEL_CONSUMPTION -> handleFuelConsumptionChange((ListPreference) preference, newValue);
+                case Preferences.KEY_UNIT_COST_PER_DISTANCE -> handleCostPerDistanceChange((ListPreference) preference, newValue);
                 case Preferences.KEY_THEME -> handleThemeChange((ListPreference) preference, newValue);
                 case Preferences.KEY_DYNAMIC_COLOR -> requireActivity().recreate();
                 default -> {
@@ -107,12 +109,19 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
                 fuelConsumption.setUnitVolume(newValue.toString());
             }
             updateFuelConsumptionField(fuelConsumption);
+            updateCostPerDistanceField(new CostPerDistance(requireContext()));
         }
 
         private void handleFuelConsumptionChange(ListPreference preference, Object newValue) {
             FuelConsumption fuelConsumption = new FuelConsumption(requireContext());
             fuelConsumption.setConsumptionType(Integer.parseInt(newValue.toString()));
             updateFuelConsumptionField(fuelConsumption, preference);
+        }
+
+        private void handleCostPerDistanceChange(ListPreference preference, Object newValue) {
+            CostPerDistance costPerDistance = new CostPerDistance(requireContext());
+            costPerDistance.setCostPerDistanceType(Integer.parseInt(newValue.toString()));
+            updateCostPerDistanceField(costPerDistance, preference);
         }
 
         private void handleThemeChange(ListPreference preference, Object newValue) {
@@ -150,6 +159,22 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
             prefFuelConsumption.setEntries(entries);
             prefFuelConsumption.setEntryValues(entryValues);
             prefFuelConsumption.setSummary(fuelConsumption.getUnitLabel());
+        }
+
+        public void updateCostPerDistanceField(CostPerDistance costPerDistance) {
+            ListPreference prefCostPerDistance = findPreference(Preferences.KEY_UNIT_COST_PER_DISTANCE);
+            if (prefCostPerDistance != null) {
+                updateCostPerDistanceField(costPerDistance, prefCostPerDistance);
+            }
+        }
+
+        public void updateCostPerDistanceField(CostPerDistance costPerDistance,
+                                               ListPreference prefCostPerDistance) {
+            String[] entries = costPerDistance.getUnitsEntries();
+            String[] entryValues = costPerDistance.getUnitsEntryValues();
+            prefCostPerDistance.setEntries(entries);
+            prefCostPerDistance.setEntryValues(entryValues);
+            prefCostPerDistance.setSummary(costPerDistance.getUnitLabel());
         }
     }
 
@@ -212,6 +237,14 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
         if (fieldFuelConsumption != null) {
             onPreferenceChangeListener.updateFuelConsumptionField(fuelConsumption, fieldFuelConsumption);
             fieldFuelConsumption.setOnPreferenceChangeListener(onPreferenceChangeListener);
+        }
+
+        // Unit cost per distance
+        ListPreference fieldCostPerDistance = findPreference(Preferences.KEY_UNIT_COST_PER_DISTANCE);
+        if (fieldCostPerDistance != null) {
+            CostPerDistance costPerDistance = new CostPerDistance(requireContext());
+            onPreferenceChangeListener.updateCostPerDistanceField(costPerDistance, fieldCostPerDistance);
+            fieldCostPerDistance.setOnPreferenceChangeListener(onPreferenceChangeListener);
         }
     }
 

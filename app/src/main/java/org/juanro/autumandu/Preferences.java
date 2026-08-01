@@ -64,6 +64,7 @@ public class Preferences {
     public static final String KEY_UNIT_VOLUME_ELECTRICITY = "unit_volume_electricity";
     public static final String KEY_UNIT_VOLUME_ADDITIVES = "unit_volume_additives";
     public static final String KEY_UNIT_FUEL_CONSUMPTION = "unit_fuel_consumption";
+    public static final String KEY_UNIT_COST_PER_DISTANCE = "unit_cost_per_distance";
     public static final String KEY_AUTO_GUESS_MISSING_DATA = "behavior_auto_guess_missing_data";
     public static final String KEY_SHOW_CAR_MENU = "behavior_show_car_menu";
     public static final String KEY_SHOW_CARBUROID = "behavior_show_carburoid";
@@ -216,6 +217,11 @@ public class Preferences {
 
     public int getUnitFuelConsumption() {
         var val = prefs.getString(KEY_UNIT_FUEL_CONSUMPTION, "0");
+        return Integer.parseInt(Objects.requireNonNullElse(val, "0"));
+    }
+
+    public int getUnitCostPerDistance() {
+        var val = prefs.getString(KEY_UNIT_COST_PER_DISTANCE, "0");
         return Integer.parseInt(Objects.requireNonNullElse(val, "0"));
     }
 

@@ -100,5 +100,9 @@
             android:defaultValue="0"
             android:key="unit_fuel_consumption"
             android:title="@string/pref_title_unit_fuel_consumption" />
+        <ListPreference
+            android:defaultValue="0"
+            android:key="unit_cost_per_distance"
+            android:title="@string/pref_title_unit_cost_per_distance" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -239,6 +239,7 @@
     <string name="report_lowest">Más bajo</string>
     <string name="report_highest">Más alto</string>
     <string name="report_average">Promedio</string>
+    <string name="report_average_cost">Coste promedio</string>
     <string name="report_day">Día</string>
     <string name="report_month">Mes</string>
     <string name="report_year">Año</string>
@@ -283,6 +284,7 @@
     <string name="pref_title_unit_volume_additives">Volumen aditivos</string>
     <string name="pref_title_unit_distance">Distancia</string>
     <string name="pref_title_unit_fuel_consumption">Consumo de combustible</string>
+    <string name="pref_title_unit_cost_per_distance">Coste por distancia</string>
     <string name="pref_title_sync_setup">Configurar sincronización de copia de seguridad</string>
     <string name="pref_title_backup">Copia de seguridad</string>
     <string name="pref_title_backup_location">Destino de la copia de seguridad</string>
