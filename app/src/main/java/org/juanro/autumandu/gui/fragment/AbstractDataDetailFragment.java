@@ -114,6 +114,13 @@ public abstract class AbstractDataDetailFragment extends Fragment {
                 if (!isInEditMode()) {
                     menu.removeItem(R.id.menu_delete);
                     menu.removeItem(R.id.menu_copy);
+                    menu.removeItem(R.id.menu_split);
+                } else {
+                    // Split is only supported by some fragments.
+                    var splitItem = menu.findItem(R.id.menu_split);
+                    if (splitItem != null) {
+                        splitItem.setVisible(false);
+                    }
                 }
             }
 
@@ -140,11 +147,17 @@ public abstract class AbstractDataDetailFragment extends Fragment {
         } else if (id == R.id.menu_copy) {
             onCopy();
             return true;
+        } else if (id == R.id.menu_split) {
+            onSplit();
+            return true;
         }
         return false;
     }
 
     protected void onCopy() {
+    }
+
+    protected void onSplit() {
     }
 
     private void showDeleteConfirmation() {

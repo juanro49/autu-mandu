@@ -17,6 +17,9 @@
 package org.juanro.autumandu.viewmodel;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -117,6 +120,57 @@ public class TireDetailViewModel extends AndroidViewModel {
                 new android.os.Handler(android.os.Looper.getMainLooper()).post(onSaved);
             }
         });
+    }
+
+    public void split(long tireId, int quantityToMove, Runnable onFinished) {
+        DB_EXECUTOR.execute(() -> {
+            db.runInTransaction(() -> {
+                TireList originalTire = db.getTireDao().getTireListById(tireId);
+                if (originalTire == null || originalTire.getQuantity() <= quantityToMove) {
+                    return;
+                }
+
+                // Update original tire quantity
+                originalTire.setQuantity(originalTire.getQuantity() - quantityToMove);
+                db.getTireDao().update(originalTire);
+
+                // Create new tire entry
+                TireList newTire = getTireList(quantityToMove, originalTire);
+
+                long[] newIds = db.getTireDao().insert(newTire);
+                long newTireId = newIds[0];
+
+                // Duplicate usages
+                List<TireUsage> usages = db.getTireDao().getUsagesForTire(tireId);
+                for (TireUsage usage : usages) {
+                    TireUsage newUsage = new TireUsage();
+                    newUsage.setTireId(newTireId);
+                    newUsage.setDistanceMount(usage.getDistanceMount());
+                    newUsage.setDateMount(usage.getDateMount());
+                    newUsage.setDistanceUmount(usage.getDistanceUmount());
+                    newUsage.setDateUmount(usage.getDateUmount());
+                    db.getTireDao().insert(newUsage);
+                }
+            });
+
+            if (onFinished != null) {
+                new Handler(Looper.getMainLooper()).post(onFinished);
+            }
+        });
+    }
+
+    @NonNull
+    private static TireList getTireList(int quantityToMove, TireList originalTire) {
+        TireList newTire = new TireList();
+        newTire.setBuyDate(originalTire.getBuyDate());
+        newTire.setTrashDate(originalTire.getTrashDate());
+        newTire.setPrice(originalTire.getPrice());
+        newTire.setQuantity(quantityToMove);
+        newTire.setManufacturer(originalTire.getManufacturer());
+        newTire.setModel(originalTire.getModel());
+        newTire.setNote(originalTire.getNote());
+        newTire.setCarId(originalTire.getCarId());
+        return newTire;
     }
 
     public void delete(long id, Runnable onDeleted) {

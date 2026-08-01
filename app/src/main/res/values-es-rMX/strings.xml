@@ -28,6 +28,7 @@
     <string name="menu_synchronize">Sincronizar</string>
     <string name="menu_save">Guardar</string>
     <string name="menu_copy">Copiar</string>
+    <string name="menu_split">Dividir</string>
     <string name="menu_cancel">Cancelar</string>
     <string name="menu_delete">Eliminar</string>
     <string name="menu_remove_account">Eliminar cuenta</string>
@@ -153,6 +154,8 @@
     <string name="alert_delete_reminders_message">Los %d recordatorios seleccionados serán eliminados.</string>
     <string name="alert_delete_tire_message">El juego de neumáticos seleccionado será eliminado.</string>
     <string name="alert_delete_tires_message">Los %d juegos de neumáticos seleccionados serán eliminados.</string>
+    <string name="alert_split_tire_message">Introduce el número de neumáticos a separar en una nueva entrada:</string>
+    <string name="alert_invalid_quantity">Cantidad no válida.</string>
     <string name="alert_invalid_distance">La distancia al desmontar debe ser mayor o igual a la distancia al montar.</string>
     <string name="alert_mount_umount_message">El juego de neumáticos seleccionado será montado/desmontado.</string>
     <string name="alert_cannot_delete_last_car">Un vehículo no puede ser eliminado.</string>
@@ -201,6 +204,7 @@
     <string name="toast_import_csv_result">Viajes importados: %1$d. Errores: %2$d</string>
     <string name="toast_import_csv_general_result">Registros importados: %1$d. Errores: %2$d</string>
     <string name="toast_need_storage_permission">Para realizar esta acción Autu Mandu necesita tener acceso a tus archivos.</string>
+    <string name="toast_split_tire_success">Juego de neumáticos dividido con éxito.</string>
     <string name="toast_auto_backup_succeeded">Copia de seguridad automática exitosa.</string>
     <string name="toast_auto_backup_failed">Copia de seguridad automática fallida.</string>
     <string name="toast_all_tires_mounted">El número de ruedas a montar es mayor que el número de ruedas del vehículo.</string>

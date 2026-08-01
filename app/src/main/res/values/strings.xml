@@ -33,6 +33,7 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_remove_account">Remove account</string>
     <string name="menu_copy">Copy</string>
+    <string name="menu_split">Split</string>
     <string name="menu_mount_umount">Mount/Umount</string>
     <string name="menu_add_car">Add car</string>
     <string name="menu_add_fuel_type">Add fuel type</string>
@@ -165,6 +166,8 @@
     <string name="alert_delete_reminders_message">The %d selected reminders will be deleted.</string>
     <string name="alert_delete_tire_message">This tire set will be deleted.</string>
     <string name="alert_delete_tires_message">The %d selected tire sets will be deleted.</string>
+    <string name="alert_split_tire_message">Enter the number of tires to split into a new entry:</string>
+    <string name="alert_invalid_quantity">Invalid quantity.</string>
     <string name="alert_invalid_distance">The unmount distance must be greater than or equal to the mount distance.</string>
     <string name="alert_mount_umount_message">The selected tire set will be mounted/umounted.</string>
     <string name="alert_cannot_delete_last_car">One car cannot be deleted.</string>
@@ -213,6 +216,7 @@
     <string name="toast_import_csv_result">Imported %1$d trips. Errors: %2$d</string>
     <string name="toast_import_csv_general_result">Imported %1$d records. Errors: %2$d</string>
     <string name="toast_need_storage_permission">To perform this action Autu Mandu needs to have access to your files.</string>
+    <string name="toast_split_tire_success">Tire set split successfully.</string>
     <string name="toast_auto_backup_succeeded">Automatic backup succeeded.</string>
     <string name="toast_auto_backup_failed">Automatic backup failed.</string>
     <string name="toast_all_tires_mounted">The number of wheels to be mounted is greater than the number of wheels of the car.</string>

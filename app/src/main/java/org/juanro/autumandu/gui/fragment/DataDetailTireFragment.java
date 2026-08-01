@@ -17,19 +17,24 @@
 package org.juanro.autumandu.gui.fragment;
 
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -44,7 +49,6 @@ import org.juanro.autumandu.gui.util.FormFieldGreaterZeroValidator;
 import org.juanro.autumandu.gui.util.FormValidator;
 import org.juanro.autumandu.gui.util.SimpleAnimator;
 import org.juanro.autumandu.model.entity.TireList;
-import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.TireUsage;
 import org.juanro.autumandu.util.reminder.ReminderWorker;
 import org.juanro.autumandu.viewmodel.TireDetailViewModel;
@@ -132,6 +136,28 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        MenuHost menuHost = requireActivity();
+        menuHost.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                if (isInEditMode() && tire != null && tire.getQuantity() > 1) {
+                    var splitItem = menu.findItem(R.id.menu_split);
+                    if (splitItem != null) {
+                        splitItem.setVisible(true);
+                    }
+                }
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
+    @Override
     protected void fillFields(Bundle savedInstanceState, View v) {
         if (!isInEditMode()) {
             setupNewTireDefaults();
@@ -177,6 +203,7 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
             updateInitialCarSelection(tireList.getCarId());
             edtMountDate.setDate(new Date());
             edtUmountDate.setDate(new Date());
+            requireActivity().invalidateMenu();
         });
 
         viewModel.isTireMounted().observe(getViewLifecycleOwner(), isMounted -> {
@@ -252,6 +279,37 @@ public class DataDetailTireFragment extends AbstractDataDetailFragment {
         layout.setVisibility(View.GONE);
         layout.getLayoutParams().height = 0;
         layout.setAlpha(0);
+    }
+
+    @Override
+    protected void onSplit() {
+        if (tire == null) return;
+
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setHint(R.string.hint_num_tires);
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.menu_split)
+                .setMessage(R.string.alert_split_tire_message)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    int quantityToMove = getIntegerFromEditText(input, 0);
+                    if (quantityToMove > 0 && quantityToMove < tire.getQuantity()) {
+                        viewModel.split(tire.getId(), quantityToMove, () -> {
+                            if (isAdded()) {
+                                requireActivity().runOnUiThread(() -> {
+                                    Toast.makeText(requireContext(), R.string.toast_split_tire_success, Toast.LENGTH_SHORT).show();
+                                    mOnItemActionListener.onItemSavedAsync(tire.getId());
+                                });
+                            }
+                        });
+                    } else {
+                        Toast.makeText(requireContext(), R.string.alert_invalid_quantity, Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     @Override

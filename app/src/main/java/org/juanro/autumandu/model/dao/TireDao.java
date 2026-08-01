@@ -41,6 +41,9 @@ public interface TireDao {
     @Query("SELECT * FROM tire_list WHERE _id = :id")
     LiveData<TireList> getTireListByIdLiveData(long id);
 
+    @Query("SELECT * FROM tire_list WHERE _id = :id")
+    TireList getTireListById(long id);
+
     @Query("SELECT * FROM tire_usage ORDER BY date_mount DESC")
     List<TireUsage> getAllTireUsages();
 
@@ -81,6 +84,9 @@ public interface TireDao {
 
     @Query("SELECT * FROM tire_usage WHERE tire_id = :tireId AND date_umount IS NULL LIMIT 1")
     TireUsage getUsageByTireIdNotUmount(long tireId);
+
+    @Query("SELECT * FROM tire_usage WHERE tire_id = :tireId")
+    List<TireUsage> getUsagesForTire(long tireId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(TireList... tireList);

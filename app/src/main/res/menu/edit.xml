@@ -22,6 +22,10 @@
         android:title="@string/menu_copy"
         app:showAsAction="ifRoom|withText" />
     <item
+        android:id="@+id/menu_split"
+        android:title="@string/menu_split"
+        app:showAsAction="ifRoom|withText" />
+    <item
         android:id="@+id/menu_delete"
         android:icon="@drawable/ic_delete_24dp"
         app:showAsAction="ifRoom|withText"
