@@ -26,6 +26,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.color.DynamicColors;
@@ -124,9 +125,17 @@ public class AutuManduApplication extends android.app.Application implements Sha
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if ("ui_theme".equals(key) || "ui_dynamic_color".equals(key)) {
-            Log.d(TAG, "UI Preference changed: " + key + ". Refreshing theme...");
-            applyThemeConfiguration();
+        if (Preferences.KEY_THEME.equals(key) || Preferences.KEY_DYNAMIC_COLOR.equals(key) || Preferences.KEY_LANGUAGE.equals(key)) {
+            Log.d(TAG, "UI Preference changed: " + key + ". Refreshing theme/language...");
+
+            if (Preferences.KEY_THEME.equals(key) || Preferences.KEY_DYNAMIC_COLOR.equals(key)) {
+                applyThemeConfiguration();
+            }
+
+            if (Preferences.KEY_LANGUAGE.equals(key)) {
+                String localeTag = sharedPreferences.getString(key, "");
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(localeTag));
+            }
 
             // Recreate all activities to apply changes everywhere (including background ones)
             synchronized (activities) {

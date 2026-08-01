@@ -74,6 +74,7 @@ public class Preferences {
     public static final String KEY_KEEP_BACKUPS = "behaviour_keep_backups";
     public static final String KEY_THEME = "ui_theme";
     public static final String KEY_DYNAMIC_COLOR = "ui_dynamic_color";
+    public static final String KEY_LANGUAGE = "ui_language";
 
     private final Context context;
     private final SharedPreferences prefs;
@@ -267,6 +268,10 @@ public class Preferences {
 
     public boolean isDynamicColorEnabled() {
         return prefs.getBoolean(KEY_DYNAMIC_COLOR, true);
+    }
+
+    public String getLanguage() {
+        return prefs.getString(KEY_LANGUAGE, "");
     }
 
     private void putString(String key, String value) {

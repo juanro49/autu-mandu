@@ -18,6 +18,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="@string/pref_title_category_ui">
         <ListPreference
+            android:defaultValue=""
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:key="ui_language"
+            android:title="@string/pref_title_language" />
+        <ListPreference
             android:defaultValue="system"
             android:entries="@array/theme_entries"
             android:entryValues="@array/theme_values"

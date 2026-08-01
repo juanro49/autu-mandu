@@ -394,6 +394,10 @@
     <string name="pref_theme_light">Claro</string>
     <string name="pref_theme_dark">Oscuro</string>
     <string name="pref_theme_system">Predeterminado del sistema</string>
+
+    <string name="pref_title_language">Idioma de la aplicación</string>
+    <string name="pref_summary_language">Cambia el idioma de la aplicación</string>
+    <string name="pref_language_default">Predeterminado del sistema</string>
     <string name="import_no_file_selected">Ningún archivo seleccionado</string>
     <string name="import_format">Formato de importación</string>
     <string name="import_preview_title">Vista previa (primeras 3 filas)</string>

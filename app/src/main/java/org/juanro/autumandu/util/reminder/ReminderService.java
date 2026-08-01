@@ -27,7 +27,6 @@ import android.content.pm.PackageManager;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
 
 import android.text.TextUtils;
@@ -39,8 +38,7 @@ import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.data.query.ReminderQueries;
 import org.juanro.autumandu.gui.MainActivity;
-import org.juanro.autumandu.gui.pref.PreferencesActivity;
-import org.juanro.autumandu.gui.pref.PreferencesRemindersFragment;
+import org.juanro.autumandu.gui.fragment.ReminderListFragment;
 import org.juanro.autumandu.model.AutuManduDatabase;
 import org.juanro.autumandu.model.dto.ReminderWithCar;
 import org.juanro.autumandu.util.MileageUtil;
@@ -178,16 +176,11 @@ public class ReminderService {
                 .setPriority(NotificationCompat.PRIORITY_LOW);
 
         // Content intent
-        var contentIntent = new Intent(context, PreferencesActivity.class);
-        contentIntent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT,
-                PreferencesRemindersFragment.class.getName());
-        contentIntent.putExtra(PreferencesActivity.EXTRA_SHOW_FRAGMENT_TITLE,
-                R.string.pref_title_header_reminders);
+        var contentIntent = new Intent(context, MainActivity.class);
+        contentIntent.putExtra(MainActivity.INTENT_EXTRA_FRAGMENT,
+                ReminderListFragment.class.getName());
 
-        var stackBuilder = TaskStackBuilder.create(context)
-                .addNextIntentWithParentStack(new Intent(context, MainActivity.class))
-                .addNextIntent(contentIntent);
-        var pendingContentIntent = stackBuilder.getPendingIntent(0,
+        var pendingContentIntent = PendingIntent.getActivity(context, 0, contentIntent,
             PendingIntent.FLAG_UPDATE_CURRENT |  PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingContentIntent);
 

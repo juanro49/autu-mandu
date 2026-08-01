@@ -28,9 +28,6 @@
         android:fragment="org.juanro.autumandu.gui.pref.PreferencesStationsFragment"
         android:title="@string/pref_title_header_stations" />
     <Preference
-        android:fragment="org.juanro.autumandu.gui.pref.PreferencesRemindersFragment"
-        android:title="@string/pref_title_header_reminders" />
-    <Preference
         android:fragment="org.juanro.autumandu.gui.pref.PreferencesBackupFragment"
         android:title="@string/pref_title_header_backup" />
     <Preference

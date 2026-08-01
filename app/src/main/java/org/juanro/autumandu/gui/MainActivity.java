@@ -91,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements
     private static final String STATE_TITLE = "title";
     private static final String STATE_NAV_ITEM_INDEX = "nav_item_index";
 
-    private static final String INTENT_EXTRA_FRAGMENT = "fragment";
-    private static final String INTENT_EXTRA_ARGUMENTS = "arguments";
+    public static final String INTENT_EXTRA_FRAGMENT = "fragment";
+    public static final String INTENT_EXTRA_ARGUMENTS = "arguments";
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -218,6 +218,13 @@ public class MainActivity extends AppCompatActivity implements
         ReminderWorker.schedulePeriodicUpdate(this);
 
         checkNotificationPermission();
+
+        if (savedInstanceState == null) {
+            String fragmentClassName = getIntent().getStringExtra(INTENT_EXTRA_FRAGMENT);
+            if (fragmentClassName != null) {
+                navigateToFragment(null, fragmentClassName, getIntent().getBundleExtra(INTENT_EXTRA_ARGUMENTS));
+            }
+        }
 
         if (new Preferences(this).hasSyncConflict()) {
             showSyncConflictDialog();
@@ -412,7 +419,9 @@ public class MainActivity extends AppCompatActivity implements
         fm.popBackStack();
         fm.beginTransaction().replace(R.id.content_frame, mCurrentFragment).commit();
 
-        setTitle(menuItem.getTitle());
+        if (menuItem != null) {
+            setTitle(menuItem.getTitle());
+        }
 
         // Update ActionBar icon
         updateActionBarIcon();
@@ -420,6 +429,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateCurrentNavItemIndex(MenuItem menuItem) {
+        if (menuItem == null) return;
         Menu menu = mNavigationView.getMenu();
         for (int i = 0; i < menu.size(); i++) {
             if (menu.getItem(i) == menuItem) {

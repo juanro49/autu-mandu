@@ -432,6 +432,30 @@
     <string name="pref_theme_light">Light</string>
     <string name="pref_theme_dark">Dark</string>
     <string name="pref_theme_system">System default</string>
+
+    <string name="pref_title_language">App language</string>
+    <string name="pref_summary_language">Change the language of the application</string>
+    <string name="pref_language_default">System default</string>
+
+    <string name="language_en">English</string>
+    <string name="language_ar">العربية (Arabic)</string>
+    <string name="language_ca">Català (Catalan)</string>
+    <string name="language_cs">Čeština (Czech)</string>
+    <string name="language_de">Deutsch (German)</string>
+    <string name="language_es">Español (Spanish)</string>
+    <string name="language_ext">Estremeñu (Extremaduran)</string>
+    <string name="language_fi">Suomi (Finnish)</string>
+    <string name="language_fr">Français (French)</string>
+    <string name="language_it">Italiano (Italian)</string>
+    <string name="language_ko">한국어 (Korean)</string>
+    <string name="language_nb">Norsk bokmål (Norwegian Bokmål)</string>
+    <string name="language_nl">Nederlands (Dutch)</string>
+    <string name="language_pl">Polski (Polish)</string>
+    <string name="language_pt">Português (Portuguese)</string>
+    <string name="language_ru">Русский (Russian)</string>
+    <string name="language_ta">தமிழ் (Tamil)</string>
+    <string name="language_tr">Türkçe (Turkish)</string>
+    <string name="language_uk">Українська (Ukrainian)</string>
     <string name="section_trip_times">Times</string>
     <string name="section_trip_route">Route &amp; Purpose</string>
     <string name="section_trip_odometer">Odometer</string>

@@ -120,5 +120,15 @@
             android:name=".util.reminder.ReminderActionReceiver"
             android:exported="false"/>
 
+        <!-- AppCompat locales service -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="auto_store_locales"
+                android:value="true" />
+        </service>
+
     </application>
 </manifest>

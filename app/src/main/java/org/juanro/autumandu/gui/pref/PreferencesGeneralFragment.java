@@ -21,6 +21,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
@@ -64,6 +65,7 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
                 case Preferences.KEY_UNIT_FUEL_CONSUMPTION -> handleFuelConsumptionChange((ListPreference) preference, newValue);
                 case Preferences.KEY_UNIT_COST_PER_DISTANCE -> handleCostPerDistanceChange((ListPreference) preference, newValue);
                 case Preferences.KEY_THEME -> handleThemeChange((ListPreference) preference, newValue);
+                case Preferences.KEY_LANGUAGE -> handleLanguageChange((ListPreference) preference, newValue);
                 case Preferences.KEY_DYNAMIC_COLOR -> requireActivity().recreate();
                 default -> {
                     if (preference instanceof EditTextPreference) {
@@ -134,9 +136,26 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
             updateThemeSummary(preference, theme);
         }
 
+        private void handleLanguageChange(ListPreference preference, Object newValue) {
+            String localeTag = newValue.toString();
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(localeTag));
+            updateLanguageSummary(preference, localeTag);
+        }
+
         private void updateThemeSummary(ListPreference preference, String value) {
             String[] values = getResources().getStringArray(R.array.theme_values);
             String[] entries = getResources().getStringArray(R.array.theme_entries);
+            for (int i = 0; i < values.length; i++) {
+                if (values[i].equals(value)) {
+                    preference.setSummary(entries[i]);
+                    break;
+                }
+            }
+        }
+
+        private void updateLanguageSummary(ListPreference preference, String value) {
+            String[] values = getResources().getStringArray(R.array.language_values);
+            String[] entries = getResources().getStringArray(R.array.language_entries);
             for (int i = 0; i < values.length; i++) {
                 if (values[i].equals(value)) {
                     preference.setSummary(entries[i]);
@@ -218,6 +237,14 @@ public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
 
         // Unit Distance
         setupSimplePreference(Preferences.KEY_UNIT_DISTANCE, prefs.getUnitDistance());
+
+        // UI Language
+        ListPreference languagePref = findPreference(Preferences.KEY_LANGUAGE);
+        if (languagePref != null) {
+            String currentLocales = AppCompatDelegate.getApplicationLocales().toLanguageTags();
+            onPreferenceChangeListener.updateLanguageSummary(languagePref, currentLocales);
+            languagePref.setOnPreferenceChangeListener(onPreferenceChangeListener);
+        }
 
         // UI Theme
         ListPreference themePref = findPreference(Preferences.KEY_THEME);
