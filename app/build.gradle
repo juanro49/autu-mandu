@@ -12,8 +12,8 @@ android {
         applicationId = "org.juanro.autumandu"
         minSdk = 26
         targetSdk = 37
-        versionCode = 603
-        versionName = "6.0.3"
+        versionCode = 604
+        versionName = "6.0.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -96,16 +96,16 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
     // --- AndroidX & Support ---
-    implementation 'androidx.compose.ui:ui:1.11.3'
+    implementation 'androidx.compose.ui:ui:1.11.4'
     implementation 'androidx.compose.material3:material3:1.4.0'
-    implementation 'androidx.compose.material:material:1.11.3'
-    implementation 'androidx.compose.ui:ui-tooling-preview:1.11.3'
+    implementation 'androidx.compose.material:material:1.11.4'
+    implementation 'androidx.compose.ui:ui-tooling-preview:1.11.4'
     implementation 'androidx.activity:activity-compose:1.13.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.recyclerview:recyclerview-selection:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
     implementation 'androidx.fragment:fragment:1.8.9'
     implementation 'androidx.documentfile:documentfile:1.1.0'
     implementation 'androidx.work:work-runtime:2.11.2'
@@ -124,7 +124,7 @@ dependencies {
 
     // --- External Charts & UI ---
     implementation 'com.kubit-lab:charts:0.2.1'
-    implementation 'com.mikepenz:aboutlibraries-core:14.2.1'
+    implementation 'com.mikepenz:aboutlibraries-core:15.0.4'
     implementation 'com.mikepenz:aboutlibraries:14.2.1'
 
     // --- Testing ---

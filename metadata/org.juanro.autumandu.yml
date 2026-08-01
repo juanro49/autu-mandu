@@ -24,7 +24,7 @@ Builds:
     subdir: app
     gradle:
       - yes
-      
+
   - versionName: 6.0.2
     versionCode: 602
     commit: c17e5bbef32a8707199a041fef31e521e6605d2a
@@ -45,5 +45,5 @@ AutoUpdateMode: Version
 UpdateCheckMode: Tags
 UpdateCheckData:
   app/build.gradle|versionCode\s*=?\s*(\d+)|app/build.gradle|versionName\s*=?\s*["']([^"']+)["']
-CurrentVersion: 6.0.3
-CurrentVersionCode: 603
+CurrentVersion: 6.0.4
+CurrentVersionCode: 604
