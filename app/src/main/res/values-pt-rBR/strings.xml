@@ -469,4 +469,6 @@
     <string name="toast_import_carbudget_success">Importação do CarBudget completada com sucesso.</string>
     <string name="toast_import_carbudget_result">Foram importados %1$d reabastecimentos, %2$d outros custos e %3$d conjunto de pneus.</string>
     <string name="toast_import_carbudget_failed">Erro ao importar do CarBudget: %s</string>
+    <string name="pref_default_backup_path_restored">Caminho de backup padrão restaurado:</string>
+    <string name="chart_content_description_line">Gráfico de linha de tendência</string>
 </resources>
