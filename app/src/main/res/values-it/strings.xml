@@ -287,7 +287,6 @@ limitations under the License.
     <string name="app_description">Inserisci i costi della tua auto e ricevi resoconti e statistiche.</string>
     <string name="pref_default_backup_path_restored">Impostato percorso di backup predefinito:</string>
     <string name="pref_title_restore_backup_location">Ripristina archivio</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="title_stations">Stazioni di rifornimento</string>
     <string name="hint_buying_price">Prezzo d\'acquisto</string>
     <string name="validate_error_station_exists">Questa stazione di rifornimento esiste già.</string>

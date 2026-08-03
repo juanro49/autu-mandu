@@ -110,7 +110,6 @@
     <string name="description_reminder_status_time">Vence em %s</string>
     <string name="hint_time">Hora</string>
     <string name="label_set_end_date">Definir a data final</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="pref_title_behavior_show_car_menu">Mostrar menu de carros</string>
     <string name="missing_refueling">Abastecimento não cadastrado</string>
     <string name="title_refuelings">Reabastecimentos</string>

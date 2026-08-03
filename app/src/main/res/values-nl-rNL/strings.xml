@@ -269,7 +269,6 @@
     <string name="time_day">Dag(en)</string>
     <string name="time_month">Maand(en)</string>
     <string name="time_year">Jaar(en)</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="menu_add_station">Voeg station toe</string>
     <string name="hint_buying_price">Koop Prijs</string>
     <string name="validate_error_station_exists">Dit station bestaat al.</string>

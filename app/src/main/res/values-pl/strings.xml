@@ -3,7 +3,6 @@
     <string name="app_description">Wprowadź koszty twojego auta i przeglądaj raporty i statystyki z nimi związane.</string>
     <string name="about_thanks">Z podziękowaniami dla:</string>
     <string name="about_version">Wersja: %s</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="drawer_reports">Raporty</string>
     <string name="drawer_calculator">Kalkulator</string>
     <string name="drawer_settings">Ustawienia</string>

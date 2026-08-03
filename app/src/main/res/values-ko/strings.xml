@@ -3,7 +3,6 @@
     <string name="app_description">차량 비용을 입력하면 유용한 보고서와 통계를 받아볼 수 있습니다.</string>
     <string name="about_thanks">감사합니다:</string>
     <string name="about_version">버전:%s</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="about_licenses">라이선스</string>
     <string name="drawer_reports">리포트</string>
     <string name="drawer_calculator">계산기</string>

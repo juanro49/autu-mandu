@@ -388,31 +388,6 @@
     <string name="time_year">Añu(s)</string>
     <string name="tire_state_mounted">Montáu</string>
     <string name="tire_state_trashed">Esborrau</string>
-    <string name="about_licenses_styles" translatable="false">
-        body {
-            color: #fff;
-            background-color: #424242;
-            font-family: sans-serif;
-            overflow-wrap: break-word;
-        }
-
-        pre {
-            color: #fff;
-            background-color: #303030;
-            padding: 1em;
-            white-space: pre-wrap;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        a {
-            color: #607d8b;
-        }
-    </string>
     <string name="title_select_color">Escoyel color</string>
     <string name="validate_error_empty">El campu nu puei estal vacíu</string>
     <string name="report_chart_option_donut">Dona</string>

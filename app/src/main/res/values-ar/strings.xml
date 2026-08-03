@@ -68,7 +68,6 @@
     <string name="notification_reminder_channel">التذكيرات</string>
     <string name="notification_reminder_title_single">تذكير: %s</string>
     <string name="notification_reminder_title_multiple">تذكيرات متعددة</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="time_month">شهر/اشهر</string>
     <string name="time_year">سنة/سنين</string>
     <string name="reminder_distance">بعد مسافة</string>

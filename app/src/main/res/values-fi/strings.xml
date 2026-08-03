@@ -6,7 +6,6 @@
     <string name="about_licenses">Lisenssit</string>
     <string name="drawer_reports">Raportit</string>
     <string name="drawer_calculator">Laskin</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="drawer_settings">Asetukset</string>
     <string name="drawer_help">Apu</string>
     <string name="drawer_open">Avaa navigointi</string>

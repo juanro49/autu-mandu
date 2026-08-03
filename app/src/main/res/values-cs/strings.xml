@@ -41,7 +41,6 @@
     <string name="drawer_help">Nápověda</string>
     <string name="about_thanks">Poděkování:</string>
     <string name="about_version">Verze: %s</string>
-    <string name="about_git">https://github.com/juanro49/autu-mandu</string>
     <string name="about_licenses">Licence</string>
     <string name="menu_save">Hotovo</string>
     <string name="menu_cancel">Zrušit</string>
