@@ -83,21 +83,25 @@
 
     <string-array name="language_entries">
         <item>@string/pref_language_default</item>
-        <item>@string/language_en</item>
         <item>@string/language_ar</item>
         <item>@string/language_ca</item>
         <item>@string/language_cs</item>
         <item>@string/language_de</item>
+        <item>@string/language_en</item>
         <item>@string/language_es</item>
+        <item>@string/language_es_mx</item>
         <item>@string/language_ext</item>
         <item>@string/language_fi</item>
         <item>@string/language_fr</item>
         <item>@string/language_it</item>
         <item>@string/language_ko</item>
         <item>@string/language_nb</item>
+        <item>@string/language_nb_no</item>
         <item>@string/language_nl</item>
+        <item>@string/language_nl_nl</item>
         <item>@string/language_pl</item>
         <item>@string/language_pt</item>
+        <item>@string/language_pt_br</item>
         <item>@string/language_ru</item>
         <item>@string/language_ta</item>
         <item>@string/language_tr</item>
@@ -106,21 +110,25 @@
 
     <string-array name="language_values">
         <item></item>
-        <item>en</item>
         <item>ar</item>
         <item>ca</item>
         <item>cs</item>
         <item>de</item>
+        <item>en</item>
         <item>es</item>
+        <item>es-MX</item>
         <item>ext</item>
         <item>fi</item>
         <item>fr</item>
         <item>it</item>
         <item>ko</item>
         <item>nb</item>
+        <item>nb-NO</item>
         <item>nl</item>
+        <item>nl-NL</item>
         <item>pl</item>
         <item>pt</item>
+        <item>pt-BR</item>
         <item>ru</item>
         <item>ta</item>
         <item>tr</item>
