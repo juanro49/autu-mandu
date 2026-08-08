@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="menu_add_station">أضف محطة وقود</string>
+    <string name="menu_add_station">إضافة محطة وقود</string>
     <string name="about_thanks">شكرا لـ :</string>
     <string name="about_version">الإصدار : %s</string>
     <string name="app_description">قم بإدراج تكاليف سيارتك واحصل على تقارير جميلة وإحصائيات.</string>
@@ -24,7 +24,7 @@
     <string name="hint_name">الإسم</string>
     <string name="hint_date">التاريخ</string>
     <string name="hint_time">الوقت</string>
-    <string name="hint_end_date">ينتهى فى</string>
+    <string name="hint_end_date">ينتهي في</string>
     <string name="hint_buying_price">سعر الشراء</string>
     <string name="hint_user_name">إسم المستخدم</string>
     <string name="hint_password">كلمة المرور</string>
@@ -44,9 +44,9 @@
     <string name="description_reminder_status_time">مستحق فى %s</string>
     <string name="validate_error_greater_zero">يجب ان يكون أكبر من الصفر</string>
     <string name="validate_error_not_empty">يجب ألا يكون فارغا</string>
-    <string name="title_add_other_income">أضف ايراد اخر</string>
+    <string name="title_add_other_income">إضافة ايراد اخر</string>
     <string name="title_edit_other_expenditure">تعديل مصروف اخر</string>
-    <string name="title_add_fuel_type">أضف نوع وقود</string>
+    <string name="title_add_fuel_type">إضافة نوع وقود</string>
     <string name="edit_title_refueling">التزود بالوقود</string>
     <string name="alert_delete_other_expenditure_message">سيتم حذف هذا المصروف.</string>
     <string name="alert_about_licenses_title">الرخص</string>
@@ -64,7 +64,7 @@
     <string name="pref_title_behavior_show_car_menu">عرض قائمة السيارات</string>
     <string name="pref_title_behavior_distance_entry_mode">طريقة ادخال المسافة</string>
     <string name="pref_title_unit_distance">المسافة</string>
-    <string name="first_start_create_car">أضف سيارة</string>
+    <string name="first_start_create_car">إضافة سيارة</string>
     <string name="notification_reminder_channel">التذكيرات</string>
     <string name="notification_reminder_title_single">تذكير: %s</string>
     <string name="notification_reminder_title_multiple">تذكيرات متعددة</string>
@@ -79,22 +79,22 @@
     <string name="reminder_distance_time">بعد مسافة او فترة زمنية , أيهما أقرب</string>
     <string name="title_stations">محطات الوقود</string>
     <string name="drawer_reports">التقارير</string>
-    <string name="menu_add_reminder">أضف تذكير</string>
-    <string name="menu_add_car">أضف سيارة</string>
-    <string name="menu_add_fuel_type">أضف نواع الوقود</string>
+    <string name="menu_add_reminder">إضافة تذكير</string>
+    <string name="menu_add_car">إضافة سيارة</string>
+    <string name="menu_add_fuel_type">إضافة نوع الوقود</string>
     <string name="label_reminder_type">النوع</string>
     <string name="overwrite">نظرة عامة</string>
     <string name="title_settings">الإعدادات</string>
     <string name="title_help">المساعدة</string>
-    <string name="title_add_other_expenditure">أضف مصروف اخر</string>
+    <string name="title_add_other_expenditure">إضافة مصروف اخر</string>
     <string name="title_edit_other_income">تعديل ايراد اخر</string>
-    <string name="title_add_reminder">أضف تذكير</string>
-    <string name="title_add_car">أضف سيارة</string>
+    <string name="title_add_reminder">إضافة تذكير</string>
+    <string name="title_add_car">إضافة سيارة</string>
     <string name="title_edit_car">تعديل سيارة</string>
     <string name="title_edit_fuel_type">تعديل نوع وقود</string>
     <string name="title_edit_reminder">تعديل تذكير</string>
     <string name="title_edit_station">تعديل محطة وقود</string>
-    <string name="title_add_station">أضف محطة وقود</string>
+    <string name="title_add_station">إضافة محطة وقود</string>
     <string name="time_day">يوم/ايام</string>
     <string name="pref_title_unit_currency">العملة</string>
     <string name="reminder_time">بعد فترة زمنية</string>
@@ -121,7 +121,7 @@
     <string name="first_start_step1_img_desc">الخطوة الأولى</string>
     <string name="first_start_step2_img_desc">الخطوة الثانية</string>
     <string name="first_start_step3_img_desc">الخطوة الثالثة</string>
-    <string name="first_start_step1_text">أضف سيارة.</string>
+    <string name="first_start_step1_text">إضافة سيارة.</string>
     <string name="first_start_step3_text">بعد مرتين من ملء خزان الوقود سوف ترى أول رسم بيانى.</string>
     <string name="validate_error_greater_equal_zero">يجب أن يكون أكبر من او يساوى صفر</string>
     <string name="alert_delete_other_income_message">سيتم حذف هذا الايراد.</string>
@@ -131,7 +131,7 @@
     <string name="alert_delete_fuel_types_message">%d انواع وقود محددة سيتم حذفها.</string>
     <string name="alert_delete_cars_message">%d سيارات محددة سيتم حذفها.</string>
     <string name="report_highest">الأعلى</string>
-    <string name="title_add_refueling">أضف تزود بالوقود</string>
+    <string name="title_add_refueling">إضافة تزود بالوقود</string>
     <string name="title_edit_refueling">تعديل تزود بالوقود</string>
     <string name="alert_delete_refueling_message">سيتم حذف هذا التزود بالوقود.</string>
     <string name="report_graph_per_refueling">لكل تزود بالوقود</string>
@@ -184,4 +184,12 @@
     <string name="pref_title_category_export">استيراد و تصدير</string>
     <string name="pref_title_exportcsv">تصدير CSV</string>
     <string name="pref_title_importcsv">استيراد CSV</string>
+    <string name="drawer_reminders">التذكيرات</string>
+    <string name="menu_copy">نسخ</string>
+    <string name="fab_add_trip">رحلة</string>
+    <string name="fab_add_tires">إطارات جديدة</string>
+    <string name="hint_start_date">يبدأ في</string>
+    <string name="hint_trip_start_time">وقت البدء</string>
+    <string name="title_add_trip">إضافة رحلة</string>
+    <string name="hint_manufacturer">الشركة المُصَنِّعة</string>
 </resources>
