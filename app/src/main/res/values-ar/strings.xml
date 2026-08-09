@@ -192,4 +192,9 @@
     <string name="hint_trip_start_time">وقت البدء</string>
     <string name="title_add_trip">إضافة رحلة</string>
     <string name="hint_manufacturer">الشركة المُصَنِّعة</string>
+    <string name="title_add_tire">إضافة إطار</string>
+    <string name="title_edit_tire">تعديل إطار</string>
+    <string name="title_edit_trip">تعديل رحلة</string>
+    <string name="default_fuel_category">عام</string>
+    <string name="default_station">افتراضى</string>
 </resources>
