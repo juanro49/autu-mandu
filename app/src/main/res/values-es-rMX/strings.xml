@@ -13,8 +13,7 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<resources>
+--><resources>
     <string name="app_description">Introduce los costes de tu coche y recibe bonitos informes y estadísticas.</string>
     <string name="about_thanks">Gracias a:</string>
     <string name="about_version">Versión: %s</string>
@@ -166,8 +165,8 @@
     <string name="alert_cannot_delete_station">No se puede eliminar la estación porque se usa en al menos una recarga o tanque.</string>
     <string name="alert_about_licenses_title">Licencias</string>
     <string name="alert_change_color_title">Elegir color</string>
-    <string name="alert_sync_finishing_authentication">Finalizando autenticación&#8230;</string>
-    <string name="alert_sync_performing_first_sync">Realizando primera sincronización&#8230;</string>
+    <string name="alert_sync_finishing_authentication">Finalizando autenticación…</string>
+    <string name="alert_sync_performing_first_sync">Realizando primera sincronización…</string>
     <string name="alert_sync_first_sync_message">Hay datos remotos disponibles. Por favor, elige qué datos quieres usar en tu primera sincronización.</string>
     <string name="alert_sync_first_sync_download">Datos en línea</string>
     <string name="alert_sync_first_sync_upload">Datos locales</string>
@@ -394,7 +393,6 @@
     <string name="pref_theme_light">Claro</string>
     <string name="pref_theme_dark">Oscuro</string>
     <string name="pref_theme_system">Predeterminado del sistema</string>
-
     <string name="pref_title_language">Idioma de la aplicación</string>
     <string name="pref_summary_language">Cambia el idioma de la aplicación</string>
     <string name="pref_language_default">Predeterminado del sistema</string>
@@ -430,7 +428,7 @@
     <string name="btn_trip_start_location">Ubicación de inicio</string>
     <string name="btn_trip_end_location">Ubicación de fin</string>
     <string name="trip_location_not_set">No establecido</string>
-    <string name="trip_location_fetching">Obteniendo ubicación&#8230;</string>
+    <string name="trip_location_fetching">Obteniendo ubicación…</string>
     <string name="trip_location_error">Error al obtener la ubicación</string>
     <string name="trip_location_disabled">Los servicios de ubicación están desactivados</string>
     <string name="trip_location_permission_denied">Permiso de ubicación denegado</string>
@@ -441,7 +439,6 @@
     <string name="import_select_file">Seleccionar archivo CSV</string>
     <string name="btn_find_station_carburoid">Buscar con Carburoid</string>
     <string name="toast_carburoid_not_installed">Carburoid no está instalado. Abriendo página de GitHub.</string>
-
     <string name="pref_title_import_carbudget">Importar desde CarBudget (SailfishOS)</string>
     <string name="pref_summary_import_carbudget">Importar datos desde un archivo de base de datos de CarBudget (.cbg).</string>
     <string name="alert_import_carbudget_title">Importar CarBudget (SailfishOS)</string>
@@ -451,4 +448,8 @@
     <string name="toast_import_carbudget_success">La importación desde CarBudget se completó con éxito.</string>
     <string name="toast_import_carbudget_result">Se importaron %1$d repostajes, %2$d otros gastos y %3$d juegos de neumáticos.</string>
     <string name="toast_import_carbudget_failed">Error al importar desde CarBudget: %s</string>
+    <string name="description_webdav_url">Favor de introducir la URL a una carpeta especial para Autu Mandu en tu servidor WebDAV. Autu Mandu guardará sus datos en esta carpeta. No hará modificaciones fuera de esta carpeta.</string>
+    <string name="description_webdav_trust_certificate">El sitio web utiliza un certificado de seguridad que no es confiado por Android.</string>
+    <string name="empty_if_unknown">Por favor, deja vacío si no sabes que indicar aquí.</string>
+    <string name="pref_default_backup_path_restored">Ruta de copia de seguridad predeterminada restaurada:</string>
 </resources>
