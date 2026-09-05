@@ -141,9 +141,18 @@ public class WebDavClient {
     }
 
     public void testLogin() throws HttpException, UntrustedCertificateException {
+        // Jianguoyun (and possibly other WebDAV servers) return 403 for HEAD/GET
+        // requests targeting a collection resource, even with valid credentials.
+        // PROPFIND with Depth: 0 is the WebDAV-mandated way to probe a collection
+        // and works reliably against such servers.
+        String propfindBody = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+                + "<D:propfind xmlns:D=\"DAV:\"><D:prop><D:resourcetype/></D:prop></D:propfind>";
+        RequestBody body = RequestBody.create(propfindBody, MediaType.parse("application/xml; charset=utf-8"));
+
         Request request = new Request.Builder()
                 .url(baseUri.toString())
-                .head()
+                .method("PROPFIND", body)
+                .header("Depth", "0")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
