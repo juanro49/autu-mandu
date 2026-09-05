@@ -35,11 +35,13 @@ import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.dialog.EditStationDialogFragment;
 import org.juanro.autumandu.gui.dialog.MessageDialogFragment;
 import org.juanro.autumandu.model.dto.StationWithVolume;
+import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.viewmodel.StationsViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class PreferencesStationsFragment extends AbstractPreferencesListFragment {
 
@@ -67,8 +69,20 @@ public class PreferencesStationsFragment extends AbstractPreferencesListFragment
             TextView text1 = view.findViewById(android.R.id.text1);
             TextView text2 = view.findViewById(android.R.id.text2);
             text1.setText(stationWithVolume.station().getName());
-            text2.setText(String.format(Locale.getDefault(), "%.2f l", stationWithVolume.totalVolume()));
+            text2.setText(formatVolumesByCategory(stationWithVolume.volumesByCategory()));
             return view;
+        }
+
+        private String formatVolumesByCategory(Map<String, Double> volumesByCategory) {
+            List<String> formatted = new ArrayList<>();
+            for (Map.Entry<String, Double> entry : volumesByCategory.entrySet()) {
+                if (entry.getValue() > 0) {
+                    FuelCategory category = FuelCategory.fromKey(entry.getKey());
+                    String unit = category.getVolumeUnit(requireContext());
+                    formatted.add(String.format(Locale.getDefault(), "%.2f %s", entry.getValue(), unit));
+                }
+            }
+            return String.join(", ", formatted);
         }
 
         @Override

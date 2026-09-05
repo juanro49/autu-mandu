@@ -16,15 +16,13 @@
 
 package org.juanro.autumandu.model.dto;
 
+import androidx.room.Embedded;
 import org.juanro.autumandu.model.entity.Station;
 
-import java.util.Map;
-
-public record StationWithVolume(
+public record StationCategoryVolume(
+        @Embedded
         Station station,
-        Map<String, Double> volumesByCategory
+        String category,
+        double volume
 ) {
-    public double totalVolume() {
-        return volumesByCategory.values().stream().mapToDouble(Double::doubleValue).sum();
-    }
 }

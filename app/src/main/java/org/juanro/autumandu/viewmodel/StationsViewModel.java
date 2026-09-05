@@ -21,12 +21,18 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 
 import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dto.StationCategoryVolume;
 import org.juanro.autumandu.model.dto.StationWithVolume;
 import org.juanro.autumandu.model.entity.Station;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -38,7 +44,22 @@ public class StationsViewModel extends AndroidViewModel {
     public StationsViewModel(@NonNull Application application) {
         super(application);
         db = AutuManduDatabase.getInstance(application);
-        stations = db.getStationDao().getAllWithVolumeLiveData();
+        stations = Transformations.map(db.getStationDao().getAllStationCategoryVolumesLiveData(), this::aggregate);
+    }
+
+    private List<StationWithVolume> aggregate(List<StationCategoryVolume> input) {
+        Map<Long, StationWithVolume> aggregated = new TreeMap<>();
+        for (StationCategoryVolume scv : input) {
+            StationWithVolume swv = aggregated.computeIfAbsent(scv.station().getId(),
+                    id -> new StationWithVolume(scv.station(), new HashMap<>()));
+            if (scv.category() != null) {
+                swv.volumesByCategory().put(scv.category(), scv.volume());
+            }
+        }
+
+        List<StationWithVolume> result = new ArrayList<>(aggregated.values());
+        result.sort((a, b) -> Double.compare(b.totalVolume(), a.totalVolume()));
+        return result;
     }
 
     public LiveData<List<StationWithVolume>> getStations() {

@@ -57,23 +57,36 @@ public interface StationDao {
     LiveData<Station> getMostUsedForCarLiveData(long carId);
 
     @Query("""
-        SELECT s.*, SUM(r.volume) AS totalVolume
+        SELECT s.*, ft.category, SUM(r.volume) AS volume
         FROM station s
         LEFT JOIN refueling r ON s._id = r.station_id
+        LEFT JOIN fuel_type ft ON r.fuel_type_id = ft._id
         WHERE r.car_id = :carId OR r.car_id IS NULL
-        GROUP BY s._id
-        ORDER BY totalVolume DESC, s.station__name ASC
+        GROUP BY s._id, ft.category
+        ORDER BY s.station__name ASC
     """)
-    LiveData<List<org.juanro.autumandu.model.dto.StationWithVolume>> getStationsWithVolumeForCarLiveData(long carId);
+    List<org.juanro.autumandu.model.dto.StationCategoryVolume> getStationCategoryVolumesForCar(long carId);
 
     @Query("""
-        SELECT s.*, SUM(r.volume) AS totalVolume
+        SELECT s.*, ft.category, SUM(r.volume) AS volume
         FROM station s
         LEFT JOIN refueling r ON s._id = r.station_id
-        GROUP BY s._id
-        ORDER BY totalVolume DESC, s.station__name ASC
+        LEFT JOIN fuel_type ft ON r.fuel_type_id = ft._id
+        WHERE r.car_id = :carId OR r.car_id IS NULL
+        GROUP BY s._id, ft.category
+        ORDER BY s.station__name ASC
     """)
-    LiveData<List<org.juanro.autumandu.model.dto.StationWithVolume>> getAllWithVolumeLiveData();
+    LiveData<List<org.juanro.autumandu.model.dto.StationCategoryVolume>> getStationCategoryVolumesForCarLiveData(long carId);
+
+    @Query("""
+        SELECT s.*, ft.category, SUM(r.volume) AS volume
+        FROM station s
+        LEFT JOIN refueling r ON s._id = r.station_id
+        LEFT JOIN fuel_type ft ON r.fuel_type_id = ft._id
+        GROUP BY s._id, ft.category
+        ORDER BY s.station__name ASC
+    """)
+    LiveData<List<org.juanro.autumandu.model.dto.StationCategoryVolume>> getAllStationCategoryVolumesLiveData();
 
     @Query("SELECT * FROM station WHERE station__name = :name LIMIT 1")
     Station getByName(String name);

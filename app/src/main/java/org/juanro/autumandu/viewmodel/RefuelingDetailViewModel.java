@@ -115,12 +115,12 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
                 getNextRefueling(carId, date, nextRefueling -> {
                     boolean showWarning;
                     if (entryMode == DistanceEntryMode.TOTAL) {
-                        showWarning = (previousRefueling != null && previousRefueling.getMileage() >= mileage) ||
-                                (nextRefueling != null && nextRefueling.getMileage() <= mileage);
+                        showWarning = (previousRefueling != null && previousRefueling.getMileage() > mileage) ||
+                                (nextRefueling != null && nextRefueling.getMileage() < mileage);
                     } else {
                         showWarning = previousRefueling != null &&
                                 nextRefueling != null &&
-                                previousRefueling.getMileage() + mileage >= nextRefueling.getMileage();
+                                previousRefueling.getMileage() + mileage > nextRefueling.getMileage();
                     }
                     callback.onLoaded(showWarning);
                 }));

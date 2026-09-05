@@ -22,26 +22,24 @@ import android.util.SparseArray;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.DataDetailActivity;
 import org.juanro.autumandu.model.dto.StationWithVolume;
+import org.juanro.autumandu.model.entity.FuelCategory;
 
 public class DataListStationFragment extends AbstractDataListFragment<StationWithVolume> {
-
-    private String unitVolume;
 
     private org.juanro.autumandu.viewmodel.StationListViewModel viewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        var prefs = new Preferences(requireContext());
-        unitVolume = prefs.getUnitVolume();
 
         viewModel = new ViewModelProvider(this).get(org.juanro.autumandu.viewmodel.StationListViewModel.class);
     }
@@ -69,9 +67,21 @@ public class DataListStationFragment extends AbstractDataListFragment<StationWit
     protected SparseArray<String> getItemData(StationWithVolume stationWithVolume) {
         var data = new SparseArray<String>(7);
         data.put(R.id.title, stationWithVolume.station().getName());
-        data.put(R.id.data1, String.format(Locale.getDefault(), "%.2f %s", stationWithVolume.totalVolume(), unitVolume));
+        data.put(R.id.data1, formatVolumesByCategory(stationWithVolume.volumesByCategory()));
 
         return data;
+    }
+
+    private String formatVolumesByCategory(Map<String, Double> volumesByCategory) {
+        List<String> formatted = new ArrayList<>();
+        for (Map.Entry<String, Double> entry : volumesByCategory.entrySet()) {
+            if (entry.getValue() > 0) {
+                FuelCategory category = FuelCategory.fromKey(entry.getKey());
+                String unit = category.getVolumeUnit(requireContext());
+                formatted.add(String.format(Locale.getDefault(), "%.2f %s", entry.getValue(), unit));
+            }
+        }
+        return String.join(", ", formatted);
     }
 
     @Override

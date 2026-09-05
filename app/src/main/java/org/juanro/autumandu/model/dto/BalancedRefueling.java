@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.util.Calculator;
@@ -121,6 +123,33 @@ public class BalancedRefueling {
                                                  FuelConsumption.Type consumptionType,
                                                  boolean guessMissingData,
                                                  boolean orderDescending) {
+        if (input.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Group by category to handle dual-fuel cars correctly.
+        // Each category (e.g. Gasoline, LPG) is balanced and its consumption calculated independently.
+        Map<String, List<RefuelingWithDetails>> byCategory = input.stream()
+                .collect(Collectors.groupingBy(rwd -> rwd.fuelTypeCategory() != null ? rwd.fuelTypeCategory() : ""));
+
+        List<BalancedRefueling> allBalanced = new ArrayList<>();
+        for (List<RefuelingWithDetails> categoryInput : byCategory.values()) {
+            allBalanced.addAll(balanceCategory(categoryInput, consumptionType, guessMissingData));
+        }
+
+        // Sort globally by date
+        allBalanced.sort(Comparator.comparing(BalancedRefueling::getDate));
+
+        if (orderDescending) {
+            Collections.reverse(allBalanced);
+        }
+
+        return allBalanced;
+    }
+
+    private static List<BalancedRefueling> balanceCategory(List<RefuelingWithDetails> input,
+                                                           FuelConsumption.Type consumptionType,
+                                                           boolean guessMissingData) {
         List<BalancedRefueling> refuelings = new ArrayList<>();
         List<RefuelingWithDetails> sortedInput = new ArrayList<>(input);
         sortedInput.sort(Comparator.comparing(RefuelingWithDetails::date));
@@ -140,10 +169,6 @@ public class BalancedRefueling {
         }
 
         calculateConsumptions(refuelings, consumptionType);
-
-        if (orderDescending) {
-            Collections.reverse(refuelings);
-        }
 
         return refuelings;
     }
@@ -453,7 +478,7 @@ public class BalancedRefueling {
         for (int i = 1; i < refuelings.size(); i++) {
             BalancedRefueling previousRefueling = refuelings.get(i - 1);
             BalancedRefueling refueling = refuelings.get(i);
-            if (refueling.getMileage() <= previousRefueling.getMileage()) {
+            if (refueling.getMileage() < previousRefueling.getMileage()) {
                 refueling.setValid(false);
                 valid = false;
             }
