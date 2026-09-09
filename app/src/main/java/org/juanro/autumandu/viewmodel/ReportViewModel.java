@@ -21,7 +21,6 @@ import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
 import android.app.Application;
 import android.content.SharedPreferences;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -29,7 +28,12 @@ import androidx.lifecycle.MediatorLiveData;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.data.query.ReminderQueries;
 import org.juanro.autumandu.data.report.AbstractReport;
-import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dao.CarDao;
+import org.juanro.autumandu.model.dao.OtherCostDao;
+import org.juanro.autumandu.model.dao.RefuelingDao;
+import org.juanro.autumandu.model.dao.ReminderDao;
+import org.juanro.autumandu.model.dao.TireDao;
+import org.juanro.autumandu.model.dao.TripDao;
 import org.juanro.autumandu.model.dto.ReminderWithCar;
 
 import java.util.ArrayList;
@@ -37,6 +41,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class ReportViewModel extends AndroidViewModel implements SharedPreferences.OnSharedPreferenceChangeListener {
     private final MediatorLiveData<List<AbstractReport>> mReports = new MediatorLiveData<>();
     private final MediatorLiveData<Boolean> mHasDueReminders = new MediatorLiveData<>();
@@ -44,21 +53,29 @@ public class ReportViewModel extends AndroidViewModel implements SharedPreferenc
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private final Preferences mPrefs;
 
-    public ReportViewModel(@NonNull Application application) {
+    @Inject
+    public ReportViewModel(
+            Application application,
+            CarDao carDao,
+            RefuelingDao refuelingDao,
+            OtherCostDao otherCostDao,
+            TireDao tireDao,
+            TripDao tripDao,
+            ReminderDao reminderDao
+    ) {
         super(application);
         mPrefs = new Preferences(application);
         getDefaultSharedPreferences(application)
                 .registerOnSharedPreferenceChangeListener(this);
 
-        AutuManduDatabase db = AutuManduDatabase.getInstance(application);
         // Observamos todas las fuentes de datos que afectan a los informes
-        mReports.addSource(db.getCarDao().getAllLiveData(), cars -> invalidateAndRefresh());
-        mReports.addSource(db.getRefuelingDao().getWithDetailsForCarLiveData(-1), refueling -> invalidateAndRefresh());
-        mReports.addSource(db.getOtherCostDao().getAllLiveData(), otherCosts -> invalidateAndRefresh());
-        mReports.addSource(db.getTireDao().getAllTireListsLiveData(), tires -> invalidateAndRefresh());
-        mReports.addSource(db.getTripDao().getTripsWithDetailsForCarLive(-1), trips -> invalidateAndRefresh());
+        mReports.addSource(carDao.getAllLiveData(), cars -> invalidateAndRefresh());
+        mReports.addSource(refuelingDao.getWithDetailsForCarLiveData(-1), refueling -> invalidateAndRefresh());
+        mReports.addSource(otherCostDao.getAllLiveData(), otherCosts -> invalidateAndRefresh());
+        mReports.addSource(tireDao.getAllTireListsLiveData(), tires -> invalidateAndRefresh());
+        mReports.addSource(tripDao.getTripsWithDetailsForCarLive(-1), trips -> invalidateAndRefresh());
 
-        mHasDueReminders.addSource(db.getReminderDao().getAllWithCarLiveData(), list -> {
+        mHasDueReminders.addSource(reminderDao.getAllWithCarLiveData(), list -> {
             if (list == null) {
                 mHasDueReminders.setValue(false);
                 return;

@@ -37,6 +37,7 @@ import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.OtherCost;
 import org.juanro.autumandu.model.entity.Refueling;
 import org.juanro.autumandu.model.entity.Station;
+import org.juanro.autumandu.model.entity.Tank;
 import org.juanro.autumandu.model.entity.TireList;
 import org.juanro.autumandu.model.entity.Trip;
 import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
@@ -85,17 +86,21 @@ public final class DemoData {
     public static void addDemoDataSync(Context context) {
         AutuManduDatabase db = AutuManduDatabase.getInstance(context);
 
-        long super95 = createFuelType(db, "Super 95", "Benzin");
-        long superE10 = createFuelType(db, "Super E10", "Benzin");
-        long lpg = createFuelType(db, "LPG", "Gas");
+        long super95 = createFuelType(db, "Super 95", "gasoline");
+        long superE10 = createFuelType(db, "Super E10", "gasoline");
+        long lpg = createFuelType(db, "LPG", "gas");
+        long electricity = createFuelType(db, "Charging (AC/DC)", "electricity");
         long stationId = createStation(db, "Iberdoex");
 
         addPuntoDemoData(db, super95, superE10, stationId);
         addAstraDemoData(db, super95, lpg, stationId);
+        addEbroDemoData(db, super95, electricity, stationId);
     }
 
     private static void addPuntoDemoData(AutuManduDatabase db, long super95, long superE10, long stationId) {
         long punto = createCar(db, "Fiat Punto", Color.BLUE);
+        long puntoTank = createTank(db, punto, "gasoline", "Main Tank", 45);
+
         int puntoCount = 50;
         ZonedDateTime puntoDate = ZonedDateTime.now().minusMonths(puntoCount / 2).withSecond(0).withNano(0);
         int puntoMileage = 15000;
@@ -122,7 +127,7 @@ public final class DemoData {
 
             if (!randBooleanTrueInOneOutOf(15)) {
                 createRefueling(db, new RefuelingConfig(puntoDate, puntoMileage, volume, price, partial, "",
-                        fuelType, stationId, punto));
+                        fuelType, stationId, punto, puntoTank));
             }
 
             // Add some trips around refuelings
@@ -146,6 +151,9 @@ public final class DemoData {
 
     private static void addAstraDemoData(AutuManduDatabase db, long super95, long lpg, long stationId) {
         long astra = createCar(db, "Opel Astra", Color.RED);
+        long astraGasolineTank = createTank(db, astra, "gasoline", "Petrol Tank", 55);
+        long astraLpgTank = createTank(db, astra, "gas", "LPG Tank", 35);
+
         int astraCount = 30;
         ZonedDateTime astraDate = ZonedDateTime.now().minusMonths(astraCount / 3).withSecond(0).withNano(0);
         int astraMileage = 120000;
@@ -157,7 +165,7 @@ public final class DemoData {
 
         createTire(db, new TireConfig(astraDate, null, 50, 4, "Insa Turbo", "All Season 4", "", astra));
 
-        AstraRefuelingConfig config = new AstraRefuelingConfig(astra, astraDate, astraMileage, astraCount, super95, lpg, stationId);
+        AstraRefuelingConfig config = new AstraRefuelingConfig(astra, astraDate, astraMileage, astraCount, super95, lpg, stationId, astraGasolineTank, astraLpgTank);
         addRefuelingsForAstra(db, config);
 
         // Add some trips for Astra
@@ -198,7 +206,7 @@ public final class DemoData {
             float price = volume * randFloat(140, 160) / 100;
             if (!randBooleanTrueInOneOutOf(15)) {
                 createRefueling(db, new RefuelingConfig(date95, mileage95, volume, price, partial, "",
-                        config.super95(), config.stationId(), config.carId()));
+                        config.super95(), config.stationId(), config.carId(), config.gasolineTankId()));
             }
         }
 
@@ -217,12 +225,64 @@ public final class DemoData {
             float price = volume * randFloat(85, 105) / 100;
             if (!randBooleanTrueInOneOutOf(15)) {
                 createRefueling(db, new RefuelingConfig(dateLpg, mileageLpg, volume, price, partial, "",
-                        config.lpg(), config.stationId(), config.carId()));
+                        config.lpg(), config.stationId(), config.carId(), config.lpgTankId()));
             }
         }
     }
 
-    private record AstraRefuelingConfig(long carId, ZonedDateTime startDate, int startMileage, int count, long super95, long lpg, long stationId) {}
+    private static void addEbroDemoData(AutuManduDatabase db, long super95, long electricity, long stationId) {
+        long ebro = createCar(db, "EBRO S800 PHEV", Color.GREEN);
+        long ebroGasTank = createTank(db, ebro, "gasoline", "Combustion Tank", 55);
+        long ebroBattery = createTank(db, ebro, "electricity", "Battery Pack", 19.4f);
+
+        int ebroCount = 40;
+        // Adjusted to ~8 refuelings/charges per month (every 3.5 days on avg)
+        ZonedDateTime ebroDate = ZonedDateTime.now().minusMonths(ebroCount / 8).withSecond(0).withNano(0);
+        int ebroMileage = 500;
+
+        createOtherCost(db, new OtherCostConfig("Impuestos", ebroDate, null, -1, 140, RecurrenceInterval.YEAR, 1, "", ebro));
+        createOtherCost(db, new OtherCostConfig("Seguro Todo Riesgo", ebroDate, null, -1, 65, RecurrenceInterval.MONTH, 1, "", ebro));
+        createTire(db, new TireConfig(ebroDate, null, 120, 4, "Insa Turbo", "ECO A5", "", ebro));
+
+        EbroRefuelingConfig config = new EbroRefuelingConfig(ebro, ebroDate, ebroMileage, ebroCount, super95, electricity, stationId, ebroGasTank, ebroBattery);
+        addRefuelingsForEbro(db, config);
+    }
+
+    private static void addRefuelingsForEbro(AutuManduDatabase db, EbroRefuelingConfig config) {
+        ZonedDateTime date = config.startDate();
+        int mileage = config.startMileage();
+
+        for (int i = 0; i < config.count(); i++) {
+            date = date.plusDays(randInt(2, 5));
+            int dist = randInt(50, 150);
+            mileage += dist;
+
+            // Electric charges (interleaved)
+            if (randBooleanTrueInOneOutOf(2) && !randBooleanTrueInOneOutOf(15)) {
+                float volumeKwh = randFloat(10, 18);
+                createRefueling(db, new RefuelingConfig(date, mileage, volumeKwh, volumeKwh * 0.35f, false, "Carga nocturna",
+                        config.electricity(), config.stationId(), config.carId(), config.batteryId()));
+            }
+
+            // Gasoline refuelings
+            if (i % 8 == 0 && !randBooleanTrueInOneOutOf(15)) {
+                float volumeLiters = randFloat(30, 50);
+                createRefueling(db, new RefuelingConfig(date, mileage, volumeLiters, volumeLiters * 1.55f, false, "Viaje largo",
+                        config.super95(), config.stationId(), config.carId(), config.gasTankId()));
+            }
+
+            // Trips
+            if (i % 3 == 0) {
+                createTrip(db, new TripConfig(date.toLocalDate(), date.toLocalDate(), date.toLocalTime(),
+                        date.toLocalTime().plusMinutes(randInt(20, 90)), "Trabajo", "Commute",
+                        mileage - randInt(20, 40), mileage, randInt(20, 40), 0, 0, config.carId()));
+            }
+        }
+    }
+
+    private record EbroRefuelingConfig(long carId, ZonedDateTime startDate, int startMileage, int count, long super95, long electricity, long stationId, long gasTankId, long batteryId) {}
+
+    private record AstraRefuelingConfig(long carId, ZonedDateTime startDate, int startMileage, int count, long super95, long lpg, long stationId, long gasolineTankId, long lpgTankId) {}
 
     public static void removeDemoData() {
         DB_EXECUTOR.execute(() -> {
@@ -243,6 +303,16 @@ public final class DemoData {
         car.setBuyingPrice(0);
         car.setNumTires(4);
         return db.getCarDao().insert(car)[0];
+    }
+
+    private static long createTank(AutuManduDatabase db, long carId, String category, String name, float capacity) {
+        Tank tank = new Tank();
+        tank.setCarId(carId);
+        tank.setFuelCategory(category);
+        tank.setName(name);
+        tank.setCapacity(capacity);
+        tank.setManuallySet(true);
+        return db.getTankDao().insert(tank)[0];
     }
 
     private static long createFuelType(AutuManduDatabase db, String name, String category) {
@@ -271,11 +341,12 @@ public final class DemoData {
         refueling.setFuelTypeId(config.fuelTypeId());
         refueling.setStationId(config.stationId());
         refueling.setCarId(config.carId());
+        refueling.setTankId(config.tankId());
 
         db.getRefuelingDao().insert(refueling);
     }
 
-    private record RefuelingConfig(ZonedDateTime date, int mileage, float volume, float price, boolean partial, String note, long fuelTypeId, long stationId, long carId) {}
+    private record RefuelingConfig(ZonedDateTime date, int mileage, float volume, float price, boolean partial, String note, long fuelTypeId, long stationId, long carId, long tankId) {}
 
     private static void createOtherCost(AutuManduDatabase db, OtherCostConfig config) {
         OtherCost otherCost = new OtherCost();

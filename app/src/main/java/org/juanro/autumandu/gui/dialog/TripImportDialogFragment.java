@@ -46,6 +46,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class TripImportDialogFragment extends DialogFragment {
     public static final String TAG = "TripImportDialog";
 
@@ -73,7 +76,7 @@ public class TripImportDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         importer = new CSVTripImporter(requireContext());
-        viewModel = new ViewModelProvider(this, new TripViewModel.Factory(requireActivity().getApplication())).get(TripViewModel.class);
+        viewModel = new ViewModelProvider(this).get(TripViewModel.class);
 
         View view = getLayoutInflater().inflate(R.layout.fragment_trip_import, null);
 

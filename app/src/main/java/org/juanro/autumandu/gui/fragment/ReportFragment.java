@@ -74,6 +74,9 @@ import org.juanro.autumandu.util.Carburoid;
 import org.juanro.autumandu.viewmodel.ReportViewModel;
 import org.juanro.autumandu.gui.fragment.ReminderListFragment;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClickListener,
         BackPressedListener {
 

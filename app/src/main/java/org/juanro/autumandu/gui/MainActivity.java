@@ -78,10 +78,13 @@ import org.juanro.autumandu.util.sync.SyncManager;
 import org.juanro.autumandu.util.sync.SyncProviders;
 import org.juanro.autumandu.viewmodel.MainViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener {
     public interface BackPressedListener {

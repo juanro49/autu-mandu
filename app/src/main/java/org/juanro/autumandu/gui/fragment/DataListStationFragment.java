@@ -33,6 +33,9 @@ import org.juanro.autumandu.gui.DataDetailActivity;
 import org.juanro.autumandu.model.dto.StationWithVolume;
 import org.juanro.autumandu.model.entity.FuelCategory;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DataListStationFragment extends AbstractDataListFragment<StationWithVolume> {
 
     private org.juanro.autumandu.viewmodel.StationListViewModel viewModel;

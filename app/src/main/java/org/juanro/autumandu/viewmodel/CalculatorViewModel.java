@@ -32,14 +32,22 @@ import org.juanro.autumandu.model.AutuManduDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class CalculatorViewModel extends AndroidViewModel {
     private final AbstractCalculation[] mCalculations;
     private final MutableLiveData<CalculationItem[]> mResults = new MutableLiveData<>();
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private final InvalidationTracker.Observer mRoomObserver;
+    private final AutuManduDatabase db;
 
-    public CalculatorViewModel(@NonNull Application application) {
+    @Inject
+    public CalculatorViewModel(Application application, AutuManduDatabase db) {
         super(application);
+        this.db = db;
         mCalculations = new AbstractCalculation[]{
                 new DistanceVolumeCalculation(application, DistanceVolumeCalculation.Direction.VOLUME_TO_DISTANCE),
                 new DistanceVolumeCalculation(application, DistanceVolumeCalculation.Direction.DISTANCE_TO_VOLUME),
@@ -58,7 +66,7 @@ public class CalculatorViewModel extends AndroidViewModel {
                 }
             }
         };
-        AutuManduDatabase.getInstance(application).getInvalidationTracker().addObserver(mRoomObserver);
+        db.getInvalidationTracker().addObserver(mRoomObserver);
     }
 
     public AbstractCalculation[] getCalculations() {
@@ -82,7 +90,7 @@ public class CalculatorViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        AutuManduDatabase.getInstance(getApplication()).getInvalidationTracker().removeObserver(mRoomObserver);
+        db.getInvalidationTracker().removeObserver(mRoomObserver);
         mExecutor.shutdown();
     }
 }

@@ -74,6 +74,7 @@ object KubitChartBridge {
                 AutuManduChartTheme {
                     KubitLineChart(
                         rawData = finalData,
+                        baseTime = report.baseTime,
                         yAxisLabel = { report.formatYValue(it, chartOption) },
                         xAxisLabel = { report.formatXValue(it, chartOption) },
                         config = LineChartConfig(isFullScreen = isFullScreen)

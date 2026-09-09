@@ -28,6 +28,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AppCompatActivity;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.fragment.AbstractDataDetailFragment;
 import org.juanro.autumandu.gui.fragment.DataDetailCarFragment;
@@ -43,6 +45,7 @@ import org.juanro.autumandu.gui.pref.PreferencesStationsFragment;
  * Activity for displaying and editing data details.
  * Modernized to handle all data types and integrate with Room-based fragments.
  */
+@AndroidEntryPoint
 public class DataDetailActivity extends AppCompatActivity implements
         AbstractDataDetailFragment.OnItemActionListener {
     public static final String EXTRA_EDIT = "edit";

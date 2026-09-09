@@ -36,6 +36,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import java.security.cert.X509Certificate;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,6 +52,7 @@ import org.juanro.autumandu.util.webdav.InvalidCertificateException;
 import org.juanro.autumandu.util.webdav.UntrustedCertificateException;
 import org.juanro.autumandu.util.webdav.WebDavClient;
 
+@AndroidEntryPoint
 public class SetupWebDavSyncDialogActivity extends AppCompatActivity {
     enum TestLoginStatus {
         OK,

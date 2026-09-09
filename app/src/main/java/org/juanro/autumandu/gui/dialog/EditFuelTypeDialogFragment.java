@@ -38,6 +38,9 @@ import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.viewmodel.FuelTypesViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class EditFuelTypeDialogFragment extends AbstractEditDialogFragment {
     public static final String REQUEST_KEY = "org.juanro.autumandu.EDIT_FUEL_TYPE_REQUEST";
 

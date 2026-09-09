@@ -28,9 +28,12 @@ import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.util.AbstractPreferenceActivity;
 
+@AndroidEntryPoint
 public class PreferencesActivity extends AbstractPreferenceActivity implements
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 

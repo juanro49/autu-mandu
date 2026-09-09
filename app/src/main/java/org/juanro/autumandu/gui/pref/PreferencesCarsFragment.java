@@ -48,6 +48,9 @@ import org.juanro.autumandu.viewmodel.CarsViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class PreferencesCarsFragment extends ListFragment implements
         AbstractPreferenceActivity.OptionsMenuListener {
 

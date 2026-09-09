@@ -16,19 +16,22 @@
 
 package org.juanro.autumandu.viewmodel;
 
-import android.app.Application;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.ViewModel;
 
-import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dao.CarDao;
 import org.juanro.autumandu.model.entity.Car;
 
 import java.util.List;
 
-public class MainViewModel extends AndroidViewModel {
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
+public class MainViewModel extends ViewModel {
+    private final CarDao carDao;
     private final MediatorLiveData<List<Car>> cars = new MediatorLiveData<>();
     private final MediatorLiveData<List<Car>> notSuspendedCars = new MediatorLiveData<>();
     private final MediatorLiveData<Integer> carCount = new MediatorLiveData<>();
@@ -36,8 +39,9 @@ public class MainViewModel extends AndroidViewModel {
     private LiveData<List<Car>> currentNotSuspendedCarsSource;
     private LiveData<Integer> currentCarCountSource;
 
-    public MainViewModel(@NonNull Application application) {
-        super(application);
+    @Inject
+    public MainViewModel(CarDao carDao) {
+        this.carDao = carDao;
         refreshSources();
     }
 
@@ -46,10 +50,9 @@ public class MainViewModel extends AndroidViewModel {
         if (currentNotSuspendedCarsSource != null) notSuspendedCars.removeSource(currentNotSuspendedCarsSource);
         if (currentCarCountSource != null) carCount.removeSource(currentCarCountSource);
 
-        var db = AutuManduDatabase.getInstance(getApplication());
-        currentCarsSource = db.getCarDao().getAllLiveData();
-        currentNotSuspendedCarsSource = db.getCarDao().getNotSuspendedLiveData();
-        currentCarCountSource = db.getCarDao().getCountLiveData();
+        currentCarsSource = carDao.getAllLiveData();
+        currentNotSuspendedCarsSource = carDao.getNotSuspendedLiveData();
+        currentCarCountSource = carDao.getCountLiveData();
 
         cars.addSource(currentCarsSource, cars::setValue);
         notSuspendedCars.addSource(currentNotSuspendedCarsSource, notSuspendedCars::setValue);

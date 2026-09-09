@@ -98,6 +98,16 @@
     <string name="label_trust_certificate">Trust this certificate</string>
     <string name="label_mount_tire">Mount</string>
     <string name="label_umount_tire">Umount</string>
+    <string name="label_tank">Tank</string>
+    <string name="hint_start_level">Start level (%)</string>
+    <string name="hint_end_level">End level (%)</string>
+    <string name="precision_warning">Note: Entering the volume directly from the pump/charger is more accurate than using percentages.</string>
+    <string name="learn_capacity_title">New Tank Capacity</string>
+    <string name="learn_capacity_message">Based on your input, the calculated capacity for this tank is %.2f %s. Do you want to save it?</string>
+    <string name="label_is_manually_set">Capacity set manually</string>
+    <string name="title_tanks">Tanks</string>
+    <string name="menu_add_tank">Add tank</string>
+    <string name="hint_tank_capacity">Capacity</string>
     <string name="description_suspend">You can suspend a car, when you don\'t use it anymore. This will cancel all repeating costs to the suspended date. Also the reports by default zoom to active cars only.</string>
     <string name="description_category">Refuelings are grouped by this category for different reports. Examples: Petrol, Diesel, Gas.</string>
     <string name="description_reminder_status_due">Due</string>
@@ -115,6 +125,7 @@
     <string name="validate_error_mileage_out_of_range_trip">The cumulated mileage cannot be higher than the mileage of the next refueling in trip distance entry mode. If you meant to insert total distance, you can change entry mode in the settings.</string>
     <string name="validate_error_fuel_type_exists">This fuel type does already exist.</string>
     <string name="validate_error_station_exists">This station does already exist.</string>
+    <string name="validate_error_volume_exceeds_capacity">Volume cannot be greater than tank capacity (%1$.2f %2$s)</string>
     <string name="validate_error_webdav_invalid_certificate">The certificate could not be trusted. It seems invalid.</string>
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>
@@ -508,4 +519,5 @@
     <string name="toast_import_carbudget_success">Import from CarBudget completed successfully.</string>
     <string name="toast_import_carbudget_result">Imported %1$d refuelings, %2$d other costs and %3$d tire sets.</string>
     <string name="toast_import_carbudget_failed">Error importing from CarBudget: %s</string>
+    <string name="label_show_levels">Calculate from levels if volume is unknown</string>
 </resources>

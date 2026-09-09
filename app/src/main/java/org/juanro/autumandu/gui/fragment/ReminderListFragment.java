@@ -46,9 +46,12 @@ import org.juanro.autumandu.model.dto.ReminderWithCar;
 import org.juanro.autumandu.util.TimeSpan;
 import org.juanro.autumandu.viewmodel.RemindersViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import java.util.Locale;
 import java.util.Objects;
 
+@AndroidEntryPoint
 public class ReminderListFragment extends Fragment {
 
     private RemindersViewModel viewModel;

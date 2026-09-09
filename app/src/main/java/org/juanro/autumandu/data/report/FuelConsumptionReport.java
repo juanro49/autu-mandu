@@ -18,7 +18,9 @@ package org.juanro.autumandu.data.report;
 
 import android.content.Context;
 
-import java.text.DateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -50,7 +52,12 @@ public class FuelConsumptionReport extends AbstractReport {
 
             FuelConsumption fuelConsumption = new FuelConsumption(context);
             mUnit = fuelConsumption.getUnitLabel(Type.fromId(new Preferences(context).getUnitFuelConsumption()), category.getVolumeUnit(context));
-            mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
+
+            if (category == FuelCategory.ELECTRICITY) {
+                setLineStyle(LineStyle.DASHED);
+            } else if (category == FuelCategory.GAS || category == FuelCategory.ADDITIVES) {
+                setLineStyle(LineStyle.DOTTED);
+            }
 
             int lastMileage = 0;
             int totalDistance = 0;
@@ -77,7 +84,7 @@ public class FuelConsumptionReport extends AbstractReport {
                                     partialDistance);
                             String tooltip = makeTooltip(car.getName(), consumption, refueling.getFuelTypeName(), refueling.getDate(), refueling.isGuessed());
 
-                            add(ReportDateHelper.toFloat(refueling.getDate()),
+                            add(ReportDateHelper.toFloat(refueling.getDate(), mBaseTime),
                                     consumption,
                                     tooltip,
                                     refueling.isGuessed());
@@ -100,7 +107,7 @@ public class FuelConsumptionReport extends AbstractReport {
                     consumption,
                     mUnit,
                     fuelTypeName,
-                    mDateFormat.format(date));
+                    mDateFormatter.format(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
             if (guessed) {
                 tooltip += "\n" + mContext.getString(R.string.report_toast_guessed);
             }
@@ -117,7 +124,7 @@ public class FuelConsumptionReport extends AbstractReport {
     }
 
     private final List<AbstractReportChartData> reportData = new ArrayList<>();
-    private DateFormat mDateFormat;
+    private DateTimeFormatter mDateFormatter;
 
     public FuelConsumptionReport(Context context) {
         super(context);
@@ -125,7 +132,8 @@ public class FuelConsumptionReport extends AbstractReport {
 
     @Override
     public String formatXValue(float value, int chartOption) {
-        return mDateFormat.format(ReportDateHelper.toDate(value));
+        return mDateFormatter.format(ReportDateHelper.toDate(value, mBaseTime).toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate());
     }
 
     @Override
@@ -158,7 +166,7 @@ public class FuelConsumptionReport extends AbstractReport {
     @Override
     protected void onUpdate() {
         reportData.clear();
-        mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
+        mDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
 
@@ -207,7 +215,7 @@ public class FuelConsumptionReport extends AbstractReport {
 
             reportData.add(carData);
 
-            Section section = addDataSection(car, categoryName);
+            Section section = addDataSection(car, categoryName, carData.getLineStyle());
             Float[] yValues = carData.getYValues().toArray(new Float[0]);
             section.addItem(new Item(mContext.getString(R.string.report_highest), String.format(Locale.getDefault(),
                     CONSUMPTION_FORMAT, Calculator.max(yValues), carData.getUnit())));
@@ -251,13 +259,17 @@ public class FuelConsumptionReport extends AbstractReport {
         }
     }
 
-    private Section addDataSection(Car car, String category) {
+    private Section addDataSection(Car car, String category, LineStyle lineStyle) {
         String name = String.format("%s (%s)", car.getName(), category);
         if (car.getSuspendedSince() != null) {
-            return addDataSection(String.format("%s [%s]", name,
-                    mContext.getString(R.string.suspended)), car.getColor(), 1);
+            return addDataSection(name + " [" + mContext.getString(R.string.suspended) + "]",
+                    car.getColor(), 1, lineStyle);
         } else {
-            return addDataSection(name, car.getColor());
+            return addDataSection(name, car.getColor(), 0, lineStyle);
         }
+    }
+
+    private Section addDataSection(Car car, String category) {
+        return addDataSection(car, category, LineStyle.SOLID);
     }
 }

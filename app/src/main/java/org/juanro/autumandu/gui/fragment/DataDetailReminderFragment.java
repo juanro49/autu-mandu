@@ -43,9 +43,12 @@ import org.juanro.autumandu.viewmodel.ReminderDetailViewModel;
 
 import java.util.Date;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Fragment to edit reminder details.
  */
+@AndroidEntryPoint
 public class DataDetailReminderFragment extends AbstractDataDetailFragment {
     private static final int PICK_START_DATE_REQUEST_CODE = 0;
     private static final int PICK_SNOOZED_UNTIL_REQUEST_CODE = 1;

@@ -33,6 +33,9 @@ import org.juanro.autumandu.model.entity.OtherCost;
 import org.juanro.autumandu.model.entity.helper.RecurrenceInterval;
 import org.juanro.autumandu.util.Recurrences;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DataListOtherFragment extends AbstractDataListFragment<OtherCost> {
     public static final String EXTRA_OTHER_TYPE = "other_type";
     public static final int EXTRA_OTHER_TYPE_EXPENDITURE = 0;

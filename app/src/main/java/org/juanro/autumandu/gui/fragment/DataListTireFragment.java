@@ -28,9 +28,12 @@ import org.juanro.autumandu.R;
 import org.juanro.autumandu.model.dto.TireWithDetails;
 import org.juanro.autumandu.gui.DataDetailActivity;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import java.util.List;
 import java.util.Locale;
 
+@AndroidEntryPoint
 public class DataListTireFragment extends AbstractDataListFragment<TireWithDetails> {
 
     private java.text.DateFormat dateFormat;

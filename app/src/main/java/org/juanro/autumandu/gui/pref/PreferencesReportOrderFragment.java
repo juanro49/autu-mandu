@@ -39,6 +39,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class PreferencesReportOrderFragment extends PreferenceFragmentCompat {
     private ItemTouchHelper mItemTouchHelper;
 

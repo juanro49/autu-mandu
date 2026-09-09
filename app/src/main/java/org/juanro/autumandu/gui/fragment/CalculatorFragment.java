@@ -43,6 +43,9 @@ import org.juanro.autumandu.data.calculation.CalculationItem;
 import org.juanro.autumandu.gui.chart.kubit.KubitChartBridge;
 import org.juanro.autumandu.viewmodel.CalculatorViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class CalculatorFragment extends Fragment {
     private static final String STATE_CURRENT_OPTION = "current_option";
 

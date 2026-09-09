@@ -44,6 +44,9 @@ import org.juanro.autumandu.gui.util.FabSpeedDialHelper;
 import org.juanro.autumandu.gui.util.FloatingActionButtonRevealer;
 import org.juanro.autumandu.gui.util.FragmentUtils;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DataFragment extends Fragment implements DataListCallback,
         AbstractDataDetailFragment.OnItemActionListener, MainActivity.BackPressedListener {
     private static final String BACK_STACK_DETAIL = "detail";

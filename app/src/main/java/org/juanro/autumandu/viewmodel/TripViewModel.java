@@ -18,14 +18,13 @@ package org.juanro.autumandu.viewmodel;
 
 import android.app.Application;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModelProvider;
 
-import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dao.CarDao;
+import org.juanro.autumandu.model.dao.TripDao;
 import org.juanro.autumandu.model.dto.TripWithDetails;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.Trip;
@@ -36,31 +35,23 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class TripViewModel extends AndroidViewModel {
-    private final AutuManduDatabase db;
+    private final CarDao carDao;
+    private final TripDao tripDao;
     private final MutableLiveData<Long> carId = new MutableLiveData<>();
 
     private static final Executor DB_EXECUTOR = Executors.newSingleThreadExecutor();
 
-    public TripViewModel(@NonNull Application application) {
-        this(application, AutuManduDatabase.getInstance(application));
-    }
-
-    public TripViewModel(@NonNull Application application, @NonNull AutuManduDatabase database) {
+    @Inject
+    public TripViewModel(Application application, CarDao carDao, TripDao tripDao) {
         super(application);
-        this.db = database;
-    }
-
-    public record Factory(@NonNull Application application) implements ViewModelProvider.Factory {
-        @NonNull
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T extends androidx.lifecycle.ViewModel> T create(@NonNull Class<T> modelClass) {
-            if (modelClass.isAssignableFrom(TripViewModel.class)) {
-                return (T) new TripViewModel(application);
-            }
-            throw new IllegalArgumentException("Unknown ViewModel class");
-        }
+        this.carDao = carDao;
+        this.tripDao = tripDao;
     }
 
     public void setCarId(long id) {
@@ -68,7 +59,7 @@ public class TripViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Car>> getCars() {
-        return db.getCarDao().getAllLiveData();
+        return carDao.getAllLiveData();
     }
 
     public LiveData<List<TripWithDetails>> getTrips() {
@@ -76,17 +67,17 @@ public class TripViewModel extends AndroidViewModel {
             if (id == null || id == -1) {
                 return new MutableLiveData<>(new ArrayList<>());
             }
-            return db.getTripDao().getTripsWithDetailsForCarLive(id);
+            return tripDao.getTripsWithDetailsForCarLive(id);
         });
     }
 
     public List<Trip> getTripsForCar(long carId) {
-        return db.getTripDao().getTripsForCar(carId);
+        return tripDao.getTripsForCar(carId);
     }
 
     public void deleteTrip(Trip trip, Runnable onDeleted) {
         DB_EXECUTOR.execute(() -> {
-            db.getTripDao().delete(trip);
+            tripDao.delete(trip);
             if (onDeleted != null) {
                 onDeleted.run();
             }

@@ -50,9 +50,12 @@ import org.juanro.autumandu.viewmodel.OtherDetailViewModel;
 
 import java.util.Date;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Fragment to edit other cost/income details.
  */
+@AndroidEntryPoint
 public class DataDetailOtherFragment extends AbstractDataDetailFragment {
     public static final String EXTRA_OTHER_TYPE = "other_type";
     public static final int EXTRA_OTHER_TYPE_EXPENDITURE = 0;

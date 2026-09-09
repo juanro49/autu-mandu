@@ -18,13 +18,12 @@ package org.juanro.autumandu.viewmodel;
 
 import android.app.Application;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
 import org.juanro.autumandu.data.query.ReminderQueries;
-import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dao.ReminderDao;
 import org.juanro.autumandu.model.dto.ReminderWithCar;
 import org.juanro.autumandu.util.reminder.ReminderService;
 
@@ -33,16 +32,22 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class RemindersViewModel extends AndroidViewModel {
-    private final AutuManduDatabase db;
+    private final ReminderDao reminderDao;
     private final MediatorLiveData<List<ReminderWithCar>> reminders = new MediatorLiveData<>();
     private static final Executor DB_EXECUTOR = Executors.newFixedThreadPool(4);
 
-    public RemindersViewModel(@NonNull Application application) {
+    @Inject
+    public RemindersViewModel(Application application, ReminderDao reminderDao) {
         super(application);
-        db = AutuManduDatabase.getInstance(application);
+        this.reminderDao = reminderDao;
 
-        LiveData<List<ReminderWithCar>> source = db.getReminderDao().getAllWithCarLiveData();
+        LiveData<List<ReminderWithCar>> source = reminderDao.getAllWithCarLiveData();
         reminders.addSource(source, list -> {
             if (list == null) {
                 reminders.setValue(null);
@@ -70,7 +75,7 @@ public class RemindersViewModel extends AndroidViewModel {
     public void deleteReminders(long[] ids) {
         DB_EXECUTOR.execute(() -> {
             for (long id : ids) {
-                db.getReminderDao().deleteById(id);
+                reminderDao.deleteById(id);
             }
         });
     }

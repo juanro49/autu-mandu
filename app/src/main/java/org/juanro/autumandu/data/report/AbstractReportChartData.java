@@ -67,6 +67,7 @@ public abstract class AbstractReportChartData {
     protected final String mName;
     protected final int mColor;
     protected final List<DataPoint> mDataPoints = new ArrayList<>();
+    protected AbstractReport.LineStyle mLineStyle = AbstractReport.LineStyle.SOLID;
 
     protected AbstractReportChartData(Context context, String name, int color) {
         mContext = context.getApplicationContext();
@@ -75,11 +76,23 @@ public abstract class AbstractReportChartData {
     }
 
     public final OverallTrendReportChartData createOverallTrendData() {
-        return new OverallTrendReportChartData(mContext, mName, getTrendColor(), mDataPoints);
+        var data = new OverallTrendReportChartData(mContext, mName, getTrendColor(), mDataPoints);
+        data.setLineStyle(mLineStyle);
+        return data;
     }
 
     public final TrendReportChartData createTrendData() {
-        return new TrendReportChartData(mContext, mName, getTrendColor(), mDataPoints);
+        var data = new TrendReportChartData(mContext, mName, getTrendColor(), mDataPoints);
+        data.setLineStyle(mLineStyle);
+        return data;
+    }
+
+    public AbstractReport.LineStyle getLineStyle() {
+        return mLineStyle;
+    }
+
+    public void setLineStyle(AbstractReport.LineStyle lineStyle) {
+        mLineStyle = lineStyle;
     }
 
     public List<DataPoint> getDataPoints() {

@@ -36,6 +36,7 @@ public interface RefuelingDao {
     @Query("""
         SELECT r._id as id, r.date, r.mileage, r.volume, r.price, r.partial, r.note,
                r.fuel_type_id as fuelTypeId, r.station_id as stationId, r.car_id as carId,
+               r.start_level as startLevel, r.end_level as endLevel, r.tank_id as tankId,
                f.fuel_type__name as fuelTypeName, f.category as fuelTypeCategory,
                s.station__name as stationName,
                c.car__name as carName, c.color as carColor, c.initial_mileage as carInitialMileage,
@@ -55,6 +56,7 @@ public interface RefuelingDao {
     @Query("""
         SELECT r._id as id, r.date, r.mileage, r.volume, r.price, r.partial, r.note,
                r.fuel_type_id as fuelTypeId, r.station_id as stationId, r.car_id as carId,
+               r.start_level as startLevel, r.end_level as endLevel, r.tank_id as tankId,
                f.fuel_type__name as fuelTypeName, f.category as fuelTypeCategory,
                s.station__name as stationName,
                c.car__name as carName, c.color as carColor, c.initial_mileage as carInitialMileage,
@@ -72,6 +74,7 @@ public interface RefuelingDao {
     @Query("""
         SELECT r._id as id, r.date, r.mileage, r.volume, r.price, r.partial, r.note,
                r.fuel_type_id as fuelTypeId, r.station_id as stationId, r.car_id as carId,
+               r.start_level as startLevel, r.end_level as endLevel, r.tank_id as tankId,
                f.fuel_type__name as fuelTypeName, f.category as fuelTypeCategory,
                s.station__name as stationName,
                c.car__name as carName, c.color as carColor, c.initial_mileage as carInitialMileage,
@@ -89,6 +92,7 @@ public interface RefuelingDao {
     @Query("""
         SELECT r._id as id, r.date, r.mileage, r.volume, r.price, r.partial, r.note,
                r.fuel_type_id as fuelTypeId, r.station_id as stationId, r.car_id as carId,
+               r.start_level as startLevel, r.end_level as endLevel, r.tank_id as tankId,
                f.fuel_type__name as fuelTypeName, f.category as fuelTypeCategory,
                s.station__name as stationName,
                c.car__name as carName, c.color as carColor, c.initial_mileage as carInitialMileage,
@@ -106,6 +110,7 @@ public interface RefuelingDao {
     @Query("""
         SELECT r._id as id, r.date, r.mileage, r.volume, r.price, r.partial, r.note,
                r.fuel_type_id as fuelTypeId, r.station_id as stationId, r.car_id as carId,
+               r.start_level as startLevel, r.end_level as endLevel, r.tank_id as tankId,
                f.fuel_type__name as fuelTypeName, f.category as fuelTypeCategory,
                s.station__name as stationName,
                c.car__name as carName, c.color as carColor, c.initial_mileage as carInitialMileage,
@@ -123,6 +128,7 @@ public interface RefuelingDao {
     @Query("""
         SELECT r._id as id, r.date, r.mileage, r.volume, r.price, r.partial, r.note,
                r.fuel_type_id as fuelTypeId, r.station_id as stationId, r.car_id as carId,
+               r.start_level as startLevel, r.end_level as endLevel, r.tank_id as tankId,
                f.fuel_type__name as fuelTypeName, f.category as fuelTypeCategory,
                s.station__name as stationName,
                c.car__name as carName, c.color as carColor, c.initial_mileage as carInitialMileage,
@@ -139,6 +145,7 @@ public interface RefuelingDao {
     @Query("""
         SELECT r._id as id, r.date, r.mileage, r.volume, r.price, r.partial, r.note,
                r.fuel_type_id as fuelTypeId, r.station_id as stationId, r.car_id as carId,
+               r.start_level as startLevel, r.end_level as endLevel, r.tank_id as tankId,
                f.fuel_type__name as fuelTypeName, f.category as fuelTypeCategory,
                s.station__name as stationName,
                c.car__name as carName, c.color as carColor, c.initial_mileage as carInitialMileage,
@@ -154,19 +161,19 @@ public interface RefuelingDao {
 
     @Query("""
         SELECT * FROM refueling
-        WHERE car_id = :carId AND date < :date
+        WHERE tank_id = :tankId AND date < :date
         ORDER BY date DESC, mileage DESC
         LIMIT 1
     """)
-    Refueling getPrevious(long carId, Date date);
+    Refueling getPrevious(long tankId, Date date);
 
     @Query("""
         SELECT * FROM refueling
-        WHERE car_id = :carId AND date > :date
+        WHERE tank_id = :tankId AND date > :date
         ORDER BY date ASC, mileage ASC
         LIMIT 1
     """)
-    Refueling getNext(long carId, Date date);
+    Refueling getNext(long tankId, Date date);
 
     @Query("SELECT * FROM refueling ORDER BY date DESC, mileage DESC")
     LiveData<List<Refueling>> getAllLiveData();

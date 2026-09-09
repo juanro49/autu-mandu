@@ -66,6 +66,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DataDetailTripFragment extends AbstractDataDetailFragment {
     private static final String TAG = "DataDetailTripFragment";
     private static final String LOCATION_COORDS_FORMAT = "%.4f, %.4f";

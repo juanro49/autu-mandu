@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.google.dagger.hilt.android'
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'com.mikepenz.aboutlibraries.plugin'
 }
@@ -126,6 +127,10 @@ dependencies {
     implementation 'com.kubit-lab:charts:0.2.1'
     implementation 'com.mikepenz:aboutlibraries-core:15.0.4'
     implementation 'com.mikepenz:aboutlibraries:14.2.1'
+
+    // --- Hilt ---
+    implementation 'com.google.dagger:hilt-android:2.60.1'
+    annotationProcessor 'com.google.dagger:hilt-compiler:2.60.1'
 
     // --- Testing ---
     testImplementation 'junit:junit:4.13.2'

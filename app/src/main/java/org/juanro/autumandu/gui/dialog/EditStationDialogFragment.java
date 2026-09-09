@@ -35,6 +35,9 @@ import org.juanro.autumandu.model.dto.StationWithVolume;
 import org.juanro.autumandu.model.entity.Station;
 import org.juanro.autumandu.viewmodel.StationsViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class EditStationDialogFragment extends AbstractEditDialogFragment {
     public static final String REQUEST_KEY = "org.juanro.autumandu.EDIT_STATION_REQUEST";
 

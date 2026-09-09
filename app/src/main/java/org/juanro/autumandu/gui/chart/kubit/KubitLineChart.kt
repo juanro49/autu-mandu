@@ -52,6 +52,7 @@ import com.kubit.charts.components.chart.linechart.LineChart
 import com.kubit.charts.components.chart.linechart.model.IntersectionPoint
 import com.kubit.charts.components.chart.linechart.model.Line
 import com.kubit.charts.components.chart.linechart.model.LineStyle
+import com.kubit.charts.components.chart.linechart.model.LineType
 import com.kubit.charts.components.chart.linechart.model.Point
 import com.kubit.charts.components.chart.linechart.model.SelectionHighlightPoint
 import com.kubit.charts.components.chart.linechart.model.SelectionHighlightPopUp
@@ -59,6 +60,7 @@ import com.kubit.charts.components.scaffold.ChartScaffold
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import org.juanro.autumandu.data.report.AbstractReport
 import org.juanro.autumandu.data.report.AbstractReportChartData
 import org.juanro.autumandu.data.report.AbstractReportChartLineData
 import org.juanro.autumandu.data.report.OverallTrendReportChartData
@@ -69,6 +71,7 @@ import java.util.Calendar
 @Composable
 fun KubitLineChart(
     rawData: List<AbstractReportChartData>,
+    baseTime: Long,
     yAxisLabel: (Float) -> String,
     xAxisLabel: (Float) -> String,
     config: LineChartConfig = LineChartConfig()
@@ -120,8 +123,8 @@ fun KubitLineChart(
             createYSteps(effectiveYMin, effectiveRangeY, labelStyle, gridStyle, yAxisLabel)
         }
 
-        val xSteps = remember(xAxisBounds) {
-            createXSteps(xAxisBounds, labelStyle, gridStyle, xAxisLabel)
+        val xSteps = remember(xAxisBounds, baseTime) {
+            createXSteps(xAxisBounds, baseTime, labelStyle, gridStyle, xAxisLabel)
         }
 
         val yAxisData = remember(ySteps) { AxisData(axisSteps = ySteps) }
@@ -196,6 +199,13 @@ private fun createLines(
     return rawData.mapIndexed { index, data ->
         val lineColor = Color(data.color)
         val isTrend = data is TrendReportChartData || data is OverallTrendReportChartData
+
+        val lineType = when (data.lineStyle) {
+            AbstractReport.LineStyle.DASHED -> LineType.SmoothCurve(dashed = true, intervals = floatArrayOf(20f, 10f))
+            AbstractReport.LineStyle.DOTTED -> LineType.SmoothCurve(dashed = true, intervals = floatArrayOf(5f, 5f))
+            else -> LineType.SmoothCurve(dashed = false)
+        }
+
         Line(
             dataPoints = data.dataPoints.filter { it.x.isFinite() && it.y.isFinite() }.map { dp ->
                 val isMarked = data is AbstractReportChartLineData && data.isMarked(dp.x)
@@ -210,9 +220,9 @@ private fun createLines(
                 )
             },
             lineStyle = if (isTrend) {
-                LineStyle(color = lineColor.copy(alpha = 0.7f), width = 3.5f)
+                LineStyle(lineType = lineType, color = lineColor.copy(alpha = 0.7f), width = 3.5f)
             } else {
-                LineStyle(color = lineColor, width = 5.5f)
+                LineStyle(lineType = lineType, color = lineColor, width = 5.5f)
             },
             selectionHighlightPoint = SelectionHighlightPoint(color = textColor),
             selectionHighlightPopUp = SelectionHighlightPopUp(
@@ -246,6 +256,7 @@ private fun createYSteps(
 
 private fun createXSteps(
     bounds: XAxisBounds,
+    baseTime: Long,
     labelStyle: TextStyle,
     gridStyle: AxisStepStyle,
     xAxisLabel: (Float) -> String
@@ -260,18 +271,18 @@ private fun createXSteps(
     steps.add(AxisStep(bounds.effectiveXMin, "", labelStyle, stepStyle = null))
 
     val startCal = Calendar.getInstance().apply {
-        time = ReportDateHelper.toDate(bounds.minX)
+        time = ReportDateHelper.toDate(bounds.minX, baseTime)
         set(Calendar.DAY_OF_MONTH, 1)
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
     }
     val endCal = Calendar.getInstance().apply {
-        time = ReportDateHelper.toDate(bounds.maxX)
+        time = ReportDateHelper.toDate(bounds.maxX, baseTime)
     }
 
     while (startCal.before(endCal) || startCal == endCal) {
-        val currentFloat = ReportDateHelper.toFloat(startCal.time)
+        val currentFloat = ReportDateHelper.toFloat(startCal.time, baseTime)
         if (currentFloat >= bounds.minX) {
             steps.add(AxisStep(
                 axisValue = currentFloat,

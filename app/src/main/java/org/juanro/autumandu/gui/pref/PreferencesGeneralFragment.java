@@ -45,6 +45,9 @@ import org.juanro.autumandu.viewmodel.PreferencesGeneralViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class PreferencesGeneralFragment extends PreferenceFragmentCompat {
 
     private PreferencesGeneralViewModel mViewModel;

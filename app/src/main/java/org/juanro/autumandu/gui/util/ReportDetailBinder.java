@@ -97,11 +97,32 @@ public class ReportDetailBinder {
     private static void bindSection(DetailViewHolder vh, AbstractReport.Section section) {
         vh.label.setText(section.getLabel());
         vh.label.setTextColor(section.getColor());
-        if (vh.sectionDrawable != null) {
-            DrawableCompat.setTint(
-                    vh.sectionDrawable.mutate(),
-                    section.getColor());
+
+        float density = vh.label.getContext().getResources().getDisplayMetrics().density;
+        int strokeWidth = vh.label.getContext().getResources().getDimensionPixelSize(R.dimen.report_row_section_stroke_width);
+
+        // Create a new GradientDrawable with SHAPE_LINE for better dashed rendering
+        android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
+        gd.setShape(android.graphics.drawable.GradientDrawable.LINE);
+
+        // Set a larger intrinsic height (4dp) than the stroke width (2dp) to prevent clipping
+        gd.setSize(1000, (int) (4 * density));
+
+        if (section.getLineStyle() == AbstractReport.LineStyle.SOLID) {
+            gd.setStroke(strokeWidth, section.getColor());
+            vh.label.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        } else {
+            float dashWidth = (section.getLineStyle() == AbstractReport.LineStyle.DASHED) ? 8 * density : 2 * density;
+            float dashGap = (section.getLineStyle() == AbstractReport.LineStyle.DASHED) ? 4 * density : 2 * density;
+
+            gd.setStroke(strokeWidth, section.getColor(), dashWidth, dashGap);
+
+            // Dashed strokes in GradientDrawable require software rendering
+            vh.label.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
+
+        android.graphics.drawable.Drawable[] drawables = vh.label.getCompoundDrawables();
+        vh.label.setCompoundDrawablesWithIntrinsicBounds(drawables[0], drawables[1], drawables[2], gd);
     }
 
     private static void bindItem(DetailViewHolder vh, AbstractReport.Item dataItem) {
@@ -115,18 +136,10 @@ public class ReportDetailBinder {
         final TextView label;
         @Nullable
         final TextView value;
-        @Nullable
-        final GradientDrawable sectionDrawable;
 
         DetailViewHolder(View v) {
             label = v.findViewById(android.R.id.text1);
             value = v.findViewById(android.R.id.text2);
-            var drawables = label.getCompoundDrawables();
-            if (drawables.length > 3 && drawables[3] instanceof GradientDrawable gd) {
-                sectionDrawable = gd;
-            } else {
-                sectionDrawable = null;
-            }
         }
     }
 }

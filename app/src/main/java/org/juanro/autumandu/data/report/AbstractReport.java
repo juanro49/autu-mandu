@@ -33,6 +33,12 @@ import org.juanro.autumandu.model.entity.Refueling;
 public abstract class AbstractReport {
     private static final String TAG = "AbstractReport";
 
+    public enum LineStyle {
+        SOLID,
+        DASHED,
+        DOTTED
+    }
+
     public abstract static class AbstractListItem implements Comparable<AbstractListItem> {
         protected final String mLabel;
 
@@ -71,6 +77,7 @@ public abstract class AbstractReport {
         private final int mColor;
         private final int mOrder;
         private final List<Item> mItems;
+        private LineStyle mLineStyle = LineStyle.SOLID;
 
         public Section(String label, int color) {
             this(label, color, 0);
@@ -85,6 +92,14 @@ public abstract class AbstractReport {
 
         public void addItem(Item item) {
             mItems.add(item);
+        }
+
+        public LineStyle getLineStyle() {
+            return mLineStyle;
+        }
+
+        public void setLineStyle(LineStyle lineStyle) {
+            mLineStyle = lineStyle;
         }
 
         @Override
@@ -149,6 +164,7 @@ public abstract class AbstractReport {
     protected final Context mContext;
     private final List<AbstractListItem> mData = new ArrayList<>();
     protected final Map<Integer, List<AbstractReportChartData>> mCachedChartData = new java.util.HashMap<>();
+    protected long mBaseTime = 0;
     private boolean mUpdated = false;
 
     protected AbstractReport(Context context) {
@@ -212,13 +228,19 @@ public abstract class AbstractReport {
             AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
             Refueling firstRefueling = db.getRefuelingDao().getFirst();
             if (firstRefueling != null) {
-                ReportDateHelper.setBaseDate(firstRefueling.getDate());
+                mBaseTime = firstRefueling.getDate().getTime();
             } else {
-                ReportDateHelper.setBaseDate(null);
+                mBaseTime = 0;
             }
 
             onUpdate();
             mUpdated = true;
+        }
+    }
+
+    public long getBaseTime() {
+        synchronized (mData) {
+            return mBaseTime;
         }
     }
 
@@ -227,8 +249,13 @@ public abstract class AbstractReport {
     }
 
     protected Section addDataSection(String label, int color, int order) {
+        return addDataSection(label, color, order, LineStyle.SOLID);
+    }
+
+    protected Section addDataSection(String label, int color, int order, LineStyle lineStyle) {
         synchronized (mData) {
             Section section = new Section(label, color, order);
+            section.setLineStyle(lineStyle);
             mData.add(section);
             return section;
         }

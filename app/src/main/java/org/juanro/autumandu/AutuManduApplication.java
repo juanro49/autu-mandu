@@ -41,10 +41,13 @@ import org.juanro.autumandu.util.reminder.ReminderEnablerReceiver;
 import org.juanro.autumandu.util.sync.Authenticator;
 import org.juanro.autumandu.util.sync.SyncManager;
 
+import dagger.hilt.android.HiltAndroidApp;
+
 /**
  * Main application class.
  * Manages global state, themes, and Material You integration.
  */
+@HiltAndroidApp
 public class AutuManduApplication extends android.app.Application implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "AutuManduApplication";
     private static AutuManduApplication instance;

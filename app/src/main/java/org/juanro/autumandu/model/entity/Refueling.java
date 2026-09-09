@@ -6,14 +6,14 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "refueling", indices = {
         @Index("fuel_type_id"),
         @Index("station_id"),
-        @Index("car_id")
+        @Index("car_id"),
+        @Index("tank_id")
 }, foreignKeys = {
         @ForeignKey(
                 parentColumns = { "_id" },
@@ -31,6 +31,12 @@ import androidx.room.PrimaryKey;
                 parentColumns = { "_id" },
                 childColumns = { "car_id" },
                 entity = Car.class,
+                onDelete = ForeignKey.CASCADE
+        ),
+        @ForeignKey(
+                parentColumns = { "_id" },
+                childColumns = { "tank_id" },
+                entity = Tank.class,
                 onDelete = ForeignKey.CASCADE
         ),
 })
@@ -67,6 +73,15 @@ public class Refueling {
 
     @ColumnInfo(name = "car_id")
     private long carId;
+
+    @ColumnInfo(name = "start_level")
+    private float startLevel;
+
+    @ColumnInfo(name = "end_level")
+    private float endLevel;
+
+    @ColumnInfo(name = "tank_id")
+    private long tankId;
 
     /**
      * Empty constructor required by Room for entity instantiation.
@@ -155,5 +170,29 @@ public class Refueling {
 
     public void setStationId(long stationId) {
         this.stationId = stationId;
+    }
+
+    public float getStartLevel() {
+        return startLevel;
+    }
+
+    public void setStartLevel(float startLevel) {
+        this.startLevel = startLevel;
+    }
+
+    public float getEndLevel() {
+        return endLevel;
+    }
+
+    public void setEndLevel(float endLevel) {
+        this.endLevel = endLevel;
+    }
+
+    public long getTankId() {
+        return tankId;
+    }
+
+    public void setTankId(long tankId) {
+        this.tankId = tankId;
     }
 }

@@ -43,6 +43,7 @@ import org.juanro.autumandu.model.dao.StationDao;
 import org.juanro.autumandu.model.dao.TireDao;
 import org.juanro.autumandu.model.dao.TripDao;
 import org.juanro.autumandu.model.dao.TripPrefabDao;
+import org.juanro.autumandu.model.dao.TankDao;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.model.entity.FuelType;
@@ -50,6 +51,7 @@ import org.juanro.autumandu.model.entity.OtherCost;
 import org.juanro.autumandu.model.entity.Refueling;
 import org.juanro.autumandu.model.entity.Reminder;
 import org.juanro.autumandu.model.entity.Station;
+import org.juanro.autumandu.model.entity.Tank;
 import org.juanro.autumandu.model.entity.TireList;
 import org.juanro.autumandu.model.entity.TireUsage;
 import org.juanro.autumandu.model.entity.Trip;
@@ -57,13 +59,13 @@ import org.juanro.autumandu.model.entity.TripPrefab;
 import org.juanro.autumandu.model.entity.helper.SQLTypeConverters;
 
 @Database(
-    entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class, Station.class, TireList.class, TireUsage.class, Trip.class, TripPrefab.class},
+    entities = {Car.class, FuelType.class, Reminder.class, Refueling.class, OtherCost.class, Station.class, Tank.class, TireList.class, TireUsage.class, Trip.class, TripPrefab.class},
     version = AutuManduDatabase.VERSION
 )
 @TypeConverters({SQLTypeConverters.class})
 public abstract class AutuManduDatabase extends RoomDatabase {
     public static final String DATABASE_NAME = "data.db";
-    public static final int VERSION = 15;
+    public static final int VERSION = 16;
 
     public abstract CarDao getCarDao();
     public abstract FuelTypeDao getFuelTypeDao();
@@ -71,6 +73,7 @@ public abstract class AutuManduDatabase extends RoomDatabase {
     public abstract RefuelingDao getRefuelingDao();
     public abstract ReminderDao getReminderDao();
     public abstract StationDao getStationDao();
+    public abstract TankDao getTankDao();
     public abstract TireDao getTireDao();
     public abstract TripDao getTripDao();
     public abstract TripPrefabDao getTripPrefabDao();
@@ -109,7 +112,8 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                             new AssetFileBasedMigration(appContext, 12),
                             new AssetFileBasedMigration(appContext, 13),
                             new AssetFileBasedMigration(appContext, 14),
-                            new AssetFileBasedMigration(appContext, 15)
+                            new AssetFileBasedMigration(appContext, 15),
+                            new AssetFileBasedMigration(appContext, 16)
                     );
 
                     builder.addCallback(new Callback() {

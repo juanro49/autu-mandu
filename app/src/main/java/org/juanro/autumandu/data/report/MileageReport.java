@@ -22,7 +22,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.text.DateFormat;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -52,7 +52,7 @@ public class MileageReport extends AbstractReport {
                 String tooltip = makeTooltip(car.getName(), refueling.getMileage(),
                         refueling.getDate(), refueling.isGuessed());
 
-                add(ReportDateHelper.toFloat(refueling.getDate()),
+                add(ReportDateHelper.toFloat(refueling.getDate(), mBaseTime),
                         (float) refueling.getMileage(),
                         tooltip,
                         refueling.isGuessed());
@@ -64,14 +64,21 @@ public class MileageReport extends AbstractReport {
                     carName,
                     mileage,
                     mUnit,
-                    formatXValue(ReportDateHelper.toFloat(date), GRAPH_OPTION_ACCUMULATED));
+                    formatXValue(ReportDateHelper.toFloat(date, mBaseTime), GRAPH_OPTION_ACCUMULATED));
             return guessed ? tooltip + "\n" + mContext.getString(R.string.report_toast_guessed) : tooltip;
         }
     }
 
     private class ReportChartDataPerRefueling extends AbstractReportChartLineData {
-        public ReportChartDataPerRefueling(Context context, Car car, String category, List<BalancedRefueling> refuelings) {
+        public ReportChartDataPerRefueling(Context context, Car car, String category, String categoryKey, List<BalancedRefueling> refuelings) {
             super(context, String.format("%s (%s)", car.getName(), category), car.getColor());
+
+            FuelCategory fuelCategory = FuelCategory.fromKey(categoryKey);
+            if (fuelCategory == FuelCategory.ELECTRICITY) {
+                setLineStyle(LineStyle.DASHED);
+            } else if (fuelCategory == FuelCategory.GAS || fuelCategory == FuelCategory.ADDITIVES) {
+                setLineStyle(LineStyle.DOTTED);
+            }
 
             int lastRefuelingMileage = -1;
             for (BalancedRefueling refueling : refuelings) {
@@ -80,7 +87,7 @@ public class MileageReport extends AbstractReport {
                     String tooltip = makeTooltip(car.getName(), mileageDiff,
                             refueling.getDate(), refueling.isGuessed());
 
-                    add(ReportDateHelper.toFloat(refueling.getDate()),
+                    add(ReportDateHelper.toFloat(refueling.getDate(), mBaseTime),
                             (float) mileageDiff,
                             tooltip,
                             refueling.isGuessed());
@@ -95,7 +102,7 @@ public class MileageReport extends AbstractReport {
                     carName,
                     mileage,
                     mUnit,
-                    formatXValue(ReportDateHelper.toFloat(date), GRAPH_OPTION_PER_REFUELING));
+                    formatXValue(ReportDateHelper.toFloat(date, mBaseTime), GRAPH_OPTION_PER_REFUELING));
             return guessed ? tooltip + "\n" + mContext.getString(R.string.report_toast_guessed) : tooltip;
         }
     }
@@ -140,7 +147,7 @@ public class MileageReport extends AbstractReport {
     private final List<AbstractReportChartData> reportDataPerMonth = new ArrayList<>();
 
     private String mUnit;
-    private DateFormat mDateFormat;
+    private DateTimeFormatter mDateFormatter;
     private String mMonthLabelFormat;
 
     public MileageReport(Context context) {
@@ -156,7 +163,8 @@ public class MileageReport extends AbstractReport {
             LocalDate date = LocalDate.of(year, month, 1);
             return date.format(DateTimeFormatter.ofPattern(mMonthLabelFormat));
         } else {
-            return mDateFormat.format(ReportDateHelper.toDate(value));
+            return mDateFormatter.format(ReportDateHelper.toDate(value, mBaseTime).toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDate());
         }
     }
 
@@ -211,7 +219,7 @@ public class MileageReport extends AbstractReport {
         // Preferences
         Preferences prefs = new Preferences(mContext);
         mUnit = prefs.getUnitDistance();
-        mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
+        mDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
         if (mContext.getResources().getConfiguration().smallestScreenWidthDp > 480) {
             mMonthLabelFormat = "MMMM yyyy";
         } else {
@@ -262,17 +270,21 @@ public class MileageReport extends AbstractReport {
             String category = entry.getKey();
             List<BalancedRefueling> categoryRefuelings = entry.getValue();
 
+            String categoryKey = balancedRefuelings.stream()
+                    .filter(r -> category.equals(FuelCategory.fromKey(r.getFuelTypeCategory()).getName(mContext)))
+                    .findFirst().map(BalancedRefueling::getFuelTypeCategory).orElse(null);
+
             ReportChartDataPerRefueling carDataPerRefueling = new ReportChartDataPerRefueling(
-                    mContext, car, category, categoryRefuelings);
+                    mContext, car, category, categoryKey, categoryRefuelings);
 
             // Add section for car
             Section section;
             if (car.getSuspendedSince() != null) {
                 section = addDataSection(String.format("%s (%s) [%s]", car.getName(), category,
-                        mContext.getString(R.string.suspended)), car.getColor(), 1);
+                        mContext.getString(R.string.suspended)), car.getColor(), 1, carDataPerRefueling.getLineStyle());
             } else {
                 section = addDataSection(String.format("%s (%s)", car.getName(), category),
-                        car.getColor());
+                        car.getColor(), 0, carDataPerRefueling.getLineStyle());
             }
 
             if (carDataPerRefueling.isEmpty()) {

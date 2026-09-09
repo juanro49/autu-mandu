@@ -29,11 +29,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import org.juanro.autumandu.R;
 import org.juanro.autumandu.gui.pref.PreferencesActivity;
 import org.juanro.autumandu.gui.pref.PreferencesBackupFragment;
 import org.juanro.autumandu.viewmodel.MainViewModel;
 
+@AndroidEntryPoint
 public class FirstStartActivity extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),

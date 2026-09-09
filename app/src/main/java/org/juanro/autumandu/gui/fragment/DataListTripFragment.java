@@ -51,6 +51,9 @@ import org.juanro.autumandu.util.backup.CSVTripExporter;
 import org.juanro.autumandu.util.backup.CSVTripFormat;
 import org.juanro.autumandu.viewmodel.TripViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DataListTripFragment extends AbstractDataListFragment<TripWithDetails> implements MenuProvider {
     private DateTimeFormatter dateFormatter;
     private DateTimeFormatter timeFormatter;
@@ -79,7 +82,7 @@ public class DataListTripFragment extends AbstractDataListFragment<TripWithDetai
         unitDistance = prefs.getUnitDistance();
         unitCurrency = prefs.getUnitCurrency();
 
-        viewModel = new ViewModelProvider(this, new TripViewModel.Factory(requireActivity().getApplication())).get(TripViewModel.class);
+        viewModel = new ViewModelProvider(this).get(TripViewModel.class);
         viewModel.setCarId(carId);
     }
 

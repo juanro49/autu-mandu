@@ -29,11 +29,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.Lifecycle;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 import org.juanro.autumandu.R;
 
 /**
  * Actividad base moderna para pantallas de preferencias.
  */
+@AndroidEntryPoint
 public abstract class AbstractPreferenceActivity extends AppCompatActivity {
 
     /**

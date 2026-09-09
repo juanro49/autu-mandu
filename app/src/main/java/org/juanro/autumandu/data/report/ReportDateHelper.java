@@ -33,37 +33,29 @@ public final class ReportDateHelper {
     private static final float SECONDS_PER_DAY = 86400.0f;
     private static final float MILLIS_PER_SECOND = 1000.0f;
 
-    private static volatile long mBaseTime = 0;
-
     private ReportDateHelper() {
         // Utility class
-    }
-
-    /**
-     * Sets the base date to be used as Day 0 for all subsequent conversions.
-     * @param baseDate The date that will represent 0.0f.
-     */
-    public static void setBaseDate(Date baseDate) {
-        mBaseTime = baseDate != null ? baseDate.getTime() : 0;
     }
 
     /**
      * Converts a Date to a float representation relative to the base date.
      *
      * @param date The date to convert.
+     * @param baseTime The base time (in millis) that represents 0.0f.
      * @return Float representation (days since base date).
      */
-    public static float toFloat(@NonNull Date date) {
-        return ((date.getTime() - mBaseTime) / MILLIS_PER_SECOND) / SECONDS_PER_DAY;
+    public static float toFloat(@NonNull Date date, long baseTime) {
+        return ((date.getTime() - baseTime) / MILLIS_PER_SECOND) / SECONDS_PER_DAY;
     }
 
     /**
      * Converts a float representation back to a Date relative to the base date.
      *
      * @param date Float representation (days since base date).
+     * @param baseTime The base time (in millis) that represents 0.0f.
      * @return The corresponding Date object.
      */
-    public static @NonNull Date toDate(float date) {
-        return new Date((long) (date * SECONDS_PER_DAY * MILLIS_PER_SECOND) + mBaseTime);
+    public static @NonNull Date toDate(float date, long baseTime) {
+        return new Date((long) (date * SECONDS_PER_DAY * MILLIS_PER_SECOND) + baseTime);
     }
 }

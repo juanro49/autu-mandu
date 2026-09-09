@@ -16,15 +16,15 @@
 
 package org.juanro.autumandu.viewmodel;
 
-import android.app.Application;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 
-import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dao.CarDao;
+import org.juanro.autumandu.model.dao.RefuelingDao;
+import org.juanro.autumandu.model.dao.TripDao;
+import org.juanro.autumandu.model.dao.TripPrefabDao;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.Trip;
 import org.juanro.autumandu.model.entity.TripPrefab;
@@ -35,14 +35,31 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class TripDetailViewModel extends AndroidViewModel {
-    private final AutuManduDatabase db;
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
+public class TripDetailViewModel extends ViewModel {
+    private final CarDao carDao;
+    private final TripDao tripDao;
+    private final TripPrefabDao tripPrefabDao;
+    private final RefuelingDao refuelingDao;
+
     private final MutableLiveData<Long> tripId = new MutableLiveData<>();
     private final Executor dbExecutor = Executors.newSingleThreadExecutor();
 
-    public TripDetailViewModel(@NonNull Application application) {
-        super(application);
-        this.db = AutuManduDatabase.getInstance(application);
+    @Inject
+    public TripDetailViewModel(
+            CarDao carDao,
+            TripDao tripDao,
+            TripPrefabDao tripPrefabDao,
+            RefuelingDao refuelingDao
+    ) {
+        this.carDao = carDao;
+        this.tripDao = tripDao;
+        this.tripPrefabDao = tripPrefabDao;
+        this.refuelingDao = refuelingDao;
     }
 
     public void setTripId(long id) {
@@ -54,28 +71,28 @@ public class TripDetailViewModel extends AndroidViewModel {
             if (id == -1) {
                 return new MutableLiveData<>(null);
             }
-            return db.getTripDao().getTripByIdLive(id);
+            return tripDao.getTripByIdLive(id);
         });
     }
 
     public LiveData<List<Car>> getCars() {
-        return db.getCarDao().getAllLiveData();
+        return carDao.getAllLiveData();
     }
 
     public LiveData<List<TripPrefab>> getPrefabsByType(long carId, String type) {
-        return db.getTripPrefabDao().getPrefabsByTypeLive(carId, type);
+        return tripPrefabDao.getPrefabsByTypeLive(carId, type);
     }
 
     public LiveData<List<RefuelingWithDetails>> getRefuelingsForCar(long carId) {
-        return db.getRefuelingDao().getWithDetailsForCarLiveData(carId);
+        return refuelingDao.getWithDetailsForCarLiveData(carId);
     }
 
     public void save(Trip trip, Runnable onSaved) {
         dbExecutor.execute(() -> {
             if (trip.getId() > 0) {
-                db.getTripDao().update(trip);
+                tripDao.update(trip);
             } else {
-                db.getTripDao().insert(trip);
+                tripDao.insert(trip);
             }
             updatePrefabs(trip);
             if (onSaved != null) {
@@ -86,9 +103,9 @@ public class TripDetailViewModel extends AndroidViewModel {
 
     public void delete(long id, Runnable onDeleted) {
         dbExecutor.execute(() -> {
-            Trip trip = db.getTripDao().getTripById(id);
+            Trip trip = tripDao.getTripById(id);
             if (trip != null) {
-                db.getTripDao().delete(trip);
+                tripDao.delete(trip);
             }
             if (onDeleted != null) {
                 onDeleted.run();
@@ -105,23 +122,23 @@ public class TripDetailViewModel extends AndroidViewModel {
     private void updateOrCreatePrefab(long carId, String type, String value) {
         if (value == null || value.trim().isEmpty()) return;
 
-        TripPrefab existing = db.getTripPrefabDao().getPrefabByTypeAndValue(carId, type, value.trim());
+        TripPrefab existing = tripPrefabDao.getPrefabByTypeAndValue(carId, type, value.trim());
         if (existing != null) {
             existing.setUsageCount(existing.getUsageCount() + 1);
-            db.getTripPrefabDao().update(existing);
+            tripPrefabDao.update(existing);
         } else {
             TripPrefab prefab = new TripPrefab();
             prefab.setCarId(carId);
             prefab.setType(type);
             prefab.setValue(value.trim());
             prefab.setUsageCount(1);
-            db.getTripPrefabDao().insert(prefab);
+            tripPrefabDao.insert(prefab);
         }
     }
 
     public void getLastKmEnd(long carId, OnLoadedCallback<Integer> callback) {
         dbExecutor.execute(() -> {
-            Trip lastTrip = db.getTripDao().getLastTripForCar(carId);
+            Trip lastTrip = tripDao.getLastTripForCar(carId);
             callback.onLoaded(lastTrip != null ? lastTrip.getKmEnd() : 0);
         });
     }

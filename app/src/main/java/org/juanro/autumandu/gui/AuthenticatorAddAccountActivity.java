@@ -62,9 +62,12 @@ import org.juanro.autumandu.util.sync.SyncParseException;
 import org.juanro.autumandu.util.sync.SyncProviders;
 import org.juanro.autumandu.util.sync.provider.WebDavSyncProvider;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Modernized activity for adding sync accounts.
  */
+@AndroidEntryPoint
 public class AuthenticatorAddAccountActivity extends AppCompatActivity implements AuthenticationFinishedListener {
     private RecyclerView mRecyclerView;
     private View mProgressView;

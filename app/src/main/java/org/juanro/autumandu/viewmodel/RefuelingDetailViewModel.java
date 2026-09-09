@@ -16,24 +16,26 @@
 
 package org.juanro.autumandu.viewmodel;
 
-import android.app.Application;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 
 import org.juanro.autumandu.DistanceEntryMode;
 import org.juanro.autumandu.PriceEntryMode;
-import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dao.CarDao;
+import org.juanro.autumandu.model.dao.FuelTypeDao;
+import org.juanro.autumandu.model.dao.RefuelingDao;
+import org.juanro.autumandu.model.dao.StationDao;
+import org.juanro.autumandu.model.dao.TankDao;
+import org.juanro.autumandu.model.dao.TripDao;
 import org.juanro.autumandu.model.dto.RefuelingWithDetails;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelType;
 import org.juanro.autumandu.model.entity.Refueling;
 import org.juanro.autumandu.model.entity.Station;
-
+import org.juanro.autumandu.model.entity.Tank;
 import org.juanro.autumandu.model.entity.Trip;
 
 import java.util.Date;
@@ -41,19 +43,43 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
 /**
  * ViewModel for refueling details.
  */
-public class RefuelingDetailViewModel extends AndroidViewModel {
-    private final AutuManduDatabase db;
+@HiltViewModel
+public class RefuelingDetailViewModel extends ViewModel {
+    private final CarDao carDao;
+    private final FuelTypeDao fuelTypeDao;
+    private final RefuelingDao refuelingDao;
+    private final StationDao stationDao;
+    private final TankDao tankDao;
+    private final TripDao tripDao;
+
     private final MutableLiveData<Long> refuelingId = new MutableLiveData<>();
     private final MutableLiveData<Long> carIdForDefaults = new MutableLiveData<>();
+    private final MutableLiveData<Float> learnedCapacity = new MutableLiveData<>();
 
     private static final Executor DB_EXECUTOR = Executors.newSingleThreadExecutor();
 
-    public RefuelingDetailViewModel(@NonNull Application application) {
-        super(application);
-        db = AutuManduDatabase.getInstance(application);
+    @Inject
+    public RefuelingDetailViewModel(
+            CarDao carDao,
+            FuelTypeDao fuelTypeDao,
+            RefuelingDao refuelingDao,
+            StationDao stationDao,
+            TankDao tankDao,
+            TripDao tripDao
+    ) {
+        this.carDao = carDao;
+        this.fuelTypeDao = fuelTypeDao;
+        this.refuelingDao = refuelingDao;
+        this.stationDao = stationDao;
+        this.tankDao = tankDao;
+        this.tripDao = tripDao;
     }
 
     public void setRefuelingId(long id) {
@@ -66,41 +92,49 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
 
     public LiveData<RefuelingWithDetails> getRefueling() {
         return Transformations.switchMap(refuelingId, id ->
-                id == -1 ? new MutableLiveData<>(null) : db.getRefuelingDao().getByIdWithDetailsLiveData(id)
+                id == -1 ? new MutableLiveData<>(null) : refuelingDao.getByIdWithDetailsLiveData(id)
         );
     }
 
     public LiveData<List<Trip>> getLinkedTrips() {
         return Transformations.switchMap(refuelingId, id ->
-                id == -1 ? new MutableLiveData<>(new java.util.ArrayList<>()) : db.getTripDao().getTripsForRefuelingLive(id)
+                id == -1 ? new MutableLiveData<>(new java.util.ArrayList<>()) : tripDao.getTripsForRefuelingLive(id)
         );
     }
 
     public LiveData<FuelType> getMostUsedFuelType() {
-        return Transformations.switchMap(carIdForDefaults, id -> db.getFuelTypeDao().getMostUsedForCarLiveData(id));
+        return Transformations.switchMap(carIdForDefaults, fuelTypeDao::getMostUsedForCarLiveData);
     }
 
     public LiveData<Station> getMostUsedStation() {
-        return Transformations.switchMap(carIdForDefaults, id -> db.getStationDao().getMostUsedForCarLiveData(id));
+        return Transformations.switchMap(carIdForDefaults, stationDao::getMostUsedForCarLiveData);
     }
 
     public LiveData<List<FuelType>> getFuelTypes() {
-        return db.getFuelTypeDao().getAllLiveData();
+        return fuelTypeDao.getAllLiveData();
     }
 
     public LiveData<List<Station>> getStations() {
-        return db.getStationDao().getAllLiveData();
+        return stationDao.getAllLiveData();
     }
 
     public LiveData<List<Car>> getCars() {
-        return db.getCarDao().getAllLiveData();
+        return carDao.getAllLiveData();
+    }
+
+    public LiveData<List<Tank>> getTanksForCar(long carId) {
+        return tankDao.getTanksForCarLiveData(carId);
+    }
+
+    public LiveData<Float> getLearnedCapacity() {
+        return learnedCapacity;
     }
 
     public void getDisplayMileage(RefuelingWithDetails refueling, DistanceEntryMode mode, OnLoadedCallback<Integer> callback) {
         if (mode == DistanceEntryMode.TOTAL) {
             callback.onLoaded(refueling.mileage());
         } else {
-            getPreviousRefueling(refueling.carId(), refueling.date(), previous -> {
+            getPreviousRefueling(refueling.tankId(), refueling.date(), previous -> {
                 if (previous != null) {
                     callback.onLoaded(refueling.mileage() - previous.getMileage());
                 } else {
@@ -110,9 +144,9 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
         }
     }
 
-    public void validateMileage(int mileage, long carId, Date date, DistanceEntryMode entryMode, OnLoadedCallback<Boolean> callback) {
-        getPreviousRefueling(carId, date, previousRefueling ->
-                getNextRefueling(carId, date, nextRefueling -> {
+    public void validateMileage(int mileage, long tankId, Date date, DistanceEntryMode entryMode, OnLoadedCallback<Boolean> callback) {
+        getPreviousRefueling(tankId, date, previousRefueling ->
+                getNextRefueling(tankId, date, nextRefueling -> {
                     boolean showWarning;
                     if (entryMode == DistanceEntryMode.TOTAL) {
                         showWarning = (previousRefueling != null && previousRefueling.getMileage() > mileage) ||
@@ -135,15 +169,18 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
             long fuelTypeId,
             long stationId,
             long carId,
+            long tankId,
             float volumeInput,
             float priceInput,
+            float startLevel,
+            float endLevel,
             DistanceEntryMode distanceEntryMode,
             PriceEntryMode priceEntryMode,
             Runnable onSaved
     ) {}
 
     public void save(SaveParams params) {
-        getPreviousRefueling(params.carId(), params.date(), previousRefueling -> {
+        getPreviousRefueling(params.tankId(), params.date(), previousRefueling -> {
             Refueling refueling = new Refueling();
             if (params.currentId() != null && params.currentId() > 0) {
                 refueling.setId(params.currentId());
@@ -162,6 +199,9 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
             refueling.setFuelTypeId(params.fuelTypeId());
             refueling.setStationId(params.stationId());
             refueling.setCarId(params.carId());
+            refueling.setTankId(params.tankId());
+            refueling.setStartLevel(params.startLevel());
+            refueling.setEndLevel(params.endLevel());
 
             switch (params.priceEntryMode()) {
                 case TOTAL_AND_VOLUME -> {
@@ -178,16 +218,42 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
                 }
             }
 
+            checkLearning(refueling);
             save(refueling, params.onSaved());
+        });
+    }
+
+    private void checkLearning(Refueling refueling) {
+        if (refueling.getVolume() > 0 && refueling.getEndLevel() > refueling.getStartLevel()) {
+            DB_EXECUTOR.execute(() -> {
+                Tank tank = tankDao.getById(refueling.getTankId());
+                if (tank != null && !tank.isManuallySet()) {
+                    float levelDiff = (refueling.getEndLevel() - refueling.getStartLevel()) / 100f;
+                    float capacity = refueling.getVolume() / levelDiff;
+                    if (Math.abs(capacity - tank.getCapacity()) > 0.1f) {
+                        learnedCapacity.postValue(capacity);
+                    }
+                }
+            });
+        }
+    }
+
+    public void updateTankCapacity(long tankId, float capacity) {
+        DB_EXECUTOR.execute(() -> {
+            Tank tank = tankDao.getById(tankId);
+            if (tank != null) {
+                tank.setCapacity(capacity);
+                tankDao.update(tank);
+            }
         });
     }
 
     public void save(Refueling refueling, Runnable onSaved) {
         DB_EXECUTOR.execute(() -> {
             if (refueling.getId() != null && refueling.getId() > 0) {
-                db.getRefuelingDao().update(refueling);
+                refuelingDao.update(refueling);
             } else {
-                var ids = db.getRefuelingDao().insert(refueling);
+                var ids = refuelingDao.insert(refueling);
                 refueling.setId(ids[0]);
             }
             if (onSaved != null) {
@@ -198,23 +264,23 @@ public class RefuelingDetailViewModel extends AndroidViewModel {
 
     public void delete(long id, Runnable onDeleted) {
         DB_EXECUTOR.execute(() -> {
-            db.getRefuelingDao().deleteById(id);
+            refuelingDao.deleteById(id);
             if (onDeleted != null) {
                 onDeleted.run();
             }
         });
     }
 
-    public void getPreviousRefueling(long carId, Date date, OnLoadedCallback<Refueling> callback) {
+    public void getPreviousRefueling(long tankId, Date date, OnLoadedCallback<Refueling> callback) {
         DB_EXECUTOR.execute(() -> {
-            var refueling = db.getRefuelingDao().getPrevious(carId, date);
+            var refueling = refuelingDao.getPrevious(tankId, date);
             callback.onLoaded(refueling);
         });
     }
 
-    public void getNextRefueling(long carId, Date date, OnLoadedCallback<Refueling> callback) {
+    public void getNextRefueling(long tankId, Date date, OnLoadedCallback<Refueling> callback) {
         DB_EXECUTOR.execute(() -> {
-            var refueling = db.getRefuelingDao().getNext(carId, date);
+            var refueling = refuelingDao.getNext(tankId, date);
             callback.onLoaded(refueling);
         });
     }

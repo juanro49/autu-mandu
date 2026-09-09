@@ -55,9 +55,12 @@ import org.juanro.autumandu.viewmodel.TireDetailViewModel;
 
 import java.util.Date;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Fragment to edit tire details.
  */
+@AndroidEntryPoint
 public class DataDetailTireFragment extends AbstractDataDetailFragment {
     private static final int PICK_DATE_REQUEST_CODE = 0;
     private static final int PICK_TRASH_DATE_REQUEST_CODE = 1;

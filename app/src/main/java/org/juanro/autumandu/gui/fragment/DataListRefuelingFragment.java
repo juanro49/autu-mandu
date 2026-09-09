@@ -32,6 +32,9 @@ import org.juanro.autumandu.gui.DataDetailActivity;
 import org.juanro.autumandu.model.dto.BalancedRefueling;
 import org.juanro.autumandu.model.entity.FuelCategory;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DataListRefuelingFragment extends AbstractDataListFragment<BalancedRefueling> {
     private static final String DISTANCE_FORMAT = "%d %s";
     private static final String VOLUME_PRICE_FORMAT = "%.2f %s";

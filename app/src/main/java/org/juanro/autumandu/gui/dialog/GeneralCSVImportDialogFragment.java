@@ -42,6 +42,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class GeneralCSVImportDialogFragment extends DialogFragment {
     public static final String TAG = "GeneralCSVImportDialog";
 

@@ -59,13 +59,13 @@ public class PriceVolumeCalculation extends AbstractCalculation {
     @Override
     public String getInputUnit() {
         Preferences prefs = new Preferences(mContext);
-        return mDirection == Direction.PRICE_TO_VOLUME ? prefs.getUnitCurrency() : prefs.getUnitVolume();
+        return mDirection == Direction.PRICE_TO_VOLUME ? prefs.getUnitCurrency() : "l / kWh";
     }
 
     @Override
     public String getOutputUnit() {
         Preferences prefs = new Preferences(mContext);
-        return mDirection == Direction.PRICE_TO_VOLUME ? prefs.getUnitVolume() : prefs.getUnitCurrency();
+        return mDirection == Direction.PRICE_TO_VOLUME ? "l / kWh" : prefs.getUnitCurrency();
     }
 
     @Override

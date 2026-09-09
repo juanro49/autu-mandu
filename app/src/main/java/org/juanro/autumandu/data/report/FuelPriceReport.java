@@ -20,7 +20,9 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
-import java.text.DateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +53,12 @@ public class FuelPriceReport extends AbstractReport {
             Preferences prefs = new Preferences(context);
             FuelCategory category = FuelCategory.fromKey(fuelType.getCategory());
             mUnit = String.format("%s/%s", prefs.getUnitCurrency(), category.getVolumeUnit(context));
-            mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
+
+            if (category == FuelCategory.ELECTRICITY) {
+                setLineStyle(LineStyle.DASHED);
+            } else if (category == FuelCategory.GAS || category == FuelCategory.ADDITIVES) {
+                setLineStyle(LineStyle.DOTTED);
+            }
 
             mMax = Double.MIN_VALUE;
             mMin = Double.MAX_VALUE;
@@ -69,13 +76,13 @@ public class FuelPriceReport extends AbstractReport {
                 mMin = Math.min(mMin, fuelPrice);
                 count++;
 
-                add(ReportDateHelper.toFloat(refueling.getDate()),
+                add(ReportDateHelper.toFloat(refueling.getDate(), mBaseTime),
                         fuelPrice,
                         mContext.getString(R.string.report_toast_fuel_price,
                                 fuelPrice,
                                 mUnit,
                                 fuelType.getName(),
-                                mDateFormat.format(refueling.getDate())),
+                                mDateFormatter.format(refueling.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())),
                         false);
             }
 
@@ -102,7 +109,7 @@ public class FuelPriceReport extends AbstractReport {
     }
 
     private final List<AbstractReportChartData> mReportChartData = new ArrayList<>();
-    private DateFormat mDateFormat;
+    private DateTimeFormatter mDateFormatter;
     private String mMostRecentFuelTypeName;
 
     public FuelPriceReport(Context context) {
@@ -116,7 +123,8 @@ public class FuelPriceReport extends AbstractReport {
 
     @Override
     public String formatXValue(float value, int chartOption) {
-        return mDateFormat.format(ReportDateHelper.toDate(value));
+        return mDateFormatter.format(ReportDateHelper.toDate(value, mBaseTime).toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate());
     }
 
     @Override
@@ -151,7 +159,7 @@ public class FuelPriceReport extends AbstractReport {
     protected void onUpdate() {
         mReportChartData.clear();
         mMostRecentFuelTypeName = null;
-        mDateFormat = android.text.format.DateFormat.getDateFormat(mContext);
+        mDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
 
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
         List<FuelType> fuelTypes = db.getFuelTypeDao().getAll();
@@ -192,7 +200,7 @@ public class FuelPriceReport extends AbstractReport {
                     sectionName += " (" + FuelCategory.fromKey(fuelType.getCategory()).getName(mContext) + ")";
                 }
 
-                Section section = addDataSection(sectionName, color);
+                Section section = addDataSection(sectionName, color, 0, data.getLineStyle());
                 section.addItem(new Item(mContext.getString(R.string.report_highest),
                         String.format(Locale.getDefault(), PRICE_FORMAT, data.getMax(), data.getUnit())));
                 section.addItem(new Item(mContext.getString(R.string.report_lowest),

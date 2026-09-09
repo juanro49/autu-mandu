@@ -108,6 +108,7 @@
     <string name="validate_error_mileage_out_of_range_trip">El kilometraje acumulado no puede ser mayor que el kilometraje de la siguiente carga en el modo de entrada de distancia del viaje. Si quieres insertar la distancia total, puedes cambiar el modo de entrada en los ajustes.</string>
     <string name="validate_error_fuel_type_exists">Este tipo de combustible ya existe.</string>
     <string name="validate_error_station_exists">Esta estación ya existe.</string>
+    <string name="validate_error_volume_exceeds_capacity">El volumen no puede ser mayor que la capacidad del tanque (%1$.2f %2$s)</string>
     <string name="validate_error_webdav_invalid_certificate">No se pudo confiar en el certificado. Parece inválido.</string>
     <string name="suspended">Suspendido</string>
     <string name="suspended_since">Suspendido desde %s</string>
@@ -452,4 +453,15 @@
     <string name="description_webdav_trust_certificate">El sitio web utiliza un certificado de seguridad que no es confiado por Android.</string>
     <string name="empty_if_unknown">Por favor, deja vacío si no sabes que indicar aquí.</string>
     <string name="pref_default_backup_path_restored">Ruta de copia de seguridad predeterminada restaurada:</string>
+    <string name="label_tank">Tanque</string>
+    <string name="hint_start_level">Nivel inicial (%)</string>
+    <string name="hint_end_level">Nivel final (%)</string>
+    <string name="precision_warning">Nota: Introducir el volumen directamente desde el surtidor/cargador es más preciso que usar porcentajes.</string>
+    <string name="learn_capacity_title">Nueva capacidad del tanque</string>
+    <string name="learn_capacity_message">Según los datos introducidos, la capacidad calculada para este tanque es %.2f %s. ¿Deseas guardarla?</string>
+    <string name="label_is_manually_set">Capacidad establecida manualmente</string>
+    <string name="title_tanks">Tanques</string>
+    <string name="menu_add_tank">Añadir tanque</string>
+    <string name="hint_tank_capacity">Capacidad</string>
+    <string name="label_show_levels">Calcular desde porcentajes si se desconoce el volumen</string>
 </resources>

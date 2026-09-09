@@ -56,6 +56,9 @@ import java.util.Map;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class PreferencesBackupFragment extends PreferenceFragmentCompat {
     public static final String EXTRA_IMPORT_CSV_URI = "import_csv_uri";
     public static final String EXTRA_RESTORE_DB_URI = "restore_db_uri";

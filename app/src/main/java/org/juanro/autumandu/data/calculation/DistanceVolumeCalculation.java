@@ -62,13 +62,13 @@ public class DistanceVolumeCalculation extends AbstractCalculation {
     @Override
     public String getInputUnit() {
         Preferences prefs = new Preferences(mContext);
-        return mDirection == Direction.DISTANCE_TO_VOLUME ? prefs.getUnitDistance() : prefs.getUnitVolume();
+        return mDirection == Direction.DISTANCE_TO_VOLUME ? prefs.getUnitDistance() : "l / kWh";
     }
 
     @Override
     public String getOutputUnit() {
         Preferences prefs = new Preferences(mContext);
-        return mDirection == Direction.DISTANCE_TO_VOLUME ? prefs.getUnitVolume() : prefs.getUnitDistance();
+        return mDirection == Direction.DISTANCE_TO_VOLUME ? "l / kWh" : prefs.getUnitDistance();
     }
 
     @Override

@@ -18,7 +18,6 @@ package org.juanro.autumandu.viewmodel;
 
 import android.app.Application;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -27,17 +26,24 @@ import androidx.lifecycle.Transformations;
 import org.juanro.autumandu.FuelConsumption;
 import org.juanro.autumandu.Preferences;
 import org.juanro.autumandu.model.AutuManduDatabase;
+import org.juanro.autumandu.model.dao.RefuelingDao;
 import org.juanro.autumandu.model.dto.BalancedRefueling;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class RefuelingListViewModel extends AndroidViewModel {
-    private final AutuManduDatabase db;
+    private final RefuelingDao refuelingDao;
     private final MutableLiveData<Long> carId = new MutableLiveData<>();
 
-    public RefuelingListViewModel(@NonNull Application application) {
+    @Inject
+    public RefuelingListViewModel(Application application, RefuelingDao refuelingDao) {
         super(application);
-        db = AutuManduDatabase.getInstance(application);
+        this.refuelingDao = refuelingDao;
     }
 
     public void setCarId(long id) {
@@ -49,11 +55,13 @@ public class RefuelingListViewModel extends AndroidViewModel {
     public LiveData<List<BalancedRefueling>> getBalancedRefuelings() {
         var prefs = new Preferences(getApplication());
         var consumptionType = FuelConsumption.Type.fromId(prefs.getUnitFuelConsumption());
-        return Transformations.map(db.getRefuelingDao().getWithDetailsForCarLiveData(carId.getValue() != null ? carId.getValue() : -1),
-                input -> BalancedRefueling.balance(input, consumptionType, prefs.isAutoGuessMissingDataEnabled(), true));
+        return Transformations.switchMap(carId, id ->
+                Transformations.map(refuelingDao.getWithDetailsForCarLiveData(id),
+                        input -> BalancedRefueling.balance(input, consumptionType, prefs.isAutoGuessMissingDataEnabled(), true))
+        );
     }
 
     public void delete(long id) {
-        AutuManduDatabase.DB_EXECUTOR.execute(() -> db.getRefuelingDao().deleteById(id));
+        AutuManduDatabase.DB_EXECUTOR.execute(() -> refuelingDao.deleteById(id));
     }
 }

@@ -98,13 +98,107 @@
             app:layout_constraintStart_toEndOf="@+id/edt_volume_input_layout"
             app:layout_constraintTop_toTopOf="@+id/edt_volume_input_layout" />
 
+        <!-- Tank Spinner (Visible for ADDITIVES or multiple tanks) -->
+        <TextView
+            android:id="@+id/txt_label_tank"
+            style="@style/AppWidget.FloatingSpinnerLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/label_tank"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_volume_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
+        <Spinner
+            android:id="@+id/spn_tank"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_label_tank"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_toggle_levels"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_show_levels"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spn_tank" />
+
+        <!-- Levels (%) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_start_level_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/edt_end_level_input_layout"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_toggle_levels"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_start_level"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_start_level"
+                android:inputType="number|numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_end_level_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/edt_start_level_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/edt_start_level_input_layout"
+            app:layout_constraintTop_toTopOf="@+id/edt_start_level_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_end_level"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_end_level"
+                android:inputType="number|numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/txt_precision_warning"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_tiny"
+            android:text="@string/precision_warning"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_start_level_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
         <!-- Partial & Station Row -->
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/barrier_refueling_mid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="edt_volume_input_layout,spn_fuel_type" />
+            app:constraint_referenced_ids="edt_volume_input_layout,spn_fuel_type,edt_start_level_input_layout,edt_end_level_input_layout,txt_precision_warning,spn_tank" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/chk_partial"

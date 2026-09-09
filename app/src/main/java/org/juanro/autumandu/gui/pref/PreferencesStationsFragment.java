@@ -43,6 +43,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class PreferencesStationsFragment extends AbstractPreferencesListFragment {
 
     private StationsViewModel mViewModel;
