@@ -66,7 +66,6 @@ public class Trip {
     @ColumnInfo(name = "date")
     private LocalDate date;
 
-    @NonNull
     @ColumnInfo(name = "date_end")
     private LocalDate dateEnd;
 
@@ -74,16 +73,13 @@ public class Trip {
     @ColumnInfo(name = "time_start")
     private LocalTime timeStart;
 
-    @NonNull
     @ColumnInfo(name = "time_end")
     private LocalTime timeEnd;
 
-    // === RUTA Y PROPÓSITO (Obligatorios) ===
-    @NonNull
+    // === RUTA Y PROPÓSITO ===
     @ColumnInfo(name = "route_target")
     private String routeTarget = "";
 
-    @NonNull
     @ColumnInfo(name = "purpose")
     private String purpose = "";
 
@@ -105,7 +101,7 @@ public class Trip {
     private int kmStart;
 
     @ColumnInfo(name = "km_end")
-    private int kmEnd;
+    private Integer kmEnd;
 
     // === CATEGORIZACIÓN DE KM (Obligatorios para fiscal) ===
     @ColumnInfo(name = "km_business")
@@ -142,6 +138,9 @@ public class Trip {
 
     @ColumnInfo(name = "other_costs_amount")
     private Double otherCostsAmount;
+
+    @ColumnInfo(name = "is_partial", defaultValue = "0")
+    private boolean isPartial;
 
     // === AUDITORÍA (Sistema) ===
     @NonNull
@@ -194,12 +193,11 @@ public class Trip {
         this.date = date;
     }
 
-    @NonNull
     public LocalDate getDateEnd() {
         return dateEnd;
     }
 
-    public void setDateEnd(@NonNull LocalDate dateEnd) {
+    public void setDateEnd(LocalDate dateEnd) {
         this.dateEnd = dateEnd;
     }
 
@@ -212,30 +210,27 @@ public class Trip {
         this.timeStart = timeStart;
     }
 
-    @NonNull
     public LocalTime getTimeEnd() {
         return timeEnd;
     }
 
-    public void setTimeEnd(@NonNull LocalTime timeEnd) {
+    public void setTimeEnd(LocalTime timeEnd) {
         this.timeEnd = timeEnd;
     }
 
-    @NonNull
     public String getRouteTarget() {
         return routeTarget;
     }
 
-    public void setRouteTarget(@NonNull String routeTarget) {
+    public void setRouteTarget(String routeTarget) {
         this.routeTarget = routeTarget;
     }
 
-    @NonNull
     public String getPurpose() {
         return purpose;
     }
 
-    public void setPurpose(@NonNull String purpose) {
+    public void setPurpose(String purpose) {
         this.purpose = purpose;
     }
 
@@ -279,11 +274,11 @@ public class Trip {
         this.kmStart = kmStart;
     }
 
-    public int getKmEnd() {
+    public Integer getKmEnd() {
         return kmEnd;
     }
 
-    public void setKmEnd(int kmEnd) {
+    public void setKmEnd(Integer kmEnd) {
         this.kmEnd = kmEnd;
     }
 
@@ -375,6 +370,14 @@ public class Trip {
         this.otherCostsAmount = otherCostsAmount;
     }
 
+    public boolean isPartial() {
+        return isPartial;
+    }
+
+    public void setPartial(boolean partial) {
+        isPartial = partial;
+    }
+
     @NonNull
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -394,6 +397,7 @@ public class Trip {
     }
 
     public Integer getTotalDistance() {
+        if (kmEnd == null) return 0;
         return kmEnd - kmStart;
     }
 

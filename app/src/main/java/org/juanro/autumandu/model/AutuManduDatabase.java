@@ -65,7 +65,7 @@ import org.juanro.autumandu.model.entity.helper.SQLTypeConverters;
 @TypeConverters({SQLTypeConverters.class})
 public abstract class AutuManduDatabase extends RoomDatabase {
     public static final String DATABASE_NAME = "data.db";
-    public static final int VERSION = 17;
+    public static final int VERSION = 18;
 
     public abstract CarDao getCarDao();
     public abstract FuelTypeDao getFuelTypeDao();
@@ -114,7 +114,8 @@ public abstract class AutuManduDatabase extends RoomDatabase {
                             new AssetFileBasedMigration(appContext, 14),
                             new AssetFileBasedMigration(appContext, 15),
                             new AssetFileBasedMigration(appContext, 16),
-                            new AssetFileBasedMigration(appContext, 17)
+                            new AssetFileBasedMigration(appContext, 17),
+                            new AssetFileBasedMigration(appContext, 18)
                     );
 
                     builder.addCallback(new Callback() {

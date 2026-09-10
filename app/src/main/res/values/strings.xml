@@ -104,6 +104,8 @@
     <string name="label_mount_tire">Mount</string>
     <string name="label_umount_tire">Umount</string>
     <string name="label_tank">Tank</string>
+    <string name="label_trip_is_partial">Partial trip (only start data)</string>
+    <string name="trip_partial_badge">Partial</string>
     <string name="hint_start_level">Start level (%)</string>
     <string name="hint_end_level">End level (%)</string>
     <string name="precision_warning">Note: Entering the volume directly from the pump/charger is more accurate than using percentages.</string>

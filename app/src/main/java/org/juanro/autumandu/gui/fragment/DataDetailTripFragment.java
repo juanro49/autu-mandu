@@ -32,6 +32,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -89,6 +90,7 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
     private DateTimeInput edtDateEnd;
     private DateTimeInput edtStartTime;
     private DateTimeInput edtEndTime;
+    private CheckBox chkIsPartial;
     private AutoCompleteTextView edtRoute;
     private AutoCompleteTextView edtPurpose;
     private EditText edtOdometerStart;
@@ -163,14 +165,18 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
             }
 
             edtDate.setDate(Date.from(trip.getDate().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-            edtDateEnd.setDate(Date.from(trip.getDateEnd().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            if (trip.getDateEnd() != null) {
+                edtDateEnd.setDate(Date.from(trip.getDateEnd().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            }
             edtStartTime.setDate(Date.from(trip.getTimeStart().atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant()));
-            edtEndTime.setDate(Date.from(trip.getTimeEnd().atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant()));
+            if (trip.getTimeEnd() != null) {
+                edtEndTime.setDate(Date.from(trip.getTimeEnd().atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant()));
+            }
 
             edtRoute.setText(trip.getRouteTarget());
             edtPurpose.setText(trip.getPurpose());
             edtOdometerStart.setText(String.valueOf(trip.getKmStart()));
-            edtOdometerEnd.setText(String.valueOf(trip.getKmEnd()));
+            edtOdometerEnd.setText(trip.getKmEnd() != null ? String.valueOf(trip.getKmEnd()) : "");
 
             edtKmBusiness.setText(String.valueOf(trip.getKmBusiness()));
             edtKmPrivate.setText(String.valueOf(trip.getKmPrivate()));
@@ -184,6 +190,9 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
             edtOccupants.setText(trip.getOccupants() != null ? String.valueOf(trip.getOccupants()) : "");
             edtCargo.setText(trip.getCargo());
             edtNote.setText(trip.getOtherCostsDescription());
+
+            chkIsPartial.setChecked(trip.isPartial());
+            updatePartialState(trip.isPartial());
 
             selectSpinnerItemById(spnCar, trip.getCarId());
             if (trip.getRefuelingId() != null) {
@@ -247,6 +256,12 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
         edtStartTime = new DateTimeInput(v.findViewById(R.id.edt_start_time), DateTimeInput.Mode.TIME);
         edtEndTime = new DateTimeInput(v.findViewById(R.id.edt_end_time), DateTimeInput.Mode.TIME);
 
+        chkIsPartial = v.findViewById(R.id.chk_is_partial);
+        chkIsPartial.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            updatePartialState(isChecked);
+            validate();
+        });
+
         edtRoute = v.findViewById(R.id.edt_route);
         edtPurpose = v.findViewById(R.id.edt_purpose);
         edtOdometerStart = v.findViewById(R.id.edt_odometer_start);
@@ -277,6 +292,23 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
         v.findViewById(R.id.btn_get_end_location).setOnClickListener(view -> fetchLocation(txtEndLocation));
 
         edtRouteInputLayout.setEndIconOnClickListener(view -> fetchLocationAndFillRoute());
+    }
+
+    private void updatePartialState(boolean isPartial) {
+        View[] endViews = {
+                getView().findViewById(R.id.edt_date_end_input_layout),
+                getView().findViewById(R.id.edt_end_time_input_layout),
+                getView().findViewById(R.id.edt_odometer_end_input_layout),
+                getView().findViewById(R.id.txt_section_categorization),
+                getView().findViewById(R.id.edt_km_business_input_layout),
+                getView().findViewById(R.id.edt_km_private_input_layout),
+                getView().findViewById(R.id.edt_km_home_work_input_layout)
+        };
+        for (View view : endViews) {
+            if (view != null) {
+                view.setVisibility(isPartial ? View.GONE : View.VISIBLE);
+            }
+        }
     }
 
     private void fetchLocation(TextView target) {
@@ -613,6 +645,10 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
         edtOdometerEnd.setError(null);
         edtKmBusiness.setError(null);
         edtEndTime.setError(null);
+        edtRoute.setError(null);
+        edtPurpose.setError(null);
+
+        boolean isPartial = chkIsPartial.isChecked();
 
         // Date/Time validation
         Date startD = edtDate.getDate();
@@ -620,7 +656,7 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
         Date startT = edtStartTime.getDate();
         Date endT = edtEndTime.getDate();
 
-        if (startD != null && endD != null && startT != null && endT != null) {
+        if (!isPartial && startD != null && endD != null && startT != null && endT != null) {
             LocalDateTime start = LocalDateTime.of(
                     startD.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
                     startT.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
@@ -635,32 +671,35 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
         }
 
         int start = getIntegerFromEditText(edtOdometerStart, 0);
-        int end = getIntegerFromEditText(edtOdometerEnd, 0);
 
-        if (end < start) {
-            edtOdometerEnd.setError(getString(R.string.validate_error_odometer_end_smaller_than_start));
-            valid = false;
-        }
+        if (!isPartial) {
+            int end = getIntegerFromEditText(edtOdometerEnd, 0);
 
-        int total = end - start;
-        int business = getIntegerFromEditText(edtKmBusiness, 0);
-        int privateKm = getIntegerFromEditText(edtKmPrivate, 0);
-        int homeWork = getIntegerFromEditText(edtKmHomeWork, 0);
+            if (end < start) {
+                edtOdometerEnd.setError(getString(R.string.validate_error_odometer_end_smaller_than_start));
+                valid = false;
+            }
 
-        if (total >= 0 && business + privateKm + homeWork != total) {
-            String unit = new Preferences(requireContext()).getUnitDistance();
-            edtKmBusiness.setError(getString(R.string.validate_error_sum_km_mismatch, total, unit));
-            valid = false;
-        }
+            int total = end - start;
+            int business = getIntegerFromEditText(edtKmBusiness, 0);
+            int privateKm = getIntegerFromEditText(edtKmPrivate, 0);
+            int homeWork = getIntegerFromEditText(edtKmHomeWork, 0);
 
-        if (edtRoute.getText().toString().trim().isEmpty()) {
-            edtRoute.setError(getString(R.string.validate_error_empty));
-            valid = false;
-        }
+            if (total >= 0 && business + privateKm + homeWork != total) {
+                String unit = new Preferences(requireContext()).getUnitDistance();
+                edtKmBusiness.setError(getString(R.string.validate_error_sum_km_mismatch, total, unit));
+                valid = false;
+            }
 
-        if (edtPurpose.getText().toString().trim().isEmpty()) {
-            edtPurpose.setError(getString(R.string.validate_error_empty));
-            valid = false;
+            if (edtRoute.getText().toString().trim().isEmpty()) {
+                edtRoute.setError(getString(R.string.validate_error_empty));
+                valid = false;
+            }
+
+            if (edtPurpose.getText().toString().trim().isEmpty()) {
+                edtPurpose.setError(getString(R.string.validate_error_empty));
+                valid = false;
+            }
         }
 
         return valid;
@@ -672,6 +711,8 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
         if (isInEditMode()) {
             trip.setId(mId);
         }
+        boolean isPartial = chkIsPartial.isChecked();
+        trip.setPartial(isPartial);
         trip.setCarId(spnCar.getSelectedItemId());
         long refuelingId = spnRefueling.getSelectedItemId();
         trip.setRefuelingId(refuelingId != -1 ? refuelingId : null);
@@ -681,9 +722,28 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
             trip.setDate(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         }
 
-        Date dateEnd = edtDateEnd.getDate();
-        if (dateEnd != null) {
-            trip.setDateEnd(dateEnd.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        if (!isPartial) {
+            Date dateEnd = edtDateEnd.getDate();
+            if (dateEnd != null) {
+                trip.setDateEnd(dateEnd.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+
+            Date endTime = edtEndTime.getDate();
+            if (endTime != null) {
+                trip.setTimeEnd(endTime.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
+            }
+
+            trip.setKmEnd(getIntegerFromEditText(edtOdometerEnd, 0));
+            trip.setKmBusiness(getIntegerFromEditText(edtKmBusiness, 0));
+            trip.setKmPrivate(getIntegerFromEditText(edtKmPrivate, 0));
+            trip.setKmHomeWork(getIntegerFromEditText(edtKmHomeWork, 0));
+        } else {
+            trip.setDateEnd(null);
+            trip.setTimeEnd(null);
+            trip.setKmEnd(null);
+            trip.setKmBusiness(0);
+            trip.setKmPrivate(0);
+            trip.setKmHomeWork(0);
         }
 
         Date startTime = edtStartTime.getDate();
@@ -691,19 +751,9 @@ public class DataDetailTripFragment extends AbstractDataDetailFragment {
             trip.setTimeStart(startTime.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
         }
 
-        Date endTime = edtEndTime.getDate();
-        if (endTime != null) {
-            trip.setTimeEnd(endTime.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
-        }
-
         trip.setRouteTarget(edtRoute.getText().toString().trim());
         trip.setPurpose(edtPurpose.getText().toString().trim());
         trip.setKmStart(getIntegerFromEditText(edtOdometerStart, 0));
-        trip.setKmEnd(getIntegerFromEditText(edtOdometerEnd, 0));
-
-        trip.setKmBusiness(getIntegerFromEditText(edtKmBusiness, 0));
-        trip.setKmPrivate(getIntegerFromEditText(edtKmPrivate, 0));
-        trip.setKmHomeWork(getIntegerFromEditText(edtKmHomeWork, 0));
 
         trip.setFuelCost(getDoubleFromEditText(edtCostFuel));
         trip.setOtherCostsAmount(getDoubleFromEditText(edtCostOther));

@@ -138,7 +138,7 @@ public class TripDetailViewModel extends ViewModel {
 
     public void getLastKmEnd(long carId, OnLoadedCallback<Integer> callback) {
         dbExecutor.execute(() -> {
-            Trip lastTrip = tripDao.getLastTripForCar(carId);
+            Trip lastTrip = tripDao.getLastCompletedTripForCar(carId);
             callback.onLoaded(lastTrip != null ? lastTrip.getKmEnd() : 0);
         });
     }

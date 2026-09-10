@@ -108,5 +108,18 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="15.50 EUR" />
+
+        <TextView
+            android:id="@+id/data_invalid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/data2"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/spacing_tiny"
+            android:text="@string/trip_partial_badge"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorError"
+            android:visibility="gone"
+            tools:visibility="visible" />
     </RelativeLayout>
 </LinearLayout>

@@ -31,6 +31,15 @@ public class TripTest {
     }
 
     @Test
+    public void testGetTotalDistance_Partial() {
+        Trip trip = new Trip();
+        trip.setKmStart(1000);
+        trip.setKmEnd(null);
+        trip.setPartial(true);
+        assertEquals(Integer.valueOf(0), trip.getTotalDistance());
+    }
+
+    @Test
     public void testGetTotalCost() {
         Trip trip = new Trip();
         trip.setFuelCost(45.50);

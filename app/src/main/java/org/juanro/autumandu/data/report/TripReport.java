@@ -163,7 +163,8 @@ public class TripReport extends AbstractReport {
 
     public List<TripMonthSummary> getSummaryByMonth(Car car) {
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
-        List<Trip> trips = db.getTripDao().getTripsForCar(car.getId());
+        List<Trip> trips = db.getTripDao().getTripsForCar(car.getId()).stream()
+                .filter(t -> !t.isPartial()).toList();
 
         Map<YearMonth, List<Trip>> grouped = trips.stream()
                 .collect(Collectors.groupingBy(trip -> YearMonth.from(trip.getDate())));
@@ -186,7 +187,8 @@ public class TripReport extends AbstractReport {
 
     public Map<String, TripPurposeSummary> getSummaryByPurpose(Car car) {
         AutuManduDatabase db = AutuManduDatabase.getInstance(mContext);
-        List<Trip> trips = db.getTripDao().getTripsForCar(car.getId());
+        List<Trip> trips = db.getTripDao().getTripsForCar(car.getId()).stream()
+                .filter(t -> !t.isPartial()).toList();
 
         Map<String, List<Trip>> grouped = trips.stream()
                 .collect(Collectors.groupingBy(Trip::getPurpose));

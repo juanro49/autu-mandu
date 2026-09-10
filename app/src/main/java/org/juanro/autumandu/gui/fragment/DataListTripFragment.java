@@ -155,10 +155,16 @@ public class DataListTripFragment extends AbstractDataListFragment<TripWithDetai
         data.put(R.id.title, trip.routeTarget());
         data.put(R.id.subtitle, trip.purpose());
 
-        String dateTime = String.format("%s %s - %s",
-                dateFormatter.format(trip.date()),
-                timeFormatter.format(trip.timeStart()),
-                timeFormatter.format(trip.timeEnd()));
+        String dateTime;
+        if (trip.isPartial()) {
+            dateTime = dateFormatter.format(trip.date()) + " " + timeFormatter.format(trip.timeStart());
+            data.put(R.id.data_invalid, "true");
+        } else {
+            dateTime = String.format("%s %s - %s",
+                    dateFormatter.format(trip.date()),
+                    timeFormatter.format(trip.timeStart()),
+                    timeFormatter.format(trip.timeEnd()));
+        }
         data.put(R.id.date, dateTime);
 
         if (trip.stationName() != null) {
@@ -167,18 +173,25 @@ public class DataListTripFragment extends AbstractDataListFragment<TripWithDetai
             data.put(R.id.station, trip.driver());
         }
 
-        data.put(R.id.data1, String.format(Locale.getDefault(), "%d %s", trip.kmEnd(), unitDistance));
-        data.put(R.id.data1_calculated, String.format(Locale.getDefault(), "+ %d %s",
-                trip.getTotalDistance(), unitDistance));
+        if (trip.isPartial()) {
+            data.put(R.id.data1, "");
+            data.put(R.id.data1_calculated, "");
+            data.put(R.id.data2, "");
+            data.put(R.id.data2_calculated, "");
+        } else {
+            data.put(R.id.data1, String.format(Locale.getDefault(), "%d %s", trip.kmEnd(), unitDistance));
+            data.put(R.id.data1_calculated, String.format(Locale.getDefault(), "+ %d %s",
+                    trip.getTotalDistance(), unitDistance));
 
-        data.put(R.id.data2, String.format(Locale.getDefault(), "%.2f %s",
-                trip.getTotalCost(), unitCurrency));
+            data.put(R.id.data2, String.format(Locale.getDefault(), "%.2f %s",
+                    trip.getTotalCost(), unitCurrency));
 
-        String category;
-        if (trip.kmBusiness() > 0) category = getString(R.string.trip_category_business);
-        else if (trip.kmHomeWork() > 0) category = getString(R.string.trip_category_home_work);
-        else category = getString(R.string.trip_category_private);
-        data.put(R.id.data2_calculated, category);
+            String category;
+            if (trip.kmBusiness() > 0) category = getString(R.string.trip_category_business);
+            else if (trip.kmHomeWork() > 0) category = getString(R.string.trip_category_home_work);
+            else category = getString(R.string.trip_category_private);
+            data.put(R.id.data2_calculated, category);
+        }
 
         return data;
     }

@@ -70,22 +70,22 @@ public interface TripDao {
     @Query("SELECT * FROM trip WHERE car_id = :carId AND date BETWEEN :startDate AND :endDate ORDER BY date DESC, time_start DESC")
     LiveData<List<Trip>> getTripsInDateRangeLive(long carId, LocalDate startDate, LocalDate endDate);
 
-    @Query("SELECT COUNT(*) FROM trip WHERE car_id = :carId")
+    @Query("SELECT COUNT(*) FROM trip WHERE car_id = :carId AND is_partial = 0")
     int getTripCountForCar(long carId);
 
-    @Query("SELECT SUM(km_end - km_start) FROM trip WHERE car_id = :carId")
+    @Query("SELECT SUM(km_end - km_start) FROM trip WHERE car_id = :carId AND is_partial = 0")
     Integer getTotalDistanceForCar(long carId);
 
-    @Query("SELECT SUM(km_business) FROM trip WHERE car_id = :carId")
+    @Query("SELECT SUM(km_business) FROM trip WHERE car_id = :carId AND is_partial = 0")
     Integer getTotalBusinessKm(long carId);
 
-    @Query("SELECT SUM(km_private) FROM trip WHERE car_id = :carId")
+    @Query("SELECT SUM(km_private) FROM trip WHERE car_id = :carId AND is_partial = 0")
     Integer getTotalPrivateKm(long carId);
 
-    @Query("SELECT SUM(km_home_work) FROM trip WHERE car_id = :carId")
+    @Query("SELECT SUM(km_home_work) FROM trip WHERE car_id = :carId AND is_partial = 0")
     Integer getTotalHomeWorkKm(long carId);
 
-    @Query("SELECT SUM(COALESCE(fuel_cost, 0) + COALESCE(other_costs_amount, 0)) FROM trip WHERE car_id = :carId")
+    @Query("SELECT SUM(COALESCE(fuel_cost, 0) + COALESCE(other_costs_amount, 0)) FROM trip WHERE car_id = :carId AND is_partial = 0")
     Double getTotalCostsForCar(long carId);
 
     @Query("SELECT MAX(km_end) FROM trip WHERE car_id = :carId AND date <= :date ORDER BY date DESC, time_end DESC LIMIT 1")
@@ -93,6 +93,9 @@ public interface TripDao {
 
     @Query("SELECT * FROM trip WHERE car_id = :carId ORDER BY date DESC, time_end DESC LIMIT 1")
     Trip getLastTripForCar(long carId);
+
+    @Query("SELECT * FROM trip WHERE car_id = :carId AND is_partial = 0 ORDER BY date DESC, time_end DESC LIMIT 1")
+    Trip getLastCompletedTripForCar(long carId);
 
     @Query("SELECT * FROM trip WHERE refueling_id = :refuelingId ORDER BY date DESC, time_start DESC")
     LiveData<List<Trip>> getTripsForRefuelingLive(long refuelingId);

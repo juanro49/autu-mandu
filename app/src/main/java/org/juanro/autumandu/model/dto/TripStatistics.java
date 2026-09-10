@@ -32,13 +32,15 @@ public record TripStatistics(
             return new TripStatistics(0, 0, 0, 0, 0, 0.0);
         }
 
+        List<Trip> completedTrips = trips.stream().filter(t -> !t.isPartial()).toList();
+
         return new TripStatistics(
-                trips.size(),
-                trips.stream().mapToInt(Trip::getTotalDistance).sum(),
-                trips.stream().mapToInt(Trip::getKmBusiness).sum(),
-                trips.stream().mapToInt(Trip::getKmPrivate).sum(),
-                trips.stream().mapToInt(Trip::getKmHomeWork).sum(),
-                trips.stream().mapToDouble(Trip::getTotalCost).sum()
+                completedTrips.size(),
+                completedTrips.stream().mapToInt(Trip::getTotalDistance).sum(),
+                completedTrips.stream().mapToInt(Trip::getKmBusiness).sum(),
+                completedTrips.stream().mapToInt(Trip::getKmPrivate).sum(),
+                completedTrips.stream().mapToInt(Trip::getKmHomeWork).sum(),
+                completedTrips.stream().mapToDouble(Trip::getTotalCost).sum()
         );
     }
 }

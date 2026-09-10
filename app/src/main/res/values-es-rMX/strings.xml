@@ -459,6 +459,8 @@
     <string name="empty_if_unknown">Por favor, deja vacío si no sabes que indicar aquí.</string>
     <string name="pref_default_backup_path_restored">Ruta de copia de seguridad predeterminada restaurada:</string>
     <string name="label_tank">Tanque</string>
+    <string name="label_trip_is_partial">Viaje parcial (solo datos de inicio)</string>
+    <string name="trip_partial_badge">Parcial</string>
     <string name="hint_start_level">Nivel inicial (%)</string>
     <string name="hint_end_level">Nivel final (%)</string>
     <string name="precision_warning">Nota: Introducir el volumen directamente desde el surtidor/cargador es más preciso que usar porcentajes.</string>

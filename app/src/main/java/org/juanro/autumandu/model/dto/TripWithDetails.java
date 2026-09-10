@@ -35,7 +35,7 @@ public record TripWithDetails(
         Integer occupants,
         String cargo,
         @ColumnInfo(name = "km_start") int kmStart,
-        @ColumnInfo(name = "km_end") int kmEnd,
+        @ColumnInfo(name = "km_end") Integer kmEnd,
         @ColumnInfo(name = "km_business") int kmBusiness,
         @ColumnInfo(name = "km_private") int kmPrivate,
         @ColumnInfo(name = "km_home_work") int kmHomeWork,
@@ -43,12 +43,14 @@ public record TripWithDetails(
         @ColumnInfo(name = "fuel_cost") Double fuelCost,
         @ColumnInfo(name = "other_costs_description") String otherCostsDescription,
         @ColumnInfo(name = "other_costs_amount") Double otherCostsAmount,
+        @ColumnInfo(name = "is_partial") boolean isPartial,
         String carName,
         String stationName,
         Double refuelingPrice,
         Double refuelingVolume
 ) {
     public Integer getTotalDistance() {
+        if (kmEnd == null) return 0;
         return kmEnd - kmStart;
     }
 

@@ -25,6 +25,16 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="@dimen/input_field_max_width" />
 
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/chk_is_partial"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/label_trip_is_partial"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_section_times"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_date_input_layout"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -35,7 +45,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txt_section_times"
+            app:layout_constraintTop_toBottomOf="@id/chk_is_partial"
             app:layout_constraintWidth_max="@dimen/input_field_max_width">
 
             <com.google.android.material.textfield.TextInputEditText
