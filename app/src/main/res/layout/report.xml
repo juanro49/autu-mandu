@@ -33,7 +33,8 @@
         <FrameLayout
             android:id="@+id/report_content_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clipChildren="true">
 
             <!-- 'details' va primero para que 'main' se dibuje encima y lo oculte al colapsar -->
             <LinearLayout
@@ -49,6 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:background="?attr/colorSurfaceContainer"
                 android:padding="@dimen/report_card_padding">
 
                 <LinearLayout

@@ -98,6 +98,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         private final MaterialButton btnReportAction;
 
         private AbstractReport report;
+        private ValueAnimator detailsAnimator;
 
         public ReportHolder(View itemView) {
             super(itemView);
@@ -118,6 +119,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             chartNotEnoughData = itemView.findViewById(R.id.chart_not_enough_data);
             main = itemView.findViewById(R.id.main);
             details = itemView.findViewById(R.id.details);
+            main.bringToFront();
         }
 
         private void showFullScreenChart(AbstractReport report, View v) {
@@ -221,15 +223,18 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         }
 
         private void toggleDetails() {
-            final var detailsParams = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
+            if (detailsAnimator != null) {
+                detailsAnimator.cancel();
+            }
 
+            final var detailsParams = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
             var from = detailsParams.topMargin;
             var to = (from >= main.getHeight()) ? (main.getHeight() - details.getHeight()) : main.getHeight();
 
-            var animator = new ValueAnimator();
-            animator.setDuration(itemView.getResources().getInteger(android.R.integer.config_longAnimTime));
-            animator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));
-            animator.addListener(new AnimatorListenerAdapter() {
+            detailsAnimator = new ValueAnimator();
+            detailsAnimator.setDuration(itemView.getResources().getInteger(android.R.integer.config_longAnimTime));
+            detailsAnimator.setValues(PropertyValuesHolder.ofInt((String) null, from, to));
+            detailsAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationStart(Animator animation) {
                     details.setVisibility(View.VISIBLE);
@@ -240,18 +245,28 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                     if (detailsParams.topMargin <= main.getHeight() - details.getHeight()) {
                         details.setVisibility(View.INVISIBLE);
                     }
+                    detailsAnimator = null;
                 }
             });
-            animator.addUpdateListener(animation -> {
+            detailsAnimator.addUpdateListener(animation -> {
                 detailsParams.topMargin = (Integer) animation.getAnimatedValue();
                 details.requestLayout();
             });
-            animator.start();
+            detailsAnimator.start();
         }
 
         private void resetUIState() {
+            if (detailsAnimator != null) {
+                detailsAnimator.cancel();
+                detailsAnimator = null;
+            }
             removePreviousKubitChart();
-            details.setVisibility(View.GONE);
+            details.setVisibility(View.INVISIBLE);
+            var params = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
+            params.topMargin = 0;
+            details.setLayoutParams(params);
+            details.setTranslationY(0);
+
             chartNotEnoughData.setVisibility(View.GONE);
             chartContainer.setVisibility(View.VISIBLE);
             chartLoading.setAlpha(1f);
@@ -275,9 +290,14 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
             ReportDetailBinder.bindDetails(details, reportData);
 
-            var params = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
-            params.topMargin = main.getHeight();
-            details.requestLayout();
+            // Ensure details are positioned after both containers have been measured
+            details.post(() -> {
+                if (this.report != report) return;
+                var params = (ViewGroup.MarginLayoutParams) details.getLayoutParams();
+                params.topMargin = main.getHeight() - details.getHeight();
+                details.setLayoutParams(params);
+                details.setVisibility(View.INVISIBLE);
+            });
         }
 
         private void renderChart(AbstractReport report, ReportChartOptions options, List<? extends AbstractReportChartData> rawData) {

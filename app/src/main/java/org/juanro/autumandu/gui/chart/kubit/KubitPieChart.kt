@@ -72,7 +72,6 @@ fun KubitPieChart(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(dimensionResource(id = R.dimen.chart_height))
                 .padding(vertical = dimensionResource(id = R.dimen.report_card_padding) / 2)
                 .semantics { contentDescription = chartDescription },
             horizontalAlignment = Alignment.CenterHorizontally,
