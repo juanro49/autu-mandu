@@ -139,6 +139,10 @@ public final class CSVConvert {
     }
 
     @Nullable
+    static String toString(Boolean value) {
+        return value != null ? value.toString() : "";
+    }
+
     static String toString(Enum<?> value) {
         if (value == null) return null;
         return switch (value) {

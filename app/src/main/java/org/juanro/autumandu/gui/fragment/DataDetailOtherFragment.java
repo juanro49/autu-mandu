@@ -80,6 +80,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
     private EditText edtPrice;
     private Spinner spnRepeat;
     private CheckBox chkEndDate;
+    private CheckBox chkSplitPrice;
     private SimpleAnimator chkEndDateAnimator;
     private SimpleAnimator edtEndDateAnimator;
     private DateTimeInput edtEndDate;
@@ -162,6 +163,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         edtPrice.setText(String.valueOf(displayPrice));
 
         spnRepeat.setSelection(otherCost.getRecurrenceInterval().ordinal());
+        chkSplitPrice.setChecked(otherCost.isSplitPrice());
         updateRecurrenceFieldsVisibility(false);
 
         edtEndDate.setDate(otherCost.getEndDate() == null ? new Date() : otherCost.getEndDate());
@@ -169,7 +171,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
     }
 
     private void updateInitialAnimatorStates() {
-        if (spnRepeat.getSelectedItemPosition() == 0) {
+        if (spnRepeat.getSelectedItemPosition() == 0 && !chkSplitPrice.isChecked()) {
             chkEndDateAnimator.hide();
         }
         if (!chkEndDate.isChecked()) {
@@ -218,6 +220,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         edtPrice = v.findViewById(R.id.edt_price);
         spnRepeat = v.findViewById(R.id.spn_repeat);
         chkEndDate = v.findViewById(R.id.chk_end_date);
+        chkSplitPrice = v.findViewById(R.id.chk_split_price);
         chkEndDateAnimator = new SimpleAnimator(getActivity(), chkEndDate, SimpleAnimator.Property.HEIGHT);
         edtEndDate = new DateTimeInput(v.findViewById(R.id.edt_end_date), DateTimeInput.Mode.DATE);
         TextInputLayout edtEndDateInputLayout = v.findViewById(R.id.edt_end_date_input_layout);
@@ -256,6 +259,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         });
 
         chkEndDate.setOnCheckedChangeListener((buttonView, isChecked) -> updateRecurrenceFieldsVisibility(true));
+        chkSplitPrice.setOnCheckedChangeListener((buttonView, isChecked) -> updateRecurrenceFieldsVisibility(true));
     }
 
     private void setupCarSpinner(Preferences prefs) {
@@ -292,12 +296,13 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
 
     private void updateRecurrenceFieldsVisibility(boolean animated) {
         boolean repeat = spnRepeat.getSelectedItemPosition() > 0;
-        updateEndDateCheckboxVisibility(repeat, animated);
-        updateEndDateInputVisibility(repeat, animated);
+        boolean split = chkSplitPrice.isChecked();
+        updateEndDateCheckboxVisibility(repeat || split, animated);
+        updateEndDateInputVisibility((repeat || split) && chkEndDate.isChecked(), animated);
     }
 
-    private void updateEndDateCheckboxVisibility(boolean repeat, boolean animated) {
-        if (repeat) {
+    private void updateEndDateCheckboxVisibility(boolean show, boolean animated) {
+        if (show) {
             if (animated) chkEndDateAnimator.show();
             else chkEndDate.setVisibility(View.VISIBLE);
         } else {
@@ -307,8 +312,8 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         }
     }
 
-    private void updateEndDateInputVisibility(boolean repeat, boolean animated) {
-        if (repeat && chkEndDate.isChecked()) {
+    private void updateEndDateInputVisibility(boolean show, boolean animated) {
+        if (show) {
             if (animated) edtEndDateAnimator.show();
             else {
                 View view = findView(R.id.edt_end_date_input_layout);
@@ -363,6 +368,7 @@ public class DataDetailOtherFragment extends AbstractDataDetailFragment {
         otherCost.setPrice(price);
         otherCost.setRecurrenceInterval(recurrenceInterval);
         otherCost.setRecurrenceMultiplier(1);
+        otherCost.setSplitPrice(chkSplitPrice.isChecked());
         otherCost.setEndDate(endDate);
         otherCost.setNote(edtNote.getText().toString().trim());
         otherCost.setCarId(spnCar.getSelectedItemId());

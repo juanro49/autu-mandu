@@ -57,6 +57,9 @@ public class OtherCost {
     @ColumnInfo(name = "note")
     private String note = "";
 
+    @ColumnInfo(name = "split_price", defaultValue = "0")
+    private boolean splitPrice = false;
+
     @ColumnInfo(name = "car_id")
     private long carId;
 
@@ -134,6 +137,14 @@ public class OtherCost {
 
     public void setEndDate(@Nullable Date endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean isSplitPrice() {
+        return splitPrice;
+    }
+
+    public void setSplitPrice(boolean splitPrice) {
+        this.splitPrice = splitPrice;
     }
 
     @NonNull

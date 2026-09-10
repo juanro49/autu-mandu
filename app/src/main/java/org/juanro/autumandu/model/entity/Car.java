@@ -31,6 +31,13 @@ public class Car {
     @ColumnInfo(name = "buying_price")
     private double buyingPrice = 0;
 
+    @ColumnInfo(name = "buying_price_split_months", defaultValue = "0")
+    private int buyingPriceSplitMonths = 0;
+
+    @ColumnInfo(name = "purchase_date")
+    @Nullable
+    private Date purchaseDate;
+
     @ColumnInfo(name = "num_tires")
     private int numTires = 4;
 
@@ -94,6 +101,23 @@ public class Car {
 
     public void setBuyingPrice(double buyingPrice) {
         this.buyingPrice = buyingPrice;
+    }
+
+    public int getBuyingPriceSplitMonths() {
+        return buyingPriceSplitMonths;
+    }
+
+    public void setBuyingPriceSplitMonths(int buyingPriceSplitMonths) {
+        this.buyingPriceSplitMonths = buyingPriceSplitMonths;
+    }
+
+    @Nullable
+    public Date getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(@Nullable Date purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 
     public int getNumTires() {

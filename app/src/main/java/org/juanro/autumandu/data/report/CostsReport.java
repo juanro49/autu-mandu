@@ -40,6 +40,7 @@ import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.OtherCost;
 import org.juanro.autumandu.model.entity.TireList;
 import org.juanro.autumandu.util.Recurrences;
+import org.juanro.autumandu.gui.fragment.ReportFragment;
 
 public class CostsReport extends AbstractReport {
 
@@ -162,6 +163,8 @@ public class CostsReport extends AbstractReport {
     @Override
     protected void onUpdate() {
         Preferences prefs = new Preferences(mContext);
+        var chartOptions = ReportChartOptions.load(mContext, "CostsReport");
+        boolean showInvestment = chartOptions.isShowInvestment();
         mUnit = prefs.getUnitCurrency();
         mCostsPerMonth.clear();
         mCostsPerYear.clear();
@@ -180,7 +183,7 @@ public class CostsReport extends AbstractReport {
                 .stream().collect(Collectors.groupingBy(TireList::getCarId));
 
         for (Car car : cars) {
-            processCar(car, refuelingsByCar, otherCostsByCar, tiresByCar, prefs);
+            processCar(car, refuelingsByCar, otherCostsByCar, tiresByCar, prefs, showInvestment);
         }
     }
 
@@ -196,7 +199,7 @@ public class CostsReport extends AbstractReport {
 
     private void processCar(Car car, Map<Long, List<RefuelingWithDetails>> refuelingsByCar,
                             Map<Long, List<OtherCost>> otherCostsByCar,
-                            Map<Long, List<TireList>> tiresByCar, Preferences prefs) {
+                            Map<Long, List<TireList>> tiresByCar, Preferences prefs, boolean showInvestment) {
         Long carIdObj = car.getId();
         if (carIdObj == null) return;
         long carId = carIdObj;
@@ -216,8 +219,11 @@ public class CostsReport extends AbstractReport {
         calculateFuelCosts(refuelingsByCar.get(carId), context, prefs);
         calculateOtherCosts(otherCostsByCar.get(carId), context);
         calculateTireCosts(tiresByCar.get(carId), context);
+        if (showInvestment) {
+            calculateCarInvestment(car, context);
+        }
 
-        if ((context.refuelingsCount + context.otherCostsCount + context.tiresCount) < 2) {
+        if ((context.refuelingsCount + context.otherCostsCount + context.tiresCount) < 2 && (!showInvestment || car.getBuyingPrice() <= 0)) {
             section.addItem(new Item(mContext.getString(R.string.report_not_enough_data), ""));
             return;
         }
@@ -300,17 +306,86 @@ public class CostsReport extends AbstractReport {
         ZonedDateTime endDate = (otherCost.getEndDate() != null && ctx.endDate.isAfter(ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault())))
                 ? ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault()) : ctx.endDate;
 
-        while (date.isBefore(endDate)) {
-            ctx.monthData.add(date, otherCost.getPrice());
-            ctx.yearData.add(date, otherCost.getPrice());
-            switch (otherCost.getRecurrenceInterval()) {
-                case ONCE -> date = ZonedDateTime.now().plusYears(100);
-                case DAY -> date = date.plusDays(otherCost.getRecurrenceMultiplier());
-                case MONTH -> date = date.plusMonths(otherCost.getRecurrenceMultiplier());
-                case QUARTER -> date = date.plusMonths(otherCost.getRecurrenceMultiplier() * 3L);
-                case YEAR -> date = date.plusYears(otherCost.getRecurrenceMultiplier());
+        if (otherCost.isSplitPrice()) {
+            if (otherCost.getRecurrenceInterval() == org.juanro.autumandu.model.entity.helper.RecurrenceInterval.ONCE) {
+                ZonedDateTime actualEndDate = (otherCost.getEndDate() != null)
+                        ? ZonedDateTime.ofInstant(otherCost.getEndDate().toInstant(), ZoneId.systemDefault())
+                        : ctx.now;
+
+                long months = Math.max(1L, ChronoUnit.MONTHS.between(date.withDayOfMonth(1), actualEndDate.withDayOfMonth(1)) + 1);
+                float monthlyPrice = otherCost.getPrice() / months;
+                ZonedDateTime current = date;
+                while (current.isBefore(actualEndDate.plusDays(1)) && current.isBefore(ctx.endDate.plusSeconds(1))) {
+                    ctx.monthData.add(current, monthlyPrice);
+                    ctx.yearData.add(current, monthlyPrice);
+                    current = current.plusMonths(1);
+                }
+            } else {
+                float monthlyPrice = otherCost.getPrice();
+                int monthsInInterval = switch (otherCost.getRecurrenceInterval()) {
+                    case YEAR -> 12 * otherCost.getRecurrenceMultiplier();
+                    case QUARTER -> 3 * otherCost.getRecurrenceMultiplier();
+                    case MONTH -> otherCost.getRecurrenceMultiplier();
+                    default -> 1;
+                };
+                monthlyPrice /= monthsInInterval;
+
+                ZonedDateTime current = date;
+                while (current.isBefore(endDate)) {
+                    ctx.monthData.add(current, monthlyPrice);
+                    ctx.yearData.add(current, monthlyPrice);
+                    current = current.plusMonths(1);
+                }
+            }
+        } else {
+            while (date.isBefore(endDate)) {
+                ctx.monthData.add(date, otherCost.getPrice());
+                ctx.yearData.add(date, otherCost.getPrice());
+                switch (otherCost.getRecurrenceInterval()) {
+                    case ONCE -> date = ZonedDateTime.now().plusYears(100);
+                    case DAY -> date = date.plusDays(otherCost.getRecurrenceMultiplier());
+                    case MONTH -> date = date.plusMonths(otherCost.getRecurrenceMultiplier());
+                    case QUARTER -> date = date.plusMonths(otherCost.getRecurrenceMultiplier() * 3L);
+                    case YEAR -> date = date.plusYears(otherCost.getRecurrenceMultiplier());
+                }
             }
         }
+    }
+
+    private void calculateCarInvestment(Car car, CalculationContext ctx) {
+        if (car.getBuyingPrice() <= 0) return;
+
+        ctx.totalCosts += car.getBuyingPrice();
+
+        ZonedDateTime purchaseDate = car.getPurchaseDate() != null ?
+                ZonedDateTime.ofInstant(car.getPurchaseDate().toInstant(), ZoneId.systemDefault()) :
+                ctx.startDate;
+
+        if (purchaseDate.isAfter(ctx.lastYearDate) && purchaseDate.isBefore(ctx.now.plusSeconds(1))) {
+            ctx.costsWithinYear += car.getBuyingPrice();
+        }
+
+        if (car.getBuyingPriceSplitMonths() != 0) {
+            int splitMonths = car.getBuyingPriceSplitMonths();
+            if (splitMonths == -1) {
+                splitMonths = (int) ChronoUnit.MONTHS.between(purchaseDate.withDayOfMonth(1), ctx.now.withDayOfMonth(1)) + 1;
+            }
+            splitMonths = Math.max(1, splitMonths);
+
+            float monthlyPrice = (float) (car.getBuyingPrice() / splitMonths);
+            ZonedDateTime current = purchaseDate;
+            ZonedDateTime endSplitDate = purchaseDate.plusMonths(splitMonths);
+            while (current.isBefore(endSplitDate) && current.isBefore(ctx.endDate.plusSeconds(1))) {
+                ctx.monthData.add(current, monthlyPrice);
+                ctx.yearData.add(current, monthlyPrice);
+                current = current.plusMonths(1);
+            }
+        } else {
+            ctx.monthData.add(purchaseDate, (float) car.getBuyingPrice());
+            ctx.yearData.add(purchaseDate, (float) car.getBuyingPrice());
+        }
+
+        if (ctx.startDate.isAfter(purchaseDate)) ctx.startDate = purchaseDate;
     }
 
     private void calculateTireCosts(List<TireList> tireLists, CalculationContext ctx) {

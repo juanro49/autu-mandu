@@ -45,6 +45,7 @@ import org.juanro.autumandu.model.entity.OtherCost;
 import org.juanro.autumandu.model.entity.Refueling;
 import org.juanro.autumandu.model.entity.Reminder;
 import org.juanro.autumandu.model.entity.Station;
+import org.juanro.autumandu.model.entity.Tank;
 import org.juanro.autumandu.model.entity.TireList;
 import org.juanro.autumandu.model.entity.TireUsage;
 import org.juanro.autumandu.model.entity.Trip;
@@ -70,9 +71,10 @@ public class CSVExportImport {
     public static final String TABLE_TIRE_USAGE = "tire_usage";
     public static final String TABLE_TRIP = "trip";
     public static final String TABLE_TRIP_PREFAB = "trip_prefab";
+    public static final String TABLE_TANK = "tank";
 
     public static String[] getTableNames() {
-        return new String[]{TABLE_CAR, TABLE_FUEL_TYPE, TABLE_STATION, TABLE_OTHER_COST, TABLE_REFUELING, TABLE_REMINDER, TABLE_TIRE_LIST, TABLE_TIRE_USAGE, TABLE_TRIP, TABLE_TRIP_PREFAB};
+        return new String[]{TABLE_CAR, TABLE_FUEL_TYPE, TABLE_STATION, TABLE_OTHER_COST, TABLE_REFUELING, TABLE_REMINDER, TABLE_TIRE_LIST, TABLE_TIRE_USAGE, TABLE_TRIP, TABLE_TRIP_PREFAB, TABLE_TANK};
     }
 
     // Common columns
@@ -85,8 +87,10 @@ public class CSVExportImport {
     private static final String CAR_INITIAL_MILEAGE = "initial_mileage";
     private static final String CAR_SUSPENDED_SINCE = "suspended_since";
     private static final String CAR_BUYING_PRICE = "buying_price";
+    private static final String CAR_BUYING_PRICE_SPLIT_MONTHS = "buying_price_split_months";
+    private static final String CAR_PURCHASE_DATE = "purchase_date";
     private static final String CAR_NUM_TIRES = "num_tires";
-    private static final String[] CAR_ALL_COLUMNS = {COLUMN_ID, CAR_NAME, CAR_COLOR, CAR_INITIAL_MILEAGE, CAR_SUSPENDED_SINCE, CAR_BUYING_PRICE, CAR_NUM_TIRES};
+    private static final String[] CAR_ALL_COLUMNS = {COLUMN_ID, CAR_NAME, CAR_COLOR, CAR_INITIAL_MILEAGE, CAR_SUSPENDED_SINCE, CAR_BUYING_PRICE, CAR_BUYING_PRICE_SPLIT_MONTHS, CAR_PURCHASE_DATE, CAR_NUM_TIRES};
 
     // FuelType columns
     private static final String FUEL_TYPE_NAME = "fuel_type__name";
@@ -106,8 +110,9 @@ public class CSVExportImport {
     private static final String OTHER_COST_RECURRENCE_MULTIPLIER = "recurrence_multiplier";
     private static final String OTHER_COST_END_DATE = "end_date";
     private static final String OTHER_COST_NOTE = "note";
+    private static final String OTHER_COST_SPLIT_PRICE = "split_price";
     private static final String OTHER_COST_CAR_ID = "car_id";
-    private static final String[] OTHER_COST_ALL_COLUMNS = {COLUMN_ID, OTHER_COST_TITLE, OTHER_COST_DATE, OTHER_COST_MILEAGE, OTHER_COST_PRICE, OTHER_COST_RECURRENCE_INTERVAL, OTHER_COST_RECURRENCE_MULTIPLIER, OTHER_COST_END_DATE, OTHER_COST_NOTE, OTHER_COST_CAR_ID};
+    private static final String[] OTHER_COST_ALL_COLUMNS = {COLUMN_ID, OTHER_COST_TITLE, OTHER_COST_DATE, OTHER_COST_MILEAGE, OTHER_COST_PRICE, OTHER_COST_RECURRENCE_INTERVAL, OTHER_COST_RECURRENCE_MULTIPLIER, OTHER_COST_END_DATE, OTHER_COST_NOTE, OTHER_COST_SPLIT_PRICE, OTHER_COST_CAR_ID};
 
     // Refueling columns
     private static final String REFUELING_DATE = "date";
@@ -119,7 +124,10 @@ public class CSVExportImport {
     private static final String REFUELING_FUEL_TYPE_ID = "fuel_type_id";
     private static final String REFUELING_STATION_ID = "station_id";
     private static final String REFUELING_CAR_ID = "car_id";
-    private static final String[] REFUELING_ALL_COLUMNS = {COLUMN_ID, REFUELING_DATE, REFUELING_MILEAGE, REFUELING_VOLUME, REFUELING_PRICE, REFUELING_PARTIAL, REFUELING_NOTE, REFUELING_FUEL_TYPE_ID, REFUELING_STATION_ID, REFUELING_CAR_ID};
+    private static final String REFUELING_START_LEVEL = "start_level";
+    private static final String REFUELING_END_LEVEL = "end_level";
+    private static final String REFUELING_TANK_ID = "tank_id";
+    private static final String[] REFUELING_ALL_COLUMNS = {COLUMN_ID, REFUELING_DATE, REFUELING_MILEAGE, REFUELING_VOLUME, REFUELING_PRICE, REFUELING_PARTIAL, REFUELING_NOTE, REFUELING_FUEL_TYPE_ID, REFUELING_STATION_ID, REFUELING_CAR_ID, REFUELING_START_LEVEL, REFUELING_END_LEVEL, REFUELING_TANK_ID};
 
     // Reminder columns
     private static final String REMINDER_TITLE = "title";
@@ -188,6 +196,14 @@ public class CSVExportImport {
     private static final String TRIP_PREFAB_VALUE = "value";
     private static final String TRIP_PREFAB_USAGE_COUNT = "usage_count";
     private static final String[] TRIP_PREFAB_ALL_COLUMNS = {COLUMN_ID, TRIP_PREFAB_CAR_ID, TRIP_PREFAB_TYPE, TRIP_PREFAB_VALUE, TRIP_PREFAB_USAGE_COUNT};
+
+    // Tank columns
+    private static final String TANK_CAR_ID = "car_id";
+    private static final String TANK_FUEL_CATEGORY = "fuel_category";
+    private static final String TANK_NAME = "tank__name";
+    private static final String TANK_CAPACITY = "capacity";
+    private static final String TANK_IS_MANUALLY_SET = "is_manually_set";
+    private static final String[] TANK_ALL_COLUMNS = {COLUMN_ID, TANK_CAR_ID, TANK_FUEL_CATEGORY, TANK_NAME, TANK_CAPACITY, TANK_IS_MANUALLY_SET};
 
     private final Context context;
     private DocumentFile exportDir;
@@ -265,6 +281,7 @@ public class CSVExportImport {
             exportTireUsages(db);
             exportTrips(db);
             exportTripPrefabs(db);
+            exportTanks(db);
 
         } catch (CSVImportException e) {
             throw e;
@@ -286,6 +303,8 @@ public class CSVExportImport {
                         car.getInitialMileage(),
                         CSVConvert.toString(car.getSuspendedSince()),
                         CSVConvert.toString(car.getBuyingPrice()),
+                        car.getBuyingPriceSplitMonths(),
+                        CSVConvert.toString(car.getPurchaseDate()),
                         car.getNumTires());
             }
         });
@@ -328,6 +347,7 @@ public class CSVExportImport {
                         otherCost.getRecurrenceMultiplier(),
                         CSVConvert.toString(otherCost.getEndDate()),
                         otherCost.getNote(),
+                        CSVConvert.toString(otherCost.isSplitPrice()),
                         otherCost.getCarId());
             }
         });
@@ -347,7 +367,10 @@ public class CSVExportImport {
                         refueling.getNote(),
                         refueling.getFuelTypeId(),
                         refueling.getStationId(),
-                        refueling.getCarId());
+                        refueling.getCarId(),
+                        CSVConvert.toString(refueling.getStartLevel()),
+                        CSVConvert.toString(refueling.getEndLevel()),
+                        refueling.getTankId());
             }
         });
     }
@@ -455,6 +478,21 @@ public class CSVExportImport {
         });
     }
 
+    private void exportTanks(AutuManduDatabase db) throws IOException {
+        doExport(TABLE_TANK + FILE_EXTENSION, TANK_ALL_COLUMNS, csv -> {
+            for (var tank : db.getTankDao().getAll()) {
+                csv.printRecord(
+                        tank.getId(),
+                        tank.getCarId(),
+                        tank.getFuelCategory(),
+                        tank.getName(),
+                        CSVConvert.toString(tank.getCapacity()),
+                        tank.isManuallySet()
+                );
+            }
+        });
+    }
+
     private DocumentFile getOrCreateFile(String name) throws IOException {
         DocumentFile dir = getExportDir();
         if (dir == null) throw new IOException("Export directory not accessible.");
@@ -539,6 +577,7 @@ public class CSVExportImport {
             importCars(db, format, result);
             importFuelTypes(db, format, result);
             importStations(db, format, result);
+            importTanks(db, format, result);
             importOtherCosts(db, format, result);
             importRefuelings(db, format, result);
             importReminders(db, format, result);
@@ -608,6 +647,9 @@ public class CSVExportImport {
         car.setSuspendedSince(CSVConvert.toDate(getSafe(csvRecord, CAR_SUSPENDED_SINCE)));
         var price = CSVConvert.toFloat(getSafe(csvRecord, CAR_BUYING_PRICE));
         car.setBuyingPrice(price != null ? price.doubleValue() : 0.0);
+        var splitMonths = CSVConvert.toInteger(getSafe(csvRecord, CAR_BUYING_PRICE_SPLIT_MONTHS));
+        car.setBuyingPriceSplitMonths(splitMonths != null ? splitMonths : 0);
+        car.setPurchaseDate(CSVConvert.toDate(getSafe(csvRecord, CAR_PURCHASE_DATE)));
         var tires = CSVConvert.toInteger(getSafe(csvRecord, CAR_NUM_TIRES));
         car.setNumTires(tires != null ? tires : 4);
         return car;
@@ -677,6 +719,8 @@ public class CSVExportImport {
         otherCost.setRecurrenceMultiplier(mult != null ? mult : 0);
         otherCost.setEndDate(CSVConvert.toDate(getSafe(csvRecord, OTHER_COST_END_DATE)));
         otherCost.setNote(Objects.requireNonNullElse(getSafe(csvRecord, OTHER_COST_NOTE), ""));
+        var split = CSVConvert.toBoolean(getSafe(csvRecord, OTHER_COST_SPLIT_PRICE));
+        otherCost.setSplitPrice(split != null ? split : false);
         var carId = CSVConvert.toLong(getSafe(csvRecord, OTHER_COST_CAR_ID));
         otherCost.setCarId(carId != null ? carId : 0L);
         return otherCost;
@@ -716,6 +760,12 @@ public class CSVExportImport {
         refueling.setStationId(stationId != null ? stationId : 0L);
         var carId = CSVConvert.toLong(getSafe(csvRecord, REFUELING_CAR_ID));
         refueling.setCarId(carId != null ? carId : 0L);
+        var startLevel = CSVConvert.toFloat(getSafe(csvRecord, REFUELING_START_LEVEL));
+        refueling.setStartLevel(startLevel != null ? startLevel : 0f);
+        var endLevel = CSVConvert.toFloat(getSafe(csvRecord, REFUELING_END_LEVEL));
+        refueling.setEndLevel(endLevel != null ? endLevel : 0f);
+        var tankId = CSVConvert.toLong(getSafe(csvRecord, REFUELING_TANK_ID));
+        refueling.setTankId(tankId != null ? tankId : 0L);
         return refueling;
     }
 
@@ -886,6 +936,29 @@ public class CSVExportImport {
                 }
             } catch (Exception e) {
                 result.addError("TripPrefab line " + csvRecord.getRecordNumber() + ": " + e.getMessage());
+            }
+        });
+    }
+
+    private void importTanks(AutuManduDatabase db, CSVFormat format, ImportResult result) throws IOException {
+        doImport(TABLE_TANK + FILE_EXTENSION, format, csvRecord -> {
+            try {
+                Long id = CSVConvert.toLong(getSafe(csvRecord, COLUMN_ID));
+                if (id != null) {
+                    var tank = new Tank();
+                    tank.setId(id);
+                    tank.setCarId(Objects.requireNonNullElse(CSVConvert.toLong(getSafe(csvRecord, TANK_CAR_ID)), 0L));
+                    tank.setFuelCategory(Objects.requireNonNullElse(getSafe(csvRecord, TANK_FUEL_CATEGORY), ""));
+                    tank.setName(getSafe(csvRecord, TANK_NAME));
+                    var cap = CSVConvert.toFloat(getSafe(csvRecord, TANK_CAPACITY));
+                    tank.setCapacity(cap != null ? cap : 0f);
+                    var manual = CSVConvert.toBoolean(getSafe(csvRecord, TANK_IS_MANUALLY_SET));
+                    tank.setManuallySet(Boolean.TRUE.equals(manual));
+                    db.getTankDao().insert(tank);
+                    result.incrementSuccess();
+                }
+            } catch (Exception e) {
+                result.addError("Tank line " + csvRecord.getRecordNumber() + ": " + e.getMessage());
             }
         });
     }

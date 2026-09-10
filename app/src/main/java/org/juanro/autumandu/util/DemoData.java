@@ -106,8 +106,8 @@ public final class DemoData {
         int puntoMileage = 15000;
 
         createOtherCost(db, new OtherCostConfig("Rechtes Abblendlicht", puntoDate.plusDays(randInt(50, 100)), null,
-                121009, 10, RecurrenceInterval.ONCE, 1, "", punto));
-        createOtherCost(db, new OtherCostConfig("Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1,
+                121009, 10, RecurrenceInterval.ONCE, 1, false, "", punto));
+        createOtherCost(db, new OtherCostConfig("Steuern", puntoDate, null, -1, 210, RecurrenceInterval.YEAR, 1, true,
                 "", punto));
 
         createTire(db, new TireConfig(puntoDate, null, 50, 4, "Insa Turbo", "Eco Evolution", "", punto));
@@ -158,10 +158,10 @@ public final class DemoData {
         ZonedDateTime astraDate = ZonedDateTime.now().minusMonths(astraCount / 3).withSecond(0).withNano(0);
         int astraMileage = 120000;
 
-        createOtherCost(db, new OtherCostConfig("Steuern", astraDate, null, -1, 250, RecurrenceInterval.YEAR, 1,
+        createOtherCost(db, new OtherCostConfig("Steuern", astraDate, null, -1, 250, RecurrenceInterval.YEAR, 1, true,
                 "", astra));
         createOtherCost(db, new OtherCostConfig("Versicherung", astraDate, null, -1, 40, RecurrenceInterval.MONTH,
-                1, "", astra));
+                1, false, "", astra));
 
         createTire(db, new TireConfig(astraDate, null, 50, 4, "Insa Turbo", "All Season 4", "", astra));
 
@@ -240,8 +240,8 @@ public final class DemoData {
         ZonedDateTime ebroDate = ZonedDateTime.now().minusMonths(ebroCount / 8).withSecond(0).withNano(0);
         int ebroMileage = 500;
 
-        createOtherCost(db, new OtherCostConfig("Impuestos", ebroDate, null, -1, 140, RecurrenceInterval.YEAR, 1, "", ebro));
-        createOtherCost(db, new OtherCostConfig("Seguro Todo Riesgo", ebroDate, null, -1, 65, RecurrenceInterval.MONTH, 1, "", ebro));
+        createOtherCost(db, new OtherCostConfig("Impuestos", ebroDate, null, -1, 140, RecurrenceInterval.YEAR, 1, true, "", ebro));
+        createOtherCost(db, new OtherCostConfig("Seguro Todo Riesgo", ebroDate, null, -1, 65, RecurrenceInterval.MONTH, 1, false, "", ebro));
         createTire(db, new TireConfig(ebroDate, null, 120, 4, "Insa Turbo", "ECO A5", "", ebro));
 
         EbroRefuelingConfig config = new EbroRefuelingConfig(ebro, ebroDate, ebroMileage, ebroCount, super95, electricity, stationId, ebroGasTank, ebroBattery);
@@ -357,13 +357,14 @@ public final class DemoData {
         otherCost.setPrice(config.price());
         otherCost.setRecurrenceInterval(config.recurrenceInterval());
         otherCost.setRecurrenceMultiplier(config.recurrenceMultiplier());
+        otherCost.setSplitPrice(config.splitPrice());
         otherCost.setNote(config.note());
         otherCost.setCarId(config.carId());
 
         db.getOtherCostDao().insert(otherCost);
     }
 
-    private record OtherCostConfig(String title, ZonedDateTime date, ZonedDateTime endDate, int mileage, float price, RecurrenceInterval recurrenceInterval, int recurrenceMultiplier, String note, long carId) {}
+    private record OtherCostConfig(String title, ZonedDateTime date, ZonedDateTime endDate, int mileage, float price, RecurrenceInterval recurrenceInterval, int recurrenceMultiplier, boolean splitPrice, String note, long carId) {}
 
     private static void createTire(AutuManduDatabase db, TireConfig config) {
         TireList tireList = new TireList();

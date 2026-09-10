@@ -89,7 +89,12 @@
     <string name="label_color_in_reports">Color in reports</string>
     <string name="label_suspend">Suspend</string>
     <string name="label_set_end_date">Set end date</string>
+    <string name="label_split_cost">Split cost as monthly expense</string>
+    <string name="hint_buying_price_split_months">Amortization period (months)</string>
+    <string name="hint_purchase_date">Purchase date</string>
+    <string name="label_amortize_until_now">Amortize until today</string>
     <string name="label_set_trash_date">Set trash date</string>
+    <string name="menu_show_investment">Show buying price</string>
     <string name="label_car">Car</string>
     <string name="label_trip_refueling">Linked refueling</string>
     <string name="label_recurrence">Recurrence</string>

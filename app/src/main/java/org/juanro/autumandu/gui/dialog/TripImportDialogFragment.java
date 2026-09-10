@@ -19,6 +19,7 @@ package org.juanro.autumandu.gui.dialog;
 import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -170,6 +171,7 @@ public class TripImportDialogFragment extends DialogFragment {
                 if (result.getFailedCount() > 0) {
                     message += "\n\n" + result.getErrorSummary();
                 }
+                Log.i(TAG, message);
                 Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
                 dismiss();
             });

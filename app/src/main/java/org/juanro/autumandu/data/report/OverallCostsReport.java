@@ -185,6 +185,13 @@ public class OverallCostsReport extends AbstractReport {
                 ZonedDateTime.ofInstant(car.getSuspendedSince().toInstant(), ZoneId.systemDefault()) :
                 ZonedDateTime.now();
 
+        if (car.getPurchaseDate() != null) {
+            ZonedDateTime pDate = ZonedDateTime.ofInstant(car.getPurchaseDate().toInstant(), ZoneId.systemDefault());
+            if (pDate.isBefore(startDate)) {
+                startDate = pDate;
+            }
+        }
+
         if (!balancedRefuelings.isEmpty()) {
             endMileage = Math.max(endMileage, balancedRefuelings.get(balancedRefuelings.size() - 1).getMileage());
             if (balancedRefuelings.get(0).getDate().getTime() < startDate.toInstant().toEpochMilli()) {

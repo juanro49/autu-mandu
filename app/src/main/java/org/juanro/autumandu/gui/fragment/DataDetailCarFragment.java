@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.juanro.autumandu.R;
+import org.juanro.autumandu.gui.dialog.DatePickerDialogFragment;
+import org.juanro.autumandu.gui.util.DateTimeInput;
 import org.juanro.autumandu.model.entity.Car;
 import org.juanro.autumandu.model.entity.FuelCategory;
 import org.juanro.autumandu.model.entity.Tank;
@@ -66,8 +68,12 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
     private EditText edtInitialMileage;
     private EditText edtNumTires;
     private EditText edtBuyingPrice;
+    private DateTimeInput edtPurchaseDate;
+    private EditText edtBuyingPriceSplitMonths;
+    private CheckBox chkAmortizeUntilNow;
     private View colorPreview;
     private CheckBox chkSuspended;
+    private DateTimeInput edtSuspendDate;
 
     private RecyclerView lstTanks;
     private MaterialButton btnAddTank;
@@ -84,8 +90,22 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
         edtInitialMileage = view.findViewById(R.id.edt_initial_mileage);
         edtNumTires = view.findViewById(R.id.edt_num_tires);
         edtBuyingPrice = view.findViewById(R.id.edt_buying_price);
+        edtPurchaseDate = new DateTimeInput(view.findViewById(R.id.edt_purchase_date), DateTimeInput.Mode.DATE);
+        edtBuyingPriceSplitMonths = view.findViewById(R.id.edt_buying_price_split_months);
+        chkAmortizeUntilNow = view.findViewById(R.id.chk_amortize_until_now);
         colorPreview = view.findViewById(R.id.btn_color);
         chkSuspended = view.findViewById(R.id.chk_suspend);
+        edtSuspendDate = new DateTimeInput(view.findViewById(R.id.edt_suspend_date), DateTimeInput.Mode.DATE);
+
+        edtPurchaseDate.applyOnClickListener(0, getParentFragmentManager());
+        edtSuspendDate.applyOnClickListener(1, getParentFragmentManager());
+
+        chkAmortizeUntilNow.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            view.findViewById(R.id.edt_buying_price_split_months_input_layout).setEnabled(!isChecked);
+            if (isChecked) {
+                edtBuyingPriceSplitMonths.setText("");
+            }
+        });
 
         lstTanks = view.findViewById(R.id.lst_tanks);
         btnAddTank = view.findViewById(R.id.btn_add_tank);
@@ -168,9 +188,29 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
                 edtInitialMileage.setText(String.valueOf(carEntity.getInitialMileage()));
                 edtNumTires.setText(String.valueOf(carEntity.getNumTires()));
                 edtBuyingPrice.setText(String.valueOf(carEntity.getBuyingPrice()));
+                if (carEntity.getBuyingPriceSplitMonths() == -1) {
+                    chkAmortizeUntilNow.setChecked(true);
+                } else {
+                    edtBuyingPriceSplitMonths.setText(String.valueOf(carEntity.getBuyingPriceSplitMonths()));
+                }
+                edtPurchaseDate.setDate(carEntity.getPurchaseDate() != null ? carEntity.getPurchaseDate() : new Date());
                 ViewCompat.setBackgroundTintList(colorPreview, ColorStateList.valueOf(carEntity.getColor()));
                 chkSuspended.setChecked(carEntity.getSuspendedSince() != null);
+                edtSuspendDate.setDate(carEntity.getSuspendedSince() != null ? carEntity.getSuspendedSince() : new Date());
             }
+        });
+
+        getParentFragmentManager().setFragmentResultListener(DatePickerDialogFragment.REQUEST_KEY, getViewLifecycleOwner(), (requestKey, result) -> {
+            int requestCode = result.getInt(DatePickerDialogFragment.RESULT_REQUEST_CODE);
+            if (requestCode == 0) {
+                edtPurchaseDate.setDate(new Date(result.getLong(DatePickerDialogFragment.RESULT_DATE)));
+            } else if (requestCode == 1) {
+                edtSuspendDate.setDate(new Date(result.getLong(DatePickerDialogFragment.RESULT_DATE)));
+            }
+        });
+
+        chkSuspended.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            view.findViewById(R.id.edt_suspend_date_input_layout).setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
         viewModel.getTanks().observe(getViewLifecycleOwner(), tanks -> {
@@ -291,10 +331,20 @@ public class DataDetailCarFragment extends AbstractDataDetailFragment {
             car.setBuyingPrice(0);
         }
 
-        if (chkSuspended.isChecked()) {
-            if (car.getSuspendedSince() == null) {
-                car.setSuspendedSince(new Date());
+        try {
+            if (chkAmortizeUntilNow.isChecked()) {
+                car.setBuyingPriceSplitMonths(-1);
+            } else {
+                car.setBuyingPriceSplitMonths(Integer.parseInt(edtBuyingPriceSplitMonths.getText().toString()));
             }
+        } catch (NumberFormatException e) {
+            car.setBuyingPriceSplitMonths(0);
+        }
+
+        car.setPurchaseDate(edtPurchaseDate.getDate());
+
+        if (chkSuspended.isChecked()) {
+            car.setSuspendedSince(edtSuspendDate.getDate());
         } else {
             car.setSuspendedSince(null);
         }

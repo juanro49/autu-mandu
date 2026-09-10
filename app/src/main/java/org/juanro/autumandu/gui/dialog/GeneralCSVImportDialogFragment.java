@@ -21,6 +21,7 @@ import static org.juanro.autumandu.AutuManduApplication.recreateAllActivities;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -121,6 +122,7 @@ public class GeneralCSVImportDialogFragment extends DialogFragment {
                             final String toastMessage = String.format(Locale.getDefault(), getString(R.string.toast_import_csv_general_result), result.getSuccessCount(), result.getFailedCount())
                                     + (result.getFailedCount() > 0 ? "\n\n" + result.getErrorSummary() : "");
 
+                            Log.i(TAG, toastMessage);
                             Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
                             recreateAllActivities();
                             requireActivity().finish();

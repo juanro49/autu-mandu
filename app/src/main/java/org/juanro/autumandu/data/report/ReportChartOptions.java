@@ -15,21 +15,26 @@
  */
 package org.juanro.autumandu.data.report;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 /**
  * Encapsulates the configuration options for a report chart.
  */
 public class ReportChartOptions {
     private boolean mShowTrend;
     private boolean mShowOverallTrend;
+    private boolean mShowInvestment;
     private int mChartOption;
 
     public ReportChartOptions() {
-        this(false, false, 0);
+        this(false, false, true, 0);
     }
 
-    public ReportChartOptions(boolean showTrend, boolean showOverallTrend, int chartOption) {
+    public ReportChartOptions(boolean showTrend, boolean showOverallTrend, boolean showInvestment, int chartOption) {
         mShowTrend = showTrend;
         mShowOverallTrend = showOverallTrend;
+        mShowInvestment = showInvestment;
         mChartOption = chartOption;
     }
 
@@ -45,6 +50,10 @@ public class ReportChartOptions {
         return mShowOverallTrend;
     }
 
+    public boolean isShowInvestment() {
+        return mShowInvestment;
+    }
+
     public void setChartOption(int chartOption) {
         mChartOption = chartOption;
     }
@@ -55,5 +64,28 @@ public class ReportChartOptions {
 
     public void setShowOverallTrend(boolean showOverallTrend) {
         mShowOverallTrend = showOverallTrend;
+    }
+
+    public void setShowInvestment(boolean showInvestment) {
+        mShowInvestment = showInvestment;
+    }
+
+    public static ReportChartOptions load(Context context, String reportName) {
+        var prefs = context.getSharedPreferences("org.juanro.autumandu.gui.fragment.ReportFragment", Context.MODE_PRIVATE);
+        var options = new ReportChartOptions();
+        options.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
+        options.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
+        options.setShowInvestment(prefs.getBoolean(reportName + "_show_investment", true));
+        options.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
+        return options;
+    }
+
+    public void save(Context context, String reportName) {
+        var prefsEdit = context.getSharedPreferences("org.juanro.autumandu.gui.fragment.ReportFragment", Context.MODE_PRIVATE).edit();
+        prefsEdit.putBoolean(reportName + "_show_trend", isShowTrend());
+        prefsEdit.putBoolean(reportName + "_show_overall_trend", isShowOverallTrend());
+        prefsEdit.putBoolean(reportName + "_show_investment", isShowInvestment());
+        prefsEdit.putInt(reportName + "_current_chart_option", getChartOption());
+        prefsEdit.apply();
     }
 }

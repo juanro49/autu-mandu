@@ -85,7 +85,12 @@
     <string name="label_color_in_reports">Color</string>
     <string name="label_suspend">Suspender</string>
     <string name="label_set_end_date">Establecer fecha fin</string>
+    <string name="label_split_cost">Dividir coste como gasto mensual</string>
+    <string name="hint_buying_price_split_months">Periodo de amortización (meses)</string>
+    <string name="hint_purchase_date">Fecha de compra</string>
+    <string name="label_amortize_until_now">Amortizar hasta hoy</string>
     <string name="label_set_trash_date">Establecer fecha eliminación</string>
+    <string name="menu_show_investment">Mostrar precio de compra</string>
     <string name="label_car">Vehículo</string>
     <string name="label_recurrence">Recurrencia</string>
     <string name="label_reminder_type">Tipo</string>

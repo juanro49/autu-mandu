@@ -211,6 +211,16 @@
                 android:hint="@string/hint_end_date" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/chk_split_price"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            android:text="@string/label_split_cost"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_end_date_input_layout"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
+
         <!-- Note -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/edt_note_input_layout"
@@ -220,7 +230,7 @@
             android:layout_marginTop="@dimen/margin_small"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edt_end_date_input_layout"
+            app:layout_constraintTop_toBottomOf="@id/chk_split_price"
             app:layout_constraintWidth_max="@dimen/input_field_max_width">
 
             <com.google.android.material.textfield.TextInputEditText

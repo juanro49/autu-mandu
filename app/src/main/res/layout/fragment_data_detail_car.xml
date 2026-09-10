@@ -150,6 +150,61 @@
                 android:inputType="number|numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Purchase Date -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_purchase_date_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_buying_price_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_purchase_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
+                android:hint="@string/hint_purchase_date" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Buying Price Split Months -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edt_buying_price_split_months_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_purchase_date_input_layout"
+            app:layout_constraintWidth_max="@dimen/input_field_max_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_buying_price_split_months"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/input_field_height_outlined"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
+                android:hint="@string/hint_buying_price_split_months"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/chk_amortize_until_now"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_field_height"
+            android:text="@string/label_amortize_until_now"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edt_buying_price_split_months_input_layout"
+            app:layout_constraintWidth_max="@dimen/button_max_width" />
+
         <!-- Tanks Header -->
         <TextView
             android:id="@+id/txt_section_tanks"
@@ -159,7 +214,7 @@
             android:text="@string/title_tanks"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edt_buying_price_input_layout"
+            app:layout_constraintTop_toBottomOf="@id/chk_amortize_until_now"
             app:layout_constraintWidth_max="@dimen/input_field_max_width" />
 
         <androidx.recyclerview.widget.RecyclerView

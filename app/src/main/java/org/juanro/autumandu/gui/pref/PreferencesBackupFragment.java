@@ -374,6 +374,7 @@ public class PreferencesBackupFragment extends PreferenceFragmentCompat {
                                             if (result.isSuccess()) {
                                                 String summary = getString(R.string.toast_import_carbudget_result,
                                                         result.getRefuelingCount(), result.getOtherCostCount(), result.getTireCount());
+                                                Log.i("PreferencesBackup", summary);
                                                 Toast.makeText(context, summary, Toast.LENGTH_LONG).show();
                                                 recreateAllActivities();
                                                 requireActivity().finish();

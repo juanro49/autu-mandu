@@ -30,6 +30,9 @@ import java.util.List;
 
 @Dao
 public interface TankDao {
+    @Query("SELECT * FROM tank")
+    List<Tank> getAll();
+
     @Query("SELECT * FROM tank WHERE car_id = :carId ORDER BY fuel_category ASC")
     List<Tank> getTanksForCar(long carId);
 

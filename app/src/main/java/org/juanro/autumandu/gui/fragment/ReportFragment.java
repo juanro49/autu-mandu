@@ -125,7 +125,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
                 return;
             }
 
-            var options = ReportAdapter.loadOptions(itemView.getContext(), report);
+            var options = ReportChartOptions.load(itemView.getContext(), report.getClass().getSimpleName());
             var rawData = report.getRawChartData(options.getChartOption());
 
             View kubitView;
@@ -145,7 +145,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
         private void showOptions(AbstractReport report, View v) {
             currentMenuReport = report;
-            var options = ReportAdapter.loadOptions(itemView.getContext(), report);
+            var options = ReportChartOptions.load(itemView.getContext(), report.getClass().getSimpleName());
 
             var popup = new PopupMenu(itemView.getContext(), v);
             popup.inflate(R.menu.report_options);
@@ -155,9 +155,15 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
             if (report instanceof OverallCostsReport) {
                 menu.removeItem(R.id.menu_show_trend);
                 menu.removeItem(R.id.menu_show_overall_trend);
+                menu.removeItem(R.id.menu_show_investment);
             } else {
                 menu.findItem(R.id.menu_show_trend).setChecked(options.isShowTrend());
                 menu.findItem(R.id.menu_show_overall_trend).setChecked(options.isShowOverallTrend());
+                if (report instanceof org.juanro.autumandu.data.report.CostsReport) {
+                    menu.findItem(R.id.menu_show_investment).setChecked(options.isShowInvestment());
+                } else {
+                    menu.removeItem(R.id.menu_show_investment);
+                }
             }
 
             var graphOptions = report.getAvailableChartOptions();
@@ -203,7 +209,7 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
             EXECUTOR.execute(() -> {
                 report.update();
-                var options = ReportAdapter.loadOptions(itemView.getContext(), report);
+                var options = ReportChartOptions.load(itemView.getContext(), report.getClass().getSimpleName());
                 var reportData = report.getData(true);
                 var rawData = report.getRawChartData(options.getChartOption());
                 boolean enoughData = !rawData.isEmpty();
@@ -324,28 +330,6 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
         public void setItems(List<AbstractReport> items) {
             submitList(items);
         }
-
-        public static ReportChartOptions loadOptions(Context context, AbstractReport report) {
-            var prefs = context.getSharedPreferences(ReportFragment.class.getName(), Context.MODE_PRIVATE);
-            var reportName = report.getClass().getSimpleName();
-
-            var options = new ReportChartOptions();
-            options.setShowTrend(prefs.getBoolean(reportName + "_show_trend", false));
-            options.setShowOverallTrend(prefs.getBoolean(reportName + "_show_overall_trend", false));
-            options.setChartOption(prefs.getInt(reportName + "_current_chart_option", 0));
-
-            return options;
-        }
-
-        public static void saveOptions(Context context, AbstractReport report, ReportChartOptions options) {
-            var prefsEdit = context.getSharedPreferences(ReportFragment.class.getName(), Context.MODE_PRIVATE).edit();
-            var reportName = report.getClass().getSimpleName();
-
-            prefsEdit.putBoolean(reportName + "_show_trend", options.isShowTrend());
-            prefsEdit.putBoolean(reportName + "_show_overall_trend", options.isShowOverallTrend());
-            prefsEdit.putInt(reportName + "_current_chart_option", options.getChartOption());
-            prefsEdit.apply();
-        }
     }
 
     private class ReportItemDecoration extends RecyclerView.ItemDecoration {
@@ -453,27 +437,33 @@ public class ReportFragment extends Fragment implements PopupMenu.OnMenuItemClic
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        var options = ReportAdapter.loadOptions(requireContext(), currentMenuReport);
+        var reportName = currentMenuReport.getClass().getSimpleName();
+        var options = ReportChartOptions.load(requireContext(), reportName);
+        boolean needsInvalidate = false;
+
         if (item.getItemId() == R.id.menu_show_trend) {
             options.setShowTrend(!item.isChecked());
         } else if (item.getItemId() == R.id.menu_show_overall_trend) {
             options.setShowOverallTrend(!item.isChecked());
+        } else if (item.getItemId() == R.id.menu_show_investment) {
+            options.setShowInvestment(!item.isChecked());
+            needsInvalidate = true;
         } else if (item.getGroupId() == R.id.group_graph) {
             options.setChartOption(item.getOrder());
+            needsInvalidate = true;
         }
 
-        ReportAdapter.saveOptions(requireContext(), currentMenuReport, options);
+        options.save(requireContext(), reportName);
 
-        int index = reportAdapter.getCurrentList().indexOf(currentMenuReport);
-        if (index != -1) {
-            reportAdapter.notifyItemChanged(index);
-        } else {
-            List<AbstractReport> currentList = reportAdapter.getCurrentList();
-            for (int i = 0; i < currentList.size(); i++) {
-                if (currentList.get(i).getClass().equals(currentMenuReport.getClass())) {
-                    reportAdapter.notifyItemChanged(i);
-                    break;
+        List<AbstractReport> currentList = reportAdapter.getCurrentList();
+        for (int i = 0; i < currentList.size(); i++) {
+            AbstractReport report = currentList.get(i);
+            if (report.getClass().equals(currentMenuReport.getClass())) {
+                if (needsInvalidate) {
+                    report.invalidate();
                 }
+                reportAdapter.notifyItemChanged(i);
+                break;
             }
         }
 
