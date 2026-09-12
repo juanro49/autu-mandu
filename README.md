@@ -24,6 +24,7 @@ The following options are currently included:
 - [x] Tire management
 - [x] Costs in general
 - [x] Trip journal
+- [x] Electric an hybrid cars
 - [x] Stations map with price (via recommended app [Carburoid](https://github.com/vokimon/carburoid))
 - [x] Import data from [CarBudget](https://github.com/condo4/carbudget) (SailfishOS)
 
