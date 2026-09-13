@@ -456,4 +456,5 @@
     <string name="toast_import_carbudget_result">Zaimportowano: %1$d tankowań, %2$d innych kosztów i %3$d kompletów opon.</string>
     <string name="toast_import_carbudget_failed">Błąd importu z CarBudget: %s</string>
     <string name="label_show_levels">Oblicz na podstawie stanu paliwa, jeśli ilość jest nieznana</string>
+    <string name="drawer_reminders">Przypomnienia</string>
 </resources>
