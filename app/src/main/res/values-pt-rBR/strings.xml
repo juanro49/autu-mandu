@@ -212,7 +212,7 @@
     <string name="pref_title_exportcsv">Exportar CSV</string>
     <string name="pref_title_importcsv">Importar CSV</string>
     <string name="pref_summary_behavior_show_car_menu">Se tiver mais de um carro, mostra um menu para escolher em qual deles um  abastecimento será adicionado.</string>
-    <string name="pref_summary_behavior_auto_guess_missing_data">Tentar identificar os abastecimentos não cadastrados. Isso vai equilibrar os consumos de combustível significativamente mais baixos, que ocorrem quando você esqueçe de inserir um abastecimento.</string>
+    <string name="pref_summary_behavior_auto_guess_missing_data">Tentar identificar os abastecimentos não cadastrados. Isso vai equilibrar os consumos de combustível significativamente mais baixos, que ocorrem quando você esquece de inserir um abastecimento.</string>
     <string name="pref_summary_sync_setup">Pode resultar em perda de dados quando utilizado por mais de uma pessoa. A sincronização sempre substituirá todos os dados. Use a mesma versão do Autu Mandu em todos os dispositivos.</string>
     <string name="pref_summary_sync_current_provider">Conectado com %s. Clique para desconectar. A sincronização poderá resultar em perda de dados quando feita por mais de uma pessoa.</string>
     <string name="pref_summary_backup">Faça backup dos dados atuais para o armazenamento local.</string>
@@ -452,4 +452,23 @@
     <string name="toast_import_carbudget_failed">Erro ao importar do CarBudget: %s</string>
     <string name="pref_default_backup_path_restored">Caminho de backup padrão restaurado:</string>
     <string name="chart_content_description_line">Gráfico de linha de tendência</string>
+    <string name="label_split_cost">Dividir custo como gasto mensal</string>
+    <string name="hint_buying_price_split_months">Período de amortização (meses)</string>
+    <string name="hint_purchase_date">Data de compra</string>
+    <string name="label_amortize_until_now">Amortizar até hoje</string>
+    <string name="menu_show_investment">Exibir preço de compra</string>
+    <string name="label_tank">Tanque</string>
+    <string name="label_trip_is_partial">Viagem parcial (apenas dados iniciais)</string>
+    <string name="trip_partial_badge">Parcial</string>
+    <string name="hint_start_level">Nível inicial (%)</string>
+    <string name="hint_end_level">Nível final (%)</string>
+    <string name="precision_warning">Nota: Inserir o volume direto da bomba/carregador é mais preciso do que usar porcentagens.</string>
+    <string name="learn_capacity_title">Nova Capacidade do Tanque</string>
+    <string name="learn_capacity_message">Baseado na sua entrada, a capacidade calculada para este tanque é %.2f %s. Você deseja salvar?</string>
+    <string name="label_is_manually_set">Capacidade definida manualmente</string>
+    <string name="title_tanks">Tanques</string>
+    <string name="menu_add_tank">Adicionar tanque</string>
+    <string name="hint_tank_capacity">Capacidade</string>
+    <string name="validate_error_volume_exceeds_capacity">Volume não pode ser maior que a capacidade do tanque (%1$.2f %2$s)</string>
+    <string name="label_show_levels">Calcular dos níveis se o volume é desconhecido</string>
 </resources>
