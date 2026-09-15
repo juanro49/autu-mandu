@@ -438,4 +438,5 @@
     <string name="toast_import_carbudget_success">从 CarBudget 导入成功。</string>
     <string name="toast_import_carbudget_result">已导入 %1$d 条加油记录、%2$d 条其他费用和 %3$d 个轮胎组。</string>
     <string name="toast_import_carbudget_failed">从 CarBudget 导入出错：%s</string>
+    <string name="hint_purchase_date">购买日期</string>
 </resources>
