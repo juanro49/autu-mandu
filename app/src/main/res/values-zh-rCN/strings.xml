@@ -439,4 +439,22 @@
     <string name="toast_import_carbudget_result">已导入 %1$d 条加油记录、%2$d 条其他费用和 %3$d 个轮胎组。</string>
     <string name="toast_import_carbudget_failed">从 CarBudget 导入出错：%s</string>
     <string name="hint_purchase_date">购买日期</string>
+    <string name="label_split_cost">将购车费用按月分摊</string>
+    <string name="hint_buying_price_split_months">分摊期限（月）</string>
+    <string name="label_amortize_until_now">分摊至今</string>
+    <string name="menu_show_investment">显示购入价格</string>
+    <string name="label_tank">油箱</string>
+    <string name="label_trip_is_partial">部分行程（仅有起始数据）</string>
+    <string name="trip_partial_badge">部分</string>
+    <string name="hint_start_level">起始油量（%）</string>
+    <string name="hint_end_level">结束油量（%）</string>
+    <string name="precision_warning">提示：直接输入加油机/充电桩显示的加油量，会比使用百分比更精确。</string>
+    <string name="learn_capacity_title">新的油箱容量</string>
+    <string name="learn_capacity_message">根据您输入的数据，计算得出该油箱的容量为 %.2f %s。是否要保存？</string>
+    <string name="label_is_manually_set">手动设置容量</string>
+    <string name="title_tanks">油箱</string>
+    <string name="menu_add_tank">添加油箱</string>
+    <string name="hint_tank_capacity">容量</string>
+    <string name="validate_error_volume_exceeds_capacity">加油量不能超过油箱容量（%1$.2f %2$s）</string>
+    <string name="label_show_levels">若加油量未知，则按油量百分比计算</string>
 </resources>
