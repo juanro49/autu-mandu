@@ -106,6 +106,7 @@
         <item>@string/language_ta</item>
         <item>@string/language_tr</item>
         <item>@string/language_uk</item>
+        <item>@string/language_zh_cn</item>
     </string-array>
 
     <string-array name="language_values">
@@ -133,5 +134,6 @@
         <item>ta</item>
         <item>tr</item>
         <item>uk</item>
+        <item>zh-CN</item>
     </string-array>
 </resources>
