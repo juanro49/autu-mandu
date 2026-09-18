@@ -114,6 +114,7 @@
     <string name="validate_error_fuel_type_exists">Este tipo de combustible ya existe.</string>
     <string name="validate_error_station_exists">Esta estación ya existe.</string>
     <string name="validate_error_volume_exceeds_capacity">El volumen no puede ser mayor que la capacidad del tanque (%1$.2f %2$s)</string>
+    <string name="validate_error_no_tank_for_category">No se encontró ningún tanque para la categoría %1$s. Por favor, revisa la configuración del vehículo y las categorías de los tipos de combustible.</string>
     <string name="validate_error_webdav_invalid_certificate">No se pudo confiar en el certificado. Parece inválido.</string>
     <string name="suspended">Suspendido</string>
     <string name="suspended_since">Suspendido desde %s</string>

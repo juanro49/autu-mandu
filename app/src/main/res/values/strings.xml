@@ -133,6 +133,7 @@
     <string name="validate_error_fuel_type_exists">This fuel type does already exist.</string>
     <string name="validate_error_station_exists">This station does already exist.</string>
     <string name="validate_error_volume_exceeds_capacity">Volume cannot be greater than tank capacity (%1$.2f %2$s)</string>
+    <string name="validate_error_no_tank_for_category">No tank found for category %1$s. Please check car configuration and fuel type categories.</string>
     <string name="validate_error_webdav_invalid_certificate">The certificate could not be trusted. It seems invalid.</string>
     <string name="suspended">Suspended</string>
     <string name="suspended_since">Suspended since %s</string>

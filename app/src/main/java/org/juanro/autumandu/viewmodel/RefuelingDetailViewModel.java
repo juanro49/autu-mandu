@@ -196,10 +196,36 @@ public class RefuelingDetailViewModel extends ViewModel {
             refueling.setDate(params.date());
             refueling.setPartial(params.partial());
             refueling.setNote(params.note());
-            refueling.setFuelTypeId(params.fuelTypeId());
-            refueling.setStationId(params.stationId());
-            refueling.setCarId(params.carId());
-            refueling.setTankId(params.tankId());
+
+            // Fallbacks for invalid IDs (can happen if spinners are still loading)
+            long fuelTypeId = params.fuelTypeId();
+            if (fuelTypeId <= 0) {
+                List<FuelType> all = fuelTypeDao.getAll();
+                if (!all.isEmpty()) fuelTypeId = all.get(0).getId();
+            }
+            refueling.setFuelTypeId(fuelTypeId);
+
+            long stationId = params.stationId();
+            if (stationId <= 0) {
+                List<Station> all = stationDao.getAll();
+                if (!all.isEmpty()) stationId = all.get(0).getId();
+            }
+            refueling.setStationId(stationId);
+
+            long carId = params.carId();
+            if (carId <= 0) {
+                List<Car> all = carDao.getAll();
+                if (!all.isEmpty()) carId = all.get(0).getId();
+            }
+            refueling.setCarId(carId);
+
+            long tankId = params.tankId();
+            if (tankId <= 0) {
+                List<Tank> all = tankDao.getTanksForCar(carId);
+                if (!all.isEmpty()) tankId = all.get(0).getId();
+            }
+            refueling.setTankId(tankId);
+
             refueling.setStartLevel(params.startLevel());
             refueling.setEndLevel(params.endLevel());
 
@@ -209,7 +235,7 @@ public class RefuelingDetailViewModel extends ViewModel {
                     refueling.setPrice(params.priceInput());
                 }
                 case PER_UNIT_AND_TOTAL -> {
-                    refueling.setVolume(params.priceInput() / params.volumeInput());
+                    refueling.setVolume(params.volumeInput() != 0 ? params.priceInput() / params.volumeInput() : 0);
                     refueling.setPrice(params.priceInput());
                 }
                 case PER_UNIT_AND_VOLUME -> {
@@ -219,7 +245,11 @@ public class RefuelingDetailViewModel extends ViewModel {
             }
 
             checkLearning(refueling);
-            save(refueling, params.onSaved());
+
+            // Final check to avoid FOREIGN KEY exception
+            if (refueling.getFuelTypeId() > 0 && refueling.getCarId() > 0 && refueling.getTankId() > 0 && refueling.getStationId() > 0) {
+                save(refueling, params.onSaved());
+            }
         });
     }
 

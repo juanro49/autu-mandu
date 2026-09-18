@@ -668,6 +668,17 @@ public class DataDetailRefuelingFragment extends AbstractDataDetailFragment {
             }
         }
 
+        // Ensure a tank is selected to avoid FOREIGN KEY exception
+        if (selectedTank == null) {
+            FuelType selectedType = (FuelType) spnFuelType.getSelectedItem();
+            String category = selectedType != null ? FuelCategory.fromKey(selectedType.getCategory()).getName(requireContext()) : "";
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(getString(R.string.validate_error_no_tank_for_category, category))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+            valid = false;
+        }
+
         return valid;
     }
 
