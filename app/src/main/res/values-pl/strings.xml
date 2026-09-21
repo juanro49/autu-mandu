@@ -457,4 +457,5 @@
     <string name="toast_import_carbudget_failed">Błąd importu z CarBudget: %s</string>
     <string name="label_show_levels">Oblicz na podstawie stanu paliwa, jeśli ilość jest nieznana</string>
     <string name="drawer_reminders">Przypomnienia</string>
+    <string name="validate_error_no_tank_for_category">Brak zbiornika dla kategorii %1$s. Proszę sprawdzić konfigurację pojazdu i przypisane rodzaje paliwa.</string>
 </resources>
