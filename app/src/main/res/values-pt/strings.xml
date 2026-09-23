@@ -456,4 +456,9 @@
     <string name="toast_import_carbudget_result">Foram importados %1$d reabastecimentos, %2$d outros custos e %3$d conjunto de pneus.</string>
     <string name="toast_import_carbudget_failed">Erro ao importar do CarBudget: %s</string>
     <string name="label_show_levels">Calcular dos níveis se o volume é desconhecido</string>
+    <string name="fuel_category_diesel">Gasóleo</string>
+    <string name="hint_trip_km_business">KM a negócios</string>
+    <string name="hint_trip_km_private">KM particulares</string>
+    <string name="hint_trip_km_home_work">KM casa-trabalho</string>
+    <string name="validate_error_sum_km_mismatch">Soma dos km categorizados devem corresponder a distância total (%1$d%2$s)</string>
 </resources>
