@@ -471,4 +471,5 @@
     <string name="hint_tank_capacity">Capacidade</string>
     <string name="validate_error_volume_exceeds_capacity">Volume não pode ser maior que a capacidade do tanque (%1$.2f %2$s)</string>
     <string name="label_show_levels">Calcular dos níveis se o volume é desconhecido</string>
+    <string name="validate_error_no_tank_for_category">Nenhum tanque encontrado para categoria %1$s. Por favor verifque a configuração do carro e de categorias de combustível.</string>
 </resources>
